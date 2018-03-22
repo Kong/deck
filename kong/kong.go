@@ -1,7 +1,11 @@
 package kong
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -29,6 +33,33 @@ func New(client *http.Client) *Kong {
 	return kong
 }
 
-func (k *Kong) Do() {
-	fmt.Println("Kong.Do()")
+func (k *Kong) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	var err error
+	if req == nil {
+		return nil, errors.New("Request object cannot be nil")
+	}
+	//Make the request
+	rawResp, err := k.client.Do(req)
+	return rawResp, err
+}
+
+func (k *Kong) Status() {
+
+	req, err := http.NewRequest("GET", "http://localhost:8001/status", nil)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	ctx := context.Background()
+
+	res, err := k.Do(ctx, req)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer res.Body.Close()
+	buf, err := ioutil.ReadAll(res.Body)
+
+	fmt.Println(string(buf))
 }
