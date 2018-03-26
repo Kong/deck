@@ -1,14 +1,18 @@
 package kong
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
+
+	"github.com/google/go-querystring/query"
 )
+
+const defaultBaseURL = "http://localhost:8001"
 
 type service struct {
 	client *Client
@@ -18,7 +22,7 @@ type service struct {
 // Kong cluster
 type Client struct {
 	client  *http.Client
-	BaseURL *url.URL
+	baseURL string
 	common  service
 	Sample  *SampleService
 }
@@ -45,17 +49,56 @@ type Status struct {
 	} `json:"server"`
 }
 
+func (c *Client) newRequest(method, endpoint string, qs interface{},
+	body interface{}) (*http.Request, error) {
+	// TODO introduce method as a type, method as string
+	// in http package is doomsday
+	if endpoint == "" {
+		return nil, errors.New("endpoint can't be nil")
+	}
+	//TODO verify endpoint is preceded with /
+
+	//body to be sent in JSON
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	//Create a new request
+	req, err := http.NewRequest(method, c.baseURL+endpoint,
+		bytes.NewBuffer(buf))
+
+	if err != nil {
+		return nil, err
+	}
+	//Add query string if any
+	if qs != nil {
+		values, err := query.Values(qs)
+		if err != nil {
+			return nil, err
+		}
+		req.URL.RawQuery = values.Encode()
+	}
+	return req, nil
+}
+
 // NewClient returns a Client which talks to Admin API of Kong
-func NewClient(client *http.Client) *Client {
+func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	if client == nil {
 		client = http.DefaultClient
 	}
 	kong := new(Client)
 	kong.client = client
+	if baseURL != nil {
+		//TODO validate URL
+		kong.baseURL = *baseURL
+	} else {
+		kong.baseURL = defaultBaseURL
+	}
 	kong.common.client = kong
 	kong.Sample = (*SampleService)(&kong.common)
 
-	return kong
+	return kong, nil
 }
 
 func newResponse(res *http.Response) *Response {
@@ -63,7 +106,8 @@ func newResponse(res *http.Response) *Response {
 }
 
 // Do executes a HTTP request and returns a response
-func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
+func (c *Client) Do(ctx context.Context, req *http.Request,
+	v interface{}) (*Response, error) {
 	var err error
 	if req == nil {
 		return nil, errors.New("Request object cannot be nil")
@@ -84,7 +128,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	}()
 	response := newResponse(resp)
 
-	//TODO check for response
+	//TODO check for response errors
 
 	// response
 	if v != nil {
@@ -106,7 +150,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 // Status returns the status of a Kong node
 func (c *Client) Status() (*Status, error) {
 
-	req, err := http.NewRequest("GET", "http://localhost:8001/status", nil)
+	req, err := c.newRequest("GET", "/status", nil, nil)
 	if err != nil {
 		log.Println(err)
 		return nil, err
