@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -82,6 +83,14 @@ func (c *Client) newRequest(method, endpoint string, qs interface{},
 	return req, nil
 }
 
+func hasError(res *http.Response) error {
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return nil
+	}
+	body, _ := ioutil.ReadAll(res.Body) // TODO error in error?
+	return errors.New(res.Status + " " + string(body))
+}
+
 // NewClient returns a Client which talks to Admin API of Kong
 func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	if client == nil {
@@ -118,6 +127,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	if err != nil {
 		return nil, err
 	}
+	///check for API errors
+	if err = hasError(resp); err != nil {
+		return nil, err
+	}
 	// Call Close on exit
 	defer func() {
 		var e error
@@ -127,8 +140,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 		}
 	}()
 	response := newResponse(resp)
-
-	//TODO check for response errors
 
 	// response
 	if v != nil {
