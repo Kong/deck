@@ -28,12 +28,6 @@ type Client struct {
 	Sample  *SampleService
 }
 
-// Response is a Kong Admin API response. It wraps http.Response.
-type Response struct {
-	*http.Response
-	//other Kong specific fields
-}
-
 // Status respresents current status of a Kong node.
 type Status struct {
 	Database struct {
@@ -48,47 +42,6 @@ type Status struct {
 		ConnectionsWriting  int `json:"connections_writing"`
 		TotalRequests       int `json:"total_requests"`
 	} `json:"server"`
-}
-
-func (c *Client) newRequest(method, endpoint string, qs interface{},
-	body interface{}) (*http.Request, error) {
-	// TODO introduce method as a type, method as string
-	// in http package is doomsday
-	if endpoint == "" {
-		return nil, errors.New("endpoint can't be nil")
-	}
-	//TODO verify endpoint is preceded with /
-
-	//body to be sent in JSON
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	//Create a new request
-	req, err := http.NewRequest(method, c.baseURL+endpoint,
-		bytes.NewBuffer(buf))
-
-	if err != nil {
-		return nil, err
-	}
-	//Add query string if any
-	if qs != nil {
-		values, err := query.Values(qs)
-		if err != nil {
-			return nil, err
-		}
-		req.URL.RawQuery = values.Encode()
-	}
-	return req, nil
-}
-
-func hasError(res *http.Response) error {
-	if res.StatusCode >= 200 && res.StatusCode <= 299 {
-		return nil
-	}
-	body, _ := ioutil.ReadAll(res.Body) // TODO error in error?
-	return errors.New(res.Status + " " + string(body))
 }
 
 // NewClient returns a Client which talks to Admin API of Kong
@@ -108,10 +61,6 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Sample = (*SampleService)(&kong.common)
 
 	return kong, nil
-}
-
-func newResponse(res *http.Response) *Response {
-	return &Response{Response: res}
 }
 
 // Do executes a HTTP request and returns a response
