@@ -1,0 +1,23 @@
+dist: trusty
+sudo: true
+
+language: go
+
+notifications:
+  email: false
+
+addons:
+  postgresql: "9.4"
+
+before_script:
+
+before_install:
+  - psql -c 'create database kong;' -U postgres
+  - psql -c 'create user kong;' -U postgres
+  - psql -c 'GRANT ALL PRIVILEGES ON DATABASE "kong" to kong;' -U postgres
+
+install:
+  - bash .ci/setup_kong.sh
+  - go get -u github.com/golang/dep/cmd/dep
+  - dep ensure
+
