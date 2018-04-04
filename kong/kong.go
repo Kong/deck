@@ -1,16 +1,12 @@
 package kong
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/google/go-querystring/query"
 )
 
 const defaultBaseURL = "http://localhost:8001"
