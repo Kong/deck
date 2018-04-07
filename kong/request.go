@@ -27,6 +27,9 @@ func (c *Client) newRequest(method, endpoint string, qs interface{},
 	//Create a new request
 	req, err := http.NewRequest(method, c.baseURL+endpoint,
 		bytes.NewBuffer(buf))
+	if body != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	if err != nil {
 		return nil, err
