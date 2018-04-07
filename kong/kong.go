@@ -15,6 +15,10 @@ type service struct {
 	client *Client
 }
 
+var (
+	defaultCtx = context.Background()
+)
+
 // Client talks to the Admin API or control plane of a
 // Kong cluster
 type Client struct {
@@ -66,6 +70,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	if req == nil {
 		return nil, errors.New("Request object cannot be nil")
 	}
+	if ctx == nil {
+		ctx = defaultCtx
+	}
 	req = req.WithContext(ctx)
 	//Make the request
 	resp, err := c.client.Do(req)
@@ -104,14 +111,13 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 }
 
 // Status returns the status of a Kong node
-func (c *Client) Status() (*Status, error) {
+func (c *Client) Status(ctx context.Context) (*Status, error) {
 
 	req, err := c.newRequest("GET", "/status", nil, nil)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	ctx := context.Background()
 
 	var s Status
 	_, err = c.Do(ctx, req, &s)

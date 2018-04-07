@@ -13,7 +13,7 @@ func TestKongStatus(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(client)
 
-	status, err := client.Status()
+	status, err := client.Status(nil)
 	assert.Nil(err)
 	assert.NotNil(status)
 }

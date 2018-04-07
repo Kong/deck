@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	status, err := client.Status()
+	status, err := client.Status(nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
