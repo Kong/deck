@@ -1,7 +1,6 @@
 package kong
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,8 +19,10 @@ func TestAPISeviceCreate(T *testing.T) {
 		UpstreamURL: String("https://google.com"),
 	}
 
-	createdAPI, err := client.APIService.Create(context.Background(), api)
+	createdAPI, err := client.APIService.Create(defaultCtx, api)
 	assert.Nil(err)
 	assert.NotNil(createdAPI)
 
+	err = client.APIService.Delete(defaultCtx, createdAPI.ID)
+	assert.Nil(err)
 }

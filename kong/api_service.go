@@ -2,6 +2,8 @@ package kong
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 )
 
@@ -23,4 +25,21 @@ func (s *APIService) Create(ctx context.Context, api *API) (*API, error) {
 		return nil, err
 	}
 	return &createdAPI, nil
+}
+
+// Delete deletes an API in Kong
+func (s *APIService) Delete(ctx context.Context, nameOrID *string) error {
+
+	if nameOrID == nil {
+		return errors.New("nameOrID cannot be nil for Delete operation")
+	}
+
+	endpoint := fmt.Sprintf("/apis/%v", *nameOrID)
+	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	return err
 }
