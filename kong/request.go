@@ -18,6 +18,11 @@ func (c *Client) newRequest(method, endpoint string, qs interface{},
 	}
 	//TODO verify endpoint is preceded with /
 
+	validator, ok := body.(Validator)
+	if ok && !validator.Valid() {
+		return nil, errors.New("validation on entity in the request failed")
+	}
+
 	//body to be sent in JSON
 	buf, err := json.Marshal(body)
 	if err != nil {
