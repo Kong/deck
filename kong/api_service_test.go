@@ -14,15 +14,10 @@ func TestAPISeviceCreate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(client)
 
-	var uris []*string
-	uri := string("/test")
-	uris = append(uris, &uri)
-	name := "test"
-	url := "https://google.com"
 	api := &API{
-		URIs:        uris,
-		Name:        &name,
-		UpstreamURL: &url,
+		URIs:        []*string{String("/test")},
+		Name:        String("test"),
+		UpstreamURL: String("https://google.com"),
 	}
 
 	createdAPI, err := client.APIService.Create(context.Background(), api)
