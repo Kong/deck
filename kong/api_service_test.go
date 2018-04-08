@@ -27,6 +27,13 @@ func TestAPISeviceCreate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(api)
 
+	api.Methods = []*string{String("GET")}
+	api, err = client.APIService.Update(defaultCtx, api)
+	assert.Nil(err)
+	assert.NotNil(api)
+	assert.Equal(1, len(api.Methods))
+	assert.Equal("GET", *api.Methods[0])
+
 	err = client.APIService.Delete(defaultCtx, createdAPI.ID)
 	assert.Nil(err)
 }

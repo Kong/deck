@@ -48,6 +48,28 @@ func (s *APIService) Get(ctx context.Context, nameOrID *string) (*API, error) {
 	return &api, nil
 }
 
+// Update updates an API in Kong
+func (s *APIService) Update(ctx context.Context, api *API) (*API, error) {
+
+	if api.ID == nil {
+		return nil, errors.New("ID cannot be nil for Update operation")
+	}
+
+	endpoint := fmt.Sprintf("/apis/%v", *api.ID)
+	req, err := s.client.newRequest("PATCH", endpoint, nil, api)
+	if err != nil {
+		return nil, err
+	}
+
+	var updatedAPI API
+	_, err = s.client.Do(ctx, req, &updatedAPI)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return &updatedAPI, nil
+}
+
 // Delete deletes an API in Kong
 func (s *APIService) Delete(ctx context.Context, nameOrID *string) error {
 
