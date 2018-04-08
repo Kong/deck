@@ -27,6 +27,27 @@ func (s *APIService) Create(ctx context.Context, api *API) (*API, error) {
 	return &createdAPI, nil
 }
 
+// Get fetches an API in Kong.
+func (s *APIService) Get(ctx context.Context, nameOrID *string) (*API, error) {
+
+	if nameOrID == nil {
+		return nil, errors.New("nameOrID cannot be nil for Get operation")
+	}
+
+	endpoint := fmt.Sprintf("/apis/%v", *nameOrID)
+	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var api API
+	_, err = s.client.Do(ctx, req, &api)
+	if err != nil {
+		return nil, err
+	}
+	return &api, nil
+}
+
 // Delete deletes an API in Kong
 func (s *APIService) Delete(ctx context.Context, nameOrID *string) error {
 

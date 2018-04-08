@@ -23,6 +23,10 @@ func TestAPISeviceCreate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdAPI)
 
+	api, err = client.APIService.Get(defaultCtx, createdAPI.ID)
+	assert.Nil(err)
+	assert.NotNil(api)
+
 	err = client.APIService.Delete(defaultCtx, createdAPI.ID)
 	assert.Nil(err)
 }
