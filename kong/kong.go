@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/http/httputil"
+	"os"
 )
 
 const defaultBaseURL = "http://localhost:8001"
@@ -26,6 +28,8 @@ type Client struct {
 	baseURL    string
 	common     service
 	APIService *APIService
+	logger     io.Writer
+	debug      bool
 }
 
 // Status respresents current status of a Kong node.
@@ -60,6 +64,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.common.client = kong
 	kong.APIService = (*APIService)(&kong.common)
 
+	kong.logger = os.Stderr
 	return kong, nil
 }
 
@@ -74,11 +79,19 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 		ctx = defaultCtx
 	}
 	req = req.WithContext(ctx)
+
+	// log the request
+	c.logRequest(req)
+
 	//Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
+
+	// log the response
+	c.logResponse(resp)
+
 	///check for API errors
 	if err = hasError(resp); err != nil {
 		return nil, err
@@ -108,6 +121,45 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 		}
 	}
 	return response, err
+}
+
+// SetDebugMode enables or disables logging of
+// the request to the logger set by SetLogger().
+// By default, debug logging is disabled.
+func (c *Client) SetDebugMode(enableDebug bool) {
+	c.debug = enableDebug
+}
+
+func (c *Client) logRequest(r *http.Request) error {
+	if !c.debug {
+		return nil
+	}
+	dump, err := httputil.DumpRequestOut(r, true)
+	if err != nil {
+		return err
+	}
+	_, err = c.logger.Write(dump)
+	return err
+}
+
+func (c *Client) logResponse(r *http.Response) error {
+	if !c.debug {
+		return nil
+	}
+	dump, err := httputil.DumpResponse(r, true)
+	if err != nil {
+		return err
+	}
+	_, err = c.logger.Write(dump)
+	return err
+}
+
+// SetLogger sets the debug logger, defaults to os.StdErr
+func (c *Client) SetLogger(w io.Writer) {
+	if w == nil {
+		return
+	}
+	c.logger = w
 }
 
 // Status returns the status of a Kong node
