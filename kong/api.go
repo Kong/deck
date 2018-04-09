@@ -19,3 +19,22 @@ type API struct {
 	UpstreamSendTimeout    *int      `json:"upstream_send_timeout,omitempty"`
 	UpstreamURL            *string   `json:"upstream_url"`
 }
+
+// Valid checks if all the fields in API are valid
+func (api *API) Valid() bool {
+	if isEmptyString(api.Name) || isEmptyString(api.UpstreamURL) {
+		return false
+	}
+	if len(api.Hosts) == 0 && len(api.Methods) == 0 && len(api.URIs) == 0 {
+		return false
+	}
+	// TODO
+	// TODO name must only contain alphanumeric and '., -, _, ~' characters
+	// TODO check upstreamurl by parsing
+	// TODO check methods are valid http methods
+	// TODO check URIs starts with /
+	// TODO all timeouts must be an integer between 1 and 2147483647
+	// TODO "retries": "must be an integer between 0 and 32767"
+	// TODO strip all of them
+	return true
+}
