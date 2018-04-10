@@ -14,7 +14,7 @@ func TestConsumerValid(T *testing.T) {
 		CustomID: String("foo"),
 		Username: String("bar"),
 	}
-	assert.Equal(false, c.Valid())
+	assert.Equal(true, c.Valid())
 
 	c = &Consumer{
 		CustomID: String(""),

@@ -16,7 +16,7 @@ func (c *Consumer) Valid() bool {
 	emptyCustomID := isEmptyString(c.CustomID)
 	emptyUsername := isEmptyString(c.Username)
 
-	return emptyCustomID != emptyUsername
+	return !(emptyCustomID && emptyUsername)
 
 }
 
