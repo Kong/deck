@@ -24,12 +24,12 @@ var (
 // Client talks to the Admin API or control plane of a
 // Kong cluster
 type Client struct {
-	client     *http.Client
-	baseURL    string
-	common     service
-	APIService *APIService
-	logger     io.Writer
-	debug      bool
+	client  *http.Client
+	baseURL string
+	common  service
+	APIs    *APIService
+	logger  io.Writer
+	debug   bool
 }
 
 // Status respresents current status of a Kong node.
@@ -62,7 +62,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 		kong.baseURL = defaultBaseURL
 	}
 	kong.common.client = kong
-	kong.APIService = (*APIService)(&kong.common)
+	kong.APIs = (*APIService)(&kong.common)
 
 	kong.logger = os.Stderr
 	return kong, nil
