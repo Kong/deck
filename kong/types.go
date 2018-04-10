@@ -7,6 +7,16 @@ func String(s string) *string {
 	return &s
 }
 
+// Bool returns a pointer to b.
+func Bool(b bool) *bool {
+	return &b
+}
+
+// Int returns a pointer to i.
+func Int(i int) *int {
+	return &i
+}
+
 func isEmptyString(s *string) bool {
 	return s == nil || strings.TrimSpace(*s) == ""
 }
