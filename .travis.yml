@@ -7,7 +7,7 @@ notifications:
   email: false
 
 addons:
-  postgresql: "9.4"
+  postgresql: "9.5"
 
 before_script:
 
