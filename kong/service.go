@@ -9,18 +9,18 @@ import (
 // Service represents a Service in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Service-object
 type Service struct {
-	ConnectTimeout *int    `json:"connect_timeout"`
-	CreatedAt      *int    `json:"created_at"`
-	Host           *string `json:"host"`
-	ID             *string `json:"id"`
-	Name           *string `json:"name"`
-	Path           *string `json:"path"`
-	Port           *int    `json:"port"`
-	Protocol       *string `json:"protocol"`
-	ReadTimeout    *int    `json:"read_timeout"`
-	Retries        *int    `json:"retries"`
-	UpdatedAt      *int    `json:"updated_at"`
-	WriteTimeout   *int    `json:"write_timeout"`
+	ConnectTimeout *int    `json:"connect_timeout,omitempty"`
+	CreatedAt      *int    `json:"created_at,omitempty"`
+	Host           *string `json:"host,omitempty"`
+	ID             *string `json:"id,omitempty"`
+	Name           *string `json:"name,omitempty"`
+	Path           *string `json:"path,omitempty"`
+	Port           *int    `json:"port,omitempty"`
+	Protocol       *string `json:"protocol,omitempty"`
+	ReadTimeout    *int    `json:"read_timeout,omitempty"`
+	Retries        *int    `json:"retries,omitempty"`
+	UpdatedAt      *int    `json:"updated_at,omitempty"`
+	WriteTimeout   *int    `json:"write_timeout,omitempty"`
 }
 
 // Valid checks if all the fields in Service are valid.

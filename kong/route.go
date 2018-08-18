@@ -8,19 +8,19 @@ import (
 // Route represents a Route in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Route-object
 type Route struct {
-	CreatedAt     *int      `json:"created_at"`
-	Hosts         []*string `json:"hosts"`
-	ID            *string   `json:"id"`
-	Methods       []*string `json:"methods"`
-	Paths         []*string `json:"paths"`
-	PreserveHost  *bool     `json:"preserve_host"`
-	Protocols     []*string `json:"protocols"`
-	RegexPriority *int      `json:"regex_priority"`
+	CreatedAt     *int      `json:"created_at,omitempty"`
+	Hosts         []*string `json:"hosts,omitempty"`
+	ID            *string   `json:"id,omitempty"`
+	Methods       []*string `json:"methods,omitempty"`
+	Paths         []*string `json:"paths,omitempty"`
+	PreserveHost  *bool     `json:"preserve_host,omitempty"`
+	Protocols     []*string `json:"protocols,omitempty"`
+	RegexPriority *int      `json:"regex_priority,omitempty"`
 	Service       *struct {
-		ID *string `json:"id"`
-	} `json:"service"`
-	StripPath *bool `json:"strip_path"`
-	UpdatedAt *int  `json:"updated_at"`
+		ID *string `json:"id,omitempty"`
+	} `json:"service,omitempty"`
+	StripPath *bool `json:"strip_path,omitempty"`
+	UpdatedAt *int  `json:"updated_at,omitempty"`
 }
 
 // Valid checks if all the fields in Route are valid.
