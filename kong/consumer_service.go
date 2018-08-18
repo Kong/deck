@@ -10,10 +10,20 @@ import (
 // ConsumerService handles Consumers in Kong.
 type ConsumerService service
 
-// Create creates a Consumer in Kong
+// Create creates a Consumer in Kong.
+// If an ID is specified, it will be used to
+// create a consumer in Kong, otherwise an ID
+// is auto-generated.
 func (s *ConsumerService) Create(ctx context.Context, consumer *Consumer) (*Consumer, error) {
 
-	req, err := s.client.newRequest("POST", "/consumers", nil, consumer)
+	queryPath := "/consumers"
+	method := "POST"
+	if consumer.ID != nil {
+		queryPath = queryPath + "/" + *consumer.ID
+		method = "PUT"
+	}
+	req, err := s.client.newRequest(method, queryPath, nil, consumer)
+
 	if err != nil {
 		return nil, err
 	}
