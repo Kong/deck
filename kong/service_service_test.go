@@ -57,4 +57,10 @@ func TestServicesService(T *testing.T) {
 
 	err = client.Services.Delete(defaultCtx, createdService.ID)
 	assert.Nil(err)
+
+	_, err = client.Services.Create(defaultCtx, nil)
+	assert.NotNil(err)
+
+	_, err = client.Services.Update(defaultCtx, nil)
+	assert.NotNil(err)
 }

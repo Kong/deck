@@ -16,6 +16,10 @@ type Svcservice service
 // is auto-generated.
 func (s *Svcservice) Create(ctx context.Context, service *Service) (*Service, error) {
 
+	if service == nil {
+		return nil, errors.New("cannot create a nil service")
+	}
+
 	endpoint := "/services"
 	method := "POST"
 	if service.ID != nil {
@@ -60,7 +64,11 @@ func (s *Svcservice) Get(ctx context.Context, nameOrID *string) (*Service, error
 // Update updates an Service in Kong
 func (s *Svcservice) Update(ctx context.Context, service *Service) (*Service, error) {
 
-	if service.ID == nil {
+	if service == nil {
+		return nil, errors.New("cannot update a nil service")
+	}
+
+	if isEmptyString(service.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
