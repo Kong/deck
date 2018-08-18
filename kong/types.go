@@ -20,3 +20,14 @@ func Int(i int) *int {
 func isEmptyString(s *string) bool {
 	return s == nil || strings.TrimSpace(*s) == ""
 }
+
+// StringSlice converts a slice of string to a
+// slice of *string
+func StringSlice(arr []string) []*string {
+	l := len(arr)
+	res := make([]*string, l)
+	for i := range arr {
+		res[i] = &arr[i]
+	}
+	return res
+}
