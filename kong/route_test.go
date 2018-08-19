@@ -14,7 +14,7 @@ func TestRouteValid(T *testing.T) {
 	assert.Equal(false, r.Valid())
 
 	r = &Route{
-		Protocols: StringSlice([]string{"http"}),
+		Protocols: StringSlice("http"),
 	}
 	assert.Equal(false, r.Valid())
 }
@@ -23,9 +23,9 @@ func TestRouteString(T *testing.T) {
 	assert := assert.New(T)
 
 	r := &Route{
-		Methods:      StringSlice([]string{"GET", "POST"}),
-		Paths:        StringSlice([]string{"/foo", "/bar"}),
-		Hosts:        StringSlice([]string{"host1.com", "host2.com"}),
+		Methods:      StringSlice("GET", "POST"),
+		Paths:        StringSlice("/foo", "/bar"),
+		Hosts:        StringSlice("host1.com", "host2.com"),
 		StripPath:    Bool(false),
 		PreserveHost: Bool(true),
 	}

@@ -23,11 +23,11 @@ func isEmptyString(s *string) bool {
 
 // StringSlice converts a slice of string to a
 // slice of *string
-func StringSlice(arr []string) []*string {
-	l := len(arr)
-	res := make([]*string, l)
-	for i := range arr {
-		res[i] = &arr[i]
+func StringSlice(elements ...string) []*string {
+	var res []*string
+	for _, element := range elements {
+		e := element
+		res = append(res, &e)
 	}
 	return res
 }

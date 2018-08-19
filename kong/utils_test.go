@@ -9,11 +9,11 @@ import (
 func TestStringArrayToString(t *testing.T) {
 	assert := assert.New(t)
 
-	arr := StringSlice([]string{"foo", "bar"})
+	arr := StringSlice("foo", "bar")
 	s := stringArrayToString(arr)
 	assert.Equal("[ foo, bar ]", s)
 
-	arr = StringSlice([]string{"foo"})
+	arr = StringSlice("foo")
 	s = stringArrayToString(arr)
 	assert.Equal("[ foo ]", s)
 
