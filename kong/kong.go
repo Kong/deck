@@ -30,6 +30,7 @@ type Client struct {
 	APIs      *APIService
 	Consumers *ConsumerService
 	Services  *Svcservice
+	Routes    *RouteService
 	logger    io.Writer
 	debug     bool
 }
@@ -67,6 +68,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.APIs = (*APIService)(&kong.common)
 	kong.Consumers = (*ConsumerService)(&kong.common)
 	kong.Services = (*Svcservice)(&kong.common)
+	kong.Routes = (*RouteService)(&kong.common)
 
 	kong.logger = os.Stderr
 	return kong, nil
