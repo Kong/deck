@@ -16,11 +16,9 @@ type Route struct {
 	PreserveHost  *bool     `json:"preserve_host,omitempty"`
 	Protocols     []*string `json:"protocols,omitempty"`
 	RegexPriority *int      `json:"regex_priority,omitempty"`
-	Service       *struct {
-		ID *string `json:"id,omitempty"`
-	} `json:"service,omitempty"`
-	StripPath *bool `json:"strip_path,omitempty"`
-	UpdatedAt *int  `json:"updated_at,omitempty"`
+	Service       *Service  `json:"service,omitempty"`
+	StripPath     *bool     `json:"strip_path,omitempty"`
+	UpdatedAt     *int      `json:"updated_at,omitempty"`
 }
 
 // Valid checks if all the fields in Route are valid.
