@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // Svcservice handles services in Kong.
@@ -34,7 +33,6 @@ func (s *Svcservice) Create(ctx context.Context, service *Service) (*Service, er
 	var createdService Service
 	_, err = s.client.Do(ctx, req, &createdService)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &createdService, nil
@@ -81,7 +79,6 @@ func (s *Svcservice) Update(ctx context.Context, service *Service) (*Service, er
 	var updatedService Service
 	_, err = s.client.Do(ctx, req, &updatedService)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &updatedService, nil

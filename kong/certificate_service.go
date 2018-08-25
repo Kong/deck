@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // CertificateService handles Certificates in Kong.
@@ -31,7 +30,6 @@ func (s *CertificateService) Create(ctx context.Context, certificate *Certificat
 	var createdCertificate Certificate
 	_, err = s.client.Do(ctx, req, &createdCertificate)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &createdCertificate, nil
@@ -74,7 +72,6 @@ func (s *CertificateService) Update(ctx context.Context, certificate *Certificat
 	var updatedAPI Certificate
 	_, err = s.client.Do(ctx, req, &updatedAPI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &updatedAPI, nil

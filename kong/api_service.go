@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // APIService handles APIs in Kong.
@@ -21,7 +20,6 @@ func (s *APIService) Create(ctx context.Context, api *API) (*API, error) {
 	var createdAPI API
 	_, err = s.client.Do(ctx, req, &createdAPI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &createdAPI, nil
@@ -64,7 +62,6 @@ func (s *APIService) Update(ctx context.Context, api *API) (*API, error) {
 	var updatedAPI API
 	_, err = s.client.Do(ctx, req, &updatedAPI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &updatedAPI, nil

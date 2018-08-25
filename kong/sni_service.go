@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // SNIService handles SNIs in Kong.
@@ -31,7 +30,6 @@ func (s *SNIService) Create(ctx context.Context, sni *SNI) (*SNI, error) {
 	var createdSNI SNI
 	_, err = s.client.Do(ctx, req, &createdSNI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &createdSNI, nil
@@ -74,7 +72,6 @@ func (s *SNIService) Update(ctx context.Context, sni *SNI) (*SNI, error) {
 	var updatedAPI SNI
 	_, err = s.client.Do(ctx, req, &updatedAPI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &updatedAPI, nil

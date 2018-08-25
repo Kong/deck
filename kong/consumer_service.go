@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 )
 
 // ConsumerService handles Consumers in Kong.
@@ -31,7 +30,6 @@ func (s *ConsumerService) Create(ctx context.Context, consumer *Consumer) (*Cons
 	var createdConsumer Consumer
 	_, err = s.client.Do(ctx, req, &createdConsumer)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &createdConsumer, nil
@@ -74,7 +72,6 @@ func (s *ConsumerService) Update(ctx context.Context, consumer *Consumer) (*Cons
 	var updatedAPI Consumer
 	_, err = s.client.Do(ctx, req, &updatedAPI)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &updatedAPI, nil

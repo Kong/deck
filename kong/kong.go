@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -177,14 +176,12 @@ func (c *Client) Status(ctx context.Context) (*Status, error) {
 
 	req, err := c.newRequest("GET", "/status", nil, nil)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 
 	var s Status
 	_, err = c.Do(ctx, req, &s)
 	if err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	return &s, nil
