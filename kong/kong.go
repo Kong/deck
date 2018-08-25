@@ -147,7 +147,7 @@ func (c *Client) logRequest(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.logger.Write(dump)
+	_, err = c.logger.Write(append(dump, '\n'))
 	return err
 }
 
@@ -159,7 +159,7 @@ func (c *Client) logResponse(r *http.Response) error {
 	if err != nil {
 		return err
 	}
-	_, err = c.logger.Write(dump)
+	_, err = c.logger.Write(append(dump, '\n'))
 	return err
 }
 
