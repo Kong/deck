@@ -38,15 +38,16 @@ func (s *RouteService) Create(ctx context.Context, route *Route) (*Route, error)
 	return &createdRoute, nil
 }
 
-func (s *RouteService) CreateInService(ctx context.Context, serviceNameOrId *string, route *Route) (*Route, error) {
-	if isEmptyString(serviceNameOrId) {
+// CreateInService creates a route associated with serviceNameOrID
+func (s *RouteService) CreateInService(ctx context.Context, serviceNameOrID *string, route *Route) (*Route, error) {
+	if isEmptyString(serviceNameOrID) {
 		return nil, errors.New("serviceNameOrId cannot be nil for creating a route")
 	}
 	if route == nil {
 		return nil, errors.New("cannot create a nil route")
 	}
 	r := *route
-	r.Service.ID = serviceNameOrId
+	r.Service.ID = serviceNameOrID
 	return s.Create(ctx, &r)
 }
 
