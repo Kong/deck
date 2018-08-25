@@ -6,12 +6,12 @@ import "bytes"
 // Read https://getkong.org/docs/0.14.x/admin-api/#sni-object
 type SNI struct {
 	ID          *string      `json:"id"`
-	Name        *string      `json:"cert,omitempty"`
+	Name        *string      `json:"name,omitempty"`
 	CreatedAt   *int64       `json:"created_at,omitempty"`
-	Certificate *Certificate `json:certificate,omitempty`
+	Certificate *Certificate `json:"certificate,omitempty"`
 }
 
-// Valid checks if all the fields in Consumer are valid.
+// Valid checks if all the fields in SNI are valid.
 func (c *SNI) Valid() bool {
 	if isEmptyString(c.Name) {
 		return false
