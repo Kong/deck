@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -92,4 +93,29 @@ func (s *ConsumerService) Delete(ctx context.Context, usernameOrID *string) erro
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of Consumers in Kong.
+// opt can be used to control pagination.
+func (s *ConsumerService) List(ctx context.Context, opt *ListOpt) ([]*Consumer, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/consumers", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var consumers []*Consumer
+
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var consumer Consumer
+		err = json.Unmarshal(b, &consumer)
+		if err != nil {
+			return nil, nil, err
+		}
+		consumers = append(consumers, &consumer)
+	}
+
+	return consumers, next, nil
 }
