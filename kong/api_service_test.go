@@ -37,3 +37,94 @@ func TestAPISeviceCreate(T *testing.T) {
 	err = client.APIs.Delete(defaultCtx, createdAPI.ID)
 	assert.Nil(err)
 }
+
+func TestAPIListEndpoint(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	// fixtures
+	apis := []*API{
+		&API{
+			Name:        String("foo1"),
+			UpstreamURL: String("http://upstream:80/foo1"),
+			URIs:        StringSlice("/foo1"),
+		},
+		&API{
+			Name:        String("foo2"),
+			UpstreamURL: String("http://upstream:80/foo2"),
+			URIs:        StringSlice("/foo2"),
+		},
+		&API{
+			Name:        String("foo3"),
+			UpstreamURL: String("http://upstream:80/foo3"),
+			URIs:        StringSlice("/foo3"),
+		},
+	}
+
+	// create fixturs
+	for i := 0; i < len(apis); i++ {
+		api, err := client.APIs.Create(defaultCtx, apis[i])
+		assert.Nil(err)
+		assert.NotNil(api)
+		apis[i] = api
+	}
+
+	apisFromKong, next, err := client.APIs.List(defaultCtx, nil)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(apisFromKong)
+	assert.Equal(3, len(apisFromKong))
+
+	// check if we see all apis
+	assert.True(compareAPIs(apis, apisFromKong))
+
+	// Test pagination
+	apisFromKong = []*API{}
+
+	// first page
+	page1, next, err := client.APIs.List(defaultCtx, &ListOpt{Size: 1})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page1)
+	assert.Equal(1, len(page1))
+	apisFromKong = append(apisFromKong, page1...)
+
+	// intermediate page
+	// Old DAO can't do dynamic paging it seems
+	page2, next, err := client.APIs.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page2)
+	assert.Equal(1, len(page2))
+	apisFromKong = append(apisFromKong, page2...)
+
+	// last page
+	page3, next, err := client.APIs.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(page3)
+	assert.Equal(1, len(page2))
+	apisFromKong = append(apisFromKong, page3...)
+
+	assert.True(compareAPIs(apis, apisFromKong))
+
+	for i := 0; i < len(apis); i++ {
+		assert.Nil(client.APIs.Delete(defaultCtx, apis[i].ID))
+	}
+}
+
+func compareAPIs(expected, actual []*API) bool {
+	var expectedNames, actualNames []string
+	for _, api := range expected {
+		expectedNames = append(expectedNames, *api.Name)
+	}
+
+	for _, api := range actual {
+		actualNames = append(actualNames, *api.Name)
+	}
+
+	return (compareSlices(expectedNames, actualNames))
+}

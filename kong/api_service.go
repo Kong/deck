@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -82,4 +83,29 @@ func (s *APIService) Delete(ctx context.Context, nameOrID *string) error {
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of APIs in Kong.
+// opt can be used to control pagination.
+func (s *APIService) List(ctx context.Context, opt *ListOpt) ([]*API, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/apis", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var apis []*API
+
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var api API
+		err = json.Unmarshal(b, &api)
+		if err != nil {
+			return nil, nil, err
+		}
+		apis = append(apis, &api)
+	}
+
+	return apis, next, nil
 }
