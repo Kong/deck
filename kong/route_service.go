@@ -138,3 +138,27 @@ func (s *RouteService) List(ctx context.Context, opt *ListOpt) ([]*Route, *ListO
 
 	return routes, next, nil
 }
+
+// ListForService fetches a list of Routes in Kong associated with a service.
+// opt can be used to control pagination.
+func (s *RouteService) ListForService(ctx context.Context, serviceNameOrID *string, opt *ListOpt) ([]*Route, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/services/"+*serviceNameOrID+"/routes", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var routes []*Route
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var route Route
+		err = json.Unmarshal(b, &route)
+		if err != nil {
+			return nil, nil, err
+		}
+		routes = append(routes, &route)
+	}
+
+	return routes, next, nil
+}
