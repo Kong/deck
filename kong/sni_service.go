@@ -118,3 +118,27 @@ func (s *SNIService) List(ctx context.Context, opt *ListOpt) ([]*SNI, *ListOpt, 
 
 	return snis, next, nil
 }
+
+// ListForCertificate fetches a list of SNIs in Kong associated with certificateID.
+// opt can be used to control pagination.
+func (s *SNIService) ListForCertificate(ctx context.Context, certificateID *string, opt *ListOpt) ([]*SNI, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/certificates/"+*certificateID+"/snis", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var snis []*SNI
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var sni SNI
+		err = json.Unmarshal(b, &sni)
+		if err != nil {
+			return nil, nil, err
+		}
+		snis = append(snis, &sni)
+	}
+
+	return snis, next, nil
+}
