@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -92,4 +93,28 @@ func (s *CertificateService) Delete(ctx context.Context, usernameOrID *string) e
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of certificate in Kong.
+// opt can be used to control pagination.
+func (s *CertificateService) List(ctx context.Context, opt *ListOpt) ([]*Certificate, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/certificates", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var certificates []*Certificate
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var certificate Certificate
+		err = json.Unmarshal(b, &certificate)
+		if err != nil {
+			return nil, nil, err
+		}
+		certificates = append(certificates, &certificate)
+	}
+
+	return certificates, next, nil
 }
