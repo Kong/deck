@@ -87,3 +87,96 @@ func TestRoutesRoute(T *testing.T) {
 	_, err = client.Routes.Update(defaultCtx, nil)
 	assert.NotNil(err)
 }
+
+func TestRouteListEndpoint(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	service := &Service{
+		Name: String("foo"),
+		Host: String("upstream"),
+		Port: Int(42),
+		Path: String("/path"),
+	}
+
+	createdService, err := client.Services.Create(defaultCtx, service)
+	assert.Nil(err)
+	assert.NotNil(createdService)
+
+	// fixtures
+	routes := []*Route{
+		&Route{
+			Paths:   StringSlice("/foo1"),
+			Service: createdService,
+		},
+		&Route{
+			Paths:   StringSlice("/foo2"),
+			Service: createdService,
+		},
+		&Route{
+			Paths:   StringSlice("/foo3"),
+			Service: createdService,
+		},
+	}
+
+	// create fixturs
+	for i := 0; i < len(routes); i++ {
+		route, err := client.Routes.Create(defaultCtx, routes[i])
+		assert.Nil(err)
+		assert.NotNil(route)
+		routes[i] = route
+	}
+
+	routesFromKong, next, err := client.Routes.List(defaultCtx, nil)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(routesFromKong)
+	assert.Equal(3, len(routesFromKong))
+
+	// check if we see all routes
+	assert.True(compareRoutes(routes, routesFromKong))
+
+	// Test pagination
+	routesFromKong = []*Route{}
+
+	// first page
+	page1, next, err := client.Routes.List(defaultCtx, &ListOpt{Size: 1})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page1)
+	assert.Equal(1, len(page1))
+	routesFromKong = append(routesFromKong, page1...)
+
+	// last page
+	next.Size = 2
+	page2, next, err := client.Routes.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(page2)
+	assert.Equal(2, len(page2))
+	routesFromKong = append(routesFromKong, page2...)
+
+	assert.True(compareRoutes(routes, routesFromKong))
+
+	for i := 0; i < len(routes); i++ {
+		assert.Nil(client.Routes.Delete(defaultCtx, routes[i].ID))
+	}
+
+	assert.Nil(client.Services.Delete(defaultCtx, createdService.ID))
+}
+
+func compareRoutes(expected, actual []*Route) bool {
+	var expectedUsernames, actualUsernames []string
+	for _, route := range expected {
+		expectedUsernames = append(expectedUsernames, *route.Paths[0])
+	}
+
+	for _, route := range actual {
+		actualUsernames = append(actualUsernames, *route.Paths[0])
+	}
+
+	return (compareSlices(expectedUsernames, actualUsernames))
+}

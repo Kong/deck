@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -11,7 +12,7 @@ type RouteService service
 
 // Create creates a Route in Kong
 // If an ID is specified, it will be used to
-// create a consumer in Kong, otherwise an ID
+// create a route in Kong, otherwise an ID
 // is auto-generated.
 func (s *RouteService) Create(ctx context.Context, route *Route) (*Route, error) {
 
@@ -112,4 +113,28 @@ func (s *RouteService) Delete(ctx context.Context, nameOrID *string) error {
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of Routes in Kong.
+// opt can be used to control pagination.
+func (s *RouteService) List(ctx context.Context, opt *ListOpt) ([]*Route, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/routes", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var routes []*Route
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var route Route
+		err = json.Unmarshal(b, &route)
+		if err != nil {
+			return nil, nil, err
+		}
+		routes = append(routes, &route)
+	}
+
+	return routes, next, nil
 }
