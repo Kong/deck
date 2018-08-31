@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -92,4 +93,28 @@ func (s *SNIService) Delete(ctx context.Context, usernameOrID *string) error {
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of SNIs in Kong.
+// opt can be used to control pagination.
+func (s *SNIService) List(ctx context.Context, opt *ListOpt) ([]*SNI, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/snis", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var snis []*SNI
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var sni SNI
+		err = json.Unmarshal(b, &sni)
+		if err != nil {
+			return nil, nil, err
+		}
+		snis = append(snis, &sni)
+	}
+
+	return snis, next, nil
 }

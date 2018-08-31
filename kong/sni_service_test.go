@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSNIsService(T *testing.T) {
+func TestSNIsCertificate(T *testing.T) {
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -67,4 +67,95 @@ func TestSNIsService(T *testing.T) {
 
 	err = client.Certificates.Delete(defaultCtx, fixtureCertificate.ID)
 	assert.Nil(err)
+}
+
+func TestSNIListEndpoint(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	certificate := &Certificate{
+		Cert: String("foo"),
+		Key:  String("bar"),
+	}
+
+	createdCertificate, err := client.Certificates.Create(defaultCtx, certificate)
+	assert.Nil(err)
+	assert.NotNil(createdCertificate)
+
+	// fixtures
+	snis := []*SNI{
+		&SNI{
+			Name:        String("sni1"),
+			Certificate: createdCertificate,
+		},
+		&SNI{
+			Name:        String("sni2"),
+			Certificate: createdCertificate,
+		},
+		&SNI{
+			Name:        String("sni3"),
+			Certificate: createdCertificate,
+		},
+	}
+
+	// create fixturs
+	for i := 0; i < len(snis); i++ {
+		sni, err := client.SNIs.Create(defaultCtx, snis[i])
+		assert.Nil(err)
+		assert.NotNil(sni)
+		snis[i] = sni
+	}
+
+	snisFromKong, next, err := client.SNIs.List(defaultCtx, nil)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(snisFromKong)
+	assert.Equal(3, len(snisFromKong))
+
+	// check if we see all snis
+	assert.True(compareSNIs(snis, snisFromKong))
+
+	// Test pagination
+	snisFromKong = []*SNI{}
+
+	// first page
+	page1, next, err := client.SNIs.List(defaultCtx, &ListOpt{Size: 1})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page1)
+	assert.Equal(1, len(page1))
+	snisFromKong = append(snisFromKong, page1...)
+
+	// last page
+	next.Size = 2
+	page2, next, err := client.SNIs.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(page2)
+	assert.Equal(2, len(page2))
+	snisFromKong = append(snisFromKong, page2...)
+
+	assert.True(compareSNIs(snis, snisFromKong))
+
+	for i := 0; i < len(snis); i++ {
+		assert.Nil(client.SNIs.Delete(defaultCtx, snis[i].ID))
+	}
+
+	assert.Nil(client.Certificates.Delete(defaultCtx, createdCertificate.ID))
+}
+
+func compareSNIs(expected, actual []*SNI) bool {
+	var expectedUsernames, actualUsernames []string
+	for _, sni := range expected {
+		expectedUsernames = append(expectedUsernames, *sni.Name)
+	}
+
+	for _, sni := range actual {
+		actualUsernames = append(actualUsernames, *sni.Name)
+	}
+
+	return (compareSlices(expectedUsernames, actualUsernames))
 }
