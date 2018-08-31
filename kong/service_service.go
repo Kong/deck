@@ -2,6 +2,7 @@ package kong
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -11,7 +12,7 @@ type Svcservice service
 
 // Create creates an Service in Kong
 // If an ID is specified, it will be used to
-// create a consumer in Kong, otherwise an ID
+// create a service in Kong, otherwise an ID
 // is auto-generated.
 func (s *Svcservice) Create(ctx context.Context, service *Service) (*Service, error) {
 
@@ -99,4 +100,28 @@ func (s *Svcservice) Delete(ctx context.Context, nameOrID *string) error {
 
 	_, err = s.client.Do(ctx, req, nil)
 	return err
+}
+
+// List fetches a list of Services in Kong.
+// opt can be used to control pagination.
+func (s *Svcservice) List(ctx context.Context, opt *ListOpt) ([]*Service, *ListOpt, error) {
+	data, next, err := s.client.list(ctx, "/services", opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	var services []*Service
+	for _, object := range data {
+		b, err := object.MarshalJSON()
+		if err != nil {
+			return nil, nil, err
+		}
+		var service Service
+		err = json.Unmarshal(b, &service)
+		if err != nil {
+			return nil, nil, err
+		}
+		services = append(services, &service)
+	}
+
+	return services, next, nil
 }
