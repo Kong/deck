@@ -38,7 +38,22 @@ func TestServicesService(T *testing.T) {
 	assert.Equal("newUpstream", *service.Host)
 	assert.Equal(42, *service.Port)
 
-	err = client.Services.Delete(defaultCtx, createdService.ID)
+	route, err := client.Routes.CreateInService(defaultCtx, service.ID, &Route{
+		Paths: StringSlice("/route"),
+	})
+	assert.Nil(err)
+	assert.NotNil(route)
+
+	serviceForRoute, err := client.Services.GetForRoute(defaultCtx, route.ID)
+	assert.Nil(err)
+	assert.NotNil(serviceForRoute)
+
+	assert.Equal(*service.ID, *serviceForRoute.ID)
+
+	err = client.Routes.Delete(defaultCtx, route.ID)
+	assert.Nil(err)
+
+	err = client.Services.Delete(defaultCtx, service.ID)
 	assert.Nil(err)
 
 	// ID can be specified

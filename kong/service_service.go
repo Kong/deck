@@ -60,6 +60,27 @@ func (s *Svcservice) Get(ctx context.Context, nameOrID *string) (*Service, error
 	return &Service, nil
 }
 
+// GetForRoute fetches a Service associated with routeID in Kong.
+func (s *Svcservice) GetForRoute(ctx context.Context, routeID *string) (*Service, error) {
+
+	if routeID == nil {
+		return nil, errors.New("routeID cannot be nil for Get operation")
+	}
+
+	endpoint := fmt.Sprintf("/routes/%v/service", *routeID)
+	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var Service Service
+	_, err = s.client.Do(ctx, req, &Service)
+	if err != nil {
+		return nil, err
+	}
+	return &Service, nil
+}
+
 // Update updates an Service in Kong
 func (s *Svcservice) Update(ctx context.Context, service *Service) (*Service, error) {
 
