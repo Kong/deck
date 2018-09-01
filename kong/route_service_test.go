@@ -88,6 +88,40 @@ func TestRoutesRoute(T *testing.T) {
 	assert.NotNil(err)
 }
 
+func TestCreateInRoute(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	service := &Service{
+		Name: String("foo"),
+		Host: String("upstream"),
+		Port: Int(42),
+		Path: String("/path"),
+	}
+
+	createdService, err := client.Services.Create(defaultCtx, service)
+	assert.Nil(err)
+	assert.NotNil(createdService)
+
+	route := &Route{
+		Hosts: StringSlice("host1.com", "host2.com"),
+	}
+
+	// specifying name won't work
+	routeNotCreated, err := client.Routes.CreateInService(defaultCtx, createdService.Name, route)
+	assert.Nil(routeNotCreated)
+	assert.NotNil(err)
+
+	createdRoute, err := client.Routes.CreateInService(defaultCtx, createdService.ID, route)
+	assert.Nil(err)
+	assert.NotNil(createdRoute)
+
+	assert.Nil(client.Routes.Delete(defaultCtx, createdRoute.ID))
+	assert.Nil(client.Services.Delete(defaultCtx, createdService.ID))
+}
 func TestRouteListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
