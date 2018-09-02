@@ -31,6 +31,7 @@ type Client struct {
 	Services     *Svcservice
 	Routes       *RouteService
 	Certificates *CertificateService
+	Plugins      *PluginService
 	SNIs         *SNIService
 	logger       io.Writer
 	debug        bool
@@ -70,6 +71,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Consumers = (*ConsumerService)(&kong.common)
 	kong.Services = (*Svcservice)(&kong.common)
 	kong.Routes = (*RouteService)(&kong.common)
+	kong.Plugins = (*PluginService)(&kong.common)
 	kong.Certificates = (*CertificateService)(&kong.common)
 	kong.SNIs = (*SNIService)(&kong.common)
 
