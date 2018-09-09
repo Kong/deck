@@ -33,6 +33,7 @@ type Client struct {
 	Certificates *CertificateService
 	Plugins      *PluginService
 	SNIs         *SNIService
+	Upstreams    *UpstreamService
 	logger       io.Writer
 	debug        bool
 }
@@ -74,6 +75,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Plugins = (*PluginService)(&kong.common)
 	kong.Certificates = (*CertificateService)(&kong.common)
 	kong.SNIs = (*SNIService)(&kong.common)
+	kong.Upstreams = (*UpstreamService)(&kong.common)
 
 	kong.logger = os.Stderr
 	return kong, nil
