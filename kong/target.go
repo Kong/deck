@@ -3,12 +3,12 @@ package kong
 import "bytes"
 
 type Target struct {
-	CreatedAt *int64  `json:"created_at"`
-	ID        *string `json:"id"`
-	Target    *string `json:"target"`
+	CreatedAt *int64  `json:"created_at,omitempty"`
+	ID        *string `json:"id,omitempty"`
+	Target    *string `json:"target,omitempty"`
 	// TODO change once Upstream/Targets are migrated to new DAO
-	UpstreamID *string `json:"upstream_id"`
-	Weight     *int    `json:"weight"`
+	UpstreamID *string `json:"upstream_id,omitempty"`
+	Weight     *int    `json:"weight,omitempty"`
 }
 
 // Valid checks if all the fields in Target are valid.
