@@ -1,0 +1,46 @@
+package kong
+
+import "bytes"
+
+type Target struct {
+	CreatedAt *int64  `json:"created_at"`
+	ID        *string `json:"id"`
+	Target    *string `json:"target"`
+	// TODO change once Upstream/Targets are migrated to new DAO
+	UpstreamID *string `json:"upstream_id"`
+	Weight     *int    `json:"weight"`
+}
+
+// Valid checks if all the fields in Target are valid.
+func (t *Target) Valid() bool {
+	if isEmptyString(t.UpstreamID) || isEmptyString(t.Target) {
+		return false
+	}
+	return true
+}
+
+func (t *Target) String() string {
+	var buf bytes.Buffer
+	buf.WriteByte('[')
+	buf.WriteByte(' ')
+	if t.ID == nil {
+		buf.WriteString("nil")
+	} else {
+		buf.WriteString(*t.ID)
+	}
+	buf.WriteByte(' ')
+	if t.Target == nil {
+		buf.WriteString("nil")
+	} else {
+		buf.WriteString(*t.Target)
+	}
+	buf.WriteByte(' ')
+	if t.UpstreamID == nil {
+		buf.WriteString("nil")
+	} else {
+		buf.WriteString(*t.UpstreamID)
+	}
+	buf.WriteByte(' ')
+	buf.WriteByte(']')
+	return buf.String()
+}
