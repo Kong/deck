@@ -2,6 +2,7 @@ package kong
 
 import "bytes"
 
+// Target represents a Target in Kong.
 type Target struct {
 	CreatedAt *int64  `json:"created_at,omitempty"`
 	ID        *string `json:"id,omitempty"`
@@ -13,7 +14,7 @@ type Target struct {
 
 // Valid checks if all the fields in Target are valid.
 func (t *Target) Valid() bool {
-	if isEmptyString(t.UpstreamID) || isEmptyString(t.Target) {
+	if isEmptyString(t.Target) {
 		return false
 	}
 	return true
