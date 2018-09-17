@@ -55,7 +55,7 @@ func (s *RouteService) CreateInService(ctx context.Context, serviceID *string, r
 // Get fetches a Route in Kong.
 func (s *RouteService) Get(ctx context.Context, nameOrID *string) (*Route, error) {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return nil, errors.New("nameOrID cannot be nil for Get operation")
 	}
 
@@ -101,7 +101,7 @@ func (s *RouteService) Update(ctx context.Context, route *Route) (*Route, error)
 // Delete deletes a Route in Kong
 func (s *RouteService) Delete(ctx context.Context, nameOrID *string) error {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return errors.New("nameOrID cannot be nil for Delete operation")
 	}
 

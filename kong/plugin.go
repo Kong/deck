@@ -31,37 +31,37 @@ func (p *Plugin) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if p.ID == nil {
+	if isEmptyString(p.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.ID)
 	}
 	buf.WriteByte(' ')
-	if p.Name == nil {
+	if isEmptyString(p.Name) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.Name)
 	}
 	buf.WriteByte(' ')
-	if p.RouteID == nil {
+	if isEmptyString(p.RouteID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.RouteID)
 	}
 	buf.WriteByte(' ')
-	if p.ServiceID == nil {
+	if isEmptyString(p.ServiceID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.ServiceID)
 	}
 	buf.WriteByte(' ')
-	if p.APIID == nil {
+	if isEmptyString(p.APIID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.APIID)
 	}
 	buf.WriteByte(' ')
-	if p.ConsumerID == nil {
+	if isEmptyString(p.ConsumerID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.ConsumerID)

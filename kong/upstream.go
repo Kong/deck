@@ -64,13 +64,13 @@ func (u *Upstream) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if u.ID == nil {
+	if isEmptyString(u.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*u.ID)
 	}
 	buf.WriteByte(' ')
-	if u.Name == nil {
+	if isEmptyString(u.Name) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*u.Name)

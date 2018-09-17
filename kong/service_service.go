@@ -42,7 +42,7 @@ func (s *Svcservice) Create(ctx context.Context, service *Service) (*Service, er
 // Get fetches an Service in Kong.
 func (s *Svcservice) Get(ctx context.Context, nameOrID *string) (*Service, error) {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return nil, errors.New("nameOrID cannot be nil for Get operation")
 	}
 
@@ -63,7 +63,7 @@ func (s *Svcservice) Get(ctx context.Context, nameOrID *string) (*Service, error
 // GetForRoute fetches a Service associated with routeID in Kong.
 func (s *Svcservice) GetForRoute(ctx context.Context, routeID *string) (*Service, error) {
 
-	if routeID == nil {
+	if isEmptyString(routeID) {
 		return nil, errors.New("routeID cannot be nil for Get operation")
 	}
 
@@ -109,7 +109,7 @@ func (s *Svcservice) Update(ctx context.Context, service *Service) (*Service, er
 // Delete deletes an Service in Kong
 func (s *Svcservice) Delete(ctx context.Context, nameOrID *string) error {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return errors.New("nameOrID cannot be nil for Delete operation")
 	}
 

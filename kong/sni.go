@@ -23,19 +23,19 @@ func (c *SNI) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if c.ID == nil {
+	if isEmptyString(c.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.ID)
 	}
 	buf.WriteByte(' ')
-	if c.Name == nil {
+	if isEmptyString(c.Name) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.Name)
 	}
 	buf.WriteByte(' ')
-	if c.Certificate == nil || c.Certificate.ID == nil {
+	if c.Certificate == nil || isEmptyString(c.Certificate.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.Certificate.ID)

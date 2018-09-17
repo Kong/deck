@@ -39,7 +39,7 @@ func (s *CertificateService) Create(ctx context.Context, certificate *Certificat
 // Get fetches a Certificate in Kong.
 func (s *CertificateService) Get(ctx context.Context, usernameOrID *string) (*Certificate, error) {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
 	}
 
@@ -60,7 +60,7 @@ func (s *CertificateService) Get(ctx context.Context, usernameOrID *string) (*Ce
 // Update updates a Certificate in Kong
 func (s *CertificateService) Update(ctx context.Context, certificate *Certificate) (*Certificate, error) {
 
-	if certificate.ID == nil {
+	if isEmptyString(certificate.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -81,7 +81,7 @@ func (s *CertificateService) Update(ctx context.Context, certificate *Certificat
 // Delete deletes a Certificate in Kong
 func (s *CertificateService) Delete(ctx context.Context, usernameOrID *string) error {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
 	}
 

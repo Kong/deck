@@ -49,7 +49,7 @@ func TestConsumerString(T *testing.T) {
 		CustomID: String(""),
 		Username: String(""),
 	}
-	assert.Equal("[ nil   ]", c.String())
+	assert.Equal("[ nil nil nil ]", c.String())
 
 	c = &Consumer{}
 	assert.Equal("[ nil nil nil ]", c.String())

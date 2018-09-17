@@ -24,19 +24,19 @@ func (c *Consumer) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if c.ID == nil {
+	if isEmptyString(c.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.ID)
 	}
 	buf.WriteByte(' ')
-	if c.Username == nil {
+	if isEmptyString(c.Username) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.Username)
 	}
 	buf.WriteByte(' ')
-	if c.CustomID == nil {
+	if isEmptyString(c.CustomID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.CustomID)

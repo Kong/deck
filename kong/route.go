@@ -33,7 +33,7 @@ func (r *Route) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if r.ID == nil {
+	if isEmptyString(r.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*r.ID)
@@ -63,7 +63,7 @@ func (r *Route) String() string {
 		buf.WriteString(strconv.Itoa(*r.RegexPriority))
 	}
 	buf.WriteByte(' ')
-	if r.Service == nil || r.Service.ID == nil {
+	if r.Service == nil || isEmptyString(r.Service.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*r.Service.ID)

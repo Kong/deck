@@ -40,7 +40,7 @@ func (s *PluginService) Create(ctx context.Context, plugin *Plugin) (*Plugin, er
 // Get fetches a Plugin in Kong.
 func (s *PluginService) Get(ctx context.Context, usernameOrID *string) (*Plugin, error) {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
 	}
 
@@ -61,7 +61,7 @@ func (s *PluginService) Get(ctx context.Context, usernameOrID *string) (*Plugin,
 // Update updates a Plugin in Kong
 func (s *PluginService) Update(ctx context.Context, plugin *Plugin) (*Plugin, error) {
 
-	if plugin.ID == nil {
+	if isEmptyString(plugin.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -82,7 +82,7 @@ func (s *PluginService) Update(ctx context.Context, plugin *Plugin) (*Plugin, er
 // Delete deletes a Plugin in Kong
 func (s *PluginService) Delete(ctx context.Context, usernameOrID *string) error {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
 	}
 

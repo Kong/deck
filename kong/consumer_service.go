@@ -39,7 +39,7 @@ func (s *ConsumerService) Create(ctx context.Context, consumer *Consumer) (*Cons
 // Get fetches a Consumer in Kong.
 func (s *ConsumerService) Get(ctx context.Context, usernameOrID *string) (*Consumer, error) {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
 	}
 
@@ -60,7 +60,7 @@ func (s *ConsumerService) Get(ctx context.Context, usernameOrID *string) (*Consu
 // Update updates a Consumer in Kong
 func (s *ConsumerService) Update(ctx context.Context, consumer *Consumer) (*Consumer, error) {
 
-	if consumer.ID == nil {
+	if isEmptyString(consumer.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -81,7 +81,7 @@ func (s *ConsumerService) Update(ctx context.Context, consumer *Consumer) (*Cons
 // Delete deletes a Consumer in Kong
 func (s *ConsumerService) Delete(ctx context.Context, usernameOrID *string) error {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
 	}
 

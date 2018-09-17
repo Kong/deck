@@ -44,7 +44,7 @@ func (s *TargetService) Delete(ctx context.Context, upstreamNameOrID *string, ta
 	if isEmptyString(upstreamNameOrID) {
 		return errors.New("upstreamNameOrID cannot be nil for Get operation")
 	}
-	if targetOrID == nil {
+	if isEmptyString(targetOrID) {
 		return errors.New("targetOrID cannot be nil for Delete operation")
 	}
 

@@ -37,25 +37,25 @@ func (s *Service) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if s.ID == nil {
+	if isEmptyString(s.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*s.ID)
 	}
 	buf.WriteByte(' ')
-	if s.Name == nil {
+	if isEmptyString(s.Name) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*s.Name)
 	}
 	buf.WriteByte(' ')
-	if s.Protocol == nil {
+	if isEmptyString(s.Protocol) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*s.Protocol)
 	}
 	buf.WriteByte(' ')
-	if s.Host == nil {
+	if isEmptyString(s.Host) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*s.Host)
@@ -67,7 +67,7 @@ func (s *Service) String() string {
 		buf.WriteString(strconv.Itoa(*s.Port))
 	}
 	buf.WriteByte(' ')
-	if s.Path == nil {
+	if isEmptyString(s.Path) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*s.Path)

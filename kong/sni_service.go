@@ -39,7 +39,7 @@ func (s *SNIService) Create(ctx context.Context, sni *SNI) (*SNI, error) {
 // Get fetches a SNI in Kong.
 func (s *SNIService) Get(ctx context.Context, usernameOrID *string) (*SNI, error) {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
 	}
 
@@ -60,7 +60,7 @@ func (s *SNIService) Get(ctx context.Context, usernameOrID *string) (*SNI, error
 // Update updates a SNI in Kong
 func (s *SNIService) Update(ctx context.Context, sni *SNI) (*SNI, error) {
 
-	if sni.ID == nil {
+	if isEmptyString(sni.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -81,7 +81,7 @@ func (s *SNIService) Update(ctx context.Context, sni *SNI) (*SNI, error) {
 // Delete deletes a SNI in Kong
 func (s *SNIService) Delete(ctx context.Context, usernameOrID *string) error {
 
-	if usernameOrID == nil {
+	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
 	}
 

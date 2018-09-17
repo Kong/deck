@@ -22,7 +22,7 @@ func (c *Certificate) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if c.ID == nil {
+	if isEmptyString(c.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*c.ID)

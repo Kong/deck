@@ -29,7 +29,7 @@ func (s *APIService) Create(ctx context.Context, api *API) (*API, error) {
 // Get fetches an API in Kong.
 func (s *APIService) Get(ctx context.Context, nameOrID *string) (*API, error) {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return nil, errors.New("nameOrID cannot be nil for Get operation")
 	}
 
@@ -50,7 +50,7 @@ func (s *APIService) Get(ctx context.Context, nameOrID *string) (*API, error) {
 // Update updates an API in Kong
 func (s *APIService) Update(ctx context.Context, api *API) (*API, error) {
 
-	if api.ID == nil {
+	if isEmptyString(api.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -71,7 +71,7 @@ func (s *APIService) Update(ctx context.Context, api *API) (*API, error) {
 // Delete deletes an API in Kong
 func (s *APIService) Delete(ctx context.Context, nameOrID *string) error {
 
-	if nameOrID == nil {
+	if isEmptyString(nameOrID) {
 		return errors.New("nameOrID cannot be nil for Delete operation")
 	}
 

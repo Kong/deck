@@ -40,7 +40,7 @@ func (s *UpstreamService) Create(ctx context.Context, upstream *Upstream) (*Upst
 // Get fetches a Upstream in Kong.
 func (s *UpstreamService) Get(ctx context.Context, upstreamNameOrID *string) (*Upstream, error) {
 
-	if upstreamNameOrID == nil {
+	if isEmptyString(upstreamNameOrID) {
 		return nil, errors.New("upstreamNameOrID cannot be nil for Get operation")
 	}
 
@@ -61,7 +61,7 @@ func (s *UpstreamService) Get(ctx context.Context, upstreamNameOrID *string) (*U
 // Update updates a Upstream in Kong
 func (s *UpstreamService) Update(ctx context.Context, upstream *Upstream) (*Upstream, error) {
 
-	if upstream.ID == nil {
+	if isEmptyString(upstream.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
 	}
 
@@ -82,7 +82,7 @@ func (s *UpstreamService) Update(ctx context.Context, upstream *Upstream) (*Upst
 // Delete deletes a Upstream in Kong
 func (s *UpstreamService) Delete(ctx context.Context, upstreamNameOrID *string) error {
 
-	if upstreamNameOrID == nil {
+	if isEmptyString(upstreamNameOrID) {
 		return errors.New("upstreamNameOrID cannot be nil for Delete operation")
 	}
 

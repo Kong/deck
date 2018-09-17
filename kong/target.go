@@ -24,19 +24,19 @@ func (t *Target) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
 	buf.WriteByte(' ')
-	if t.ID == nil {
+	if isEmptyString(t.ID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*t.ID)
 	}
 	buf.WriteByte(' ')
-	if t.Target == nil {
+	if isEmptyString(t.Target) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*t.Target)
 	}
 	buf.WriteByte(' ')
-	if t.UpstreamID == nil {
+	if isEmptyString(t.UpstreamID) {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*t.UpstreamID)
