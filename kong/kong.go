@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+
+	"github.com/hbagdi/go-kong/kong/custom"
 )
 
 const defaultBaseURL = "http://localhost:8001"
@@ -23,20 +25,23 @@ var (
 // Client talks to the Admin API or control plane of a
 // Kong cluster
 type Client struct {
-	client       *http.Client
-	baseURL      string
-	common       service
-	APIs         *APIService
-	Consumers    *ConsumerService
-	Services     *Svcservice
-	Routes       *RouteService
-	Certificates *CertificateService
-	Plugins      *PluginService
-	SNIs         *SNIService
-	Upstreams    *UpstreamService
-	Targets      *TargetService
-	logger       io.Writer
-	debug        bool
+	client         *http.Client
+	baseURL        string
+	common         service
+	APIs           *APIService
+	Consumers      *ConsumerService
+	Services       *Svcservice
+	Routes         *RouteService
+	Certificates   *CertificateService
+	Plugins        *PluginService
+	SNIs           *SNIService
+	Upstreams      *UpstreamService
+	Targets        *TargetService
+	logger         io.Writer
+	debug          bool
+	CustomEntities *CustomEntityService
+
+	custom.Registry
 }
 
 // Status respresents current status of a Kong node.
@@ -78,7 +83,12 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.SNIs = (*SNIService)(&kong.common)
 	kong.Upstreams = (*UpstreamService)(&kong.common)
 	kong.Targets = (*TargetService)(&kong.common)
+	kong.CustomEntities = (*CustomEntityService)(&kong.common)
+	kong.Registry = custom.NewDefaultRegistry()
 
+	for i := 0; i < len(defaultCustomEntities); i++ {
+		kong.Register(defaultCustomEntities[i].Type(), &defaultCustomEntities[i])
+	}
 	kong.logger = os.Stderr
 	return kong, nil
 }
