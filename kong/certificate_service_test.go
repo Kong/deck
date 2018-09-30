@@ -64,15 +64,15 @@ func TestCertificateListEndpoint(T *testing.T) {
 
 	// fixtures
 	certificates := []*Certificate{
-		&Certificate{
+		{
 			Cert: String("foo1"),
 			Key:  String("bar1"),
 		},
-		&Certificate{
+		{
 			Cert: String("foo2"),
 			Key:  String("bar2"),
 		},
-		&Certificate{
+		{
 			Cert: String("foo3"),
 			Key:  String("bar3"),
 		},

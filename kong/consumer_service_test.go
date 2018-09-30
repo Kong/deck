@@ -62,13 +62,13 @@ func TestConsumerListEndpoint(T *testing.T) {
 
 	// fixtures
 	consumers := []*Consumer{
-		&Consumer{
+		{
 			Username: String("foo1"),
 		},
-		&Consumer{
+		{
 			Username: String("foo2"),
 		},
-		&Consumer{
+		{
 			Username: String("foo3"),
 		},
 	}

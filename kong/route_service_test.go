@@ -142,15 +142,15 @@ func TestRouteListEndpoint(T *testing.T) {
 
 	// fixtures
 	routes := []*Route{
-		&Route{
+		{
 			Paths:   StringSlice("/foo1"),
 			Service: createdService,
 		},
-		&Route{
+		{
 			Paths:   StringSlice("/foo2"),
 			Service: createdService,
 		},
-		&Route{
+		{
 			Paths:   StringSlice("/foo3"),
 			Service: createdService,
 		},

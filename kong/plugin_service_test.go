@@ -76,13 +76,13 @@ func TestPluginListEndpoint(T *testing.T) {
 
 	// fixtures
 	plugins := []*Plugin{
-		&Plugin{
+		{
 			Name: String("key-auth"),
 		},
-		&Plugin{
+		{
 			Name: String("basic-auth"),
 		},
-		&Plugin{
+		{
 			Name: String("jwt"),
 		},
 	}

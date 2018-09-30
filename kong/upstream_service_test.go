@@ -62,13 +62,13 @@ func TestUpstreamListEndpoint(T *testing.T) {
 
 	// fixtures
 	upstreams := []*Upstream{
-		&Upstream{
+		{
 			Name: String("vhost1.com"),
 		},
-		&Upstream{
+		{
 			Name: String("vhost2.com"),
 		},
-		&Upstream{
+		{
 			Name: String("vhost3.com"),
 		},
 	}

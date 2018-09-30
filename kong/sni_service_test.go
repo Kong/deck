@@ -87,15 +87,15 @@ func TestSNIListEndpoint(T *testing.T) {
 
 	// fixtures
 	snis := []*SNI{
-		&SNI{
+		{
 			Name:        String("sni1"),
 			Certificate: createdCertificate,
 		},
-		&SNI{
+		{
 			Name:        String("sni2"),
 			Certificate: createdCertificate,
 		},
-		&SNI{
+		{
 			Name:        String("sni3"),
 			Certificate: createdCertificate,
 		},

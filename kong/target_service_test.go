@@ -88,15 +88,15 @@ func TestTargetListEndpoint(T *testing.T) {
 
 	// fixtures
 	targets := []*Target{
-		&Target{
+		{
 			Target:     String("target1"),
 			UpstreamID: createdUpstream.ID,
 		},
-		&Target{
+		{
 			Target:     String("target2"),
 			UpstreamID: createdUpstream.ID,
 		},
-		&Target{
+		{
 			Target:     String("target3"),
 			UpstreamID: createdUpstream.ID,
 		},

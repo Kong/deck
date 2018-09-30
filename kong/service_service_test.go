@@ -89,15 +89,15 @@ func TestServiceListEndpoint(T *testing.T) {
 
 	// fixtures
 	services := []*Service{
-		&Service{
+		{
 			Name: String("foo1"),
 			Host: String("upstream1.com"),
 		},
-		&Service{
+		{
 			Name: String("foo2"),
 			Host: String("upstream2.com"),
 		},
-		&Service{
+		{
 			Name: String("foo3"),
 			Host: String("upstream3.com"),
 		},

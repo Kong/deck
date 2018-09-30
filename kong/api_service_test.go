@@ -47,17 +47,17 @@ func TestAPIListEndpoint(T *testing.T) {
 
 	// fixtures
 	apis := []*API{
-		&API{
+		{
 			Name:        String("foo1"),
 			UpstreamURL: String("http://upstream:80/foo1"),
 			URIs:        StringSlice("/foo1"),
 		},
-		&API{
+		{
 			Name:        String("foo2"),
 			UpstreamURL: String("http://upstream:80/foo2"),
 			URIs:        StringSlice("/foo2"),
 		},
-		&API{
+		{
 			Name:        String("foo3"),
 			UpstreamURL: String("http://upstream:80/foo3"),
 			URIs:        StringSlice("/foo3"),
