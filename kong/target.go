@@ -4,12 +4,12 @@ import "bytes"
 
 // Target represents a Target in Kong.
 type Target struct {
-	CreatedAt *int64  `json:"created_at,omitempty"`
-	ID        *string `json:"id,omitempty"`
-	Target    *string `json:"target,omitempty"`
+	CreatedAt *int64  `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Target    *string `json:"target,omitempty" yaml:"target,omitempty"`
 	// TODO change once Upstream/Targets are migrated to new DAO
-	UpstreamID *string `json:"upstream_id,omitempty"`
-	Weight     *int    `json:"weight,omitempty"`
+	UpstreamID *string `json:"upstream_id,omitempty" yaml:"upstream_id,omitempty"`
+	Weight     *int    `json:"weight,omitempty" yaml:"weight,omitempty"`
 }
 
 // Valid checks if all the fields in Target are valid.

@@ -5,10 +5,10 @@ import "bytes"
 // SNI represents a SNI in Kong.
 // Read https://getkong.org/docs/0.14.x/admin-api/#sni-object
 type SNI struct {
-	ID          *string      `json:"id,omitempty"`
-	Name        *string      `json:"name,omitempty"`
-	CreatedAt   *int64       `json:"created_at,omitempty"`
-	Certificate *Certificate `json:"certificate,omitempty"`
+	ID          *string      `json:"id,omitempty" yaml:"id,omitempty"`
+	Name        *string      `json:"name,omitempty" yaml:"name,omitempty"`
+	CreatedAt   *int64       `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Certificate *Certificate `json:"certificate,omitempty" yaml:"certificate,omitempty"`
 }
 
 // Valid checks if all the fields in SNI are valid.

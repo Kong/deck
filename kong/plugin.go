@@ -11,15 +11,15 @@ type Configuration map[string]interface{}
 // Plugin represents a Plugin in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Plugin-object
 type Plugin struct {
-	CreatedAt  *int          `json:"created_at,omitempty"`
-	ID         *string       `json:"id,omitempty"`
-	Name       *string       `json:"name,omitempty"`
-	RouteID    *string       `json:"route_id,omitempty"`
-	ServiceID  *string       `json:"service_id,omitempty"`
-	APIID      *string       `json:"api_id,omitempty"`
-	ConsumerID *string       `json:"consumer_id,omitempty"`
-	Config     Configuration `json:"config,omitempty"`
-	Enabled    *bool         `json:"enabled,omitempty"`
+	CreatedAt  *int          `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID         *string       `json:"id,omitempty" yaml:"id,omitempty"`
+	Name       *string       `json:"name,omitempty" yaml:"name,omitempty"`
+	RouteID    *string       `json:"route_id,omitempty" yaml:"route_id,omitempty"`
+	ServiceID  *string       `json:"service_id,omitempty" yaml:"service_id,omitempty"`
+	APIID      *string       `json:"api_id,omitempty" yaml:"api_id,omitempty"`
+	ConsumerID *string       `json:"consumer_id,omitempty" yaml:"consumer_id,omitempty"`
+	Config     Configuration `json:"config,omitempty" yaml:"config,omitempty"`
+	Enabled    *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 }
 
 // Valid checks if all the fields in Plugin are valid.

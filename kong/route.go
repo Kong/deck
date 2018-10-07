@@ -8,17 +8,17 @@ import (
 // Route represents a Route in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Route-object
 type Route struct {
-	CreatedAt     *int      `json:"created_at,omitempty"`
-	Hosts         []*string `json:"hosts,omitempty"`
-	ID            *string   `json:"id,omitempty"`
-	Methods       []*string `json:"methods,omitempty"`
-	Paths         []*string `json:"paths,omitempty"`
-	PreserveHost  *bool     `json:"preserve_host,omitempty"`
-	Protocols     []*string `json:"protocols,omitempty"`
-	RegexPriority *int      `json:"regex_priority,omitempty"`
-	Service       *Service  `json:"service,omitempty"`
-	StripPath     *bool     `json:"strip_path,omitempty"`
-	UpdatedAt     *int      `json:"updated_at,omitempty"`
+	CreatedAt     *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Hosts         []*string `json:"hosts,omitempty" yaml:"hosts,omitempty"`
+	ID            *string   `json:"id,omitempty" yaml:"id,omitempty"`
+	Methods       []*string `json:"methods,omitempty" yaml:"methods,omitempty"`
+	Paths         []*string `json:"paths,omitempty" yaml:"paths,omitempty"`
+	PreserveHost  *bool     `json:"preserve_host,omitempty" yaml:"preserve_host,omitempty"`
+	Protocols     []*string `json:"protocols,omitempty" yaml:"protocols,omitempty"`
+	RegexPriority *int      `json:"regex_priority,omitempty" yaml:"regex_priority,omitempty"`
+	Service       *Service  `json:"service,omitempty" yaml:"service,omitempty"`
+	StripPath     *bool     `json:"strip_path,omitempty" yaml:"strip_path,omitempty"`
+	UpdatedAt     *int      `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 }
 
 // Valid checks if all the fields in Route are valid.
