@@ -5,7 +5,7 @@ import "bytes"
 // Certificate represents a Certificate in Kong.
 // Read https://getkong.org/docs/0.14.x/admin-api/#certificate-object
 type Certificate struct {
-	ID        *string   `json:"id"`
+	ID        *string   `json:"id,omitempty"`
 	Cert      *string   `json:"cert,omitempty"`
 	Key       *string   `json:"key,omitempty"`
 	CreatedAt *int64    `json:"created_at,omitempty"`
