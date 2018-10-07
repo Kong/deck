@@ -1,9 +1,6 @@
 package dump
 
 import (
-	"errors"
-
-	"github.com/hbagdi/doko/utils"
 	"github.com/hbagdi/go-kong/kong"
 )
 
@@ -15,12 +12,7 @@ func Get(client *kong.Client) (*KongRawState, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, s := range state.Services {
-		if utils.Empty(s.Name) {
-			return nil, errors.New("service with id '" + *s.ID + "' has no 'name' property." +
-				" 'name' property is required if IDs are not being exported.")
-		}
-	}
+
 	state.Services = services
 
 	routes, err := GetAllRoutes(client)
