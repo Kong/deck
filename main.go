@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"log"
 
+	"github.com/hbagdi/doko/dump"
+	"github.com/hbagdi/doko/utils"
 	"github.com/hbagdi/go-kong/kong"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -12,219 +14,91 @@ import (
 var entities = []string{"key-auth", "hmac-auth", "jwt", "oauth2", "acl"}
 
 func main() {
-	fmt.Println("vim-go")
-	dumpState()
-}
-
-func dumpState() {
 	client, err := kong.NewClient(nil, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	var b []byte
-
-	services, err := GetAllServices(client)
-	if err != nil {
+	if err := Dump(client); err != nil {
 		log.Fatalln(err)
 	}
-	c, err := yaml.Marshal(services)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	routes, err := GetAllRoutes(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(routes)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	plugins, err := GetAllPlugins(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(plugins)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	certificates, err := GetAllCertificates(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(certificates)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	snis, err := GetAllSNIs(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(snis)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	consumers, err := GetAllConsumers(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(consumers)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	upstreams, err := GetAllUpstreams(client)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	c, err = yaml.Marshal(upstreams)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	b = append(b, c...)
-
-	fmt.Println(services)
-	fmt.Println(routes)
-	fmt.Print(plugins)
-	fmt.Println(certificates)
-	fmt.Println(snis)
-	fmt.Println(consumers)
-	fmt.Println(upstreams)
-
-	err = ioutil.WriteFile("test2.out", b, 0644)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// err = ioutil.WriteFile("test.out", b, 0644)
-
 }
 
-func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
-	var services []*kong.Service
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Services.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		services = append(services, s...)
-		if opt == nil {
-			break
+func Dump(client *kong.Client) error {
+	ks, err := dump.Get(client)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// check if all services havea name or not
+	for _, s := range ks.Services {
+		if utils.Empty(s.Name) {
+			return (errors.New("service with id '" + *s.ID + "' has no 'name' property." +
+				" 'name' property is required if IDs are not being exported."))
 		}
 	}
-	return services, nil
+
+	if err := removeTSAndIDs(ks); err != nil {
+		log.Fatalln(err)
+	}
+
+	if err := outputToFile(ks); err != nil {
+		log.Fatalln(err)
+	}
+	return nil
 }
 
-func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
-	var routes []*kong.Route
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Routes.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		routes = append(routes, s...)
-		if opt == nil {
-			break
-		}
+func removeTSAndIDs(state *dump.KongRawState) error {
+	for _, s := range state.Services {
+		s.ID = nil
+		s.CreatedAt = nil
+		s.UpdatedAt = nil
 	}
-	return routes, nil
+
+	for _, r := range state.Routes {
+		r.ID = nil
+		r.CreatedAt = nil
+		r.UpdatedAt = nil
+	}
+
+	for _, p := range state.Plugins {
+		p.ID = nil
+		p.CreatedAt = nil
+	}
+
+	for _, c := range state.Certificates {
+		c.ID = nil
+		c.CreatedAt = nil
+	}
+
+	for _, s := range state.SNIs {
+		s.ID = nil
+		s.CreatedAt = nil
+	}
+
+	for _, u := range state.Upstreams {
+		u.ID = nil
+		u.CreatedAt = nil
+	}
+
+	for _, t := range state.Targets {
+		t.ID = nil
+		t.CreatedAt = nil
+	}
+
+	for _, c := range state.Consumers {
+		c.ID = nil
+		c.CreatedAt = nil
+	}
+	return nil
 }
 
-func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
-	var plugins []*kong.Plugin
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Plugins.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		plugins = append(plugins, s...)
-		if opt == nil {
-			break
-		}
+func outputToFile(state *dump.KongRawState) error {
+	c, err := yaml.Marshal(state)
+	err = ioutil.WriteFile("test3.out", c, 0644)
+	if err != nil {
+		return err
 	}
-	return plugins, nil
-}
 
-func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
-	var certificates []*kong.Certificate
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Certificates.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		certificates = append(certificates, s...)
-		if opt == nil {
-			break
-		}
-	}
-	return certificates, nil
-}
-
-func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
-	var snis []*kong.SNI
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.SNIs.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		snis = append(snis, s...)
-		if opt == nil {
-			break
-		}
-	}
-	return snis, nil
-}
-
-func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
-	var consumers []*kong.Consumer
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Consumers.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		consumers = append(consumers, s...)
-		if opt == nil {
-			break
-		}
-	}
-	return consumers, nil
-}
-
-func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
-	var upstreams []*kong.Upstream
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
-	for {
-		s, opt, err := client.Upstreams.List(nil, opt)
-		if err != nil {
-			return nil, err
-		}
-		upstreams = append(upstreams, s...)
-		if opt == nil {
-			break
-		}
-	}
-	return upstreams, nil
+	return nil
 }
