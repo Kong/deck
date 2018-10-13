@@ -118,3 +118,21 @@ func (s *CertificateService) List(ctx context.Context, opt *ListOpt) ([]*Certifi
 
 	return certificates, next, nil
 }
+
+// ListAll fetches all Certificates in Kong.
+// This method can take a while if there
+// a lot of Certificates present.
+func (s *CertificateService) ListAll(ctx context.Context) ([]*Certificate, error) {
+	var certificates, data []*Certificate
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		certificates = append(certificates, data...)
+	}
+	return certificates, nil
+}

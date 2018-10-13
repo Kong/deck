@@ -164,3 +164,19 @@ func (s *CustomEntityService) List(ctx context.Context, opt *ListOpt, entity cus
 
 	return entities, next, nil
 }
+
+// ListAll fetches all custom entities based on relations
+func (s *CustomEntityService) ListAll(ctx context.Context, entity custom.Entity) ([]custom.Entity, error) {
+	var entities, data []custom.Entity
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt, entity)
+		if err != nil {
+			return nil, err
+		}
+		entities = append(entities, data...)
+	}
+	return entities, nil
+}

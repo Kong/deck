@@ -119,6 +119,11 @@ func TestUpstreamListEndpoint(T *testing.T) {
 
 	assert.True(compareUpstreams(upstreams, upstreamsFromKong))
 
+	upstreams, err = client.Upstreams.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(upstreams)
+	assert.Equal(3, len(upstreams))
+
 	for i := 0; i < len(upstreams); i++ {
 		assert.Nil(client.Upstreams.Delete(defaultCtx, upstreams[i].ID))
 	}

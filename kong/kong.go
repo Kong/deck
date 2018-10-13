@@ -14,6 +14,8 @@ import (
 
 const defaultBaseURL = "http://localhost:8001"
 
+var pageSize = 1000
+
 type service struct {
 	client *Client
 }

@@ -119,3 +119,21 @@ func (s *ConsumerService) List(ctx context.Context, opt *ListOpt) ([]*Consumer, 
 
 	return consumers, next, nil
 }
+
+// ListAll fetches all Consumers in Kong.
+// This method can take a while if there
+// a lot of Consumers present.
+func (s *ConsumerService) ListAll(ctx context.Context) ([]*Consumer, error) {
+	var consumers, data []*Consumer
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		consumers = append(consumers, data...)
+	}
+	return consumers, nil
+}

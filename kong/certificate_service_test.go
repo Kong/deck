@@ -117,6 +117,11 @@ func TestCertificateListEndpoint(T *testing.T) {
 
 	assert.True(compareCertificates(certificates, certificatesFromKong))
 
+	certificates, err = client.Certificates.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(certificates)
+	assert.Equal(3, len(certificates))
+
 	for i := 0; i < len(certificates); i++ {
 		assert.Nil(client.Certificates.Delete(defaultCtx, certificates[i].ID))
 	}

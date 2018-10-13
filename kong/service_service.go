@@ -146,3 +146,21 @@ func (s *Svcservice) List(ctx context.Context, opt *ListOpt) ([]*Service, *ListO
 
 	return services, next, nil
 }
+
+// ListAll fetches all Services in Kong.
+// This method can take a while if there
+// a lot of Services present.
+func (s *Svcservice) ListAll(ctx context.Context) ([]*Service, error) {
+	var services, data []*Service
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, data...)
+	}
+	return services, nil
+}

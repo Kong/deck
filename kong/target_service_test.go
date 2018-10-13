@@ -142,6 +142,11 @@ func TestTargetListEndpoint(T *testing.T) {
 
 	// assert.True(compareTargets(targets, targetsFromKong))
 
+	targets, err = client.Targets.ListAll(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+	assert.NotNil(targets)
+	assert.Equal(3, len(targets))
+
 	assert.Nil(client.Upstreams.Delete(defaultCtx, createdUpstream.ID))
 }
 

@@ -109,3 +109,21 @@ func (s *APIService) List(ctx context.Context, opt *ListOpt) ([]*API, *ListOpt, 
 
 	return apis, next, nil
 }
+
+// ListAll fetches all APIs in Kong.
+// This method can take a while if there
+// a lot of APIs present.
+func (s *APIService) ListAll(ctx context.Context) ([]*API, error) {
+	var apis, data []*API
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		apis = append(apis, data...)
+	}
+	return apis, nil
+}

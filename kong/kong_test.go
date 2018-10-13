@@ -1,6 +1,7 @@
 package kong
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,4 +17,10 @@ func TestKongStatus(T *testing.T) {
 	status, err := client.Status(nil)
 	assert.Nil(err)
 	assert.NotNil(status)
+}
+
+func TestMain(m *testing.M) {
+	// to test ListAll code for pagination
+	pageSize = 1
+	os.Exit(m.Run())
 }

@@ -142,3 +142,21 @@ func (s *SNIService) ListForCertificate(ctx context.Context, certificateID *stri
 
 	return snis, next, nil
 }
+
+// ListAll fetches all SNIs in Kong.
+// This method can take a while if there
+// a lot of SNIs present.
+func (s *SNIService) ListAll(ctx context.Context) ([]*SNI, error) {
+	var snis, data []*SNI
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		snis = append(snis, data...)
+	}
+	return snis, nil
+}

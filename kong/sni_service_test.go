@@ -147,6 +147,11 @@ func TestSNIListEndpoint(T *testing.T) {
 
 	assert.True(compareSNIs(snis, snisForCert))
 
+	snis, err = client.SNIs.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(snis)
+	assert.Equal(3, len(snis))
+
 	for i := 0; i < len(snis); i++ {
 		assert.Nil(client.SNIs.Delete(defaultCtx, snis[i].ID))
 	}

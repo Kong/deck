@@ -120,3 +120,21 @@ func (s *UpstreamService) List(ctx context.Context, opt *ListOpt) ([]*Upstream, 
 
 	return upstreams, next, nil
 }
+
+// ListAll fetches all Upstreams in Kong.
+// This method can take a while if there
+// a lot of Upstreams present.
+func (s *UpstreamService) ListAll(ctx context.Context) ([]*Upstream, error) {
+	var upstreams, data []*Upstream
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		upstreams = append(upstreams, data...)
+	}
+	return upstreams, nil
+}

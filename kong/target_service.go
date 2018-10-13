@@ -84,3 +84,19 @@ func (s *TargetService) List(ctx context.Context, upstreamNameOrID *string, opt 
 
 	return targets, next, nil
 }
+
+// ListAll fetches all Targets in Kong for an upstream.
+func (s *TargetService) ListAll(ctx context.Context, upstreamNameOrID *string) ([]*Target, error) {
+	var targets, data []*Target
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, upstreamNameOrID, opt)
+		if err != nil {
+			return nil, err
+		}
+		targets = append(targets, data...)
+	}
+	return targets, nil
+}

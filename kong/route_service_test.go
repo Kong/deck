@@ -201,6 +201,11 @@ func TestRouteListEndpoint(T *testing.T) {
 	assert.NotNil(routesForService)
 	assert.True(compareRoutes(routes, routesForService))
 
+	routes, err = client.Routes.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(routes)
+	assert.Equal(3, len(routes))
+
 	for i := 0; i < len(routes); i++ {
 		assert.Nil(client.Routes.Delete(defaultCtx, routes[i].ID))
 	}

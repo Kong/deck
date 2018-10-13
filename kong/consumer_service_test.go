@@ -112,6 +112,11 @@ func TestConsumerListEndpoint(T *testing.T) {
 
 	assert.True(compareConsumers(consumers, consumersFromKong))
 
+	consumers, err = client.Consumers.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(consumers)
+	assert.Equal(3, len(consumers))
+
 	for i := 0; i < len(consumers); i++ {
 		assert.Nil(client.Consumers.Delete(defaultCtx, consumers[i].ID))
 	}

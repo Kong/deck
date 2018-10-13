@@ -120,3 +120,21 @@ func (s *PluginService) List(ctx context.Context, opt *ListOpt) ([]*Plugin, *Lis
 
 	return plugins, next, nil
 }
+
+// ListAll fetches all Plugins in Kong.
+// This method can take a while if there
+// a lot of Plugins present.
+func (s *PluginService) ListAll(ctx context.Context) ([]*Plugin, error) {
+	var plugins, data []*Plugin
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		plugins = append(plugins, data...)
+	}
+	return plugins, nil
+}

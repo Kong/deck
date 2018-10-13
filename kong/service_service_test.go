@@ -142,6 +142,11 @@ func TestServiceListEndpoint(T *testing.T) {
 
 	assert.True(compareServices(services, servicesFromKong))
 
+	services, err = client.Services.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(services)
+	assert.Equal(3, len(services))
+
 	for i := 0; i < len(services); i++ {
 		assert.Nil(client.Services.Delete(defaultCtx, services[i].ID))
 	}

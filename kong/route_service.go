@@ -139,6 +139,24 @@ func (s *RouteService) List(ctx context.Context, opt *ListOpt) ([]*Route, *ListO
 	return routes, next, nil
 }
 
+// ListAll fetches all Routes in Kong.
+// This method can take a while if there
+// a lot of Routes present.
+func (s *RouteService) ListAll(ctx context.Context) ([]*Route, error) {
+	var routes, data []*Route
+	var err error
+	opt := &ListOpt{Size: pageSize}
+
+	for opt != nil {
+		data, opt, err = s.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		routes = append(routes, data...)
+	}
+	return routes, nil
+}
+
 // ListForService fetches a list of Routes in Kong associated with a service.
 // opt can be used to control pagination.
 func (s *RouteService) ListForService(ctx context.Context, serviceNameOrID *string, opt *ListOpt) ([]*Route, *ListOpt, error) {

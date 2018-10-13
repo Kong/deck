@@ -133,6 +133,11 @@ func TestPluginListEndpoint(T *testing.T) {
 
 	assert.True(comparePlugins(plugins, pluginsFromKong))
 
+	plugins, err = client.Plugins.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(plugins)
+	assert.Equal(3, len(plugins))
+
 	for i := 0; i < len(plugins); i++ {
 		assert.Nil(client.Plugins.Delete(defaultCtx, plugins[i].ID))
 	}

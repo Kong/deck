@@ -111,6 +111,11 @@ func TestAPIListEndpoint(T *testing.T) {
 
 	assert.True(compareAPIs(apis, apisFromKong))
 
+	apis, err = client.APIs.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(apis)
+	assert.Equal(3, len(apis))
+
 	for i := 0; i < len(apis); i++ {
 		assert.Nil(client.APIs.Delete(defaultCtx, apis[i].ID))
 	}
