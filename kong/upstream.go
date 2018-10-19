@@ -44,14 +44,17 @@ type Healthcheck struct {
 
 // Upstream represents a Consumer in Kong.
 type Upstream struct {
-	CreatedAt        *int64      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	HashFallback     *string     `json:"hash_fallback,omitempty" yaml:"hash_fallback,omitempty"`
-	HashOn           *string     `json:"hash_on,omitempty" yaml:"hash_on,omitempty"`
-	HashOnCookiePath *string     `json:"hash_on_cookie_path,omitempty" yaml:"hash_on_cookie_path,omitempty"`
-	Healthchecks     Healthcheck `json:"healthchecks,omitempty" yaml:"healthchecks,omitempty"`
-	ID               *string     `json:"id,omitempty" yaml:"id,omitempty"`
-	Name             *string     `json:"name,omitempty" yaml:"name,omitempty"`
-	Slots            *int        `json:"slots,omitempty" yaml:"slots,omitempty"`
+	ID                 *string      `json:"id,omitempty" yaml:"id,omitempty"`
+	Name               *string      `json:"name,omitempty" yaml:"name,omitempty"`
+	Slots              *int         `json:"slots,omitempty" yaml:"slots,omitempty"`
+	Healthchecks       *Healthcheck `json:"healthchecks,omitempty" yaml:"healthchecks,omitempty"`
+	CreatedAt          *int64       `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	HashOn             *string      `json:"hash_on,omitempty" yaml:"hash_on,omitempty"`
+	HashFallback       *string      `json:"hash_fallback,omitempty" yaml:"hash_fallback,omitempty"`
+	HashOnHeader       *string      `json:"hash_on_header,omitempty" yaml:"hash_on_header,omitempty"`
+	HashFallbackHeader *string      `json:"hash_fallback_header,omitempty" yaml:"hash_fallback_header,omitempty"`
+	HashOnCookie       *string      `json:"hash_on_cookie,omitempty" yaml:"hash_on_cookie,omitempty"`
+	HashOnCookiePath   *string      `json:"hash_on_cookie_path,omitempty" yaml:"hash_on_cookie_path,omitempty"`
 }
 
 // Valid checks if all the fields in Upstream are valid.
