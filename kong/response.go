@@ -20,6 +20,11 @@ func hasError(res *http.Response) error {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
+
+	if res.StatusCode == 404 {
+		return err404{}
+	}
+
 	body, _ := ioutil.ReadAll(res.Body) // TODO error in error?
 	return errors.New(res.Status + " " + string(body))
 }
