@@ -143,6 +143,122 @@ func TestPluginListEndpoint(T *testing.T) {
 	}
 }
 
+func TestPluginListAllForEntityEndpoint(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	// fixtures
+
+	createdService, err := client.Services.Create(defaultCtx, &Service{
+		Name: String("foo"),
+		Host: String("upstream"),
+		Port: Int(42),
+		Path: String("/path"),
+	})
+	assert.Nil(err)
+	assert.NotNil(createdService)
+
+	createdRoute, err := client.Routes.Create(defaultCtx, &Route{
+		Hosts:   StringSlice("host1.com", "host2.com"),
+		Service: createdService,
+	})
+	assert.Nil(err)
+	assert.NotNil(createdRoute)
+
+	createdConsumer, err := client.Consumers.Create(defaultCtx, &Consumer{
+		Username: String("foo"),
+	})
+	assert.Nil(err)
+	assert.NotNil(createdConsumer)
+
+	plugins := []*Plugin{
+		// global
+		{
+			Name: String("key-auth"),
+		},
+		{
+			Name: String("basic-auth"),
+		},
+		{
+			Name: String("jwt"),
+		},
+		// specific to route
+		{
+			Name:    String("key-auth"),
+			RouteID: createdRoute.ID,
+		},
+		{
+			Name:    String("jwt"),
+			RouteID: createdRoute.ID,
+		},
+		// specific to service
+		{
+			Name:      String("key-auth"),
+			ServiceID: createdService.ID,
+		},
+		{
+			Name:      String("jwt"),
+			ServiceID: createdService.ID,
+		},
+		// specific to consumer
+		{
+			Name:       String("rate-limiting"),
+			ConsumerID: createdConsumer.ID,
+			Config: map[string]interface{}{
+				"second": 1,
+			},
+		},
+	}
+
+	// create fixturs
+	for i := 0; i < len(plugins); i++ {
+		plugin, err := client.Plugins.Create(defaultCtx, plugins[i])
+		assert.Nil(err)
+		assert.NotNil(plugin)
+		plugins[i] = plugin
+	}
+
+	pluginsFromKong, err := client.Plugins.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(pluginsFromKong)
+	assert.Equal(len(plugins), len(pluginsFromKong))
+
+	// check if we see all plugins
+	assert.True(comparePlugins(plugins, pluginsFromKong))
+
+	assert.True(comparePlugins(plugins, pluginsFromKong))
+
+	pluginsFromKong, err = client.Plugins.ListAll(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(pluginsFromKong)
+	assert.Equal(8, len(pluginsFromKong))
+
+	pluginsFromKong, err = client.Plugins.ListAllForConsumer(defaultCtx, createdConsumer.ID)
+	assert.Nil(err)
+	assert.NotNil(pluginsFromKong)
+	assert.Equal(1, len(pluginsFromKong))
+
+	pluginsFromKong, err = client.Plugins.ListAllForService(defaultCtx, createdService.ID)
+	assert.Nil(err)
+	assert.NotNil(pluginsFromKong)
+	assert.Equal(2, len(pluginsFromKong))
+
+	pluginsFromKong, err = client.Plugins.ListAllForRoute(defaultCtx, createdRoute.ID)
+	assert.NotNil(pluginsFromKong)
+	assert.Equal(2, len(pluginsFromKong))
+
+	for i := 0; i < len(plugins); i++ {
+		assert.Nil(client.Plugins.Delete(defaultCtx, plugins[i].ID))
+	}
+
+	assert.Nil(client.Consumers.Delete(defaultCtx, createdConsumer.ID))
+	assert.Nil(client.Routes.Delete(defaultCtx, createdRoute.ID))
+	assert.Nil(client.Services.Delete(defaultCtx, createdService.ID))
+}
+
 func comparePlugins(expected, actual []*Plugin) bool {
 	var expectedNames, actualNames []string
 	for _, plugin := range expected {
