@@ -204,3 +204,19 @@ func (c *Client) Status(ctx context.Context) (*Status, error) {
 	}
 	return &s, nil
 }
+
+// Root returns the response of GET request on root of
+// Admin API (GET /).
+func (c *Client) Root(ctx context.Context) (map[string]interface{}, error) {
+	req, err := c.newRequest("GET", "/", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var root map[string]interface{}
+	_, err = c.Do(ctx, req, &root)
+	if err != nil {
+		return nil, err
+	}
+	return root, nil
+}
