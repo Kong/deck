@@ -89,7 +89,10 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Registry = custom.NewDefaultRegistry()
 
 	for i := 0; i < len(defaultCustomEntities); i++ {
-		kong.Register(defaultCustomEntities[i].Type(), &defaultCustomEntities[i])
+		err := kong.Register(defaultCustomEntities[i].Type(), &defaultCustomEntities[i])
+		if err != nil {
+			return nil, err
+		}
 	}
 	kong.logger = os.Stderr
 	return kong, nil

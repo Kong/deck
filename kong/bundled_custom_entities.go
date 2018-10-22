@@ -16,8 +16,8 @@ var defaultCustomEntities = []custom.EntityCRUDDefinition{
 		PrimaryKey: "id",
 	},
 	{
-		Name:       "hmac-auth",
-		CRUDPath:   "/consumers/${consumer_id}/hmac-auth",
+		Name:       "acl",
+		CRUDPath:   "/consumers/${consumer_id}/acls",
 		PrimaryKey: "id",
 	},
 	{
