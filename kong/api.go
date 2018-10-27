@@ -2,6 +2,7 @@ package kong
 
 // API represents an API in Kong
 // Read https://getkong.org/docs/latest/admin-api/#api-object
+// +k8s:deepcopy-gen=true
 type API struct {
 	CreatedAt              *int64    `json:"created_at,omitempty" yaml:"created_at,omitempty"` //TODO marshal to time.Time
 	Hosts                  []*string `json:"hosts,omitempty" yaml:"hosts,omitempty"`

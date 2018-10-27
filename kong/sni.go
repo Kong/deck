@@ -4,6 +4,7 @@ import "bytes"
 
 // SNI represents a SNI in Kong.
 // Read https://getkong.org/docs/0.14.x/admin-api/#sni-object
+// +k8s:deepcopy-gen=true
 type SNI struct {
 	ID          *string      `json:"id,omitempty" yaml:"id,omitempty"`
 	Name        *string      `json:"name,omitempty" yaml:"name,omitempty"`

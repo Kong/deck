@@ -7,6 +7,7 @@ import (
 
 // Route represents a Route in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Route-object
+// +k8s:deepcopy-gen=true
 type Route struct {
 	CreatedAt     *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Hosts         []*string `json:"hosts,omitempty" yaml:"hosts,omitempty"`

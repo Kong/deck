@@ -8,6 +8,7 @@ import (
 
 // Service represents a Service in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Service-object
+// +k8s:deepcopy-gen=true
 type Service struct {
 	ConnectTimeout *int    `json:"connect_timeout,omitempty" yaml:"connect_timeout,omitempty"`
 	CreatedAt      *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`

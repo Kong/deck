@@ -4,6 +4,7 @@ import "bytes"
 
 // Healthy configures thresholds and HTTP status codes
 // to mark targets healthy for an upstream.
+// +k8s:deepcopy-gen=true
 type Healthy struct {
 	HTTPStatuses []int `json:"http_statuses,omitempty" yaml:"http_statuses,omitempty"`
 	Interval     *int  `json:"interval,omitempty" yaml:"interval,omitempty"`
@@ -12,6 +13,7 @@ type Healthy struct {
 
 // Unhealthy configures thresholds and HTTP status codes
 // to mark targets unhealthy.
+// +k8s:deepcopy-gen=true
 type Unhealthy struct {
 	HTTPFailures *int  `json:"http_failures,omitempty" yaml:"http_failures,omitempty"`
 	HTTPStatuses []int `json:"http_statuses,omitempty" yaml:"http_statuses,omitempty"`
@@ -20,6 +22,7 @@ type Unhealthy struct {
 }
 
 // ActiveHealthcheck configures active health check probing.
+// +k8s:deepcopy-gen=true
 type ActiveHealthcheck struct {
 	Concurrency *int       `json:"concurrency,omitempty" yaml:"concurrency,omitempty"`
 	Healthy     *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
@@ -30,6 +33,7 @@ type ActiveHealthcheck struct {
 
 // PassiveHealthcheck configures passive checks around
 // passive health checks.
+// +k8s:deepcopy-gen=true
 type PassiveHealthcheck struct {
 	Healthy   *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
 	Unhealthy *Unhealthy `json:"unhealthy,omitempty" yaml:"unhealthy,omitempty"`
@@ -37,12 +41,14 @@ type PassiveHealthcheck struct {
 
 // Healthcheck represents a health-check config of an upstream
 // in Kong.
+// +k8s:deepcopy-gen=true
 type Healthcheck struct {
 	Active  *ActiveHealthcheck  `json:"active,omitempty" yaml:"active,omitempty"`
 	Passive *PassiveHealthcheck `json:"passive,omitempty" yaml:"passive,omitempty"`
 }
 
 // Upstream represents a Consumer in Kong.
+// +k8s:deepcopy-gen=true
 type Upstream struct {
 	ID                 *string      `json:"id,omitempty" yaml:"id,omitempty"`
 	Name               *string      `json:"name,omitempty" yaml:"name,omitempty"`

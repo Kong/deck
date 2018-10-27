@@ -4,6 +4,7 @@ import "bytes"
 
 // Consumer represents a Consumer in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#consumer-object
+// +k8s:deepcopy-gen=true
 type Consumer struct {
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
 	CustomID  *string `json:"custom_id,omitempty" yaml:"custom_id,omitempty"`
