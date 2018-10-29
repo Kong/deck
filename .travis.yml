@@ -20,4 +20,5 @@ install:
   - bash .ci/setup_kong.sh
   - go get -u github.com/golang/dep/cmd/dep
   - dep ensure
+  - ./hack/verify-deepcopy-gen.sh
 

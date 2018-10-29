@@ -3,6 +3,7 @@ package kong
 import "bytes"
 
 // Target represents a Target in Kong.
+// +k8s:deepcopy-gen=true
 type Target struct {
 	CreatedAt *int64  `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`

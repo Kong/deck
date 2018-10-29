@@ -23,6 +23,17 @@
 #   non-go = false
 #   go-tests = true
 #   unused-packages = true
+required = [
+  "k8s.io/code-generator/cmd/client-gen",
+  "k8s.io/code-generator/cmd/deepcopy-gen",
+  "k8s.io/code-generator/cmd/defaulter-gen",
+  "k8s.io/code-generator/cmd/lister-gen",
+  "k8s.io/code-generator/cmd/informer-gen",
+]
+
+[[constraint]]
+  name = "k8s.io/code-generator"
+  version = "kubernetes-1.11.3"
 
 
 [[constraint]]
@@ -31,7 +42,6 @@
 
 [prune]
   go-tests = true
-  unused-packages = true
 
 [[constraint]]
   name = "github.com/satori/go.uuid"
