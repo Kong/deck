@@ -33,6 +33,8 @@ to quickly create a Cobra application.`,
 	},
 }
 
+var withID bool
+
 func init() {
 	rootCmd.AddCommand(dumpCmd)
 
@@ -45,6 +47,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// dumpCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	dumpCmd.Flags().BoolVar(&withID, "with-ids", false, "export all entities with IDs")
 }
 
 func d(client *kong.Client) error {
@@ -61,7 +64,7 @@ func d(client *kong.Client) error {
 		}
 	}
 
-	if err := dropFields(ks, true, true); err != nil {
+	if err := dropFields(ks, !withID, true); err != nil {
 		log.Fatalln(err)
 	}
 
