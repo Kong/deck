@@ -1,8 +1,9 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/go-memdb"
-	"github.com/hbagdi/doko/graph"
 	"github.com/pkg/errors"
 )
 
@@ -10,16 +11,16 @@ var serviceTableSchema = &memdb.TableSchema{
 	Name: serviceTableName,
 	Indexes: map[string]*memdb.IndexSchema{
 		id: &memdb.IndexSchema{
-			Name:          id,
-			Unique:        true,
-			EnforceUnique: true,
-			Indexer:       &memdb.StringFieldIndex{Field: "ID"},
+			Name:   id,
+			Unique: true,
+			// EnforceUnique: true,
+			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
 		"name": &memdb.IndexSchema{
-			Name:          "name",
-			Unique:        true,
-			EnforceUnique: true,
-			Indexer:       &memdb.StringFieldIndex{Field: "Name"},
+			Name:   "name",
+			Unique: true,
+			// EnforceUnique: true,
+			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
 		all: &memdb.IndexSchema{
 			Name: all,
@@ -33,11 +34,10 @@ var serviceTableSchema = &memdb.TableSchema{
 }
 
 // AddService adds a service to KongState
-func (k *KongState) AddService(service graph.Service) error {
+func (k *KongState) AddService(service Service) error {
 	txn := k.memdb.Txn(true)
 	defer txn.Commit()
-
-	err := txn.Insert(serviceTableName, service)
+	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
 		return errors.Wrap(err, "insert failed")
 	}
@@ -45,20 +45,37 @@ func (k *KongState) AddService(service graph.Service) error {
 }
 
 // GetService gets a service by name or ID.
-func (k *KongState) GetService(nameOrID string) (*graph.Service, error) {
-	res, err := k.multiIndexLookup(serviceTableName, []string{"name", "id"}, nameOrID)
+func (k *KongState) GetService(nameOrID string) (*Service, error) {
+	res, err := k.multiIndexLookup(serviceTableName, []string{"name", id}, nameOrID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "service lookup failed")
 	}
-	service, ok := res.(graph.Service)
-	if !ok {
-		panic("unexpected type found")
+	if res == nil {
+		return nil, ErrNotFound
 	}
-	return &service, nil
+	service, ok := res.(*Service)
+	if !ok {
+		panic("unexpected type found ")
+	}
+	return service, nil
 }
 
-// DeletService deletes a service by name or ID.
-func (k *KongState) DeletService(nameOrID string) error {
+func (k *KongState) GetServiceByName(nameOrID string) (*Service, error) {
+	txn := k.memdb.Txn(false)
+	res, err := txn.First(serviceTableName, "name", nameOrID)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(res, err)
+	service, ok := res.(*Service)
+	if !ok {
+		panic("unexpected type found ")
+	}
+	return service, nil
+}
+
+// DeleteService deletes a service by name or ID.
+func (k *KongState) DeleteService(nameOrID string) error {
 	service, err := k.GetService(nameOrID)
 
 	if err != nil {
@@ -76,7 +93,7 @@ func (k *KongState) DeletService(nameOrID string) error {
 }
 
 // GetAllServices gets a service by name or ID.
-func (k *KongState) GetAllServices() ([]*graph.Service, error) {
+func (k *KongState) GetAllServices() ([]*Service, error) {
 	txn := k.memdb.Txn(false)
 	defer txn.Commit()
 
@@ -85,13 +102,13 @@ func (k *KongState) GetAllServices() ([]*graph.Service, error) {
 		return nil, errors.Wrapf(err, "service lookup failed")
 	}
 
-	var res []*graph.Service
+	var res []*Service
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(graph.Service)
+		s, ok := el.(*Service)
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, &s)
+		res = append(res, s)
 	}
 	return res, nil
 }

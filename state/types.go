@@ -1,15 +1,10 @@
-package graph
+package state
 
 import (
 	"reflect"
 
 	"github.com/hbagdi/go-kong/kong"
 )
-
-// KongState can store a graph of Kong Entities
-type KongState struct {
-	Services []*Service
-}
 
 // Meta contains additional information for an entity
 type Meta struct {
@@ -18,6 +13,7 @@ type Meta struct {
 	Kind   *string `json:"type,omitempty" yaml:"type,omitempty"`
 }
 
+// Service represents a service in Kong with helper methods
 type Service struct {
 	kong.Service
 }

@@ -5,7 +5,9 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/hbagdi/doko/state"
 	"github.com/hbagdi/doko/sync"
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -19,10 +21,50 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("sync called")
+	RunE: func(cmd *cobra.Command, args []string) error {
 		s, _ := sync.NewSyncer(nil, nil)
-		s.Or()
+		target, err := state.NewKongState()
+		if err != nil {
+			return err
+		}
+		current, err := state.NewKongState()
+		if err != nil {
+			return err
+		}
+		var service state.Service
+		// service.Name = kong.String("foo")
+		service.Name = kong.String("S")
+		err = current.AddService(service)
+		if err != nil {
+			return err
+		}
+
+		var service2 state.Service
+		// service2.Name = kong.String("foo")
+		service2.Name = kong.String("S")
+		err = target.AddService(service2)
+		if err != nil {
+			return err
+		}
+
+		se, err := target.GetServiceByName("S")
+		if err != nil {
+			return err
+		}
+		fmt.Println(*se)
+
+		svcs, err := target.GetAllServices()
+		fmt.Printf("%#v %v\n", svcs[0], err)
+
+		g, err := s.Diff(target, current)
+		if err != nil {
+			return err
+		}
+		err = s.Solve(g)
+		if err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

@@ -17,6 +17,8 @@ const (
 	all              = "all"
 )
 
+var ErrNotFound = errors.New("not found")
+
 var schema = &memdb.DBSchema{
 	Tables: map[string]*memdb.TableSchema{
 		serviceTableName: serviceTableSchema,
@@ -49,7 +51,7 @@ func (k *KongState) multiIndexLookup(tableName string,
 	)
 	for _, indexName := range indices {
 		res, err = txn.First(tableName, indexName, args...)
-		if err == nil {
+		if err == nil && res != nil {
 			return res, nil
 		}
 		if err == memdb.ErrNotFound {
@@ -58,5 +60,5 @@ func (k *KongState) multiIndexLookup(tableName string,
 			return nil, errors.Wrap(err, "lookup failed")
 		}
 	}
-	return nil, errors.New("not found")
+	return nil, ErrNotFound
 }

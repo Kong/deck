@@ -4,14 +4,13 @@ import (
 	"fmt"
 
 	"github.com/hbagdi/doko/crud"
-	"github.com/hbagdi/go-kong/kong"
 )
 
-type Callback func(crud.Arg) error
+type Callback func(crud.Arg, error) error
 
 type ServiceCRUD struct {
-	client *kong.Client
-	CB     Callback // use this to update the current in-memory state
+	// client    *kong.Client
+	// callbacks []Callback // use this to update the current in-memory state
 }
 
 func (s *ServiceCRUD) Create(arg crud.Arg) (crud.Arg, error) {

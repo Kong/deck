@@ -1,4 +1,4 @@
-package event
+package sync
 
 import "github.com/hbagdi/doko/crud"
 
