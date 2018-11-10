@@ -15,7 +15,7 @@ type Meta struct {
 
 // Service represents a service in Kong with helper methods
 type Service struct {
-	kong.Service
+	kong.Service `yaml:",inline"`
 }
 
 func (s *Service) Equal(s2 *Service) bool {

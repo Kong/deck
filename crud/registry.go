@@ -39,46 +39,46 @@ func (r *Registry) Get(kind Kind) (Actions, error) {
 	return a, nil
 }
 
-func (r *Registry) Create(kind Kind, arg Arg) (Arg, error) {
+func (r *Registry) Create(kind Kind, arg ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, errors.Wrap(err, "create failed")
 	}
 
-	res, err := a.Create(arg)
+	res, err := a.Create(arg...)
 	if err != nil {
 		return nil, errors.Wrap(err, "create failed")
 	}
 	return res, nil
 }
 
-func (r *Registry) Update(kind Kind, arg Arg) (Arg, error) {
+func (r *Registry) Update(kind Kind, arg ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, errors.Wrap(err, "update failed")
 	}
 
-	res, err := a.Update(arg)
+	res, err := a.Update(arg...)
 	if err != nil {
 		return nil, errors.Wrap(err, "update failed")
 	}
 	return res, nil
 }
 
-func (r *Registry) Delete(kind Kind, arg Arg) (Arg, error) {
+func (r *Registry) Delete(kind Kind, arg ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, errors.Wrap(err, "delete failed")
 	}
 
-	res, err := a.Delete(arg)
+	res, err := a.Delete(arg...)
 	if err != nil {
 		return nil, errors.Wrap(err, "delete failed")
 	}
 	return res, nil
 }
 
-func (r *Registry) Do(kind Kind, op Op, arg Arg) (Arg, error) {
+func (r *Registry) Do(kind Kind, op Op, arg ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, errors.Wrapf(err, "%v failed", op)
@@ -88,11 +88,11 @@ func (r *Registry) Do(kind Kind, op Op, arg Arg) (Arg, error) {
 
 	switch op.name {
 	case Create.name:
-		res, err = a.Create(arg)
+		res, err = a.Create(arg...)
 	case Update.name:
-		res, err = a.Update(arg)
+		res, err = a.Update(arg...)
 	case Delete.name:
-		res, err = a.Delete(arg)
+		res, err = a.Delete(arg...)
 	default:
 		return nil, errors.New("unknown operation: " + op.name)
 	}

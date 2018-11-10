@@ -3,8 +3,12 @@
 package cmd
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
 	"strconv"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/hbagdi/doko/dump"
 	"github.com/hbagdi/doko/state"
@@ -12,6 +16,8 @@ import (
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
+
+var kongStateFile string
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
@@ -24,6 +30,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		fmt.Println(kongStateFile)
+
 		target, err := state.NewKongState()
 		if err != nil {
 			return err
@@ -36,7 +44,7 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		client.SetDebugMode(true)
+		// client.SetDebugMode(true)
 		services, err := dump.GetAllServices(client)
 		if err != nil {
 			return err
@@ -49,12 +57,23 @@ to quickly create a Cobra application.`,
 				return err
 			}
 		}
-		targetServices := make([]state.Service, 3)
+		servicesFromLocalState, err := readFile(kongStateFile)
+		if err != nil {
+			return err
+		}
+		// targetServices := make([]state.Service, 3)
 
-		for i, s := range targetServices {
+		fmt.Println(servicesFromLocalState)
+		for i, s := range servicesFromLocalState {
 			s.ID = kong.String("placeholder" + strconv.Itoa(i))
-			s.Name = kong.String("name" + strconv.Itoa(i))
-			s.Host = kong.String("host" + strconv.Itoa(i))
+			// s.Name = kong.String("name" + strconv.Itoa(i))
+			// s.Host = kong.String("host" + strconv.Itoa(i))
+			// s.Port = kong.Int(80)
+			// s.ConnectTimeout = kong.Int(60000)
+			// s.Protocol = kong.String("http")
+			// s.WriteTimeout = kong.Int(1000)
+			// s.ReadTimeout = kong.Int(60000)
+			// s.Retries = kong.Int(5)
 			// s.Host = kong.String("host" + strconv.Itoa(i))
 			err := target.AddService(s)
 			if err != nil {
@@ -67,16 +86,30 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		err = s.Solve(gDelete)
+		err = s.Solve(gDelete, client)
 		if err != nil {
 			return err
 		}
-		err = s.Solve(gCreateUpdate)
+		err = s.Solve(gCreateUpdate, client)
 		if err != nil {
 			return err
 		}
 		return nil
 	},
+}
+
+func readFile(kongStateFile string) ([]state.Service, error) {
+	type State struct {
+		Services []state.Service `yaml:"services"`
+	}
+	var s State
+	b, err := ioutil.ReadFile(kongStateFile)
+	err = yaml.Unmarshal(b, &s)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(s)
+	return s.Services, nil
 }
 
 func init() {
@@ -90,5 +123,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// syncCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	syncCmd.Flags().StringVarP(&kongStateFile, "state", "s", "", "Kong configuration directory or file")
 }

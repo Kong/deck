@@ -17,7 +17,7 @@ type Arg interface{}
 
 // Actions is an interface for CRUD operations on any entity
 type Actions interface {
-	Create(Arg) (Arg, error)
-	Delete(Arg) (Arg, error)
-	Update(Arg) (Arg, error)
+	Create(...Arg) (Arg, error)
+	Delete(...Arg) (Arg, error)
+	Update(...Arg) (Arg, error)
 }

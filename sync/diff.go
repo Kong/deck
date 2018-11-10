@@ -5,6 +5,7 @@ import (
 	"github.com/hbagdi/doko/crud"
 	"github.com/hbagdi/doko/state"
 	"github.com/hbagdi/doko/utils"
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -108,8 +109,10 @@ func (sc *Syncer) createUpdateServices() error {
 }
 
 func (sc *Syncer) createUpdateService(service *state.Service) error {
+	service = &state.Service{*service.DeepCopy()}
 	s, err := sc.currentState.GetService(*service.Name)
 	if err == state.ErrNotFound {
+		service.ID = nil
 		sc.createUpdateGraph.Add(Node{
 			Op:   crud.Create,
 			Kind: "service",
@@ -122,6 +125,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 	}
 	// if found, check if update needed
 	if !s.EqualWithOpts(service, true, true) {
+		service.ID = kong.String(*s.ID)
 		sc.createUpdateGraph.Add(Node{
 			Op:   crud.Update,
 			Kind: "service",
@@ -131,7 +135,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 	return nil
 }
 
-func (s *Syncer) Solve(g *dag.AcyclicGraph) error {
+func (s *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 	err := g.Walk(func(v dag.Vertex) error {
 		n, ok := v.(Node)
 		if !ok {
@@ -140,7 +144,7 @@ func (s *Syncer) Solve(g *dag.AcyclicGraph) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		s.registry.Do(n.Kind, n.Op, n.Obj)
+		s.registry.Do(n.Kind, n.Op, n.Obj, s.currentState, s.targetState, client)
 		return nil
 	})
 	return err
