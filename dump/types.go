@@ -7,8 +7,6 @@ import (
 
 // KongRawState contains all of Kong Data
 type KongRawState struct {
-	Root kong.Configuration
-
 	Services []*kong.Service
 	Routes   []*kong.Route
 

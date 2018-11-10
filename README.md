@@ -1,3 +1,3 @@
-# doko
+# decK
 
 Declaratively configure Kong

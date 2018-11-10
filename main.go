@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/hbagdi/doko/cmd"
+	"github.com/hbagdi/deck/cmd"
 )
 
 var entities = []string{"key-auth", "hmac-auth", "jwt", "oauth2", "acl"}

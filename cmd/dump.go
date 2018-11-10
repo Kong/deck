@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/hbagdi/doko/dump"
-	"github.com/hbagdi/doko/utils"
+	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"

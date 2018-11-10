@@ -2,9 +2,9 @@ package sync
 
 import (
 	"github.com/hashicorp/terraform/dag"
-	"github.com/hbagdi/doko/crud"
-	"github.com/hbagdi/doko/state"
-	"github.com/hbagdi/doko/utils"
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )

@@ -10,9 +10,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/hbagdi/doko/dump"
-	"github.com/hbagdi/doko/state"
-	"github.com/hbagdi/doko/sync"
+	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/sync"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )

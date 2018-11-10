@@ -3,8 +3,8 @@ package sync
 import (
 	"fmt"
 
-	"github.com/hbagdi/doko/crud"
-	"github.com/hbagdi/doko/state"
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
 )
 

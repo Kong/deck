@@ -5,7 +5,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/hbagdi/doko/utils"
+	"github.com/hbagdi/deck/utils"
 	"github.com/spf13/cobra"
 )
 
