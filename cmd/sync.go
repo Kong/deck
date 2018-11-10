@@ -3,8 +3,10 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"strconv"
 
+	"github.com/hbagdi/doko/dump"
 	"github.com/hbagdi/doko/state"
 	"github.com/hbagdi/doko/sync"
 	"github.com/hbagdi/go-kong/kong"
@@ -22,7 +24,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		s, _ := sync.NewSyncer(nil, nil)
 		target, err := state.NewKongState()
 		if err != nil {
 			return err
@@ -31,36 +32,46 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		var service state.Service
-		// service.Name = kong.String("foo")
-		service.Name = kong.String("S")
-		err = current.AddService(service)
+		client, err := kong.NewClient(nil, nil)
 		if err != nil {
 			return err
 		}
-
-		var service2 state.Service
-		// service2.Name = kong.String("foo")
-		service2.Name = kong.String("S")
-		err = target.AddService(service2)
+		client.SetDebugMode(true)
+		services, err := dump.GetAllServices(client)
 		if err != nil {
 			return err
 		}
+		for _, service := range services {
+			var s state.Service
+			s.Service = *service
+			err := current.AddService(s)
+			if err != nil {
+				return err
+			}
+		}
+		targetServices := make([]state.Service, 3)
 
-		se, err := target.GetServiceByName("S")
+		for i, s := range targetServices {
+			s.ID = kong.String("placeholder" + strconv.Itoa(i))
+			s.Name = kong.String("name" + strconv.Itoa(i))
+			s.Host = kong.String("host" + strconv.Itoa(i))
+			// s.Host = kong.String("host" + strconv.Itoa(i))
+			err := target.AddService(s)
+			if err != nil {
+				return err
+			}
+		}
+		log.Println("creating syncer")
+		s, _ := sync.NewSyncer(current, target)
+		gDelete, gCreateUpdate, err := s.Diff()
 		if err != nil {
 			return err
 		}
-		fmt.Println(*se)
-
-		svcs, err := target.GetAllServices()
-		fmt.Printf("%#v %v\n", svcs[0], err)
-
-		g, err := s.Diff(target, current)
+		err = s.Solve(gDelete)
 		if err != nil {
 			return err
 		}
-		err = s.Solve(g)
+		err = s.Solve(gCreateUpdate)
 		if err != nil {
 			return err
 		}

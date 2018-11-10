@@ -14,12 +14,14 @@ type ServiceCRUD struct {
 }
 
 func (s *ServiceCRUD) Create(arg crud.Arg) (crud.Arg, error) {
-	fmt.Println("create called with ", arg)
+	fmt.Println("Create called with ", arg)
 	return nil, nil
 }
 func (s *ServiceCRUD) Delete(arg crud.Arg) (crud.Arg, error) {
+	fmt.Println("Delete called with ", arg)
 	return nil, nil
 }
 func (s *ServiceCRUD) Update(arg crud.Arg) (crud.Arg, error) {
+	fmt.Println("Update called with ", arg)
 	return nil, nil
 }

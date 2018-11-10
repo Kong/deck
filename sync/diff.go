@@ -1,98 +1,133 @@
 package sync
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/hashicorp/terraform/dag"
 	"github.com/hbagdi/doko/crud"
 	"github.com/hbagdi/doko/state"
+	"github.com/hbagdi/doko/utils"
 	"github.com/pkg/errors"
 )
 
 type Syncer struct {
-	currentState, targetState *state.KongState
-	registry                  crud.Registry
+	currentState, targetState      *state.KongState
+	deleteGraph, createUpdateGraph *dag.AcyclicGraph
+	registry                       crud.Registry
 }
 
 func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
+	s.deleteGraph = new(dag.AcyclicGraph)
+	s.createUpdateGraph = new(dag.AcyclicGraph)
 	s.registry.Register("service", &ServiceCRUD{})
 	return s, nil
 }
 
-func (sc *Syncer) Diff(target, current *state.KongState) (*dag.AcyclicGraph, error) {
-	var g dag.AcyclicGraph
+func (sc *Syncer) Diff() (*dag.AcyclicGraph, *dag.AcyclicGraph, error) {
 
-	// every Node will need to add a few things to arg:
-	// *kong.Client to use
-	// callbacks to execute
-
-	err := sc.delete(&g, target, current)
+	err := sc.delete()
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create graph")
+		return nil, nil, errors.Wrap(err, "couldn't create graph")
 	}
-	// figure out how to make all create/updates depened on deletes or
-	// have two graphs
-	// figure out how to setup dependencies
-	err = sc.createAndUpdate(&g, target, current)
-
+	err = sc.createUpdate()
 	if err != nil {
-		return nil, errors.Wrap(err, "couldn't create graph")
+		return nil, nil, errors.Wrap(err, "couldn't create graph")
 	}
-	return &g, nil
+	return sc.deleteGraph, sc.createUpdateGraph, nil
 }
 
-func (sc *Syncer) createAndUpdate(g *dag.AcyclicGraph, target, current *state.KongState) error {
-
-	targetServices, err := target.GetAllServices()
+func (sc *Syncer) delete() error {
+	err := sc.deleteServices()
+	// deleteServices(g,target,current)
 	if err != nil {
-		return errors.Wrap(err, "error fetching services from state")
+		return errors.Wrap(err, "while building graph ")
 	}
-
-	for _, service := range targetServices {
-		log.Println("service in createAndUpdate: ", service)
-		s, err := current.GetService(*service.ID)
-		fmt.Println(s, err)
-	}
-
 	return nil
 }
 
-func (sc *Syncer) delete(g *dag.AcyclicGraph, target, current *state.KongState) error {
-
-	currentServices, err := current.GetAllServices()
+func (sc *Syncer) deleteServices() error {
+	currentServices, err := sc.currentState.GetAllServices()
 	if err != nil {
 		return errors.Wrap(err, "error fetching services from state")
 	}
 
 	for _, service := range currentServices {
-		s, err := target.GetService(*service.ID)
-		fmt.Println(s, err)
-		if err == nil {
-			continue
-		} else if err == state.ErrNotFound {
-			// search by name
-			// figure out what to do when IDs don't match up
-			_, err = target.GetService(*service.Name)
-			if err == nil {
-				continue
-			} else if err == state.ErrNotFound {
-				// delete the service
-				g.Add(Node{
-					Op:   crud.Delete,
-					Kind: "service",
-					Obj:  service,
-				})
-			} else {
-				return errors.Wrap(err, "error looking up service")
-			}
-		} else {
-			return errors.Wrap(err, "error looking up service")
+		ok, err := sc.deleteService(service)
+		if err != nil {
+			return err
+		}
+		if ok {
+			sc.deleteGraph.Add(Node{
+				Op:   crud.Delete,
+				Kind: "service",
+				Obj:  service,
+			})
 		}
 	}
+	return nil
+}
 
+func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
+	// lookup by name
+	if utils.Empty(service.Name) {
+		return false, errors.New("'name' attribute for a service cannot be nil")
+	}
+	_, err := sc.targetState.GetService(*service.Name)
+	if err == state.ErrNotFound {
+		return true, nil
+	}
+	// any other type of error
+	if err != nil {
+		return false, err
+	}
+	return false, nil
+}
+
+func (sc *Syncer) createUpdate() error {
+	err := sc.createUpdateServices()
+	if err != nil {
+		return errors.Wrap(err, "while building graph")
+	}
+	return nil
+}
+
+func (sc *Syncer) createUpdateServices() error {
+
+	targetServices, err := sc.targetState.GetAllServices()
+	if err != nil {
+		return errors.Wrap(err, "error fetching services from state")
+	}
+
+	for _, service := range targetServices {
+		err := sc.createUpdateService(service)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (sc *Syncer) createUpdateService(service *state.Service) error {
+	s, err := sc.currentState.GetService(*service.Name)
+	if err == state.ErrNotFound {
+		sc.createUpdateGraph.Add(Node{
+			Op:   crud.Create,
+			Kind: "service",
+			Obj:  service,
+		})
+		return nil
+	}
+	if err != nil {
+		return errors.Wrap(err, "error looking up service")
+	}
+	// if found, check if update needed
+	if !s.EqualWithOpts(service, true, true) {
+		sc.createUpdateGraph.Add(Node{
+			Op:   crud.Update,
+			Kind: "service",
+			Obj:  service,
+		})
+	}
 	return nil
 }
 
@@ -100,10 +135,11 @@ func (s *Syncer) Solve(g *dag.AcyclicGraph) error {
 	err := g.Walk(func(v dag.Vertex) error {
 		n, ok := v.(Node)
 		if !ok {
-			fmt.Println("shit")
+			panic("unexpected type encountered while solving the graph")
 		}
-		fmt.Println(n)
-
+		// every Node will need to add a few things to arg:
+		// *kong.Client to use
+		// callbacks to execute
 		s.registry.Do(n.Kind, n.Op, n.Obj)
 		return nil
 	})

@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/pkg/errors"
 )
@@ -17,7 +19,7 @@ const (
 	all              = "all"
 )
 
-var ErrNotFound = errors.New("not found")
+var ErrNotFound = errors.New("entity not found")
 
 var schema = &memdb.DBSchema{
 	Tables: map[string]*memdb.TableSchema{
@@ -45,20 +47,18 @@ func (k *KongState) multiIndexLookup(tableName string,
 	txn := k.memdb.Txn(false)
 	defer txn.Commit()
 
-	var (
-		res interface{}
-		err error
-	)
 	for _, indexName := range indices {
-		res, err = txn.First(tableName, indexName, args...)
-		if err == nil && res != nil {
+		res, err := txn.First(tableName, indexName, args...)
+		if res == nil && err == nil {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		if res != nil {
 			return res, nil
 		}
-		if err == memdb.ErrNotFound {
-			continue
-		} else {
-			return nil, errors.Wrap(err, "lookup failed")
-		}
 	}
+	fmt.Println("return 3")
 	return nil, ErrNotFound
 }

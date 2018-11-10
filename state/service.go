@@ -47,15 +47,19 @@ func (k *KongState) AddService(service Service) error {
 // GetService gets a service by name or ID.
 func (k *KongState) GetService(nameOrID string) (*Service, error) {
 	res, err := k.multiIndexLookup(serviceTableName, []string{"name", id}, nameOrID)
+	if err == ErrNotFound {
+		return nil, ErrNotFound
+	}
+
 	if err != nil {
-		return nil, errors.Wrapf(err, "service lookup failed")
+		return nil, errors.Wrap(err, "service lookup failed")
 	}
 	if res == nil {
-		return nil, ErrNotFound
+		fmt.Println("res is nil")
 	}
 	service, ok := res.(*Service)
 	if !ok {
-		panic("unexpected type found ")
+		panic("unexpected type found")
 	}
 	return service, nil
 }
