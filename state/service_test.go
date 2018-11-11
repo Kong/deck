@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBasic(t *testing.T) {
+func TestBasicService(t *testing.T) {
 	assert := assert.New(t)
 	state, err := NewKongState()
 	assert.Nil(err)
@@ -20,7 +20,16 @@ func TestBasic(t *testing.T) {
 	err = state.AddService(service)
 	assert.Nil(err)
 
-	se, err := state.GetServiceByName("first")
+	se, err := state.GetService("first")
 	assert.Nil(err)
 	assert.NotNil(se)
+
+	se.Host = kong.String("example.com")
+	err = state.UpdateService(*se)
+	assert.Nil(err)
+
+	se, err = state.GetService("first")
+	assert.Nil(err)
+	assert.NotNil(se)
+	assert.Equal("example.com", *se.Host)
 }

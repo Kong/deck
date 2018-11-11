@@ -64,18 +64,14 @@ func (k *KongState) GetService(nameOrID string) (*Service, error) {
 	return service, nil
 }
 
-func (k *KongState) GetServiceByName(nameOrID string) (*Service, error) {
-	txn := k.memdb.Txn(false)
-	res, err := txn.First(serviceTableName, "name", nameOrID)
+func (k *KongState) UpdateService(service Service) error {
+	txn := k.memdb.Txn(true)
+	defer txn.Commit()
+	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
-		return nil, err
+		return errors.Wrap(err, "update failed")
 	}
-	fmt.Println(res, err)
-	service, ok := res.(*Service)
-	if !ok {
-		panic("unexpected type found ")
-	}
-	return service, nil
+	return nil
 }
 
 // DeleteService deletes a service by name or ID.

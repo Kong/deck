@@ -65,6 +65,9 @@ to quickly create a Cobra application.`,
 
 		fmt.Println(servicesFromLocalState)
 		for i, s := range servicesFromLocalState {
+			// TODO add override logic
+			// TODO add support for file based defaults
+			// TODO add counter abstraction to use everywhere in this file
 			s.ID = kong.String("placeholder" + strconv.Itoa(i))
 			// s.Name = kong.String("name" + strconv.Itoa(i))
 			// s.Host = kong.String("host" + strconv.Itoa(i))
@@ -75,11 +78,19 @@ to quickly create a Cobra application.`,
 			// s.ReadTimeout = kong.Int(60000)
 			// s.Retries = kong.Int(5)
 			// s.Host = kong.String("host" + strconv.Itoa(i))
+
+			// use a set to check for duplicate services (services with same name)
 			err := target.AddService(s)
 			if err != nil {
 				return err
 			}
 		}
+		var route state.Route
+		route.Paths = kong.StringSlice("/foo")
+		route.Service = &kong.Service{
+			Name: servicesFromLocalState[0].Name,
+		}
+		target.AddRoute(route)
 		log.Println("creating syncer")
 		s, _ := sync.NewSyncer(current, target)
 		gDelete, gCreateUpdate, err := s.Diff()

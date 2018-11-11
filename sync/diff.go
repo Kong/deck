@@ -84,8 +84,53 @@ func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
 	return false, nil
 }
 
+func (sc *Syncer) deleteRoutes() error {
+	
+	currentRoutes, err := sc.currentState.GetAllRoutes()
+	if err != nil {
+		return errors.Wrap(err, "error fetching routes from state")
+	}
+
+	for _, route := range currentRoutes {
+		ok, err := sc.deleteRoute(route)
+		if err != nil {
+			return err
+		}
+		if ok {
+			sc.deleteGraph.Add(Node{
+				Op:   crud.Delete,
+				Kind: "route",
+				Obj:  route,
+			})
+		}
+	}
+	return nil
+}
+
+func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
+	// lookup by name
+	if route.Service == nil ||
+	(utils.Empty(route.Service.ID) && utils.Empty(route.Service.Name)){
+		return false, errors.Errorf("route has no associated service: %+v", route)
+	}
+	routes , err :=
+	_, err := sc.targetState.GetRoute(*route.Name)
+	if err == state.ErrNotFound {
+		return true, nil
+	}
+	// any other type of error
+	if err != nil {
+		return false, err
+	}
+	return false, nil
+}
+
 func (sc *Syncer) createUpdate() error {
 	err := sc.createUpdateServices()
+	if err != nil {
+		return errors.Wrap(err, "while building graph")
+	}
+	err = sc.createUpdateRoutes()
 	if err != nil {
 		return errors.Wrap(err, "while building graph")
 	}
@@ -126,6 +171,49 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 	// if found, check if update needed
 	if !s.EqualWithOpts(service, true, true) {
 		service.ID = kong.String(*s.ID)
+		sc.createUpdateGraph.Add(Node{
+			Op:   crud.Update,
+			Kind: "service",
+			Obj:  service,
+		})
+	}
+	return nil
+}
+
+func (sc *Syncer) createUpdateRoutes() error {
+
+	targetRoutes, err := sc.targetState.GetAllRoutes()
+	if err != nil {
+		return errors.Wrap(err, "error fetching routes from state")
+	}
+
+	for _, route := range targetRoutes {
+		err := sc.createUpdateRoute(route)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (sc *Syncer) createUpdateRoute(route *state.Route) error {
+	route = &state.Route{*route.DeepCopy()}
+	r, err := sc.currentState.GetRoute(*route.ID)
+	if err == state.ErrNotFound {
+		route.ID = nil
+		sc.createUpdateGraph.Add(Node{
+			Op:   crud.Create,
+			Kind: "route",
+			Obj:  route,
+		})
+		return nil
+	}
+	if err != nil {
+		return errors.Wrap(err, "error looking up service")
+	}
+	// if found, check if update needed
+	if !r.EqualWithOpts(route, true, true) {
+		route.ID = kong.String(*s.ID)
 		sc.createUpdateGraph.Add(Node{
 			Op:   crud.Update,
 			Kind: "service",

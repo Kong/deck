@@ -1,8 +1,6 @@
 package state
 
 import (
-	"fmt"
-
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/pkg/errors"
 )
@@ -15,6 +13,7 @@ type KongState struct {
 
 const (
 	serviceTableName = "service"
+	routeTableName   = "route"
 	id               = "id"
 	all              = "all"
 )
@@ -24,6 +23,7 @@ var ErrNotFound = errors.New("entity not found")
 var schema = &memdb.DBSchema{
 	Tables: map[string]*memdb.TableSchema{
 		serviceTableName: serviceTableSchema,
+		routeTableName:   routeTableSchema,
 	},
 }
 
@@ -59,6 +59,5 @@ func (k *KongState) multiIndexLookup(tableName string,
 			return res, nil
 		}
 	}
-	fmt.Println("return 3")
 	return nil, ErrNotFound
 }
