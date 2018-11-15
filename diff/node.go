@@ -1,4 +1,4 @@
-package sync
+package diff
 
 import "github.com/hbagdi/deck/crud"
 

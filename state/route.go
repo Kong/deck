@@ -67,18 +67,21 @@ func (k *KongState) GetRoute(ID string) (*Route, error) {
 	return route, nil
 }
 
-func (k *KongState) GetAllRoutesByServiceName(name string) (*Route, error) {
+func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
-	res, err := txn.First(routeTableName, "routesByService", name)
+	iter, err := txn.Get(routeTableName, "routesByService", name)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(res, err)
-	route, ok := res.(*Route)
-	if !ok {
-		panic("unexpected type found ")
+	var res []*Route
+	for el := iter.Next(); el != nil; el = iter.Next() {
+		s, ok := el.(*Route)
+		if !ok {
+			panic("unexpected type found")
+		}
+		res = append(res, s)
 	}
-	return route, nil
+	return res, nil
 }
 
 // DeleteRoute deletes a route by name or ID.
@@ -111,5 +114,6 @@ func (k *KongState) GetAllRoutes() ([]*Route, error) {
 		}
 		res = append(res, s)
 	}
+	fmt.Println(res)
 	return res, nil
 }

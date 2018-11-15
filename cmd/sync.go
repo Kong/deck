@@ -3,16 +3,14 @@
 package cmd
 
 import (
-	"fmt"
 	"io/ioutil"
-	"log"
 	"strconv"
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/sync"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
@@ -30,7 +28,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println(kongStateFile)
 
 		target, err := state.NewKongState()
 		if err != nil {
@@ -57,13 +54,24 @@ to quickly create a Cobra application.`,
 				return err
 			}
 		}
+		routes, err := dump.GetAllRoutes(client)
+		if err != nil {
+			return err
+		}
+		for _, route := range routes {
+			var r state.Route
+			r.Route = *route
+			err := current.AddRoute(r)
+			if err != nil {
+				return err
+			}
+		}
 		servicesFromLocalState, err := readFile(kongStateFile)
 		if err != nil {
 			return err
 		}
 		// targetServices := make([]state.Service, 3)
 
-		fmt.Println(servicesFromLocalState)
 		for i, s := range servicesFromLocalState {
 			// TODO add override logic
 			// TODO add support for file based defaults
@@ -85,14 +93,13 @@ to quickly create a Cobra application.`,
 				return err
 			}
 		}
-		var route state.Route
-		route.Paths = kong.StringSlice("/foo")
-		route.Service = &kong.Service{
-			Name: servicesFromLocalState[0].Name,
-		}
-		target.AddRoute(route)
-		log.Println("creating syncer")
-		s, _ := sync.NewSyncer(current, target)
+		// var route state.Route
+		// route.Paths = kong.StringSlice("/foo")
+		// route.Service = &kong.Service{
+		// 	Name: servicesFromLocalState[0].Name,
+		// }
+		// target.AddRoute(route)
+		s, _ := diff.NewSyncer(current, target)
 		gDelete, gCreateUpdate, err := s.Diff()
 		if err != nil {
 			return err
@@ -119,7 +126,6 @@ func readFile(kongStateFile string) ([]state.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(s)
 	return s.Services, nil
 }
 
