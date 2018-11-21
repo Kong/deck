@@ -11,51 +11,45 @@ import (
 )
 
 func (sc *Syncer) deleteRoutes() error {
-	fmt.Println("delete routes called")
 	currentRoutes, err := sc.currentState.GetAllRoutes()
 	if err != nil {
 		return errors.Wrap(err, "error fetching routes from state")
 	}
 
 	for _, route := range currentRoutes {
-		fmt.Println("route in ")
-		ok, err := sc.deleteRoute(route)
+		fmt.Println("considering for delete", *route.ID)
+		_, err := sc.deleteRoute(route)
 		if err != nil {
 			return err
-		}
-		if ok {
-			// n := &Node{
-			// 	Op:   crud.Delete,
-			// 	Kind: "route",
-			// 	Obj:  route,
-			// }
-			// sc.deleteGraph.Add(n)
 		}
 	}
 	return nil
 }
 
 func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
-	fmt.Println("considering: " + *route.ID)
 	if route.Service == nil ||
 		(utils.Empty(route.Service.ID) && utils.Empty(route.Service.Name)) {
 		return false, errors.Errorf("route has no associated service: %+v", route)
 	}
 	service, err := sc.currentState.GetService(*route.Service.ID)
+	fmt.Println(service)
 	if err != nil {
 		return false, errors.Wrap(err, "no service found with ID "+*route.Service.ID)
 	}
-	serviceGraphNode := service.Meta.GetMeta(nodeKey).(*Node)
-	if serviceGraphNode.Op == crud.Delete {
+	node := service.Meta.GetMeta(nodeKey)
+	if node != nil {
 		// delete this node if the service is to be deleted
-		n := &Node{
-			Op:   crud.Delete,
-			Kind: "route",
-			Obj:  route,
+		serviceGraphNode := node.(*Node)
+		if serviceGraphNode.Op == crud.Delete {
+			n := &Node{
+				Op:   crud.Delete,
+				Kind: "route",
+				Obj:  route,
+			}
+			sc.deleteGraph.Add(n)
+			sc.deleteGraph.Connect(dag.BasicEdge(serviceGraphNode, n))
+			return true, nil
 		}
-		sc.deleteGraph.Add(n)
-		sc.deleteGraph.Connect(dag.BasicEdge(serviceGraphNode, n))
-		return true, nil
 	}
 	// lookup the route by ID
 	r, err := sc.targetState.GetRoute(*route.ID)
@@ -64,17 +58,29 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 	}
 	// TODO add lookup by name post Kong 1.0
 
-	routes, err := sc.targetState.GetAllRoutesByServiceName(*service.Name)
+	routes, err := sc.currentState.GetAllRoutesByServiceID(*service.ID)
 	if err == state.ErrNotFound {
 		return true, nil
 	}
+	fmt.Println("routes", routes)
 	for _, r := range routes {
+		// if we are matching up then assign the IP of the route in
+		// current state to target state so that it matches things correctly
 		if r.EqualWithOpts(route, true, true) {
+			fmt.Println("not equal route")
 			return false, nil
 		}
 	}
+	fmt.Println("route not found for ", *route.ID)
+	n := &Node{
+		Op:   crud.Delete,
+		Kind: "route",
+		Obj:  route,
+	}
+	sc.deleteGraph.Add(n)
 	return true, nil
 }
+
 func (sc *Syncer) createUpdateRoutes() error {
 
 	targetRoutes, err := sc.targetState.GetAllRoutes()
@@ -84,6 +90,7 @@ func (sc *Syncer) createUpdateRoutes() error {
 
 	for _, route := range targetRoutes {
 		err := sc.createUpdateRoute(route)
+		fmt.Println("considering for create", *route.ID)
 		if err != nil {
 			return err
 		}
@@ -96,7 +103,7 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 	_, err := sc.currentState.GetRoute(*route.ID)
 	if err == state.ErrNotFound {
 		route.ID = nil
-		sc.createUpdateGraph.Add(Node{
+		sc.createUpdateGraph.Add(&Node{
 			Op:   crud.Create,
 			Kind: "route",
 			Obj:  route,

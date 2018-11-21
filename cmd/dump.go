@@ -3,12 +3,11 @@
 package cmd
 
 import (
-	"errors"
 	"io/ioutil"
 	"log"
 
 	"github.com/hbagdi/deck/dump"
-	"github.com/hbagdi/deck/utils"
+	"github.com/hbagdi/deck/file"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
@@ -51,26 +50,33 @@ func init() {
 }
 
 func d(client *kong.Client) error {
-	ks, err := dump.Get(client)
+	// ks, err := dump.Get(client)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	// // check if all services havea name or not
+	// for _, s := range ks.Services {
+	// 	if utils.Empty(s.Name) {
+	// 		return (errors.New("service with id '" + *s.ID + "' has no 'name' property." +
+	// 			" 'name' property is required if IDs are not being exported."))
+	// 	}
+	// }
+
+	// if err := dropFields(ks, !withID, true); err != nil {
+	// 	log.Fatalln(err)
+	// }
+
+	ks, err := dump.GetState(client)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	// check if all services havea name or not
-	for _, s := range ks.Services {
-		if utils.Empty(s.Name) {
-			return (errors.New("service with id '" + *s.ID + "' has no 'name' property." +
-				" 'name' property is required if IDs are not being exported."))
-		}
-	}
-
-	if err := dropFields(ks, !withID, true); err != nil {
+	if err := file.KongStateToFile(ks, "out"); err != nil {
 		log.Fatalln(err)
 	}
-
-	if err := outputToFile(ks); err != nil {
-		log.Fatalln(err)
-	}
+	// if err := outputToFile(ks); err != nil {
+	// 	log.Fatalln(err)
+	// }
 	return nil
 }
 

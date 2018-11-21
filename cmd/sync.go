@@ -3,13 +3,9 @@
 package cmd
 
 import (
-	"io/ioutil"
-	"strconv"
-
-	"gopkg.in/yaml.v2"
-
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/file"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
@@ -66,39 +62,10 @@ to quickly create a Cobra application.`,
 				return err
 			}
 		}
-		servicesFromLocalState, err := readFile(kongStateFile)
+		target, err = file.GetStateFromFile(kongStateFile)
 		if err != nil {
 			return err
 		}
-		// targetServices := make([]state.Service, 3)
-
-		for i, s := range servicesFromLocalState {
-			// TODO add override logic
-			// TODO add support for file based defaults
-			// TODO add counter abstraction to use everywhere in this file
-			s.ID = kong.String("placeholder" + strconv.Itoa(i))
-			// s.Name = kong.String("name" + strconv.Itoa(i))
-			// s.Host = kong.String("host" + strconv.Itoa(i))
-			// s.Port = kong.Int(80)
-			// s.ConnectTimeout = kong.Int(60000)
-			// s.Protocol = kong.String("http")
-			// s.WriteTimeout = kong.Int(1000)
-			// s.ReadTimeout = kong.Int(60000)
-			// s.Retries = kong.Int(5)
-			// s.Host = kong.String("host" + strconv.Itoa(i))
-
-			// use a set to check for duplicate services (services with same name)
-			err := target.AddService(s)
-			if err != nil {
-				return err
-			}
-		}
-		// var route state.Route
-		// route.Paths = kong.StringSlice("/foo")
-		// route.Service = &kong.Service{
-		// 	Name: servicesFromLocalState[0].Name,
-		// }
-		// target.AddRoute(route)
 		s, _ := diff.NewSyncer(current, target)
 		gDelete, gCreateUpdate, err := s.Diff()
 		if err != nil {
@@ -114,19 +81,6 @@ to quickly create a Cobra application.`,
 		}
 		return nil
 	},
-}
-
-func readFile(kongStateFile string) ([]state.Service, error) {
-	type State struct {
-		Services []state.Service `yaml:"services"`
-	}
-	var s State
-	b, err := ioutil.ReadFile(kongStateFile)
-	err = yaml.Unmarshal(b, &s)
-	if err != nil {
-		return nil, err
-	}
-	return s.Services, nil
 }
 
 func init() {

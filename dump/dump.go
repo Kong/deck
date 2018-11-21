@@ -1,8 +1,25 @@
 package dump
 
 import (
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
 )
+
+func GetState(client *kong.Client) (*state.KongState, error) {
+	raw, err := Get(client)
+	if err != nil {
+		return nil, err
+	}
+	kongState, err := state.NewKongState()
+	for _, s := range raw.Services {
+		kongState.AddService(state.Service{Service: *s})
+	}
+	for _, r := range raw.Routes {
+		kongState.AddRoute(state.Route{Route: *r})
+	}
+
+	return kongState, nil
+}
 
 // Get gets all entities in Kong
 func Get(client *kong.Client) (*KongRawState, error) {

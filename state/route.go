@@ -15,11 +15,19 @@ var routeTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		"routesByService": &memdb.IndexSchema{
-			Name: "routesByService",
+		// TODO add ServiceName/ServiceID both fields for indexing
+		"routesByServiceName": &memdb.IndexSchema{
+			Name: "routesByServiceName",
 			Indexer: &SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "Name",
+			},
+		},
+		"routesByServiceID": &memdb.IndexSchema{
+			Name: "routesByServiceID",
+			Indexer: &SubFieldIndexer{
+				StructField: "Service",
+				SubField:    "ID",
 			},
 		},
 		all: &memdb.IndexSchema{
@@ -69,7 +77,24 @@ func (k *KongState) GetRoute(ID string) (*Route, error) {
 
 func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(routeTableName, "routesByService", name)
+	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
+	if err != nil {
+		return nil, err
+	}
+	var res []*Route
+	for el := iter.Next(); el != nil; el = iter.Next() {
+		s, ok := el.(*Route)
+		if !ok {
+			panic("unexpected type found")
+		}
+		res = append(res, s)
+	}
+	return res, nil
+}
+
+func (k *KongState) GetAllRoutesByServiceID(id string) ([]*Route, error) {
+	txn := k.memdb.Txn(false)
+	iter, err := txn.Get(routeTableName, "routesByServiceID", id)
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +139,5 @@ func (k *KongState) GetAllRoutes() ([]*Route, error) {
 		}
 		res = append(res, s)
 	}
-	fmt.Println(res)
 	return res, nil
 }

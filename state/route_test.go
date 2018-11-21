@@ -27,9 +27,12 @@ func TestBasicRoute(t *testing.T) {
 	assert.NotNil(r)
 	assert.Equal("prod", *r.Service.Name)
 
-	r, err = state.GetAllRoutesByServiceName("prod")
+	routes, err := state.GetAllRoutesByServiceName("prod")
 	assert.Nil(err)
-	assert.NotNil(r)
+	assert.NotNil(routes)
+	assert.Equal(1, len(routes))
+
+	r = routes[0]
 	assert.Equal("prod", *r.Service.Name)
 	assert.Equal("first", *r.ID)
 }

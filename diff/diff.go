@@ -56,10 +56,10 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return errors.Wrap(err, "while building graph")
 	}
-	// err = sc.createUpdateRoutes()
-	// if err != nil {
-	// 	return errors.Wrap(err, "while building graph")
-	// }
+	err = sc.createUpdateRoutes()
+	if err != nil {
+		return errors.Wrap(err, "while building graph")
+	}
 	return nil
 }
 
