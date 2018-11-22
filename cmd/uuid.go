@@ -28,7 +28,7 @@ var uuidCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(uuidCmd)
+	// rootCmd.AddCommand(uuidCmd)
 
 	// Here you will define your flags and configuration settings.
 

@@ -3,25 +3,37 @@
 package cmd
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/reset"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
+var resetCmdForce bool
+
 // resetCmd represents the reset command
 var resetCmd = &cobra.Command{
 	Use:   "reset",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Reset deletes all entities in Kong",
+	Long: `Reset command will delete all entities in Kong's database.string
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Use this command with extreme care as it is equivalent to running
+"kong migrations reset" on your Kong instance.
+
+By default, this command will ask for a confirmation prompt.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// TODO add a confirmation prompt
-		// also add a -f/--force flag to get around the prompt
+		if !resetCmdForce {
+			ok, err := confirm()
+			if err != nil {
+				return err
+			}
+			if !ok {
+				return nil
+			}
+		}
 		client, err := kong.NewClient(nil, nil)
 		if err != nil {
 			return err
@@ -38,16 +50,28 @@ to quickly create a Cobra application.`,
 	},
 }
 
+// confirm prompts a user for a confirmation
+// and returns true with no error if input is "yes" or "y" (case-insensitive),
+// otherwise false.
+func confirm() (bool, error) {
+	fmt.Print("> Are you sure? ")
+	yes := []string{"yes", "y"}
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return false, err
+	}
+	input = strings.ToLower(input)
+	for _, valid := range yes {
+		if input == valid {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func init() {
 	rootCmd.AddCommand(resetCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// resetCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// resetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	resetCmd.Flags().BoolVarP(&resetCmdForce, "force", "f",
+		false, "Skip interactive confirmation prompt before reset")
 }

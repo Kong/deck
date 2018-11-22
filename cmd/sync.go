@@ -3,6 +3,8 @@
 package cmd
 
 import (
+	"errors"
+
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
@@ -11,24 +13,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var kongStateFile string
+var syncCmdKongStateFile string
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Use:   "sync",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Sync performs operations to get Kong's configuration to match the state file",
+	Long: `Sync command reads the state file and performs operation on Kong to get Kong's
+state in sync with the input state.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		target, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
 		current, err := state.NewKongState()
 		if err != nil {
 			return err
@@ -37,7 +30,6 @@ to quickly create a Cobra application.`,
 		if err != nil {
 			return err
 		}
-		// client.SetDebugMode(true)
 		services, err := dump.GetAllServices(client)
 		if err != nil {
 			return err
@@ -62,7 +54,7 @@ to quickly create a Cobra application.`,
 				return err
 			}
 		}
-		target, err = file.GetStateFromFile(kongStateFile)
+		target, err := file.GetStateFromFile(syncCmdKongStateFile)
 		if err != nil {
 			return err
 		}
@@ -81,18 +73,17 @@ to quickly create a Cobra application.`,
 		}
 		return nil
 	},
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if syncCmdKongStateFile == "" {
+			return errors.New("A state file with Kong's configuration " +
+				"must be specified using -s/--state flag.")
+		}
+		return nil
+	},
 }
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// syncCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	syncCmd.Flags().StringVarP(&kongStateFile, "state", "s", "", "Kong configuration directory or file")
+	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
+		"state", "s", "", "file containing Kong's configuration.")
 }

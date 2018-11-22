@@ -26,34 +26,35 @@ func Reset(state *utils.KongRawState, client *kong.Client) error {
 			return err
 		}
 	}
-	for _, c := range state.Consumers {
-		err := client.Consumers.Delete(nil, c.ID)
-		if err != nil {
-			return err
-		}
-	}
-	for _, u := range state.Upstreams {
-		err := client.Consumers.Delete(nil, u.ID)
-		if err != nil {
-			return err
-		}
-	}
-	for _, u := range state.Certificates {
-		err := client.Consumers.Delete(nil, u.ID)
-		if err != nil {
-			return err
-		}
-	}
-	for _, p := range state.Plugins {
-		// Delete global plugins
-		if p.APIID == nil && p.ConsumerID == nil && p.ServiceID == nil &&
-			p.RouteID == nil {
-			err := client.Plugins.Delete(nil, p.ID)
-			if err != nil {
-				return err
-			}
-		}
-	}
+	// TODO uncomment as development progresses
+	// for _, c := range state.Consumers {
+	// 	err := client.Consumers.Delete(nil, c.ID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// for _, u := range state.Upstreams {
+	// 	err := client.Consumers.Delete(nil, u.ID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// for _, u := range state.Certificates {
+	// 	err := client.Consumers.Delete(nil, u.ID)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// for _, p := range state.Plugins {
+	// 	// Delete global plugins
+	// 	if p.APIID == nil && p.ConsumerID == nil && p.ServiceID == nil &&
+	// 		p.RouteID == nil {
+	// 		err := client.Plugins.Delete(nil, p.ID)
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 	}
+	// }
 	// Certificates will delete SNIs
 	// Plugins will be removed, except Global plugins
 	// Upstreams will remove Targets
