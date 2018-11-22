@@ -3,18 +3,27 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/hbagdi/deck/utils"
 	"github.com/spf13/cobra"
 )
 
+var count int
+
 // uuidCmd represents the uuid command
 var uuidCmd = &cobra.Command{
 	Use:   "uuid",
-	Short: "Generate a random UUID",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(utils.UUID())
+	Short: "Generate a pseudorandom UUID",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if count < 1 {
+			return errors.New("count should be at least 1")
+		}
+		for i := 0; i < count; i++ {
+			fmt.Println(utils.UUID())
+		}
+		return nil
 	},
 }
 
@@ -29,5 +38,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// uuidCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	uuidCmd.Flags().IntVarP(&count, "count", "c", 1, "number of UUIDs to generate")
 }

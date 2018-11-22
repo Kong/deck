@@ -7,6 +7,10 @@ type Op struct {
 	name string
 }
 
+func (op *Op) String() string {
+	return op.name
+}
+
 var (
 	Create Op = Op{"Create"}
 	Update Op = Op{"Update"}

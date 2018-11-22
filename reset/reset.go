@@ -3,11 +3,12 @@ package reset
 import (
 	"errors"
 
-	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 )
 
-func Reset(state *dump.KongRawState, client *kong.Client) error {
+// Reset deletes all entities in Kong.
+func Reset(state *utils.KongRawState, client *kong.Client) error {
 
 	if state == nil {
 		return errors.New("state cannot be empty")

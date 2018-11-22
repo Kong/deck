@@ -8,6 +8,7 @@ import (
 
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 	yaml "gopkg.in/yaml.v2"
@@ -80,7 +81,7 @@ func d(client *kong.Client) error {
 	return nil
 }
 
-func dropFields(state *dump.KongRawState, id, ts bool) error {
+func dropFields(state *utils.KongRawState, id, ts bool) error {
 	for _, s := range state.Services {
 		if id {
 			s.ID = nil
@@ -157,7 +158,7 @@ func dropFields(state *dump.KongRawState, id, ts bool) error {
 	return nil
 }
 
-func outputToFile(state *dump.KongRawState) error {
+func outputToFile(state *utils.KongRawState) error {
 	c, err := yaml.Marshal(state)
 	err = ioutil.WriteFile("out", c, 0644)
 	if err != nil {

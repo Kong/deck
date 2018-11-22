@@ -109,6 +109,17 @@ func (k *KongState) GetAllRoutesByServiceID(id string) ([]*Route, error) {
 	return res, nil
 }
 
+// UpdateRoute updates a route
+func (k *KongState) UpdateRoute(route Route) error {
+	txn := k.memdb.Txn(true)
+	defer txn.Commit()
+	err := txn.Insert(routeTableName, &route)
+	if err != nil {
+		return errors.Wrap(err, "update failed")
+	}
+	return nil
+}
+
 // DeleteRoute deletes a route by name or ID.
 func (k *KongState) DeleteRoute(route Route) error {
 	txn := k.memdb.Txn(true)

@@ -1,4 +1,4 @@
-package dump
+package utils
 
 import (
 	"github.com/hbagdi/go-kong/kong"

@@ -71,7 +71,7 @@ func (r1 *Route) Equal(r2 *Route) bool {
 	return reflect.DeepEqual(r1.Route, r2.Route)
 }
 
-func (r *Route) EqualWithOpts(r2 *Route, ignoreID bool, ignoreTS bool) bool {
+func (r *Route) EqualWithOpts(r2 *Route, ignoreID, ignoreTS, ignoreForeign bool) bool {
 	rCopy := r.Route.DeepCopy()
 	r2Copy := r2.Route.DeepCopy()
 
@@ -85,6 +85,10 @@ func (r *Route) EqualWithOpts(r2 *Route, ignoreID bool, ignoreTS bool) bool {
 
 		rCopy.UpdatedAt = nil
 		r2Copy.UpdatedAt = nil
+	}
+	if ignoreForeign {
+		rCopy.Service = nil
+		r2Copy.Service = nil
 	}
 	return reflect.DeepEqual(rCopy, r2Copy)
 }

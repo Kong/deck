@@ -39,9 +39,13 @@ func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
 	if utils.Empty(service.Name) {
 		return false, errors.New("'name' attribute for a service cannot be nil")
 	}
-	_, err := sc.targetState.GetService(*service.Name)
+	s, err := sc.targetState.GetService(*service.Name)
 	if err == state.ErrNotFound {
 		return true, nil
+	}
+	s.ID = service.ID
+	if err = sc.targetState.UpdateService(*s); err != nil {
+		return false, errors.New("updating service with ID")
 	}
 	// any other type of error
 	if err != nil {
@@ -67,7 +71,7 @@ func (sc *Syncer) createUpdateServices() error {
 }
 
 func (sc *Syncer) createUpdateService(service *state.Service) error {
-	service = &state.Service{Service: *service.DeepCopy()}
+	// service = &state.Service{Service: *service.DeepCopy()}
 	s, err := sc.currentState.GetService(*service.Name)
 	if err == state.ErrNotFound {
 		service.ID = nil
@@ -78,7 +82,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 		}
 		sc.createUpdateGraph.Add(n)
 		service.AddMeta(nodeKey, n)
-		sc.currentState.UpdateService(*service)
+		sc.targetState.UpdateService(*service)
 		return nil
 	}
 	if err != nil {

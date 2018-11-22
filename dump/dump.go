@@ -2,6 +2,7 @@ package dump
 
 import (
 	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 )
 
@@ -22,9 +23,9 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 }
 
 // Get gets all entities in Kong
-func Get(client *kong.Client) (*KongRawState, error) {
+func Get(client *kong.Client) (*utils.KongRawState, error) {
 
-	var state KongRawState
+	var state utils.KongRawState
 	services, err := GetAllServices(client)
 	if err != nil {
 		return nil, err

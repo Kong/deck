@@ -1,0 +1,44 @@
+services:
+- connect_timeout: 60000
+  host: host2
+  name: name2
+  port: 81
+  protocol: https
+  read_timeout: 60001
+  retries: 5
+  write_timeout: 1000
+  routes:
+  - paths:
+    - /name22
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+- connect_timeout: 60000
+  host: host1
+  name: name1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 1000
+  routes: []
+- connect_timeout: 60000
+  host: host0
+  name: name00
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 1000
+  routes:
+  - paths:
+    - /namfo
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
