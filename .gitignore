@@ -25,3 +25,5 @@ _testmain.go
 *.prof
 
 # for this repo only
+deck
+dist/
