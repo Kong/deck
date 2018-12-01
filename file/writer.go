@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/hbagdi/deck/state"
+	"github.com/kong/deck/state"
 	yaml "gopkg.in/yaml.v2"
 )
 

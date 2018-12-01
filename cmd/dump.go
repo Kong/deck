@@ -3,8 +3,8 @@
 package cmd
 
 import (
-	"github.com/hbagdi/deck/dump"
-	"github.com/hbagdi/deck/file"
+	"github.com/kong/deck/dump"
+	"github.com/kong/deck/file"
 	"github.com/spf13/cobra"
 )
 

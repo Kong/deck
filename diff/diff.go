@@ -2,10 +2,10 @@ package diff
 
 import (
 	"github.com/hashicorp/terraform/dag"
-	"github.com/hbagdi/deck/crud"
-	"github.com/hbagdi/deck/state"
-	cruds "github.com/hbagdi/deck/state/crud"
 	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/state"
+	cruds "github.com/kong/deck/state/crud"
 	"github.com/pkg/errors"
 )
 

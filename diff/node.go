@@ -1,6 +1,6 @@
 package diff
 
-import "github.com/hbagdi/deck/crud"
+import "github.com/kong/deck/crud"
 
 // Node represents an imperative operation
 // that gets Kong closer to the target state.

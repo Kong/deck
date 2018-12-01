@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 

@@ -22,7 +22,7 @@ builds:
   - all=-trimpath={{.Env.GOPATH}}
   ldflags:
   - all=-trimpath={{.Env.GOPATH}}
-  - -s -w -X github.com/hbagdi/deck/cmd.VERSION={{ .Tag }} -X github.com/hbagdi/deck/cmd.COMMIT={{ .ShortCommit }}
+  - -s -w -X github.com/kong/deck/cmd.VERSION={{ .Tag }} -X github.com/kong/deck/cmd.COMMIT={{ .ShortCommit }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:

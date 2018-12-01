@@ -3,8 +3,8 @@ package reset
 import (
 	"errors"
 
-	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/deck/utils"
 )
 
 // Reset deletes all entities in Kong.
