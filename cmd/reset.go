@@ -8,7 +8,6 @@ import (
 
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/reset"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +33,7 @@ By default, this command will ask for a confirmation prompt.`,
 				return nil
 			}
 		}
-		client, err := kong.NewClient(nil, nil)
+		client, err := GetKongClient(config)
 		if err != nil {
 			return err
 		}
@@ -54,6 +53,7 @@ By default, this command will ask for a confirmation prompt.`,
 // and returns true with no error if input is "yes" or "y" (case-insensitive),
 // otherwise false.
 func confirm() (bool, error) {
+	fmt.Println("This will delete all configuration from Kong's database.")
 	fmt.Print("> Are you sure? ")
 	yes := []string{"yes", "y"}
 	var input string

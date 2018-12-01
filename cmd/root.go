@@ -4,14 +4,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	config  kongClientConfig
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -24,6 +30,12 @@ You can export your existing Kong configuration, reset your Kong clusters.
 It is also possible to use deck in your CI/CD pipeline to manage your Kong
 configuration via GitOps.`,
 	SilenceUsage: true,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if _, err := url.ParseRequestURI(config.Address); err != nil {
+			return errors.WithStack(errors.Wrap(err, "invalid URL"))
+		}
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -39,14 +51,37 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.deck.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
+		"config file (default is $HOME/.deck.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().BoolP("debug", "", false, "enable debug logging")
+	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
+		"HTTP Address of Kong's Admin APIn\n"+
+			"This value can also be set using DECK_KONG_ADDR"+
+			" environment variable.")
+	viper.BindPFlag("kong-addr",
+		rootCmd.PersistentFlags().Lookup("kong-addr"))
+
+	rootCmd.PersistentFlags().Bool("tls-skip-verify", false,
+		"Disable verification of Kong's Admin TLS certificate.\n"+
+			"This value can also be set using DECK_TLS_SKIP_VERIFY "+
+			"environment variable.")
+	viper.BindPFlag("tls-skip-verify",
+		rootCmd.PersistentFlags().Lookup("tls-skip-verify"))
+
+	rootCmd.PersistentFlags().String("tls-server-name", "",
+		"Custom CA certificate to use to verify"+
+			"Kong's Admin TLS certificate.\n"+
+			"This value can also be set using DECK_TLS_SERVER_NAME"+
+			" environment variable.")
+	viper.BindPFlag("tls-server-name",
+		rootCmd.PersistentFlags().Lookup("tls-server-name"))
+
+	rootCmd.PersistentFlags().String("ca-cert", "",
+		"Custom CA certificate to use to verify Kong's Admin TLS certificate.\n"+
+			"This value can also be set using DECK_CA_CERT"+
+			" environment variable.")
+	viper.BindPFlag("ca-cert",
+		rootCmd.PersistentFlags().Lookup("ca-cert"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -66,11 +101,13 @@ func initConfig() {
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".deck")
 	}
-
+	viper.SetEnvPrefix("deck")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	viper.AutomaticEnv() // read in environment variables that match
-
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	viper.ReadInConfig()
+	config.Address = viper.GetString("kong-addr")
+	config.TLSServerName = viper.GetString("tls-server-name")
+	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
+	config.TLSCACert = viper.GetString("ca-cert")
 }

@@ -10,27 +10,27 @@ import (
 var routeTableSchema = &memdb.TableSchema{
 	Name: routeTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: &memdb.IndexSchema{
+		id: {
 			Name:    id,
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
 		// TODO add ServiceName/ServiceID both fields for indexing
-		"routesByServiceName": &memdb.IndexSchema{
+		"routesByServiceName": {
 			Name: "routesByServiceName",
 			Indexer: &SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "Name",
 			},
 		},
-		"routesByServiceID": &memdb.IndexSchema{
+		"routesByServiceID": {
 			Name: "routesByServiceID",
 			Indexer: &SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "ID",
 			},
 		},
-		all: &memdb.IndexSchema{
+		all: {
 			Name: all,
 			Indexer: &memdb.ConditionalIndex{
 				Conditional: func(v interface{}) (bool, error) {

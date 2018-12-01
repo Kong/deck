@@ -9,7 +9,6 @@ import (
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +25,7 @@ state in sync with the input state.`,
 		if err != nil {
 			return err
 		}
-		client, err := kong.NewClient(nil, nil)
+		client, err := GetKongClient(config)
 		if err != nil {
 			return err
 		}

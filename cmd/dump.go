@@ -5,7 +5,6 @@ package cmd
 import (
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +22,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// TODO move this out to a common factory
-		client, err := kong.NewClient(nil, nil)
+		client, err := GetKongClient(config)
 		if err != nil {
 			return err
 		}

@@ -10,19 +10,19 @@ import (
 var serviceTableSchema = &memdb.TableSchema{
 	Name: serviceTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: &memdb.IndexSchema{
+		id: {
 			Name:   id,
 			Unique: true,
 			// EnforceUnique: true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		"name": &memdb.IndexSchema{
+		"name": {
 			Name:   "name",
 			Unique: true,
 			// EnforceUnique: true,
 			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
-		all: &memdb.IndexSchema{
+		all: {
 			Name: all,
 			Indexer: &memdb.ConditionalIndex{
 				Conditional: func(v interface{}) (bool, error) {

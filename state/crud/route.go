@@ -1,8 +1,6 @@
 package crud
 
 import (
-	"fmt"
-
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
@@ -33,7 +31,6 @@ func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState, *state.KongS
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	route, current, _, client := argsFroRoute(arg...)
 	// find the service to associate this route with
-	fmt.Println("finding service id for route: ", *route.Service.Name)
 	svc, err := current.GetService(*route.Service.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to find service associated with route %+v", route)
