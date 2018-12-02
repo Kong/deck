@@ -75,6 +75,8 @@ func (k *KongState) GetRoute(ID string) (*Route, error) {
 	return route, nil
 }
 
+// GetAllRoutesByServiceName returns all routes referencing a service
+// by its name.
 func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
@@ -92,6 +94,8 @@ func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 	return res, nil
 }
 
+// GetAllRoutesByServiceID returns all routes referencing a service
+// by its id.
 func (k *KongState) GetAllRoutesByServiceID(id string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceID", id)

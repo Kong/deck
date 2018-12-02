@@ -8,10 +8,16 @@ import (
 // SubFieldIndexer is used to extract a field from an object
 // using reflection and builds an index on that field.
 type SubFieldIndexer struct {
+	// StructField is the name of the field of the struct
+	// being indexed.
 	StructField string
-	SubField    string
+	// Subfield is the name of the field inside the struct StructField,
+	// which is being indexed.
+	SubField string
 }
 
+// FromObject take Obj and returns index key formed using
+// the field SubField.
 func (s *SubFieldIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 	v := reflect.ValueOf(obj)
 	v = reflect.Indirect(v) // Dereference the pointer if any
@@ -35,6 +41,7 @@ func (s *SubFieldIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 	return true, []byte(val), nil
 }
 
+// FromArgs takes in a string and returns its byte form.
 func (s *SubFieldIndexer) FromArgs(args ...interface{}) ([]byte, error) {
 	if len(args) != 1 {
 		return nil, fmt.Errorf("must provide only a single argument")

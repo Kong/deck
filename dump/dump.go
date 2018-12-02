@@ -6,6 +6,8 @@ import (
 	"github.com/kong/deck/utils"
 )
 
+// GetState queries Kong for all entities using client and
+// constructs a structered state.
 func GetState(client *kong.Client) (*state.KongState, error) {
 	raw, err := Get(client)
 	if err != nil {
@@ -22,7 +24,8 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 	return kongState, nil
 }
 
-// Get gets all entities in Kong
+// Get queries all the entities using client and returns
+// all the entities in KongRawState.
 func Get(client *kong.Client) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
@@ -78,6 +81,7 @@ func Get(client *kong.Client) (*utils.KongRawState, error) {
 	return &state, nil
 }
 
+// GetAllServices queries Kong for all the services using client.
 func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := new(kong.ListOpt)
@@ -95,6 +99,7 @@ func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 	return services, nil
 }
 
+// GetAllRoutes queries Kong for all the routes using client.
 func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
 	var routes []*kong.Route
 	opt := new(kong.ListOpt)
@@ -112,6 +117,7 @@ func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
 	return routes, nil
 }
 
+// GetAllPlugins queries Kong for all the plugins using client.
 func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
 	var plugins []*kong.Plugin
 	opt := new(kong.ListOpt)
@@ -129,6 +135,7 @@ func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
 	return plugins, nil
 }
 
+// GetAllCertificates queries Kong for all the certificates using client.
 func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
 	var certificates []*kong.Certificate
 	opt := new(kong.ListOpt)
@@ -146,6 +153,7 @@ func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
 	return certificates, nil
 }
 
+// GetAllSNIs queries Kong for all the SNIs using client.
 func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
 	var snis []*kong.SNI
 	opt := new(kong.ListOpt)
@@ -163,6 +171,8 @@ func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
 	return snis, nil
 }
 
+// GetAllConsumers queries Kong for all the consumers using client.
+// Please use this method with caution if you have a lot of consumers.
 func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
 	var consumers []*kong.Consumer
 	opt := new(kong.ListOpt)
@@ -180,6 +190,7 @@ func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
 	return consumers, nil
 }
 
+// GetAllUpstreams queries Kong for all the Upstreams using client.
 func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
 	var upstreams []*kong.Upstream
 	opt := new(kong.ListOpt)
@@ -197,6 +208,9 @@ func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
 	return upstreams, nil
 }
 
+// GetAllTargets queries Kong for all the Targets of upstreams using client.
+// Targets are queries per upstream as there exists no endpoint in Kong
+// to list all targets of all upstreams.
 func GetAllTargets(client *kong.Client, upstreams []*kong.Upstream) ([]*kong.Target, error) {
 	var targets []*kong.Target
 	opt := new(kong.ListOpt)

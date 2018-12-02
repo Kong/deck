@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 )
 
+// Empty checks if a string referenced by s or s itself is empty.
 func Empty(s *string) bool {
 	return s == nil || *s == ""
 }

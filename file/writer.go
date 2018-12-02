@@ -8,6 +8,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// KongStateToFile writes a state object to file with filename.
+// It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState, filename string) error {
 	var file fileStructure
 

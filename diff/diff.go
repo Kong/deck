@@ -9,12 +9,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Syncer takes in a current and target state of Kong,
+// diffs them, generating a Graph to get Kong from current
+// to target state.
 type Syncer struct {
 	currentState, targetState      *state.KongState
 	deleteGraph, createUpdateGraph *dag.AcyclicGraph
 	registry                       crud.Registry
 }
 
+// NewSyncer constructs a Syncer.
 func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
@@ -25,6 +29,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	return s, nil
 }
 
+// Diff diffs the current and target states and returns two graphs.
+// The first graph contains all the entities which should be deleted from Kong
+// and the second graph contains the entities which should be created or
+// updated to get Kong to target state.
 func (sc *Syncer) Diff() (*dag.AcyclicGraph, *dag.AcyclicGraph, error) {
 
 	err := sc.delete()
@@ -63,7 +71,8 @@ func (sc *Syncer) createUpdate() error {
 	return nil
 }
 
-func (s *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
+// Solve walks a graph and executes actions.
+func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 	err := g.Walk(func(v dag.Vertex) error {
 		n, ok := v.(*Node)
 		if !ok {
@@ -72,7 +81,7 @@ func (s *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		_, err := s.registry.Do(n.Kind, n.Op, n.Obj, s.currentState, s.targetState, client)
+		_, err := sc.registry.Do(n.Kind, n.Op, n.Obj, sc.currentState, sc.targetState, client)
 		return err
 	})
 	return err

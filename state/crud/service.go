@@ -6,6 +6,8 @@ import (
 	"github.com/kong/deck/state"
 )
 
+// ServiceCRUD implements Actions interface
+// from the github.com/kong/crud package for the Service entitiy of Kong.
 type ServiceCRUD struct {
 	// client    *kong.Client
 	// callbacks []Callback // use this to update the current in-memory state
@@ -32,6 +34,7 @@ func argsForService(arg ...crud.Arg) (*state.Service, *state.KongState, *state.K
 	return service, currentState, targetState, client
 }
 
+// Create creates a Service in Kong. TODO Doc
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	service, current, _, client := argsForService(arg...)
 	createdService, err := client.Services.Create(nil, &service.Service)
@@ -44,6 +47,8 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	return createdService, nil
 }
+
+// Delete deletes a service in Kong. TODO Doc
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	service, current, _, client := argsForService(arg...)
 	err := client.Services.Delete(nil, service.ID)
@@ -56,6 +61,8 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	return nil, err
 }
+
+// Update udpates a service in Kong. TODO Doc
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	service, current, _, client := argsForService(arg...)
 	updatedService, err := client.Services.Update(nil, &service.Service)
@@ -67,9 +74,4 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 		return nil, err //TODO annotate error
 	}
 	return updatedService, nil
-}
-
-type RouteCRUD struct {
-	// client    *kong.Client
-	// callbacks []Callback // use this to update the current in-memory state
 }

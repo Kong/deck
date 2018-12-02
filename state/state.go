@@ -18,6 +18,8 @@ const (
 	all              = "all"
 )
 
+// ErrNotFound is an error type that is
+// returned when an entity is not found in the state.
 var ErrNotFound = errors.New("entity not found")
 
 var schema = &memdb.DBSchema{

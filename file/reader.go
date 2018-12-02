@@ -27,6 +27,11 @@ type fileStructure struct {
 
 var count counter.Counter
 
+// GetStateFromFile reads in a file with filename and constructs
+// a state. It will return an error if the file representation is invalid
+// or if there is any error during processing.
+// All entities without an ID will get a `placeholder-{iota}` ID
+// assigned to them.
 func GetStateFromFile(filename string) (*state.KongState, error) {
 
 	if filename == "" {

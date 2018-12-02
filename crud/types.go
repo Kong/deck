@@ -12,11 +12,15 @@ func (op *Op) String() string {
 }
 
 var (
-	Create Op = Op{"Create"}
-	Update Op = Op{"Update"}
-	Delete Op = Op{"Delete"}
+	// Create is a constant representing create operations.
+	Create = Op{"Create"}
+	// Update is a constant representing update operations.
+	Update = Op{"Update"}
+	// Delete is a constant representing delete operations.
+	Delete = Op{"Delete"}
 )
 
+// Arg is an argument to a callback function.
 type Arg interface{}
 
 // Actions is an interface for CRUD operations on any entity

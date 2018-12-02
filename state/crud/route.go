@@ -7,6 +7,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RouteCRUD implements Actions interface
+// from the github.com/kong/crud package for the Route entitiy of Kong.
+type RouteCRUD struct {
+	// client    *kong.Client
+	// callbacks []Callback // use this to update the current in-memory state
+}
+
 func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState, *state.KongState, *kong.Client) {
 	route, ok := arg[0].(*state.Route)
 	if !ok {
@@ -28,6 +35,7 @@ func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState, *state.KongS
 	return route, currentState, targetState, client
 }
 
+// Create creates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	route, current, _, client := argsFroRoute(arg...)
 	// find the service to associate this route with
@@ -42,11 +50,15 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	return createdService, nil
 }
+
+// Delete deletes a Route in Kong. TODO Doc
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	route, _, _, client := argsFroRoute(arg...)
 	err := client.Routes.Delete(nil, route.ID)
 	return nil, err
 }
+
+// Update updates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	route, _, _, client := argsFroRoute(arg...)
 	updatedService, err := client.Routes.Update(nil, &route.Route)

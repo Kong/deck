@@ -64,6 +64,8 @@ func (k *KongState) GetService(nameOrID string) (*Service, error) {
 	return service, nil
 }
 
+// UpdateService udpates an exisitng service.
+// It returns an error if the service is not already present.
 func (k *KongState) UpdateService(service Service) error {
 	txn := k.memdb.Txn(true)
 	defer txn.Commit()
