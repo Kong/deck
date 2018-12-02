@@ -1,0 +1,23 @@
+language: go
+
+env:
+ - GO111MODULE=on
+
+go:
+ - "1.11.2"
+
+before_script:
+ - go get golang.org/x/lint/golint
+
+script:
+ - diff -u <(echo -n) <(gofmt -d -s .)
+ - golint -set_exit_status $(go list ./...)
+ - go tool vet .
+ - go test -v ./...
+ - GOOS=linux go build
+ - GOOS=darwin go build
+ - GOOS=windows go build
+
+cache:
+  directories:
+   - $HOME/gopath/pkg/mod
