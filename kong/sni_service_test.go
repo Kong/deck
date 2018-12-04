@@ -25,8 +25,8 @@ func TestSNIsCertificate(T *testing.T) {
 
 	// create a cert
 	fixtureCertificate, err := client.Certificates.Create(defaultCtx, &Certificate{
-		Key:  String("foo"),
-		Cert: String("bar"),
+		Key:  String(key1),
+		Cert: String(cert1),
 	})
 	assert.Nil(err)
 	assert.NotNil(fixtureCertificate)
@@ -77,8 +77,8 @@ func TestSNIListEndpoint(T *testing.T) {
 	assert.NotNil(client)
 
 	certificate := &Certificate{
-		Cert: String("foo"),
-		Key:  String("bar"),
+		Cert: String(cert2),
+		Key:  String(key2),
 	}
 
 	createdCertificate, err := client.Certificates.Create(defaultCtx, certificate)
