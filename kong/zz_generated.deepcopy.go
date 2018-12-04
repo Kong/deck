@@ -354,25 +354,25 @@ func (in *Plugin) DeepCopyInto(out *Plugin) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.RouteID != nil {
-		in, out := &in.RouteID, &out.RouteID
-		*out = new(string)
-		**out = **in
+	if in.Route != nil {
+		in, out := &in.Route, &out.Route
+		*out = new(Route)
+		(*in).DeepCopyInto(*out)
 	}
-	if in.ServiceID != nil {
-		in, out := &in.ServiceID, &out.ServiceID
-		*out = new(string)
-		**out = **in
+	if in.Service != nil {
+		in, out := &in.Service, &out.Service
+		*out = new(Service)
+		(*in).DeepCopyInto(*out)
 	}
-	if in.APIID != nil {
-		in, out := &in.APIID, &out.APIID
-		*out = new(string)
-		**out = **in
+	if in.API != nil {
+		in, out := &in.API, &out.API
+		*out = new(API)
+		(*in).DeepCopyInto(*out)
 	}
-	if in.ConsumerID != nil {
-		in, out := &in.ConsumerID, &out.ConsumerID
-		*out = new(string)
-		**out = **in
+	if in.Consumer != nil {
+		in, out := &in.Consumer, &out.Consumer
+		*out = new(Consumer)
+		(*in).DeepCopyInto(*out)
 	}
 	out.Config = in.Config.DeepCopy()
 	if in.Enabled != nil {

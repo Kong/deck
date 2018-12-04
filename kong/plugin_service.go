@@ -18,11 +18,10 @@ func (s *PluginService) Create(ctx context.Context, plugin *Plugin) (*Plugin, er
 
 	queryPath := "/plugins"
 	method := "POST"
-	// TODO enable PUT support once plugins are migrated to new DAO in Kong
-	// if plugin.ID != nil {
-	// 	queryPath = queryPath + "/" + *plugin.ID
-	// 	method = "PUT"
-	// }
+	if plugin.ID != nil {
+		queryPath = queryPath + "/" + *plugin.ID
+		method = "PUT"
+	}
 	req, err := s.client.newRequest(method, queryPath, nil, plugin)
 
 	if err != nil {

@@ -32,15 +32,15 @@ func (in Configuration) DeepCopy() Configuration {
 // Read https://getkong.org/docs/0.13.x/admin-api/#Plugin-object
 // +k8s:deepcopy-gen=true
 type Plugin struct {
-	CreatedAt  *int          `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	ID         *string       `json:"id,omitempty" yaml:"id,omitempty"`
-	Name       *string       `json:"name,omitempty" yaml:"name,omitempty"`
-	RouteID    *string       `json:"route_id,omitempty" yaml:"route_id,omitempty"`
-	ServiceID  *string       `json:"service_id,omitempty" yaml:"service_id,omitempty"`
-	APIID      *string       `json:"api_id,omitempty" yaml:"api_id,omitempty"`
-	ConsumerID *string       `json:"consumer_id,omitempty" yaml:"consumer_id,omitempty"`
-	Config     Configuration `json:"config,omitempty" yaml:"config,omitempty"`
-	Enabled    *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	CreatedAt *int          `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string       `json:"id,omitempty" yaml:"id,omitempty"`
+	Name      *string       `json:"name,omitempty" yaml:"name,omitempty"`
+	Route     *Route        `json:"route,omitempty" yaml:"route,omitempty"`
+	Service   *Service      `json:"service,omitempty" yaml:"service,omitempty"`
+	API       *API          `json:"api,omitempty" yaml:"api,omitempty"`
+	Consumer  *Consumer     `json:"consumer,omitempty" yaml:"consumer,omitempty"`
+	Config    Configuration `json:"config,omitempty" yaml:"config,omitempty"`
+	Enabled   *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 }
 
 // Valid checks if all the fields in Plugin are valid.
@@ -64,28 +64,28 @@ func (p *Plugin) String() string {
 		buf.WriteString(*p.Name)
 	}
 	buf.WriteByte(' ')
-	if isEmptyString(p.RouteID) {
+	if p.Route == nil || isEmptyString(p.Route.ID) {
 		buf.WriteString("nil")
 	} else {
-		buf.WriteString(*p.RouteID)
+		buf.WriteString(*p.Route.ID)
 	}
 	buf.WriteByte(' ')
-	if isEmptyString(p.ServiceID) {
+	if p.Service == nil || isEmptyString(p.Service.ID) {
 		buf.WriteString("nil")
 	} else {
-		buf.WriteString(*p.ServiceID)
+		buf.WriteString(*p.Service.ID)
 	}
 	buf.WriteByte(' ')
-	if isEmptyString(p.APIID) {
+	if p.API == nil || isEmptyString(p.API.ID) {
 		buf.WriteString("nil")
 	} else {
-		buf.WriteString(*p.APIID)
+		buf.WriteString(*p.API.ID)
 	}
 	buf.WriteByte(' ')
-	if isEmptyString(p.ConsumerID) {
+	if p.Consumer == nil || isEmptyString(p.Consumer.ID) {
 		buf.WriteString("nil")
 	} else {
-		buf.WriteString(*p.ConsumerID)
+		buf.WriteString(*p.Consumer.ID)
 	}
 	buf.WriteByte(' ')
 	buf.WriteString(fmt.Sprint(p.Config))

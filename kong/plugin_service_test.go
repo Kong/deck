@@ -3,6 +3,7 @@ package kong
 import (
 	"testing"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,23 +35,20 @@ func TestPluginsService(T *testing.T) {
 	err = client.Plugins.Delete(defaultCtx, createdPlugin.ID)
 	assert.Nil(err)
 
-	// PUT request is not yet supported
-	// TODO uncomment this plugin entity is migrated over to new DAO
-
 	// ID can be specified
-	// id := uuid.NewV4().String()
-	// plugin = &Plugin{
-	// 	Name: String("key-auth"),
-	// 	ID:   String(id),
-	// }
+	id := uuid.NewV4().String()
+	plugin = &Plugin{
+		Name: String("key-auth"),
+		ID:   String(id),
+	}
 
-	// createdPlugin, err = client.Plugins.Create(defaultCtx, plugin)
-	// assert.Nil(err)
-	// assert.NotNil(createdPlugin)
-	// assert.Equal(id, *createdPlugin.ID)
+	createdPlugin, err = client.Plugins.Create(defaultCtx, plugin)
+	assert.Nil(err)
+	assert.NotNil(createdPlugin)
+	assert.Equal(id, *createdPlugin.ID)
 
-	// err = client.Plugins.Delete(defaultCtx, createdPlugin.ID)
-	// assert.Nil(err)
+	err = client.Plugins.Delete(defaultCtx, createdPlugin.ID)
+	assert.Nil(err)
 }
 
 func TestUnknownPlugin(T *testing.T) {
@@ -187,26 +185,26 @@ func TestPluginListAllForEntityEndpoint(T *testing.T) {
 		},
 		// specific to route
 		{
-			Name:    String("key-auth"),
-			RouteID: createdRoute.ID,
+			Name:  String("key-auth"),
+			Route: createdRoute,
 		},
 		{
-			Name:    String("jwt"),
-			RouteID: createdRoute.ID,
+			Name:  String("jwt"),
+			Route: createdRoute,
 		},
 		// specific to service
 		{
-			Name:      String("key-auth"),
-			ServiceID: createdService.ID,
+			Name:    String("key-auth"),
+			Service: createdService,
 		},
 		{
-			Name:      String("jwt"),
-			ServiceID: createdService.ID,
+			Name:    String("jwt"),
+			Service: createdService,
 		},
 		// specific to consumer
 		{
-			Name:       String("rate-limiting"),
-			ConsumerID: createdConsumer.ID,
+			Name:     String("rate-limiting"),
+			Consumer: createdConsumer,
 			Config: map[string]interface{}{
 				"second": 1,
 			},
