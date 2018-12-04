@@ -3,6 +3,7 @@ package kong
 import (
 	"testing"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,27 +52,26 @@ func TestTargetsUpstream(T *testing.T) {
 	err = client.Targets.Delete(defaultCtx, fixtureUpstream.ID, createdTarget.ID)
 	assert.Nil(err)
 
-	// PUT request is not yet supported
-	// TODO uncomment this target entity is migrated over to new DAO
-
 	// ID can be specified
-	// id := uuid.NewV4().String()
-	// target = &Target{
-	// 	ID:         String(id),
-	// 	Target:     String("10.0.0.3"),
-	// 	UpstreamID: fixtureUpstream.ID,
-	// }
+	id := uuid.NewV4().String()
+	target = &Target{
+		ID:       String(id),
+		Target:   String("10.0.0.3"),
+		Upstream: fixtureUpstream,
+	}
 
-	// createdTarget, err = client.Targets.Create(defaultCtx, target)
-	// assert.Nil(err)
-	// assert.NotNil(createdTarget)
-	// assert.Equal(id, *createdTarget.ID)
+	createdTarget, err = client.Targets.Create(defaultCtx, fixtureUpstream.ID, target)
+	assert.Nil(err)
+	assert.NotNil(createdTarget)
+	assert.Equal(id, *createdTarget.ID)
 
 	err = client.Upstreams.Delete(defaultCtx, fixtureUpstream.ID)
 	assert.Nil(err)
 }
 
 func TestTargetListEndpoint(T *testing.T) {
+	// TODO remove this once https://github.com/Kong/kong/issues/4043 is fixed
+	T.SkipNow()
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -89,19 +89,18 @@ func TestTargetListEndpoint(T *testing.T) {
 	// fixtures
 	targets := []*Target{
 		{
-			Target:     String("target1"),
-			UpstreamID: createdUpstream.ID,
+			Target:   String("10.42.1.2"),
+			Upstream: createdUpstream,
 		},
 		{
-			Target:     String("target2"),
-			UpstreamID: createdUpstream.ID,
+			Target:   String("10.42.1.3"),
+			Upstream: createdUpstream,
 		},
 		{
-			Target:     String("target3"),
-			UpstreamID: createdUpstream.ID,
+			Target:   String("10.42.1.4"),
+			Upstream: createdUpstream,
 		},
 	}
-
 	// create fixturs
 	for i := 0; i < len(targets); i++ {
 		target, err := client.Targets.Create(defaultCtx, createdUpstream.ID, targets[i])

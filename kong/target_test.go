@@ -13,8 +13,8 @@ func TestTargetValid(T *testing.T) {
 	target := &Target{}
 	assert.Equal(false, target.Valid())
 	target = &Target{
-		Target:     String("host.com"),
-		UpstreamID: String("upstream-id"),
+		Target:   String("host.com"),
+		Upstream: &Upstream{Name: String("upstream-id")},
 	}
 	assert.Equal(true, target.Valid())
 }

@@ -605,7 +605,7 @@ func (in *Target) DeepCopyInto(out *Target) {
 	*out = *in
 	if in.CreatedAt != nil {
 		in, out := &in.CreatedAt, &out.CreatedAt
-		*out = new(int64)
+		*out = new(float64)
 		**out = **in
 	}
 	if in.ID != nil {
@@ -618,10 +618,10 @@ func (in *Target) DeepCopyInto(out *Target) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.UpstreamID != nil {
-		in, out := &in.UpstreamID, &out.UpstreamID
-		*out = new(string)
-		**out = **in
+	if in.Upstream != nil {
+		in, out := &in.Upstream, &out.Upstream
+		*out = new(Upstream)
+		(*in).DeepCopyInto(*out)
 	}
 	if in.Weight != nil {
 		in, out := &in.Weight, &out.Weight

@@ -18,11 +18,10 @@ func (s *UpstreamService) Create(ctx context.Context, upstream *Upstream) (*Upst
 
 	queryPath := "/upstreams"
 	method := "POST"
-	// TODO enable PUT support once upstreams are migrated to new DAO in Kong
-	// if upstream.ID != nil {
-	// 	queryPath = queryPath + "/" + *upstream.ID
-	// 	method = "PUT"
-	// }
+	if upstream.ID != nil {
+		queryPath = queryPath + "/" + *upstream.ID
+		method = "PUT"
+	}
 	req, err := s.client.newRequest(method, queryPath, nil, upstream)
 
 	if err != nil {

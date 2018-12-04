@@ -5,12 +5,11 @@ import "bytes"
 // Target represents a Target in Kong.
 // +k8s:deepcopy-gen=true
 type Target struct {
-	CreatedAt *int64  `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
-	Target    *string `json:"target,omitempty" yaml:"target,omitempty"`
-	// TODO change once Upstream/Targets are migrated to new DAO
-	UpstreamID *string `json:"upstream_id,omitempty" yaml:"upstream_id,omitempty"`
-	Weight     *int    `json:"weight,omitempty" yaml:"weight,omitempty"`
+	CreatedAt *float64  `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
+	Target    *string   `json:"target,omitempty" yaml:"target,omitempty"`
+	Upstream  *Upstream `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+	Weight    *int      `json:"weight,omitempty" yaml:"weight,omitempty"`
 }
 
 // Valid checks if all the fields in Target are valid.
@@ -37,10 +36,10 @@ func (t *Target) String() string {
 		buf.WriteString(*t.Target)
 	}
 	buf.WriteByte(' ')
-	if isEmptyString(t.UpstreamID) {
+	if t.Upstream == nil || isEmptyString(t.Upstream.ID) {
 		buf.WriteString("nil")
 	} else {
-		buf.WriteString(*t.UpstreamID)
+		buf.WriteString(*t.Upstream.ID)
 	}
 	buf.WriteByte(' ')
 	buf.WriteByte(']')

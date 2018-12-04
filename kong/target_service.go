@@ -20,7 +20,6 @@ func (s *TargetService) Create(ctx context.Context, upstreamNameOrID *string, ta
 	}
 	queryPath := "/upstreams/" + *upstreamNameOrID + "/targets"
 	method := "POST"
-	// TODO enable when PUT support comes to Target entities
 	// if target.ID != nil {
 	// 	queryPath = queryPath + "/" + *target.ID
 	// 	method = "PUT"

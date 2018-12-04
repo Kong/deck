@@ -3,6 +3,7 @@ package kong
 import (
 	"testing"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,23 +35,20 @@ func TestUpstreamsService(T *testing.T) {
 	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
 	assert.Nil(err)
 
-	// PUT request is not yet supported
-	// TODO uncomment this upstream entity is migrated over to new DAO
-
 	// ID can be specified
-	// id := uuid.NewV4().String()
-	// upstream = &Upstream{
-	// 	Name: String("key-auth"),
-	// 	ID:   String(id),
-	// }
+	id := uuid.NewV4().String()
+	upstream = &Upstream{
+		Name: String("key-auth"),
+		ID:   String(id),
+	}
 
-	// createdUpstream, err = client.Upstreams.Create(defaultCtx, upstream)
-	// assert.Nil(err)
-	// assert.NotNil(createdUpstream)
-	// assert.Equal(id, *createdUpstream.ID)
+	createdUpstream, err = client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+	assert.Equal(id, *createdUpstream.ID)
 
-	// err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
-	// assert.Nil(err)
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
 }
 
 func TestUpstreamListEndpoint(T *testing.T) {
