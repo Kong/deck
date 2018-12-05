@@ -55,7 +55,7 @@ func init() {
 		"config file (default is $HOME/.deck.yaml)")
 
 	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
-		"HTTP Address of Kong's Admin APIn\n"+
+		"HTTP Address of Kong's Admin API.\n"+
 			"This value can also be set using DECK_KONG_ADDR"+
 			" environment variable.")
 	viper.BindPFlag("kong-addr",
