@@ -1,7 +1,6 @@
 package file
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"github.com/kong/deck/state"
@@ -17,14 +16,9 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	if err != nil {
 		return err
 	}
-	ro, err := kongState.GetAllRoutes()
-	fmt.Println(ro, err)
-	fmt.Println(services, err)
 	for _, s := range services {
 		s := service{Service: s.Service}
-		fmt.Println(*s.ID)
 		routes, err := kongState.GetAllRoutesByServiceID(*s.ID)
-		fmt.Println(routes)
 		if err != nil {
 			return err
 		}
