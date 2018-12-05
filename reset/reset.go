@@ -20,44 +20,49 @@ func Reset(state *utils.KongRawState, client *kong.Client) error {
 			return err
 		}
 	}
+
 	for _, s := range state.Services {
 		err := client.Services.Delete(nil, s.ID)
 		if err != nil {
 			return err
 		}
 	}
-	// TODO uncomment as development progresses
-	// for _, c := range state.Consumers {
-	// 	err := client.Consumers.Delete(nil, c.ID)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// for _, u := range state.Upstreams {
-	// 	err := client.Consumers.Delete(nil, u.ID)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// for _, u := range state.Certificates {
-	// 	err := client.Consumers.Delete(nil, u.ID)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// for _, p := range state.Plugins {
-	// 	// Delete global plugins
-	// 	if p.APIID == nil && p.ConsumerID == nil && p.ServiceID == nil &&
-	// 		p.RouteID == nil {
-	// 		err := client.Plugins.Delete(nil, p.ID)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 	}
-	// }
-	// Certificates will delete SNIs
-	// Plugins will be removed, except Global plugins
-	// Upstreams will remove Targets
+
+	for _, c := range state.Consumers {
+		err := client.Consumers.Delete(nil, c.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Upstreams also removes Targets
+	for _, u := range state.Upstreams {
+		err := client.Upstreams.Delete(nil, u.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Certificates also removes SNIs
+	for _, u := range state.Certificates {
+		err := client.Certificates.Delete(nil, u.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, p := range state.Plugins {
+		// Delete global plugins explicitly since those will not
+		// DELETE ON CASCADE
+		if p.APIID == nil && p.ConsumerID == nil && p.ServiceID == nil &&
+			p.RouteID == nil {
+			err := client.Plugins.Delete(nil, p.ID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	// TODO handle custom entities
 	return nil
 }
