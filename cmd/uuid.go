@@ -38,5 +38,6 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	uuidCmd.Flags().IntVarP(&count, "count", "c", 1, "number of UUIDs to generate")
+	uuidCmd.Flags().IntVarP(&count, "count", "c", 1,
+		"number of UUIDs to generate")
 }

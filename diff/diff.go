@@ -59,7 +59,8 @@ func (sc *Syncer) delete() error {
 }
 
 func (sc *Syncer) createUpdate() error {
-	// TODO write an interface and register by types, then execute in a particular order
+	// TODO write an interface and register by types,
+	// then execute in a particular order
 	err := sc.createUpdateServices()
 	if err != nil {
 		return errors.Wrap(err, "while building graph")
@@ -81,7 +82,8 @@ func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		_, err := sc.registry.Do(n.Kind, n.Op, n.Obj, sc.currentState, sc.targetState, client)
+		_, err := sc.registry.Do(n.Kind, n.Op, n.Obj, sc.currentState,
+			sc.targetState, client)
 		return err
 	})
 	return err

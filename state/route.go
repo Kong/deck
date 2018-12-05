@@ -42,7 +42,8 @@ var routeTableSchema = &memdb.TableSchema{
 }
 
 // TODO add method to lookup a route based on service association,
-// methods, hosts, paths -- Search by service name, then match the fields if equal or not
+// methods, hosts, paths -- Search by service name,
+// then match the fields if equal or not
 
 // AddRoute adds a route to KongState
 func (k *KongState) AddRoute(route Route) error {

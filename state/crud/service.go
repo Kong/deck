@@ -13,7 +13,8 @@ type ServiceCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func argsForService(arg ...crud.Arg) (*state.Service, *state.KongState, *state.KongState, *kong.Client) {
+func argsForService(arg ...crud.Arg) (*state.Service,
+	*state.KongState, *state.KongState, *kong.Client) {
 	service, ok := arg[0].(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.Service")

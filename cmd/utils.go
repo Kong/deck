@@ -29,7 +29,8 @@ type HeaderRoundTripper struct {
 }
 
 // RoundTrip satisfies the RoundTripper interface.
-func (t *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *HeaderRoundTripper) RoundTrip(req *http.Request) (*http.Response,
+	error) {
 	newRequest := new(http.Request)
 	*newRequest = *req
 	newRequest.Header = make(http.Header, len(req.Header))

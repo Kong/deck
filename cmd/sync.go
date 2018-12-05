@@ -16,10 +16,11 @@ var syncCmdKongStateFile string
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
-	Use:   "sync",
-	Short: "Sync performs operations to get Kong's configuration to match the state file",
-	Long: `Sync command reads the state file and performs operation on Kong to get Kong's
-state in sync with the input state.`,
+	Use: "sync",
+	Short: "Sync performs operations to get Kong's configuration " +
+		"to match the state file",
+	Long: `Sync command reads the state file and performs operation on Kong
+to get Kong's state in sync with the input state.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		current, err := state.NewKongState()
 		if err != nil {

@@ -14,7 +14,8 @@ var dumpCmdKongStateFile string
 var dumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export Kong configuration to a file",
-	Long: `A longer description that spans multiple lines and likely contains examples
+	Long: `A longer description that spans multiple lines
+and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.

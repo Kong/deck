@@ -14,7 +14,8 @@ type RouteCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState, *state.KongState, *kong.Client) {
+func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState,
+	*state.KongState, *kong.Client) {
 	route, ok := arg[0].(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -41,7 +42,8 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	// find the service to associate this route with
 	svc, err := current.GetService(*route.Service.Name)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to find service associated with route %+v", route)
+		return nil, errors.Wrapf(err,
+			"failed to find service associated with route %+v", route)
 	}
 	route.Service = svc.Service.DeepCopy()
 	createdService, err := client.Routes.Create(nil, &route.Route)

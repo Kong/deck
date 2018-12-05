@@ -38,7 +38,8 @@ configuration via GitOps.`,
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
+// Execute adds all child commands to the root command and sets
+// sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	log.SetFlags(0)
@@ -77,7 +78,8 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-server-name"))
 
 	rootCmd.PersistentFlags().String("ca-cert", "",
-		"Custom CA certificate to use to verify Kong's Admin TLS certificate.\n"+
+		"Custom CA certificate to use to verify"+
+			"Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_CA_CERT"+
 			" environment variable.")
 	viper.BindPFlag("ca-cert",
@@ -97,7 +99,7 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".deck" (without extension).
+		// Search config in home directory with name ".deck"(without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".deck")
 	}

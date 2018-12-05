@@ -46,7 +46,8 @@ func (k *KongState) AddService(service Service) error {
 
 // GetService gets a service by name or ID.
 func (k *KongState) GetService(nameOrID string) (*Service, error) {
-	res, err := k.multiIndexLookup(serviceTableName, []string{"name", id}, nameOrID)
+	res, err := k.multiIndexLookup(serviceTableName,
+		[]string{"name", id}, nameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}

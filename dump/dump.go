@@ -211,7 +211,8 @@ func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
 // GetAllTargets queries Kong for all the Targets of upstreams using client.
 // Targets are queries per upstream as there exists no endpoint in Kong
 // to list all targets of all upstreams.
-func GetAllTargets(client *kong.Client, upstreams []*kong.Upstream) ([]*kong.Target, error) {
+func GetAllTargets(client *kong.Client,
+	upstreams []*kong.Upstream) ([]*kong.Target, error) {
 	var targets []*kong.Target
 	opt := new(kong.ListOpt)
 	opt.Size = 1000

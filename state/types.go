@@ -53,7 +53,8 @@ func (s1 *Service) Equal(s2 *Service) bool {
 // EqualWithOpts returns true if s1 and s2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
-func (s1 *Service) EqualWithOpts(s2 *Service, ignoreID bool, ignoreTS bool) bool {
+func (s1 *Service) EqualWithOpts(s2 *Service,
+	ignoreID bool, ignoreTS bool) bool {
 	s1Copy := s1.Service.DeepCopy()
 	s2Copy := s2.Service.DeepCopy()
 
@@ -87,7 +88,8 @@ func (r1 *Route) Equal(r2 *Route) bool {
 // EqualWithOpts returns true if r1 and r2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
-func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID, ignoreTS, ignoreForeign bool) bool {
+func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
 	r1Copy := r1.Route.DeepCopy()
 	r2Copy := r2.Route.DeepCopy()
 
