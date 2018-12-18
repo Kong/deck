@@ -37,18 +37,6 @@ func TestTargetsUpstream(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdTarget)
 
-	// client.SetDebugMode(true)
-	// target, err = client.Targets.Get(defaultCtx, fixtureUpstream.ID, createdTarget.ID)
-	// assert.Nil(err)
-	// assert.NotNil(target)
-	// client.SetDebugMode(false)
-
-	// createdTarget.Target = String("10.0.0.2")
-	// target, err = client.Targets.Update(defaultCtx, fixtureUpstream.ID, createdTarget)
-	// assert.Nil(err)
-	// assert.NotNil(target)
-	// assert.Equal("10.0.0.2", *target.Target)
-
 	err = client.Targets.Delete(defaultCtx, fixtureUpstream.ID, createdTarget.ID)
 	assert.Nil(err)
 
@@ -70,8 +58,6 @@ func TestTargetsUpstream(T *testing.T) {
 }
 
 func TestTargetListEndpoint(T *testing.T) {
-	// TODO remove this once https://github.com/Kong/kong/issues/4043 is fixed
-	T.SkipNow()
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -118,28 +104,27 @@ func TestTargetListEndpoint(T *testing.T) {
 	// check if we see all targets
 	assert.True(compareTargets(targets, targetsFromKong))
 
-	// TODO seems like a bug in Kong in pagination of targets, uncomment this once the bug is fixed
 	// Test pagination
-	// targetsFromKong = []*Target{}
+	targetsFromKong = []*Target{}
 
-	// // first page
-	// page1, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, &ListOpt{Size: 1})
-	// assert.Nil(err)
-	// assert.NotNil(next)
-	// assert.NotNil(page1)
-	// assert.Equal(1, len(page1))
-	// targetsFromKong = append(targetsFromKong, page1...)
+	// first page
+	page1, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, &ListOpt{Size: 1})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.NotNil(page1)
+	assert.Equal(1, len(page1))
+	targetsFromKong = append(targetsFromKong, page1...)
 
-	// // last page
-	// next.Size = 2
-	// page2, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, next)
-	// assert.Nil(err)
-	// assert.Nil(next)
-	// assert.NotNil(page2)
-	// assert.Equal(2, len(page2))
-	// targetsFromKong = append(targetsFromKong, page2...)
+	// last page
+	next.Size = 2
+	page2, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.NotNil(page2)
+	assert.Equal(2, len(page2))
+	targetsFromKong = append(targetsFromKong, page2...)
 
-	// assert.True(compareTargets(targets, targetsFromKong))
+	assert.True(compareTargets(targets, targetsFromKong))
 
 	targets, err = client.Targets.ListAll(defaultCtx, createdUpstream.ID)
 	assert.Nil(err)
