@@ -63,8 +63,16 @@ func TestRoutesRoute(T *testing.T) {
 	// ID can be specified
 	id := uuid.NewV4().String()
 	route = &Route{
-		ID:      String(id),
-		Hosts:   StringSlice("buzz"),
+		ID:        String(id),
+		Name:      String("new-route"),
+		SNIs:      StringSlice("snihost1.com", "snihost2.com"),
+		Protocols: StringSlice("tcp", "tls"),
+		Destinations: []*CIDRPort{
+			{
+				IP:   String("10.0.0.0/8"),
+				Port: Int(80),
+			},
+		},
 		Service: service,
 	}
 
@@ -72,8 +80,11 @@ func TestRoutesRoute(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdRoute)
 	assert.Equal(id, *createdRoute.ID)
-	assert.Equal(1, len(createdRoute.Hosts))
-	assert.Equal("buzz", *createdRoute.Hosts[0])
+	assert.Equal(2, len(createdRoute.SNIs))
+	assert.Equal("snihost1.com", *createdRoute.SNIs[0])
+	assert.Equal("snihost2.com", *createdRoute.SNIs[1])
+	assert.Equal("10.0.0.0/8", *createdRoute.Destinations[0].IP)
+	assert.Equal(80, *createdRoute.Destinations[0].Port)
 
 	err = client.Routes.Delete(defaultCtx, createdRoute.ID)
 	assert.Nil(err)
