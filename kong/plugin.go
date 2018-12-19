@@ -41,6 +41,7 @@ type Plugin struct {
 	Consumer  *Consumer     `json:"consumer,omitempty" yaml:"consumer,omitempty"`
 	Config    Configuration `json:"config,omitempty" yaml:"config,omitempty"`
 	Enabled   *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	RunOn     *string       `json:"run_on,omitempty" yaml:"run_on,omitempty"`
 }
 
 // Valid checks if all the fields in Plugin are valid.
@@ -86,6 +87,12 @@ func (p *Plugin) String() string {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.Consumer.ID)
+	}
+	buf.WriteByte(' ')
+	if isEmptyString(p.RunOn) {
+		buf.WriteString("nil")
+	} else {
+		buf.WriteString(*p.RunOn)
 	}
 	buf.WriteByte(' ')
 	buf.WriteString(fmt.Sprint(p.Config))

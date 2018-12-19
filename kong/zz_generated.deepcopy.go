@@ -380,6 +380,11 @@ func (in *Plugin) DeepCopyInto(out *Plugin) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.RunOn != nil {
+		in, out := &in.RunOn, &out.RunOn
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 

@@ -38,13 +38,15 @@ func TestPluginsService(T *testing.T) {
 	// ID can be specified
 	id := uuid.NewV4().String()
 	plugin = &Plugin{
-		Name: String("key-auth"),
-		ID:   String(id),
+		Name:  String("prometheus"),
+		ID:    String(id),
+		RunOn: String("all"),
 	}
 
 	createdPlugin, err = client.Plugins.Create(defaultCtx, plugin)
 	assert.Nil(err)
 	assert.NotNil(createdPlugin)
+	assert.Equal("all", *createdPlugin.RunOn)
 	assert.Equal(id, *createdPlugin.ID)
 
 	err = client.Plugins.Delete(defaultCtx, createdPlugin.ID)
