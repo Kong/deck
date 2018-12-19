@@ -37,7 +37,6 @@ type Plugin struct {
 	Name      *string       `json:"name,omitempty" yaml:"name,omitempty"`
 	Route     *Route        `json:"route,omitempty" yaml:"route,omitempty"`
 	Service   *Service      `json:"service,omitempty" yaml:"service,omitempty"`
-	API       *API          `json:"api,omitempty" yaml:"api,omitempty"`
 	Consumer  *Consumer     `json:"consumer,omitempty" yaml:"consumer,omitempty"`
 	Config    Configuration `json:"config,omitempty" yaml:"config,omitempty"`
 	Enabled   *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
@@ -75,12 +74,6 @@ func (p *Plugin) String() string {
 		buf.WriteString("nil")
 	} else {
 		buf.WriteString(*p.Service.ID)
-	}
-	buf.WriteByte(' ')
-	if p.API == nil || isEmptyString(p.API.ID) {
-		buf.WriteString("nil")
-	} else {
-		buf.WriteString(*p.API.ID)
 	}
 	buf.WriteByte(' ')
 	if p.Consumer == nil || isEmptyString(p.Consumer.ID) {

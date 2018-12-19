@@ -24,13 +24,13 @@ func TestPluginString(T *testing.T) {
 	assert := assert.New(T)
 
 	p := &Plugin{}
-	assert.Equal("[ nil nil nil nil nil nil nil map[] ]", p.String())
+	assert.Equal("[ nil nil nil nil nil nil map[] ]", p.String())
 
 	p = &Plugin{
 		Name:  String("bar"),
 		RunOn: String("all"),
 	}
-	assert.Equal("[ nil bar nil nil nil nil all map[] ]", p.String())
+	assert.Equal("[ nil bar nil nil nil all map[] ]", p.String())
 
 	p = &Plugin{
 		Name: String("foo"),
@@ -38,7 +38,7 @@ func TestPluginString(T *testing.T) {
 			"array": "value",
 		},
 	}
-	assert.Equal("[ nil foo nil nil nil nil nil map[array:value] ]", p.String())
+	assert.Equal("[ nil foo nil nil nil nil map[array:value] ]", p.String())
 
 	p = &Plugin{
 		Name: String("foo"),
@@ -50,7 +50,7 @@ func TestPluginString(T *testing.T) {
 		},
 		RunOn: String("first"),
 	}
-	assert.Equal("[ nil foo nil nil nil nil first "+
+	assert.Equal("[ nil foo nil nil nil first "+
 		"map[array:[element1 element2]] ]", p.String())
 
 	p = &Plugin{
@@ -61,7 +61,7 @@ func TestPluginString(T *testing.T) {
 			},
 		},
 	}
-	assert.Equal("[ nil foo nil nil nil nil nil "+
+	assert.Equal("[ nil foo nil nil nil nil "+
 		"map[key:map[subkey:subvalue]] ]", p.String())
 }
 
