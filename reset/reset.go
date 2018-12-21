@@ -54,8 +54,8 @@ func Reset(state *utils.KongRawState, client *kong.Client) error {
 	for _, p := range state.Plugins {
 		// Delete global plugins explicitly since those will not
 		// DELETE ON CASCADE
-		if p.APIID == nil && p.ConsumerID == nil && p.ServiceID == nil &&
-			p.RouteID == nil {
+		if p.Consumer == nil && p.Service == nil &&
+			p.Route == nil {
 			err := client.Plugins.Delete(nil, p.ID)
 			if err != nil {
 				return err
