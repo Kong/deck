@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/hashicorp/terraform v0.11.10
-	github.com/hbagdi/go-kong v0.0.0-20181029031242-2e78416d393c
+	github.com/hbagdi/go-kong v0.0.0-20181219182410-fe26db196e3c
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/mitchellh/mapstructure v1.1.2 // indirect

@@ -26,6 +26,8 @@ github.com/hashicorp/terraform v0.11.10 h1:XYZ/V+teSckRfZdwxsoP+66v0slHixe5Ai8wx
 github.com/hashicorp/terraform v0.11.10/go.mod h1:uN1KUiT7Wdg61fPwsGXQwK3c8PmpIVZrt5Vcb1VrSoM=
 github.com/hbagdi/go-kong v0.0.0-20181029031242-2e78416d393c h1:ZD5fona5yP6PBZMJUI9kg5qYu9XumTT51x/Hpg6CfPw=
 github.com/hbagdi/go-kong v0.0.0-20181029031242-2e78416d393c/go.mod h1:QbVau8Rt4KAnbRxEyHaOFg0R8v+mcu45tX4Tft/J4gU=
+github.com/hbagdi/go-kong v0.0.0-20181219182410-fe26db196e3c h1:1Z9tTEHgaBzx9HgCqBqoCuKnGPko7qtrwJxfWb8BjLM=
+github.com/hbagdi/go-kong v0.0.0-20181219182410-fe26db196e3c/go.mod h1:QbVau8Rt4KAnbRxEyHaOFg0R8v+mcu45tX4Tft/J4gU=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/kong/deck v0.0.0-20181201222409-556eb16abad3 h1:JPRUjAlMgn3vJsJPm4l3Xa1hihPi1TUJTfxpB6clkZc=
