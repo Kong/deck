@@ -4,6 +4,7 @@ import (
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 )
 
 // GetState queries Kong for all entities using client and
@@ -15,10 +16,20 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 	}
 	kongState, err := state.NewKongState()
 	for _, s := range raw.Services {
-		kongState.AddService(state.Service{Service: *s})
+		if utils.Empty(s.Name) {
+			return nil, errors.New("service '" + *s.ID + "' does not" +
+				" have a name. decK needs services to be named.")
+		}
+		err := kongState.AddService(state.Service{Service: *s})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting service into state")
+		}
 	}
 	for _, r := range raw.Routes {
-		kongState.AddRoute(state.Route{Route: *r})
+		err := kongState.AddRoute(state.Route{Route: *r})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting route into state")
+		}
 	}
 
 	return kongState, nil

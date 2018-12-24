@@ -8,7 +8,6 @@ import (
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
-	"github.com/kong/deck/state"
 	"github.com/spf13/cobra"
 )
 
@@ -22,52 +21,28 @@ var syncCmd = &cobra.Command{
 	Long: `Sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		current, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
 		client, err := GetKongClient(config)
 		if err != nil {
 			return err
 		}
-		services, err := dump.GetAllServices(client)
+		currentState, err := dump.GetState(client)
 		if err != nil {
 			return err
 		}
-		for _, service := range services {
-			var s state.Service
-			s.Service = *service
-			err := current.AddService(s)
-			if err != nil {
-				return err
-			}
-		}
-		routes, err := dump.GetAllRoutes(client)
+		targetState, err := file.GetStateFromFile(syncCmdKongStateFile)
 		if err != nil {
 			return err
 		}
-		for _, route := range routes {
-			var r state.Route
-			r.Route = *route
-			err := current.AddRoute(r)
-			if err != nil {
-				return err
-			}
-		}
-		target, err := file.GetStateFromFile(syncCmdKongStateFile)
+		syncer, _ := diff.NewSyncer(currentState, targetState)
+		gDelete, gCreateUpdate, err := syncer.Diff()
 		if err != nil {
 			return err
 		}
-		s, _ := diff.NewSyncer(current, target)
-		gDelete, gCreateUpdate, err := s.Diff()
+		err = syncer.Solve(gDelete, client)
 		if err != nil {
 			return err
 		}
-		err = s.Solve(gDelete, client)
-		if err != nil {
-			return err
-		}
-		err = s.Solve(gCreateUpdate, client)
+		err = syncer.Solve(gCreateUpdate, client)
 		if err != nil {
 			return err
 		}
