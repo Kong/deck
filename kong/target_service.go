@@ -17,7 +17,8 @@ type TargetService service
 // If an ID is specified, it will be used to
 // create a target in Kong, otherwise an ID
 // is auto-generated.
-func (s *TargetService) Create(ctx context.Context, upstreamNameOrID *string, target *Target) (*Target, error) {
+func (s *TargetService) Create(ctx context.Context,
+	upstreamNameOrID *string, target *Target) (*Target, error) {
 	if isEmptyString(upstreamNameOrID) {
 		return nil, errors.New("upstreamNameOrID can not be nil")
 	}
@@ -42,7 +43,8 @@ func (s *TargetService) Create(ctx context.Context, upstreamNameOrID *string, ta
 }
 
 // Delete deletes a Target in Kong
-func (s *TargetService) Delete(ctx context.Context, upstreamNameOrID *string, targetOrID *string) error {
+func (s *TargetService) Delete(ctx context.Context,
+	upstreamNameOrID *string, targetOrID *string) error {
 	if isEmptyString(upstreamNameOrID) {
 		return errors.New("upstreamNameOrID cannot be nil for Get operation")
 	}
@@ -50,7 +52,8 @@ func (s *TargetService) Delete(ctx context.Context, upstreamNameOrID *string, ta
 		return errors.New("targetOrID cannot be nil for Delete operation")
 	}
 
-	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v", *upstreamNameOrID, *targetOrID)
+	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v",
+		*upstreamNameOrID, *targetOrID)
 	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -62,11 +65,14 @@ func (s *TargetService) Delete(ctx context.Context, upstreamNameOrID *string, ta
 
 // List fetches a list of Targets in Kong.
 // opt can be used to control pagination.
-func (s *TargetService) List(ctx context.Context, upstreamNameOrID *string, opt *ListOpt) ([]*Target, *ListOpt, error) {
+func (s *TargetService) List(ctx context.Context,
+	upstreamNameOrID *string, opt *ListOpt) ([]*Target, *ListOpt, error) {
 	if isEmptyString(upstreamNameOrID) {
-		return nil, nil, errors.New("upstreamNameOrID cannot be nil for Get operation")
+		return nil, nil, errors.New(
+			"upstreamNameOrID cannot be nil for Get operation")
 	}
-	data, next, err := s.client.list(ctx, "/upstreams/"+*upstreamNameOrID+"/targets", opt)
+	data, next, err := s.client.list(ctx,
+		"/upstreams/"+*upstreamNameOrID+"/targets", opt)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,9 +93,9 @@ func (s *TargetService) List(ctx context.Context, upstreamNameOrID *string, opt 
 	return targets, next, nil
 }
 
-// ListAll fetches all Targets in Kong for an upstream
-// from /upstreams/:upstream/targets endpoint in Kong.
-func (s *TargetService) ListAll(ctx context.Context, upstreamNameOrID *string) ([]*Target, error) {
+// ListAll fetches all Targets in Kong for an upstream.
+func (s *TargetService) ListAll(ctx context.Context,
+	upstreamNameOrID *string) ([]*Target, error) {
 	var targets, data []*Target
 	var err error
 	opt := &ListOpt{Size: pageSize}

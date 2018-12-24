@@ -63,5 +63,6 @@ func TestRouteString(T *testing.T) {
 		"true false nil nil ]", r.String())
 
 	r = &Route{}
-	assert.Equal("[ nil nil nil nil nil nil nil nil nil nil nil nil ]", r.String())
+	assert.Equal("[ nil nil nil nil nil nil nil nil nil nil nil nil ]",
+		r.String())
 }

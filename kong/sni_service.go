@@ -37,10 +37,12 @@ func (s *SNIService) Create(ctx context.Context, sni *SNI) (*SNI, error) {
 }
 
 // Get fetches a SNI in Kong.
-func (s *SNIService) Get(ctx context.Context, usernameOrID *string) (*SNI, error) {
+func (s *SNIService) Get(ctx context.Context,
+	usernameOrID *string) (*SNI, error) {
 
 	if isEmptyString(usernameOrID) {
-		return nil, errors.New("usernameOrID cannot be nil for Get operation")
+		return nil, errors.New(
+			"usernameOrID cannot be nil for Get operation")
 	}
 
 	endpoint := fmt.Sprintf("/snis/%v", *usernameOrID)
@@ -97,7 +99,8 @@ func (s *SNIService) Delete(ctx context.Context, usernameOrID *string) error {
 
 // List fetches a list of SNIs in Kong.
 // opt can be used to control pagination.
-func (s *SNIService) List(ctx context.Context, opt *ListOpt) ([]*SNI, *ListOpt, error) {
+func (s *SNIService) List(ctx context.Context,
+	opt *ListOpt) ([]*SNI, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/snis", opt)
 	if err != nil {
 		return nil, nil, err
@@ -119,10 +122,13 @@ func (s *SNIService) List(ctx context.Context, opt *ListOpt) ([]*SNI, *ListOpt, 
 	return snis, next, nil
 }
 
-// ListForCertificate fetches a list of SNIs in Kong associated with certificateID.
+// ListForCertificate fetches a list of SNIs
+// in Kong associated with certificateID.
 // opt can be used to control pagination.
-func (s *SNIService) ListForCertificate(ctx context.Context, certificateID *string, opt *ListOpt) ([]*SNI, *ListOpt, error) {
-	data, next, err := s.client.list(ctx, "/certificates/"+*certificateID+"/snis", opt)
+func (s *SNIService) ListForCertificate(ctx context.Context,
+	certificateID *string, opt *ListOpt) ([]*SNI, *ListOpt, error) {
+	data, next, err := s.client.list(ctx,
+		"/certificates/"+*certificateID+"/snis", opt)
 	if err != nil {
 		return nil, nil, err
 	}

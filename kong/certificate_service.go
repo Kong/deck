@@ -14,7 +14,8 @@ type CertificateService service
 // If an ID is specified, it will be used to
 // create a certificate in Kong, otherwise an ID
 // is auto-generated.
-func (s *CertificateService) Create(ctx context.Context, certificate *Certificate) (*Certificate, error) {
+func (s *CertificateService) Create(ctx context.Context,
+	certificate *Certificate) (*Certificate, error) {
 
 	queryPath := "/certificates"
 	method := "POST"
@@ -37,7 +38,8 @@ func (s *CertificateService) Create(ctx context.Context, certificate *Certificat
 }
 
 // Get fetches a Certificate in Kong.
-func (s *CertificateService) Get(ctx context.Context, usernameOrID *string) (*Certificate, error) {
+func (s *CertificateService) Get(ctx context.Context,
+	usernameOrID *string) (*Certificate, error) {
 
 	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
@@ -58,10 +60,11 @@ func (s *CertificateService) Get(ctx context.Context, usernameOrID *string) (*Ce
 }
 
 // Update updates a Certificate in Kong
-func (s *CertificateService) Update(ctx context.Context, certificate *Certificate) (*Certificate, error) {
+func (s *CertificateService) Update(ctx context.Context,
+	certificate *Certificate) (*Certificate, error) {
 
 	if isEmptyString(certificate.ID) {
-		return nil, errors.New("ID cannot be nil for Update operation")
+		return nil, errors.New("ID cannot be nil for Update op           eration")
 	}
 
 	endpoint := fmt.Sprintf("/certificates/%v", *certificate.ID)
@@ -79,7 +82,8 @@ func (s *CertificateService) Update(ctx context.Context, certificate *Certificat
 }
 
 // Delete deletes a Certificate in Kong
-func (s *CertificateService) Delete(ctx context.Context, usernameOrID *string) error {
+func (s *CertificateService) Delete(ctx context.Context,
+	usernameOrID *string) error {
 
 	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
@@ -97,7 +101,8 @@ func (s *CertificateService) Delete(ctx context.Context, usernameOrID *string) e
 
 // List fetches a list of certificate in Kong.
 // opt can be used to control pagination.
-func (s *CertificateService) List(ctx context.Context, opt *ListOpt) ([]*Certificate, *ListOpt, error) {
+func (s *CertificateService) List(ctx context.Context,
+	opt *ListOpt) ([]*Certificate, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/certificates", opt)
 	if err != nil {
 		return nil, nil, err
@@ -122,7 +127,8 @@ func (s *CertificateService) List(ctx context.Context, opt *ListOpt) ([]*Certifi
 // ListAll fetches all Certificates in Kong.
 // This method can take a while if there
 // a lot of Certificates present.
-func (s *CertificateService) ListAll(ctx context.Context) ([]*Certificate, error) {
+func (s *CertificateService) ListAll(ctx context.Context) ([]*Certificate,
+	error) {
 	var certificates, data []*Certificate
 	var err error
 	opt := &ListOpt{Size: pageSize}

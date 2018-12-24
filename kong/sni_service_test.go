@@ -24,10 +24,11 @@ func TestSNIsCertificate(T *testing.T) {
 	assert.Nil(badSNI)
 
 	// create a cert
-	fixtureCertificate, err := client.Certificates.Create(defaultCtx, &Certificate{
-		Key:  String(key1),
-		Cert: String(cert1),
-	})
+	fixtureCertificate, err := client.Certificates.Create(defaultCtx,
+		&Certificate{
+			Key:  String(key1),
+			Cert: String(cert1),
+		})
 	assert.Nil(err)
 	assert.NotNil(fixtureCertificate)
 	assert.NotNil(fixtureCertificate.ID)
@@ -81,7 +82,8 @@ func TestSNIListEndpoint(T *testing.T) {
 		Key:  String(key2),
 	}
 
-	createdCertificate, err := client.Certificates.Create(defaultCtx, certificate)
+	createdCertificate, err := client.Certificates.Create(defaultCtx,
+		certificate)
 	assert.Nil(err)
 	assert.NotNil(createdCertificate)
 
@@ -140,7 +142,8 @@ func TestSNIListEndpoint(T *testing.T) {
 
 	assert.True(compareSNIs(snis, snisFromKong))
 
-	snisForCert, next, err := client.SNIs.ListForCertificate(defaultCtx, createdCertificate.ID, nil)
+	snisForCert, next, err := client.SNIs.ListForCertificate(defaultCtx,
+		createdCertificate.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(snisForCert)

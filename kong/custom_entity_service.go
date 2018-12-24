@@ -13,10 +13,12 @@ type CustomEntityService service
 
 // Get fetches a custom entity. The primary key and all relations of the
 // entity must be populated in entity.
-func (s *CustomEntityService) Get(ctx context.Context, entity custom.Entity) (custom.Entity, error) {
+func (s *CustomEntityService) Get(ctx context.Context,
+	entity custom.Entity) (custom.Entity, error) {
 	def := s.client.Lookup(entity.Type())
 	if def == nil {
-		return nil, errors.New("entity '" + string(entity.Type()) + "' not registered")
+		return nil, errors.New("entity '" + string(entity.Type()) +
+			"' not registered")
 	}
 
 	queryPath, err := def.GetEndpoint(entity)
@@ -39,11 +41,14 @@ func (s *CustomEntityService) Get(ctx context.Context, entity custom.Entity) (cu
 	return entity, nil
 }
 
-// Create creates a custom entity based on entity. All required fields must be present in entity.
-func (s *CustomEntityService) Create(ctx context.Context, entity custom.Entity) (custom.Entity, error) {
+// Create creates a custom entity based on entity.
+// All required fields must be present in entity.
+func (s *CustomEntityService) Create(ctx context.Context,
+	entity custom.Entity) (custom.Entity, error) {
 	def := s.client.Lookup(entity.Type())
 	if def == nil {
-		return nil, errors.New("entity '" + string(entity.Type()) + "' not registered")
+		return nil, errors.New("entity '" + string(entity.Type()) +
+			"' not registered")
 	}
 
 	queryPath, err := def.PostEndpoint(entity)
@@ -73,10 +78,12 @@ func (s *CustomEntityService) Create(ctx context.Context, entity custom.Entity) 
 }
 
 // Update updates a custom entity in Kong.
-func (s *CustomEntityService) Update(ctx context.Context, entity custom.Entity) (custom.Entity, error) {
+func (s *CustomEntityService) Update(ctx context.Context,
+	entity custom.Entity) (custom.Entity, error) {
 	def := s.client.Lookup(entity.Type())
 	if def == nil {
-		return nil, errors.New("entity '" + string(entity.Type()) + "' not registered")
+		return nil, errors.New("entity '" + string(entity.Type()) +
+			"' not registered")
 	}
 
 	queryPath, err := def.PatchEndpoint(entity)
@@ -106,10 +113,12 @@ func (s *CustomEntityService) Update(ctx context.Context, entity custom.Entity) 
 }
 
 // Delete deletes a custom entity in Kong.
-func (s *CustomEntityService) Delete(ctx context.Context, entity custom.Entity) error {
+func (s *CustomEntityService) Delete(ctx context.Context,
+	entity custom.Entity) error {
 	def := s.client.Lookup(entity.Type())
 	if def == nil {
-		return errors.New("entity '" + string(entity.Type()) + "' not registered")
+		return errors.New("entity '" + string(entity.Type()) +
+			"' not registered")
 	}
 
 	queryPath, err := def.PatchEndpoint(entity)
@@ -127,10 +136,12 @@ func (s *CustomEntityService) Delete(ctx context.Context, entity custom.Entity) 
 }
 
 // List fetches all custom entities based on relations
-func (s *CustomEntityService) List(ctx context.Context, opt *ListOpt, entity custom.Entity) ([]custom.Entity, *ListOpt, error) {
+func (s *CustomEntityService) List(ctx context.Context, opt *ListOpt,
+	entity custom.Entity) ([]custom.Entity, *ListOpt, error) {
 	def := s.client.Lookup(entity.Type())
 	if def == nil {
-		return nil, nil, errors.New("entity '" + string(entity.Type()) + "' not registered")
+		return nil, nil, errors.New("entity '" + string(entity.Type()) +
+			"' not registered")
 	}
 
 	queryPath, err := def.ListEndpoint(entity)
@@ -166,7 +177,8 @@ func (s *CustomEntityService) List(ctx context.Context, opt *ListOpt, entity cus
 }
 
 // ListAll fetches all custom entities based on relations
-func (s *CustomEntityService) ListAll(ctx context.Context, entity custom.Entity) ([]custom.Entity, error) {
+func (s *CustomEntityService) ListAll(ctx context.Context,
+	entity custom.Entity) ([]custom.Entity, error) {
 	var entities, data []custom.Entity
 	var err error
 	opt := &ListOpt{Size: pageSize}

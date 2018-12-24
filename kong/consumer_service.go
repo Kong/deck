@@ -14,7 +14,8 @@ type ConsumerService service
 // If an ID is specified, it will be used to
 // create a consumer in Kong, otherwise an ID
 // is auto-generated.
-func (s *ConsumerService) Create(ctx context.Context, consumer *Consumer) (*Consumer, error) {
+func (s *ConsumerService) Create(ctx context.Context,
+	consumer *Consumer) (*Consumer, error) {
 
 	queryPath := "/consumers"
 	method := "POST"
@@ -37,7 +38,8 @@ func (s *ConsumerService) Create(ctx context.Context, consumer *Consumer) (*Cons
 }
 
 // Get fetches a Consumer in Kong.
-func (s *ConsumerService) Get(ctx context.Context, usernameOrID *string) (*Consumer, error) {
+func (s *ConsumerService) Get(ctx context.Context,
+	usernameOrID *string) (*Consumer, error) {
 
 	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
@@ -58,7 +60,8 @@ func (s *ConsumerService) Get(ctx context.Context, usernameOrID *string) (*Consu
 }
 
 // Update updates a Consumer in Kong
-func (s *ConsumerService) Update(ctx context.Context, consumer *Consumer) (*Consumer, error) {
+func (s *ConsumerService) Update(ctx context.Context,
+	consumer *Consumer) (*Consumer, error) {
 
 	if isEmptyString(consumer.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
@@ -79,7 +82,8 @@ func (s *ConsumerService) Update(ctx context.Context, consumer *Consumer) (*Cons
 }
 
 // Delete deletes a Consumer in Kong
-func (s *ConsumerService) Delete(ctx context.Context, usernameOrID *string) error {
+func (s *ConsumerService) Delete(ctx context.Context,
+	usernameOrID *string) error {
 
 	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
@@ -97,7 +101,8 @@ func (s *ConsumerService) Delete(ctx context.Context, usernameOrID *string) erro
 
 // List fetches a list of Consumers in Kong.
 // opt can be used to control pagination.
-func (s *ConsumerService) List(ctx context.Context, opt *ListOpt) ([]*Consumer, *ListOpt, error) {
+func (s *ConsumerService) List(ctx context.Context,
+	opt *ListOpt) ([]*Consumer, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/consumers", opt)
 	if err != nil {
 		return nil, nil, err

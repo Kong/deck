@@ -13,7 +13,8 @@ type ListOpt struct {
 
 // list fetches a list of an entity in Kong.
 // opt can be used to control pagination.
-func (c *Client) list(ctx context.Context, endpoint string, opt *ListOpt) ([]json.RawMessage, *ListOpt, error) {
+func (c *Client) list(ctx context.Context,
+	endpoint string, opt *ListOpt) ([]json.RawMessage, *ListOpt, error) {
 
 	req, err := c.newRequest("GET", endpoint, opt, nil)
 	if err != nil {

@@ -236,17 +236,20 @@ func TestPluginListAllForEntityEndpoint(T *testing.T) {
 	assert.NotNil(pluginsFromKong)
 	assert.Equal(8, len(pluginsFromKong))
 
-	pluginsFromKong, err = client.Plugins.ListAllForConsumer(defaultCtx, createdConsumer.ID)
+	pluginsFromKong, err = client.Plugins.ListAllForConsumer(defaultCtx,
+		createdConsumer.ID)
 	assert.Nil(err)
 	assert.NotNil(pluginsFromKong)
 	assert.Equal(1, len(pluginsFromKong))
 
-	pluginsFromKong, err = client.Plugins.ListAllForService(defaultCtx, createdService.ID)
+	pluginsFromKong, err = client.Plugins.ListAllForService(defaultCtx,
+		createdService.ID)
 	assert.Nil(err)
 	assert.NotNil(pluginsFromKong)
 	assert.Equal(2, len(pluginsFromKong))
 
-	pluginsFromKong, err = client.Plugins.ListAllForRoute(defaultCtx, createdRoute.ID)
+	pluginsFromKong, err = client.Plugins.ListAllForRoute(defaultCtx,
+		createdRoute.ID)
 	assert.NotNil(pluginsFromKong)
 	assert.Equal(2, len(pluginsFromKong))
 

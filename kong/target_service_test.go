@@ -31,13 +31,15 @@ func TestTargetsUpstream(T *testing.T) {
 	assert.NotNil(fixtureUpstream)
 	assert.NotNil(fixtureUpstream.ID)
 
-	createdTarget, err := client.Targets.Create(defaultCtx, fixtureUpstream.ID, &Target{
-		Target: String("10.0.0.1:80"),
-	})
+	createdTarget, err := client.Targets.Create(defaultCtx,
+		fixtureUpstream.ID, &Target{
+			Target: String("10.0.0.1:80"),
+		})
 	assert.Nil(err)
 	assert.NotNil(createdTarget)
 
-	err = client.Targets.Delete(defaultCtx, fixtureUpstream.ID, createdTarget.ID)
+	err = client.Targets.Delete(defaultCtx, fixtureUpstream.ID,
+		createdTarget.ID)
 	assert.Nil(err)
 
 	// ID can be specified
@@ -48,7 +50,8 @@ func TestTargetsUpstream(T *testing.T) {
 		Upstream: fixtureUpstream,
 	}
 
-	createdTarget, err = client.Targets.Create(defaultCtx, fixtureUpstream.ID, target)
+	createdTarget, err = client.Targets.Create(defaultCtx,
+		fixtureUpstream.ID, target)
 	assert.Nil(err)
 	assert.NotNil(createdTarget)
 	assert.Equal(id, *createdTarget.ID)
@@ -89,13 +92,15 @@ func TestTargetListEndpoint(T *testing.T) {
 	}
 	// create fixturs
 	for i := 0; i < len(targets); i++ {
-		target, err := client.Targets.Create(defaultCtx, createdUpstream.ID, targets[i])
+		target, err := client.Targets.Create(defaultCtx,
+			createdUpstream.ID, targets[i])
 		assert.Nil(err)
 		assert.NotNil(target)
 		targets[i] = target
 	}
 
-	targetsFromKong, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, nil)
+	targetsFromKong, next, err := client.Targets.List(defaultCtx,
+		createdUpstream.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(targetsFromKong)
@@ -108,7 +113,8 @@ func TestTargetListEndpoint(T *testing.T) {
 	targetsFromKong = []*Target{}
 
 	// first page
-	page1, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, &ListOpt{Size: 1})
+	page1, next, err := client.Targets.List(defaultCtx,
+		createdUpstream.ID, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
@@ -117,7 +123,8 @@ func TestTargetListEndpoint(T *testing.T) {
 
 	// last page
 	next.Size = 2
-	page2, next, err := client.Targets.List(defaultCtx, createdUpstream.ID, next)
+	page2, next, err := client.Targets.List(defaultCtx,
+		createdUpstream.ID, next)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(page2)

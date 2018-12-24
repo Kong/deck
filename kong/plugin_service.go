@@ -14,7 +14,8 @@ type PluginService service
 // If an ID is specified, it will be used to
 // create a plugin in Kong, otherwise an ID
 // is auto-generated.
-func (s *PluginService) Create(ctx context.Context, plugin *Plugin) (*Plugin, error) {
+func (s *PluginService) Create(ctx context.Context,
+	plugin *Plugin) (*Plugin, error) {
 
 	queryPath := "/plugins"
 	method := "POST"
@@ -37,7 +38,8 @@ func (s *PluginService) Create(ctx context.Context, plugin *Plugin) (*Plugin, er
 }
 
 // Get fetches a Plugin in Kong.
-func (s *PluginService) Get(ctx context.Context, usernameOrID *string) (*Plugin, error) {
+func (s *PluginService) Get(ctx context.Context,
+	usernameOrID *string) (*Plugin, error) {
 
 	if isEmptyString(usernameOrID) {
 		return nil, errors.New("usernameOrID cannot be nil for Get operation")
@@ -58,7 +60,8 @@ func (s *PluginService) Get(ctx context.Context, usernameOrID *string) (*Plugin,
 }
 
 // Update updates a Plugin in Kong
-func (s *PluginService) Update(ctx context.Context, plugin *Plugin) (*Plugin, error) {
+func (s *PluginService) Update(ctx context.Context,
+	plugin *Plugin) (*Plugin, error) {
 
 	if isEmptyString(plugin.ID) {
 		return nil, errors.New("ID cannot be nil for Update operation")
@@ -79,7 +82,8 @@ func (s *PluginService) Update(ctx context.Context, plugin *Plugin) (*Plugin, er
 }
 
 // Delete deletes a Plugin in Kong
-func (s *PluginService) Delete(ctx context.Context, usernameOrID *string) error {
+func (s *PluginService) Delete(ctx context.Context,
+	usernameOrID *string) error {
 
 	if isEmptyString(usernameOrID) {
 		return errors.New("usernameOrID cannot be nil for Delete operation")
@@ -99,7 +103,8 @@ func (s *PluginService) Delete(ctx context.Context, usernameOrID *string) error 
 // on a specific path.
 // This is a helper method for listing all plugins
 // or plugins for specific entities.
-func (s *PluginService) listByPath(ctx context.Context, path string, opt *ListOpt) ([]*Plugin, *ListOpt, error) {
+func (s *PluginService) listByPath(ctx context.Context,
+	path string, opt *ListOpt) ([]*Plugin, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, path, opt)
 	if err != nil {
 		return nil, nil, err
@@ -125,7 +130,8 @@ func (s *PluginService) listByPath(ctx context.Context, path string, opt *ListOp
 // ListAll fetches all Plugins in Kong.
 // This method can take a while if there
 // a lot of Plugins present.
-func (s *PluginService) listAllByPath(ctx context.Context, path string) ([]*Plugin, error) {
+func (s *PluginService) listAllByPath(ctx context.Context,
+	path string) ([]*Plugin, error) {
 	var plugins, data []*Plugin
 	var err error
 	opt := &ListOpt{Size: pageSize}
@@ -142,7 +148,8 @@ func (s *PluginService) listAllByPath(ctx context.Context, path string) ([]*Plug
 
 // List fetches a list of Plugins in Kong.
 // opt can be used to control pagination.
-func (s *PluginService) List(ctx context.Context, opt *ListOpt) ([]*Plugin, *ListOpt, error) {
+func (s *PluginService) List(ctx context.Context,
+	opt *ListOpt) ([]*Plugin, *ListOpt, error) {
 	return s.listByPath(ctx, "/plugins", opt)
 }
 
@@ -154,7 +161,8 @@ func (s *PluginService) ListAll(ctx context.Context) ([]*Plugin, error) {
 }
 
 // ListAllForConsumer fetches all Plugins in Kong enabled for a consumer.
-func (s *PluginService) ListAllForConsumer(ctx context.Context, consumerIDorName *string) ([]*Plugin, error) {
+func (s *PluginService) ListAllForConsumer(ctx context.Context,
+	consumerIDorName *string) ([]*Plugin, error) {
 	if isEmptyString(consumerIDorName) {
 		return nil, errors.New("consumerIDorName cannot be nil")
 	}
@@ -162,7 +170,8 @@ func (s *PluginService) ListAllForConsumer(ctx context.Context, consumerIDorName
 }
 
 // ListAllForService fetches all Plugins in Kong enabled for a service.
-func (s *PluginService) ListAllForService(ctx context.Context, serviceIDorName *string) ([]*Plugin, error) {
+func (s *PluginService) ListAllForService(ctx context.Context,
+	serviceIDorName *string) ([]*Plugin, error) {
 	if isEmptyString(serviceIDorName) {
 		return nil, errors.New("serviceIDorName cannot be nil")
 	}
@@ -170,7 +179,8 @@ func (s *PluginService) ListAllForService(ctx context.Context, serviceIDorName *
 }
 
 // ListAllForRoute fetches all Plugins in Kong enabled for a service.
-func (s *PluginService) ListAllForRoute(ctx context.Context, routeID *string) ([]*Plugin, error) {
+func (s *PluginService) ListAllForRoute(ctx context.Context,
+	routeID *string) ([]*Plugin, error) {
 	if isEmptyString(routeID) {
 		return nil, errors.New("routeID cannot be nil")
 	}

@@ -122,11 +122,13 @@ func TestCreateInRoute(T *testing.T) {
 	}
 
 	// specifying name won't work
-	routeNotCreated, err := client.Routes.CreateInService(defaultCtx, createdService.Name, route)
+	routeNotCreated, err := client.Routes.CreateInService(defaultCtx,
+		createdService.Name, route)
 	assert.Nil(routeNotCreated)
 	assert.NotNil(err)
 
-	createdRoute, err := client.Routes.CreateInService(defaultCtx, createdService.ID, route)
+	createdRoute, err := client.Routes.CreateInService(defaultCtx,
+		createdService.ID, route)
 	assert.Nil(err)
 	assert.NotNil(createdRoute)
 
@@ -206,7 +208,8 @@ func TestRouteListEndpoint(T *testing.T) {
 
 	assert.True(compareRoutes(routes, routesFromKong))
 
-	routesForService, next, err := client.Routes.ListForService(defaultCtx, createdService.ID, nil)
+	routesForService, next, err := client.Routes.ListForService(defaultCtx,
+		createdService.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(routesForService)
