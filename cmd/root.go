@@ -42,6 +42,7 @@ configuration via GitOps.`,
 // sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	// supress output of terraform DAG by default
 	log.SetFlags(0)
 	log.SetOutput(ioutil.Discard)
 	if err := rootCmd.Execute(); err != nil {
@@ -84,6 +85,11 @@ func init() {
 			" environment variable.")
 	viper.BindPFlag("ca-cert",
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
+
+	rootCmd.PersistentFlags().Bool("debug", false,
+		"enable verbose debug logging")
+	viper.BindPFlag("debug",
+		rootCmd.PersistentFlags().Lookup("debug"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -112,4 +118,5 @@ func initConfig() {
 	config.TLSServerName = viper.GetString("tls-server-name")
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	config.TLSCACert = viper.GetString("ca-cert")
+	config.Debug = viper.GetBool("debug")
 }

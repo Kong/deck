@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/hbagdi/go-kong/kong"
@@ -19,6 +20,8 @@ type kongClientConfig struct {
 	TLSServerName string
 
 	TLSCACert string
+
+	Debug bool
 }
 
 // HeaderRoundTripper injects Headers into requests
@@ -76,5 +79,13 @@ func GetKongClient(opt kongClientConfig) (*kong.Client, error) {
 			rt:      defaultTransport,
 		}
 	}
-	return kong.NewClient(kong.String(opt.Address), c)
+	kongClient, err := kong.NewClient(kong.String(opt.Address), c)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating client for Kong's Admin API")
+	}
+	if opt.Debug {
+		kongClient.SetDebugMode(true)
+		kongClient.SetLogger(os.Stderr)
+	}
+	return kongClient, nil
 }
