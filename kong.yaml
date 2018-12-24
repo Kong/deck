@@ -3,7 +3,7 @@ services:
   host: host1
   name: name1
   port: 80
-  protocol: http
+  protocol: https
   read_timeout: 60000
   retries: 5
   write_timeout: 1000
@@ -34,7 +34,7 @@ services:
   write_timeout: 1000
   routes:
   - paths:
-    - /namfo
+    - /namfos
     preserve_host: false
     protocols:
     - http
