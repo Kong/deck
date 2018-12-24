@@ -75,6 +75,9 @@ func readFile(kongStateFile string) (*fileStructure, error) {
 
 	var s fileStructure
 	b, err := ioutil.ReadFile(kongStateFile)
+	if err != nil {
+		return nil, err
+	}
 	err = yaml.Unmarshal(b, &s)
 	if err != nil {
 		return nil, err
