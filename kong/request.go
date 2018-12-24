@@ -24,9 +24,13 @@ func (c *Client) newRequest(method, endpoint string, qs interface{},
 	}
 
 	//body to be sent in JSON
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
+	var buf []byte
+	if body != nil {
+		var err error
+		buf, err = json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	//Create a new request

@@ -10,6 +10,9 @@ import (
 // TargetService handles Targets in Kong.
 type TargetService service
 
+// TODO foreign key can be read directly from the embedded key itself
+// upstreamNameOrID need not be an explicit parameter.
+
 // Create creates a Target in Kong under upstreamID.
 // If an ID is specified, it will be used to
 // create a target in Kong, otherwise an ID
@@ -84,7 +87,8 @@ func (s *TargetService) List(ctx context.Context, upstreamNameOrID *string, opt 
 	return targets, next, nil
 }
 
-// ListAll fetches all Targets in Kong for an upstream.
+// ListAll fetches all Targets in Kong for an upstream
+// from /upstreams/:upstream/targets endpoint in Kong.
 func (s *TargetService) ListAll(ctx context.Context, upstreamNameOrID *string) ([]*Target, error) {
 	var targets, data []*Target
 	var err error
@@ -98,4 +102,68 @@ func (s *TargetService) ListAll(ctx context.Context, upstreamNameOrID *string) (
 		targets = append(targets, data...)
 	}
 	return targets, nil
+}
+
+// MarkHealthy marks target belonging to upstreamNameOrID as healthy in
+// Kong's load balancer.
+func (s *TargetService) MarkHealthy(ctx context.Context,
+	upstreamNameOrID *string, target *Target) error {
+	if target == nil {
+		return errors.New("cannot set health status for a nil target")
+	}
+	if isEmptyString(target.ID) && isEmptyString(target.Target) {
+		return errors.New("need at least one of target or ID to" +
+			" set health status")
+	}
+	if isEmptyString(upstreamNameOrID) {
+		return errors.New("upstreamNameOrID cannot be nil " +
+			"for updating health check")
+	}
+
+	tid := target.ID
+	if target.ID == nil {
+		tid = target.Target
+	}
+
+	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v/healthy",
+		*upstreamNameOrID, *tid)
+	req, err := s.client.newRequest("POST", endpoint, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	return err
+}
+
+// MarkUnhealthy marks target belonging to upstreamNameOrID as unhealthy in
+// Kong's load balancer.
+func (s *TargetService) MarkUnhealthy(ctx context.Context,
+	upstreamNameOrID *string, target *Target) error {
+	if target == nil {
+		return errors.New("cannot set health status for a nil target")
+	}
+	if isEmptyString(target.ID) && isEmptyString(target.Target) {
+		return errors.New("need at least one of target or ID to" +
+			" set health status")
+	}
+	if isEmptyString(upstreamNameOrID) {
+		return errors.New("upstreamNameOrID cannot be nil " +
+			"for updating health check")
+	}
+
+	tid := target.ID
+	if target.ID == nil {
+		tid = target.Target
+	}
+
+	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v/unhealthy",
+		*upstreamNameOrID, *tid)
+	req, err := s.client.newRequest("POST", endpoint, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	return err
 }
