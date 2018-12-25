@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// TODO implement graph command
+
 // graphCmd represents the graph command
 var graphCmd = &cobra.Command{
 	Use:   "graph",

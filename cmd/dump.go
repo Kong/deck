@@ -14,13 +14,11 @@ var dumpCmdKongStateFile string
 var dumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export Kong configuration to a file",
-	Long: `A longer description that spans multiple lines
-and likely contains examples
-and usage of using your command. For example:
+	Long: `Dump command reads all the entities present in Kong
+and writes them to a file on disk.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+The file can then be read using the Sync o Diff command to again
+configure Kong.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// TODO move this out to a common factory
 		client, err := GetKongClient(config)
