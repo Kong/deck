@@ -2,6 +2,7 @@ module github.com/kong/deck
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/fatih/color v1.7.0
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
 	github.com/hashicorp/go-memdb v0.0.0-20181108192425-032f93b25bec
@@ -10,6 +11,8 @@ require (
 	github.com/hashicorp/terraform v0.11.10
 	github.com/hbagdi/go-kong v0.0.0-20181219182410-fe26db196e3c
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/mattn/go-colorable v0.0.9 // indirect
+	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/pkg/errors v0.8.0

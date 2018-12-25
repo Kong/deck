@@ -1,10 +1,9 @@
 package dry
 
 import (
-	"fmt"
-
 	"github.com/kong/deck/crud"
 	arg "github.com/kong/deck/crud/kong"
+	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 )
 
@@ -29,7 +28,7 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	fmt.Println("creating service", service)
+	print.CreatePrintln("creating service", service)
 	return nil, nil
 }
 
@@ -38,7 +37,7 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	fmt.Println("deleting service", service)
+	print.DeletePrintln("deleting service", service)
 	return nil, nil
 }
 
@@ -47,6 +46,6 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	fmt.Println("updating service", service)
+	print.UpdatePrintln("updating service", service)
 	return nil, nil
 }

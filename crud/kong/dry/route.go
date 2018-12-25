@@ -1,10 +1,9 @@
 package dry
 
 import (
-	"fmt"
-
 	"github.com/kong/deck/crud"
 	arg "github.com/kong/deck/crud/kong"
+	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 )
 
@@ -37,8 +36,7 @@ func routeFromStuct(arg arg.ArgStruct) *state.Route {
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-
-	fmt.Println("creating route", route)
+	print.CreatePrintln("creating route ", route)
 	return nil, nil
 }
 
@@ -46,8 +44,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-
-	fmt.Println("deleting route", route)
+	print.DeletePrintln("deleting route ", route)
 	return nil, nil
 }
 
@@ -56,6 +53,6 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
 
-	fmt.Println("updating route", route)
+	print.UpdatePrintln("updating route", route)
 	return nil, nil
 }

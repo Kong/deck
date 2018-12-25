@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fatih/color"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -17,6 +18,7 @@ import (
 var (
 	cfgFile string
 	config  kongClientConfig
+	noColor bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -33,6 +35,9 @@ configuration via GitOps.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(config.Address); err != nil {
 			return errors.WithStack(errors.Wrap(err, "invalid URL"))
+		}
+		if noColor {
+			color.NoColor = true
 		}
 		return nil
 	},
@@ -90,6 +95,11 @@ func init() {
 		"enable verbose debug logging")
 	viper.BindPFlag("debug",
 		rootCmd.PersistentFlags().Lookup("debug"))
+
+	rootCmd.PersistentFlags().Bool("no-color", false,
+		"disable colorized output")
+	viper.BindPFlag("no-color",
+		rootCmd.PersistentFlags().Lookup("no-color"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -119,4 +129,5 @@ func initConfig() {
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	config.TLSCACert = viper.GetString("ca-cert")
 	config.Debug = viper.GetBool("debug")
+	noColor = viper.GetBool("no-color")
 }
