@@ -1,10 +1,10 @@
-package drycrud
+package dry
 
 import (
 	"fmt"
 
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
+	arg "github.com/kong/deck/crud/kong"
 	"github.com/kong/deck/state"
 )
 
@@ -15,32 +15,47 @@ type RouteCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func argsFroRoute(arg ...crud.Arg) (*state.Route, *state.KongState, *state.KongState, *kong.Client) {
-	route, ok := arg[0].(*state.Route)
+// TODO abstract this out
+func argStructFromArg(a crud.Arg) arg.ArgStruct {
+	argStruct, ok := a.(arg.ArgStruct)
+	if !ok {
+		panic("unexpected type, expected ArgStruct")
+	}
+	return argStruct
+}
+
+func routeFromStuct(arg arg.ArgStruct) *state.Route {
+	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
 	}
 
-	return route, nil, nil, nil
+	return route
 }
 
 // Create creates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
-	route, _, _, _ := argsFroRoute(arg...)
+	argStruct := argStructFromArg(arg[0])
+	route := routeFromStuct(argStruct)
+
 	fmt.Println("creating route", route)
 	return nil, nil
 }
 
 // Delete deletes a Route in Kong. TODO Doc
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
-	route, _, _, _ := argsFroRoute(arg...)
+	argStruct := argStructFromArg(arg[0])
+	route := routeFromStuct(argStruct)
+
 	fmt.Println("deleting route", route)
 	return nil, nil
 }
 
 // Update updates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
-	route, _, _, _ := argsFroRoute(arg...)
+	argStruct := argStructFromArg(arg[0])
+	route := routeFromStuct(argStruct)
+
 	fmt.Println("updating route", route)
 	return nil, nil
 }

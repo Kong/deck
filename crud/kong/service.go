@@ -1,0 +1,70 @@
+package kong
+
+import (
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/state"
+)
+
+// ServiceCRUD implements Actions interface
+// from the github.com/kong/crud package for the Service entitiy of Kong.
+type ServiceCRUD struct {
+	// client    *kong.Client
+	// callbacks []Callback // use this to update the current in-memory state
+}
+
+func serviceFromStuct(arg ArgStruct) *state.Service {
+	service, ok := arg.Obj.(*state.Service)
+	if !ok {
+		panic("unexpected type, expected *state.service")
+	}
+
+	return service
+}
+
+// Create creates a Service in Kong. TODO Doc
+func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
+	createdService, err := argStruct.Client.Services.Create(nil, &service.Service)
+	if err != nil {
+		return nil, err
+	}
+	err = argStruct.CurrentState.AddService(state.Service{Service: *createdService})
+	if err != nil {
+		return nil, err //TODO annotate error
+	}
+	return createdService, nil
+}
+
+// Delete deletes a service in Kong. TODO Doc
+func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
+	err := argStruct.Client.Services.Delete(nil, service.ID)
+	if err != nil {
+		return nil, err
+	}
+	err = argStruct.CurrentState.DeleteService(*service.ID)
+	if err != nil {
+		return nil, err //TODO annotate error
+	}
+	return nil, err
+}
+
+// Update udpates a service in Kong. TODO Doc
+func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
+	updatedService, err := argStruct.Client.Services.Update(nil, &service.Service)
+	if err != nil {
+		return nil, err
+	}
+	err = argStruct.CurrentState.UpdateService(*service)
+	if err != nil {
+		return nil, err //TODO annotate error
+	}
+	return updatedService, nil
+}

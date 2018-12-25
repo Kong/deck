@@ -4,8 +4,8 @@ import (
 	"github.com/hashicorp/terraform/dag"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
+	cruds "github.com/kong/deck/crud/kong"
 	"github.com/kong/deck/state"
-	cruds "github.com/kong/deck/state/crud"
 	"github.com/pkg/errors"
 )
 
@@ -82,8 +82,15 @@ func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		_, err := sc.registry.Do(n.Kind, n.Op, n.Obj, sc.currentState,
-			sc.targetState, client)
+		_, err := sc.registry.Do(n.Kind, n.Op, cruds.ArgStruct{
+			Obj:    n.Obj,
+			OldObj: n.OldObj,
+
+			CurrentState: sc.currentState,
+			TargetState:  sc.targetState,
+
+			Client: client,
+		})
 		return err
 	})
 	return err

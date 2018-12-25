@@ -11,7 +11,8 @@ import (
 
 	"github.com/hashicorp/terraform/dag"
 	"github.com/kong/deck/crud"
-	cruds "github.com/kong/deck/state/drycrud"
+	cruds "github.com/kong/deck/crud/kong"
+	drycrud "github.com/kong/deck/crud/kong/dry"
 )
 
 var diffCmdKongStateFile string
@@ -76,8 +77,8 @@ func init() {
 // It doesn't actually make any calls to Kong's Admin API.
 func Solve(g *dag.AcyclicGraph) error {
 	var r crud.Registry
-	r.Register("service", &cruds.ServiceCRUD{})
-	r.Register("route", &cruds.RouteCRUD{})
+	r.Register("service", &drycrud.ServiceCRUD{})
+	r.Register("route", &drycrud.RouteCRUD{})
 	err := g.Walk(func(v dag.Vertex) error {
 		n, ok := v.(*diff.Node)
 		if !ok {
@@ -86,7 +87,13 @@ func Solve(g *dag.AcyclicGraph) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		_, err := r.Do(n.Kind, n.Op, n.Obj)
+		_, err := r.Do(n.Kind, n.Op, cruds.ArgStruct{
+			Obj:    n.Obj,
+			OldObj: n.OldObj,
+			// TODO inject these
+			// CurrentState: sc.currentState,
+			// TargetState: sc.targetState,
+		})
 		return err
 	})
 	return err

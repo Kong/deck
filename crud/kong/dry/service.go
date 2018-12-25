@@ -1,10 +1,10 @@
-package drycrud
+package dry
 
 import (
 	"fmt"
 
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
+	arg "github.com/kong/deck/crud/kong"
 	"github.com/kong/deck/state"
 )
 
@@ -15,32 +15,38 @@ type ServiceCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func argsForService(arg ...crud.Arg) (*state.Service, *state.KongState, *state.KongState, *kong.Client) {
-	service, ok := arg[0].(*state.Service)
+func serviceFromStuct(a arg.ArgStruct) *state.Service {
+	service, ok := a.Obj.(*state.Service)
 	if !ok {
-		panic("unexpected type, expected *state.Service")
+		panic("unexpected type, expected *state.service")
 	}
 
-	return service, nil, nil, nil
+	return service
 }
 
 // Create creates a Service in Kong. TODO Doc
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
-	service, _, _, _ := argsForService(arg...)
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
 	fmt.Println("creating service", service)
 	return nil, nil
 }
 
 // Delete deletes a service in Kong. TODO Doc
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
-	service, _, _, _ := argsForService(arg...)
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
 	fmt.Println("deleting service", service)
 	return nil, nil
 }
 
 // Update udpates a service in Kong. TODO Doc
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
-	service, _, _, _ := argsForService(arg...)
+	argStruct := argStructFromArg(arg[0])
+	service := serviceFromStuct(argStruct)
+
 	fmt.Println("updating service", service)
 	return nil, nil
 }
