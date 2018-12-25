@@ -15,7 +15,6 @@ import (
 type Syncer struct {
 	currentState, targetState      *state.KongState
 	deleteGraph, createUpdateGraph *dag.AcyclicGraph
-	registry                       crud.Registry
 }
 
 // NewSyncer constructs a Syncer.
@@ -24,8 +23,6 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.currentState, s.targetState = current, target
 	s.deleteGraph = new(dag.AcyclicGraph)
 	s.createUpdateGraph = new(dag.AcyclicGraph)
-	s.registry.Register("service", &cruds.ServiceCRUD{})
-	s.registry.Register("route", &cruds.RouteCRUD{})
 	return s, nil
 }
 
@@ -73,7 +70,8 @@ func (sc *Syncer) createUpdate() error {
 }
 
 // Solve walks a graph and executes actions.
-func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
+func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client,
+	registry crud.Registry) error {
 	err := g.Walk(func(v dag.Vertex) error {
 		n, ok := v.(*Node)
 		if !ok {
@@ -82,7 +80,7 @@ func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client) error {
 		// every Node will need to add a few things to arg:
 		// *kong.Client to use
 		// callbacks to execute
-		_, err := sc.registry.Do(n.Kind, n.Op, cruds.ArgStruct{
+		_, err := registry.Do(n.Kind, n.Op, cruds.ArgStruct{
 			Obj:    n.Obj,
 			OldObj: n.OldObj,
 

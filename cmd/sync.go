@@ -8,6 +8,7 @@ import (
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
+	"github.com/kong/deck/solver"
 	"github.com/spf13/cobra"
 )
 
@@ -34,19 +35,7 @@ to get Kong's state in sync with the input state.`,
 			return err
 		}
 		syncer, _ := diff.NewSyncer(currentState, targetState)
-		gDelete, gCreateUpdate, err := syncer.Diff()
-		if err != nil {
-			return err
-		}
-		err = syncer.Solve(gDelete, client)
-		if err != nil {
-			return err
-		}
-		err = syncer.Solve(gCreateUpdate, client)
-		if err != nil {
-			return err
-		}
-		return nil
+		return solver.Solve(syncer, client, false)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if syncCmdKongStateFile == "" {
