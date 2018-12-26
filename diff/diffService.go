@@ -92,9 +92,10 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 	if !s.EqualWithOpts(service, true, true) {
 		service.ID = kong.String(*s.ID)
 		n := &Node{
-			Op:   crud.Update,
-			Kind: "service",
-			Obj:  service,
+			Op:     crud.Update,
+			Kind:   "service",
+			Obj:    service,
+			OldObj: s,
 		}
 		sc.createUpdateGraph.Add(n)
 		service.AddMeta(nodeKey, n)

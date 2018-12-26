@@ -28,7 +28,7 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	print.CreatePrintln("creating service", service)
+	print.CreatePrintln("creating service", *service.Name)
 	return nil, nil
 }
 
@@ -37,7 +37,7 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	print.DeletePrintln("deleting service", service)
+	print.DeletePrintln("deleting service", *service.Name)
 	return nil, nil
 }
 
@@ -45,7 +45,16 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
-
-	print.UpdatePrintln("updating service", service)
+	oldServiceObj, ok := argStruct.OldObj.(*state.Service)
+	if !ok {
+		panic("unexpected type, expected *state.service")
+	}
+	oldService := oldServiceObj.DeepCopy()
+	// TODO remove this hack
+	oldService.CreatedAt = nil
+	oldService.UpdatedAt = nil
+	diff := getDiff(oldService, &service.Service)
+	print.UpdatePrintln("updating service", *service.Name)
+	print.UpdatePrintf("%s", diff)
 	return nil, nil
 }

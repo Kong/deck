@@ -2,7 +2,7 @@ services:
 - connect_timeout: 60000
   host: host1
   name: name1
-  port: 80
+  port: 81
   protocol: https
   read_timeout: 60000
   retries: 5

@@ -14,15 +14,6 @@ type RouteCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-// TODO abstract this out
-func argStructFromArg(a crud.Arg) arg.ArgStruct {
-	argStruct, ok := a.(arg.ArgStruct)
-	if !ok {
-		panic("unexpected type, expected ArgStruct")
-	}
-	return argStruct
-}
-
 func routeFromStuct(arg arg.ArgStruct) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
@@ -52,7 +43,16 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-
+	oldRouteObj, ok := argStruct.OldObj.(*state.Service)
+	if !ok {
+		panic("unexpected type, expected *state.service")
+	}
+	oldRoute := oldRouteObj.DeepCopy()
+	// TODO remove this hack
+	oldRoute.CreatedAt = nil
+	oldRoute.UpdatedAt = nil
+	diff := getDiff(oldRoute, route.DeepCopy())
 	print.UpdatePrintln("updating route", route)
+	print.UpdatePrintf("%s", diff)
 	return nil, nil
 }
