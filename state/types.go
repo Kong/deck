@@ -76,7 +76,7 @@ func (s1 *Service) EqualWithOpts(s2 *Service,
 // It adds some helper methods along with Meta to the original Route object.
 type Route struct {
 	kong.Route `yaml:",inline"`
-	Meta       map[string]interface{}
+	Meta
 }
 
 // Equal returns true if r1 and r2 are equal.

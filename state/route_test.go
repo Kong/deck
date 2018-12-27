@@ -16,6 +16,7 @@ func TestBasicRoute(t *testing.T) {
 	var route Route
 	// route.Name = kong.String("foo")
 	route.ID = kong.String("first")
+	route.Name = kong.String("my-route")
 	route.Service = &kong.Service{
 		Name: kong.String("prod"),
 	}
@@ -23,6 +24,11 @@ func TestBasicRoute(t *testing.T) {
 	assert.Nil(err)
 
 	r, err := state.GetRoute("first")
+	assert.Nil(err)
+	assert.NotNil(r)
+	assert.Equal("prod", *r.Service.Name)
+
+	r, err = state.GetRoute("my-route")
 	assert.Nil(err)
 	assert.NotNil(r)
 	assert.Equal("prod", *r.Service.Name)

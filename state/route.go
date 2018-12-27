@@ -30,6 +30,11 @@ var routeTableSchema = &memdb.TableSchema{
 				SubField:    "ID",
 			},
 		},
+		"name": {
+			Name:    "name",
+			Unique:  true,
+			Indexer: &memdb.StringFieldIndex{Field: "Name"},
+		},
 		all: {
 			Name: all,
 			Indexer: &memdb.ConditionalIndex{
@@ -58,7 +63,7 @@ func (k *KongState) AddRoute(route Route) error {
 
 // GetRoute gets a route by name or ID.
 func (k *KongState) GetRoute(ID string) (*Route, error) {
-	res, err := k.multiIndexLookup(routeTableName, []string{id}, ID)
+	res, err := k.multiIndexLookup(routeTableName, []string{"name", id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
