@@ -14,7 +14,6 @@ func (sc *Syncer) deleteRoutes() error {
 	if err != nil {
 		return errors.Wrap(err, "error fetching routes from state")
 	}
-
 	for _, route := range currentRoutes {
 		_, err := sc.deleteRoute(route)
 		if err != nil {
@@ -25,11 +24,15 @@ func (sc *Syncer) deleteRoutes() error {
 }
 
 func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
-
+	if utils.Empty(route.Name) {
+		return false, errors.New("'name' attribute for a route cannot be nil")
+	}
 	if route.Service == nil ||
 		(utils.Empty(route.Service.ID) && utils.Empty(route.Service.Name)) {
 		return false, errors.Errorf("route has no associated service: %+v", route)
 	}
+	deleteRoute := false
+	// If parent entity is being deleted, delete this as well
 	service, err := sc.currentState.GetService(*route.Service.ID)
 	if err != nil {
 		return false, errors.Wrap(err, "no service found with ID "+*route.Service.ID)
@@ -39,56 +42,31 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 		// delete this node if the service is to be deleted
 		serviceGraphNode := node.(*Node)
 		if serviceGraphNode.Op == crud.Delete {
-			n := &Node{
-				Op:   crud.Delete,
-				Kind: "route",
-				Obj:  route,
-			}
-			sc.deleteGraph.Add(n)
-			// Route needs to be deleted before service
-			sc.deleteGraph.Connect(dag.BasicEdge(serviceGraphNode, n))
-			return true, nil
+			deleteRoute = true
 		}
 	}
-	// lookup the route by ID
-	r, err := sc.targetState.GetRoute(*route.ID)
-	if err == nil && r != nil {
-		return false, nil
-	}
-	// TODO add lookup by name post Kong 1.0
-
-	// Try best effort matching
-	routes, err := sc.targetState.GetAllRoutesByServiceName(*service.Name)
+	// lookup by Name
+	_, err = sc.targetState.GetRoute(*route.Name)
 	if err == state.ErrNotFound {
+		deleteRoute = true
+	} else {
+		return false, errors.Wrapf(err, "looking up route '%v'", *route.Name)
+	}
+	if deleteRoute {
+		n := &Node{
+			Op:   crud.Delete,
+			Kind: "route",
+			Obj:  route,
+		}
+		sc.deleteGraph.Add(n)
+		route.AddMeta(nodeKey, n)
+		sc.currentState.UpdateRoute(*route)
 		return true, nil
 	}
-
-	for _, r := range routes {
-		// if we are matching up then assign the IP of the route in
-		// current state to target state so that it matches things correctly
-		if !r.EqualWithOpts(route, true, true, true) {
-			continue
-		}
-		if r.ID != nil && *r.ID == *route.ID {
-			return false, nil
-		}
-		if isPlaceHolder(r.ID) {
-			r.ID = kong.String(*route.ID)
-			err = sc.currentState.UpdateRoute(*r)
-			return false, nil
-		}
-	}
-	n := &Node{
-		Op:   crud.Delete,
-		Kind: "route",
-		Obj:  route,
-	}
-	sc.deleteGraph.Add(n)
-	return true, nil
+	return false, nil
 }
 
 func (sc *Syncer) createUpdateRoutes() error {
-
 	targetRoutes, err := sc.targetState.GetAllRoutes()
 	if err != nil {
 		return errors.Wrap(err, "error fetching routes from state")
@@ -104,41 +82,66 @@ func (sc *Syncer) createUpdateRoutes() error {
 }
 
 func (sc *Syncer) createUpdateRoute(route *state.Route) error {
-	route = &state.Route{Route: *route.DeepCopy()}
-	_, err := sc.currentState.GetRoute(*route.ID)
+	routeCopy := &state.Route{Route: *route.DeepCopy()}
+	// route should be created or updated
+
+	// search
+	currentRoute, err := sc.currentState.GetRoute(*route.Name)
 	if err == state.ErrNotFound {
-		route.ID = nil
-		n := &Node{
-			Op:   crud.Create,
-			Kind: "route",
-			Obj:  route,
-		}
-		sc.createUpdateGraph.Add(n)
+		// create it
+		routeCopy := &state.Route{Route: *route.DeepCopy()}
+
 		svc, err := sc.targetState.GetService(*route.Service.Name)
 		if err != nil {
 			return errors.Wrapf(err, "couldn't find service for route %+v", route)
 		}
+		routeCopy.ID = nil
+		n := &Node{
+			Op:   crud.Create,
+			Kind: "route",
+			Obj:  routeCopy,
+		}
+		sc.createUpdateGraph.Add(n)
+
 		node := svc.Meta.GetMeta(nodeKey)
 		if node != nil {
-			// delete this node if the service is to be deleted
+			// foreign service needs to be created before this route can be created
 			serviceGraphNode := node.(*Node)
 			if serviceGraphNode.Op == crud.Create {
 				sc.createUpdateGraph.Connect(dag.BasicEdge(n, serviceGraphNode))
 			}
 		}
+		route.AddMeta(nodeKey, n)
+		sc.targetState.UpdateRoute(*route)
 		return nil
 	}
+	// if found, check if update needed
+
+	// TODO if the new service is being created, then add dependency
+	// first fill foreign keys; those could have changed
+	currentRouteCopy := &state.Route{Route: *currentRoute.DeepCopy()}
 	if err != nil {
-		return errors.Wrap(err, "error looking up service")
+		return errors.Wrap(err, "error looking up route")
 	}
-	// // if found, check if update needed
-	// if !r.EqualWithOpts(route, true, true) {
-	// 	route.ID = kong.String(*s.ID)
-	// 	sc.createUpdateGraph.Add(Node{
-	// 		Op:   crud.Update,
-	// 		Kind: "service",
-	// 		Obj:  service,
-	// 	})
-	// }
+
+	routeCopy.Service = &kong.Service{Name: kong.String(*route.Service.Name)}
+	svcForCurrentRoute, err := sc.currentState.GetService(*currentRoute.Service.ID)
+	if err != nil {
+		return errors.Wrapf(err, "error looking up service for route '%v'", *currentRoute.ID)
+	}
+	currentRouteCopy.Service = &kong.Service{Name: svcForCurrentRoute.Name}
+
+	if !currentRouteCopy.EqualWithOpts(routeCopy, true, true, false) {
+		routeCopy.ID = kong.String(*currentRoute.ID)
+		n := &Node{
+			Op:     crud.Update,
+			Kind:   "route",
+			Obj:    routeCopy,
+			OldObj: currentRouteCopy,
+		}
+		sc.createUpdateGraph.Add(n)
+		route.AddMeta(nodeKey, n)
+		sc.targetState.UpdateRoute(*route)
+	}
 	return nil
 }

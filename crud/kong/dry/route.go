@@ -1,6 +1,7 @@
 package dry
 
 import (
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	arg "github.com/kong/deck/crud/kong"
 	"github.com/kong/deck/print"
@@ -27,7 +28,7 @@ func routeFromStuct(arg arg.ArgStruct) *state.Route {
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-	print.CreatePrintln("creating route ", route)
+	print.CreatePrintln("creating route ", *route.Name)
 	return nil, nil
 }
 
@@ -35,7 +36,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-	print.DeletePrintln("deleting route ", route)
+	print.DeletePrintln("deleting route ", *route.Name)
 	return nil, nil
 }
 
@@ -43,16 +44,21 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-	oldRouteObj, ok := argStruct.OldObj.(*state.Service)
+	oldRoute, ok := argStruct.OldObj.(*state.Route)
 	if !ok {
-		panic("unexpected type, expected *state.service")
+		panic("unexpected type, expected *state.Route")
 	}
-	oldRoute := oldRouteObj.DeepCopy()
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
 	oldRoute.UpdatedAt = nil
-	diff := getDiff(oldRoute, route.DeepCopy())
-	print.UpdatePrintln("updating route", route)
+	oldRoute.Service = &kong.Service{Name: oldRoute.Service.Name}
+	oldRoute.ID = nil
+
+	route.ID = nil
+	route.Service = &kong.Service{Name: route.Service.Name}
+
+	diff := getDiff(oldRoute.Route, route.Route)
+	print.UpdatePrintln("updating route", *route.Name)
 	print.UpdatePrintf("%s", diff)
 	return nil, nil
 }

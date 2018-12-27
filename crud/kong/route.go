@@ -63,6 +63,14 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
 
+	// find the service to associate this route with
+	svc, err := argStruct.CurrentState.GetService(*route.Service.Name)
+	if err != nil {
+		return nil, errors.Wrapf(err,
+			"failed to find service associated with route %+v", route)
+	}
+	route.Service = svc.Service.DeepCopy()
+
 	updatedService, err := argStruct.Client.Routes.Update(nil, &route.Route)
 	if err != nil {
 		return nil, err
