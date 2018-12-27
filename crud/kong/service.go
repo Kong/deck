@@ -30,7 +30,7 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.AddService(state.Service{Service: *createdService})
+	err = argStruct.CurrentState.Services.Add(state.Service{Service: *createdService})
 	if err != nil {
 		return nil, err //TODO annotate error
 	}
@@ -46,7 +46,7 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.DeleteService(*service.ID)
+	err = argStruct.CurrentState.Services.Delete(*service.ID)
 	if err != nil {
 		return nil, err //TODO annotate error
 	}
@@ -62,7 +62,7 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.UpdateService(*service)
+	err = argStruct.CurrentState.Services.Update(*service)
 	if err != nil {
 		return nil, err //TODO annotate error
 	}

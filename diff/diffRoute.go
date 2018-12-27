@@ -10,7 +10,7 @@ import (
 )
 
 func (sc *Syncer) deleteRoutes() error {
-	currentRoutes, err := sc.currentState.GetAllRoutes()
+	currentRoutes, err := sc.currentState.Routes.GetAll()
 	if err != nil {
 		return errors.Wrap(err, "error fetching routes from state")
 	}
@@ -33,7 +33,7 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 	}
 	deleteRoute := false
 	// If parent entity is being deleted, delete this as well
-	service, err := sc.currentState.GetService(*route.Service.ID)
+	service, err := sc.currentState.Services.Get(*route.Service.ID)
 	if err != nil {
 		return false, errors.Wrap(err, "no service found with ID "+*route.Service.ID)
 	}
@@ -46,7 +46,7 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 		}
 	}
 	// lookup by Name
-	_, err = sc.targetState.GetRoute(*route.Name)
+	_, err = sc.targetState.Routes.Get(*route.Name)
 	if err == state.ErrNotFound {
 		deleteRoute = true
 	} else {
@@ -60,14 +60,14 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 		}
 		sc.deleteGraph.Add(n)
 		route.AddMeta(nodeKey, n)
-		sc.currentState.UpdateRoute(*route)
+		sc.currentState.Routes.Update(*route)
 		return true, nil
 	}
 	return false, nil
 }
 
 func (sc *Syncer) createUpdateRoutes() error {
-	targetRoutes, err := sc.targetState.GetAllRoutes()
+	targetRoutes, err := sc.targetState.Routes.GetAll()
 	if err != nil {
 		return errors.Wrap(err, "error fetching routes from state")
 	}
@@ -86,12 +86,12 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 	// route should be created or updated
 
 	// search
-	currentRoute, err := sc.currentState.GetRoute(*route.Name)
+	currentRoute, err := sc.currentState.Routes.Get(*route.Name)
 	if err == state.ErrNotFound {
 		// create it
 		routeCopy := &state.Route{Route: *route.DeepCopy()}
 
-		svc, err := sc.targetState.GetService(*route.Service.Name)
+		svc, err := sc.targetState.Services.Get(*route.Service.Name)
 		if err != nil {
 			return errors.Wrapf(err, "couldn't find service for route %+v", route)
 		}
@@ -112,7 +112,7 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 			}
 		}
 		route.AddMeta(nodeKey, n)
-		sc.targetState.UpdateRoute(*route)
+		sc.targetState.Routes.Update(*route)
 		return nil
 	}
 	// if found, check if update needed
@@ -125,7 +125,7 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 	}
 
 	routeCopy.Service = &kong.Service{Name: kong.String(*route.Service.Name)}
-	svcForCurrentRoute, err := sc.currentState.GetService(*currentRoute.Service.ID)
+	svcForCurrentRoute, err := sc.currentState.Services.Get(*currentRoute.Service.ID)
 	if err != nil {
 		return errors.Wrapf(err, "error looking up service for route '%v'", *currentRoute.ID)
 	}
@@ -141,7 +141,7 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 		}
 		sc.createUpdateGraph.Add(n)
 		route.AddMeta(nodeKey, n)
-		sc.targetState.UpdateRoute(*route)
+		sc.targetState.Routes.Update(*route)
 	}
 	return nil
 }

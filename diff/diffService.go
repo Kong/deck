@@ -9,7 +9,7 @@ import (
 )
 
 func (sc *Syncer) deleteServices() error {
-	currentServices, err := sc.currentState.GetAllServices()
+	currentServices, err := sc.currentState.Services.GetAll()
 	if err != nil {
 		return errors.Wrap(err, "error fetching services from state")
 	}
@@ -29,7 +29,7 @@ func (sc *Syncer) deleteServices() error {
 		}
 		sc.deleteGraph.Add(n)
 		service.AddMeta(nodeKey, n)
-		sc.currentState.UpdateService(*service)
+		sc.currentState.Services.Update(*service)
 	}
 	return nil
 }
@@ -39,7 +39,7 @@ func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
 	if utils.Empty(service.Name) {
 		return false, errors.New("'name' attribute for a service cannot be nil")
 	}
-	_, err := sc.targetState.GetService(*service.Name)
+	_, err := sc.targetState.Services.Get(*service.Name)
 	if err == state.ErrNotFound {
 		return true, nil
 	}
@@ -51,7 +51,7 @@ func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
 
 func (sc *Syncer) createUpdateServices() error {
 
-	targetServices, err := sc.targetState.GetAllServices()
+	targetServices, err := sc.targetState.Services.GetAll()
 	if err != nil {
 		return errors.Wrap(err, "error fetching services from state")
 	}
@@ -67,7 +67,7 @@ func (sc *Syncer) createUpdateServices() error {
 
 func (sc *Syncer) createUpdateService(service *state.Service) error {
 	// service = &state.Service{Service: *service.DeepCopy()}
-	s, err := sc.currentState.GetService(*service.Name)
+	s, err := sc.currentState.Services.Get(*service.Name)
 	if err == state.ErrNotFound {
 		service.ID = nil
 		n := &Node{
@@ -77,7 +77,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 		}
 		sc.createUpdateGraph.Add(n)
 		service.AddMeta(nodeKey, n)
-		sc.targetState.UpdateService(*service)
+		sc.targetState.Services.Update(*service)
 		return nil
 	}
 	if err != nil {
@@ -94,7 +94,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) error {
 		}
 		sc.createUpdateGraph.Add(n)
 		service.AddMeta(nodeKey, n)
-		sc.targetState.UpdateService(*service)
+		sc.targetState.Services.Update(*service)
 	}
 	return nil
 }

@@ -12,13 +12,13 @@ import (
 func KongStateToFile(kongState *state.KongState, filename string) error {
 	var file fileStructure
 
-	services, err := kongState.GetAllServices()
+	services, err := kongState.Services.GetAll()
 	if err != nil {
 		return err
 	}
 	for _, s := range services {
 		s := service{Service: s.Service}
-		routes, err := kongState.GetAllRoutesByServiceID(*s.ID)
+		routes, err := kongState.Routes.GetAllRoutesByServiceID(*s.ID)
 		if err != nil {
 			return err
 		}

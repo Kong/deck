@@ -9,7 +9,7 @@ import (
 
 func TestBasicRoute(t *testing.T) {
 	assert := assert.New(t)
-	state, err := NewKongState()
+	state, err := NewRoutesCollection()
 	assert.Nil(err)
 	assert.NotNil(state)
 
@@ -20,15 +20,15 @@ func TestBasicRoute(t *testing.T) {
 	route.Service = &kong.Service{
 		Name: kong.String("prod"),
 	}
-	err = state.AddRoute(route)
+	err = state.Add(route)
 	assert.Nil(err)
 
-	r, err := state.GetRoute("first")
+	r, err := state.Get("first")
 	assert.Nil(err)
 	assert.NotNil(r)
 	assert.Equal("prod", *r.Service.Name)
 
-	r, err = state.GetRoute("my-route")
+	r, err = state.Get("my-route")
 	assert.Nil(err)
 	assert.NotNil(r)
 	assert.Equal("prod", *r.Service.Name)

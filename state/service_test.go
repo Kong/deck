@@ -9,7 +9,7 @@ import (
 
 func TestBasicService(t *testing.T) {
 	assert := assert.New(t)
-	state, err := NewKongState()
+	state, err := NewServicesCollection()
 	assert.Nil(err)
 	assert.NotNil(state)
 
@@ -17,18 +17,18 @@ func TestBasicService(t *testing.T) {
 	// service.Name = kong.String("foo")
 	service.Name = kong.String("first")
 	service.ID = kong.String("first")
-	err = state.AddService(service)
+	err = state.Add(service)
 	assert.Nil(err)
 
-	se, err := state.GetService("first")
+	se, err := state.Get("first")
 	assert.Nil(err)
 	assert.NotNil(se)
 
 	se.Host = kong.String("example.com")
-	err = state.UpdateService(*se)
+	err = state.Update(*se)
 	assert.Nil(err)
 
-	se, err = state.GetService("first")
+	se, err = state.Get("first")
 	assert.Nil(err)
 	assert.NotNil(se)
 	assert.Equal("example.com", *se.Host)

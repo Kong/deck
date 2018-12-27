@@ -36,7 +36,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	route := routeFromStuct(argStruct)
 
 	// find the service to associate this route with
-	svc, err := argStruct.CurrentState.GetService(*route.Service.Name)
+	svc, err := argStruct.CurrentState.Services.Get(*route.Service.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err,
 			"failed to find service associated with route %+v", route)
@@ -64,7 +64,7 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	route := routeFromStuct(argStruct)
 
 	// find the service to associate this route with
-	svc, err := argStruct.CurrentState.GetService(*route.Service.Name)
+	svc, err := argStruct.CurrentState.Services.Get(*route.Service.Name)
 	if err != nil {
 		return nil, errors.Wrapf(err,
 			"failed to find service associated with route %+v", route)

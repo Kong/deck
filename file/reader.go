@@ -53,7 +53,7 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 		}
 		// TODO add check if service is named or not
 		// TODO check for duplicate services (services with same name)
-		err := kongState.AddService(state.Service{Service: s.Service})
+		err := kongState.Services.Add(state.Service{Service: s.Service})
 		if err != nil {
 			return nil, err
 		}
@@ -64,7 +64,7 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 			}
 			// TODO add check if route is named or not
 			r.Service = s.Service.DeepCopy()
-			err := kongState.AddRoute(state.Route{Route: r.Route})
+			err := kongState.Routes.Add(state.Route{Route: r.Route})
 			if err != nil {
 				return nil, err
 			}

@@ -20,7 +20,7 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			return nil, errors.New("service '" + *s.ID + "' does not" +
 				" have a name. decK needs services to be named.")
 		}
-		err := kongState.AddService(state.Service{Service: *s})
+		err := kongState.Services.Add(state.Service{Service: *s})
 		if err != nil {
 			return nil, errors.Wrap(err, "inserting service into state")
 		}
@@ -30,7 +30,7 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			return nil, errors.New("route '" + *r.ID + "' does not" +
 				" have a name. decK needs routes to be named.")
 		}
-		err := kongState.AddRoute(state.Route{Route: *r})
+		err := kongState.Routes.Add(state.Route{Route: *r})
 		if err != nil {
 			return nil, errors.Wrap(err, "inserting route into state")
 		}

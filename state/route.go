@@ -7,6 +7,10 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	routeTableName = "route"
+)
+
 var routeTableSchema = &memdb.TableSchema{
 	Name: routeTableName,
 	Indexes: map[string]*memdb.IndexSchema{
@@ -46,12 +50,29 @@ var routeTableSchema = &memdb.TableSchema{
 	},
 }
 
-// TODO add method to lookup a route based on service association,
-// methods, hosts, paths -- Search by service name,
-// then match the fields if equal or not
+// RoutesCollection stores and indexes Kong Services.
+type RoutesCollection struct {
+	memdb *memdb.MemDB
+}
 
-// AddRoute adds a route to KongState
-func (k *KongState) AddRoute(route Route) error {
+// NewRoutesCollection instantiates a RoutesCollection.
+func NewRoutesCollection() (*RoutesCollection, error) {
+	var schema = &memdb.DBSchema{
+		Tables: map[string]*memdb.TableSchema{
+			routeTableName: routeTableSchema,
+		},
+	}
+	m, err := memdb.NewMemDB(schema)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating new RouteCollection")
+	}
+	return &RoutesCollection{
+		memdb: m,
+	}, nil
+}
+
+// Add adds a route to RoutesCollection
+func (k *RoutesCollection) Add(route Route) error {
 	txn := k.memdb.Txn(true)
 	defer txn.Commit()
 	err := txn.Insert(routeTableName, &route)
@@ -61,9 +82,9 @@ func (k *KongState) AddRoute(route Route) error {
 	return nil
 }
 
-// GetRoute gets a route by name or ID.
-func (k *KongState) GetRoute(ID string) (*Route, error) {
-	res, err := k.multiIndexLookup(routeTableName, []string{"name", id}, ID)
+// Get gets a route by name or ID.
+func (k *RoutesCollection) Get(ID string) (*Route, error) {
+	res, err := multiIndexLookup(k.memdb, routeTableName, []string{"name", id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
@@ -83,7 +104,7 @@ func (k *KongState) GetRoute(ID string) (*Route, error) {
 
 // GetAllRoutesByServiceName returns all routes referencing a service
 // by its name.
-func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
+func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
 	if err != nil {
@@ -102,7 +123,7 @@ func (k *KongState) GetAllRoutesByServiceName(name string) ([]*Route, error) {
 
 // GetAllRoutesByServiceID returns all routes referencing a service
 // by its id.
-func (k *KongState) GetAllRoutesByServiceID(id string) ([]*Route, error) {
+func (k *RoutesCollection) GetAllRoutesByServiceID(id string) ([]*Route, error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceID", id)
 	if err != nil {
@@ -119,8 +140,8 @@ func (k *KongState) GetAllRoutesByServiceID(id string) ([]*Route, error) {
 	return res, nil
 }
 
-// UpdateRoute updates a route
-func (k *KongState) UpdateRoute(route Route) error {
+// Update updates a route
+func (k *RoutesCollection) Update(route Route) error {
 	txn := k.memdb.Txn(true)
 	defer txn.Commit()
 	err := txn.Insert(routeTableName, &route)
@@ -130,8 +151,8 @@ func (k *KongState) UpdateRoute(route Route) error {
 	return nil
 }
 
-// DeleteRoute deletes a route by name or ID.
-func (k *KongState) DeleteRoute(route Route) error {
+// Delete deletes a route by name or ID.
+func (k *RoutesCollection) Delete(route Route) error {
 	txn := k.memdb.Txn(true)
 	defer txn.Commit()
 
@@ -142,8 +163,8 @@ func (k *KongState) DeleteRoute(route Route) error {
 	return nil
 }
 
-// GetAllRoutes gets a route by name or ID.
-func (k *KongState) GetAllRoutes() ([]*Route, error) {
+// GetAll gets a route by name or ID.
+func (k *RoutesCollection) GetAll() ([]*Route, error) {
 	txn := k.memdb.Txn(false)
 	defer txn.Commit()
 
