@@ -18,6 +18,7 @@ import (
 var (
 	cfgFile string
 	config  kongClientConfig
+	verbose int
 	noColor bool
 )
 
@@ -47,9 +48,6 @@ configuration via GitOps.`,
 // sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	// supress output of terraform DAG by default
-	log.SetFlags(0)
-	log.SetOutput(ioutil.Discard)
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -91,10 +89,10 @@ func init() {
 	viper.BindPFlag("ca-cert",
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
 
-	rootCmd.PersistentFlags().Bool("debug", false,
-		"enable verbose debug logging")
-	viper.BindPFlag("debug",
-		rootCmd.PersistentFlags().Lookup("debug"))
+	rootCmd.PersistentFlags().Int("verbose", 0,
+		"enable verbose verbose logging")
+	viper.BindPFlag("verbose",
+		rootCmd.PersistentFlags().Lookup("verbose"))
 
 	rootCmd.PersistentFlags().Bool("no-color", false,
 		"disable colorized output")
@@ -128,6 +126,15 @@ func initConfig() {
 	config.TLSServerName = viper.GetString("tls-server-name")
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	config.TLSCACert = viper.GetString("ca-cert")
-	config.Debug = viper.GetBool("debug")
+	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
+
+	if verbose < 1 {
+		// supress output of terraform DAG if verbose logging is not enabled
+		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
+	}
+	if verbose >= 2 {
+		config.Debug = true
+	}
 }
