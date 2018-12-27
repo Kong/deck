@@ -17,7 +17,8 @@ services:
   retries: 5
   write_timeout: 1000
   routes:
-  - paths:
+  - name: r1
+    paths:
     - /name22
     preserve_host: false
     protocols:
@@ -33,7 +34,8 @@ services:
   retries: 5
   write_timeout: 1000
   routes:
-  - paths:
+  - name: r2
+    paths:
     - /namfos
     preserve_host: false
     protocols:

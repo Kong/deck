@@ -26,6 +26,10 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 		}
 	}
 	for _, r := range raw.Routes {
+		if utils.Empty(r.Name) {
+			return nil, errors.New("route '" + *r.ID + "' does not" +
+				" have a name. decK needs routes to be named.")
+		}
 		err := kongState.AddRoute(state.Route{Route: *r})
 		if err != nil {
 			return nil, errors.Wrap(err, "inserting route into state")
