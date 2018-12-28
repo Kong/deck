@@ -28,14 +28,14 @@ func (m *Meta) initMeta() {
 // It will override the old obj in key is already present.
 func (m *Meta) AddMeta(key string, obj interface{}) {
 	m.initMeta()
-	m.metaMap["key"] = obj
+	m.metaMap[key] = obj
 }
 
 // GetMeta returns the obj previously added using AddMeta().
 // It returns nil if key is not present.
 func (m *Meta) GetMeta(key string) interface{} {
 	m.initMeta()
-	return m.metaMap["key"]
+	return m.metaMap[key]
 }
 
 // Service represents a service in Kong.
