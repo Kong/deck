@@ -1,9 +1,7 @@
 package state
 
 import (
-	"fmt"
-
-	"github.com/hashicorp/go-memdb"
+	memdb "github.com/hashicorp/go-memdb"
 	"github.com/pkg/errors"
 )
 
@@ -61,11 +59,12 @@ func NewServicesCollection() (*ServicesCollection, error) {
 // Add adds a service to the collection
 func (k *ServicesCollection) Add(service Service) error {
 	txn := k.memdb.Txn(true)
-	defer txn.Commit()
+	defer txn.Abort()
 	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
 		return errors.Wrap(err, "insert failed")
 	}
+	txn.Commit()
 	return nil
 }
 
@@ -81,7 +80,7 @@ func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
 		return nil, errors.Wrap(err, "service lookup failed")
 	}
 	if res == nil {
-		fmt.Println("res is nil")
+		return nil, ErrNotFound
 	}
 	service, ok := res.(*Service)
 	if !ok {
@@ -93,12 +92,15 @@ func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
 // Update udpates an exisitng service.
 // It returns an error if the service is not already present.
 func (k *ServicesCollection) Update(service Service) error {
+	// TODO check if entity is already present or not, throw error if present
+	// TODO abstract this in the go-memdb library itself
 	txn := k.memdb.Txn(true)
-	defer txn.Commit()
+	defer txn.Abort()
 	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
 		return errors.Wrap(err, "update failed")
 	}
+	txn.Commit()
 	return nil
 }
 
@@ -111,19 +113,20 @@ func (k *ServicesCollection) Delete(nameOrID string) error {
 	}
 
 	txn := k.memdb.Txn(true)
-	defer txn.Commit()
+	defer txn.Abort()
 
 	err = txn.Delete(serviceTableName, service)
 	if err != nil {
 		return errors.Wrap(err, "delete failed")
 	}
+	txn.Commit()
 	return nil
 }
 
 // GetAll gets a service by name or ID.
 func (k *ServicesCollection) GetAll() ([]*Service, error) {
 	txn := k.memdb.Txn(false)
-	defer txn.Commit()
+	defer txn.Abort()
 
 	iter, err := txn.Get(serviceTableName, all, true)
 	if err != nil {
@@ -138,5 +141,6 @@ func (k *ServicesCollection) GetAll() ([]*Service, error) {
 		}
 		res = append(res, s)
 	}
+	txn.Commit()
 	return res, nil
 }
