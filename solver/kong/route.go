@@ -2,6 +2,7 @@ package kong
 
 import (
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
 )
@@ -13,15 +14,15 @@ type RouteCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func argStructFromArg(arg crud.Arg) ArgStruct {
-	argStruct, ok := arg.(ArgStruct)
+func argStructFromArg(arg crud.Arg) diff.ArgStruct {
+	argStruct, ok := arg.(diff.ArgStruct)
 	if !ok {
 		panic("unexpected type, expected ArgStruct")
 	}
 	return argStruct
 }
 
-func routeFromStuct(arg ArgStruct) *state.Route {
+func routeFromStuct(arg diff.ArgStruct) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")

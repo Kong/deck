@@ -3,9 +3,9 @@ package solver
 import (
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
-	cruds "github.com/kong/deck/crud/kong"
-	drycrud "github.com/kong/deck/crud/kong/dry"
 	"github.com/kong/deck/diff"
+	cruds "github.com/kong/deck/solver/kong"
+	drycrud "github.com/kong/deck/solver/kong/dry"
 	"github.com/pkg/errors"
 )
 

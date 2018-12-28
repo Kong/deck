@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/kong/deck/crud"
-	arg "github.com/kong/deck/crud/kong"
+	arg "github.com/kong/deck/diff"
 	diff "gopkg.in/d4l3k/messagediff.v1"
 )
 

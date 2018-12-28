@@ -1,4 +1,4 @@
-package kong
+package diff
 
 import (
 	"github.com/hbagdi/go-kong/kong"

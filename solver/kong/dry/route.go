@@ -3,7 +3,7 @@ package dry
 import (
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
-	arg "github.com/kong/deck/crud/kong"
+	arg "github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 )

@@ -1,7 +1,9 @@
-package kong
+package dry
 
 import (
 	"github.com/kong/deck/crud"
+	arg "github.com/kong/deck/diff"
+	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 )
 
@@ -12,8 +14,8 @@ type ServiceCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func serviceFromStuct(arg ArgStruct) *state.Service {
-	service, ok := arg.Obj.(*state.Service)
+func serviceFromStuct(a arg.ArgStruct) *state.Service {
+	service, ok := a.Obj.(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.service")
 	}
@@ -26,15 +28,8 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	createdService, err := argStruct.Client.Services.Create(nil, &service.Service)
-	if err != nil {
-		return nil, err
-	}
-	err = argStruct.CurrentState.Services.Add(state.Service{Service: *createdService})
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return createdService, nil
+	print.CreatePrintln("creating service", *service.Name)
+	return nil, nil
 }
 
 // Delete deletes a service in Kong. TODO Doc
@@ -42,29 +37,24 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
 
-	err := argStruct.Client.Services.Delete(nil, service.ID)
-	if err != nil {
-		return nil, err
-	}
-	err = argStruct.CurrentState.Services.Delete(*service.ID)
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return nil, err
+	print.DeletePrintln("deleting service", *service.Name)
+	return nil, nil
 }
 
 // Update udpates a service in Kong. TODO Doc
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
-
-	updatedService, err := argStruct.Client.Services.Update(nil, &service.Service)
-	if err != nil {
-		return nil, err
+	oldServiceObj, ok := argStruct.OldObj.(*state.Service)
+	if !ok {
+		panic("unexpected type, expected *state.service")
 	}
-	err = argStruct.CurrentState.Services.Update(*service)
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return updatedService, nil
+	oldService := oldServiceObj.DeepCopy()
+	// TODO remove this hack
+	oldService.CreatedAt = nil
+	oldService.UpdatedAt = nil
+	diff := getDiff(oldService, &service.Service)
+	print.UpdatePrintln("updating service", *service.Name)
+	print.UpdatePrintf("%s", diff)
+	return nil, nil
 }
