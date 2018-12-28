@@ -32,17 +32,20 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 		return false, errors.Errorf("route has no associated service: %+v", route)
 	}
 	deleteRoute := false
+	addServiceDependency := false
 	// If parent entity is being deleted, delete this as well
 	service, err := sc.currentState.Services.Get(*route.Service.ID)
 	if err != nil {
 		return false, errors.Wrap(err, "no service found with ID "+*route.Service.ID)
 	}
+	var serviceGraphNode *Node
 	node := service.Meta.GetMeta(nodeKey)
 	if node != nil {
 		// delete this node if the service is to be deleted
-		serviceGraphNode := node.(*Node)
+		serviceGraphNode = node.(*Node)
 		if serviceGraphNode.Op == crud.Delete {
 			deleteRoute = true
+			addServiceDependency = true
 		}
 	}
 	// lookup by Name
@@ -59,6 +62,9 @@ func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
 			Obj:  route,
 		}
 		sc.deleteGraph.Add(n)
+		if addServiceDependency {
+			sc.deleteGraph.Connect(dag.BasicEdge(serviceGraphNode, n))
+		}
 		route.AddMeta(nodeKey, n)
 		sc.currentState.Routes.Update(*route)
 		return true, nil
