@@ -48,5 +48,5 @@ to get Kong's state in sync with the input state.`,
 func init() {
 	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
-		"state", "s", "", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration.")
 }
