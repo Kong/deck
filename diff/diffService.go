@@ -22,14 +22,12 @@ func (sc *Syncer) deleteServices() error {
 		if !ok {
 			continue
 		}
-		n := &Node{
+		n := Node{
 			Op:   crud.Delete,
 			Kind: "service",
 			Obj:  service,
 		}
-		sc.deleteGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.currentState.Services.Update(*service)
+		sc.sendEvent(n)
 	}
 	return nil
 }
@@ -44,7 +42,7 @@ func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
 		return true, nil
 	}
 	if err != nil {
-		return false, err
+		return false, errors.Wrapf(err, "looking up service '%v'", *service.Name)
 	}
 	return false, nil
 }
@@ -66,35 +64,34 @@ func (sc *Syncer) createUpdateServices() error {
 }
 
 func (sc *Syncer) createUpdateService(service *state.Service) error {
-	// service = &state.Service{Service: *service.DeepCopy()}
-	s, err := sc.currentState.Services.Get(*service.Name)
+	serviceCopy := &state.Service{Service: *service.DeepCopy()}
+	currentService, err := sc.currentState.Services.Get(*service.Name)
+
 	if err == state.ErrNotFound {
-		service.ID = nil
-		n := &Node{
+		// service not present, create it
+		serviceCopy.ID = nil
+		n := Node{
 			Op:   crud.Create,
 			Kind: "service",
-			Obj:  service,
+			Obj:  serviceCopy,
 		}
-		sc.createUpdateGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.targetState.Services.Update(*service)
+		sc.sendEvent(n)
 		return nil
 	}
 	if err != nil {
-		return errors.Wrap(err, "error looking up service")
+		return errors.Wrapf(err, "error looking up service %v", *service.Name)
 	}
-	// if found, check if update needed
-	if !s.EqualWithOpts(service, true, true) {
-		service.ID = kong.String(*s.ID)
-		n := &Node{
+
+	// found, check if update needed
+	if !currentService.EqualWithOpts(serviceCopy, true, true) {
+		serviceCopy.ID = kong.String(*currentService.ID)
+		n := Node{
 			Op:     crud.Update,
 			Kind:   "service",
-			Obj:    service,
-			OldObj: s,
+			Obj:    serviceCopy,
+			OldObj: currentService,
 		}
-		sc.createUpdateGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.targetState.Services.Update(*service)
+		sc.sendEvent(n)
 	}
 	return nil
 }

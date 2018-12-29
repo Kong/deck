@@ -2,8 +2,18 @@ package diff
 
 import (
 	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 )
+
+// Node represents an imperative operation
+// that gets Kong closer to the target state.
+type Node struct {
+	Op     crud.Op
+	Kind   crud.Kind
+	Obj    interface{}
+	OldObj interface{}
+}
 
 // ArgStruct represents the input that Kong's
 // CRUD operations take in as a parameter.
