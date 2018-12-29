@@ -1,6 +1,9 @@
 package solver
 
 import (
+	"fmt"
+	"sync"
+
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
@@ -21,18 +24,21 @@ func Solve(syncer *diff.Syncer, client *kong.Client, dry bool) error {
 	if err != nil {
 		return errors.Wrapf(err, "cannot build registry")
 	}
-	gDelete, gCreateUpdate, err := syncer.Diff()
-	if err != nil {
-		return err
-	}
-	err = syncer.Solve(gDelete, client, *r)
-	if err != nil {
-		return err
-	}
-	err = syncer.Solve(gCreateUpdate, client, *r)
-	if err != nil {
-		return err
-	}
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		err := syncer.Run()
+		fmt.Println(err)
+		wg.Done()
+	}()
+	go func() {
+		err := syncer.Process(r, client)
+		fmt.Println(err)
+		wg.Done()
+	}()
+	wg.Wait()
 	return nil
 }
 

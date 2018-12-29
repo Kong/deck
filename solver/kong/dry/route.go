@@ -6,6 +6,7 @@ import (
 	arg "github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/utils"
 )
 
 // RouteCRUD implements Actions interface
@@ -29,7 +30,8 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
 	print.CreatePrintln("creating route ", *route.Name)
-	return nil, nil
+	route.ID = kong.String(utils.UUID())
+	return route, nil
 }
 
 // Delete deletes a Route in Kong. TODO Doc
@@ -37,7 +39,7 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
 	print.DeletePrintln("deleting route ", *route.Name)
-	return nil, nil
+	return route, nil
 }
 
 // Update updates a Route in Kong. TODO Doc
@@ -60,5 +62,5 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	diff := getDiff(oldRoute.Route, route.Route)
 	print.UpdatePrintln("updating route", *route.Name)
 	print.UpdatePrintf("%s", diff)
-	return nil, nil
+	return route, nil
 }

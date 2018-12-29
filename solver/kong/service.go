@@ -18,7 +18,6 @@ func serviceFromStuct(arg diff.ArgStruct) *state.Service {
 	if !ok {
 		panic("unexpected type, expected *state.service")
 	}
-
 	return service
 }
 
@@ -26,32 +25,22 @@ func serviceFromStuct(arg diff.ArgStruct) *state.Service {
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
-
 	createdService, err := argStruct.Client.Services.Create(nil, &service.Service)
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.Services.Add(state.Service{Service: *createdService})
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return createdService, nil
+	return &state.Service{Service: *createdService}, nil
 }
 
 // Delete deletes a service in Kong. TODO Doc
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	service := serviceFromStuct(argStruct)
-
 	err := argStruct.Client.Services.Delete(nil, service.ID)
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.Services.Delete(*service.ID)
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return nil, err
+	return service, nil
 }
 
 // Update udpates a service in Kong. TODO Doc
@@ -63,9 +52,5 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = argStruct.CurrentState.Services.Update(*service)
-	if err != nil {
-		return nil, err //TODO annotate error
-	}
-	return updatedService, nil
+	return &state.Service{Service: *updatedService}, nil
 }

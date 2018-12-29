@@ -1,10 +1,12 @@
 package dry
 
 import (
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	arg "github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/utils"
 )
 
 // ServiceCRUD implements Actions interface
@@ -29,7 +31,8 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	service := serviceFromStuct(argStruct)
 
 	print.CreatePrintln("creating service", *service.Name)
-	return nil, nil
+	service.ID = kong.String(utils.UUID())
+	return service, nil
 }
 
 // Delete deletes a service in Kong. TODO Doc
@@ -38,7 +41,7 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	service := serviceFromStuct(argStruct)
 
 	print.DeletePrintln("deleting service", *service.Name)
-	return nil, nil
+	return service, nil
 }
 
 // Update udpates a service in Kong. TODO Doc
@@ -56,5 +59,5 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	diff := getDiff(oldService, &service.Service)
 	print.UpdatePrintln("updating service", *service.Name)
 	print.UpdatePrintf("%s", diff)
-	return nil, nil
+	return service, nil
 }

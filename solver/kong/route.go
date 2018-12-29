@@ -4,7 +4,6 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 // RouteCRUD implements Actions interface
@@ -35,28 +34,22 @@ func routeFromStuct(arg diff.ArgStruct) *state.Route {
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-
-	// find the service to associate this route with
-	svc, err := argStruct.CurrentState.Services.Get(*route.Service.Name)
-	if err != nil {
-		return nil, errors.Wrapf(err,
-			"failed to find service associated with route %+v", route)
-	}
-	route.Service = svc.Service.DeepCopy()
-	createdService, err := argStruct.Client.Routes.Create(nil, &route.Route)
+	createdRoute, err := argStruct.Client.Routes.Create(nil, &route.Route)
 	if err != nil {
 		return nil, err
 	}
-	return createdService, nil
+	return &state.Route{Route: *createdRoute}, nil
 }
 
 // Delete deletes a Route in Kong. TODO Doc
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
-
 	err := argStruct.Client.Routes.Delete(nil, route.ID)
-	return nil, err
+	if err != nil {
+		return nil, err
+	}
+	return route, nil
 }
 
 // Update updates a Route in Kong. TODO Doc
@@ -64,17 +57,9 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	argStruct := argStructFromArg(arg[0])
 	route := routeFromStuct(argStruct)
 
-	// find the service to associate this route with
-	svc, err := argStruct.CurrentState.Services.Get(*route.Service.Name)
-	if err != nil {
-		return nil, errors.Wrapf(err,
-			"failed to find service associated with route %+v", route)
-	}
-	route.Service = svc.Service.DeepCopy()
-
-	updatedService, err := argStruct.Client.Routes.Update(nil, &route.Route)
+	updatedRoute, err := argStruct.Client.Routes.Update(nil, &route.Route)
 	if err != nil {
 		return nil, err
 	}
-	return updatedService, nil
+	return &state.Route{Route: *updatedRoute}, nil
 }
