@@ -1,7 +1,6 @@
 package file
 
 import (
-	"errors"
 	"io/ioutil"
 	"strconv"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/kong/deck/counter"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -49,22 +49,38 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 		// TODO add override logic
 		// TODO add support for file based defaults
 		if utils.Empty(s.ID) {
-			s.ID = kong.String("placeholder-" + strconv.FormatUint(count.Inc(), 10))
+			s.ID = kong.String("placeholder-" +
+				strconv.FormatUint(count.Inc(), 10))
 		}
-		// TODO add check if service is named or not
-		// TODO check for duplicate services (services with same name)
-		err := kongState.Services.Add(state.Service{Service: s.Service})
+		if utils.Empty(s.Service.Name) {
+			return nil, errors.New("all services in the file must be named")
+		}
+		_, err := kongState.Services.Get(*s.Service.Name)
+		if err != state.ErrNotFound {
+			return nil, errors.Errorf("duplicate service definitions"+
+				" found for: '%s'", *s.Service.Name)
+		}
+		err = kongState.Services.Add(state.Service{Service: s.Service})
 		if err != nil {
 			return nil, err
 		}
 
 		for _, r := range s.Routes {
 			if utils.Empty(r.ID) {
-				r.ID = kong.String("placeholder-" + strconv.FormatUint(count.Inc(), 10))
+				r.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(r.Name) {
+				return nil, errors.New("all routes in the file must be named")
+			}
+			_, err := kongState.Routes.Get(*r.Name)
+			if err != state.ErrNotFound {
+				return nil, errors.Errorf("duplicate route definitions"+
+					" found for: '%s'", *s.Service.Name)
 			}
 			// TODO add check if route is named or not
 			r.Service = s.Service.DeepCopy()
-			err := kongState.Routes.Add(state.Route{Route: r.Route})
+			err = kongState.Routes.Add(state.Route{Route: r.Route})
 			if err != nil {
 				return nil, err
 			}
