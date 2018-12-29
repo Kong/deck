@@ -3,10 +3,10 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
