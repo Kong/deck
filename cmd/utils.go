@@ -3,13 +3,41 @@ package cmd
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
+
+var stopChannel chan struct{}
+
+// SetStopCh sets the stop channel for long running commands.
+// This is useful for cases when a process needs to be cancelled gracefully
+// before it can complete to finish. Example: SIGINT
+func SetStopCh(stopCh chan struct{}) {
+	stopChannel = stopCh
+}
+
+type errorArray struct {
+	Errors []error
+}
+
+func (e errorArray) Error() string {
+	if len(e.Errors) == 0 {
+		return "nil"
+	}
+	var res string
+
+	res = strconv.Itoa(len(e.Errors)) + " errors occured:\n"
+	for _, err := range e.Errors {
+		res += fmt.Sprintf("\t%v\n", err)
+	}
+	return res
+}
 
 type kongClientConfig struct {
 	Address string
