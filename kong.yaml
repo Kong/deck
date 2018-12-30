@@ -1,6 +1,6 @@
 services:
 - connect_timeout: 60000
-  host: host1
+  host: mockbin.org
   name: svc1
   port: 80
   protocol: http
@@ -10,7 +10,7 @@ services:
   routes:
   - name: r1
     paths:
-    - /path1
+    - /r1
     preserve_host: false
     protocols:
     - http
@@ -18,7 +18,7 @@ services:
     regex_priority: 0
     strip_path: true
 - connect_timeout: 60000
-  host: host2
+  host: mockbin.org
   name: svc2
   port: 80
   protocol: http
@@ -28,7 +28,7 @@ services:
   routes:
   - name: r2
     paths:
-    - /path
+    - /r2
     preserve_host: false
     protocols:
     - http
@@ -36,7 +36,7 @@ services:
     regex_priority: 0
     strip_path: true
 - connect_timeout: 60000
-  host: host3
+  host: mockbin.org
   name: svc3
   port: 80
   protocol: http
@@ -46,7 +46,7 @@ services:
   routes:
   - name: r3
     paths:
-    - /path3
+    - /r3
     preserve_host: false
     protocols:
     - http

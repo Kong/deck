@@ -11,10 +11,10 @@ import (
 )
 
 // TODO abstract this out
-func argStructFromArg(a crud.Arg) arg.ArgStruct {
-	argStruct, ok := a.(arg.ArgStruct)
+func eventFromArg(a crud.Arg) arg.Event {
+	argStruct, ok := a.(arg.Event)
 	if !ok {
-		panic("unexpected type, expected ArgStruct")
+		panic("unexpected type, expected Event")
 	}
 	return argStruct
 }
