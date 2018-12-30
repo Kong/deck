@@ -1,94 +1,213 @@
 package diff
 
 import (
-	"github.com/hashicorp/terraform/dag"
-	"github.com/hbagdi/go-kong/kong"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
 )
 
+var (
+	errEnqueueFailed = errors.New("failed to queue event")
+)
+
+// TODO get rid of the syncer struct and simply have a func for it
+
 // Syncer takes in a current and target state of Kong,
 // diffs them, generating a Graph to get Kong from current
 // to target state.
 type Syncer struct {
-	currentState, targetState      *state.KongState
-	deleteGraph, createUpdateGraph *dag.AcyclicGraph
+	currentState *state.KongState
+	targetState  *state.KongState
+	postProcess  crud.Registry
+
+	eventChan chan Event
+	errChan   chan error
+	stopChan  chan struct{}
+
+	InFlightOps int32
 }
 
 // NewSyncer constructs a Syncer.
 func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
-	s.deleteGraph = new(dag.AcyclicGraph)
-	s.createUpdateGraph = new(dag.AcyclicGraph)
+
+	err := s.postProcess.Register("service", &servicePostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'service' crud")
+	}
+	err = s.postProcess.Register("route", &routePostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'route' crud")
+	}
 	return s, nil
 }
 
-// Diff diffs the current and target states and returns two graphs.
-// The first graph contains all the entities which should be deleted from Kong
-// and the second graph contains the entities which should be created or
-// updated to get Kong to target state.
-func (sc *Syncer) Diff() (*dag.AcyclicGraph, *dag.AcyclicGraph, error) {
-
-	err := sc.delete()
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "couldn't create graph")
-	}
+func (sc *Syncer) diff() error {
+	var err error
 	err = sc.createUpdate()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "couldn't create graph")
+		return err
 	}
-	return sc.deleteGraph, sc.createUpdateGraph, nil
+	err = sc.delete()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (sc *Syncer) delete() error {
-	err := sc.deleteServices()
+	// routes should be deleted before services
+	err := sc.deleteRoutes()
 	if err != nil {
-		return errors.Wrap(err, "while building graph ")
+		return err
 	}
-	err = sc.deleteRoutes()
+	sc.wait()
+	err = sc.deleteServices()
 	if err != nil {
-		return errors.Wrap(err, "while building graph ")
+		return err
 	}
+	sc.wait()
 	return nil
 }
 
 func (sc *Syncer) createUpdate() error {
 	// TODO write an interface and register by types,
 	// then execute in a particular order
+
+	// services should be created before routes
 	err := sc.createUpdateServices()
 	if err != nil {
-		return errors.Wrap(err, "while building graph")
+		return err
 	}
+	sc.wait()
 	err = sc.createUpdateRoutes()
 	if err != nil {
-		return errors.Wrap(err, "while building graph")
+		return err
+	}
+	sc.wait()
+	return nil
+}
+
+func (sc *Syncer) queueEvent(e Event) error {
+	atomic.AddInt32(&sc.InFlightOps, 1)
+	select {
+	case sc.eventChan <- e:
+		return nil
+	case <-sc.stopChan:
+		return errEnqueueFailed
+	}
+}
+
+func (sc *Syncer) eventCompleted(e Event) {
+	atomic.AddInt32(&sc.InFlightOps, -1)
+}
+
+func (sc *Syncer) wait() {
+	for atomic.LoadInt32(&sc.InFlightOps) != 0 {
+		// TODO hack?
+		time.Sleep(5 * time.Millisecond)
+	}
+}
+
+// Run starts a diff and invokes d for every diff.
+func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
+	if parallelism < 1 {
+		return append([]error{}, errors.New("parallelism can not be negative"))
+	}
+
+	var wg sync.WaitGroup
+
+	sc.eventChan = make(chan Event, 10)
+	sc.stopChan = make(chan struct{})
+	sc.errChan = make(chan error)
+
+	// run rabbit run
+	// start the consumers
+	wg.Add(parallelism)
+	for i := 0; i < parallelism; i++ {
+		go func(a int) {
+			err := sc.eventLoop(d, a)
+			if err != nil {
+				sc.errChan <- err
+			}
+			wg.Done()
+		}(i)
+	}
+
+	// start the producer
+	wg.Add(1)
+	go func() {
+		err := sc.diff()
+		if err != nil {
+			sc.errChan <- err
+		}
+		close(sc.eventChan)
+		wg.Done()
+	}()
+
+	// close the error chan once all done
+	go func() {
+		wg.Wait()
+		close(sc.errChan)
+	}()
+
+	var errs []error
+	select {
+	case <-done:
+	case err, ok := <-sc.errChan:
+		if ok && err != nil {
+			if err != errEnqueueFailed {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	// stop the producer
+	close(sc.stopChan)
+
+	// collect errors
+	for err := range sc.errChan {
+		if err != errEnqueueFailed {
+
+			errs = append(errs, err)
+		}
+	}
+
+	return errs
+}
+
+// Do is the worker function to sync the diff
+// TODO remove crud.Arg
+type Do func(a Event) (crud.Arg, error)
+
+func (sc *Syncer) eventLoop(d Do, a int) error {
+	for event := range sc.eventChan {
+		err := sc.handleEvent(d, event, a)
+		sc.eventCompleted(event)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-// Solve walks a graph and executes actions.
-func (sc *Syncer) Solve(g *dag.AcyclicGraph, client *kong.Client,
-	registry crud.Registry) error {
-	err := g.Walk(func(v dag.Vertex) error {
-		n, ok := v.(*Node)
-		if !ok {
-			panic("unexpected type encountered while solving the graph")
-		}
-		// every Node will need to add a few things to arg:
-		// *kong.Client to use
-		// callbacks to execute
-		_, err := registry.Do(n.Kind, n.Op, ArgStruct{
-			Obj:    n.Obj,
-			OldObj: n.OldObj,
-
-			CurrentState: sc.currentState,
-			TargetState:  sc.targetState,
-
-			Client: client,
-		})
-		return err
-	})
-	return err
+func (sc *Syncer) handleEvent(d Do, event Event, a int) error {
+	res, err := d(event)
+	if err != nil {
+		return errors.Wrapf(err, "while processing event: %v", event)
+	}
+	if res == nil {
+		return errors.New("result of event is nil")
+	}
+	_, err = sc.postProcess.Do(event.Kind,
+		event.Op, sc.currentState, res)
+	if err != nil {
+		return errors.Wrap(err, "while post processing event")
+	}
+	return nil
 }

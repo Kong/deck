@@ -15,86 +15,88 @@ func (sc *Syncer) deleteServices() error {
 	}
 
 	for _, service := range currentServices {
-		ok, err := sc.deleteService(service)
+		n, err := sc.deleteService(service)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			continue
+		if n != nil {
+			err = sc.queueEvent(*n)
+			if err != nil {
+				return err
+			}
 		}
-		n := &Node{
-			Op:   crud.Delete,
-			Kind: "service",
-			Obj:  service,
-		}
-		sc.deleteGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.currentState.Services.Update(*service)
+
 	}
 	return nil
 }
 
-func (sc *Syncer) deleteService(service *state.Service) (bool, error) {
+func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
 	// lookup by name
 	if utils.Empty(service.Name) {
-		return false, errors.New("'name' attribute for a service cannot be nil")
+		return nil, errors.New("'name' attribute for a service cannot be nil")
 	}
 	_, err := sc.targetState.Services.Get(*service.Name)
 	if err == state.ErrNotFound {
-		return true, nil
+		return &Event{
+			Op:   crud.Delete,
+			Kind: "service",
+			Obj:  service,
+		}, nil
 	}
 	if err != nil {
-		return false, err
+		return nil, errors.Wrapf(err, "looking up service '%v'", *service.Name)
 	}
-	return false, nil
+	return nil, nil
 }
 
 func (sc *Syncer) createUpdateServices() error {
-
 	targetServices, err := sc.targetState.Services.GetAll()
 	if err != nil {
 		return errors.Wrap(err, "error fetching services from state")
 	}
 
 	for _, service := range targetServices {
-		err := sc.createUpdateService(service)
+		n, err := sc.createUpdateService(service)
 		if err != nil {
 			return err
+		}
+		if n != nil {
+			err = sc.queueEvent(*n)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (sc *Syncer) createUpdateService(service *state.Service) error {
-	// service = &state.Service{Service: *service.DeepCopy()}
-	s, err := sc.currentState.Services.Get(*service.Name)
+func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
+	serviceCopy := &state.Service{Service: *service.DeepCopy()}
+	currentService, err := sc.currentState.Services.Get(*service.Name)
+
 	if err == state.ErrNotFound {
-		service.ID = nil
-		n := &Node{
+		// service not present, create it
+		serviceCopy.ID = nil
+		return &Event{
 			Op:   crud.Create,
 			Kind: "service",
-			Obj:  service,
-		}
-		sc.createUpdateGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.targetState.Services.Update(*service)
-		return nil
+			Obj:  serviceCopy,
+		}, nil
 	}
 	if err != nil {
-		return errors.Wrap(err, "error looking up service")
+		return nil, errors.Wrapf(err, "error looking up service %v",
+			*service.Name)
 	}
-	// if found, check if update needed
-	if !s.EqualWithOpts(service, true, true) {
-		service.ID = kong.String(*s.ID)
-		n := &Node{
+
+	// found, check if update needed
+	if !currentService.EqualWithOpts(serviceCopy, true, true) {
+		serviceCopy.ID = kong.String(*currentService.ID)
+		return &Event{
 			Op:     crud.Update,
 			Kind:   "service",
-			Obj:    service,
-			OldObj: s,
-		}
-		sc.createUpdateGraph.Add(n)
-		service.AddMeta(nodeKey, n)
-		sc.targetState.Services.Update(*service)
+			Obj:    serviceCopy,
+			OldObj: currentService,
+		}, nil
 	}
-	return nil
+	return nil, nil
 }

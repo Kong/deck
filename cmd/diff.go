@@ -37,8 +37,11 @@ that will be created or updated or deleted.
 			return err
 		}
 		s, _ := diff.NewSyncer(currentState, targetState)
-		err = solver.Solve(s, client, true)
-		return err
+		errs := solver.Solve(stopChannel, s, client, true)
+		if errs != nil {
+			return errorArray{errs}
+		}
+		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if diffCmdKongStateFile == "" {
@@ -52,5 +55,5 @@ that will be created or updated or deleted.
 func init() {
 	rootCmd.AddCommand(diffCmd)
 	diffCmd.Flags().StringVarP(&diffCmdKongStateFile,
-		"state", "s", "", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration.")
 }

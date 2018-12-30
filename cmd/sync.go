@@ -34,7 +34,11 @@ to get Kong's state in sync with the input state.`,
 			return err
 		}
 		syncer, _ := diff.NewSyncer(currentState, targetState)
-		return solver.Solve(syncer, client, false)
+		errs := solver.Solve(stopChannel, syncer, client, false)
+		if errs != nil {
+			return errorArray{errs}
+		}
+		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if syncCmdKongStateFile == "" {
@@ -48,5 +52,5 @@ to get Kong's state in sync with the input state.`,
 func init() {
 	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
-		"state", "s", "", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration.")
 }
