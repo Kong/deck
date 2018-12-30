@@ -1,27 +1,38 @@
 package kong
 
 import (
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
+	"github.com/pkg/errors"
 )
 
 // RouteCRUD implements Actions interface
 // from the github.com/kong/crud package for the Route entitiy of Kong.
 type RouteCRUD struct {
-	// client    *kong.Client
-	// callbacks []Callback // use this to update the current in-memory state
+	client *kong.Client
 }
 
-func argStructFromArg(arg crud.Arg) diff.ArgStruct {
-	argStruct, ok := arg.(diff.ArgStruct)
-	if !ok {
-		panic("unexpected type, expected ArgStruct")
+// NewRouteCRUD creates a new RouteCRUD. Client is required.
+func NewRouteCRUD(client *kong.Client) (*RouteCRUD, error) {
+	if client == nil {
+		return nil, errors.New("client is required")
 	}
-	return argStruct
+	return &RouteCRUD{
+		client: client,
+	}, nil
 }
 
-func routeFromStuct(arg diff.ArgStruct) *state.Route {
+func eventFromArg(arg crud.Arg) diff.Event {
+	event, ok := arg.(diff.Event)
+	if !ok {
+		panic("unexpected type, expected diff.Event")
+	}
+	return event
+}
+
+func routeFromStuct(arg diff.Event) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -32,9 +43,9 @@ func routeFromStuct(arg diff.ArgStruct) *state.Route {
 
 // Create creates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	route := routeFromStuct(argStruct)
-	createdRoute, err := argStruct.Client.Routes.Create(nil, &route.Route)
+	event := eventFromArg(arg[0])
+	route := routeFromStuct(event)
+	createdRoute, err := s.client.Routes.Create(nil, &route.Route)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +54,9 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 
 // Delete deletes a Route in Kong. TODO Doc
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	route := routeFromStuct(argStruct)
-	err := argStruct.Client.Routes.Delete(nil, route.ID)
+	event := eventFromArg(arg[0])
+	route := routeFromStuct(event)
+	err := s.client.Routes.Delete(nil, route.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,10 +65,10 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 
 // Update updates a Route in Kong. TODO Doc
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	route := routeFromStuct(argStruct)
+	event := eventFromArg(arg[0])
+	route := routeFromStuct(event)
 
-	updatedRoute, err := argStruct.Client.Routes.Update(nil, &route.Route)
+	updatedRoute, err := s.client.Routes.Update(nil, &route.Route)
 	if err != nil {
 		return nil, err
 	}

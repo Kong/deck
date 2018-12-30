@@ -3,7 +3,7 @@ package dry
 import (
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
-	arg "github.com/kong/deck/diff"
+	"github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -16,7 +16,7 @@ type ServiceCRUD struct {
 	// callbacks []Callback // use this to update the current in-memory state
 }
 
-func serviceFromStuct(a arg.ArgStruct) *state.Service {
+func serviceFromStuct(a diff.Event) *state.Service {
 	service, ok := a.Obj.(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.service")
@@ -27,8 +27,8 @@ func serviceFromStuct(a arg.ArgStruct) *state.Service {
 
 // Create creates a Service in Kong. TODO Doc
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
 
 	print.CreatePrintln("creating service", *service.Name)
 	service.ID = kong.String(utils.UUID())
@@ -37,8 +37,8 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 
 // Delete deletes a service in Kong. TODO Doc
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
 
 	print.DeletePrintln("deleting service", *service.Name)
 	return service, nil
@@ -46,9 +46,9 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 
 // Update udpates a service in Kong. TODO Doc
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
-	oldServiceObj, ok := argStruct.OldObj.(*state.Service)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
+	oldServiceObj, ok := event.OldObj.(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.service")
 	}

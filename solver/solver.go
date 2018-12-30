@@ -1,9 +1,6 @@
 package solver
 
 import (
-	"fmt"
-	"sync"
-
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
@@ -13,36 +10,25 @@ import (
 )
 
 // Solve generates a diff and walks the graph.
-func Solve(syncer *diff.Syncer, client *kong.Client, dry bool) error {
+func Solve(doneCh chan struct{}, syncer *diff.Syncer,
+	client *kong.Client, dry bool) []error {
 	var r *crud.Registry
 	var err error
 	if dry {
-		r, err = buildDryRegistry()
+		r, err = buildDryRegistry(client)
 	} else {
-		r, err = buildRegistry()
+		r, err = buildRegistry(client)
 	}
 	if err != nil {
-		return errors.Wrapf(err, "cannot build registry")
+		return append([]error{}, errors.Wrapf(err, "cannot build registry"))
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	go func() {
-		err := syncer.Run()
-		fmt.Println(err)
-		wg.Done()
-	}()
-	go func() {
-		err := syncer.Process(r, client)
-		fmt.Println(err)
-		wg.Done()
-	}()
-	wg.Wait()
-	return nil
+	return syncer.Run(doneCh, 10, func(e diff.Event) (crud.Arg, error) {
+		return r.Do(e.Kind, e.Op, e)
+	})
 }
 
-func buildDryRegistry() (*crud.Registry, error) {
+func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	var r crud.Registry
 	err := r.Register("service", &drycrud.ServiceCRUD{})
 	if err != nil {
@@ -55,13 +41,22 @@ func buildDryRegistry() (*crud.Registry, error) {
 	return &r, nil
 }
 
-func buildRegistry() (*crud.Registry, error) {
+func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	var r crud.Registry
-	err := r.Register("service", &cruds.ServiceCRUD{})
+	var err error
+	service, err := cruds.NewServiceCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a service CRUD")
+	}
+	err = r.Register("service", service)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'service' crud")
 	}
-	err = r.Register("route", &cruds.RouteCRUD{})
+	route, err := cruds.NewRouteCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a route CRUD")
+	}
+	err = r.Register("route", route)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'route' crud")
 	}

@@ -1,19 +1,30 @@
 package kong
 
 import (
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
+	"github.com/pkg/errors"
 )
 
 // ServiceCRUD implements Actions interface
 // from the github.com/kong/crud package for the Service entitiy of Kong.
 type ServiceCRUD struct {
-	// client    *kong.Client
-	// callbacks []Callback // use this to update the current in-memory state
+	client *kong.Client
 }
 
-func serviceFromStuct(arg diff.ArgStruct) *state.Service {
+// NewServiceCRUD creates a new ServiceCRUD. Client is required.
+func NewServiceCRUD(client *kong.Client) (*ServiceCRUD, error) {
+	if client == nil {
+		return nil, errors.New("client is required")
+	}
+	return &ServiceCRUD{
+		client: client,
+	}, nil
+}
+
+func serviceFromStuct(arg diff.Event) *state.Service {
 	service, ok := arg.Obj.(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.service")
@@ -23,9 +34,9 @@ func serviceFromStuct(arg diff.ArgStruct) *state.Service {
 
 // Create creates a Service in Kong. TODO Doc
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
-	createdService, err := argStruct.Client.Services.Create(nil, &service.Service)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
+	createdService, err := s.client.Services.Create(nil, &service.Service)
 	if err != nil {
 		return nil, err
 	}
@@ -34,9 +45,9 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 
 // Delete deletes a service in Kong. TODO Doc
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
-	err := argStruct.Client.Services.Delete(nil, service.ID)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
+	err := s.client.Services.Delete(nil, service.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -45,10 +56,10 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 
 // Update udpates a service in Kong. TODO Doc
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
-	argStruct := argStructFromArg(arg[0])
-	service := serviceFromStuct(argStruct)
+	event := eventFromArg(arg[0])
+	service := serviceFromStuct(event)
 
-	updatedService, err := argStruct.Client.Services.Update(nil, &service.Service)
+	updatedService, err := s.client.Services.Update(nil, &service.Service)
 	if err != nil {
 		return nil, err
 	}
