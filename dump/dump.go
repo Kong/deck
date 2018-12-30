@@ -32,7 +32,9 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 		}
 		s, err := kongState.Services.Get(*r.Service.ID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "looking up service '%v' for route '%v'", *r.Service.ID, *r.Name)
+			return nil, errors.Wrapf(err,
+				"looking up service '%v' for route '%v'",
+				*r.Service.ID, *r.Name)
 		}
 		r.Service = s.DeepCopy()
 		err = kongState.Routes.Add(state.Route{Route: *r})

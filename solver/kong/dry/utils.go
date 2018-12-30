@@ -24,13 +24,16 @@ func getDiff(a, b interface{}) string {
 	d, _ := diff.DeepDiff(a, b)
 	var dstr []string
 	for path, added := range d.Added {
-		dstr = append(dstr, fmt.Sprintf("  added: %s = %#v\n", path.String(), added))
+		dstr = append(dstr, fmt.Sprintf("  added: %s = %#v\n",
+			path.String(), added))
 	}
 	for path, removed := range d.Removed {
-		dstr = append(dstr, fmt.Sprintf("  removed: %s = %#v\n", path.String(), removed))
+		dstr = append(dstr, fmt.Sprintf("  removed: %s = %#v\n",
+			path.String(), removed))
 	}
 	for path, modified := range d.Modified {
-		dstr = append(dstr, fmt.Sprintf("  modified: %s = %#v\n", path.String(), modified))
+		dstr = append(dstr, fmt.Sprintf("  modified: %s = %#v\n",
+			path.String(), modified))
 	}
 	sort.Strings(dstr)
 	return strings.Join(dstr, "")

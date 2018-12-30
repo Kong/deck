@@ -83,7 +83,8 @@ func (k *RoutesCollection) Add(route Route) error {
 
 // Get gets a route by name or ID.
 func (k *RoutesCollection) Get(ID string) (*Route, error) {
-	res, err := multiIndexLookup(k.memdb, routeTableName, []string{"name", id}, ID)
+	res, err := multiIndexLookup(k.memdb, routeTableName,
+		[]string{"name", id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
@@ -103,7 +104,8 @@ func (k *RoutesCollection) Get(ID string) (*Route, error) {
 
 // GetAllRoutesByServiceName returns all routes referencing a service
 // by its name.
-func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route, error) {
+func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route,
+	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
 	if err != nil {
@@ -122,7 +124,8 @@ func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route, err
 
 // GetAllRoutesByServiceID returns all routes referencing a service
 // by its id.
-func (k *RoutesCollection) GetAllRoutesByServiceID(id string) ([]*Route, error) {
+func (k *RoutesCollection) GetAllRoutesByServiceID(id string) ([]*Route,
+	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceID", id)
 	if err != nil {
