@@ -15,40 +15,41 @@ func (sc *Syncer) deleteRoutes() error {
 	}
 
 	for _, route := range currentRoutes {
-		ok, err := sc.deleteRoute(route)
+		n, err := sc.deleteRoute(route)
 		if err != nil {
 			return err
 		}
-		if !ok {
-			continue
+		if n != nil {
+			err = sc.queueEvent(*n)
+			if err != nil {
+				return err
+			}
 		}
-		n := Node{
-			Op:   crud.Delete,
-			Kind: "route",
-			Obj:  route,
-		}
-		sc.sendEvent(n)
 	}
 	return nil
 }
 
-func (sc *Syncer) deleteRoute(route *state.Route) (bool, error) {
+func (sc *Syncer) deleteRoute(route *state.Route) (*Event, error) {
 	if utils.Empty(route.Name) {
-		return false, errors.New("'name' attribute for a route cannot be nil")
+		return nil, errors.New("'name' attribute for a route cannot be nil")
 	}
 	if route.Service == nil ||
 		(utils.Empty(route.Service.ID)) {
-		return false, errors.Errorf("route has no associated service: %+v", route)
+		return nil, errors.Errorf("route has no associated service: %+v", route)
 	}
 	// lookup by Name
 	_, err := sc.targetState.Routes.Get(*route.Name)
 	if err == state.ErrNotFound {
-		return true, nil
+		return &Event{
+			Op:   crud.Delete,
+			Kind: "route",
+			Obj:  route,
+		}, nil
 	}
 	if err != nil {
-		return false, errors.Wrapf(err, "looking up route '%v'", *route.Name)
+		return nil, errors.Wrapf(err, "looking up route '%v'", *route.Name)
 	}
-	return false, nil
+	return nil, nil
 }
 
 func (sc *Syncer) createUpdateRoutes() error {
@@ -58,15 +59,21 @@ func (sc *Syncer) createUpdateRoutes() error {
 	}
 
 	for _, route := range targetRoutes {
-		err := sc.createUpdateRoute(route)
+		n, err := sc.createUpdateRoute(route)
 		if err != nil {
 			return err
+		}
+		if n != nil {
+			err = sc.queueEvent(*n)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (sc *Syncer) createUpdateRoute(route *state.Route) error {
+func (sc *Syncer) createUpdateRoute(route *state.Route) (*Event, error) {
 	route = &state.Route{Route: *route.DeepCopy()}
 	currentRoute, err := sc.currentState.Routes.Get(*route.Name)
 	if err == state.ErrNotFound {
@@ -75,22 +82,22 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 		// XXX fill foreign
 		svc, err := sc.currentState.Services.Get(*route.Service.Name)
 		if err != nil {
-			return errors.Wrapf(err, "could not find service '%v' for route %+v", *route.Service.Name, *route.Name)
+			return nil, errors.Wrapf(err,
+				"could not find service '%v' for route %+v",
+				*route.Service.Name, *route.Name)
 		}
 		route.Service = &svc.Service
 		// XXX
 
 		route.ID = nil
-		n := Node{
+		return &Event{
 			Op:   crud.Create,
 			Kind: "route",
 			Obj:  route,
-		}
-		sc.sendEvent(n)
-		return nil
+		}, nil
 	}
 	if err != nil {
-		return errors.Wrapf(err, "error looking up route %v", *route.Name)
+		return nil, errors.Wrapf(err, "error looking up route %v", *route.Name)
 	}
 	currentRoute = &state.Route{Route: *currentRoute.DeepCopy()}
 	// found, check if update needed
@@ -103,17 +110,18 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) error {
 		// XXX fill foreign
 		svc, err := sc.currentState.Services.Get(*route.Service.Name)
 		if err != nil {
-			return errors.Wrapf(err, "looking up service '%v' for route '%v'", *route.Service.Name, *route.Name)
+			return nil, errors.Wrapf(err,
+				"looking up service '%v' for route '%v'",
+				*route.Service.Name, *route.Name)
 		}
 		route.Service.ID = svc.ID
 		// XXX
-		n := Node{
+		return &Event{
 			Op:     crud.Update,
 			Kind:   "route",
 			Obj:    route,
 			OldObj: currentRoute,
-		}
-		sc.sendEvent(n)
+		}, nil
 	}
-	return nil
+	return nil, nil
 }
