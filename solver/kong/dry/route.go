@@ -29,7 +29,7 @@ func routeFromStuct(arg diff.Event) *state.Route {
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
-	print.CreatePrintln("creating route ", *route.Name)
+	print.CreatePrintln("creating route", *route.Name)
 	route.ID = kong.String(utils.UUID())
 	return route, nil
 }
@@ -38,7 +38,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
-	print.DeletePrintln("deleting route ", *route.Name)
+	print.DeletePrintln("deleting route", *route.Name)
 	return route, nil
 }
 
