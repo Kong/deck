@@ -67,6 +67,12 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 		}
 	}
 
+	for _, c := range raw.Certificates {
+		err := kongState.Certificates.Add(state.Certificate{Certificate: *c})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting certificate into state")
+		}
+	}
 	return kongState, nil
 }
 

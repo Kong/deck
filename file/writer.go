@@ -56,6 +56,17 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 		file.Upstreams = append(file.Upstreams, u)
 	}
 
+	certificates, err := kongState.Certificates.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, c := range certificates {
+		c := certificate{Certificate: c.Certificate}
+		c.ID = nil
+		c.CreatedAt = nil
+		file.Certificates = append(file.Certificates, c)
+	}
+
 	c, err := yaml.Marshal(file)
 	err = ioutil.WriteFile(filename, c, 0600)
 	if err != nil {

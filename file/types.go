@@ -20,7 +20,12 @@ type target struct {
 	kong.Target `yaml:",inline"`
 }
 
+type certificate struct {
+	kong.Certificate `yaml:",inline"`
+}
+
 type fileStructure struct {
-	Services  []service
-	Upstreams []upstream
+	Services     []service
+	Upstreams    []upstream
+	Certificates []certificate
 }
