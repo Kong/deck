@@ -146,3 +146,70 @@ func TestRouteGetAll(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(2, len(routes))
 }
+
+func TestRouteGetAllByServiceName(t *testing.T) {
+	assert := assert.New(t)
+	collection, err := NewRoutesCollection()
+	assert.Nil(err)
+	assert.NotNil(collection)
+
+	targets := []*Route{
+		{
+			Route: kong.Route{
+				ID:   kong.String("target1-id"),
+				Name: kong.String("target1-name"),
+				Service: &kong.Service{
+					ID:   kong.String("upstream1-id"),
+					Name: kong.String("upstream1-name"),
+				},
+			},
+		},
+		{
+			Route: kong.Route{
+				ID:   kong.String("target2-id"),
+				Name: kong.String("target2-name"),
+				Service: &kong.Service{
+					ID:   kong.String("upstream1-id"),
+					Name: kong.String("upstream1-name"),
+				},
+			},
+		},
+		{
+			Route: kong.Route{
+				ID:   kong.String("target3-id"),
+				Name: kong.String("target3-name"),
+				Service: &kong.Service{
+					ID:   kong.String("upstream2-id"),
+					Name: kong.String("upstream2-name"),
+				},
+			},
+		},
+		{
+			Route: kong.Route{
+				ID:   kong.String("target4-id"),
+				Name: kong.String("target4-name"),
+				Service: &kong.Service{
+					ID:   kong.String("upstream2-id"),
+					Name: kong.String("upstream2-name"),
+				},
+			},
+		},
+	}
+
+	for _, target := range targets {
+		err = collection.Add(*target)
+		assert.Nil(err)
+	}
+
+	targets, err = collection.GetAllRoutesByServiceID("upstream1-id")
+	assert.Nil(err)
+	assert.Equal(2, len(targets))
+
+	targets, err = collection.GetAllRoutesByServiceName("upstream2-name")
+	assert.Nil(err)
+	assert.Equal(2, len(targets))
+
+	targets, err = collection.GetAllRoutesByServiceName("upstream1-id")
+	assert.Nil(err)
+	assert.Equal(0, len(targets))
+}

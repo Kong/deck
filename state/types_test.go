@@ -104,3 +104,65 @@ func TestRouteEqual(t *testing.T) {
 	r1.Service = &kong.Service{ID: kong.String("2")}
 	assert.True(r1.EqualWithOpts(&r2, true, true, false))
 }
+
+func TestUpstreamEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var u1, u2 Upstream
+	u1.ID = kong.String("foo")
+	u1.Name = kong.String("bar")
+
+	u2.ID = kong.String("foo")
+	u2.Name = kong.String("baz")
+
+	assert.False(u1.Equal(&u2))
+	assert.False(u1.EqualWithOpts(&u2, false, false))
+
+	u2.Name = kong.String("bar")
+	assert.True(u1.Equal(&u2))
+	assert.True(u1.EqualWithOpts(&u2, false, false))
+
+	u1.ID = kong.String("fuu")
+	assert.False(u1.EqualWithOpts(&u2, false, false))
+	assert.True(u1.EqualWithOpts(&u2, true, false))
+
+	var timestamp int64 = 1
+	u2.CreatedAt = &timestamp
+	assert.False(u1.EqualWithOpts(&u2, false, false))
+	assert.False(u1.EqualWithOpts(&u2, false, true))
+}
+
+func TestTargetEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var t1, t2 Target
+	t1.ID = kong.String("foo")
+	t1.Target.Target = kong.String("bar")
+
+	t2.ID = kong.String("foo")
+	t2.Target.Target = kong.String("baz")
+
+	assert.False(t1.Equal(&t2))
+	assert.False(t1.EqualWithOpts(&t2, false, false, false))
+
+	t2.Target.Target = kong.String("bar")
+	assert.True(t1.Equal(&t2))
+	assert.True(t1.EqualWithOpts(&t2, false, false, false))
+
+	t1.ID = kong.String("fuu")
+	assert.False(t1.EqualWithOpts(&t2, false, false, false))
+	assert.True(t1.EqualWithOpts(&t2, true, false, false))
+
+	var timestamp float64 = 1
+	t2.CreatedAt = &timestamp
+	assert.False(t1.EqualWithOpts(&t2, false, false, false))
+	assert.False(t1.EqualWithOpts(&t2, false, true, false))
+
+	t1.Upstream = &kong.Upstream{ID: kong.String("1")}
+	t2.Upstream = &kong.Upstream{ID: kong.String("2")}
+	assert.False(t1.EqualWithOpts(&t2, true, true, false))
+	assert.True(t1.EqualWithOpts(&t2, true, true, true))
+
+	t1.Upstream = &kong.Upstream{ID: kong.String("2")}
+	assert.True(t1.EqualWithOpts(&t2, true, true, false))
+}
