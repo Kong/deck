@@ -3,10 +3,11 @@ package state
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
-	Services  *ServicesCollection
-	Routes    *RoutesCollection
-	Upstreams *UpstreamsCollection
-	Targets   *TargetsCollection
+	Services     *ServicesCollection
+	Routes       *RoutesCollection
+	Upstreams    *UpstreamsCollection
+	Targets      *TargetsCollection
+	Certificates *CertificatesCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -27,10 +28,15 @@ func NewKongState() (*KongState, error) {
 	if err != nil {
 		return nil, err
 	}
+	certificates, err := NewCertificatesCollection()
+	if err != nil {
+		return nil, err
+	}
 	return &KongState{
-		Services:  services,
-		Routes:    routes,
-		Upstreams: upstreams,
-		Targets:   targets,
+		Services:     services,
+		Routes:       routes,
+		Upstreams:    upstreams,
+		Targets:      targets,
+		Certificates: certificates,
 	}, nil
 }

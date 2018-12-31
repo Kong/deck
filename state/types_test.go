@@ -166,3 +166,67 @@ func TestTargetEqual(t *testing.T) {
 	t1.Upstream = &kong.Upstream{ID: kong.String("2")}
 	assert.True(t1.EqualWithOpts(&t2, true, true, false))
 }
+
+func TestCertificateEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var c1, c2 Certificate
+	c1.ID = kong.String("foo")
+	c1.Cert = kong.String("certfoo")
+	c1.Key = kong.String("keyfoo")
+
+	c2.ID = kong.String("foo")
+	c2.Cert = kong.String("certfoo")
+	c2.Key = kong.String("keyfoo-unequal")
+
+	assert.False(c1.Equal(&c2))
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+
+	c2.Key = kong.String("keyfoo")
+	assert.True(c1.Equal(&c2))
+	assert.True(c1.EqualWithOpts(&c2, false, false))
+
+	c1.ID = kong.String("fuu")
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+	assert.True(c1.EqualWithOpts(&c2, true, false))
+
+	var timestamp int64 = 1
+	c2.CreatedAt = &timestamp
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+	assert.False(c1.EqualWithOpts(&c2, false, true))
+}
+
+func TestSNIEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var s1, s2 SNI
+	s1.ID = kong.String("foo")
+	s1.Name = kong.String("bar")
+
+	s2.ID = kong.String("foo")
+	s2.Name = kong.String("baz")
+
+	assert.False(s1.Equal(&s2))
+	assert.False(s1.EqualWithOpts(&s2, false, false, false))
+
+	s2.Name = kong.String("bar")
+	assert.True(s1.Equal(&s2))
+	assert.True(s1.EqualWithOpts(&s2, false, false, false))
+
+	s1.ID = kong.String("fuu")
+	assert.False(s1.EqualWithOpts(&s2, false, false, false))
+	assert.True(s1.EqualWithOpts(&s2, true, false, false))
+
+	var timestamp int64 = 1
+	s2.CreatedAt = &timestamp
+	assert.False(s1.EqualWithOpts(&s2, false, false, false))
+	assert.False(s1.EqualWithOpts(&s2, false, true, false))
+
+	s1.Certificate = &kong.Certificate{ID: kong.String("1")}
+	s2.Certificate = &kong.Certificate{ID: kong.String("2")}
+	assert.False(s1.EqualWithOpts(&s2, true, true, false))
+	assert.True(s1.EqualWithOpts(&s2, true, true, true))
+
+	s1.Certificate = &kong.Certificate{ID: kong.String("2")}
+	assert.True(s1.EqualWithOpts(&s2, true, true, false))
+}

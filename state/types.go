@@ -177,3 +177,70 @@ func (t1 *Target) EqualWithOpts(t2 *Target, ignoreID,
 	}
 	return reflect.DeepEqual(t1Copy, t2Copy)
 }
+
+// Certificate represents a upstream in Kong.
+// It adds some helper methods along with Meta to the original Certificate object.
+type Certificate struct {
+	kong.Certificate `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *Certificate) Equal(c2 *Certificate) bool {
+	return reflect.DeepEqual(c1.Certificate, c2.Certificate)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *Certificate) EqualWithOpts(c2 *Certificate,
+	ignoreID bool, ignoreTS bool) bool {
+	c1Copy := c1.Certificate.DeepCopy()
+	c2Copy := c2.Certificate.DeepCopy()
+
+	if ignoreID {
+		c1Copy.ID = nil
+		c2Copy.ID = nil
+	}
+	if ignoreTS {
+		c1Copy.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copy, c2Copy)
+}
+
+// SNI represents a SNI in Kong.
+// It adds some helper methods along with Meta to the original SNI object.
+type SNI struct {
+	kong.SNI `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if s1 and s2 are equal.
+// TODO add compare array without position
+func (s1 *SNI) Equal(s2 *SNI) bool {
+	return reflect.DeepEqual(s1.SNI, s2.SNI)
+}
+
+// EqualWithOpts returns true if s1 and s2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (s1 *SNI) EqualWithOpts(s2 *SNI, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	s1Copy := s1.SNI.DeepCopy()
+	s2Copy := s2.SNI.DeepCopy()
+
+	if ignoreID {
+		s1Copy.ID = nil
+		s2Copy.ID = nil
+	}
+	if ignoreTS {
+		s1Copy.CreatedAt = nil
+		s2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		s1Copy.Certificate = nil
+		s2Copy.Certificate = nil
+	}
+	return reflect.DeepEqual(s1Copy, s2Copy)
+}
