@@ -46,6 +46,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'target' crud")
 	}
+	err = r.Register("certificate", &drycrud.CertificateCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'certificate' crud")
+	}
 	return &r, nil
 }
 
@@ -83,6 +87,14 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("target", target)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'target' crud")
+	}
+	certificate, err := cruds.NewCertificateCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a certificate CRUD")
+	}
+	err = r.Register("certificate", certificate)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'certificate' crud")
 	}
 	return &r, nil
 }
