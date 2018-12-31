@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	targetTableName = "target"
+	targetTableName       = "target"
+	targetsByUpstreamName = "targetsByUpstreamName"
+	targetsByUpstreamID   = "targetsByUpstreamID"
 )
 
 var targetTableSchema = &memdb.TableSchema{
@@ -17,15 +19,15 @@ var targetTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		"targetsByUpstreamName": {
-			Name: "targetsByUpstreamName",
+		targetsByUpstreamName: {
+			Name: targetsByUpstreamName,
 			Indexer: &SubFieldIndexer{
 				StructField: "Upstream",
 				SubField:    "Name",
 			},
 		},
-		"targetsByUpstreamID": {
-			Name: "targetsByUpstreamID",
+		targetsByUpstreamID: {
+			Name: targetsByUpstreamID,
 			Indexer: &SubFieldIndexer{
 				StructField: "Upstream",
 				SubField:    "ID",
@@ -39,14 +41,7 @@ var targetTableSchema = &memdb.TableSchema{
 				SubField:    "Target",
 			},
 		},
-		all: {
-			Name: all,
-			Indexer: &memdb.ConditionalIndex{
-				Conditional: func(v interface{}) (bool, error) {
-					return true, nil
-				},
-			},
-		},
+		all: allIndex,
 	},
 }
 
@@ -109,7 +104,7 @@ func (k *TargetsCollection) Get(ID string) (*Target, error) {
 func (k *TargetsCollection) GetAllByUpstreamName(
 	name string) ([]*Target, error) {
 	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(targetTableName, "targetsByUpstreamName", name)
+	iter, err := txn.Get(targetTableName, targetsByUpstreamName, name)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +124,7 @@ func (k *TargetsCollection) GetAllByUpstreamName(
 func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
 	error) {
 	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(targetTableName, "targetsByUpstreamID", id)
+	iter, err := txn.Get(targetTableName, targetsByUpstreamID, id)
 	if err != nil {
 		return nil, err
 	}

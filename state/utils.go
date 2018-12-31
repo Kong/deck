@@ -14,6 +14,15 @@ const (
 // returned when an entity is not found in the state.
 var ErrNotFound = errors.New("entity not found")
 
+var allIndex = &memdb.IndexSchema{
+	Name: all,
+	Indexer: &memdb.ConditionalIndex{
+		Conditional: func(v interface{}) (bool, error) {
+			return true, nil
+		},
+	},
+}
+
 // multiIndexLookup can be used to search for an entity
 // based on search on multiple indexes with same key.
 func multiIndexLookup(memdb *memdb.MemDB, tableName string,

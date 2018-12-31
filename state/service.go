@@ -24,14 +24,7 @@ var serviceTableSchema = &memdb.TableSchema{
 			// EnforceUnique: true,
 			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
-		all: {
-			Name: all,
-			Indexer: &memdb.ConditionalIndex{
-				Conditional: func(v interface{}) (bool, error) {
-					return true, nil
-				},
-			},
-		},
+		all: allIndex,
 	},
 }
 

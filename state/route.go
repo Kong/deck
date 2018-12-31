@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	routeTableName = "route"
+	routeTableName      = "route"
+	routesByServiceName = "routesByServiceName"
+	routesByServiceID   = "routesByServiceID"
 )
 
 var routeTableSchema = &memdb.TableSchema{
@@ -17,15 +19,15 @@ var routeTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		"routesByServiceName": {
-			Name: "routesByServiceName",
+		routesByServiceName: {
+			Name: routesByServiceName,
 			Indexer: &SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "Name",
 			},
 		},
-		"routesByServiceID": {
-			Name: "routesByServiceID",
+		routesByServiceID: {
+			Name: routesByServiceID,
 			Indexer: &SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "ID",
@@ -36,14 +38,7 @@ var routeTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
-		all: {
-			Name: all,
-			Indexer: &memdb.ConditionalIndex{
-				Conditional: func(v interface{}) (bool, error) {
-					return true, nil
-				},
-			},
-		},
+		all: allIndex,
 	},
 }
 
@@ -106,7 +101,7 @@ func (k *RoutesCollection) Get(ID string) (*Route, error) {
 func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 	error) {
 	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
+	iter, err := txn.Get(routeTableName, routesByServiceName, name)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +121,7 @@ func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
 	error) {
 	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(routeTableName, "routesByServiceID", id)
+	iter, err := txn.Get(routeTableName, routesByServiceID, id)
 	if err != nil {
 		return nil, err
 	}
