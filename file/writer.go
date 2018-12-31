@@ -18,7 +18,7 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	}
 	for _, s := range services {
 		s := service{Service: s.Service}
-		routes, err := kongState.Routes.GetAllRoutesByServiceID(*s.ID)
+		routes, err := kongState.Routes.GetAllByServiceID(*s.ID)
 		if err != nil {
 			return err
 		}
@@ -41,7 +41,7 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	}
 	for _, u := range upstreams {
 		u := upstream{Upstream: u.Upstream}
-		targets, err := kongState.Targets.GetAllTargetsByUpstreamID(*u.ID)
+		targets, err := kongState.Targets.GetAllByUpstreamID(*u.ID)
 		if err != nil {
 			return err
 		}

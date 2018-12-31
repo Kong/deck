@@ -214,15 +214,15 @@ func TestTargetGetAllByUpstreamName(t *testing.T) {
 		assert.Nil(err)
 	}
 
-	targets, err = collection.GetAllTargetsByUpstreamID("upstream1-id")
+	targets, err = collection.GetAllByUpstreamID("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 
-	targets, err = collection.GetAllTargetsByUpstreamName("upstream2-name")
+	targets, err = collection.GetAllByUpstreamName("upstream2-name")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 
-	targets, err = collection.GetAllTargetsByUpstreamName("upstream1-id")
+	targets, err = collection.GetAllByUpstreamName("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(0, len(targets))
 }

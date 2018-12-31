@@ -101,9 +101,9 @@ func (k *RoutesCollection) Get(ID string) (*Route, error) {
 	return route, nil
 }
 
-// GetAllRoutesByServiceName returns all routes referencing a service
+// GetAllByServiceName returns all routes referencing a service
 // by its name.
-func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route,
+func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceName", name)
@@ -121,9 +121,9 @@ func (k *RoutesCollection) GetAllRoutesByServiceName(name string) ([]*Route,
 	return res, nil
 }
 
-// GetAllRoutesByServiceID returns all routes referencing a service
+// GetAllByServiceID returns all routes referencing a service
 // by its id.
-func (k *RoutesCollection) GetAllRoutesByServiceID(id string) ([]*Route,
+func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
 	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(routeTableName, "routesByServiceID", id)

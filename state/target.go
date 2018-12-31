@@ -104,9 +104,9 @@ func (k *TargetsCollection) Get(ID string) (*Target, error) {
 	return target, nil
 }
 
-// GetAllTargetsByUpstreamName returns all targets referencing a Upstream
+// GetAllByUpstreamName returns all targets referencing a Upstream
 // by its name.
-func (k *TargetsCollection) GetAllTargetsByUpstreamName(
+func (k *TargetsCollection) GetAllByUpstreamName(
 	name string) ([]*Target, error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(targetTableName, "targetsByUpstreamName", name)
@@ -124,9 +124,9 @@ func (k *TargetsCollection) GetAllTargetsByUpstreamName(
 	return res, nil
 }
 
-// GetAllTargetsByUpstreamID returns all targets referencing a Upstream
+// GetAllByUpstreamID returns all targets referencing a Upstream
 // by its ID.
-func (k *TargetsCollection) GetAllTargetsByUpstreamID(id string) ([]*Target,
+func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
 	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(targetTableName, "targetsByUpstreamID", id)

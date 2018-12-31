@@ -201,15 +201,15 @@ func TestRouteGetAllByServiceName(t *testing.T) {
 		assert.Nil(err)
 	}
 
-	targets, err = collection.GetAllRoutesByServiceID("upstream1-id")
+	targets, err = collection.GetAllByServiceID("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 
-	targets, err = collection.GetAllRoutesByServiceName("upstream2-name")
+	targets, err = collection.GetAllByServiceName("upstream2-name")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 
-	targets, err = collection.GetAllRoutesByServiceName("upstream1-id")
+	targets, err = collection.GetAllByServiceName("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(0, len(targets))
 }
