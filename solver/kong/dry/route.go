@@ -30,7 +30,7 @@ func routeFromStuct(arg diff.Event) *state.Route {
 }
 
 // Create creates a fake Route.
-// The arg should be of type diff.Event, containing the service to be created,
+// The arg should be of type diff.Event, containing the route to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
@@ -42,7 +42,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 }
 
 // Delete deletes a fake Route.
-// The arg should be of type diff.Event, containing the service to be deleted,
+// The arg should be of type diff.Event, containing the route to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
@@ -53,7 +53,7 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 }
 
 // Update updates a fake Route.
-// The arg should be of type diff.Event, containing the service to be updated,
+// The arg should be of type diff.Event, containing the route to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
