@@ -25,7 +25,10 @@ func serviceFromStuct(a diff.Event) *state.Service {
 	return service
 }
 
-// Create creates a Service in Kong. TODO Doc
+// Create creates a fake service.
+// The arg should be of type diff.Event, containing the service to be created,
+// else the function will panic.
+// It returns a the created *state.Service.
 func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStuct(event)
@@ -35,7 +38,10 @@ func (s *ServiceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	return service, nil
 }
 
-// Delete deletes a service in Kong. TODO Doc
+// Delete deletes a fake service.
+// The arg should be of type diff.Event, containing the service to be deleted,
+// else the function will panic.
+// It returns a the deleted *state.Service.
 func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStuct(event)
@@ -44,7 +50,10 @@ func (s *ServiceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	return service, nil
 }
 
-// Update udpates a service in Kong. TODO Doc
+// Update updates a fake service.
+// The arg should be of type diff.Event, containing the service to be updated,
+// else the function will panic.
+// It returns a the updated *state.Service.
 func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStuct(event)

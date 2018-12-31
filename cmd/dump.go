@@ -20,7 +20,6 @@ and writes them to a file on disk.
 The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// TODO move this out to a common factory
 		client, err := GetKongClient(config)
 		if err != nil {
 			return err

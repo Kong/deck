@@ -17,7 +17,6 @@ var routeTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		// TODO add ServiceName/ServiceID both fields for indexing
 		"routesByServiceName": {
 			Name: "routesByServiceName",
 			Indexer: &SubFieldIndexer{

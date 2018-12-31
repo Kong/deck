@@ -7,6 +7,10 @@ import (
 
 type servicePostAction struct{}
 
+// Create creates the service from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Service, will be added.
+// If the args are of incorrect types, Create will panic.
 func (crud *servicePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {
@@ -20,7 +24,10 @@ func (crud *servicePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
 	return nil, nil
 }
 
-// Delete deletes a service in Kong. TODO Doc
+// Delete deletes the service from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Service, will be deleted.
+// If the args are of incorrect types, Delete will panic.
 func (crud *servicePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {
@@ -34,7 +41,10 @@ func (crud *servicePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	return nil, nil
 }
 
-// Update udpates a service in Kong. TODO Doc
+// Update updates the service from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Service, will be updated.
+// If the args are of incorrect types, Update will panic.
 func (crud *servicePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {
@@ -50,6 +60,10 @@ func (crud *servicePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 
 type routePostAction struct{}
 
+// Create creates the route from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Route, will be added.
+// If the args are of incorrect types, Create will panic.
 func (crud *routePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {
@@ -63,7 +77,10 @@ func (crud *routePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
 	return nil, nil
 }
 
-// Delete deletes a route in Kong. TODO Doc
+// Delete deletes the route from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Route, will be deleted.
+// If the args are of incorrect types, Delete will panic.
 func (crud *routePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {
@@ -77,7 +94,10 @@ func (crud *routePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	return nil, nil
 }
 
-// Update udpates a route in Kong. TODO Doc
+// Update updates the route from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Route, will be updated.
+// If the args are of incorrect types, Update will panic.
 func (crud *routePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s, ok := arg[0].(*state.KongState)
 	if !ok {

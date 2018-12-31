@@ -1,3 +1,7 @@
+// Package dry contains Action for Kong entites.
+// The actions are fake, meaning, the operations
+// don't actually make REST Calls to Kong but
+// mimic them.
 package dry
 
 import (
@@ -25,7 +29,10 @@ func routeFromStuct(arg diff.Event) *state.Route {
 	return route
 }
 
-// Create creates a Route in Kong. TODO Doc
+// Create creates a fake Route.
+// The arg should be of type diff.Event, containing the service to be created,
+// else the function will panic.
+// It returns a the created *state.Route.
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
@@ -34,7 +41,10 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	return route, nil
 }
 
-// Delete deletes a Route in Kong. TODO Doc
+// Delete deletes a fake Route.
+// The arg should be of type diff.Event, containing the service to be deleted,
+// else the function will panic.
+// It returns a the deleted *state.Route.
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
@@ -42,7 +52,10 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	return route, nil
 }
 
-// Update updates a Route in Kong. TODO Doc
+// Update updates a fake Route.
+// The arg should be of type diff.Event, containing the service to be updated,
+// else the function will panic.
+// It returns a the updated *state.Route.
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
