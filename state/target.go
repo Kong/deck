@@ -2,6 +2,7 @@ package state
 
 import (
 	memdb "github.com/hashicorp/go-memdb"
+	"github.com/kong/deck/state/indexers"
 	"github.com/pkg/errors"
 )
 
@@ -21,14 +22,14 @@ var targetTableSchema = &memdb.TableSchema{
 		},
 		targetsByUpstreamName: {
 			Name: targetsByUpstreamName,
-			Indexer: &SubFieldIndexer{
+			Indexer: &indexers.SubFieldIndexer{
 				StructField: "Upstream",
 				SubField:    "Name",
 			},
 		},
 		targetsByUpstreamID: {
 			Name: targetsByUpstreamID,
-			Indexer: &SubFieldIndexer{
+			Indexer: &indexers.SubFieldIndexer{
 				StructField: "Upstream",
 				SubField:    "ID",
 			},
@@ -36,7 +37,7 @@ var targetTableSchema = &memdb.TableSchema{
 		"target": {
 			Name:   "target",
 			Unique: true,
-			Indexer: &SubFieldIndexer{
+			Indexer: &indexers.SubFieldIndexer{
 				StructField: "Target",
 				SubField:    "Target",
 			},

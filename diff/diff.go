@@ -52,6 +52,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'target' crud")
 	}
+	err = s.postProcess.Register("certificate", &certificatePostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'certificate' crud")
+	}
 	return s, nil
 }
 
@@ -82,6 +86,7 @@ func (sc *Syncer) delete() error {
 	sc.wait()
 	// targets should be deleted before upstreams
 	// If an upstream is deleted, deleting a target will give back a 404.
+
 	// TODO implement the following optimization:
 	// If an upstream is deleted, do not make API calls to delete for it's
 	// targets as they will be onCascade deleted in Kong, saving a few
@@ -96,6 +101,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	sc.wait()
+	err = sc.createUpdateCertificates()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -128,6 +137,20 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
+	sc.wait()
+	// If a cert is changed but SNIs are the same,
+	// the operations will be to create the new cert and delete the old
+	// cert. Creation will fail because the SNIs will still
+	// be associated with the old cert.
+	// This is currently an exception only for certificate entity.
+	// This can be solved if SNI are also treated as a resource in this
+	// codebase.
+	err = sc.deleteCertificates()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+
 	sc.wait()
 	return nil
 }

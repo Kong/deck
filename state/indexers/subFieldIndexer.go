@@ -1,4 +1,4 @@
-package state
+package indexers
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ func (s *SubFieldIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 
 	val := subField.String()
 	if val == "" {
-		return false, nil, nil
+		return false, nil, fmt.Errorf("all fields are empty for indexing")
 	}
 
 	// Add the null character as a terminator

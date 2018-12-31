@@ -216,3 +216,56 @@ func (crud *targetPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.Targets.Update(*svc)
 	return nil, nil
 }
+
+type certificatePostAction struct{}
+
+// Create creates the Certificate in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Certificate, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *certificatePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Certificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.Certificates.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the Certificate from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Certificate, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *certificatePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Certificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.Certificates.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the certificate in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Certificate, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *certificatePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Certificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.Certificates.Update(*svc)
+	return nil, nil
+}

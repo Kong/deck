@@ -79,7 +79,7 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(u.Name) {
-			return nil, errors.New("all services in the file must be named")
+			return nil, errors.New("all upstreams in the file must be named")
 		}
 		_, err := kongState.Upstreams.Get(*u.Name)
 		if err != state.ErrNotFound {
@@ -108,6 +108,38 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 			}
 		}
 	}
+
+	allSNIs := make(map[string]bool)
+	for _, c := range fileContent.Certificates {
+		if utils.Empty(c.ID) {
+			c.ID = kong.String("placeholder-" +
+				strconv.FormatUint(count.Inc(), 10))
+		}
+		if utils.Empty(c.Cert) || utils.Empty(c.Key) {
+			return nil, errors.Errorf("all certificates must have a cert" +
+				" and a key")
+		}
+		// check if an SNI is present in multiple certificates
+		for _, s := range c.SNIs {
+			if allSNIs[*s] {
+				return nil, errors.Errorf("duplicate sni found: '%s'", *s)
+			}
+			allSNIs[*s] = true
+		}
+
+		_, err := kongState.Certificates.GetByCertKey(*c.Cert, *c.Key)
+		if err != state.ErrNotFound {
+			return nil, errors.Errorf("duplicate certificate definitions"+
+				" found for the following certificate:\n'%s'", *c.Cert)
+		}
+		err = kongState.Certificates.Add(state.Certificate{
+			Certificate: c.Certificate,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return kongState, nil
 }
 
