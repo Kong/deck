@@ -1,4 +1,4 @@
-package state
+package indexers
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ func TestSubFieldIndexer(t *testing.T) {
 	}
 
 	type Baz struct {
-		A Foo
+		A *Foo
 	}
 
 	in := &SubFieldIndexer{
@@ -21,7 +21,7 @@ func TestSubFieldIndexer(t *testing.T) {
 	}
 	s := "yolo"
 	b := Baz{
-		A: Foo{
+		A: &Foo{
 			Bar: &s,
 		},
 	}
@@ -32,10 +32,30 @@ func TestSubFieldIndexer(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal("yolo\x00", string(val))
 
+	ok, val, err = in.FromObject(Baz{})
+	assert.False(ok)
+	assert.NotNil(err)
+
+	s = ""
+	ok, val, err = in.FromObject(Baz{
+		A: &Foo{
+			Bar: &s,
+		},
+	})
+	assert.False(ok)
+	assert.NotNil(err)
+
 	val, err = in.FromArgs("yolo")
 	assert.Nil(err)
 	assert.Equal("yolo\x00", string(val))
 
+	val, err = in.FromArgs(2)
+	assert.Nil(val)
+	assert.NotNil(err)
+
+	val, err = in.FromArgs("1", "2")
+	assert.Nil(val)
+	assert.NotNil(err)
 }
 
 func TestSubFieldIndexerPointer(t *testing.T) {

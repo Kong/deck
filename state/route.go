@@ -2,6 +2,7 @@ package state
 
 import (
 	memdb "github.com/hashicorp/go-memdb"
+	"github.com/kong/deck/state/indexers"
 	"github.com/pkg/errors"
 )
 
@@ -21,14 +22,14 @@ var routeTableSchema = &memdb.TableSchema{
 		},
 		routesByServiceName: {
 			Name: routesByServiceName,
-			Indexer: &SubFieldIndexer{
+			Indexer: &indexers.SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "Name",
 			},
 		},
 		routesByServiceID: {
 			Name: routesByServiceID,
-			Indexer: &SubFieldIndexer{
+			Indexer: &indexers.SubFieldIndexer{
 				StructField: "Service",
 				SubField:    "ID",
 			},
