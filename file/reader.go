@@ -12,19 +12,6 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-type service struct {
-	kong.Service `yaml:",inline"`
-	Routes       []*route
-}
-
-type route struct {
-	kong.Route `yaml:",inline"`
-}
-
-type fileStructure struct {
-	Services []service
-}
-
 var count counter.Counter
 
 // GetStateFromFile reads in a file with filename and constructs
@@ -33,7 +20,8 @@ var count counter.Counter
 // All entities without an ID will get a `placeholder-{iota}` ID
 // assigned to them.
 func GetStateFromFile(filename string) (*state.KongState, error) {
-
+	// TODO add override logic
+	// TODO add support for file based defaults
 	if filename == "" {
 		return nil, errors.New("filename cannot be empty")
 	}
@@ -46,8 +34,6 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 		return nil, err
 	}
 	for _, s := range fileContent.Services {
-		// TODO add override logic
-		// TODO add support for file based defaults
 		if utils.Empty(s.ID) {
 			s.ID = kong.String("placeholder-" +
 				strconv.FormatUint(count.Inc(), 10))
@@ -76,11 +62,47 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 			_, err := kongState.Routes.Get(*r.Name)
 			if err != state.ErrNotFound {
 				return nil, errors.Errorf("duplicate route definitions"+
-					" found for: '%s'", *s.Service.Name)
+					" found for: '%s'", *r.Name)
 			}
 			// TODO add check if route is named or not
 			r.Service = s.Service.DeepCopy()
 			err = kongState.Routes.Add(state.Route{Route: r.Route})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	for _, u := range fileContent.Upstreams {
+		if utils.Empty(u.ID) {
+			u.ID = kong.String("placeholder-" +
+				strconv.FormatUint(count.Inc(), 10))
+		}
+		if utils.Empty(u.Name) {
+			return nil, errors.New("all services in the file must be named")
+		}
+		_, err := kongState.Upstreams.Get(*u.Name)
+		if err != state.ErrNotFound {
+			return nil, errors.Errorf("duplicate upstream definitions"+
+				" found for: '%s'", *u.Name)
+		}
+		err = kongState.Upstreams.Add(state.Upstream{Upstream: u.Upstream})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, t := range u.Targets {
+			if utils.Empty(t.ID) {
+				t.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			_, err := kongState.Targets.Get(*t.Target.Target)
+			if err != state.ErrNotFound {
+				return nil, errors.Errorf("duplicate target definitions"+
+					" found for: '%s'", *t.Target.Target)
+			}
+			t.Upstream = u.Upstream.DeepCopy()
+			err = kongState.Targets.Add(state.Target{Target: t.Target})
 			if err != nil {
 				return nil, err
 			}
