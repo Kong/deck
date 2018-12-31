@@ -38,6 +38,14 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'route' crud")
 	}
+	err = r.Register("upstream", &drycrud.UpstreamCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'upstream' crud")
+	}
+	err = r.Register("target", &drycrud.TargetCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'target' crud")
+	}
 	return &r, nil
 }
 
@@ -59,6 +67,22 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("route", route)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'route' crud")
+	}
+	upstream, err := cruds.NewUpstreamCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a upstream CRUD")
+	}
+	err = r.Register("upstream", upstream)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'upstream' crud")
+	}
+	target, err := cruds.NewTargetCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a target CRUD")
+	}
+	err = r.Register("target", target)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'target' crud")
 	}
 	return &r, nil
 }

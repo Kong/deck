@@ -43,6 +43,30 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 		}
 	}
 
+	for _, u := range raw.Upstreams {
+		if utils.Empty(u.Name) {
+			return nil, errors.New("upstream '" + *u.ID + "' does not" +
+				" have a name. decK needs upstreams to be named.")
+		}
+		err := kongState.Upstreams.Add(state.Upstream{Upstream: *u})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting upstream into state")
+		}
+	}
+	for _, t := range raw.Targets {
+		u, err := kongState.Upstreams.Get(*t.Upstream.ID)
+		if err != nil {
+			return nil, errors.Wrapf(err,
+				"looking up upstream '%v' for target '%v'",
+				*t.Upstream.ID, *t.Target)
+		}
+		t.Upstream = u.DeepCopy()
+		err = kongState.Targets.Add(state.Target{Target: *t})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting target into state")
+		}
+	}
+
 	return kongState, nil
 }
 

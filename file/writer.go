@@ -35,6 +35,27 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 		file.Services = append(file.Services, s)
 	}
 
+	upstreams, err := kongState.Upstreams.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, u := range upstreams {
+		u := upstream{Upstream: u.Upstream}
+		targets, err := kongState.Targets.GetAllTargetsByUpstreamID(*u.ID)
+		if err != nil {
+			return err
+		}
+		for _, t := range targets {
+			t.Upstream = nil
+			t.ID = nil
+			t.CreatedAt = nil
+			u.Targets = append(u.Targets, &target{Target: t.Target})
+		}
+		u.ID = nil
+		u.CreatedAt = nil
+		file.Upstreams = append(file.Upstreams, u)
+	}
+
 	c, err := yaml.Marshal(file)
 	err = ioutil.WriteFile(filename, c, 0600)
 	if err != nil {

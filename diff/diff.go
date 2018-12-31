@@ -44,6 +44,14 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'route' crud")
 	}
+	err = s.postProcess.Register("upstream", &upstreamPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'upstream' crud")
+	}
+	err = s.postProcess.Register("target", &targetPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'target' crud")
+	}
 	return s, nil
 }
 
@@ -72,6 +80,22 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	sc.wait()
+	// targets should be deleted before upstreams
+	// If an upstream is deleted, deleting a target will give back a 404.
+	// TODO implement the following optimization:
+	// If an upstream is deleted, do not make API calls to delete for it's
+	// targets as they will be onCascade deleted in Kong, saving a few
+	// round trip calls to Kong.
+	err = sc.deleteTargets()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.deleteUpstreams()
+	if err != nil {
+		return err
+	}
+	sc.wait()
 	return nil
 }
 
@@ -79,6 +103,10 @@ func (sc *Syncer) createUpdate() error {
 	// TODO write an interface and register by types,
 	// then execute in a particular order
 
+	// TODO optimize: increase parallelism
+	// Unrelated entities like services, upstreams and certificates
+	// can be all changed at the same time, then have a barrier
+	// and then execute changes for routes, targets and snis.
 	// services should be created before routes
 	err := sc.createUpdateServices()
 	if err != nil {
@@ -86,6 +114,17 @@ func (sc *Syncer) createUpdate() error {
 	}
 	sc.wait()
 	err = sc.createUpdateRoutes()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	// upstreams should be created before targets
+	err = sc.createUpdateUpstreams()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.createUpdateTargets()
 	if err != nil {
 		return err
 	}

@@ -110,3 +110,70 @@ func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID,
 	}
 	return reflect.DeepEqual(r1Copy, r2Copy)
 }
+
+// Upstream represents a upstream in Kong.
+// It adds some helper methods along with Meta to the original Upstream object.
+type Upstream struct {
+	kong.Upstream `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if u1 and u2 are equal.
+func (u1 *Upstream) Equal(u2 *Upstream) bool {
+	return reflect.DeepEqual(u1.Upstream, u2.Upstream)
+}
+
+// EqualWithOpts returns true if u1 and u2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (u1 *Upstream) EqualWithOpts(u2 *Upstream,
+	ignoreID bool, ignoreTS bool) bool {
+	u1Copy := u1.Upstream.DeepCopy()
+	u2Copy := u2.Upstream.DeepCopy()
+
+	if ignoreID {
+		u1Copy.ID = nil
+		u2Copy.ID = nil
+	}
+	if ignoreTS {
+		u1Copy.CreatedAt = nil
+		u2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(u1Copy, u2Copy)
+}
+
+// Target represents a Target in Kong.
+// It adds some helper methods along with Meta to the original Target object.
+type Target struct {
+	kong.Target `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if t1 and t2 are equal.
+// TODO add compare array without position
+func (t1 *Target) Equal(t2 *Target) bool {
+	return reflect.DeepEqual(t1.Target, t2.Target)
+}
+
+// EqualWithOpts returns true if t1 and t2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (t1 *Target) EqualWithOpts(t2 *Target, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	t1Copy := t1.Target.DeepCopy()
+	t2Copy := t2.Target.DeepCopy()
+
+	if ignoreID {
+		t1Copy.ID = nil
+		t2Copy.ID = nil
+	}
+	if ignoreTS {
+		t1Copy.CreatedAt = nil
+		t2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		t1Copy.Upstream = nil
+		t2Copy.Upstream = nil
+	}
+	return reflect.DeepEqual(t1Copy, t2Copy)
+}

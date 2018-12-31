@@ -24,14 +24,6 @@ func NewRouteCRUD(client *kong.Client) (*RouteCRUD, error) {
 	}, nil
 }
 
-func eventFromArg(arg crud.Arg) diff.Event {
-	event, ok := arg.(diff.Event)
-	if !ok {
-		panic("unexpected type, expected diff.Event")
-	}
-	return event
-}
-
 func routeFromStuct(arg diff.Event) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
@@ -42,7 +34,7 @@ func routeFromStuct(arg diff.Event) *state.Route {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the service to be created,
+// The arg should be of type diff.Event, containing the route to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
@@ -56,7 +48,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the service to be deleted,
+// The arg should be of type diff.Event, containing the route to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
@@ -70,7 +62,7 @@ func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the service to be updated,
+// The arg should be of type diff.Event, containing the route to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
