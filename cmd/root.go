@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/kong/deck/utils"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -17,7 +18,7 @@ import (
 
 var (
 	cfgFile string
-	config  kongClientConfig
+	config  utils.KongClientConfig
 	verbose int
 	noColor bool
 )

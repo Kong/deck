@@ -7,6 +7,7 @@ import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/solver"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +22,7 @@ var syncCmd = &cobra.Command{
 	Long: `Sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}
@@ -36,7 +37,7 @@ to get Kong's state in sync with the input state.`,
 		syncer, _ := diff.NewSyncer(currentState, targetState)
 		errs := solver.Solve(stopChannel, syncer, client, false)
 		if errs != nil {
-			return errorArray{errs}
+			return utils.ErrArray{Errors: errs}
 		}
 		return nil
 	},

@@ -7,6 +7,7 @@ import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/solver"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,7 @@ the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}
@@ -39,7 +40,7 @@ that will be created or updated or deleted.
 		s, _ := diff.NewSyncer(currentState, targetState)
 		errs := solver.Solve(stopChannel, s, client, true)
 		if errs != nil {
-			return errorArray{errs}
+			return utils.ErrArray{Errors: errs}
 		}
 		return nil
 	},

@@ -5,6 +5,7 @@ package cmd
 import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
+	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,7 @@ and writes them to a file on disk.
 The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}

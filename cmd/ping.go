@@ -5,6 +5,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,7 @@ var pingCmd = &cobra.Command{
 	Long: `Ping command can be used to verify if deck
 can connect to Kong's Admin API or not.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return errors.Wrap(err, "creating kong client")
 		}

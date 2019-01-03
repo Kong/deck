@@ -8,6 +8,7 @@ import (
 
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/reset"
+	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +34,7 @@ By default, this command will ask for a confirmation prompt.`,
 				return nil
 			}
 		}
-		client, err := GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}
