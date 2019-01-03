@@ -68,7 +68,7 @@ func (s *CertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 
-	updatedCertificate, err := s.client.Certificates.Update(nil, &certificate.Certificate)
+	updatedCertificate, err := s.client.Certificates.Create(nil, &certificate.Certificate)
 	if err != nil {
 		return nil, err
 	}

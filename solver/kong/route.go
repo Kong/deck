@@ -69,7 +69,7 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
 
-	updatedRoute, err := s.client.Routes.Update(nil, &route.Route)
+	updatedRoute, err := s.client.Routes.Create(nil, &route.Route)
 	if err != nil {
 		return nil, err
 	}

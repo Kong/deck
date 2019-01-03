@@ -68,7 +68,7 @@ func (s *UpstreamCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	upstream := upstreamFromStuct(event)
 
-	updatedUpstream, err := s.client.Upstreams.Update(nil, &upstream.Upstream)
+	updatedUpstream, err := s.client.Upstreams.Create(nil, &upstream.Upstream)
 	if err != nil {
 		return nil, err
 	}

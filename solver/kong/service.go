@@ -68,7 +68,7 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStuct(event)
 
-	updatedService, err := s.client.Services.Update(nil, &service.Service)
+	updatedService, err := s.client.Services.Create(nil, &service.Service)
 	if err != nil {
 		return nil, err
 	}
