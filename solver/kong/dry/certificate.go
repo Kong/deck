@@ -65,7 +65,6 @@ func (s *CertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// TODO remove this hack
 	oldCertificate.CreatedAt = nil
 	diff := getDiff(oldCertificate, &certificate.Certificate)
-	print.UpdatePrintln("updating certificate", *certificate.Cert)
-	print.UpdatePrintf("%s", diff)
+	print.UpdatePrintf("updating certificate %s\n%s", *certificate.Cert, diff)
 	return certificate, nil
 }

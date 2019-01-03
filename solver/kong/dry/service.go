@@ -66,7 +66,6 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	oldService.CreatedAt = nil
 	oldService.UpdatedAt = nil
 	diff := getDiff(oldService, &service.Service)
-	print.UpdatePrintln("updating service", *service.Name)
-	print.UpdatePrintf("%s", diff)
+	print.UpdatePrintf("updating service %s\n%s", *service.Name, diff)
 	return service, nil
 }

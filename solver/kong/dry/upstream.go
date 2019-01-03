@@ -65,7 +65,6 @@ func (s *UpstreamCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// TODO remove this hack
 	oldUpstream.CreatedAt = nil
 	diff := getDiff(oldUpstream, &upstream.Upstream)
-	print.UpdatePrintln("updating upstream", *upstream.Name)
-	print.UpdatePrintf("%s", diff)
+	print.UpdatePrintf("updating upstream %s\n%s", *upstream.Name, diff)
 	return upstream, nil
 }
