@@ -32,7 +32,8 @@ func targetFromStuct(arg diff.Event) *state.Target {
 func (s *TargetCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	target := targetFromStuct(event)
-	print.CreatePrintln("creating target", *target.Target.Target)
+	print.CreatePrintln("creating target", *target.Target.Target,
+		"on upstream", *target.Upstream.Name)
 	target.ID = kong.String(utils.UUID())
 	return target, nil
 }
@@ -44,7 +45,8 @@ func (s *TargetCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *TargetCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	target := targetFromStuct(event)
-	print.DeletePrintln("deleting target", *target.Target.Target)
+	print.DeletePrintln("deleting target", *target.Target.Target,
+		"from upstream", *target.Upstream.Name)
 	return target, nil
 }
 
@@ -59,7 +61,9 @@ func (s *TargetCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if !ok {
 		panic("unexpected type, expected *state.Target")
 	}
-	print.DeletePrintln("deleting target", *oldTarget.Target.Target)
-	print.CreatePrintln("creating target", *target.Target.Target)
+	print.DeletePrintln("deleting target", *oldTarget.Target.Target,
+		"from upstream", *oldTarget.Upstream.Name)
+	print.CreatePrintln("creating target", *target.Target.Target,
+		"on upstream", *target.Upstream.Name)
 	return target, nil
 }
