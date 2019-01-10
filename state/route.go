@@ -94,7 +94,7 @@ func (k *RoutesCollection) Get(ID string) (*Route, error) {
 	if !ok {
 		panic("unexpected type found")
 	}
-	return route, nil
+	return &Route{Route: *route.DeepCopy()}, nil
 }
 
 // GetAllByServiceName returns all routes referencing a service
@@ -108,11 +108,11 @@ func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 	}
 	var res []*Route
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Route)
+		r, ok := el.(*Route)
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, s)
+		res = append(res, &Route{Route: *r.DeepCopy()})
 	}
 	return res, nil
 }
@@ -128,11 +128,11 @@ func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
 	}
 	var res []*Route
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Route)
+		r, ok := el.(*Route)
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, s)
+		res = append(res, &Route{Route: *r.DeepCopy()})
 	}
 	return res, nil
 }
@@ -180,11 +180,11 @@ func (k *RoutesCollection) GetAll() ([]*Route, error) {
 
 	var res []*Route
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Route)
+		r, ok := el.(*Route)
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, s)
+		res = append(res, &Route{Route: *r.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

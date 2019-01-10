@@ -82,6 +82,43 @@ func TestRoutesInvalidType(t *testing.T) {
 	assert.Panics(func() {
 		collection.Get("my-service")
 	})
+	assert.Panics(func() {
+		collection.GetAll()
+	})
+}
+
+// Regression test
+// to ensure that the memory reference of the pointer returned by Get()
+// is different from the one stored in MemDB.
+func TestRouteGetMemoryReference(t *testing.T) {
+	assert := assert.New(t)
+	collection, err := NewRoutesCollection()
+	assert.Nil(err)
+	assert.NotNil(collection)
+	var route Route
+	route.Name = kong.String("my-route")
+	route.ID = kong.String("first")
+	route.Hosts = kong.StringSlice("example.com", "demo.example.com")
+	route.Service = &kong.Service{
+		ID:   kong.String("service1-id"),
+		Name: kong.String("service1-name"),
+	}
+	assert.NotNil(route.Service)
+	err = collection.Add(route)
+	assert.NotNil(route.Service)
+	assert.Nil(err)
+
+	re, err := collection.Get("first")
+	assert.Nil(err)
+	assert.NotNil(re)
+	assert.Equal("my-route", *re.Name)
+
+	re.SNIs = kong.StringSlice("example.com", "demo.example.com")
+
+	re, err = collection.Get("my-route")
+	assert.Nil(err)
+	assert.NotNil(re)
+	assert.Nil(re.SNIs)
 }
 
 func TestRouteDelete(t *testing.T) {

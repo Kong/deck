@@ -60,6 +60,37 @@ func TestTargetGetUpdate(t *testing.T) {
 	assert.NotNil(re)
 }
 
+// Regression test
+// to ensure that the memory reference of the pointer returned by Get()
+// is different from the one stored in MemDB.
+func TestTargetGetMemoryReference(t *testing.T) {
+	assert := assert.New(t)
+	collection, err := NewTargetsCollection()
+	assert.Nil(err)
+	assert.NotNil(collection)
+	var target Target
+	target.Target.Target = kong.String("my-target")
+	target.ID = kong.String("first")
+	target.Upstream = &kong.Upstream{
+		ID:   kong.String("upstream1-id"),
+		Name: kong.String("upstream1-name"),
+	}
+	err = collection.Add(target)
+	assert.Nil(err)
+
+	re, err := collection.Get("first")
+	assert.Nil(err)
+	assert.NotNil(re)
+	assert.Equal("my-target", *re.Target.Target)
+
+	re.Weight = kong.Int(1)
+
+	re, err = collection.Get("my-target")
+	assert.Nil(err)
+	assert.NotNil(re)
+	assert.Nil(re.Weight)
+}
+
 func TestTargetsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 

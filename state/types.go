@@ -179,7 +179,8 @@ func (t1 *Target) EqualWithOpts(t2 *Target, ignoreID,
 }
 
 // Certificate represents a upstream in Kong.
-// It adds some helper methods along with Meta to the original Certificate object.
+// It adds some helper methods along with Meta to the
+// original Certificate object.
 type Certificate struct {
 	kong.Certificate `yaml:",inline"`
 	Meta

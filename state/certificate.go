@@ -76,17 +76,19 @@ func (k *CertificatesCollection) Get(id string) (*Certificate, error) {
 	if res == nil {
 		return nil, ErrNotFound
 	}
-	certificate, ok := res.(*Certificate)
+	c, ok := res.(*Certificate)
 	if !ok {
 		panic("unexpected type found")
 	}
-	return certificate, nil
+	return &Certificate{Certificate: *c.DeepCopy()}, nil
 }
 
-// GetByCertKey gets a certificate with the same key and cert from the collection.
-func (k *CertificatesCollection) GetByCertKey(cert, key string) (*Certificate, error) {
+// GetByCertKey gets a certificate with
+// the same key and cert from the collection.
+func (k *CertificatesCollection) GetByCertKey(cert,
+	key string) (*Certificate, error) {
 	txn := k.memdb.Txn(false)
-	defer txn.Commit()
+	defer txn.Abort()
 
 	res, err := txn.First(certificateTableName, "certkey", cert, key)
 	if err == ErrNotFound {
@@ -99,11 +101,11 @@ func (k *CertificatesCollection) GetByCertKey(cert, key string) (*Certificate, e
 	if res == nil {
 		return nil, ErrNotFound
 	}
-	certificate, ok := res.(*Certificate)
+	c, ok := res.(*Certificate)
 	if !ok {
 		panic("unexpected type found")
 	}
-	return certificate, nil
+	return &Certificate{Certificate: *c.DeepCopy()}, nil
 }
 
 // Update udpates an exisitng certificate.
@@ -171,11 +173,11 @@ func (k *CertificatesCollection) GetAll() ([]*Certificate, error) {
 
 	var res []*Certificate
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Certificate)
+		c, ok := el.(*Certificate)
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, s)
+		res = append(res, &Certificate{Certificate: *c.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

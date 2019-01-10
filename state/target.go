@@ -93,11 +93,11 @@ func (k *TargetsCollection) Get(ID string) (*Target, error) {
 	if res == nil {
 		return nil, ErrNotFound
 	}
-	target, ok := res.(*Target)
+	t, ok := res.(*Target)
 	if !ok {
 		panic("unexpected type found")
 	}
-	return target, nil
+	return &Target{Target: *t.DeepCopy()}, nil
 }
 
 // GetAllByUpstreamName returns all targets referencing a Upstream
@@ -115,7 +115,7 @@ func (k *TargetsCollection) GetAllByUpstreamName(
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, t)
+		res = append(res, &Target{Target: *t.DeepCopy()})
 	}
 	return res, nil
 }
@@ -135,7 +135,7 @@ func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, t)
+		res = append(res, &Target{Target: *t.DeepCopy()})
 	}
 	return res, nil
 }
@@ -187,7 +187,7 @@ func (k *TargetsCollection) GetAll() ([]*Target, error) {
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, t)
+		res = append(res, &Target{Target: *t.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

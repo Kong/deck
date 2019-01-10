@@ -79,7 +79,8 @@ func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
 	if !ok {
 		panic("unexpected type found")
 	}
-	return service, nil
+
+	return &Service{Service: *service.DeepCopy()}, nil
 }
 
 // Update udpates an exisitng service.
@@ -132,7 +133,7 @@ func (k *ServicesCollection) GetAll() ([]*Service, error) {
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, s)
+		res = append(res, &Service{Service: *s.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

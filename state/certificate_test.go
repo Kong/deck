@@ -51,6 +51,32 @@ func TestCertificateGetUpdate(t *testing.T) {
 	assert.Nil(se)
 }
 
+// Regression test
+// to ensure that the memory reference of the pointer returned by Get()
+// is different from the one stored in MemDB.
+func TestCertificateGetMemoryReference(t *testing.T) {
+	assert := assert.New(t)
+	collection, err := NewCertificatesCollection()
+	assert.Nil(err)
+	assert.NotNil(collection)
+	var cert Certificate
+	cert.Cert = kong.String("my-cert")
+	cert.Key = kong.String("my-key")
+	cert.ID = kong.String("first")
+	err = collection.Add(cert)
+	assert.Nil(err)
+
+	c, err := collection.Get("first")
+	assert.Nil(err)
+	assert.NotNil(c)
+	c.Cert = kong.String("my-new-cert")
+
+	c, err = collection.Get("first")
+	assert.Nil(err)
+	assert.NotNil(c)
+	assert.Equal("my-cert", *c.Cert)
+}
+
 func TestCertificatesInvalidType(t *testing.T) {
 	assert := assert.New(t)
 

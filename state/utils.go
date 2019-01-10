@@ -30,7 +30,7 @@ func multiIndexLookup(memdb *memdb.MemDB, tableName string,
 	args ...interface{}) (interface{}, error) {
 
 	txn := memdb.Txn(false)
-	defer txn.Commit()
+	defer txn.Abort()
 
 	for _, indexName := range indices {
 		res, err := txn.First(tableName, indexName, args...)

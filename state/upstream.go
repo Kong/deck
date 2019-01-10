@@ -73,11 +73,11 @@ func (k *UpstreamsCollection) Get(nameOrID string) (*Upstream, error) {
 	if res == nil {
 		return nil, ErrNotFound
 	}
-	upstream, ok := res.(*Upstream)
+	u, ok := res.(*Upstream)
 	if !ok {
 		panic("unexpected type found")
 	}
-	return upstream, nil
+	return &Upstream{Upstream: *u.DeepCopy()}, nil
 }
 
 // Update udpates an exisitng upstream.
@@ -129,7 +129,7 @@ func (k *UpstreamsCollection) GetAll() ([]*Upstream, error) {
 		if !ok {
 			panic("unexpected type found")
 		}
-		res = append(res, u)
+		res = append(res, &Upstream{Upstream: *u.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

@@ -50,12 +50,36 @@ func TestUpstreamGetUpdate(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(se)
 
-	// TODO fix this for all entities
-	// se, err = collection.Get("my-upstream")
-	// assert.Equal(ErrNotFound, err)
-	// assert.Nil(se)
+	se, err = collection.Get("my-upstream")
+	assert.Equal(ErrNotFound, err)
+	assert.Nil(se)
 }
 
+// Regression test
+// to ensure that the memory reference of the pointer returned by Get()
+// is different from the one stored in MemDB.
+func TestUpstreamGetMemoryReference(t *testing.T) {
+	assert := assert.New(t)
+	collection, err := NewUpstreamsCollection()
+	assert.Nil(err)
+	assert.NotNil(collection)
+
+	var upstream Upstream
+	upstream.Name = kong.String("my-upstream")
+	upstream.ID = kong.String("first")
+	err = collection.Add(upstream)
+	assert.Nil(err)
+
+	se, err := collection.Get("first")
+	assert.Nil(err)
+	assert.NotNil(se)
+	se.Slots = kong.Int(1)
+
+	se, err = collection.Get("my-upstream")
+	assert.Nil(err)
+	assert.NotNil(se)
+	assert.Nil(se.Slots)
+}
 func TestUpstreamsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 
