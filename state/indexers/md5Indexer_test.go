@@ -46,7 +46,7 @@ func TestMD5FieldsIndexer(t *testing.T) {
 		Baz: &s2,
 	})
 	assert.False(ok)
-	assert.NotNil(err)
+	assert.Nil(err)
 
 	val, err = in.FromArgs("")
 	assert.NotNil(err)

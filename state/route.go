@@ -23,15 +23,23 @@ var routeTableSchema = &memdb.TableSchema{
 		routesByServiceName: {
 			Name: routesByServiceName,
 			Indexer: &indexers.SubFieldIndexer{
-				StructField: "Service",
-				SubField:    "Name",
+				Fields: []indexers.Field{
+					{
+						Struct: "Service",
+						Sub:    "Name",
+					},
+				},
 			},
 		},
 		routesByServiceID: {
 			Name: routesByServiceID,
 			Indexer: &indexers.SubFieldIndexer{
-				StructField: "Service",
-				SubField:    "ID",
+				Fields: []indexers.Field{
+					{
+						Struct: "Service",
+						Sub:    "ID",
+					},
+				},
 			},
 		},
 		"name": {
