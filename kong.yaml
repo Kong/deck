@@ -17,6 +17,8 @@ services:
     - https
     regex_priority: 0
     strip_path: true
+    plugins: []
+  plugins: []
 - connect_timeout: 60000
   host: mockbin.org
   name: svc2
@@ -35,6 +37,8 @@ services:
     - https
     regex_priority: 0
     strip_path: true
+    plugins: []
+  plugins: []
 - connect_timeout: 60000
   host: mockbin.org
   name: svc3
@@ -53,6 +57,8 @@ services:
     - https
     regex_priority: 0
     strip_path: true
+    plugins: []
+  plugins: []
 upstreams:
 - name: upstream1
   slots: 10000
@@ -174,3 +180,33 @@ certificates:
   - demo1.example.com
   - demo2.example.com
   - demo3.example.com
+plugins:
+- name: prometheus
+  enabled: true
+  run_on: first
+- name: request-transformer
+  config:
+    add:
+      body: []
+      headers:
+      - foo:bar
+      querystring: []
+    append:
+      body: []
+      headers: []
+      querystring: []
+    http_method: null
+    remove:
+      body: []
+      headers: []
+      querystring: []
+    rename:
+      body: []
+      headers: []
+      querystring: []
+    replace:
+      body: []
+      headers: []
+      querystring: []
+  enabled: true
+  run_on: first
