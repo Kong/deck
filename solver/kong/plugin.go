@@ -1,10 +1,10 @@
 package kong
 
 import (
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/diff"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
-	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
 )
 

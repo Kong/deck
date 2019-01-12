@@ -3,11 +3,11 @@
 package cmd
 
 import (
-	"github.com/kong/deck/diff"
-	"github.com/kong/deck/dump"
-	"github.com/kong/deck/file"
-	"github.com/kong/deck/solver"
-	"github.com/kong/deck/utils"
+	"github.com/hbagdi/deck/diff"
+	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/solver"
+	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

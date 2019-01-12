@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kong/deck/state"
+	"github.com/hbagdi/deck/state"
 	yaml "gopkg.in/yaml.v2"
 )
 

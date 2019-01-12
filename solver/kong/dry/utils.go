@@ -6,8 +6,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kong/deck/crud"
-	arg "github.com/kong/deck/diff"
+	"github.com/hbagdi/deck/crud"
+	arg "github.com/hbagdi/deck/diff"
 	diff "gopkg.in/d4l3k/messagediff.v1"
 )
 

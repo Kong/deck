@@ -1,12 +1,12 @@
 package dry
 
 import (
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/diff"
+	"github.com/hbagdi/deck/print"
+	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
-	"github.com/kong/deck/print"
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
 )
 
 // TargetCRUD implements Actions interface

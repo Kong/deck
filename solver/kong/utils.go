@@ -1,8 +1,8 @@
 package kong
 
 import (
-	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/diff"
 )
 
 func eventFromArg(arg crud.Arg) diff.Event {

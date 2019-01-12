@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"strconv"
 
+	"github.com/hbagdi/deck/counter"
+	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/kong/deck/counter"
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )

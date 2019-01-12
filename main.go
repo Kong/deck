@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kong/deck/cmd"
+	"github.com/hbagdi/deck/cmd"
 )
 
 var entities = []string{"key-auth", "hmac-auth", "jwt", "oauth2", "acl"}
