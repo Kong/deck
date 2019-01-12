@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strconv"
 
@@ -50,6 +51,16 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 		if err != nil {
 			return nil, err
 		}
+		for _, p := range s.Plugins {
+			if ok, err := processPlugin(p); !ok {
+				return nil, err
+			}
+			p.Service = s.Service.DeepCopy()
+			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
+			if err != nil {
+				return nil, err
+			}
+		}
 
 		for _, r := range s.Routes {
 			if utils.Empty(r.ID) {
@@ -64,12 +75,31 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				return nil, errors.Errorf("duplicate route definitions"+
 					" found for: '%s'", *r.Name)
 			}
-			// TODO add check if route is named or not
 			r.Service = s.Service.DeepCopy()
 			err = kongState.Routes.Add(state.Route{Route: r.Route})
 			if err != nil {
 				return nil, err
 			}
+			for _, p := range r.Plugins {
+				if ok, err := processPlugin(p); !ok {
+					return nil, err
+				}
+				p.Route = r.Route.DeepCopy()
+				err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
+	for _, p := range fileContent.Plugins {
+		if ok, err := processPlugin(&p); !ok {
+			return nil, err
+		}
+		err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -155,4 +185,63 @@ func readFile(kongStateFile string) (*fileStructure, error) {
 		return nil, err
 	}
 	return &s, nil
+}
+
+func processPlugin(p *plugin) (bool, error) {
+	if utils.Empty(p.ID) {
+		p.ID = kong.String("placeholder-" +
+			strconv.FormatUint(count.Inc(), 10))
+	}
+	if utils.Empty(p.Name) {
+		return false, errors.New("plugin does not have a name")
+	}
+	if p.Route != nil || p.Service != nil || p.Consumer != nil {
+		return false, errors.New("plugin " + *p.Name +
+			" has foreign relations " +
+			"defined. Plugins in config file " +
+			"cannot define foreign relations (yet).")
+	}
+	if p.Config == nil {
+		p.Config = make(map[string]interface{})
+	}
+	p.Config = ensureJSON(p.Config)
+	// TODO error out on consumer/route not nil
+	return true, nil
+}
+
+func ensureJSON(m map[string]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+	for k, v := range m {
+		switch v2 := v.(type) {
+		case map[interface{}]interface{}:
+			res[fmt.Sprint(k)] = yamlToJSON(v2)
+		case []interface{}:
+			var array []interface{}
+			for _, element := range v2 {
+				switch el := element.(type) {
+				case map[interface{}]interface{}:
+					array = append(array, yamlToJSON(el))
+				default:
+					array = append(array, el)
+				}
+			}
+			res[fmt.Sprint(k)] = array
+		default:
+			res[fmt.Sprint(k)] = v
+		}
+	}
+	return res
+}
+
+func yamlToJSON(m map[interface{}]interface{}) map[string]interface{} {
+	res := map[string]interface{}{}
+	for k, v := range m {
+		switch v2 := v.(type) {
+		case map[interface{}]interface{}:
+			res[fmt.Sprint(k)] = yamlToJSON(v2)
+		default:
+			res[fmt.Sprint(k)] = v
+		}
+	}
+	return res
 }

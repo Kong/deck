@@ -24,12 +24,39 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 		if err != nil {
 			return err
 		}
+		plugins, err := kongState.Plugins.GetAllByServiceID(*s.ID)
+		if err != nil {
+			return err
+		}
+		for _, p := range plugins {
+			p.ID = nil
+			p.CreatedAt = nil
+			p.Service = nil
+			s.Plugins = append(s.Plugins, &plugin{Plugin: p.Plugin})
+		}
+		sort.SliceStable(s.Plugins, func(i, j int) bool {
+			return strings.Compare(*s.Plugins[i].Name, *s.Plugins[j].Name) < 0
+		})
 		for _, r := range routes {
+			plugins, err := kongState.Plugins.GetAllByRouteID(*r.ID)
+			if err != nil {
+				return err
+			}
 			r.Service = nil
 			r.ID = nil
 			r.CreatedAt = nil
 			r.UpdatedAt = nil
-			s.Routes = append(s.Routes, &route{Route: r.Route})
+			route := &route{Route: r.Route}
+			for _, p := range plugins {
+				p.ID = nil
+				p.CreatedAt = nil
+				p.Route = nil
+				route.Plugins = append(route.Plugins, &plugin{Plugin: p.Plugin})
+			}
+			sort.SliceStable(route.Plugins, func(i, j int) bool {
+				return strings.Compare(*route.Plugins[i].Name, *route.Plugins[j].Name) < 0
+			})
+			s.Routes = append(s.Routes, route)
 		}
 		sort.SliceStable(s.Routes, func(i, j int) bool {
 			return strings.Compare(*s.Routes[i].Name, *s.Routes[j].Name) < 0
@@ -42,6 +69,24 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	sort.SliceStable(file.Services, func(i, j int) bool {
 		return strings.Compare(*file.Services[i].Name,
 			*file.Services[j].Name) < 0
+	})
+
+	// Add global plugins
+	plugins, err := kongState.Plugins.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, p := range plugins {
+		if p.Consumer == nil && p.Service == nil && p.Route == nil {
+			p.ID = nil
+			p.CreatedAt = nil
+			p := plugin{Plugin: p.Plugin}
+			file.Plugins = append(file.Plugins, p)
+		}
+	}
+	sort.SliceStable(file.Plugins, func(i, j int) bool {
+		return strings.Compare(*file.Plugins[i].Name,
+			*file.Plugins[j].Name) < 0
 	})
 
 	upstreams, err := kongState.Upstreams.GetAll()
