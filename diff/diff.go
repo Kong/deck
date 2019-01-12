@@ -56,6 +56,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'certificate' crud")
 	}
+	err = s.postProcess.Register("plugin", &pluginPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'plugin' crud")
+	}
 	return s, nil
 }
 
@@ -73,8 +77,14 @@ func (sc *Syncer) diff() error {
 }
 
 func (sc *Syncer) delete() error {
+	var err error
+	err = sc.deletePlugins()
+	if err != nil {
+		return err
+	}
+	sc.wait()
 	// routes should be deleted before services
-	err := sc.deleteRoutes()
+	err = sc.deleteRoutes()
 	if err != nil {
 		return err
 	}
@@ -150,7 +160,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	sc.wait()
-
+	err = sc.createUpdatePlugins()
+	if err != nil {
+		return err
+	}
 	sc.wait()
 	return nil
 }
@@ -261,7 +274,7 @@ func (sc *Syncer) eventLoop(d Do, a int) error {
 func (sc *Syncer) handleEvent(d Do, event Event, a int) error {
 	res, err := d(event)
 	if err != nil {
-		return errors.Wrapf(err, "while processing event: %v", event)
+		return errors.Wrapf(err, "while processing event")
 	}
 	if res == nil {
 		return errors.New("result of event is nil")

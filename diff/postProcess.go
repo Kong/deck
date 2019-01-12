@@ -269,3 +269,56 @@ func (crud *certificatePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.Certificates.Update(*svc)
 	return nil, nil
 }
+
+type pluginPostAction struct{}
+
+// Create creates the Plugin in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Plugin, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *pluginPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Plugin)
+	if !ok {
+		panic("whoops")
+	}
+	s.Plugins.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the Plugin from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Plugin, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *pluginPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Plugin)
+	if !ok {
+		panic("whoops")
+	}
+	s.Plugins.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the plugin in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Plugin, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *pluginPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Plugin)
+	if !ok {
+		panic("whoops")
+	}
+	s.Plugins.Update(*svc)
+	return nil, nil
+}

@@ -8,6 +8,7 @@ type KongState struct {
 	Upstreams    *UpstreamsCollection
 	Targets      *TargetsCollection
 	Certificates *CertificatesCollection
+	Plugins      *PluginsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -32,11 +33,16 @@ func NewKongState() (*KongState, error) {
 	if err != nil {
 		return nil, err
 	}
+	plugins, err := NewPluginsCollection()
+	if err != nil {
+		return nil, err
+	}
 	return &KongState{
 		Services:     services,
 		Routes:       routes,
 		Upstreams:    upstreams,
 		Targets:      targets,
 		Certificates: certificates,
+		Plugins:      plugins,
 	}, nil
 }

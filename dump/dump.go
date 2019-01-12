@@ -73,6 +73,38 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			return nil, errors.Wrap(err, "inserting certificate into state")
 		}
 	}
+
+	for _, p := range raw.Plugins {
+		if p.Consumer != nil {
+			panic("plugins on consumers are not yet supported by deck")
+		}
+		if p.Service != nil && p.Route != nil {
+			panic("plugins for a service and a " +
+				"route pair is not yet supported by deck")
+		}
+		if p.Service != nil {
+			s, err := kongState.Services.Get(*p.Service.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up service '%v' for plugin '%v'",
+					*p.Service.ID, *p.Name)
+			}
+			p.Service = s.DeepCopy()
+		}
+		if p.Route != nil {
+			r, err := kongState.Routes.Get(*p.Route.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up route '%v' for plugin '%v'",
+					*p.Route.ID, *p.Name)
+			}
+			p.Route = r.DeepCopy()
+		}
+		err := kongState.Plugins.Add(state.Plugin{Plugin: *p})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting plugins into state")
+		}
+	}
 	return kongState, nil
 }
 

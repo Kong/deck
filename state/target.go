@@ -23,23 +23,35 @@ var targetTableSchema = &memdb.TableSchema{
 		targetsByUpstreamName: {
 			Name: targetsByUpstreamName,
 			Indexer: &indexers.SubFieldIndexer{
-				StructField: "Upstream",
-				SubField:    "Name",
+				Fields: []indexers.Field{
+					{
+						Struct: "Upstream",
+						Sub:    "Name",
+					},
+				},
 			},
 		},
 		targetsByUpstreamID: {
 			Name: targetsByUpstreamID,
 			Indexer: &indexers.SubFieldIndexer{
-				StructField: "Upstream",
-				SubField:    "ID",
+				Fields: []indexers.Field{
+					{
+						Struct: "Upstream",
+						Sub:    "ID",
+					},
+				},
 			},
 		},
 		"target": {
 			Name:   "target",
 			Unique: true,
 			Indexer: &indexers.SubFieldIndexer{
-				StructField: "Target",
-				SubField:    "Target",
+				Fields: []indexers.Field{
+					{
+						Struct: "Target",
+						Sub:    "Target",
+					},
+				},
 			},
 		},
 		all: allIndex,

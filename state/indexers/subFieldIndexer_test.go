@@ -16,8 +16,12 @@ func TestSubFieldIndexer(t *testing.T) {
 	}
 
 	in := &SubFieldIndexer{
-		StructField: "A",
-		SubField:    "Bar",
+		Fields: []Field{
+			{
+				Struct: "A",
+				Sub:    "Bar",
+			},
+		},
 	}
 	s := "yolo"
 	b := Baz{
@@ -34,7 +38,7 @@ func TestSubFieldIndexer(t *testing.T) {
 
 	ok, val, err = in.FromObject(Baz{})
 	assert.False(ok)
-	assert.NotNil(err)
+	assert.Nil(err)
 
 	s = ""
 	ok, val, err = in.FromObject(Baz{
@@ -43,7 +47,7 @@ func TestSubFieldIndexer(t *testing.T) {
 		},
 	})
 	assert.False(ok)
-	assert.NotNil(err)
+	assert.Nil(err)
 
 	val, err = in.FromArgs("yolo")
 	assert.Nil(err)
@@ -54,8 +58,8 @@ func TestSubFieldIndexer(t *testing.T) {
 	assert.NotNil(err)
 
 	val, err = in.FromArgs("1", "2")
-	assert.Nil(val)
-	assert.NotNil(err)
+	assert.Equal([]byte("12\x00"), val)
+	assert.Nil(err)
 }
 
 func TestSubFieldIndexerPointer(t *testing.T) {
@@ -68,8 +72,12 @@ func TestSubFieldIndexerPointer(t *testing.T) {
 	}
 
 	in := &SubFieldIndexer{
-		StructField: "A",
-		SubField:    "Bar",
+		Fields: []Field{
+			{
+				Struct: "A",
+				Sub:    "Bar",
+			},
+		},
 	}
 	s := "yolo"
 	b := Baz{

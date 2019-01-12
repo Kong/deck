@@ -30,7 +30,7 @@ func (s *MD5FieldsIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 		blob += fv.String()
 	}
 	if blob == "" {
-		return false, nil, fmt.Errorf("all fields for md5sum are empty")
+		return false, nil, nil
 	}
 	md5Sum := md5.Sum([]byte(blob))
 	return true, md5Sum[:], nil

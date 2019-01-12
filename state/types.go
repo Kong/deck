@@ -245,3 +245,43 @@ func (s1 *SNI) EqualWithOpts(s2 *SNI, ignoreID,
 	}
 	return reflect.DeepEqual(s1Copy, s2Copy)
 }
+
+// Plugin represents a route in Kong.
+// It adds some helper methods along with Meta to the original Plugin object.
+type Plugin struct {
+	kong.Plugin `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if r1 and r2 are equal.
+// TODO add compare array without position
+func (p1 *Plugin) Equal(p2 *Plugin) bool {
+	return reflect.DeepEqual(p1.Plugin, p2.Plugin)
+}
+
+// EqualWithOpts returns true if p1 and p2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	p1Copy := p1.Plugin.DeepCopy()
+	p2Copy := p2.Plugin.DeepCopy()
+
+	if ignoreID {
+		p1Copy.ID = nil
+		p2Copy.ID = nil
+	}
+	if ignoreTS {
+		p1Copy.CreatedAt = nil
+		p2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		p1Copy.Service = nil
+		p1Copy.Route = nil
+		p1Copy.Consumer = nil
+		p2Copy.Service = nil
+		p2Copy.Route = nil
+		p2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(p1Copy, p2Copy)
+}

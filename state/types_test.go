@@ -230,3 +230,38 @@ func TestSNIEqual(t *testing.T) {
 	s1.Certificate = &kong.Certificate{ID: kong.String("2")}
 	assert.True(s1.EqualWithOpts(&s2, true, true, false))
 }
+
+func TestPluginEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var p1, p2 Plugin
+	p1.ID = kong.String("foo")
+	p1.Name = kong.String("bar")
+
+	p2.ID = kong.String("foo")
+	p2.Name = kong.String("baz")
+
+	assert.False(p1.Equal(&p2))
+	assert.False(p1.EqualWithOpts(&p2, false, false, false))
+
+	p2.Name = kong.String("bar")
+	assert.True(p1.Equal(&p2))
+	assert.True(p1.EqualWithOpts(&p2, false, false, false))
+
+	p1.ID = kong.String("fuu")
+	assert.False(p1.EqualWithOpts(&p2, false, false, false))
+	assert.True(p1.EqualWithOpts(&p2, true, false, false))
+
+	timestamp := 1
+	p2.CreatedAt = &timestamp
+	assert.False(p1.EqualWithOpts(&p2, false, false, false))
+	assert.False(p1.EqualWithOpts(&p2, false, true, false))
+
+	p1.Service = &kong.Service{ID: kong.String("1")}
+	p2.Service = &kong.Service{ID: kong.String("2")}
+	assert.False(p1.EqualWithOpts(&p2, true, true, false))
+	assert.True(p1.EqualWithOpts(&p2, true, true, true))
+
+	p1.Service = &kong.Service{ID: kong.String("2")}
+	assert.True(p1.EqualWithOpts(&p2, true, true, false))
+}
