@@ -65,7 +65,10 @@ func (s *ServiceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// TODO remove this hack
 	oldService.CreatedAt = nil
 	oldService.UpdatedAt = nil
-	diff := getDiff(oldService, &service.Service)
+	diff, err := getDiff(oldService, &service.Service)
+	if err != nil {
+		return nil, err
+	}
 	print.UpdatePrintf("updating service %s\n%s", *service.Name, diff)
 	return service, nil
 }

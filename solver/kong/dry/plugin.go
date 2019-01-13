@@ -98,7 +98,10 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if plugin.Route != nil {
 		plugin.Route = &kong.Route{Name: plugin.Route.Name}
 	}
-	diff := getDiff(oldPlugin, &plugin.Plugin)
+	diff, err := getDiff(oldPlugin, &plugin.Plugin)
+	if err != nil {
+		return nil, err
+	}
 	print.UpdatePrintf("updating %s\n%s", formatPluginMessage(plugin), diff)
 	return plugin, nil
 }

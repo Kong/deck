@@ -64,7 +64,10 @@ func (s *UpstreamCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	oldUpstream := oldUpstreamObj.DeepCopy()
 	// TODO remove this hack
 	oldUpstream.CreatedAt = nil
-	diff := getDiff(oldUpstream, &upstream.Upstream)
+	diff, err := getDiff(oldUpstream, &upstream.Upstream)
+	if err != nil {
+		return nil, err
+	}
 	print.UpdatePrintf("updating upstream %s\n%s", *upstream.Name, diff)
 	return upstream, nil
 }

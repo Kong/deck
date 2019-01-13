@@ -72,7 +72,10 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	route.ID = nil
 	route.Service = &kong.Service{Name: route.Service.Name}
 
-	diff := getDiff(oldRoute.Route, route.Route)
-	print.UpdatePrintf("updating route %s\n%s", *route.Name, diff)
+	diffString, err := getDiff(oldRoute.Route, route.Route)
+	if err != nil {
+		return nil, err
+	}
+	print.UpdatePrintf("updating route %s\n%s", *route.Name, diffString)
 	return route, nil
 }

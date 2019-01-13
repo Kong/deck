@@ -64,7 +64,10 @@ func (s *CertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	oldCertificate := oldCertificateObj.DeepCopy()
 	// TODO remove this hack
 	oldCertificate.CreatedAt = nil
-	diff := getDiff(oldCertificate, &certificate.Certificate)
+	diff, err := getDiff(oldCertificate, &certificate.Certificate)
+	if err != nil {
+		return nil, err
+	}
 	print.UpdatePrintf("updating certificate %s\n%s", *certificate.Cert, diff)
 	return certificate, nil
 }
