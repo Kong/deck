@@ -13,11 +13,9 @@ builds:
   - linux
   - darwin
   - windows
+  - freebsd
   goarch:
-  - 386
   - amd64
-  - arm
-  - arm64
   asmflags:
   - all=-trimpath={{.Env.GOPATH}}
   ldflags:
@@ -27,3 +25,12 @@ checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Tag }}"
+nfpm:
+  name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Arch }}'
+  homepage:  https://github.com/hbagdi/deck
+  description: Declarative configuration for Kong
+  maintainer: Harry Bagdi <harrybagdi@gmail.com>
+  license: Apache License v2.0
+  formats:
+  - deb
+  - rpm
