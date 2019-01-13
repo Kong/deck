@@ -27,12 +27,10 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "deck",
 	Short: "Administer your Kong declaritively",
-	Long: `decK helps you manage your Kong clusters in a declaritive fashion.
+	Long: `decK helps you manage Kong clusters with a declarative
+configuration file.
 
-You can export your existing Kong configuration, reset your Kong clusters.
-
-It is also possible to use deck in your CI/CD pipeline to manage your Kong
-configuration via GitOps.`,
+It can be used to export, import or sync entities to Kong.`,
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(config.Address); err != nil {
