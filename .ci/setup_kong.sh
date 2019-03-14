@@ -1,6 +1,6 @@
 #!/bin/bash
 
-KONG_VERSION="1.0.0"
+KONG_VERSION="1.1.0rc2"
 set e
 # download Kong deb
 
