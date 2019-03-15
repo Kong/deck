@@ -14,11 +14,8 @@ func TestRoutesRoute(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(client)
 
-	route := &Route{
-		Hosts: StringSlice("host1.com", "host2.com"),
-	}
+	route := &Route{}
 
-	// foreign key not specified
 	routeNotCreated, err := client.Routes.Create(defaultCtx, route)
 	assert.NotNil(err)
 	assert.Nil(routeNotCreated)
