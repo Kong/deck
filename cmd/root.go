@@ -66,9 +66,8 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
 
 	rootCmd.PersistentFlags().StringSlice("headers", []string{},
-		"HTTP Headers to call Kong's Admin API.\n"+
-			"This value can also be set using DECK_HEADERS"+
-			" environment variable.")
+		"HTTP Headers(key:value) to inject in all requests to Kong's Admin API.\n"+
+			"This flag can be specified multiple times to inject multiple headers.")
 	viper.BindPFlag("headers",
 		rootCmd.PersistentFlags().Lookup("headers"))
 
