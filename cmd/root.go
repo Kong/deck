@@ -65,6 +65,12 @@ func init() {
 	viper.BindPFlag("kong-addr",
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
 
+	rootCmd.PersistentFlags().StringSlice("headers", []string{},
+		"HTTP Headers(key:value) to inject in all requests to Kong's Admin API.\n"+
+			"This flag can be specified multiple times to inject multiple headers.")
+	viper.BindPFlag("headers",
+		rootCmd.PersistentFlags().Lookup("headers"))
+
 	rootCmd.PersistentFlags().Bool("tls-skip-verify", false,
 		"Disable verification of Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_TLS_SKIP_VERIFY "+
@@ -125,6 +131,7 @@ func initConfig() {
 	config.TLSServerName = viper.GetString("tls-server-name")
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	config.TLSCACert = viper.GetString("ca-cert")
+	config.Headers = viper.GetStringSlice("headers")
 	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
 
