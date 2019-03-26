@@ -171,14 +171,15 @@ func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Services.List(nil, opt)
+		s, nextopt, err := client.Services.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		services = append(services, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return services, nil
 }
@@ -189,14 +190,15 @@ func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Routes.List(nil, opt)
+		s, nextopt, err := client.Routes.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		routes = append(routes, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return routes, nil
 }
@@ -207,14 +209,15 @@ func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Plugins.List(nil, opt)
+		s, nextopt, err := client.Plugins.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		plugins = append(plugins, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return plugins, nil
 }
@@ -225,14 +228,15 @@ func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Certificates.List(nil, opt)
+		s, nextopt, err := client.Certificates.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		certificates = append(certificates, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return certificates, nil
 }
@@ -243,14 +247,15 @@ func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.SNIs.List(nil, opt)
+		s, nextopt, err := client.SNIs.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		snis = append(snis, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return snis, nil
 }
@@ -262,14 +267,15 @@ func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Consumers.List(nil, opt)
+		s, nextopt, err := client.Consumers.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		consumers = append(consumers, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return consumers, nil
 }
@@ -280,14 +286,15 @@ func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
 	for {
-		s, opt, err := client.Upstreams.List(nil, opt)
+		s, nextopt, err := client.Upstreams.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
 		upstreams = append(upstreams, s...)
-		if opt == nil {
+		if nextopt == nil {
 			break
 		}
+		opt = nextopt
 	}
 	return upstreams, nil
 }
@@ -302,14 +309,15 @@ func GetAllTargets(client *kong.Client,
 	opt.Size = 1000
 	for _, upstream := range upstreams {
 		for {
-			t, opt, err := client.Targets.List(nil, upstream.ID, opt)
+			t, nextopt, err := client.Targets.List(nil, upstream.ID, opt)
 			if err != nil {
 				return nil, err
 			}
 			targets = append(targets, t...)
-			if opt == nil {
+			if nextopt == nil {
 				break
 			}
+			opt = nextopt
 		}
 	}
 
