@@ -4,7 +4,7 @@ env:
  - GO111MODULE=on
 
 go:
- - "1.11.2"
+ - "1.12"
 
 before_script:
  - go get golang.org/x/lint/golint
@@ -12,7 +12,7 @@ before_script:
 script:
  - diff -u <(echo -n) <(gofmt -d -s .)
  - golint -set_exit_status $(go list ./...)
- - go tool vet .
+ - go vet .
  - go test -v ./...
  - GOOS=linux go build
  - GOOS=darwin go build
