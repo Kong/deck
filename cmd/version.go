@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// VERSION is the current version of deck.
+// VERSION is the current version of decK.
 // This should be substituted by git tag during the build process.
 var VERSION = "dev"
 
@@ -20,7 +20,7 @@ var COMMIT = "unknown"
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version of decK",
-	Long: `version prints the version of deck along with git short
+	Long: `version prints the version of decK along with git short
 commit hash of the source tree`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)

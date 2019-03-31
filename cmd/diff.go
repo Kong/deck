@@ -18,7 +18,7 @@ var diffCmdKongStateFile string
 var diffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Diff the current entities in Kong with the on on disks",
-	Long: `Diff is like a dry run of 'deck sync' command.
+	Long: `Diff is like a dry run of 'decK sync' command.
 
 It will load entities form Kong and then perform a diff on those with
 the entities present in files locally. This allows you to see the entities

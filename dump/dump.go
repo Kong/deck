@@ -108,7 +108,7 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		}
 		if relations > 1 {
 			panic("plugins on a combination of route/service/consumer " +
-				"are not yet supported by deck")
+				"are not yet supported by decK")
 		}
 		if p.Service != nil {
 			s, err := kongState.Services.Get(*p.Service.ID)

@@ -14,7 +14,7 @@ import (
 var pingCmd = &cobra.Command{
 	Use:   "ping",
 	Short: "Verify connectivity with Kong",
-	Long: `Ping command can be used to verify if deck
+	Long: `Ping command can be used to verify if decK
 can connect to Kong's Admin API or not.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetKongClient(config)
