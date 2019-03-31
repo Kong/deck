@@ -92,6 +92,18 @@ func TestGetPluginByProp(t *testing.T) {
 				},
 			},
 		},
+		{
+			Plugin: kong.Plugin{
+				ID:   kong.String("4"),
+				Name: kong.String("key-auth"),
+				Consumer: &kong.Consumer{
+					Username: kong.String("consumer1"),
+				},
+				Config: map[string]interface{}{
+					"key4": "value4",
+				},
+			},
+		},
 	}
 	assert := assert.New(t)
 	collection, err := NewPluginsCollection()
@@ -102,24 +114,29 @@ func TestGetPluginByProp(t *testing.T) {
 		assert.Nil(collection.Add(p))
 	}
 
-	plugin, err := collection.GetByProp("foo", "", "")
+	plugin, err := collection.GetByProp("foo", "", "", "")
 	assert.Nil(plugin)
 	assert.Equal(ErrNotFound, err)
 
-	plugin, err = collection.GetByProp("key-auth", "", "")
+	plugin, err = collection.GetByProp("key-auth", "", "", "")
 	assert.Nil(err)
 	assert.NotNil(plugin)
 	assert.Equal("value1", plugin.Config["key1"])
 
-	plugin, err = collection.GetByProp("key-auth", "svc1", "")
+	plugin, err = collection.GetByProp("key-auth", "svc1", "", "")
 	assert.Nil(err)
 	assert.NotNil(plugin)
 	assert.Equal("value2", plugin.Config["key2"])
 
-	plugin, err = collection.GetByProp("key-auth", "", "route1")
+	plugin, err = collection.GetByProp("key-auth", "", "route1", "")
 	assert.Nil(err)
 	assert.NotNil(plugin)
 	assert.Equal("value3", plugin.Config["key3"])
+
+	plugin, err = collection.GetByProp("key-auth", "", "", "consumer1")
+	assert.Nil(err)
+	assert.NotNil(plugin)
+	assert.Equal("value4", plugin.Config["key4"])
 }
 
 func TestPluginsInvalidType(t *testing.T) {
