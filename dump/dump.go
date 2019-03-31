@@ -42,7 +42,19 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			return nil, errors.Wrap(err, "inserting route into state")
 		}
 	}
-
+	for _, c := range raw.Consumers {
+		if utils.Empty(c.Username) {
+			return nil, errors.New("consumer '" + *c.ID + "' does not" +
+				" have a username. decK needs consumers to have " +
+				"If you're using custom_id, " +
+				"please set the username of the consumer " +
+				"same as the custom_id.")
+		}
+		err := kongState.Consumers.Add(state.Consumer{Consumer: *c})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting consumer into state")
+		}
+	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
 			return nil, errors.New("upstream '" + *u.ID + "' does not" +
@@ -75,12 +87,19 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 	}
 
 	for _, p := range raw.Plugins {
-		if p.Consumer != nil {
-			panic("plugins on consumers are not yet supported by deck")
+		relations := 0
+		if p.Service != nil {
+			relations++
 		}
-		if p.Service != nil && p.Route != nil {
-			panic("plugins for a service and a " +
-				"route pair is not yet supported by deck")
+		if p.Route != nil {
+			relations++
+		}
+		if p.Consumer != nil {
+			relations++
+		}
+		if relations > 1 {
+			panic("plugins on a combination of route/service/consumer " +
+				"are not yet supported by deck")
 		}
 		if p.Service != nil {
 			s, err := kongState.Services.Get(*p.Service.ID)
@@ -99,6 +118,15 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 					*p.Route.ID, *p.Name)
 			}
 			p.Route = r.DeepCopy()
+		}
+		if p.Consumer != nil {
+			c, err := kongState.Consumers.Get(*p.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for plugin '%v'",
+					*p.Consumer.ID, *p.Name)
+			}
+			p.Consumer = c.DeepCopy()
 		}
 		err := kongState.Plugins.Add(state.Plugin{Plugin: *p})
 		if err != nil {
