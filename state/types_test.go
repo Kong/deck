@@ -265,3 +265,30 @@ func TestPluginEqual(t *testing.T) {
 	p1.Service = &kong.Service{ID: kong.String("2")}
 	assert.True(p1.EqualWithOpts(&p2, true, true, false))
 }
+
+func TestConsumerEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var c1, c2 Consumer
+	c1.ID = kong.String("foo")
+	c1.Username = kong.String("bar")
+
+	c2.ID = kong.String("foo")
+	c2.Username = kong.String("baz")
+
+	assert.False(c1.Equal(&c2))
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+
+	c2.Username = kong.String("bar")
+	assert.True(c1.Equal(&c2))
+	assert.True(c1.EqualWithOpts(&c2, false, false))
+
+	c1.ID = kong.String("fuu")
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+	assert.True(c1.EqualWithOpts(&c2, true, false))
+
+	var a int64 = 1
+	c2.CreatedAt = &a
+	assert.False(c1.EqualWithOpts(&c2, false, false))
+	assert.False(c1.EqualWithOpts(&c2, false, true))
+}

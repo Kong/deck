@@ -285,3 +285,34 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 	}
 	return reflect.DeepEqual(p1Copy, p2Copy)
 }
+
+// Consumer represents a consumer in Kong.
+// It adds some helper methods along with Meta to the original Consumer object.
+type Consumer struct {
+	kong.Consumer `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *Consumer) Equal(c2 *Consumer) bool {
+	return reflect.DeepEqual(c1.Consumer, c2.Consumer)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
+	ignoreID bool, ignoreTS bool) bool {
+	c1Copt := c1.Consumer.DeepCopy()
+	c2Copy := c2.Consumer.DeepCopy()
+
+	if ignoreID {
+		c1Copt.ID = nil
+		c2Copy.ID = nil
+	}
+	if ignoreTS {
+		c1Copt.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copt, c2Copy)
+}
