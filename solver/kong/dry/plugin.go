@@ -44,6 +44,10 @@ func formatPluginMessage(plugin *state.Plugin) (message string) {
 		message += " on route " + *plugin.Route.Name
 		return
 	}
+	if plugin.Consumer != nil {
+		message += " on consumer " + *plugin.Consumer.Username
+		return
+	}
 	return
 }
 
@@ -97,6 +101,12 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	if plugin.Route != nil {
 		plugin.Route = &kong.Route{Name: plugin.Route.Name}
+	}
+	if oldPlugin.Consumer != nil {
+		oldPlugin.Consumer = &kong.Consumer{Username: oldPlugin.Consumer.Username}
+	}
+	if plugin.Consumer != nil {
+		plugin.Consumer = &kong.Consumer{Username: plugin.Consumer.Username}
 	}
 	diff, err := getDiff(oldPlugin, &plugin.Plugin)
 	if err != nil {
