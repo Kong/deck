@@ -153,8 +153,8 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 			svc, err := sc.currentState.Consumers.Get(*plugin.Consumer.Username)
 			if err != nil {
 				return nil, errors.Wrapf(err,
-					"could not find route '%v' for plugin %+v",
-					*plugin.Route.Name, *plugin.Name)
+					"could not find consumer '%v' for plugin %+v",
+					*plugin.Consumer.Username, *plugin.Name)
 			}
 			plugin.Consumer = &svc.Consumer
 		}

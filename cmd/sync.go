@@ -26,7 +26,7 @@ to get Kong's state in sync with the input state.`,
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client)
+		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -54,4 +54,7 @@ func init() {
 	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
 		"state", "s", "kong.yaml", "file containing Kong's configuration.")
+	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
+		false, "do not diff consumers or "+
+			"any plugins associated with consumers")
 }

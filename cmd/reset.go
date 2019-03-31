@@ -38,7 +38,7 @@ By default, this command will ask for a confirmation prompt.`,
 		if err != nil {
 			return err
 		}
-		state, err := dump.Get(client)
+		state, err := dump.Get(client, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -75,4 +75,7 @@ func init() {
 	rootCmd.AddCommand(resetCmd)
 	resetCmd.Flags().BoolVarP(&resetCmdForce, "force", "f",
 		false, "Skip interactive confirmation prompt before reset")
+	resetCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
+		false, "do not reset consumers or "+
+			"any plugins associated with consumers")
 }

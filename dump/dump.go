@@ -7,10 +7,17 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Config can be used to skip exporting certain entities
+type Config struct {
+	// If true, consumers and any plugins associated with it
+	// are not exported.
+	SkipConsumers bool
+}
+
 // GetState queries Kong for all entities using client and
 // constructs a structered state.
-func GetState(client *kong.Client) (*state.KongState, error) {
-	raw, err := Get(client)
+func GetState(client *kong.Client, config Config) (*state.KongState, error) {
+	raw, err := Get(client, config)
 	if err != nil {
 		return nil, err
 	}
@@ -42,17 +49,19 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			return nil, errors.Wrap(err, "inserting route into state")
 		}
 	}
-	for _, c := range raw.Consumers {
-		if utils.Empty(c.Username) {
-			return nil, errors.New("consumer '" + *c.ID + "' does not" +
-				" have a username. decK needs consumers to have " +
-				"If you're using custom_id, " +
-				"please set the username of the consumer " +
-				"same as the custom_id.")
-		}
-		err := kongState.Consumers.Add(state.Consumer{Consumer: *c})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting consumer into state")
+	if !config.SkipConsumers {
+		for _, c := range raw.Consumers {
+			if utils.Empty(c.Username) {
+				return nil, errors.New("consumer '" + *c.ID + "' does not" +
+					" have a username. decK needs consumers to have " +
+					"If you're using custom_id, " +
+					"please set the username of the consumer " +
+					"same as the custom_id.")
+			}
+			err := kongState.Consumers.Add(state.Consumer{Consumer: *c})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting consumer into state")
+			}
 		}
 	}
 	for _, u := range raw.Upstreams {
@@ -120,6 +129,11 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 			p.Route = r.DeepCopy()
 		}
 		if p.Consumer != nil {
+			// if consumer export is disabled, do not export
+			// plugins associated with consumers as well
+			if config.SkipConsumers {
+				continue
+			}
 			c, err := kongState.Consumers.Get(*p.Consumer.ID)
 			if err != nil {
 				return nil, errors.Wrapf(err,
@@ -138,7 +152,7 @@ func GetState(client *kong.Client) (*state.KongState, error) {
 
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
-func Get(client *kong.Client) (*utils.KongRawState, error) {
+func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
 	services, err := GetAllServices(client)
@@ -172,11 +186,13 @@ func Get(client *kong.Client) (*utils.KongRawState, error) {
 	}
 	state.SNIs = snis
 
-	consumers, err := GetAllConsumers(client)
-	if err != nil {
-		return nil, err
+	if !config.SkipConsumers {
+		consumers, err := GetAllConsumers(client)
+		if err != nil {
+			return nil, err
+		}
+		state.Consumers = consumers
 	}
-	state.Consumers = consumers
 
 	upstreams, err := GetAllUpstreams(client)
 	if err != nil {

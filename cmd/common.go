@@ -1,5 +1,7 @@
 package cmd
 
+import "github.com/hbagdi/deck/dump"
+
 var stopChannel chan struct{}
 
 // SetStopCh sets the stop channel for long running commands.
@@ -8,3 +10,5 @@ var stopChannel chan struct{}
 func SetStopCh(stopCh chan struct{}) {
 	stopChannel = stopCh
 }
+
+var dumpConfig dump.Config

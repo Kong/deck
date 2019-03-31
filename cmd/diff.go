@@ -29,7 +29,7 @@ that will be created or updated or deleted.
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client)
+		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -57,4 +57,7 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 	diffCmd.Flags().StringVarP(&diffCmdKongStateFile,
 		"state", "s", "kong.yaml", "file containing Kong's configuration.")
+	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
+		false, "do not diff consumers or "+
+			"any plugins associated with consumers")
 }
