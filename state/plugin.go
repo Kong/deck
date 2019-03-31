@@ -7,11 +7,13 @@ import (
 )
 
 const (
-	pluginTableName      = "plugin"
-	pluginsByServiceName = "pluginsByServiceName"
-	pluginsByServiceID   = "pluginsByServiceID"
-	pluginsByRouteName   = "pluginsByRouteName"
-	pluginsByRouteID     = "pluginsByRouteID"
+	pluginTableName           = "plugin"
+	pluginsByServiceName      = "pluginsByServiceName"
+	pluginsByServiceID        = "pluginsByServiceID"
+	pluginsByRouteName        = "pluginsByRouteName"
+	pluginsByRouteID          = "pluginsByRouteID"
+	pluginsByConsumerUsername = "pluginsByConsumerUsername"
+	pluginsByConsumerID       = "pluginsByConsumerID"
 )
 
 var pluginTableSchema = &memdb.TableSchema{
@@ -70,6 +72,30 @@ var pluginTableSchema = &memdb.TableSchema{
 			},
 			AllowMissing: true,
 		},
+		pluginsByConsumerUsername: {
+			Name: pluginsByConsumerUsername,
+			Indexer: &indexers.SubFieldIndexer{
+				Fields: []indexers.Field{
+					{
+						Struct: "Consumer",
+						Sub:    "Username",
+					},
+				},
+			},
+			AllowMissing: true,
+		},
+		pluginsByConsumerID: {
+			Name: pluginsByConsumerID,
+			Indexer: &indexers.SubFieldIndexer{
+				Fields: []indexers.Field{
+					{
+						Struct: "Consumer",
+						Sub:    "ID",
+					},
+				},
+			},
+			AllowMissing: true,
+		},
 		"name": {
 			Name:    "name",
 			Indexer: &memdb.StringFieldIndex{Field: "Name"},
@@ -89,6 +115,10 @@ var pluginTableSchema = &memdb.TableSchema{
 					{
 						Struct: "Route",
 						Sub:    "Name",
+					},
+					{
+						Struct: "Consumer",
+						Sub:    "Username",
 					},
 				},
 			},
@@ -194,11 +224,11 @@ func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin,
 // If serviceName is empty, a plugin for the route with routeName is searched.
 // If routeName is empty, a plugin for the route with serviceName is searched.
 func (k *PluginsCollection) GetByProp(name, serviceName,
-	routeName string) (*Plugin, error) {
+	routeName string, consumerUsername string) (*Plugin, error) {
 	txn := k.memdb.Txn(false)
 	defer txn.Commit()
 	res, err := txn.First(pluginTableName, "fields",
-		name, serviceName, routeName)
+		name, serviceName, routeName, consumerUsername)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
@@ -241,6 +271,26 @@ func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
 	error) {
 	txn := k.memdb.Txn(false)
 	iter, err := txn.Get(pluginTableName, pluginsByRouteID, id)
+	if err != nil {
+		return nil, err
+	}
+	var res []*Plugin
+	for el := iter.Next(); el != nil; el = iter.Next() {
+		p, ok := el.(*Plugin)
+		if !ok {
+			panic("unexpected type found")
+		}
+		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
+	}
+	return res, nil
+}
+
+// GetAllByConsumerID returns all plugins referencing a consumer
+// by its id.
+func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
+	error) {
+	txn := k.memdb.Txn(false)
+	iter, err := txn.Get(pluginTableName, pluginsByConsumerID, id)
 	if err != nil {
 		return nil, err
 	}

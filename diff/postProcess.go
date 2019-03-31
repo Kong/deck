@@ -322,3 +322,56 @@ func (crud *pluginPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.Plugins.Update(*svc)
 	return nil, nil
 }
+
+type consumerPostAction struct{}
+
+// Create creates the consumer from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Consumer, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *consumerPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Consumer)
+	if !ok {
+		panic("whoops")
+	}
+	s.Consumers.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the consumer from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Consumer, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *consumerPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Consumer)
+	if !ok {
+		panic("whoops")
+	}
+	s.Consumers.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the consumer from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Consumer, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *consumerPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Consumer)
+	if !ok {
+		panic("whoops")
+	}
+	s.Consumers.Update(*svc)
+	return nil, nil
+}

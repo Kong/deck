@@ -170,6 +170,35 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 		}
 	}
 
+	for _, c := range fileContent.Consumers {
+		if utils.Empty(c.ID) {
+			c.ID = kong.String("placeholder-" +
+				strconv.FormatUint(count.Inc(), 10))
+		}
+		if utils.Empty(c.Consumer.Username) {
+			return nil, errors.New("all services in the file must be named")
+		}
+		_, err := kongState.Consumers.Get(*c.Consumer.Username)
+		if err != state.ErrNotFound {
+			return nil, errors.Errorf("duplicate consumer definitions"+
+				" found for: '%v'", *c.Consumer.Username)
+		}
+		err = kongState.Consumers.Add(state.Consumer{Consumer: c.Consumer})
+		if err != nil {
+			return nil, err
+		}
+		for _, p := range c.Plugins {
+			if ok, err := processPlugin(p); !ok {
+				return nil, err
+			}
+			p.Consumer = c.Consumer.DeepCopy()
+			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return kongState, nil
 }
 

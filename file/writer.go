@@ -136,6 +136,34 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 			*file.Certificates[j].Cert) < 0
 	})
 
+	consumers, err := kongState.Consumers.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, c := range consumers {
+		c := consumer{Consumer: c.Consumer}
+		plugins, err := kongState.Plugins.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, p := range plugins {
+			p.ID = nil
+			p.CreatedAt = nil
+			p.Consumer = nil
+			c.Plugins = append(c.Plugins, &plugin{Plugin: p.Plugin})
+		}
+		sort.SliceStable(c.Plugins, func(i, j int) bool {
+			return strings.Compare(*c.Plugins[i].Name, *c.Plugins[j].Name) < 0
+		})
+		c.ID = nil
+		c.CreatedAt = nil
+		file.Consumers = append(file.Consumers, c)
+	}
+	sort.SliceStable(file.Consumers, func(i, j int) bool {
+		return strings.Compare(*file.Consumers[i].Username,
+			*file.Consumers[j].Username) < 0
+	})
+
 	c, err := yaml.Marshal(file)
 	err = ioutil.WriteFile(filename, c, 0600)
 	if err != nil {
