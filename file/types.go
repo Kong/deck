@@ -30,9 +30,15 @@ type plugin struct {
 	kong.Plugin `yaml:",inline"`
 }
 
+type consumer struct {
+	kong.Consumer `yaml:",inline"`
+	Plugins       []*plugin
+}
+
 type fileStructure struct {
 	Services     []service
 	Upstreams    []upstream
 	Certificates []certificate
 	Plugins      []plugin
+	Consumers    []consumer
 }
