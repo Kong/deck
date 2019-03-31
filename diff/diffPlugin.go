@@ -67,9 +67,26 @@ func (sc *Syncer) deletePlugin(plugin *state.Plugin) (*Event, error) {
 		}
 		plugin.Route = &r.Route
 	}
+	if plugin.Consumer != nil {
+		id := ""
+		if plugin.Consumer.Username != nil {
+			id = *plugin.Consumer.Username
+		}
+		if plugin.Consumer.ID != nil {
+			id = *plugin.Consumer.ID
+		}
+		c, err := sc.currentState.Consumers.Get(id)
+		if err != nil {
+			return nil, errors.Wrapf(err,
+				"could not find Consumer '%v' for plugin %+v",
+				id, *plugin.Name)
+		}
+		plugin.Consumer = &c.Consumer
+	}
 	name := *plugin.Name
-	serviceName, routeName := foreignNames(plugin)
-	_, err := sc.targetState.Plugins.GetByProp(name, serviceName, routeName)
+	serviceName, routeName, consumerName := foreignNames(plugin)
+	_, err := sc.targetState.Plugins.GetByProp(name, serviceName, routeName,
+		consumerName)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -107,9 +124,9 @@ func (sc *Syncer) createUpdatePlugins() error {
 func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 	plugin = &state.Plugin{Plugin: *plugin.DeepCopy()}
 	name := *plugin.Name
-	serviceName, routeName := foreignNames(plugin)
+	serviceName, routeName, consumerName := foreignNames(plugin)
 	currentPlugin, err := sc.currentState.Plugins.GetByProp(name,
-		serviceName, routeName)
+		serviceName, routeName, consumerName)
 	if err == state.ErrNotFound {
 		// plugin not present, create it
 
@@ -131,6 +148,15 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 					*plugin.Route.Name, *plugin.Name)
 			}
 			plugin.Route = &svc.Route
+		}
+		if plugin.Consumer != nil {
+			svc, err := sc.currentState.Consumers.Get(*plugin.Consumer.Username)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"could not find route '%v' for plugin %+v",
+					*plugin.Route.Name, *plugin.Name)
+			}
+			plugin.Consumer = &svc.Consumer
 		}
 		// XXX
 
@@ -160,6 +186,12 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 	if plugin.Route != nil {
 		plugin.Route = &kong.Route{Name: plugin.Route.Name}
 	}
+	if currentPlugin.Consumer != nil {
+		currentPlugin.Consumer = &kong.Consumer{Username: currentPlugin.Consumer.Username}
+	}
+	if plugin.Consumer != nil {
+		plugin.Consumer = &kong.Consumer{Username: plugin.Consumer.Username}
+	}
 	if !currentPlugin.EqualWithOpts(plugin, true, true, false) {
 		plugin.ID = kong.String(*currentPlugin.ID)
 
@@ -174,13 +206,22 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 			plugin.Service = &svc.Service
 		}
 		if plugin.Route != nil {
-			svc, err := sc.currentState.Routes.Get(*plugin.Route.Name)
+			route, err := sc.currentState.Routes.Get(*plugin.Route.Name)
 			if err != nil {
 				return nil, errors.Wrapf(err,
 					"could not find route '%v' for plugin %+v",
 					*plugin.Route.Name, *plugin.Name)
 			}
-			plugin.Route = &svc.Route
+			plugin.Route = &route.Route
+		}
+		if plugin.Consumer != nil {
+			consumer, err := sc.currentState.Consumers.Get(*plugin.Consumer.Username)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"could not find consumer '%v' for plugin %+v",
+					*plugin.Consumer.Username, *plugin.Name)
+			}
+			plugin.Consumer = &consumer.Consumer
 		}
 		// XXX
 		return &Event{
@@ -193,7 +234,8 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 	return nil, nil
 }
 
-func foreignNames(p *state.Plugin) (serviceName, routeName string) {
+func foreignNames(p *state.Plugin) (serviceName, routeName,
+	consumerUsername string) {
 	if p == nil {
 		return
 	}
@@ -202,6 +244,9 @@ func foreignNames(p *state.Plugin) (serviceName, routeName string) {
 	}
 	if p.Route != nil && p.Route.Name != nil {
 		routeName = *p.Route.Name
+	}
+	if p.Consumer != nil && p.Consumer.Username != nil {
+		consumerUsername = *p.Consumer.Username
 	}
 	return
 }

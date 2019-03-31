@@ -210,3 +210,27 @@ plugins:
       querystring: []
   enabled: true
   run_on: first
+consumers:
+- username: harry
+  plugins: []
+- username: yolo
+  plugins:
+  - name: rate-limiting
+    config:
+      day: null
+      fault_tolerant: true
+      hide_client_headers: false
+      hour: null
+      limit_by: consumer
+      minute: 10
+      month: null
+      policy: redis
+      redis_database: 0
+      redis_host: redis.common.svc
+      redis_password: null
+      redis_port: 6379
+      redis_timeout: 2000
+      second: null
+      year: null
+    enabled: true
+    run_on: first

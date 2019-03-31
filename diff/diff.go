@@ -60,6 +60,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'plugin' crud")
 	}
+	err = s.postProcess.Register("consumer", &consumerPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'consumer' crud")
+	}
 	return s, nil
 }
 
@@ -90,6 +94,11 @@ func (sc *Syncer) delete() error {
 	}
 	sc.wait()
 	err = sc.deleteServices()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.deleteConsumers()
 	if err != nil {
 		return err
 	}
@@ -133,6 +142,11 @@ func (sc *Syncer) createUpdate() error {
 	}
 	sc.wait()
 	err = sc.createUpdateRoutes()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.createUpdateConsumers()
 	if err != nil {
 		return err
 	}
