@@ -14,9 +14,6 @@ script:
  - golint -set_exit_status $(go list ./...)
  - go vet .
  - go test -v ./...
- - GOOS=linux go build
- - GOOS=darwin go build
- - GOOS=windows go build
 
 cache:
   directories:
