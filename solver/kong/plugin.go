@@ -69,7 +69,7 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
-	updatedPlugin, err := s.client.Plugins.Update(nil, &plugin.Plugin)
+	updatedPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {
 		return nil, err
 	}
