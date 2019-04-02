@@ -4,6 +4,8 @@ decK is a CLI tool to configure Kong declaratively using a single config file.
 
 [![Build Status](https://travis-ci.com/hbagdi/deck.svg?branch=master)](https://travis-ci.com/hbagdi/deck)
 
+[![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
+
 ## Table of Content
 
 - [**Features**](#features)
