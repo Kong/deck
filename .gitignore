@@ -27,3 +27,4 @@ _testmain.go
 # for this repo only
 deck
 dist/
+bin/
