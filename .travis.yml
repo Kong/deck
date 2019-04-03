@@ -3,6 +3,9 @@ sudo: true
 
 language: go
 
+go:
+ - "1.12"
+
 notifications:
   email: false
 
