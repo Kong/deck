@@ -69,6 +69,9 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
+	if plugin.Service != nil {
+		plugin.Service = &kong.Service{ID: plugin.Service.ID}
+	}
 	updatedPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {
 		return nil, err
