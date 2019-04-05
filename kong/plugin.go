@@ -41,6 +41,7 @@ type Plugin struct {
 	Config    Configuration `json:"config,omitempty" yaml:"config,omitempty"`
 	Enabled   *bool         `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 	RunOn     *string       `json:"run_on,omitempty" yaml:"run_on,omitempty"`
+	Protocols []*string     `json:"protocols,omitempty" yaml:"protocols,omitempty"`
 }
 
 // Valid checks if all the fields in Plugin are valid.

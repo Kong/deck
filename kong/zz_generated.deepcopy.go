@@ -297,6 +297,17 @@ func (in *Plugin) DeepCopyInto(out *Plugin) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Protocols != nil {
+		in, out := &in.Protocols, &out.Protocols
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
