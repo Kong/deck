@@ -61,6 +61,7 @@ type Upstream struct {
 	HashFallbackHeader *string      `json:"hash_fallback_header,omitempty" yaml:"hash_fallback_header,omitempty"`
 	HashOnCookie       *string      `json:"hash_on_cookie,omitempty" yaml:"hash_on_cookie,omitempty"`
 	HashOnCookiePath   *string      `json:"hash_on_cookie_path,omitempty" yaml:"hash_on_cookie_path,omitempty"`
+	Tags               []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // Valid checks if all the fields in Upstream are valid.

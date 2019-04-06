@@ -10,6 +10,7 @@ type SNI struct {
 	Name        *string      `json:"name,omitempty" yaml:"name,omitempty"`
 	CreatedAt   *int64       `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Certificate *Certificate `json:"certificate,omitempty" yaml:"certificate,omitempty"`
+	Tags        []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // Valid checks if all the fields in SNI are valid.
