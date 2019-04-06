@@ -80,6 +80,29 @@ func TestServicesService(T *testing.T) {
 	assert.NotNil(err)
 }
 
+func TestServiceWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	service := &Service{
+		Name: String("key-auth"),
+		Host: String("example.com"),
+		Tags: StringSlice("tag1", "tag2"),
+	}
+
+	createdService, err := client.Services.Create(defaultCtx, service)
+	assert.Nil(err)
+	assert.NotNil(createdService)
+	assert.Equal(StringSlice("tag1", "tag2"), createdService.Tags)
+
+	err = client.Services.Delete(defaultCtx, createdService.ID)
+	assert.Nil(err)
+}
+
 func TestServiceListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

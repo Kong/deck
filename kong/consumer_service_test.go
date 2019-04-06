@@ -53,6 +53,28 @@ func TestConsumersService(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestConsumerWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	consumer := &Consumer{
+		Username: String("foo"),
+		Tags:     StringSlice("tag1", "tag2"),
+	}
+
+	createdConsumer, err := client.Consumers.Create(defaultCtx, consumer)
+	assert.Nil(err)
+	assert.NotNil(createdConsumer)
+	assert.Equal(StringSlice("tag1", "tag2"), createdConsumer.Tags)
+
+	err = client.Consumers.Delete(defaultCtx, createdConsumer.ID)
+	assert.Nil(err)
+}
+
 func TestConsumerListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

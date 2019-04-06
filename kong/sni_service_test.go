@@ -70,6 +70,34 @@ func TestSNIsCertificate(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestSNIWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	fixtureCertificate, err := client.Certificates.Create(defaultCtx,
+		&Certificate{
+			Key:  String(key1),
+			Cert: String(cert1),
+		})
+	assert.Nil(err)
+
+	createdSNI, err := client.SNIs.Create(defaultCtx, &SNI{
+		Name:        String("host1.com"),
+		Certificate: fixtureCertificate,
+		Tags:        StringSlice("tag1", "tag2"),
+	})
+	assert.Nil(err)
+	assert.NotNil(createdSNI)
+	assert.Equal(StringSlice("tag1", "tag2"), createdSNI.Tags)
+
+	err = client.Certificates.Delete(defaultCtx, fixtureCertificate.ID)
+	assert.Nil(err)
+}
+
 func TestSNIListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

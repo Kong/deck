@@ -60,6 +60,32 @@ func TestTargetsUpstream(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestTargetWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	fixtureUpstream, err := client.Upstreams.Create(defaultCtx, &Upstream{
+		Name: String("vhost.com"),
+	})
+	assert.Nil(err)
+
+	createdTarget, err := client.Targets.Create(defaultCtx,
+		fixtureUpstream.ID, &Target{
+			Target: String("10.0.0.1:80"),
+			Tags:   StringSlice("tag1", "tag2"),
+		})
+	assert.Nil(err)
+	assert.NotNil(createdTarget)
+	assert.Equal(StringSlice("tag1", "tag2"), createdTarget.Tags)
+
+	err = client.Upstreams.Delete(defaultCtx, fixtureUpstream.ID)
+	assert.Nil(err)
+}
+
 func TestTargetListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
