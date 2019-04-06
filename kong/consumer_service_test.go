@@ -144,6 +144,111 @@ func TestConsumerListEndpoint(T *testing.T) {
 	}
 }
 
+func TestConsumerListWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	// fixtures
+	consumers := []*Consumer{
+		{
+			Username: String("user1"),
+			Tags:     StringSlice("tag1", "tag2"),
+		},
+		{
+			Username: String("user2"),
+			Tags:     StringSlice("tag2", "tag3"),
+		},
+		{
+			Username: String("user3"),
+			Tags:     StringSlice("tag1", "tag3"),
+		},
+		{
+			Username: String("user4"),
+			Tags:     StringSlice("tag1", "tag2"),
+		},
+		{
+			Username: String("user5"),
+			Tags:     StringSlice("tag2", "tag3"),
+		},
+		{
+			Username: String("user6"),
+			Tags:     StringSlice("tag1", "tag3"),
+		},
+	}
+
+	// create fixtures
+	for i := 0; i < len(consumers); i++ {
+		consumer, err := client.Consumers.Create(defaultCtx, consumers[i])
+		assert.Nil(err)
+		assert.NotNil(consumer)
+		consumers[i] = consumer
+	}
+
+	consumersFromKong, next, err := client.Consumers.List(defaultCtx, &ListOpt{
+		Tags: StringSlice("tag1"),
+	})
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(4, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, &ListOpt{
+		Tags: StringSlice("tag2"),
+	})
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(4, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, &ListOpt{
+		Tags: StringSlice("tag1", "tag2"),
+	})
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(6, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, &ListOpt{
+		Tags:         StringSlice("tag1", "tag2"),
+		MatchAllTags: true,
+	})
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(2, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, &ListOpt{
+		Tags: StringSlice("tag1", "tag2"),
+		Size: 3,
+	})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.Equal(3, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(3, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, &ListOpt{
+		Tags:         StringSlice("tag1", "tag2"),
+		MatchAllTags: true,
+		Size:         1,
+	})
+	assert.Nil(err)
+	assert.NotNil(next)
+	assert.Equal(1, len(consumersFromKong))
+
+	consumersFromKong, next, err = client.Consumers.List(defaultCtx, next)
+	assert.Nil(err)
+	assert.Nil(next)
+	assert.Equal(1, len(consumersFromKong))
+
+	for i := 0; i < len(consumers); i++ {
+		assert.Nil(client.Consumers.Delete(defaultCtx, consumers[i].Username))
+	}
+}
+
 func compareConsumers(expected, actual []*Consumer) bool {
 	var expectedUsernames, actualUsernames []string
 	for _, consumer := range expected {
