@@ -307,6 +307,29 @@ func TestCertificatesService(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestCertificateWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	certificate := &Certificate{
+		Key:  String(key3),
+		Cert: String(cert3),
+		Tags: StringSlice("tag1", "tag2"),
+	}
+
+	createdCertificate, err := client.Certificates.Create(defaultCtx, certificate)
+	assert.Nil(err)
+	assert.NotNil(createdCertificate)
+	assert.Equal(StringSlice("tag1", "tag2"), createdCertificate.Tags)
+
+	err = client.Certificates.Delete(defaultCtx, createdCertificate.ID)
+	assert.Nil(err)
+}
+
 func TestCertificateListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

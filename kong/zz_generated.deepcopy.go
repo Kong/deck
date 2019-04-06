@@ -121,6 +121,17 @@ func (in *Certificate) DeepCopyInto(out *Certificate) {
 			}
 		}
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -156,6 +167,17 @@ func (in *Consumer) DeepCopyInto(out *Consumer) {
 		in, out := &in.CreatedAt, &out.CreatedAt
 		*out = new(int64)
 		**out = **in
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }
@@ -308,6 +330,17 @@ func (in *Plugin) DeepCopyInto(out *Plugin) {
 			}
 		}
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -441,6 +474,17 @@ func (in *Route) DeepCopyInto(out *Route) {
 			}
 		}
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -476,6 +520,17 @@ func (in *SNI) DeepCopyInto(out *SNI) {
 		in, out := &in.Certificate, &out.Certificate
 		*out = new(Certificate)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }
@@ -553,6 +608,17 @@ func (in *Service) DeepCopyInto(out *Service) {
 		*out = new(int)
 		**out = **in
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -593,6 +659,17 @@ func (in *Target) DeepCopyInto(out *Target) {
 		in, out := &in.Weight, &out.Weight
 		*out = new(int)
 		**out = **in
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }
@@ -700,6 +777,17 @@ func (in *Upstream) DeepCopyInto(out *Upstream) {
 		in, out := &in.HashOnCookiePath, &out.HashOnCookiePath
 		*out = new(string)
 		**out = **in
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }

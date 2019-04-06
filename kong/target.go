@@ -10,6 +10,7 @@ type Target struct {
 	Target    *string   `json:"target,omitempty" yaml:"target,omitempty"`
 	Upstream  *Upstream `json:"upstream,omitempty" yaml:"upstream,omitempty"`
 	Weight    *int      `json:"weight,omitempty" yaml:"weight,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // Valid checks if all the fields in Target are valid.

@@ -51,6 +51,28 @@ func TestUpstreamsService(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestUpstreamWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name: String("key-auth"),
+		Tags: StringSlice("tag1", "tag2"),
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+	assert.Equal(StringSlice("tag1", "tag2"), createdUpstream.Tags)
+
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+}
+
 func TestUpstreamListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

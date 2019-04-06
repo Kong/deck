@@ -51,6 +51,7 @@ type Route struct {
 	SNIs          []*string   `json:"snis,omitempty" yaml:"snis,omitempty"`
 	Sources       []*CIDRPort `json:"sources,omitempty" yaml:"sources,omitempty"`
 	Destinations  []*CIDRPort `json:"destinations,omitempty" yaml:"destinations,omitempty"`
+	Tags          []*string   `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // Valid checks if all the fields in Route are valid.

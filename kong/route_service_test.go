@@ -96,6 +96,29 @@ func TestRoutesRoute(T *testing.T) {
 	assert.NotNil(err)
 }
 
+func TestRouteWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	route := &Route{
+		Name:  String("key-auth"),
+		Paths: StringSlice("/"),
+		Tags:  StringSlice("tag1", "tag2"),
+	}
+
+	createdRoute, err := client.Routes.Create(defaultCtx, route)
+	assert.Nil(err)
+	assert.NotNil(createdRoute)
+	assert.Equal(StringSlice("tag1", "tag2"), createdRoute.Tags)
+
+	err = client.Routes.Delete(defaultCtx, createdRoute.ID)
+	assert.Nil(err)
+}
+
 func TestCreateInRoute(T *testing.T) {
 	assert := assert.New(T)
 

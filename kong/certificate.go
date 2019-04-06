@@ -11,6 +11,7 @@ type Certificate struct {
 	Key       *string   `json:"key,omitempty" yaml:"key,omitempty"`
 	CreatedAt *int64    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	SNIs      []*string `json:"snis,omitempty" yaml:"snis,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 // Valid checks if all the fields in Consumer are valid.

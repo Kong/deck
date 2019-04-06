@@ -53,6 +53,28 @@ func TestPluginsService(T *testing.T) {
 	assert.Nil(err)
 }
 
+func TestPluginWithTags(T *testing.T) {
+	runWhenKong(T, ">=1.1.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	plugin := &Plugin{
+		Name: String("key-auth"),
+		Tags: StringSlice("tag1", "tag2"),
+	}
+
+	createdPlugin, err := client.Plugins.Create(defaultCtx, plugin)
+	assert.Nil(err)
+	assert.NotNil(createdPlugin)
+	assert.Equal(StringSlice("tag1", "tag2"), createdPlugin.Tags)
+
+	err = client.Plugins.Delete(defaultCtx, createdPlugin.ID)
+	assert.Nil(err)
+}
+
 func TestUnknownPlugin(T *testing.T) {
 	assert := assert.New(T)
 
