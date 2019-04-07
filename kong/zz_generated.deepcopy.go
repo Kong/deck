@@ -38,6 +38,21 @@ func (in *ActiveHealthcheck) DeepCopyInto(out *ActiveHealthcheck) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.HTTPSSni != nil {
+		in, out := &in.HTTPSSni, &out.HTTPSSni
+		*out = new(string)
+		**out = **in
+	}
+	if in.HTTPSVerifyCertificate != nil {
+		in, out := &in.HTTPSVerifyCertificate, &out.HTTPSVerifyCertificate
+		*out = new(bool)
+		**out = **in
+	}
+	if in.Type != nil {
+		in, out := &in.Type, &out.Type
+		*out = new(string)
+		**out = **in
+	}
 	if in.Timeout != nil {
 		in, out := &in.Timeout, &out.Timeout
 		*out = new(int)

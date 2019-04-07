@@ -24,11 +24,14 @@ type Unhealthy struct {
 // ActiveHealthcheck configures active health check probing.
 // +k8s:deepcopy-gen=true
 type ActiveHealthcheck struct {
-	Concurrency *int       `json:"concurrency,omitempty" yaml:"concurrency,omitempty"`
-	Healthy     *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
-	HTTPPath    *string    `json:"http_path,omitempty" yaml:"http_path,omitempty"`
-	Timeout     *int       `json:"timeout,omitempty" yaml:"timeout,omitempty"`
-	Unhealthy   *Unhealthy `json:"unhealthy,omitempty" yaml:"unhealthy,omitempty"`
+	Concurrency            *int       `json:"concurrency,omitempty" yaml:"concurrency,omitempty"`
+	Healthy                *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
+	HTTPPath               *string    `json:"http_path,omitempty" yaml:"http_path,omitempty"`
+	HTTPSSni               *string    `json:"https_sni" yaml:"https_sni"`
+	HTTPSVerifyCertificate *bool      `json:"https_verify_certificate" yaml:"https_verify_certificate"`
+	Type                   *string    `json:"type" yaml:"type"`
+	Timeout                *int       `json:"timeout,omitempty" yaml:"timeout,omitempty"`
+	Unhealthy              *Unhealthy `json:"unhealthy,omitempty" yaml:"unhealthy,omitempty"`
 }
 
 // PassiveHealthcheck configures passive checks around
