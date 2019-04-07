@@ -27,11 +27,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4275bc26624e32edecc55173f51914df5e2ef738d3497ef2eccaeac664a0da8e"
+  digest = "1:f32bb767f6e5134ef9acd06a0cf339ee91d8b92d9c4424fa65114f5897f71a54"
   name = "github.com/google/go-querystring"
   packages = ["query"]
   pruneopts = "T"
-  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+  revision = "c8c88dbee036db4e4808d1f2ec8c2e15e11c3f80"
 
 [[projects]]
   digest = "1:22aa691fe0213cb5c07d103f9effebcb7ad04bee45a0ce5fe5369d0ca2ec3a1f"
@@ -58,25 +58,32 @@
   version = "v1.0.3"
 
 [[projects]]
-  digest = "1:e95496462101745805bd4e041a5b841e108c7cf761264d53648246308de2761e"
+  digest = "1:17c4ccf5cdb1627aaaeb5c1725cb13aec97b63ea2033d4a6824dcaedf94223dc"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
   pruneopts = "T"
-  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
-  version = "v1.2.2"
+  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:62468f8d9abb738a892313231b2809db45a5b52681fa6084b1cd3dde15fc7cc8"
+  digest = "1:2fb31975b57de33e3f2e1b53c7b610f059192b54d71f42a2fbf03ce98086a136"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
+    "go/gcexportdata",
+    "go/internal/gcimporter",
+    "go/internal/packagesdriver",
+    "go/packages",
+    "go/types/typeutil",
     "imports",
     "internal/fastwalk",
     "internal/gopathwalk",
+    "internal/module",
+    "internal/semver",
   ]
   pruneopts = "T"
-  revision = "f60e5f99f0816fc2d9ecb338008ea420248d2943"
+  revision = "719e078ade55b7837564fa380a8946830f621152"
 
 [[projects]]
   digest = "1:3b9c82e73290987c719062ba514f47cc95a7b1e10d9868b1e083e48044c0820b"
@@ -108,7 +115,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f90b6152db4c5ee920eda292be42f4103498429d4238ea3e4003972b0dc5cfdd"
+  digest = "1:06449c9193d3d1f9375b97d1ce8a3f7a59d531c69ca34a6b0663cf3c144c2178"
   name = "k8s.io/gengo"
   packages = [
     "args",
@@ -121,7 +128,15 @@
     "types",
   ]
   pruneopts = "T"
-  revision = "7338e4bfd6915369a1375890db1bbda0158c9863"
+  revision = "e17681d19d3ac4837a019ece36c2a0ec31ffe985"
+
+[[projects]]
+  digest = "1:ed9fcc00d9b154265b72e4117e7e41c4af049bf2c4a7ee9171960f938ff1ca65"
+  name = "k8s.io/klog"
+  packages = ["."]
+  pruneopts = "T"
+  revision = "71442cd4037d612096940ceb0f3fec3f7fff66e0"
+  version = "v0.2.0"
 
 [solve-meta]
   analyzer-name = "dep"
