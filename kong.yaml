@@ -17,8 +17,6 @@ services:
     - https
     regex_priority: 0
     strip_path: true
-    plugins: []
-  plugins: []
 - connect_timeout: 60000
   host: mockbin.org
   name: svc2
@@ -37,8 +35,6 @@ services:
     - https
     regex_priority: 0
     strip_path: true
-    plugins: []
-  plugins: []
 - connect_timeout: 60000
   host: mockbin.org
   name: svc3
@@ -57,8 +53,6 @@ services:
     - https
     regex_priority: 0
     strip_path: true
-    plugins: []
-  plugins: []
 upstreams:
 - name: upstream1
   slots: 10000
@@ -212,7 +206,6 @@ plugins:
   run_on: first
 consumers:
 - username: harry
-  plugins: []
 - username: yolo
   plugins:
   - name: rate-limiting

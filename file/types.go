@@ -3,42 +3,42 @@ package file
 import "github.com/hbagdi/go-kong/kong"
 
 type service struct {
-	kong.Service `yaml:",inline"`
-	Routes       []*route
-	Plugins      []*plugin
+	kong.Service `yaml:",inline,omitempty"`
+	Routes       []*route  `yaml:",omitempty"`
+	Plugins      []*plugin `yaml:",omitempty"`
 }
 
 type route struct {
-	kong.Route `yaml:",inline"`
-	Plugins    []*plugin
+	kong.Route `yaml:",inline,omitempty"`
+	Plugins    []*plugin `yaml:",omitempty"`
 }
 
 type upstream struct {
-	kong.Upstream `yaml:",inline"`
-	Targets       []*target
+	kong.Upstream `yaml:",inline,omitempty"`
+	Targets       []*target `yaml:",omitempty"`
 }
 
 type target struct {
-	kong.Target `yaml:",inline"`
+	kong.Target `yaml:",inline,omitempty"`
 }
 
 type certificate struct {
-	kong.Certificate `yaml:",inline"`
+	kong.Certificate `yaml:",inline,omitempty"`
 }
 
 type plugin struct {
-	kong.Plugin `yaml:",inline"`
+	kong.Plugin `yaml:",inline,omitempty"`
 }
 
 type consumer struct {
-	kong.Consumer `yaml:",inline"`
-	Plugins       []*plugin
+	kong.Consumer `yaml:",inline,omitempty"`
+	Plugins       []*plugin `yaml:",omitempty"`
 }
 
 type fileStructure struct {
-	Services     []service
-	Upstreams    []upstream
-	Certificates []certificate
-	Plugins      []plugin
-	Consumers    []consumer
+	Services     []service     `yaml:",omitempty"`
+	Upstreams    []upstream    `yaml:",omitempty"`
+	Certificates []certificate `yaml:",omitempty"`
+	Plugins      []plugin      `yaml:",omitempty"`
+	Consumers    []consumer    `yaml:",omitempty"`
 }
