@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -44,7 +45,7 @@ func captureOutput(f func()) string {
 	writer.Close()
 	return <-out
 }
-func TestWriteKongStateToStdout(t *testing.T) {
+func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	var ks, _ = state.NewKongState()
 	var filename = "-"
 	assert := assert.New(t)
@@ -55,15 +56,49 @@ func TestWriteKongStateToStdout(t *testing.T) {
 	})
 	assert.Equal("{}\n", output)
 
+}
+func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
+	var ks, _ = state.NewKongState()
+	var filename = "-"
+	assert := assert.New(t)
 	var service state.Service
 	service.ID = kong.String("first")
 	service.Host = kong.String("example.com")
 	service.Name = kong.String("my-service")
-	err := ks.Services.Add(service)
-	assert.Nil(err)
-	output = captureOutput(func() {
+	ks.Services.Add(service)
+	output := captureOutput(func() {
 		KongStateToFile(ks, filename)
 	})
-	assert.Equal("services:\n- host: example.com\n  name: my-service\n", output)
+	fmt.Print(service.Host)
+	expected := fmt.Sprintf("services:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
+	assert.Equal(expected, output)
 
+}
+func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
+	var ks, _ = state.NewKongState()
+	var filename = "-"
+	assert := assert.New(t)
+	var service state.Service
+	service.ID = kong.String("first")
+	service.Host = kong.String("example.com")
+	service.Name = kong.String("my-service")
+	ks.Services.Add(service)
+
+	var route state.Route
+	route.Name = kong.String("my-route")
+	route.ID = kong.String("first")
+	route.Hosts = kong.StringSlice("example.com", "demo.example.com")
+	route.Service = &kong.Service{
+		ID:   kong.String(*service.ID),
+		Name: kong.String(*service.Name),
+	}
+
+	ks.Routes.Add(route)
+
+	output := captureOutput(func() {
+		KongStateToFile(ks, filename)
+	})
+	fmt.Print(service.Host)
+	expected := fmt.Sprintf("services:\n- host: %s\n  name: %s\n  routes:\n  - hosts:\n    - %s\n    - %s\n    name: %s\n", *service.Host, *service.Name, *route.Hosts[0], *route.Hosts[1], *route.Name)
+	assert.Equal(expected, output)
 }
