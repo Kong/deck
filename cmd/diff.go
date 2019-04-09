@@ -3,6 +3,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
@@ -13,6 +15,7 @@ import (
 )
 
 var diffCmdKongStateFile string
+var diffCmdKongStateFileFromStdin bool
 
 // diffCmd represents the diff command
 var diffCmd = &cobra.Command{
@@ -45,6 +48,18 @@ that will be created or updated or deleted.
 		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
+		if diffCmdKongStateFileFromStdin == true {
+			diffCmdKongStateFile = "-"
+		} else {
+			// cobra doesn't seem to allow managing the "--" or "-"
+			//   flag directly so it has to be parsed out of os.Args
+			for i, arg := range os.Args {
+				if i > 1 && arg == "--" {
+					diffCmdKongStateFile = "-"
+					break
+				}
+			}
+		}
 		if diffCmdKongStateFile == "" {
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
@@ -56,8 +71,11 @@ that will be created or updated or deleted.
 func init() {
 	rootCmd.AddCommand(diffCmd)
 	diffCmd.Flags().StringVarP(&diffCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
+	diffCmd.Flags().BoolVarP(&diffCmdKongStateFileFromStdin, "read-state-from-stdin",
+		"-", false, "read Kong's configuration state from stdin (overrides "+
+			"--state flag)")
 }
