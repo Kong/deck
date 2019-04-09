@@ -207,7 +207,6 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 
 func readFile(kongStateFile string) (*fileStructure, error) {
 
-	fmt.Println(kongStateFile)
 	if kongStateFile == "-" {
 		return readStdin()
 	}
