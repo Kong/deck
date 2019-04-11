@@ -3,8 +3,6 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
