@@ -254,7 +254,11 @@ func ensureJSON(m map[string]interface{}) map[string]interface{} {
 					array = append(array, el)
 				}
 			}
-			res[fmt.Sprint(k)] = array
+			if array != nil {
+				res[fmt.Sprint(k)] = array
+			} else {
+				res[fmt.Sprint(k)] = v
+			}
 		default:
 			res[fmt.Sprint(k)] = v
 		}
