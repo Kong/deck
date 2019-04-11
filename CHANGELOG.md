@@ -1,9 +1,16 @@
 # Table of Contents
 
-- [v0.4.0](#030---20190406)
+- [v0.4.1](#v041---20190411)
+- [v0.4.0](#v040---20190406)
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.4.1] - 2019/04/11
+
+### Fix
+
+- Add `omitempty` property to Upstream fields for Kong 1.0 compatibility
 
 ## [v0.4.0] - 2019/04/06
 
@@ -75,6 +82,7 @@
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.4.1]: https://github.com/hbagdi/go-kong/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/hbagdi/go-kong/compare/0.3.0...v0.4.0
 [0.3.0]: https://github.com/hbagdi/go-kong/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/hbagdi/go-kong/compare/0.1.0...0.2.0
