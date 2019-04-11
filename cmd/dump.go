@@ -40,7 +40,8 @@ configure Kong.`,
 func init() {
 	rootCmd.AddCommand(dumpCmd)
 	dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
-		"kong.yaml", "write Kong configuration to FILE")
+		"kong.yaml", "write Kong configuration to FILE. "+
+			"Use '-' to write to stdout.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "skip exporting consumers and any plugins associated "+
 			"with consumers")
