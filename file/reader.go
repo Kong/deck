@@ -1,9 +1,7 @@
 package file
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -207,41 +205,17 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 
 func readFile(kongStateFile string) (*fileStructure, error) {
 
+	var s fileStructure
+	var b []byte
+	var err error
 	if kongStateFile == "-" {
-		return readStdin()
+		b, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		b, err = ioutil.ReadFile(kongStateFile)
 	}
-	var s fileStructure
-	b, err := ioutil.ReadFile(kongStateFile)
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(b, &s)
-	if err != nil {
-		return nil, err
-	}
-	return &s, nil
-}
-
-func readStdin() (*fileStructure, error) {
-
-	var s fileStructure
-	_, err := os.Stdin.Stat()
-	if err != nil {
-		panic(err)
-	}
-
-	reader := bufio.NewReader(os.Stdin)
-	var output []rune
-
-	for {
-		input, _, err := reader.ReadRune()
-		if err != nil && err == io.EOF {
-			break
-		}
-		output = append(output, input)
-	}
-
-	b := []byte(string(output))
 	err = yaml.Unmarshal(b, &s)
 	if err != nil {
 		return nil, err
