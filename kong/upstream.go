@@ -27,9 +27,9 @@ type ActiveHealthcheck struct {
 	Concurrency            *int       `json:"concurrency,omitempty" yaml:"concurrency,omitempty"`
 	Healthy                *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
 	HTTPPath               *string    `json:"http_path,omitempty" yaml:"http_path,omitempty"`
-	HTTPSSni               *string    `json:"https_sni" yaml:"https_sni"`
-	HTTPSVerifyCertificate *bool      `json:"https_verify_certificate" yaml:"https_verify_certificate"`
-	Type                   *string    `json:"type" yaml:"type"`
+	HTTPSSni               *string    `json:"https_sni,omitempty" yaml:"https_sni,omitempty"`
+	HTTPSVerifyCertificate *bool      `json:"https_verify_certificate,omitempty" yaml:"https_verify_certificate,omitempty"`
+	Type                   *string    `json:"type,omitempty" yaml:"type,omitempty"`
 	Timeout                *int       `json:"timeout,omitempty" yaml:"timeout,omitempty"`
 	Unhealthy              *Unhealthy `json:"unhealthy,omitempty" yaml:"unhealthy,omitempty"`
 }
