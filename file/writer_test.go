@@ -99,6 +99,14 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 		KongStateToFile(ks, filename)
 	})
 	fmt.Print(service.Host)
-	expected := fmt.Sprintf("services:\n- host: %s\n  name: %s\n  routes:\n  - hosts:\n    - %s\n    - %s\n    name: %s\n", *service.Host, *service.Name, *route.Hosts[0], *route.Hosts[1], *route.Name)
+	expected := fmt.Sprintf(`services:
+- host: %s
+  name: %s
+  routes:
+  - hosts:
+    - %s
+    - %s
+    name: %s
+`, *service.Host, *service.Name, *route.Hosts[0], *route.Hosts[1], *route.Name)
 	assert.Equal(expected, output)
 }
