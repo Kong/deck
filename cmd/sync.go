@@ -15,7 +15,6 @@ import (
 )
 
 var syncCmdKongStateFile string
-var syncCmdKongStateFileFromStdin bool
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
@@ -45,18 +44,6 @@ to get Kong's state in sync with the input state.`,
 		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if syncCmdKongStateFileFromStdin == true {
-			syncCmdKongStateFile = "-"
-		} else {
-			// cobra doesn't seem to allow managing the "--" or "-"
-			//   flag directly so it has to be parsed out of os.Args
-			for i, arg := range os.Args {
-				if i > 1 && arg == "--" {
-					syncCmdKongStateFile = "-"
-					break
-				}
-			}
-		}
 		if syncCmdKongStateFile == "" {
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
@@ -68,11 +55,9 @@ to get Kong's state in sync with the input state.`,
 func init() {
 	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration. "+
+			"Use '-' to read from stdin.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
-	syncCmd.Flags().BoolVarP(&syncCmdKongStateFileFromStdin, "read-state-from-stdin",
-		"-", false, "read Kong's configuration state from stdin (overrides "+
-			"--state flag)")
 }
