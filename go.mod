@@ -2,11 +2,12 @@ module github.com/hbagdi/deck
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/fatih/color v1.7.0
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
 	github.com/hashicorp/go-memdb v0.0.0-20181108192425-032f93b25bec
-	github.com/hbagdi/go-kong v0.0.0-20181219182410-fe26db196e3c
+	github.com/hbagdi/go-kong v0.4.1
 	github.com/imdario/mergo v0.3.7
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
