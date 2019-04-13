@@ -166,6 +166,10 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	})
 
 	c, err := yaml.Marshal(file)
+	if err != nil {
+		return err
+	}
+
 	if filename == "-" {
 		_, err = fmt.Print(string(c))
 	} else {
