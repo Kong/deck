@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"io/ioutil"
 	"sort"
 	"strings"
@@ -165,7 +166,11 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 	})
 
 	c, err := yaml.Marshal(file)
-	err = ioutil.WriteFile(filename, c, 0600)
+	if filename == "-" {
+		_, err = fmt.Print(string(c))
+	} else {
+		err = ioutil.WriteFile(filename, c, 0600)
+	}
 	if err != nil {
 		return err
 	}
