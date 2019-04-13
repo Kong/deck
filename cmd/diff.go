@@ -56,7 +56,8 @@ that will be created or updated or deleted.
 func init() {
 	rootCmd.AddCommand(diffCmd)
 	diffCmd.Flags().StringVarP(&diffCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration.")
+		"state", "s", "kong.yaml", "file containing Kong's configuration. "+
+			"Use '-' to read from stdin.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")

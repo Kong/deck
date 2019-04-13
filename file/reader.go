@@ -3,6 +3,7 @@ package file
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 
 	"github.com/hbagdi/deck/counter"
@@ -223,7 +224,13 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 func readFile(kongStateFile string) (*fileStructure, error) {
 
 	var s fileStructure
-	b, err := ioutil.ReadFile(kongStateFile)
+	var b []byte
+	var err error
+	if kongStateFile == "-" {
+		b, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		b, err = ioutil.ReadFile(kongStateFile)
+	}
 	if err != nil {
 		return nil, err
 	}
