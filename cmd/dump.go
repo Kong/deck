@@ -30,7 +30,8 @@ configure Kong.`,
 		if err != nil {
 			return err
 		}
-		if err := file.KongStateToFile(ks, dumpCmdKongStateFile); err != nil {
+		if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
+			dumpCmdKongStateFile); err != nil {
 			return err
 		}
 		return nil
@@ -45,4 +46,9 @@ func init() {
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "skip exporting consumers and any plugins associated "+
 			"with consumers")
+	dumpCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
+		"select-tag", []string{},
+		"only entities matching tags specified via this flag are exported.\n"+
+			"Multiple tags are ANDed together.")
+
 }

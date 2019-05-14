@@ -26,11 +26,12 @@ to get Kong's state in sync with the input state.`,
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client, dumpConfig)
+		targetState, selectTags, err := file.GetStateFromFile(syncCmdKongStateFile)
 		if err != nil {
 			return err
 		}
-		targetState, err := file.GetStateFromFile(syncCmdKongStateFile)
+		dumpConfig.SelectorTags = selectTags
+		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
 		}
