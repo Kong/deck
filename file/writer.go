@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hbagdi/deck/state"
+	"github.com/hbagdi/deck/utils"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -34,6 +35,7 @@ func KongStateToFile(kongState *state.KongState,
 			p.ID = nil
 			p.CreatedAt = nil
 			p.Service = nil
+			utils.RemoveTags(&p.Plugin, selectTags)
 			s.Plugins = append(s.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(s.Plugins, func(i, j int) bool {
@@ -49,10 +51,12 @@ func KongStateToFile(kongState *state.KongState,
 			r.CreatedAt = nil
 			r.UpdatedAt = nil
 			route := &Route{Route: r.Route}
+			utils.RemoveTags(&route.Route, selectTags)
 			for _, p := range plugins {
 				p.ID = nil
 				p.CreatedAt = nil
 				p.Route = nil
+				utils.RemoveTags(&p.Plugin, selectTags)
 				route.Plugins = append(route.Plugins, &Plugin{Plugin: p.Plugin})
 			}
 			sort.SliceStable(route.Plugins, func(i, j int) bool {
@@ -66,6 +70,7 @@ func KongStateToFile(kongState *state.KongState,
 		s.ID = nil
 		s.CreatedAt = nil
 		s.UpdatedAt = nil
+		utils.RemoveTags(&s.Service, selectTags)
 		file.Services = append(file.Services, s)
 	}
 	sort.SliceStable(file.Services, func(i, j int) bool {
@@ -83,6 +88,7 @@ func KongStateToFile(kongState *state.KongState,
 			p.ID = nil
 			p.CreatedAt = nil
 			p := Plugin{Plugin: p.Plugin}
+			utils.RemoveTags(&p.Plugin, selectTags)
 			file.Plugins = append(file.Plugins, p)
 		}
 	}
@@ -105,6 +111,7 @@ func KongStateToFile(kongState *state.KongState,
 			t.Upstream = nil
 			t.ID = nil
 			t.CreatedAt = nil
+			utils.RemoveTags(&t.Target, selectTags)
 			u.Targets = append(u.Targets, &Target{Target: t.Target})
 		}
 		sort.SliceStable(u.Targets, func(i, j int) bool {
@@ -113,6 +120,7 @@ func KongStateToFile(kongState *state.KongState,
 		})
 		u.ID = nil
 		u.CreatedAt = nil
+		utils.RemoveTags(&u.Upstream, selectTags)
 		file.Upstreams = append(file.Upstreams, u)
 	}
 	sort.SliceStable(file.Upstreams, func(i, j int) bool {
@@ -131,6 +139,7 @@ func KongStateToFile(kongState *state.KongState,
 		})
 		c.ID = nil
 		c.CreatedAt = nil
+		utils.RemoveTags(&c.Certificate, selectTags)
 		file.Certificates = append(file.Certificates, c)
 	}
 	sort.SliceStable(file.Certificates, func(i, j int) bool {
@@ -152,6 +161,7 @@ func KongStateToFile(kongState *state.KongState,
 			p.ID = nil
 			p.CreatedAt = nil
 			p.Consumer = nil
+			utils.RemoveTags(&p.Plugin, selectTags)
 			c.Plugins = append(c.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
@@ -159,6 +169,7 @@ func KongStateToFile(kongState *state.KongState,
 		})
 		c.ID = nil
 		c.CreatedAt = nil
+		utils.RemoveTags(&c.Consumer, selectTags)
 		file.Consumers = append(file.Consumers, c)
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
