@@ -12,7 +12,8 @@ import (
 
 // KongStateToFile writes a state object to file with filename.
 // It will omit timestamps and IDs while writing.
-func KongStateToFile(kongState *state.KongState, filename string) error {
+func KongStateToFile(kongState *state.KongState,
+	selectTags []string, filename string) error {
 	var file fileStructure
 
 	services, err := kongState.Services.GetAll()
@@ -164,6 +165,7 @@ func KongStateToFile(kongState *state.KongState, filename string) error {
 		return strings.Compare(*file.Consumers[i].Username,
 			*file.Consumers[j].Username) < 0
 	})
+	file.Info.SelectorTags = selectTags
 
 	c, err := yaml.Marshal(file)
 	if err != nil {
