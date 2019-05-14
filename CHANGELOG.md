@@ -37,6 +37,8 @@ No breaking changes have been introduced in this release.
 - Empty plugins and other Kong entities are not populated in the config file
   as empty arrays to keep the file concise and clean.
   [ae38f1b](https://github.com/hbagdi/deck/commit/ae38f1b)
+- Docker image is now available via Docker Hub.
+  You can use `docker pull hbagdi/deck` to pull down decK in a Docker image.
 
 ### Fixed
 
