@@ -21,21 +21,21 @@ var count counter.Counter
 // or if there is any error during processing.
 // All entities without an ID will get a `placeholder-{iota}` ID
 // assigned to them.
-func GetStateFromFile(filename string) (*state.KongState, error) {
+func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 	if filename == "" {
-		return nil, errors.New("filename cannot be empty")
+		return nil, nil, errors.New("filename cannot be empty")
 	}
 	d, err := utils.GetKongDefaulter()
 	if err != nil {
-		return nil, errors.Wrap(err, "creating defaulter")
+		return nil, nil, errors.Wrap(err, "creating defaulter")
 	}
 	fileContent, err := readFile(filename)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	kongState, err := state.NewKongState()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	for _, s := range fileContent.Services {
 		if utils.Empty(s.ID) {
@@ -43,29 +43,29 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(s.Service.Name) {
-			return nil, errors.New("all services in the file must be named")
+			return nil, nil, errors.New("all services in the file must be named")
 		}
 		_, err := kongState.Services.Get(*s.Service.Name)
 		if err != state.ErrNotFound {
-			return nil, errors.Errorf("duplicate service definitions"+
+			return nil, nil, errors.Errorf("duplicate service definitions"+
 				" found for: '%s'", *s.Service.Name)
 		}
 		err = d.Set(&s.Service)
 		if err != nil {
-			return nil, errors.Wrap(err, "filling in defaults for service")
+			return nil, nil, errors.Wrap(err, "filling in defaults for service")
 		}
 		err = kongState.Services.Add(state.Service{Service: s.Service})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		for _, p := range s.Plugins {
 			if ok, err := processPlugin(p); !ok {
-				return nil, err
+				return nil, nil, err
 			}
 			p.Service = s.Service.DeepCopy()
 			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		}
 
@@ -75,30 +75,30 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 					strconv.FormatUint(count.Inc(), 10))
 			}
 			if utils.Empty(r.Name) {
-				return nil, errors.New("all routes in the file must be named")
+				return nil, nil, errors.New("all routes in the file must be named")
 			}
 			_, err := kongState.Routes.Get(*r.Name)
 			if err != state.ErrNotFound {
-				return nil, errors.Errorf("duplicate route definitions"+
+				return nil, nil, errors.Errorf("duplicate route definitions"+
 					" found for: '%s'", *r.Name)
 			}
 			r.Service = s.Service.DeepCopy()
 			err = d.Set(&r.Route)
 			if err != nil {
-				return nil, errors.Wrap(err, "filling in defaults for route")
+				return nil, nil, errors.Wrap(err, "filling in defaults for route")
 			}
 			err = kongState.Routes.Add(state.Route{Route: r.Route})
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			for _, p := range r.Plugins {
 				if ok, err := processPlugin(p); !ok {
-					return nil, err
+					return nil, nil, err
 				}
 				p.Route = r.Route.DeepCopy()
 				err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
 				if err != nil {
-					return nil, err
+					return nil, nil, err
 				}
 			}
 		}
@@ -106,11 +106,11 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 
 	for _, p := range fileContent.Plugins {
 		if ok, err := processPlugin(&p); !ok {
-			return nil, err
+			return nil, nil, err
 		}
 		err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
@@ -120,20 +120,20 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(u.Name) {
-			return nil, errors.New("all upstreams in the file must be named")
+			return nil, nil, errors.New("all upstreams in the file must be named")
 		}
 		_, err := kongState.Upstreams.Get(*u.Name)
 		if err != state.ErrNotFound {
-			return nil, errors.Errorf("duplicate upstream definitions"+
+			return nil, nil, errors.Errorf("duplicate upstream definitions"+
 				" found for: '%s'", *u.Name)
 		}
 		err = d.Set(&u.Upstream)
 		if err != nil {
-			return nil, errors.Wrap(err, "filling in defaults for upstream")
+			return nil, nil, errors.Wrap(err, "filling in defaults for upstream")
 		}
 		err = kongState.Upstreams.Add(state.Upstream{Upstream: u.Upstream})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		for _, t := range u.Targets {
@@ -143,17 +143,17 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 			}
 			_, err := kongState.Targets.Get(*t.Target.Target)
 			if err != state.ErrNotFound {
-				return nil, errors.Errorf("duplicate target definitions"+
+				return nil, nil, errors.Errorf("duplicate target definitions"+
 					" found for: '%s'", *t.Target.Target)
 			}
 			t.Upstream = u.Upstream.DeepCopy()
 			err = d.Set(&t.Target)
 			if err != nil {
-				return nil, errors.Wrap(err, "filling in defaults for target")
+				return nil, nil, errors.Wrap(err, "filling in defaults for target")
 			}
 			err = kongState.Targets.Add(state.Target{Target: t.Target})
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		}
 	}
@@ -165,27 +165,27 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(c.Cert) || utils.Empty(c.Key) {
-			return nil, errors.Errorf("all certificates must have a cert" +
+			return nil, nil, errors.Errorf("all certificates must have a cert" +
 				" and a key")
 		}
 		// check if an SNI is present in multiple certificates
 		for _, s := range c.SNIs {
 			if allSNIs[*s] {
-				return nil, errors.Errorf("duplicate sni found: '%s'", *s)
+				return nil, nil, errors.Errorf("duplicate sni found: '%s'", *s)
 			}
 			allSNIs[*s] = true
 		}
 
 		_, err := kongState.Certificates.GetByCertKey(*c.Cert, *c.Key)
 		if err != state.ErrNotFound {
-			return nil, errors.Errorf("duplicate certificate definitions"+
+			return nil, nil, errors.Errorf("duplicate certificate definitions"+
 				" found for the following certificate:\n'%s'", *c.Cert)
 		}
 		err = kongState.Certificates.Add(state.Certificate{
 			Certificate: c.Certificate,
 		})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
@@ -195,30 +195,30 @@ func GetStateFromFile(filename string) (*state.KongState, error) {
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(c.Consumer.Username) {
-			return nil, errors.New("all services in the file must be named")
+			return nil, nil, errors.New("all services in the file must be named")
 		}
 		_, err := kongState.Consumers.Get(*c.Consumer.Username)
 		if err != state.ErrNotFound {
-			return nil, errors.Errorf("duplicate consumer definitions"+
+			return nil, nil, errors.Errorf("duplicate consumer definitions"+
 				" found for: '%v'", *c.Consumer.Username)
 		}
 		err = kongState.Consumers.Add(state.Consumer{Consumer: c.Consumer})
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		for _, p := range c.Plugins {
 			if ok, err := processPlugin(p); !ok {
-				return nil, err
+				return nil, nil, err
 			}
 			p.Consumer = c.Consumer.DeepCopy()
 			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		}
 	}
 
-	return kongState, nil
+	return kongState, fileContent.Info.SelectorTags, nil
 }
 
 func readFile(kongStateFile string) (*fileStructure, error) {

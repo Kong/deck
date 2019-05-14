@@ -35,7 +35,13 @@ type consumer struct {
 	Plugins       []*plugin `yaml:",omitempty"`
 }
 
+// Info contains meta-data of the file.
+type Info struct {
+	SelectorTags []string `yaml:"select_tags,omitempty"`
+}
+
 type fileStructure struct {
+	Info         Info          `yaml:"_info,omitempty"`
 	Services     []service     `yaml:",omitempty"`
 	Upstreams    []upstream    `yaml:",omitempty"`
 	Certificates []certificate `yaml:",omitempty"`
