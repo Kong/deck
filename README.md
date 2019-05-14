@@ -43,6 +43,9 @@ decK is a CLI tool to configure Kong declaratively using a single config file.
 - **Authentication with Kong**
   Custom HTTP headers can be injected in requests to Kong's Admin API
   for authentication/authorization purposes.
+- **Manage Kong's config with multiple config file**
+  Split your Kong's configuration into multiple logical files based on a shared
+  set of tags amongst entities.
 
 ## Compatibility
 
@@ -50,9 +53,8 @@ decK is compatible with Kong 1.x.
 
 ## Roadmap
 
-- Tag entities in Kong for distributed config management.
 - Default attributes
-  Support filling in defaults for entities and configs of plugins
+  Support filling in defaults for configs of plugins
   for cases when the config file doesn't contain the attribute.
 - Complete end to end integration tests with Kong.
 - Add support for credentials in Kong
