@@ -12,6 +12,10 @@ type Config struct {
 	// If true, consumers and any plugins associated with it
 	// are not exported.
 	SkipConsumers bool
+
+	// SelectorTags can be used to export entities tagged with only specific
+	// tags.
+	SelectorTags []string
 }
 
 // GetState queries Kong for all entities using client and
@@ -150,57 +154,65 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 	return kongState, nil
 }
 
+func newOpt(tags []string) *kong.ListOpt {
+	opt := new(kong.ListOpt)
+	opt.Size = 1000
+	opt.Tags = kong.StringSlice(tags...)
+	opt.MatchAllTags = true
+	return opt
+}
+
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
 func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
-	services, err := GetAllServices(client)
+	services, err := GetAllServices(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 
 	state.Services = services
 
-	routes, err := GetAllRoutes(client)
+	routes, err := GetAllRoutes(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 	state.Routes = routes
 
-	plugins, err := GetAllPlugins(client)
+	plugins, err := GetAllPlugins(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 	state.Plugins = plugins
 
-	certificates, err := GetAllCertificates(client)
+	certificates, err := GetAllCertificates(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 	state.Certificates = certificates
 
-	snis, err := GetAllSNIs(client)
+	snis, err := GetAllSNIs(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 	state.SNIs = snis
 
 	if !config.SkipConsumers {
-		consumers, err := GetAllConsumers(client)
+		consumers, err := GetAllConsumers(client, config.SelectorTags)
 		if err != nil {
 			return nil, err
 		}
 		state.Consumers = consumers
 	}
 
-	upstreams, err := GetAllUpstreams(client)
+	upstreams, err := GetAllUpstreams(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
 	state.Upstreams = upstreams
 
-	targets, err := GetAllTargets(client, upstreams)
+	targets, err := GetAllTargets(client, upstreams, config.SelectorTags)
 	if err != nil {
 		return nil, err
 	}
@@ -210,10 +222,10 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 }
 
 // GetAllServices queries Kong for all the services using client.
-func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
+func GetAllServices(client *kong.Client, tags []string) ([]*kong.Service, error) {
 	var services []*kong.Service
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Services.List(nil, opt)
 		if err != nil {
@@ -229,10 +241,10 @@ func GetAllServices(client *kong.Client) ([]*kong.Service, error) {
 }
 
 // GetAllRoutes queries Kong for all the routes using client.
-func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
+func GetAllRoutes(client *kong.Client, tags []string) ([]*kong.Route, error) {
 	var routes []*kong.Route
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Routes.List(nil, opt)
 		if err != nil {
@@ -248,10 +260,10 @@ func GetAllRoutes(client *kong.Client) ([]*kong.Route, error) {
 }
 
 // GetAllPlugins queries Kong for all the plugins using client.
-func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
+func GetAllPlugins(client *kong.Client, tags []string) ([]*kong.Plugin, error) {
 	var plugins []*kong.Plugin
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Plugins.List(nil, opt)
 		if err != nil {
@@ -267,10 +279,10 @@ func GetAllPlugins(client *kong.Client) ([]*kong.Plugin, error) {
 }
 
 // GetAllCertificates queries Kong for all the certificates using client.
-func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
+func GetAllCertificates(client *kong.Client, tags []string) ([]*kong.Certificate, error) {
 	var certificates []*kong.Certificate
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Certificates.List(nil, opt)
 		if err != nil {
@@ -286,10 +298,10 @@ func GetAllCertificates(client *kong.Client) ([]*kong.Certificate, error) {
 }
 
 // GetAllSNIs queries Kong for all the SNIs using client.
-func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
+func GetAllSNIs(client *kong.Client, tags []string) ([]*kong.SNI, error) {
 	var snis []*kong.SNI
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.SNIs.List(nil, opt)
 		if err != nil {
@@ -306,10 +318,10 @@ func GetAllSNIs(client *kong.Client) ([]*kong.SNI, error) {
 
 // GetAllConsumers queries Kong for all the consumers using client.
 // Please use this method with caution if you have a lot of consumers.
-func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
+func GetAllConsumers(client *kong.Client, tags []string) ([]*kong.Consumer, error) {
 	var consumers []*kong.Consumer
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Consumers.List(nil, opt)
 		if err != nil {
@@ -325,10 +337,10 @@ func GetAllConsumers(client *kong.Client) ([]*kong.Consumer, error) {
 }
 
 // GetAllUpstreams queries Kong for all the Upstreams using client.
-func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
+func GetAllUpstreams(client *kong.Client, tags []string) ([]*kong.Upstream, error) {
 	var upstreams []*kong.Upstream
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for {
 		s, nextopt, err := client.Upstreams.List(nil, opt)
 		if err != nil {
@@ -347,10 +359,10 @@ func GetAllUpstreams(client *kong.Client) ([]*kong.Upstream, error) {
 // Targets are queries per upstream as there exists no endpoint in Kong
 // to list all targets of all upstreams.
 func GetAllTargets(client *kong.Client,
-	upstreams []*kong.Upstream) ([]*kong.Target, error) {
+	upstreams []*kong.Upstream, tags []string) ([]*kong.Target, error) {
 	var targets []*kong.Target
-	opt := new(kong.ListOpt)
-	opt.Size = 1000
+	opt := newOpt(tags)
+
 	for _, upstream := range upstreams {
 		for {
 			t, nextopt, err := client.Targets.List(nil, upstream.ID, opt)
