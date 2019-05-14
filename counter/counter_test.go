@@ -12,4 +12,6 @@ func TestCounter(t *testing.T) {
 	assert.Equal(uint64(0), c.Value())
 	assert.Equal(uint64(1), c.Inc())
 	assert.Equal(uint64(1), c.Value())
+	c.Reset()
+	assert.Equal(uint64(0), c.Value())
 }
