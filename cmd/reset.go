@@ -78,4 +78,8 @@ func init() {
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not reset consumers or "+
 			"any plugins associated with consumers")
+	resetCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
+		"select-tag", []string{},
+		"only entities matching tags specified via this flag are deleted.\n"+
+			"Multiple tags are ANDed together.")
 }

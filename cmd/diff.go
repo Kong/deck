@@ -29,11 +29,12 @@ that will be created or updated or deleted.
 		if err != nil {
 			return err
 		}
-		currentState, err := dump.GetState(client, dumpConfig)
+		targetState, selectTags, err := file.GetStateFromFile(diffCmdKongStateFile)
 		if err != nil {
 			return err
 		}
-		targetState, err := file.GetStateFromFile(diffCmdKongStateFile)
+		dumpConfig.SelectorTags = selectTags
+		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
 		}
