@@ -2,37 +2,44 @@ package file
 
 import "github.com/hbagdi/go-kong/kong"
 
-type service struct {
+// Service represents a Kong Service and it's associated routes and plugins.
+type Service struct {
 	kong.Service `yaml:",inline,omitempty"`
-	Routes       []*route  `yaml:",omitempty"`
-	Plugins      []*plugin `yaml:",omitempty"`
+	Routes       []*Route  `yaml:",omitempty"`
+	Plugins      []*Plugin `yaml:",omitempty"`
 }
 
-type route struct {
+// Route represents a Kong Route and it's associated plugins.
+type Route struct {
 	kong.Route `yaml:",inline,omitempty"`
-	Plugins    []*plugin `yaml:",omitempty"`
+	Plugins    []*Plugin `yaml:",omitempty"`
 }
 
-type upstream struct {
+// Upstream represents a Kong Upstream and it's associated targets.
+type Upstream struct {
 	kong.Upstream `yaml:",inline,omitempty"`
-	Targets       []*target `yaml:",omitempty"`
+	Targets       []*Target `yaml:",omitempty"`
 }
 
-type target struct {
+// Target represents a Kong Target.
+type Target struct {
 	kong.Target `yaml:",inline,omitempty"`
 }
 
-type certificate struct {
+// Certificate represents a Kong Certificate.
+type Certificate struct {
 	kong.Certificate `yaml:",inline,omitempty"`
 }
 
-type plugin struct {
+// Plugin represents a plugin in Kong.
+type Plugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
 }
 
-type consumer struct {
+// Consumer represents a consumer in Kong.
+type Consumer struct {
 	kong.Consumer `yaml:",inline,omitempty"`
-	Plugins       []*plugin `yaml:",omitempty"`
+	Plugins       []*Plugin `yaml:",omitempty"`
 }
 
 // Info contains meta-data of the file.
@@ -40,11 +47,12 @@ type Info struct {
 	SelectorTags []string `yaml:"select_tags,omitempty"`
 }
 
-type fileStructure struct {
+// Content represents a serialized Kong state.
+type Content struct {
 	Info         Info          `yaml:"_info,omitempty"`
-	Services     []service     `yaml:",omitempty"`
-	Upstreams    []upstream    `yaml:",omitempty"`
-	Certificates []certificate `yaml:",omitempty"`
-	Plugins      []plugin      `yaml:",omitempty"`
-	Consumers    []consumer    `yaml:",omitempty"`
+	Services     []Service     `yaml:",omitempty"`
+	Upstreams    []Upstream    `yaml:",omitempty"`
+	Certificates []Certificate `yaml:",omitempty"`
+	Plugins      []Plugin      `yaml:",omitempty"`
+	Consumers    []Consumer    `yaml:",omitempty"`
 }
