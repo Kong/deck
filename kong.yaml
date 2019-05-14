@@ -1,6 +1,12 @@
+_info:
+  select_tags:
+  - managed-by-deck
+  - org-unit-42
 services:
 - name: svc1
   host: mockbin.org
+  tags:
+  - team-svc1
   routes:
   - name: r1
     paths:
@@ -75,6 +81,8 @@ certificates:
     hJCaXTsiP4IUmBjiwzSp3o1ctP8lWvnyJpAadYdDhaDaAAoaMjCo9cm5OMwc8t8x
     hwAPXV2cgWH8fPcT9NLAcwWk
     -----END PRIVATE KEY-----
+  tags:
+  - cloudops-managed
   snis:
   - demo1.example.com
   - demo2.example.com
@@ -83,35 +91,14 @@ plugins:
 - name: prometheus
   enabled: true
   run_on: first
-- name: request-transformer
-  config:
-    add:
-      body: []
-      headers:
-      - foo:bar
-      querystring: []
-    append:
-      body: []
-      headers: []
-      querystring: []
-    http_method: null
-    remove:
-      body: []
-      headers: []
-      querystring: []
-    rename:
-      body: []
-      headers: []
-      querystring: []
-    replace:
-      body: []
-      headers: []
-      querystring: []
-  enabled: true
-  run_on: first
+  protocols:
+  - http
+  - https
 consumers:
 - username: harry
 - username: yolo
+  tags:
+  - internal-user
   plugins:
   - name: rate-limiting
     config:
@@ -132,3 +119,6 @@ consumers:
       year: null
     enabled: true
     run_on: first
+    protocols:
+    - http
+    - https
