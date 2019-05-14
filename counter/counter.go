@@ -15,3 +15,8 @@ func (c *Counter) Inc() uint64 {
 func (c *Counter) Value() uint64 {
 	return atomic.LoadUint64((*uint64)(c))
 }
+
+// Reset resets the counter to 0.
+func (c *Counter) Reset() {
+	atomic.StoreUint64((*uint64)(c), 0)
+}
