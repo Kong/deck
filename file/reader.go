@@ -25,14 +25,27 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 	if filename == "" {
 		return nil, nil, errors.New("filename cannot be empty")
 	}
-	d, err := utils.GetKongDefaulter()
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "creating defaulter")
-	}
+
 	fileContent, err := readFile(filename)
 	if err != nil {
 		return nil, nil, err
 	}
+	return GetStateFromContent(fileContent)
+}
+
+// GetStateFromContent takes the serialized state and returns a Kong.
+// It will return an error if the file representation is invalid
+// or if there is any error during processing.
+// All entities without an ID will get a `placeholder-{iota}` ID
+// assigned to them.
+func GetStateFromContent(fileContent *Content) (*state.KongState,
+	[]string, error) {
+	count.Reset()
+	d, err := utils.GetKongDefaulter()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "creating defaulter")
+	}
+	selectTags := fileContent.Info.SelectorTags
 	kongState, err := state.NewKongState()
 	if err != nil {
 		return nil, nil, err
@@ -50,6 +63,10 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 			return nil, nil, errors.Errorf("duplicate service definitions"+
 				" found for: '%s'", *s.Service.Name)
 		}
+		if err = utils.MergeTags(&s.Service, selectTags); err != nil {
+			return nil, nil, errors.Wrap(err,
+				"merging selector tag with object")
+		}
 		err = d.Set(&s.Service)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "filling in defaults for service")
@@ -59,10 +76,14 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 			return nil, nil, err
 		}
 		for _, p := range s.Plugins {
-			if ok, err := processPlugin(p); !ok {
+			if ok, err := processPlugin(p, selectTags); !ok {
 				return nil, nil, err
 			}
 			p.Service = s.Service.DeepCopy()
+			if err = utils.MergeTags(&p.Plugin, selectTags); err != nil {
+				return nil, nil, errors.Wrap(err,
+					"merging selector tag with object")
+			}
 			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
 			if err != nil {
 				return nil, nil, err
@@ -83,6 +104,10 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 					" found for: '%s'", *r.Name)
 			}
 			r.Service = s.Service.DeepCopy()
+			if err = utils.MergeTags(&r.Route, selectTags); err != nil {
+				return nil, nil, errors.Wrap(err,
+					"merging selector tag with object")
+			}
 			err = d.Set(&r.Route)
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "filling in defaults for route")
@@ -92,7 +117,7 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 				return nil, nil, err
 			}
 			for _, p := range r.Plugins {
-				if ok, err := processPlugin(p); !ok {
+				if ok, err := processPlugin(p, selectTags); !ok {
 					return nil, nil, err
 				}
 				p.Route = r.Route.DeepCopy()
@@ -105,7 +130,7 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 	}
 
 	for _, p := range fileContent.Plugins {
-		if ok, err := processPlugin(&p); !ok {
+		if ok, err := processPlugin(&p, selectTags); !ok {
 			return nil, nil, err
 		}
 		err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
@@ -126,6 +151,10 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 		if err != state.ErrNotFound {
 			return nil, nil, errors.Errorf("duplicate upstream definitions"+
 				" found for: '%s'", *u.Name)
+		}
+		if err = utils.MergeTags(&u.Upstream, selectTags); err != nil {
+			return nil, nil, errors.Wrap(err,
+				"merging selector tag with object")
 		}
 		err = d.Set(&u.Upstream)
 		if err != nil {
@@ -148,6 +177,10 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 			}
 			t.Upstream = u.Upstream.DeepCopy()
 			err = d.Set(&t.Target)
+			if err = utils.MergeTags(&t.Target, selectTags); err != nil {
+				return nil, nil, errors.Wrap(err,
+					"merging selector tag with object")
+			}
 			if err != nil {
 				return nil, nil, errors.Wrap(err, "filling in defaults for target")
 			}
@@ -181,6 +214,10 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 			return nil, nil, errors.Errorf("duplicate certificate definitions"+
 				" found for the following certificate:\n'%s'", *c.Cert)
 		}
+		if err = utils.MergeTags(&c.Certificate, selectTags); err != nil {
+			return nil, nil, errors.Wrap(err,
+				"merging selector tag with object")
+		}
 		err = kongState.Certificates.Add(state.Certificate{
 			Certificate: c.Certificate,
 		})
@@ -202,12 +239,16 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 			return nil, nil, errors.Errorf("duplicate consumer definitions"+
 				" found for: '%v'", *c.Consumer.Username)
 		}
+		if err = utils.MergeTags(&c.Consumer, selectTags); err != nil {
+			return nil, nil, errors.Wrap(err,
+				"merging selector tag with object")
+		}
 		err = kongState.Consumers.Add(state.Consumer{Consumer: c.Consumer})
 		if err != nil {
 			return nil, nil, err
 		}
 		for _, p := range c.Plugins {
-			if ok, err := processPlugin(p); !ok {
+			if ok, err := processPlugin(p, selectTags); !ok {
 				return nil, nil, err
 			}
 			p.Consumer = c.Consumer.DeepCopy()
@@ -221,9 +262,9 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 	return kongState, fileContent.Info.SelectorTags, nil
 }
 
-func readFile(kongStateFile string) (*fileStructure, error) {
+func readFile(kongStateFile string) (*Content, error) {
 
-	var s fileStructure
+	var s Content
 	var b []byte
 	var err error
 	if kongStateFile == "-" {
@@ -241,7 +282,7 @@ func readFile(kongStateFile string) (*fileStructure, error) {
 	return &s, nil
 }
 
-func processPlugin(p *plugin) (bool, error) {
+func processPlugin(p *Plugin, tags []string) (bool, error) {
 	if utils.Empty(p.ID) {
 		p.ID = kong.String("placeholder-" +
 			strconv.FormatUint(count.Inc(), 10))
@@ -259,6 +300,10 @@ func processPlugin(p *plugin) (bool, error) {
 		p.Config = make(map[string]interface{})
 	}
 	p.Config = ensureJSON(p.Config)
+	if err := utils.MergeTags(&p.Plugin, tags); err != nil {
+		return false, errors.Wrap(err,
+			"merging selector tag with object")
+	}
 	// TODO error out on consumer/route not nil
 	return true, nil
 }

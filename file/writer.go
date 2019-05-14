@@ -14,14 +14,14 @@ import (
 // It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState,
 	selectTags []string, filename string) error {
-	var file fileStructure
+	var file Content
 
 	services, err := kongState.Services.GetAll()
 	if err != nil {
 		return err
 	}
 	for _, s := range services {
-		s := service{Service: s.Service}
+		s := Service{Service: s.Service}
 		routes, err := kongState.Routes.GetAllByServiceID(*s.ID)
 		if err != nil {
 			return err
@@ -34,7 +34,7 @@ func KongStateToFile(kongState *state.KongState,
 			p.ID = nil
 			p.CreatedAt = nil
 			p.Service = nil
-			s.Plugins = append(s.Plugins, &plugin{Plugin: p.Plugin})
+			s.Plugins = append(s.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(s.Plugins, func(i, j int) bool {
 			return strings.Compare(*s.Plugins[i].Name, *s.Plugins[j].Name) < 0
@@ -48,12 +48,12 @@ func KongStateToFile(kongState *state.KongState,
 			r.ID = nil
 			r.CreatedAt = nil
 			r.UpdatedAt = nil
-			route := &route{Route: r.Route}
+			route := &Route{Route: r.Route}
 			for _, p := range plugins {
 				p.ID = nil
 				p.CreatedAt = nil
 				p.Route = nil
-				route.Plugins = append(route.Plugins, &plugin{Plugin: p.Plugin})
+				route.Plugins = append(route.Plugins, &Plugin{Plugin: p.Plugin})
 			}
 			sort.SliceStable(route.Plugins, func(i, j int) bool {
 				return strings.Compare(*route.Plugins[i].Name, *route.Plugins[j].Name) < 0
@@ -82,7 +82,7 @@ func KongStateToFile(kongState *state.KongState,
 		if p.Consumer == nil && p.Service == nil && p.Route == nil {
 			p.ID = nil
 			p.CreatedAt = nil
-			p := plugin{Plugin: p.Plugin}
+			p := Plugin{Plugin: p.Plugin}
 			file.Plugins = append(file.Plugins, p)
 		}
 	}
@@ -96,7 +96,7 @@ func KongStateToFile(kongState *state.KongState,
 		return err
 	}
 	for _, u := range upstreams {
-		u := upstream{Upstream: u.Upstream}
+		u := Upstream{Upstream: u.Upstream}
 		targets, err := kongState.Targets.GetAllByUpstreamID(*u.ID)
 		if err != nil {
 			return err
@@ -105,7 +105,7 @@ func KongStateToFile(kongState *state.KongState,
 			t.Upstream = nil
 			t.ID = nil
 			t.CreatedAt = nil
-			u.Targets = append(u.Targets, &target{Target: t.Target})
+			u.Targets = append(u.Targets, &Target{Target: t.Target})
 		}
 		sort.SliceStable(u.Targets, func(i, j int) bool {
 			return strings.Compare(*u.Targets[i].Target.Target,
@@ -125,7 +125,7 @@ func KongStateToFile(kongState *state.KongState,
 		return err
 	}
 	for _, c := range certificates {
-		c := certificate{Certificate: c.Certificate}
+		c := Certificate{Certificate: c.Certificate}
 		sort.SliceStable(c.SNIs, func(i, j int) bool {
 			return strings.Compare(*c.SNIs[i], *c.SNIs[j]) < 0
 		})
@@ -143,7 +143,7 @@ func KongStateToFile(kongState *state.KongState,
 		return err
 	}
 	for _, c := range consumers {
-		c := consumer{Consumer: c.Consumer}
+		c := Consumer{Consumer: c.Consumer}
 		plugins, err := kongState.Plugins.GetAllByConsumerID(*c.ID)
 		if err != nil {
 			return err
@@ -152,7 +152,7 @@ func KongStateToFile(kongState *state.KongState,
 			p.ID = nil
 			p.CreatedAt = nil
 			p.Consumer = nil
-			c.Plugins = append(c.Plugins, &plugin{Plugin: p.Plugin})
+			c.Plugins = append(c.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
 			return strings.Compare(*c.Plugins[i].Name, *c.Plugins[j].Name) < 0
