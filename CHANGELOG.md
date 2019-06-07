@@ -1,10 +1,29 @@
 # Table of Contents
 
+- [v0.5.0](#v050---20190607)
 - [v0.4.1](#v041---20190411)
 - [v0.4.0](#v040---20190406)
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.5.0] - 2019/06/07
+
+### Summary
+
+- This release adds support for Kong 1.2.
+
+### Added
+
+- Added HTTPSRedirectStatusCode property to Route struct.
+  [#3](https://github.com/hbagdi/go-kong/pull/3)
+
+### Breaking change
+
+- `Create()` for Custom Entities now supports HTTP PUT method.
+  If `id` is specified in the object, it will be used to PUT the entity.
+  This was always POST previously.
+  [#3](https://github.com/hbagdi/go-kong/pull/3)
 
 ## [v0.4.1] - 2019/04/11
 
@@ -82,6 +101,7 @@
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.5.0]: https://github.com/hbagdi/go-kong/compare/v0.4.1...v0.5.0
 [v0.4.1]: https://github.com/hbagdi/go-kong/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/hbagdi/go-kong/compare/0.3.0...v0.4.0
 [0.3.0]: https://github.com/hbagdi/go-kong/compare/0.2.0...0.3.0
