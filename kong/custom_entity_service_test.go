@@ -42,14 +42,19 @@ func TestCustomEntityService(T *testing.T) {
 	assert.Nil(err)
 	assert.Equal("my-secret", e1.Object()["key"])
 
-	// list endpoint
+	// PUT request
 	k2 := custom.NewEntityObject("key-auth")
-	k2.SetObject(map[string]interface{}{"key": "super-secret"})
+	id := "fc3898d9-4b4d-4491-a834-8358646e2d20"
+	k2.SetObject(map[string]interface{}{
+		"id":  id,
+		"key": "super-secret",
+	})
 	k2.AddRelation("consumer_id", *consumer.ID)
 	e2, err := client.CustomEntities.Create(defaultCtx, k2)
 	assert.NotNil(e2)
 	assert.Nil(err)
 	assert.Equal("super-secret", e2.Object()["key"])
+	assert.Equal(id, e2.Object()["id"])
 
 	se = custom.NewEntityObject("key-auth")
 	se.AddRelation("consumer_id", *consumer.ID)
@@ -58,6 +63,7 @@ func TestCustomEntityService(T *testing.T) {
 	assert.Nil(err)
 	assert.Equal(2, len(keyAuths))
 
+	// list endpoint
 	keyAuths, err = client.CustomEntities.ListAll(defaultCtx, se)
 	assert.Nil(err)
 	assert.Equal(2, len(keyAuths))

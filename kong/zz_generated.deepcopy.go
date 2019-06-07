@@ -500,6 +500,11 @@ func (in *Route) DeepCopyInto(out *Route) {
 			}
 		}
 	}
+	if in.HTTPSRedirectStatusCode != nil {
+		in, out := &in.HTTPSRedirectStatusCode, &out.HTTPSRedirectStatusCode
+		*out = new(int)
+		**out = **in
+	}
 	return
 }
 

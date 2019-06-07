@@ -51,9 +51,19 @@ func (s *CustomEntityService) Create(ctx context.Context,
 			"' not registered")
 	}
 
+	method := "POST"
 	queryPath, err := def.PostEndpoint(entity)
 	if err != nil {
 		return nil, err
+	}
+	if entity.Object() != nil {
+		if _, ok := entity.Object()["id"]; ok {
+			queryPath, err = def.PatchEndpoint(entity)
+			if err != nil {
+				return nil, err
+			}
+			method = "PUT"
+		}
 	}
 
 	o := entity.Object()
@@ -62,7 +72,7 @@ func (s *CustomEntityService) Create(ctx context.Context,
 	if o == nil || len(o) == 0 {
 		o = make(map[string]interface{})
 	}
-	req, err := s.client.newRequest("POST", queryPath, nil, o)
+	req, err := s.client.newRequest(method, queryPath, nil, o)
 
 	if err != nil {
 		return nil, err
