@@ -52,6 +52,8 @@ type Route struct {
 	Sources       []*CIDRPort `json:"sources,omitempty" yaml:"sources,omitempty"`
 	Destinations  []*CIDRPort `json:"destinations,omitempty" yaml:"destinations,omitempty"`
 	Tags          []*string   `json:"tags,omitempty" yaml:"tags,omitempty"`
+
+	HTTPSRedirectStatusCode *int `json:"https_redirect_status_code,omitempty" yaml:"https_redirect_status_code,omitempty"`
 }
 
 // Valid checks if all the fields in Route are valid.
