@@ -144,7 +144,7 @@ func TestRouteSetTest(t *testing.T) {
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(true),
 				RegexPriority: kong.Int(0),
-				StripPath:     kong.Bool(true),
+				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "https"),
 			},
 		},
@@ -156,7 +156,7 @@ func TestRouteSetTest(t *testing.T) {
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(false),
 				RegexPriority: kong.Int(0),
-				StripPath:     kong.Bool(true),
+				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "tls"),
 			},
 		},
@@ -172,6 +172,30 @@ func TestRouteSetTest(t *testing.T) {
 				Name:          kong.String("foo"),
 				Hosts:         kong.StringSlice("1.example.com", "2.example.com"),
 				Methods:       kong.StringSlice("GET", "POST"),
+				PreserveHost:  kong.Bool(false),
+				RegexPriority: kong.Int(0),
+				StripPath:     kong.Bool(false),
+				Protocols:     kong.StringSlice("http", "https"),
+			},
+		},
+		{
+			desc: "strip-path can be set to false",
+			arg: &kong.Route{
+				StripPath: kong.Bool(false),
+			},
+			want: &kong.Route{
+				PreserveHost:  kong.Bool(false),
+				RegexPriority: kong.Int(0),
+				StripPath:     kong.Bool(false),
+				Protocols:     kong.StringSlice("http", "https"),
+			},
+		},
+		{
+			desc: "strip-path can be set to true",
+			arg: &kong.Route{
+				StripPath: kong.Bool(true),
+			},
+			want: &kong.Route{
 				PreserveHost:  kong.Bool(false),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(true),
