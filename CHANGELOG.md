@@ -1,8 +1,26 @@
 # Table of Contents
 
+- [v0.4.0](#v040---20190610)
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.4.0] - 2019/06/10
+
+### Summary
+
+This release introduces support for Kong 1.2.x.
+
+### Breaking changes
+
+- `strip_path` attribute of Route can now be set to false. The default value
+  is now false, which was true previously.
+  [#18](https://github.com/hbagdi/deck/issues/18)
+
+### Added
+
+- `https_redirect_status_code` attribute of Route in Kong can be set,
+  and defaults to `426`.
 
 ## [v0.3.0] - 2019/05/14
 
@@ -88,6 +106,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.4.0]: https://github.com/hbagdi/deck/compare/v0.3.0...v0.4.0
 [v0.3.0]: https://github.com/hbagdi/deck/compare/v0.2.0...v0.3.0
 [v0.2.0]: https://github.com/hbagdi/deck/compare/v0.1.0...v0.2.0
 [v0.1.0]: https://github.com/hbagdi/deck/compare/0c7e839...v0.1.0
