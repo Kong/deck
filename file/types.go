@@ -49,10 +49,11 @@ type Info struct {
 
 // Content represents a serialized Kong state.
 type Content struct {
-	Info         Info          `yaml:"_info,omitempty"`
-	Services     []Service     `yaml:",omitempty"`
-	Upstreams    []Upstream    `yaml:",omitempty"`
-	Certificates []Certificate `yaml:",omitempty"`
-	Plugins      []Plugin      `yaml:",omitempty"`
-	Consumers    []Consumer    `yaml:",omitempty"`
+	FormatVersion string        `yaml:"_format_version,omitempty"`
+	Info          Info          `yaml:"_info,omitempty"`
+	Services      []Service     `yaml:",omitempty"`
+	Upstreams     []Upstream    `yaml:",omitempty"`
+	Certificates  []Certificate `yaml:",omitempty"`
+	Plugins       []Plugin      `yaml:",omitempty"`
+	Consumers     []Consumer    `yaml:",omitempty"`
 }

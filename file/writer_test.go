@@ -54,7 +54,7 @@ func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	output := captureOutput(func() {
 		KongStateToFile(ks, nil, filename)
 	})
-	assert.Equal("{}\n", output)
+	assert.Equal("_format_version: \"1.1\"\n", output)
 
 }
 func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
@@ -70,7 +70,7 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 		KongStateToFile(ks, nil, filename)
 	})
 	fmt.Print(service.Host)
-	expected := fmt.Sprintf("services:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
+	expected := fmt.Sprintf("_format_version: \"1.1\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
 	assert.Equal(expected, output)
 
 }
@@ -99,7 +99,8 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 		KongStateToFile(ks, nil, filename)
 	})
 	fmt.Print(service.Host)
-	expected := fmt.Sprintf(`services:
+	expected := fmt.Sprintf(`_format_version: "1.1"
+services:
 - host: %s
   name: %s
   routes:

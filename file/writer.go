@@ -177,6 +177,8 @@ func KongStateToFile(kongState *state.KongState,
 			*file.Consumers[j].Username) < 0
 	})
 	file.Info.SelectorTags = selectTags
+	// hardcoded as only one version exists currently
+	file.FormatVersion = "1.1"
 
 	c, err := yaml.Marshal(file)
 	if err != nil {
