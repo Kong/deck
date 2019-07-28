@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -95,7 +93,9 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
-		"enable verbose verbose logging")
+		"Enable verbose verbose logging levels\n"+
+			"Setting this value to 2 outputs all HTTP reqeust/response "+
+			"between decK and Kong.")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))
 
@@ -135,12 +135,5 @@ func initConfig() {
 	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
 
-	if verbose < 1 {
-		// supress output of terraform DAG if verbose logging is not enabled
-		log.SetFlags(0)
-		log.SetOutput(ioutil.Discard)
-	}
-	if verbose >= 2 {
-		config.Debug = true
-	}
+	config.Debug = verbose >= 1
 }
