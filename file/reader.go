@@ -2,8 +2,6 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 
 	"github.com/hbagdi/deck/counter"
@@ -11,13 +9,17 @@ import (
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 var count counter.Counter
 
 // GetStateFromFile reads in a file with filename and constructs
-// a state. It will return an error if the file representation is invalid
+// a state. If filename is `-`, then it will read from os.Stdin.
+// If filename represents a directory, it will traverse the tree
+// rooted at filename, read all the files with .yaml and .yml extensions
+// and generate a state after a merge of the content from all the files.
+//
+// It will return an error if the file representation is invalid
 // or if there is any error during processing.
 // All entities without an ID will get a `placeholder-{iota}` ID
 // assigned to them.
@@ -26,7 +28,7 @@ func GetStateFromFile(filename string) (*state.KongState, []string, error) {
 		return nil, nil, errors.New("filename cannot be empty")
 	}
 
-	fileContent, err := readFile(filename)
+	fileContent, err := getContent(filename)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -260,26 +262,6 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 	}
 
 	return kongState, fileContent.Info.SelectorTags, nil
-}
-
-func readFile(kongStateFile string) (*Content, error) {
-
-	var s Content
-	var b []byte
-	var err error
-	if kongStateFile == "-" {
-		b, err = ioutil.ReadAll(os.Stdin)
-	} else {
-		b, err = ioutil.ReadFile(kongStateFile)
-	}
-	if err != nil {
-		return nil, err
-	}
-	err = yaml.Unmarshal(b, &s)
-	if err != nil {
-		return nil, err
-	}
-	return &s, nil
 }
 
 func processPlugin(p *Plugin, tags []string) (bool, error) {

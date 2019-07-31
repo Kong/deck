@@ -1,0 +1,14 @@
+_info:
+  select_tags:
+  - tag1
+services:
+- name: svc1
+  host: 1.example.com
+  tags:
+  - team-svc1
+  routes:
+  - name: r1
+    paths:
+    - /r1
+consumers:
+- username: harry

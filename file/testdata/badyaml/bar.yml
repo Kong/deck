@@ -1,0 +1,8 @@
+- name: svc2
+  host: 2.example.com
+  routes:
+  - name: r2
+    paths:
+    - /r2
+plugins:
+- name: prometheus

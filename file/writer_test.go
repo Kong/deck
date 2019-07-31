@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
 	"testing"
@@ -25,12 +24,10 @@ func captureOutput(f func()) string {
 	defer func() {
 		os.Stdout = stdout
 		os.Stderr = stderr
-		log.SetOutput(os.Stderr)
 	}()
 	os.Stdout = writer
 	os.Stderr = writer
 
-	log.SetOutput(writer)
 	out := make(chan string)
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
@@ -69,7 +66,6 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 	output := captureOutput(func() {
 		KongStateToFile(ks, nil, filename)
 	})
-	fmt.Print(service.Host)
 	expected := fmt.Sprintf("_format_version: \"1.1\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
 	assert.Equal(expected, output)
 
@@ -98,7 +94,6 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 	output := captureOutput(func() {
 		KongStateToFile(ks, nil, filename)
 	})
-	fmt.Print(service.Host)
 	expected := fmt.Sprintf(`_format_version: "1.1"
 services:
 - host: %s
