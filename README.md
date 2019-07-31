@@ -79,14 +79,8 @@ $ cp /tmp/deck /usr/local/bin/
 
 ## Roadmap
 
-- Default attributes
-  Support filling in defaults for configs of plugins
-  for cases when the config file doesn't contain the attribute.
-- Complete end to end integration tests with Kong.
-- Add support for credentials in Kong
-- Certificate encryption  
-  Support in decK to fetch certificate from Vault or a cloud
-  secret storage and then sync it to Kong.
+Please see [issues](https://github.com/hbagdi/deck/issues)
+section for upcoming release milestones and features requests.
 
 ## License
 
