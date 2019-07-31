@@ -77,6 +77,12 @@ $ tar -xf deck.tar.gz -C /tmp
 $ cp /tmp/deck /usr/local/bin/
 ```
 
+### Docker image
+
+```
+docker pull hbagdi/deck
+```
+
 ## Roadmap
 
 Please see [issues](https://github.com/hbagdi/deck/issues)
