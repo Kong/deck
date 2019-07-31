@@ -17,6 +17,7 @@ env:
   - KONG_VERSION=1.0.3 GOPROXY=https://gocenter.io GO111MODULE=on
   - KONG_VERSION=1.1.2 GOPROXY=https://gocenter.io GO111MODULE=on
   - KONG_VERSION=1.2.0 GOPROXY=https://gocenter.io GO111MODULE=on
+  - KONG_VERSION=1.3.0rc1 GOPROXY=https://gocenter.io GO111MODULE=on
 
 before_install:
   - psql -c 'create database kong;' -U postgres
