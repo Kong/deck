@@ -13,11 +13,14 @@ addons:
   postgresql: "9.5"
 
 env:
+  global:
+  - GO111MODULE=on
+  - GOPROXY=https://proxy.golang.org
   matrix:
-  - KONG_VERSION=1.0.3 GOPROXY=https://gocenter.io GO111MODULE=on
-  - KONG_VERSION=1.1.2 GOPROXY=https://gocenter.io GO111MODULE=on
-  - KONG_VERSION=1.2.0 GOPROXY=https://gocenter.io GO111MODULE=on
-  - KONG_VERSION=1.3.0rc1 GOPROXY=https://gocenter.io GO111MODULE=on
+  - KONG_VERSION=1.0.3
+  - KONG_VERSION=1.1.2
+  - KONG_VERSION=1.2.0
+  - KONG_VERSION=1.3.0rc1
 
 before_install:
   - psql -c 'create database kong;' -U postgres
@@ -28,3 +31,6 @@ install:
   - bash .ci/setup_kong.sh
   - ./hack/verify-deepcopy-gen.sh
 
+cache:
+  directories:
+   - $HOME/gopath/pkg/mod
