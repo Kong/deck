@@ -2,6 +2,7 @@ package kong
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/blang/semver"
@@ -56,6 +57,10 @@ func runWhenKong(t *testing.T, semverRange string) {
 			t.Error(err)
 		}
 		v := res["version"].(string)
+		rcIndex := strings.Index(v, "rc")
+		if rcIndex != -1 {
+			v = v[:rcIndex]
+		}
 		currentVersion, err = semver.Parse(v)
 		if err != nil {
 			t.Error(err)
