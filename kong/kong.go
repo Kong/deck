@@ -33,6 +33,7 @@ type Client struct {
 	Consumers      *ConsumerService
 	Services       *Svcservice
 	Routes         *RouteService
+	CACertificates *CACertificateService
 	Certificates   *CertificateService
 	Plugins        *PluginService
 	SNIs           *SNIService
@@ -80,6 +81,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Routes = (*RouteService)(&kong.common)
 	kong.Plugins = (*PluginService)(&kong.common)
 	kong.Certificates = (*CertificateService)(&kong.common)
+	kong.CACertificates = (*CACertificateService)(&kong.common)
 	kong.SNIs = (*SNIService)(&kong.common)
 	kong.Upstreams = (*UpstreamService)(&kong.common)
 	kong.Targets = (*TargetService)(&kong.common)
