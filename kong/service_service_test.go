@@ -187,3 +187,38 @@ func compareServices(expected, actual []*Service) bool {
 
 	return (compareSlices(expectedUsernames, actualUsernames))
 }
+
+func TestServiceWithClientCert(T *testing.T) {
+	runWhenKong(T, ">=1.3.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	certificate := &Certificate{
+		Key:  String(key1),
+		Cert: String(cert1),
+	}
+	createdCertificate, err := client.Certificates.Create(defaultCtx, certificate)
+	assert.Nil(err)
+	assert.NotNil(createdCertificate)
+
+	service := &Service{
+		Name:              String("foo"),
+		Host:              String("example.com"),
+		Protocol:          String("https"),
+		ClientCertificate: createdCertificate,
+	}
+
+	createdService, err := client.Services.Create(defaultCtx, service)
+	assert.Nil(err)
+	assert.NotNil(createdService)
+	assert.Equal(*createdCertificate.ID, *createdService.ClientCertificate.ID)
+
+	err = client.Services.Delete(defaultCtx, createdService.ID)
+	assert.Nil(err)
+
+	err = client.Certificates.Delete(defaultCtx, createdCertificate.ID)
+	assert.Nil(err)
+}
