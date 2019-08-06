@@ -1,11 +1,19 @@
 # Table of Contents
 
+- [v0.5.1](#v051---20190805)
 - [v0.5.0](#v050---20190607)
 - [v0.4.1](#v041---20190411)
 - [v0.4.0](#v040---20190406)
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.5.1] - 2019/08/05
+
+### Fix
+
+- Add missing healthchecks.active.unhealthy.interval field to Upstream
+  [#6](https://github.com/hbagdi/go-kong/issues/6)
 
 ## [v0.5.0] - 2019/06/07
 
@@ -101,6 +109,7 @@
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.5.1]: https://github.com/hbagdi/go-kong/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/go-kong/compare/v0.4.1...v0.5.0
 [v0.4.1]: https://github.com/hbagdi/go-kong/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/hbagdi/go-kong/compare/0.3.0...v0.4.0
