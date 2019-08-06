@@ -73,6 +73,57 @@ func TestUpstreamWithTags(T *testing.T) {
 	assert.Nil(err)
 }
 
+// regression test for #6
+func TestUpstreamWithActiveUnHealthyInterval(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name: String("upstream-foo"),
+		Healthchecks: &Healthcheck{
+			Active: &ActiveHealthcheck{
+				Unhealthy: &Unhealthy{
+					Interval: Int(5),
+				},
+			},
+		},
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+}
+
+// regression test for #6
+func TestUpstreamWithPassiveUnHealthyInterval(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name: String("upstream-foo"),
+		Healthchecks: &Healthcheck{
+			Passive: &PassiveHealthcheck{
+				Unhealthy: &Unhealthy{
+					Interval: Int(5),
+				},
+			},
+		},
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.NotNil(err)
+	assert.Nil(createdUpstream)
+}
+
 func TestUpstreamListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 

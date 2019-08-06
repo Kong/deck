@@ -19,6 +19,7 @@ type Unhealthy struct {
 	HTTPStatuses []int `json:"http_statuses,omitempty" yaml:"http_statuses,omitempty"`
 	TCPFailures  *int  `json:"tcp_failures,omitempty" yaml:"tcp_failures,omitempty"`
 	Timeouts     *int  `json:"timeouts,omitempty" yaml:"timeouts,omitempty"`
+	Interval     *int  `json:"interval,omitempty" yaml:"interval,omitempty"`
 }
 
 // ActiveHealthcheck configures active health check probing.
