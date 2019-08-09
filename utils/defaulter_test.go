@@ -70,7 +70,6 @@ func TestServiceSetTest(t *testing.T) {
 				Port:           kong.Int(80),
 				Retries:        kong.Int(5),
 				Protocol:       kong.String("http"),
-				Path:           kong.String("/"),
 				ConnectTimeout: kong.Int(60000),
 				WriteTimeout:   kong.Int(42),
 				ReadTimeout:    kong.Int(60000),
