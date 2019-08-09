@@ -3,7 +3,7 @@ language: go
 env:
   global:
   - GO111MODULE=on
-  - GOPROXY=https://proxy.golang.org
+#  - GOPROXY=https://proxy.golang.org
 
 go:
  - "1.12"
