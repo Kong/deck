@@ -6,36 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConsumerValid(T *testing.T) {
-
-	assert := assert.New(T)
-
-	c := &Consumer{
-		CustomID: String("foo"),
-		Username: String("bar"),
-	}
-	assert.Equal(true, c.Valid())
-
-	c = &Consumer{
-		CustomID: String(""),
-		Username: String(""),
-	}
-	assert.Equal(false, c.Valid())
-
-	c = &Consumer{}
-	assert.Equal(false, c.Valid())
-
-	c = &Consumer{
-		Username: String("foo"),
-	}
-	assert.Equal(true, c.Valid())
-
-	c = &Consumer{
-		CustomID: String("foo"),
-	}
-	assert.Equal(true, c.Valid())
-}
-
 func TestConsumerString(T *testing.T) {
 	assert := assert.New(T)
 
@@ -57,7 +27,6 @@ func TestConsumerString(T *testing.T) {
 	c = &Consumer{
 		Username: String("foo"),
 	}
-	assert.Equal(true, c.Valid())
 	assert.Equal("[ nil foo nil ]", c.String())
 
 	c = &Consumer{

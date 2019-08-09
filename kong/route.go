@@ -57,25 +57,6 @@ type Route struct {
 	HTTPSRedirectStatusCode *int `json:"https_redirect_status_code,omitempty" yaml:"https_redirect_status_code,omitempty"`
 }
 
-// Valid checks if all the fields in Route are valid.
-func (r *Route) Valid() bool {
-	if len(r.Protocols) == 0 {
-		r.Protocols = StringSlice("http", "https")
-	}
-	if contains(r.Protocols, "http") || contains(r.Protocols, "https") {
-		if len(r.Methods) == 0 && len(r.Paths) == 0 && len(r.Hosts) == 0 &&
-			r.Headers == nil {
-			return false
-		}
-	}
-	if contains(r.Protocols, "tcp") || contains(r.Protocols, "tls") {
-		if len(r.Sources) == 0 && len(r.Destinations) == 0 && len(r.SNIs) == 0 {
-			return false
-		}
-	}
-	return true
-}
-
 func (r *Route) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

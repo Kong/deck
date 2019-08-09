@@ -7,19 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPluginValid(T *testing.T) {
-	assert := assert.New(T)
-
-	p := &Plugin{}
-	assert.False(p.Valid())
-
-	p = &Plugin{
-		Name: String("foo"),
-	}
-	assert.True(p.Valid())
-
-}
-
 func TestPluginString(T *testing.T) {
 	assert := assert.New(T)
 

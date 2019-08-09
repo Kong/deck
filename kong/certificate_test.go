@@ -6,14 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCertificateValid(T *testing.T) {
-
-	assert := assert.New(T)
-
-	c := &Certificate{}
-	assert.Equal(true, c.Valid())
-}
-
 func TestCertificateString(T *testing.T) {
 	assert := assert.New(T)
 

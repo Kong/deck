@@ -3,7 +3,6 @@ package kong
 import (
 	"bytes"
 	"strconv"
-	"strings"
 )
 
 // Service represents a Service in Kong.
@@ -24,16 +23,6 @@ type Service struct {
 	UpdatedAt         *int         `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 	WriteTimeout      *int         `json:"write_timeout,omitempty" yaml:"write_timeout,omitempty"`
 	Tags              []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
-}
-
-// Valid checks if all the fields in Service are valid.
-func (s *Service) Valid() bool {
-	if s.Protocol != nil &&
-		strings.ToLower(*s.Protocol) != "http" &&
-		strings.ToLower(*s.Protocol) != "https" {
-		return false
-	}
-	return true
 }
 
 func (s *Service) String() string {

@@ -8,9 +8,3 @@ type CACertificate struct {
 	CreatedAt *int64    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
-
-// Valid checks if all the fields in CACertificate are valid.
-func (c *CACertificate) Valid() bool {
-	// TODO
-	return true
-}

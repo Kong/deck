@@ -13,15 +13,6 @@ type Consumer struct {
 	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in Consumer are valid.
-func (c *Consumer) Valid() bool {
-	emptyCustomID := isEmptyString(c.CustomID)
-	emptyUsername := isEmptyString(c.Username)
-
-	return !(emptyCustomID && emptyUsername)
-
-}
-
 func (c *Consumer) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

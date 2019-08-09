@@ -14,12 +14,6 @@ type Certificate struct {
 	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in Consumer are valid.
-func (c *Certificate) Valid() bool {
-	// TODO
-	return true
-}
-
 func (c *Certificate) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

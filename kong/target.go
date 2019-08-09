@@ -13,14 +13,6 @@ type Target struct {
 	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in Target are valid.
-func (t *Target) Valid() bool {
-	if isEmptyString(t.Target) {
-		return false
-	}
-	return true
-}
-
 func (t *Target) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

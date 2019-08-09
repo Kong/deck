@@ -6,21 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestServiceValid(T *testing.T) {
-
-	assert := assert.New(T)
-
-	c := &Service{
-		Protocol: String("httpX"),
-	}
-	assert.Equal(false, c.Valid())
-
-	c = &Service{
-		Protocol: String("https"),
-	}
-	assert.Equal(true, c.Valid())
-}
-
 func TestServiceString(T *testing.T) {
 	assert := assert.New(T)
 

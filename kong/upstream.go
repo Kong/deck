@@ -68,12 +68,6 @@ type Upstream struct {
 	Tags               []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in Upstream are valid.
-func (u *Upstream) Valid() bool {
-	// TODO
-	return !isEmptyString(u.Name)
-}
-
 func (u *Upstream) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

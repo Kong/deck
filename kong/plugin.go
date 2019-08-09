@@ -45,11 +45,6 @@ type Plugin struct {
 	Tags      []*string     `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in Plugin are valid.
-func (p *Plugin) Valid() bool {
-	return !isEmptyString(p.Name)
-}
-
 func (p *Plugin) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')

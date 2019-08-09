@@ -13,14 +13,6 @@ type SNI struct {
 	Tags        []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-// Valid checks if all the fields in SNI are valid.
-func (c *SNI) Valid() bool {
-	if isEmptyString(c.Name) {
-		return false
-	}
-	return true
-}
-
 func (c *SNI) String() string {
 	var buf bytes.Buffer
 	buf.WriteByte('[')
