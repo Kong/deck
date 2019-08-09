@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.6.0](#v060---20190809)
 - [v0.5.1](#v051---20190805)
 - [v0.5.0](#v050---20190607)
 - [v0.4.1](#v041---20190411)
@@ -7,6 +8,30 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.6.0] - 2019/08/09
+
+### Summary
+
+- This release adds support for Kong 1.3.
+
+### Breaking change
+
+- `Validator` Interface has been dropped and Valid() method from
+  all entities is dropped.
+  [#8](https://github.com/hbagdi/go-kong/pull/8)
+
+### Added
+
+- `Headers` field has been added to Route struct.
+  [#5](https://github.com/hbagdi/go-kong/pull/5)
+- `ClientCertificate` field has been added to Service struct.
+  [#5](https://github.com/hbagdi/go-kong/pull/5)
+- `CACertificate` is a new core entity in Kong. A struct to represent
+  it and a corresponding new service is added.
+  [#5](https://github.com/hbagdi/go-kong/pull/5)
+- `Algorithm` field has been added to Upstream struct.
+  [#9](https://github.com/hbagdi/go-kong/pull/9)
 
 ## [v0.5.1] - 2019/08/05
 
@@ -109,6 +134,7 @@
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.6.0]: https://github.com/hbagdi/go-kong/compare/v0.5.1...v0.6.0
 [v0.5.1]: https://github.com/hbagdi/go-kong/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/go-kong/compare/v0.4.1...v0.5.0
 [v0.4.1]: https://github.com/hbagdi/go-kong/compare/v0.4.0...v0.4.1
