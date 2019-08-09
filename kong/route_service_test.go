@@ -271,7 +271,7 @@ func TestRouteWithHeaders(T *testing.T) {
 	route := &Route{
 		Name: String("route-by-header"),
 		Headers: map[string][]string{
-			"foo": []string{"bar"},
+			"foo": {"bar"},
 		},
 		Tags: StringSlice("tag1", "tag2"),
 	}
@@ -280,7 +280,7 @@ func TestRouteWithHeaders(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdRoute)
 	assert.Equal(StringSlice("tag1", "tag2"), createdRoute.Tags)
-	assert.Equal(map[string][]string{"foo": []string{"bar"}}, createdRoute.Headers)
+	assert.Equal(map[string][]string{"foo": {"bar"}}, createdRoute.Headers)
 
 	err = client.Routes.Delete(defaultCtx, createdRoute.ID)
 	assert.Nil(err)

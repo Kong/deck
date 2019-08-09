@@ -272,6 +272,7 @@ func TestPluginListAllForEntityEndpoint(T *testing.T) {
 
 	pluginsFromKong, err = client.Plugins.ListAllForRoute(defaultCtx,
 		createdRoute.ID)
+	assert.Nil(err)
 	assert.NotNil(pluginsFromKong)
 	assert.Equal(2, len(pluginsFromKong))
 
