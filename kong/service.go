@@ -9,7 +9,7 @@ import (
 // Read https://getkong.org/docs/0.13.x/admin-api/#Service-object
 // +k8s:deepcopy-gen=true
 type Service struct {
-	ClientCertificate *Certificate `json:"client_certificate,omitempty" yamls:"client_certificate"`
+	ClientCertificate *Certificate `json:"client_certificate,omitempty" yaml:"client_certificate"`
 	ConnectTimeout    *int         `json:"connect_timeout,omitempty" yaml:"connect_timeout,omitempty"`
 	CreatedAt         *int         `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Host              *string      `json:"host,omitempty" yaml:"host,omitempty"`
