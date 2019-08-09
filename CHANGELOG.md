@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.6.1](#v061---20190809)
 - [v0.6.0](#v060---20190809)
 - [v0.5.1](#v051---20190805)
 - [v0.5.0](#v050---20190607)
@@ -8,6 +9,12 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.6.1] - 2019/08/09
+
+### Fix
+
+- Fix a typo in Service struct definition for YAML tag
 
 ## [v0.6.0] - 2019/08/09
 
@@ -134,6 +141,7 @@
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.6.1]: https://github.com/hbagdi/go-kong/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/hbagdi/go-kong/compare/v0.5.1...v0.6.0
 [v0.5.1]: https://github.com/hbagdi/go-kong/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/go-kong/compare/v0.4.1...v0.5.0
