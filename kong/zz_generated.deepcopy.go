@@ -820,6 +820,11 @@ func (in *Upstream) DeepCopyInto(out *Upstream) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Algorithm != nil {
+		in, out := &in.Algorithm, &out.Algorithm
+		*out = new(string)
+		**out = **in
+	}
 	if in.Slots != nil {
 		in, out := &in.Slots, &out.Slots
 		*out = new(int)

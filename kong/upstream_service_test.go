@@ -124,6 +124,28 @@ func TestUpstreamWithPassiveUnHealthyInterval(T *testing.T) {
 	assert.Nil(createdUpstream)
 }
 
+func TestUpstreamWithAlgorithm(T *testing.T) {
+	runWhenKong(T, ">=1.3.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name:      String("upstream1"),
+		Algorithm: String("least-connections"),
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+	assert.Equal("least-connections", *createdUpstream.Algorithm)
+
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+}
+
 func TestUpstreamListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
