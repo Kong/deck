@@ -39,6 +39,9 @@ type Client struct {
 	SNIs           *SNIService
 	Upstreams      *UpstreamService
 	Targets        *TargetService
+
+	credentials *credentialService
+
 	logger         io.Writer
 	debug          bool
 	CustomEntities *CustomEntityService
@@ -85,6 +88,9 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.SNIs = (*SNIService)(&kong.common)
 	kong.Upstreams = (*UpstreamService)(&kong.common)
 	kong.Targets = (*TargetService)(&kong.common)
+
+	kong.credentials = (*credentialService)(&kong.common)
+
 	kong.CustomEntities = (*CustomEntityService)(&kong.common)
 	kong.Registry = custom.NewDefaultRegistry()
 
