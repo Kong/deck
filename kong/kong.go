@@ -41,6 +41,7 @@ type Client struct {
 	Targets        *TargetService
 
 	credentials *credentialService
+	KeyAuths    *KeyAuthService
 
 	logger         io.Writer
 	debug          bool
@@ -90,6 +91,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Targets = (*TargetService)(&kong.common)
 
 	kong.credentials = (*credentialService)(&kong.common)
+	kong.KeyAuths = (*KeyAuthService)(&kong.common)
 
 	kong.CustomEntities = (*CustomEntityService)(&kong.common)
 	kong.Registry = custom.NewDefaultRegistry()
