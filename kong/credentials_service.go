@@ -15,6 +15,7 @@ var (
 	credPath = map[string]string{
 		"key-auth":   "key-auth",
 		"basic-auth": "basic-auth",
+		"hmac-auth":  "hmac-auth",
 	}
 )
 
