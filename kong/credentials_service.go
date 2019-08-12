@@ -16,6 +16,7 @@ var (
 		"key-auth":   "key-auth",
 		"basic-auth": "basic-auth",
 		"hmac-auth":  "hmac-auth",
+		"jwt-auth":   "jwt",
 	}
 )
 
