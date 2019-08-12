@@ -11,29 +11,17 @@ builds:
   asmflags:
   - all=-trimpath={{.Env.GOPATH}}
   ldflags:
-  - -s -w -X github.com/hbagdi/deck/cmd.VERSION={{ .Tag }} -X github.com/hbagdi/deck/cmd.COMMIT={{ .ShortCommit }}
+  - -s -w -X github.com/alpiquero/deck/cmd.VERSION={{ .Tag }} -X github.com/alpiquero/deck/cmd.COMMIT={{ .ShortCommit }}
 checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Tag }}"
 nfpms:
 -  name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Arch }}'
-   homepage:  https://github.com/hbagdi/deck
+   homepage:  https://github.com/alpiquero/deck
    description: Declarative configuration for Kong
-   maintainer: Harry Bagdi <harrybagdi@gmail.com>
+   maintainer: Ángel Luis Piquero <alpiquero87@gmail.com>
    license: Apache License v2.0
    formats:
    - deb
    - rpm
-brews:
--  github:
-     owner: hbagdi
-     name: homebrew-deck
-   commit_author:
-     name: Harry Bagdi
-     email: harrybagdi@gmail.com
-   homepage: "https://github.com/hbagdi/deck"
-   description: Declarative configuration for Kong
-   skip_upload: true
-   test: |
-       system "#{bin}/program --version"
