@@ -45,6 +45,7 @@ type Client struct {
 	BasicAuths  *BasicAuthService
 	HMACAuths   *HMACAuthService
 	JWTAuths    *JWTAuthService
+	ACLs        *ACLService
 
 	logger         io.Writer
 	debug          bool
@@ -98,6 +99,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.BasicAuths = (*BasicAuthService)(&kong.common)
 	kong.HMACAuths = (*HMACAuthService)(&kong.common)
 	kong.JWTAuths = (*JWTAuthService)(&kong.common)
+	kong.ACLs = (*ACLService)(&kong.common)
 
 	kong.CustomEntities = (*CustomEntityService)(&kong.common)
 	kong.Registry = custom.NewDefaultRegistry()
