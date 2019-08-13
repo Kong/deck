@@ -80,6 +80,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting key-auth into state")
 			}
 		}
+		for _, cred := range raw.HMACAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for hmac-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.HMACAuths.Add(state.HMACAuth{HMACAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting hmac-auth into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -236,6 +249,12 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.KeyAuths = keyAuths
+
+	hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.HMACAuths = hmacAuths
 	return &state, nil
 }
 
@@ -417,4 +436,25 @@ func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error)
 		opt = nextopt
 	}
 	return keyAuths, nil
+}
+
+// GetAllHMACAuths queries Kong for all hmac-auth credentials using client.
+func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
+	var hmacAuths []*kong.HMACAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.HMACAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		hmacAuths = append(hmacAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return hmacAuths, nil
 }
