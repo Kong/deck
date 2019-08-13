@@ -179,6 +179,16 @@ func KongStateToFile(kongState *state.KongState,
 			k.Consumer = nil
 			c.KeyAuths = append(c.KeyAuths, &k.KeyAuth)
 		}
+		hmacAuth, err := kongState.HMACAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range hmacAuth {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.HMACAuths = append(c.HMACAuths, &k.HMACAuth)
+		}
 		c.ID = nil
 		c.CreatedAt = nil
 		utils.RemoveTags(&c.Consumer, selectTags)

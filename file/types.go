@@ -39,8 +39,9 @@ type Plugin struct {
 // Consumer represents a consumer in Kong.
 type Consumer struct {
 	kong.Consumer `yaml:",inline,omitempty"`
-	Plugins       []*Plugin       `yaml:",omitempty"`
-	KeyAuths      []*kong.KeyAuth `yaml:"keyauth_credentials,omitempty"`
+	Plugins       []*Plugin        `yaml:",omitempty"`
+	KeyAuths      []*kong.KeyAuth  `yaml:"keyauth_credentials,omitempty"`
+	HMACAuths     []*kong.HMACAuth `yaml:"hmacauth_credentials,omitempty"`
 }
 
 // Info contains meta-data of the file.

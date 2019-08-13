@@ -279,6 +279,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				return nil, nil, err
 			}
 		}
+		for _, cred := range c.HMACAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Username) {
+				return nil, nil, errors.New("username field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.HMACAuths.Get(*cred.Username)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate hmac-auth "+
+					"definitions found for username: '%s'", *cred.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.HMACAuths.Add(state.HMACAuth{HMACAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	return kongState, fileContent.Info.SelectorTags, nil
