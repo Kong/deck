@@ -67,6 +67,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting consumer into state")
 			}
 		}
+		for _, cred := range raw.KeyAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for key-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.KeyAuths.Add(state.KeyAuth{KeyAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting key-auth into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -218,6 +231,11 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	}
 	state.Targets = targets
 
+	keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.KeyAuths = keyAuths
 	return &state, nil
 }
 
@@ -378,4 +396,25 @@ func GetAllTargets(client *kong.Client,
 	}
 
 	return targets, nil
+}
+
+// GetAllKeyAuths queries Kong for all key-auth credentials using client.
+func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
+	var keyAuths []*kong.KeyAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.KeyAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		keyAuths = append(keyAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return keyAuths, nil
 }

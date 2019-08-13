@@ -29,6 +29,8 @@ type KongRawState struct {
 
 	Consumers      []*kong.Consumer
 	CustomEntities []*custom.Entity
+
+	KeyAuths []*kong.KeyAuth
 }
 
 // ErrArray holds an array of errors.
