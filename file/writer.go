@@ -14,6 +14,7 @@ import (
 // KongStateToFile writes a state object to file with filename.
 // It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState,
+	// TODO break-down this giant function
 	selectTags []string, filename string) error {
 	var file Content
 
@@ -167,6 +168,17 @@ func KongStateToFile(kongState *state.KongState,
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
 			return strings.Compare(*c.Plugins[i].Name, *c.Plugins[j].Name) < 0
 		})
+		// custom-entities associated with Consumer
+		keyAuths, err := kongState.KeyAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range keyAuths {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.KeyAuths = append(c.KeyAuths, &k.KeyAuth)
+		}
 		c.ID = nil
 		c.CreatedAt = nil
 		utils.RemoveTags(&c.Consumer, selectTags)

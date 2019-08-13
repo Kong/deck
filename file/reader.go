@@ -259,6 +259,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				return nil, nil, err
 			}
 		}
+		for _, cred := range c.KeyAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Key) {
+				return nil, nil, errors.New("key field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.KeyAuths.Get(*cred.Key)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate key-auth definitions"+
+					" found for apikey: '%s'", *cred.Key)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.KeyAuths.Add(state.KeyAuth{KeyAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	return kongState, fileContent.Info.SelectorTags, nil
