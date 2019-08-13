@@ -375,3 +375,56 @@ func (crud *consumerPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.Consumers.Update(*svc)
 	return nil, nil
 }
+
+type keyAuthPostAction struct{}
+
+// Create creates the key-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.KeyAuth, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *keyAuthPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.KeyAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.KeyAuths.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the key-auth from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.KeyAuth, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *keyAuthPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.KeyAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.KeyAuths.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the key-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.KeyAuth, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *keyAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.KeyAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.KeyAuths.Update(*svc)
+	return nil, nil
+}
