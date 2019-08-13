@@ -11,7 +11,8 @@ type KongState struct {
 	Plugins      *PluginsCollection
 	Consumers    *ConsumersCollection
 
-	KeyAuths *KeyAuthsCollection
+	KeyAuths  *KeyAuthsCollection
+	HMACAuths *HMACAuthsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -49,6 +50,11 @@ func NewKongState() (*KongState, error) {
 	if err != nil {
 		return nil, err
 	}
+	hmacAuths, err := NewHMACAuthsCollection()
+	if err != nil {
+		return nil, err
+	}
+
 	return &KongState{
 		Services:     services,
 		Routes:       routes,
@@ -58,6 +64,7 @@ func NewKongState() (*KongState, error) {
 		Plugins:      plugins,
 		Consumers:    consumers,
 
-		KeyAuths: keyAuths,
+		KeyAuths:  keyAuths,
+		HMACAuths: hmacAuths,
 	}, nil
 }

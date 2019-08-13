@@ -138,7 +138,7 @@ func TestKeyAuthGetAll(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(collection)
 
-	populateWithFixtures(assert, collection)
+	populateWithKeyAuthFixtures(assert, collection)
 
 	keyAuths, err := collection.GetAll()
 	assert.Nil(err)
@@ -151,7 +151,7 @@ func TestKeyAuthGetByConsumer(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(collection)
 
-	populateWithFixtures(assert, collection)
+	populateWithKeyAuthFixtures(assert, collection)
 
 	keyAuths, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
@@ -162,7 +162,7 @@ func TestKeyAuthGetByConsumer(t *testing.T) {
 	assert.Equal(2, len(keyAuths))
 }
 
-func populateWithFixtures(assert *assert.Assertions,
+func populateWithKeyAuthFixtures(assert *assert.Assertions,
 	collection *KeyAuthsCollection) {
 
 	keyAuths := []KeyAuth{

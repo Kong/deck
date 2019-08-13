@@ -329,7 +329,7 @@ func (k1 *KeyAuth) Equal(k2 *KeyAuth) bool {
 	return reflect.DeepEqual(k1.KeyAuth, k2.KeyAuth)
 }
 
-// EqualWithOpts returns true if r1 and k2 are equal.
+// EqualWithOpts returns true if k1 and k2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
@@ -350,4 +350,39 @@ func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
 		k2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
+}
+
+// HMACAuth represents a key-auth credential in Kong.
+// It adds some helper methods along with Meta to the original HMACAuth object.
+type HMACAuth struct {
+	kong.HMACAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if h1 and h2 are equal.
+func (h1 *HMACAuth) Equal(h2 *HMACAuth) bool {
+	return reflect.DeepEqual(h1.HMACAuth, h2.HMACAuth)
+}
+
+// EqualWithOpts returns true if h1 and h2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	h1Copy := h1.HMACAuth.DeepCopy()
+	h2Copy := h2.HMACAuth.DeepCopy()
+
+	if ignoreID {
+		h1Copy.ID = nil
+		h2Copy.ID = nil
+	}
+	if ignoreTS {
+		h1Copy.CreatedAt = nil
+		h2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		h1Copy.Consumer = nil
+		h2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(h1Copy, h2Copy)
 }
