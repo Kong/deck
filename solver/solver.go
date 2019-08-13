@@ -58,6 +58,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
 	}
+	err = r.Register("key-auth", &drycrud.KeyAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
+	}
 	return &r, nil
 }
 
@@ -116,6 +120,11 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("consumer", consumer)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
+	}
+	keyAuth, err := cruds.NewKeyAuthCRUD(client)
+	err = r.Register("key-auth", keyAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
 	}
 	return &r, nil
 }
