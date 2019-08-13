@@ -316,3 +316,38 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 	}
 	return reflect.DeepEqual(c1Copt, c2Copy)
 }
+
+// KeyAuth represents a key-auth credential in Kong.
+// It adds some helper methods along with Meta to the original KeyAuth object.
+type KeyAuth struct {
+	kong.KeyAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if k1 and k2 are equal.
+func (k1 *KeyAuth) Equal(k2 *KeyAuth) bool {
+	return reflect.DeepEqual(k1.KeyAuth, k2.KeyAuth)
+}
+
+// EqualWithOpts returns true if r1 and k2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	k1Copy := k1.KeyAuth.DeepCopy()
+	k2Copy := k2.KeyAuth.DeepCopy()
+
+	if ignoreID {
+		k1Copy.ID = nil
+		k2Copy.ID = nil
+	}
+	if ignoreTS {
+		k1Copy.CreatedAt = nil
+		k2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		k1Copy.Consumer = nil
+		k2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(k1Copy, k2Copy)
+}
