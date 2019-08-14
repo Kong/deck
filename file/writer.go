@@ -209,6 +209,16 @@ func KongStateToFile(kongState *state.KongState,
 			k.Consumer = nil
 			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
 		}
+		aclGroups, err := kongState.ACLGroups.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range aclGroups {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.ACLGroups = append(c.ACLGroups, &k.ACLGroup)
+		}
 		c.ID = nil
 		c.CreatedAt = nil
 		utils.RemoveTags(&c.Consumer, selectTags)

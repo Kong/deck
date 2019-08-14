@@ -44,6 +44,7 @@ type Consumer struct {
 	HMACAuths     []*kong.HMACAuth  `yaml:"hmacauth_credentials,omitempty"`
 	JWTAuths      []*kong.JWTAuth   `yaml:"jwt_secrets,omitempty"`
 	BasicAuths    []*kong.BasicAuth `yaml:"basicauth_credentials,omitempty"`
+	ACLGroups     []*kong.ACLGroup  `yaml:"acls,omitempty"`
 }
 
 // Info contains meta-data of the file.

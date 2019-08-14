@@ -234,7 +234,8 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(c.Consumer.Username) {
-			return nil, nil, errors.New("all services in the file must be named")
+			return nil, nil,
+				errors.New("all consumers in the file must have a username")
 		}
 		_, err := kongState.Consumers.Get(*c.Consumer.Username)
 		if err != state.ErrNotFound {
@@ -335,6 +336,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 			}
 			cred.Consumer = c.Consumer.DeepCopy()
 			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.ACLGroups {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Group) {
+				return nil, nil, errors.New("group field is missing" +
+					"for acl")
+			}
+			_, err := kongState.ACLGroups.Get(*c.Username, *cred.Group)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate acl definitions"+
+					" found for username: '%s'", *c.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.ACLGroups.Add(state.ACLGroup{ACLGroup: *cred})
 			if err != nil {
 				return nil, nil, err
 			}
