@@ -421,3 +421,42 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 	}
 	return reflect.DeepEqual(j1Copy, j2Copy)
 }
+
+// BasicAuth represents a basic-auth credential in Kong.
+// It adds some helper methods along with Meta to the original BasicAuth object.
+type BasicAuth struct {
+	kong.BasicAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if b1 and b2 are equal.
+func (b1 *BasicAuth) Equal(b2 *BasicAuth) bool {
+	return reflect.DeepEqual(b1.BasicAuth, b2.BasicAuth)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
+	ignoreTS, ignorePassword, ignoreForeign bool) bool {
+	b1Copy := b1.BasicAuth.DeepCopy()
+	b2Copy := b2.BasicAuth.DeepCopy()
+
+	if ignoreID {
+		b1Copy.ID = nil
+		b2Copy.ID = nil
+	}
+	if ignoreTS {
+		b1Copy.CreatedAt = nil
+		b2Copy.CreatedAt = nil
+	}
+	if ignorePassword {
+		b1Copy.Password = nil
+		b2Copy.Password = nil
+	}
+	if ignoreForeign {
+		b1Copy.Consumer = nil
+		b2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(b1Copy, b2Copy)
+}
