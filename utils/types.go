@@ -30,9 +30,10 @@ type KongRawState struct {
 	Consumers      []*kong.Consumer
 	CustomEntities []*custom.Entity
 
-	KeyAuths  []*kong.KeyAuth
-	HMACAuths []*kong.HMACAuth
-	JWTAuths  []*kong.JWTAuth
+	KeyAuths   []*kong.KeyAuth
+	HMACAuths  []*kong.HMACAuth
+	JWTAuths   []*kong.JWTAuth
+	BasicAuths []*kong.BasicAuth
 }
 
 // ErrArray holds an array of errors.

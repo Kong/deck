@@ -199,6 +199,16 @@ func KongStateToFile(kongState *state.KongState,
 			k.Consumer = nil
 			c.JWTAuths = append(c.JWTAuths, &k.JWTAuth)
 		}
+		basicAuths, err := kongState.BasicAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range basicAuths {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
+		}
 		c.ID = nil
 		c.CreatedAt = nil
 		utils.RemoveTags(&c.Consumer, selectTags)

@@ -319,6 +319,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				return nil, nil, err
 			}
 		}
+		for _, cred := range c.BasicAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Username) {
+				return nil, nil, errors.New("username field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.BasicAuths.Get(*cred.Username)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate basic-auth definitions"+
+					" found for username: '%s'", *cred.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	return kongState, fileContent.Info.SelectorTags, nil
