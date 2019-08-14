@@ -62,6 +62,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
 	}
+	err = r.Register("hmac-auth", &drycrud.HMACAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
 	return &r, nil
 }
 
@@ -125,6 +129,11 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("key-auth", keyAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
+	}
+	hmacAuth, err := cruds.NewHMACAuthCRUD(client)
+	err = r.Register("hmac-auth", hmacAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
 	}
 	return &r, nil
 }
