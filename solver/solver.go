@@ -74,6 +74,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
 	}
+	err = r.Register("acl-group", &drycrud.ACLGroupCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
+	}
 	return &r, nil
 }
 
@@ -152,6 +156,11 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("basic-auth", basicAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
+	}
+	aclGroups, err := cruds.NewACLGroupCRUD(client)
+	err = r.Register("acl-group", aclGroups)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
 	}
 	return &r, nil
 }
