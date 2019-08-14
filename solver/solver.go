@@ -66,6 +66,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
 	}
+	err = r.Register("jwt-auth", &drycrud.JWTAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
+	}
 	return &r, nil
 }
 
@@ -134,6 +138,11 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("hmac-auth", hmacAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
+	jwtAuth, err := cruds.NewJWTAuthCRUD(client)
+	err = r.Register("jwt-auth", jwtAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
 	}
 	return &r, nil
 }

@@ -73,12 +73,6 @@ func (s *HMACAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO strip out or trim key diff
-	// decK's logs will be sent to logging system as it is likely
-	// users are using decK using a CI.
-	// A diff of HMACAuth is unlikely but when this happens, we don't
-	// want to be logging the entire key.
-	// This is a larger problem with decK.
 	print.UpdatePrintf("updating hmac-auth %s\n%s", *hmacAuth.Username, diffString)
 	return hmacAuth, nil
 }
