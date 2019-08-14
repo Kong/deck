@@ -13,6 +13,7 @@ type KongState struct {
 
 	KeyAuths  *KeyAuthsCollection
 	HMACAuths *HMACAuthsCollection
+	JWTAuths  *JWTAuthsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -54,6 +55,10 @@ func NewKongState() (*KongState, error) {
 	if err != nil {
 		return nil, err
 	}
+	jwtAuths, err := NewJWTAuthsCollection()
+	if err != nil {
+		return nil, err
+	}
 
 	return &KongState{
 		Services:     services,
@@ -66,5 +71,6 @@ func NewKongState() (*KongState, error) {
 
 		KeyAuths:  keyAuths,
 		HMACAuths: hmacAuths,
+		JWTAuths:  jwtAuths,
 	}, nil
 }

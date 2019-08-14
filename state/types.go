@@ -386,3 +386,38 @@ func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
 	}
 	return reflect.DeepEqual(h1Copy, h2Copy)
 }
+
+// JWTAuth represents a jwt credential in Kong.
+// It adds some helper methods along with Meta to the original JWTAuth object.
+type JWTAuth struct {
+	kong.JWTAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if j1 and j2 are equal.
+func (j1 *JWTAuth) Equal(j2 *JWTAuth) bool {
+	return reflect.DeepEqual(j1.JWTAuth, j2.JWTAuth)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	j1Copy := j1.JWTAuth.DeepCopy()
+	j2Copy := j2.JWTAuth.DeepCopy()
+
+	if ignoreID {
+		j1Copy.ID = nil
+		j2Copy.ID = nil
+	}
+	if ignoreTS {
+		j1Copy.CreatedAt = nil
+		j2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		j1Copy.Consumer = nil
+		j2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(j1Copy, j2Copy)
+}
