@@ -106,6 +106,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting jwt into state")
 			}
 		}
+		for _, cred := range raw.BasicAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for basic-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting basic-auth into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -274,6 +287,12 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.JWTAuths = jwtAuths
+
+	basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.BasicAuths = basicAuths
 
 	return &state, nil
 }
@@ -488,6 +507,27 @@ func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error)
 
 	for {
 		s, nextopt, err := client.JWTAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		jwtAuths = append(jwtAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return jwtAuths, nil
+}
+
+// GetAllBasicAuths queries Kong for all jwt credentials using client.
+func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
+	var jwtAuths []*kong.BasicAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.BasicAuths.List(nil, opt)
 		if err != nil {
 			return nil, err
 		}
