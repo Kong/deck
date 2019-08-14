@@ -119,6 +119,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting basic-auth into state")
 			}
 		}
+		for _, cred := range raw.ACLGroups {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for acl '%v'",
+					*cred.Consumer.ID, *cred.Group)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.ACLGroups.Add(state.ACLGroup{ACLGroup: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting basic-auth into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -293,6 +306,12 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.BasicAuths = basicAuths
+
+	aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.ACLGroups = aclGroups
 
 	return &state, nil
 }
@@ -519,7 +538,7 @@ func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error)
 	return jwtAuths, nil
 }
 
-// GetAllBasicAuths queries Kong for all jwt credentials using client.
+// GetAllBasicAuths queries Kong for all basic-auth credentials using client.
 func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
 	var jwtAuths []*kong.BasicAuth
 	// tags are not supported on credentials
@@ -538,4 +557,25 @@ func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, er
 		opt = nextopt
 	}
 	return jwtAuths, nil
+}
+
+// GetAllACLGroups queries Kong for all ACL groups using client.
+func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
+	var aclGroups []*kong.ACLGroup
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.ACLs.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		aclGroups = append(aclGroups, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return aclGroups, nil
 }
