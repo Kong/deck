@@ -80,6 +80,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
 	}
+	err = s.postProcess.Register("acl-group", &aclGroupPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
+	}
 	return s, nil
 }
 
@@ -127,6 +131,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	err = sc.deleteBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteACLGroups()
 	if err != nil {
 		return err
 	}
@@ -197,6 +205,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	err = sc.createUpdateBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateACLGroups()
 	if err != nil {
 		return err
 	}

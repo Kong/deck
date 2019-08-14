@@ -587,3 +587,56 @@ func (crud *basicAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.BasicAuths.Update(*svc)
 	return nil, nil
 }
+
+type aclGroupPostAction struct{}
+
+// Create creates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.ACLGroup, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *aclGroupPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.ACLGroup)
+	if !ok {
+		panic("whoops")
+	}
+	s.ACLGroups.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.ACLGroup, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *aclGroupPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.ACLGroup)
+	if !ok {
+		panic("whoops")
+	}
+	s.ACLGroups.DeleteByID(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.ACLGroup, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *aclGroupPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.ACLGroup)
+	if !ok {
+		panic("whoops")
+	}
+	s.ACLGroups.Update(*svc)
+	return nil, nil
+}
