@@ -67,6 +67,71 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting consumer into state")
 			}
 		}
+		for _, cred := range raw.KeyAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for key-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.KeyAuths.Add(state.KeyAuth{KeyAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting key-auth into state")
+			}
+		}
+		for _, cred := range raw.HMACAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for hmac-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.HMACAuths.Add(state.HMACAuth{HMACAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting hmac-auth into state")
+			}
+		}
+		for _, cred := range raw.JWTAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for jwt '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.JWTAuths.Add(state.JWTAuth{JWTAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting jwt into state")
+			}
+		}
+		for _, cred := range raw.BasicAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for basic-auth '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting basic-auth into state")
+			}
+		}
+		for _, cred := range raw.ACLGroups {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for acl '%v'",
+					*cred.Consumer.ID, *cred.Group)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.ACLGroups.Add(state.ACLGroup{ACLGroup: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting basic-auth into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -217,6 +282,36 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.Targets = targets
+
+	keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.KeyAuths = keyAuths
+
+	hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.HMACAuths = hmacAuths
+
+	jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.JWTAuths = jwtAuths
+
+	basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.BasicAuths = basicAuths
+
+	aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.ACLGroups = aclGroups
 
 	return &state, nil
 }
@@ -378,4 +473,109 @@ func GetAllTargets(client *kong.Client,
 	}
 
 	return targets, nil
+}
+
+// GetAllKeyAuths queries Kong for all key-auth credentials using client.
+func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
+	var keyAuths []*kong.KeyAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.KeyAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		keyAuths = append(keyAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return keyAuths, nil
+}
+
+// GetAllHMACAuths queries Kong for all hmac-auth credentials using client.
+func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
+	var hmacAuths []*kong.HMACAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.HMACAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		hmacAuths = append(hmacAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return hmacAuths, nil
+}
+
+// GetAllJWTAuths queries Kong for all jwt credentials using client.
+func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
+	var jwtAuths []*kong.JWTAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.JWTAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		jwtAuths = append(jwtAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return jwtAuths, nil
+}
+
+// GetAllBasicAuths queries Kong for all basic-auth credentials using client.
+func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
+	var jwtAuths []*kong.BasicAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.BasicAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		jwtAuths = append(jwtAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return jwtAuths, nil
+}
+
+// GetAllACLGroups queries Kong for all ACL groups using client.
+func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
+	var aclGroups []*kong.ACLGroup
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.ACLs.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		aclGroups = append(aclGroups, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return aclGroups, nil
 }

@@ -58,6 +58,26 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
 	}
+	err = r.Register("key-auth", &drycrud.KeyAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
+	}
+	err = r.Register("hmac-auth", &drycrud.HMACAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
+	err = r.Register("jwt-auth", &drycrud.JWTAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
+	}
+	err = r.Register("basic-auth", &drycrud.BasicAuthCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
+	}
+	err = r.Register("acl-group", &drycrud.ACLGroupCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
+	}
 	return &r, nil
 }
 
@@ -116,6 +136,31 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("consumer", consumer)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
+	}
+	keyAuth, err := cruds.NewKeyAuthCRUD(client)
+	err = r.Register("key-auth", keyAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
+	}
+	hmacAuth, err := cruds.NewHMACAuthCRUD(client)
+	err = r.Register("hmac-auth", hmacAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
+	jwtAuth, err := cruds.NewJWTAuthCRUD(client)
+	err = r.Register("jwt-auth", jwtAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
+	}
+	basicAuth, err := cruds.NewBasicAuthCRUD(client)
+	err = r.Register("basic-auth", basicAuth)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
+	}
+	aclGroups, err := cruds.NewACLGroupCRUD(client)
+	err = r.Register("acl-group", aclGroups)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
 	}
 	return &r, nil
 }

@@ -292,3 +292,154 @@ func TestConsumerEqual(t *testing.T) {
 	assert.False(c1.EqualWithOpts(&c2, false, false))
 	assert.False(c1.EqualWithOpts(&c2, false, true))
 }
+
+func TestKeyAuthEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var k1, k2 KeyAuth
+	k1.ID = kong.String("foo")
+	k1.Key = kong.String("bar")
+
+	k2.ID = kong.String("foo")
+	k2.Key = kong.String("baz")
+
+	assert.False(k1.Equal(&k2))
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+
+	k2.Key = kong.String("bar")
+	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+
+	k1.ID = kong.String("fuu")
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, true, false, false))
+
+	k2.CreatedAt = kong.Int(1)
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+
+	k2.Consumer = &kong.Consumer{Username: kong.String("u1")}
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+	assert.False(k1.EqualWithOpts(&k2, false, false, true))
+}
+
+func TestHMACAuthEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var k1, k2 HMACAuth
+	k1.ID = kong.String("foo")
+	k1.Username = kong.String("bar")
+
+	k2.ID = kong.String("foo")
+	k2.Username = kong.String("baz")
+
+	assert.False(k1.Equal(&k2))
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+
+	k2.Username = kong.String("bar")
+	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+
+	k1.ID = kong.String("fuu")
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, true, false, false))
+
+	k2.CreatedAt = kong.Int(1)
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+
+	k2.Consumer = &kong.Consumer{Username: kong.String("u1")}
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+	assert.False(k1.EqualWithOpts(&k2, false, false, true))
+}
+
+func TestJWTAuthEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var k1, k2 JWTAuth
+	k1.ID = kong.String("foo")
+	k1.Key = kong.String("bar")
+
+	k2.ID = kong.String("foo")
+	k2.Key = kong.String("baz")
+
+	assert.False(k1.Equal(&k2))
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+
+	k2.Key = kong.String("bar")
+	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+
+	k1.ID = kong.String("fuu")
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, true, false, false))
+
+	k2.CreatedAt = kong.Int(1)
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+
+	k2.Consumer = &kong.Consumer{Username: kong.String("u1")}
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+	assert.False(k1.EqualWithOpts(&k2, false, false, true))
+}
+
+func TestBasicAuthEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var k1, k2 BasicAuth
+	k1.ID = kong.String("foo")
+	k1.Password = kong.String("bar")
+
+	k2.ID = kong.String("foo")
+	k2.Password = kong.String("baz")
+
+	assert.False(k1.Equal(&k2))
+	assert.False(k1.EqualWithOpts(&k2, false, false, false, false))
+
+	k2.Password = kong.String("bar")
+	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false, true))
+
+	k1.ID = kong.String("fuu")
+	assert.False(k1.EqualWithOpts(&k2, false, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, true, false, false, false))
+
+	k2.CreatedAt = kong.Int(1)
+	assert.False(k1.EqualWithOpts(&k2, false, false, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, true, false, false))
+
+	k2.Consumer = &kong.Consumer{Username: kong.String("u1")}
+	assert.False(k1.EqualWithOpts(&k2, false, true, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, false, true, false))
+}
+
+func TestACLGroupEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var k1, k2 ACLGroup
+	k1.ID = kong.String("foo")
+	k1.Group = kong.String("bar")
+
+	k2.ID = kong.String("foo")
+	k2.Group = kong.String("baz")
+
+	assert.False(k1.Equal(&k2))
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+
+	k2.Group = kong.String("bar")
+	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+
+	k1.ID = kong.String("fuu")
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.True(k1.EqualWithOpts(&k2, true, false, false))
+
+	k2.CreatedAt = kong.Int(1)
+	assert.False(k1.EqualWithOpts(&k2, false, false, false))
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+
+	k2.Consumer = &kong.Consumer{Username: kong.String("u1")}
+	assert.False(k1.EqualWithOpts(&k2, false, true, false))
+	assert.False(k1.EqualWithOpts(&k2, false, false, true))
+}

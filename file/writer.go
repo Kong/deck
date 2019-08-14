@@ -14,6 +14,7 @@ import (
 // KongStateToFile writes a state object to file with filename.
 // It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState,
+	// TODO break-down this giant function
 	selectTags []string, filename string) error {
 	var file Content
 
@@ -167,6 +168,57 @@ func KongStateToFile(kongState *state.KongState,
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
 			return strings.Compare(*c.Plugins[i].Name, *c.Plugins[j].Name) < 0
 		})
+		// custom-entities associated with Consumer
+		keyAuths, err := kongState.KeyAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range keyAuths {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.KeyAuths = append(c.KeyAuths, &k.KeyAuth)
+		}
+		hmacAuth, err := kongState.HMACAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range hmacAuth {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.HMACAuths = append(c.HMACAuths, &k.HMACAuth)
+		}
+		jwtSecrets, err := kongState.JWTAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range jwtSecrets {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.JWTAuths = append(c.JWTAuths, &k.JWTAuth)
+		}
+		basicAuths, err := kongState.BasicAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range basicAuths {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
+		}
+		aclGroups, err := kongState.ACLGroups.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range aclGroups {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.ACLGroups = append(c.ACLGroups, &k.ACLGroup)
+		}
 		c.ID = nil
 		c.CreatedAt = nil
 		utils.RemoveTags(&c.Consumer, selectTags)

@@ -64,6 +64,26 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
 	}
+	err = s.postProcess.Register("key-auth", &keyAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
+	}
+	err = s.postProcess.Register("hmac-auth", &hmacAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
+	err = s.postProcess.Register("jwt-auth", &jwtAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
+	}
+	err = s.postProcess.Register("basic-auth", &basicAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
+	}
+	err = s.postProcess.Register("acl-group", &aclGroupPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
+	}
 	return s, nil
 }
 
@@ -94,6 +114,27 @@ func (sc *Syncer) delete() error {
 	}
 	sc.wait()
 	err = sc.deleteServices()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.deleteKeyAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteHMACAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteJWTAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteACLGroups()
 	if err != nil {
 		return err
 	}
@@ -150,6 +191,29 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
+	sc.wait()
+	err = sc.createUpdateKeyAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateHMACAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateJWTAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateACLGroups()
+	if err != nil {
+		return err
+	}
+	// TODO this barrier can be removed
+	// TODO open up barriers and optimize
 	sc.wait()
 	// upstreams should be created before targets
 	err = sc.createUpdateUpstreams()

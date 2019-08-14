@@ -234,7 +234,8 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				strconv.FormatUint(count.Inc(), 10))
 		}
 		if utils.Empty(c.Consumer.Username) {
-			return nil, nil, errors.New("all services in the file must be named")
+			return nil, nil,
+				errors.New("all consumers in the file must have a username")
 		}
 		_, err := kongState.Consumers.Get(*c.Consumer.Username)
 		if err != state.ErrNotFound {
@@ -255,6 +256,106 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 			}
 			p.Consumer = c.Consumer.DeepCopy()
 			err = kongState.Plugins.Add(state.Plugin{Plugin: p.Plugin})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.KeyAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Key) {
+				return nil, nil, errors.New("key field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.KeyAuths.Get(*cred.Key)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate key-auth definitions"+
+					" found for apikey: '%s'", *cred.Key)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.KeyAuths.Add(state.KeyAuth{KeyAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.HMACAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Username) {
+				return nil, nil, errors.New("username field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.HMACAuths.Get(*cred.Username)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate hmac-auth "+
+					"definitions found for username: '%s'", *cred.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.HMACAuths.Add(state.HMACAuth{HMACAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.JWTAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Key) {
+				return nil, nil, errors.New("key field is missing" +
+					"for jwt_secret")
+			}
+			_, err := kongState.JWTAuths.Get(*cred.Key)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate jwt definitions"+
+					" found for key: '%s'", *cred.Key)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.JWTAuths.Add(state.JWTAuth{JWTAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.BasicAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Username) {
+				return nil, nil, errors.New("username field is missing" +
+					"for keyauth_credential")
+			}
+			_, err := kongState.BasicAuths.Get(*cred.Username)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate basic-auth definitions"+
+					" found for username: '%s'", *cred.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
+		for _, cred := range c.ACLGroups {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Group) {
+				return nil, nil, errors.New("group field is missing" +
+					"for acl")
+			}
+			_, err := kongState.ACLGroups.Get(*c.Username, *cred.Group)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate acl definitions"+
+					" found for username: '%s'", *c.Username)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.ACLGroups.Add(state.ACLGroup{ACLGroup: *cred})
 			if err != nil {
 				return nil, nil, err
 			}

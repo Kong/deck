@@ -316,3 +316,182 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 	}
 	return reflect.DeepEqual(c1Copt, c2Copy)
 }
+
+// KeyAuth represents a key-auth credential in Kong.
+// It adds some helper methods along with Meta to the original KeyAuth object.
+type KeyAuth struct {
+	kong.KeyAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if k1 and k2 are equal.
+func (k1 *KeyAuth) Equal(k2 *KeyAuth) bool {
+	return reflect.DeepEqual(k1.KeyAuth, k2.KeyAuth)
+}
+
+// EqualWithOpts returns true if k1 and k2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	k1Copy := k1.KeyAuth.DeepCopy()
+	k2Copy := k2.KeyAuth.DeepCopy()
+
+	if ignoreID {
+		k1Copy.ID = nil
+		k2Copy.ID = nil
+	}
+	if ignoreTS {
+		k1Copy.CreatedAt = nil
+		k2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		k1Copy.Consumer = nil
+		k2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(k1Copy, k2Copy)
+}
+
+// HMACAuth represents a key-auth credential in Kong.
+// It adds some helper methods along with Meta to the original HMACAuth object.
+type HMACAuth struct {
+	kong.HMACAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if h1 and h2 are equal.
+func (h1 *HMACAuth) Equal(h2 *HMACAuth) bool {
+	return reflect.DeepEqual(h1.HMACAuth, h2.HMACAuth)
+}
+
+// EqualWithOpts returns true if h1 and h2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	h1Copy := h1.HMACAuth.DeepCopy()
+	h2Copy := h2.HMACAuth.DeepCopy()
+
+	if ignoreID {
+		h1Copy.ID = nil
+		h2Copy.ID = nil
+	}
+	if ignoreTS {
+		h1Copy.CreatedAt = nil
+		h2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		h1Copy.Consumer = nil
+		h2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(h1Copy, h2Copy)
+}
+
+// JWTAuth represents a jwt credential in Kong.
+// It adds some helper methods along with Meta to the original JWTAuth object.
+type JWTAuth struct {
+	kong.JWTAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if j1 and j2 are equal.
+func (j1 *JWTAuth) Equal(j2 *JWTAuth) bool {
+	return reflect.DeepEqual(j1.JWTAuth, j2.JWTAuth)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	j1Copy := j1.JWTAuth.DeepCopy()
+	j2Copy := j2.JWTAuth.DeepCopy()
+
+	if ignoreID {
+		j1Copy.ID = nil
+		j2Copy.ID = nil
+	}
+	if ignoreTS {
+		j1Copy.CreatedAt = nil
+		j2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		j1Copy.Consumer = nil
+		j2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(j1Copy, j2Copy)
+}
+
+// BasicAuth represents a basic-auth credential in Kong.
+// It adds some helper methods along with Meta to the original BasicAuth object.
+type BasicAuth struct {
+	kong.BasicAuth `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if b1 and b2 are equal.
+func (b1 *BasicAuth) Equal(b2 *BasicAuth) bool {
+	return reflect.DeepEqual(b1.BasicAuth, b2.BasicAuth)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
+	ignoreTS, ignorePassword, ignoreForeign bool) bool {
+	b1Copy := b1.BasicAuth.DeepCopy()
+	b2Copy := b2.BasicAuth.DeepCopy()
+
+	if ignoreID {
+		b1Copy.ID = nil
+		b2Copy.ID = nil
+	}
+	if ignoreTS {
+		b1Copy.CreatedAt = nil
+		b2Copy.CreatedAt = nil
+	}
+	if ignorePassword {
+		b1Copy.Password = nil
+		b2Copy.Password = nil
+	}
+	if ignoreForeign {
+		b1Copy.Consumer = nil
+		b2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(b1Copy, b2Copy)
+}
+
+// ACLGroup represents an ACL group for a consumer in Kong.
+// It adds some helper methods along with Meta to the original ACLGroup object.
+type ACLGroup struct {
+	kong.ACLGroup `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if b1 and b2 are equal.
+func (b1 *ACLGroup) Equal(b2 *ACLGroup) bool {
+	return reflect.DeepEqual(b1.ACLGroup, b2.ACLGroup)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	b1Copy := b1.ACLGroup.DeepCopy()
+	b2Copy := b2.ACLGroup.DeepCopy()
+
+	if ignoreID {
+		b1Copy.ID = nil
+		b2Copy.ID = nil
+	}
+	if ignoreTS {
+		b1Copy.CreatedAt = nil
+		b2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		b1Copy.Consumer = nil
+		b2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(b1Copy, b2Copy)
+}
