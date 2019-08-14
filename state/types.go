@@ -460,3 +460,38 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
+
+// ACLGroup represents an ACL group for a consumer in Kong.
+// It adds some helper methods along with Meta to the original ACLGroup object.
+type ACLGroup struct {
+	kong.ACLGroup `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if b1 and b2 are equal.
+func (b1 *ACLGroup) Equal(b2 *ACLGroup) bool {
+	return reflect.DeepEqual(b1.ACLGroup, b2.ACLGroup)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	b1Copy := b1.ACLGroup.DeepCopy()
+	b2Copy := b2.ACLGroup.DeepCopy()
+
+	if ignoreID {
+		b1Copy.ID = nil
+		b2Copy.ID = nil
+	}
+	if ignoreTS {
+		b1Copy.CreatedAt = nil
+		b2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		b1Copy.Consumer = nil
+		b2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(b1Copy, b2Copy)
+}
