@@ -428,3 +428,56 @@ func (crud *keyAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.KeyAuths.Update(*svc)
 	return nil, nil
 }
+
+type hmacAuthPostAction struct{}
+
+// Create creates the hmac-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.HMACAuth, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *hmacAuthPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.HMACAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.HMACAuths.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the hmac-auth from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.HMACAuth, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *hmacAuthPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.HMACAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.HMACAuths.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the hmac-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.HMACAuth, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *hmacAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.HMACAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.HMACAuths.Update(*svc)
+	return nil, nil
+}

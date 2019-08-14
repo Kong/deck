@@ -33,7 +33,7 @@ func (sc *Syncer) deleteKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 	if keyAuth.Consumer == nil ||
 		(utils.Empty(keyAuth.Consumer.ID)) {
 		return nil, errors.Errorf("key-auth has no associated consumer: %+v",
-			keyAuth.Key)
+			*keyAuth.Key)
 	}
 	// lookup by Name
 	_, err := sc.targetState.KeyAuths.Get(*keyAuth.Key)

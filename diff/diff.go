@@ -68,6 +68,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
 	}
+	err = s.postProcess.Register("hmac-auth", &hmacAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
+	}
 	return s, nil
 }
 
@@ -103,6 +107,10 @@ func (sc *Syncer) delete() error {
 	}
 	sc.wait()
 	err = sc.deleteKeyAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteHMACAuths()
 	if err != nil {
 		return err
 	}
@@ -161,6 +169,10 @@ func (sc *Syncer) createUpdate() error {
 	}
 	sc.wait()
 	err = sc.createUpdateKeyAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateHMACAuths()
 	if err != nil {
 		return err
 	}
