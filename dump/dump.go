@@ -93,6 +93,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting hmac-auth into state")
 			}
 		}
+		for _, cred := range raw.JWTAuths {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for jwt '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.JWTAuths.Add(state.JWTAuth{JWTAuth: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting jwt into state")
+			}
+		}
 	}
 	for _, u := range raw.Upstreams {
 		if utils.Empty(u.Name) {
@@ -255,6 +268,13 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.HMACAuths = hmacAuths
+
+	jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.JWTAuths = jwtAuths
+
 	return &state, nil
 }
 
@@ -457,4 +477,25 @@ func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, erro
 		opt = nextopt
 	}
 	return hmacAuths, nil
+}
+
+// GetAllJWTAuths queries Kong for all jwt credentials using client.
+func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
+	var jwtAuths []*kong.JWTAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.JWTAuths.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		jwtAuths = append(jwtAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return jwtAuths, nil
 }
