@@ -481,3 +481,56 @@ func (crud *hmacAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.HMACAuths.Update(*svc)
 	return nil, nil
 }
+
+type jwtAuthPostAction struct{}
+
+// Create creates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.JWTAuth, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *jwtAuthPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.JWTAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.JWTAuths.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.JWTAuth, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *jwtAuthPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.JWTAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.JWTAuths.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.JWTAuth, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *jwtAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.JWTAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.JWTAuths.Update(*svc)
+	return nil, nil
+}

@@ -72,6 +72,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
 	}
+	err = s.postProcess.Register("jwt-auth", &jwtAuthPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
+	}
 	return s, nil
 }
 
@@ -111,6 +115,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	err = sc.deleteHMACAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteJWTAuths()
 	if err != nil {
 		return err
 	}
@@ -173,6 +181,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	err = sc.createUpdateHMACAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateJWTAuths()
 	if err != nil {
 		return err
 	}
