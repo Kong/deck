@@ -299,6 +299,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				return nil, nil, err
 			}
 		}
+		for _, cred := range c.JWTAuths {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.Key) {
+				return nil, nil, errors.New("key field is missing" +
+					"for jwt_secret")
+			}
+			_, err := kongState.JWTAuths.Get(*cred.Key)
+			if err != state.ErrNotFound {
+				return nil, nil, errors.Errorf("duplicate jwt definitions"+
+					" found for key: '%s'", *cred.Key)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.JWTAuths.Add(state.JWTAuth{JWTAuth: *cred})
+			if err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	return kongState, fileContent.Info.SelectorTags, nil

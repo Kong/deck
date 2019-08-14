@@ -32,6 +32,7 @@ type KongRawState struct {
 
 	KeyAuths  []*kong.KeyAuth
 	HMACAuths []*kong.HMACAuth
+	JWTAuths  []*kong.JWTAuth
 }
 
 // ErrArray holds an array of errors.

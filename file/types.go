@@ -42,6 +42,7 @@ type Consumer struct {
 	Plugins       []*Plugin        `yaml:",omitempty"`
 	KeyAuths      []*kong.KeyAuth  `yaml:"keyauth_credentials,omitempty"`
 	HMACAuths     []*kong.HMACAuth `yaml:"hmacauth_credentials,omitempty"`
+	JWTAuths      []*kong.JWTAuth  `yaml:"jwt_secrets,omitempty"`
 }
 
 // Info contains meta-data of the file.
