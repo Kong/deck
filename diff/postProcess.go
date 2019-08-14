@@ -534,3 +534,56 @@ func (crud *jwtAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.JWTAuths.Update(*svc)
 	return nil, nil
 }
+
+type basicAuthPostAction struct{}
+
+// Create creates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.BasicAuth, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *basicAuthPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.BasicAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.BasicAuths.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.BasicAuth, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *basicAuthPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.BasicAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.BasicAuths.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the jwt-auth from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.BasicAuth, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *basicAuthPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.BasicAuth)
+	if !ok {
+		panic("whoops")
+	}
+	s.BasicAuths.Update(*svc)
+	return nil, nil
+}
