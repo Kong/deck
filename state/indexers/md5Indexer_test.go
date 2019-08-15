@@ -38,6 +38,7 @@ func TestMD5FieldsIndexer(t *testing.T) {
 	ok, val, err = in.FromObject(Foo{})
 	assert.False(ok)
 	assert.NotNil(err)
+	assert.Empty(val)
 
 	s1 = ""
 	s2 = ""
@@ -47,6 +48,7 @@ func TestMD5FieldsIndexer(t *testing.T) {
 	})
 	assert.False(ok)
 	assert.Nil(err)
+	assert.Empty(val)
 
 	val, err = in.FromArgs("")
 	assert.NotNil(err)

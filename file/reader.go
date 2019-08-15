@@ -179,6 +179,9 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 			}
 			t.Upstream = u.Upstream.DeepCopy()
 			err = d.Set(&t.Target)
+			if err != nil {
+				return nil, nil, errors.Wrap(err, "setting defaults in target")
+			}
 			if err = utils.MergeTags(&t.Target, selectTags); err != nil {
 				return nil, nil, errors.Wrap(err,
 					"merging selector tag with object")

@@ -39,6 +39,7 @@ func TestSubFieldIndexer(t *testing.T) {
 	ok, val, err = in.FromObject(Baz{})
 	assert.False(ok)
 	assert.Nil(err)
+	assert.Empty(val)
 
 	s = ""
 	ok, val, err = in.FromObject(Baz{
@@ -48,6 +49,7 @@ func TestSubFieldIndexer(t *testing.T) {
 	})
 	assert.False(ok)
 	assert.Nil(err)
+	assert.Empty(val)
 
 	val, err = in.FromArgs("yolo")
 	assert.Nil(err)

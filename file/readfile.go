@@ -28,6 +28,9 @@ func getContent(fileOrDir string) (*Content, error) {
 			return nil, errors.Wrap(err, "reading file")
 		}
 		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
+		if err != nil {
+			return nil, errors.Wrap(err, "merging file contents")
+		}
 	}
 	return &res, nil
 }

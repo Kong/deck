@@ -133,31 +133,49 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 		return nil, errors.Wrapf(err, "registering 'plugin' crud")
 	}
 	consumer, err := cruds.NewConsumerCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a 'consumer' CRUD")
+	}
 	err = r.Register("consumer", consumer)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'consumer' crud")
 	}
 	keyAuth, err := cruds.NewKeyAuthCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a 'key-auth' CRUD")
+	}
 	err = r.Register("key-auth", keyAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
 	}
 	hmacAuth, err := cruds.NewHMACAuthCRUD(client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "creating 'hmac-auth' crud")
+	}
 	err = r.Register("hmac-auth", hmacAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
 	}
 	jwtAuth, err := cruds.NewJWTAuthCRUD(client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "creating 'jwt-auth' crud")
+	}
 	err = r.Register("jwt-auth", jwtAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
 	}
 	basicAuth, err := cruds.NewBasicAuthCRUD(client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "creating 'basic-auth' crud")
+	}
 	err = r.Register("basic-auth", basicAuth)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
 	}
 	aclGroups, err := cruds.NewACLGroupCRUD(client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "creating 'acl' crud")
+	}
 	err = r.Register("acl-group", aclGroups)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'acl-group' crud")

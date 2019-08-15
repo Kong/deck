@@ -26,6 +26,9 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		return nil, err
 	}
 	kongState, err := state.NewKongState()
+	if err != nil {
+		return nil, errors.Wrap(err, "creating new in-memory state of Kong")
+	}
 	for _, s := range raw.Services {
 		if utils.Empty(s.Name) {
 			return nil, errors.New("service '" + *s.ID + "' does not" +
