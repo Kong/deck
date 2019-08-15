@@ -15,9 +15,12 @@ import (
 // It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState,
 	// TODO break-down this giant function
-	selectTags []string, filename string) error {
+	selectTags []string, workspace, filename string) error {
 	var file Content
 
+	if workspace != "" {
+		file.Workspace = workspace
+	}
 	services, err := kongState.Services.GetAll()
 	if err != nil {
 		return err
