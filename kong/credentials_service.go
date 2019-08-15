@@ -25,7 +25,7 @@ var (
 // If an ID is specified in the credential, it will be used to
 // create a credential in Kong, otherwise an ID
 // is auto-generated.
-func (c *credentialService) Create(ctx context.Context, credType string,
+func (s *credentialService) Create(ctx context.Context, credType string,
 	consumerUsernameOrID *string, credential interface{}) (json.RawMessage, error) {
 
 	if isEmptyString(consumerUsernameOrID) {
@@ -50,13 +50,13 @@ func (c *credentialService) Create(ctx context.Context, credType string,
 		}
 	}
 
-	req, err := c.client.newRequest(method, endpoint, nil, credential)
+	req, err := s.client.newRequest(method, endpoint, nil, credential)
 	if err != nil {
 		return nil, err
 	}
 
 	var createdCredential json.RawMessage
-	_, err = c.client.Do(ctx, req, &createdCredential)
+	_, err = s.client.Do(ctx, req, &createdCredential)
 	if err != nil {
 		return nil, err
 	}

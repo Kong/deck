@@ -269,16 +269,12 @@ func TestHMACAuthListMethods(T *testing.T) {
 	assert.NotNil(hmacAuthsFromKong)
 	assert.Equal(4, len(hmacAuthsFromKong))
 
-	// Test pagination
-	hmacAuthsFromKong = []*HMACAuth{}
-
 	// first page
 	page1, next, err := client.HMACAuths.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
 	assert.Equal(1, len(page1))
-	hmacAuthsFromKong = append(hmacAuthsFromKong, page1...)
 
 	// last page
 	next.Size = 3
@@ -287,7 +283,6 @@ func TestHMACAuthListMethods(T *testing.T) {
 	assert.Nil(next)
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
-	hmacAuthsFromKong = append(hmacAuthsFromKong, page2...)
 
 	hmacAuthsForConsumer, next, err := client.HMACAuths.ListForConsumer(defaultCtx,
 		consumer1.ID, nil)

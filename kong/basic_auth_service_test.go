@@ -274,16 +274,12 @@ func TestBasicAuthListMethods(T *testing.T) {
 	assert.NotNil(basicAuthsFromKong)
 	assert.Equal(4, len(basicAuthsFromKong))
 
-	// Test pagination
-	basicAuthsFromKong = []*BasicAuth{}
-
 	// first page
 	page1, next, err := client.BasicAuths.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
 	assert.Equal(1, len(page1))
-	basicAuthsFromKong = append(basicAuthsFromKong, page1...)
 
 	// last page
 	next.Size = 3
@@ -292,7 +288,6 @@ func TestBasicAuthListMethods(T *testing.T) {
 	assert.Nil(next)
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
-	basicAuthsFromKong = append(basicAuthsFromKong, page2...)
 
 	basicAuthsForConsumer, next, err := client.BasicAuths.ListForConsumer(defaultCtx,
 		consumer1.ID, nil)

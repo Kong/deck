@@ -61,7 +61,7 @@ func (c JWTAuth) id() *string {
 	return c.ID
 }
 
-// HMACAuth represents a hmac-auth credential in Kong.
+// ACLGroup represents an ACL group for a consumer in Kong.
 // +k8s:deepcopy-gen=true
 type ACLGroup struct {
 	Consumer  *Consumer `json:"consumer,omitempty" yaml:"consumer,omitempty"`

@@ -268,16 +268,12 @@ func TestJWTListMethods(T *testing.T) {
 	assert.NotNil(jwtsFromKong)
 	assert.Equal(4, len(jwtsFromKong))
 
-	// Test pagination
-	jwtsFromKong = []*JWTAuth{}
-
 	// first page
 	page1, next, err := client.JWTAuths.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
 	assert.Equal(1, len(page1))
-	jwtsFromKong = append(jwtsFromKong, page1...)
 
 	// last page
 	next.Size = 3
@@ -286,7 +282,6 @@ func TestJWTListMethods(T *testing.T) {
 	assert.Nil(next)
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
-	jwtsFromKong = append(jwtsFromKong, page2...)
 
 	jwtsForConsumer, next, err := client.JWTAuths.ListForConsumer(defaultCtx,
 		consumer1.ID, nil)

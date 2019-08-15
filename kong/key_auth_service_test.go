@@ -258,16 +258,12 @@ func TestKeyAuthListMethods(T *testing.T) {
 	assert.NotNil(keyAuthsFromKong)
 	assert.Equal(4, len(keyAuthsFromKong))
 
-	// Test pagination
-	keyAuthsFromKong = []*KeyAuth{}
-
 	// first page
 	page1, next, err := client.KeyAuths.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
 	assert.Equal(1, len(page1))
-	keyAuthsFromKong = append(keyAuthsFromKong, page1...)
 
 	// last page
 	next.Size = 3
@@ -276,7 +272,6 @@ func TestKeyAuthListMethods(T *testing.T) {
 	assert.Nil(next)
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
-	keyAuthsFromKong = append(keyAuthsFromKong, page2...)
 
 	keyAuthsForConsumer, next, err := client.KeyAuths.ListForConsumer(defaultCtx,
 		consumer1.ID, nil)

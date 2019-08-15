@@ -260,16 +260,12 @@ func TestACLGroupListMethods(T *testing.T) {
 	assert.NotNil(aclGroupsFromKong)
 	assert.Equal(4, len(aclGroupsFromKong))
 
-	// Test pagination
-	aclGroupsFromKong = []*ACLGroup{}
-
 	// first page
 	page1, next, err := client.ACLs.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
 	assert.Equal(1, len(page1))
-	aclGroupsFromKong = append(aclGroupsFromKong, page1...)
 
 	// last page
 	next.Size = 3
@@ -278,7 +274,6 @@ func TestACLGroupListMethods(T *testing.T) {
 	assert.Nil(next)
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
-	aclGroupsFromKong = append(aclGroupsFromKong, page2...)
 
 	aclGroupsForConsumer, next, err := client.ACLs.ListForConsumer(defaultCtx,
 		consumer1.ID, nil)
