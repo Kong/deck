@@ -108,7 +108,7 @@ func (k *CertificatesCollection) GetByCertKey(cert,
 	return &Certificate{Certificate: *c.DeepCopy()}, nil
 }
 
-// Update udpates an exisitng certificate.
+// Update udpates an existing certificate.
 // It returns an error if the certificate is not already present.
 func (k *CertificatesCollection) Update(certificate Certificate) error {
 	// TODO check if entity is already present or not, throw error if present

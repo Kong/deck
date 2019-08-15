@@ -49,7 +49,7 @@ func (e ErrArray) Error() string {
 	}
 	var res string
 
-	res = strconv.Itoa(len(e.Errors)) + " errors occured:\n"
+	res = strconv.Itoa(len(e.Errors)) + " errors occurred:\n"
 	for _, err := range e.Errors {
 		res += fmt.Sprintf("\t%v\n", err)
 	}

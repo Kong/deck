@@ -70,7 +70,7 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 	return res, nil
 }
 
-// readContent reads all the byes untill io.EOF and unmarshals the read
+// readContent reads all the byes until io.EOF and unmarshals the read
 // bytes into Content.
 func readContent(reader io.Reader) (*Content, error) {
 	var content Content

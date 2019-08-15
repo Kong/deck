@@ -83,7 +83,7 @@ func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
 	return &Service{Service: *service.DeepCopy()}, nil
 }
 
-// Update udpates an exisitng service.
+// Update udpates an existing service.
 // It returns an error if the service is not already present.
 func (k *ServicesCollection) Update(service Service) error {
 	// TODO check if entity is already present or not, throw error if present

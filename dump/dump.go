@@ -19,7 +19,7 @@ type Config struct {
 }
 
 // GetState queries Kong for all entities using client and
-// constructs a structered state.
+// constructs a structured state.
 func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 	raw, err := Get(client, config)
 	if err != nil {

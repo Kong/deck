@@ -17,7 +17,7 @@ decK is a CLI tool to configure Kong declaratively using a single config file.
 ## Features
 
 - **Export**  
-  Exisitng Kong configuration to a YAML configuration file
+  Existing Kong configuration to a YAML configuration file
   This can be used to backup Kong's configuration.
 - **Import**  
   Kong's database can be populated using the exported or a hand written config

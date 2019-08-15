@@ -14,9 +14,9 @@ func TestErrArrayString(t *testing.T) {
 
 	err.Errors = append(err.Errors, errors.New("foo failed"))
 
-	assert.Equal(err.Error(), "1 errors occured:\n\tfoo failed\n")
+	assert.Equal(err.Error(), "1 errors occurred:\n\tfoo failed\n")
 
 	err.Errors = append(err.Errors, errors.New("bar failed"))
 
-	assert.Equal(err.Error(), "2 errors occured:\n\tfoo failed\n\tbar failed\n")
+	assert.Equal(err.Error(), "2 errors occurred:\n\tfoo failed\n\tbar failed\n")
 }

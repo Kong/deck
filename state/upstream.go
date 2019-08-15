@@ -80,7 +80,7 @@ func (k *UpstreamsCollection) Get(nameOrID string) (*Upstream, error) {
 	return &Upstream{Upstream: *u.DeepCopy()}, nil
 }
 
-// Update udpates an exisitng upstream.
+// Update udpates an existing upstream.
 func (k *UpstreamsCollection) Update(upstream Upstream) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself

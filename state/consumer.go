@@ -83,7 +83,7 @@ func (k *ConsumersCollection) Get(userNameOrID string) (*Consumer, error) {
 	return &Consumer{Consumer: *consumer.DeepCopy()}, nil
 }
 
-// Update udpates an exisitng consumer.
+// Update udpates an existing consumer.
 // It returns an error if the consumer is not already present.
 func (k *ConsumersCollection) Update(consumer Consumer) error {
 	// TODO check if entity is already present or not, throw error if present

@@ -30,7 +30,7 @@ No breaking changes have been introduced in this release.
 
 ### Added
 
-- **Tag-based distrubuted configuration management**  
+- **Tag-based distributed configuration management**  
   Only a subset of Kong entities sharing a (set of) tag can now be exported,
   deleted, diffed or synced.
   decK can now manage your Kong's configuration in a distributed manner,

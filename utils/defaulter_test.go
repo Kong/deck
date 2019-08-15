@@ -62,7 +62,7 @@ func TestServiceSetTest(t *testing.T) {
 			want: &serviceDefaults,
 		},
 		{
-			desc: "timeout value value is not overriden",
+			desc: "timeout value value is not overridden",
 			arg: &kong.Service{
 				WriteTimeout: kong.Int(42),
 			},
@@ -76,7 +76,7 @@ func TestServiceSetTest(t *testing.T) {
 			},
 		},
 		{
-			desc: "path value is not overriden",
+			desc: "path value is not overridden",
 			arg: &kong.Service{
 				Path: kong.String("/foo"),
 			},
@@ -136,7 +136,7 @@ func TestRouteSetTest(t *testing.T) {
 			want: &routeDefaults,
 		},
 		{
-			desc: "preserve host is not overriden",
+			desc: "preserve host is not overridden",
 			arg: &kong.Route{
 				PreserveHost: kong.Bool(true),
 			},
@@ -228,7 +228,7 @@ func TestUpstreamSetTest(t *testing.T) {
 			want: &upstreamDefaults,
 		},
 		{
-			desc: "Healthchecks.Active.Healthy.HTTPStatuses is not overriden",
+			desc: "Healthchecks.Active.Healthy.HTTPStatuses is not overridden",
 			arg: &kong.Upstream{
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
@@ -281,7 +281,7 @@ func TestUpstreamSetTest(t *testing.T) {
 			},
 		},
 		{
-			desc: "Healthchecks.Active.Healthy.Timeout is not overriden",
+			desc: "Healthchecks.Active.Healthy.Timeout is not overridden",
 			arg: &kong.Upstream{
 				Name: kong.String("foo"),
 				Healthchecks: &kong.Healthcheck{
