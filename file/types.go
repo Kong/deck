@@ -56,6 +56,7 @@ type Info struct {
 type Content struct {
 	FormatVersion string        `yaml:"_format_version,omitempty"`
 	Info          Info          `yaml:"_info,omitempty"`
+	Workspace     string        `yaml:"_workspace,omitempty"`
 	Services      []Service     `yaml:",omitempty"`
 	Upstreams     []Upstream    `yaml:",omitempty"`
 	Certificates  []Certificate `yaml:",omitempty"`

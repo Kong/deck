@@ -31,7 +31,7 @@ configure Kong.`,
 			return err
 		}
 		if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
-			dumpCmdKongStateFile); err != nil {
+			"", dumpCmdKongStateFile); err != nil {
 			return err
 		}
 		return nil
