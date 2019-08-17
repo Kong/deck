@@ -3,13 +3,14 @@ package state
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
-	Services     *ServicesCollection
-	Routes       *RoutesCollection
-	Upstreams    *UpstreamsCollection
-	Targets      *TargetsCollection
-	Certificates *CertificatesCollection
-	Plugins      *PluginsCollection
-	Consumers    *ConsumersCollection
+	Services       *ServicesCollection
+	Routes         *RoutesCollection
+	Upstreams      *UpstreamsCollection
+	Targets        *TargetsCollection
+	Certificates   *CertificatesCollection
+	CACertificates *CACertificatesCollection
+	Plugins        *PluginsCollection
+	Consumers      *ConsumersCollection
 
 	KeyAuths   *KeyAuthsCollection
 	HMACAuths  *HMACAuthsCollection
@@ -37,6 +38,10 @@ func NewKongState() (*KongState, error) {
 		return nil, err
 	}
 	certificates, err := NewCertificatesCollection()
+	if err != nil {
+		return nil, err
+	}
+	caCertificates, err := NewCACertificatesCollection()
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +76,14 @@ func NewKongState() (*KongState, error) {
 	}
 
 	return &KongState{
-		Services:     services,
-		Routes:       routes,
-		Upstreams:    upstreams,
-		Targets:      targets,
-		Certificates: certificates,
-		Plugins:      plugins,
-		Consumers:    consumers,
+		Services:       services,
+		Routes:         routes,
+		Upstreams:      upstreams,
+		Targets:        targets,
+		Certificates:   certificates,
+		CACertificates: caCertificates,
+		Plugins:        plugins,
+		Consumers:      consumers,
 
 		KeyAuths:   keyAuths,
 		HMACAuths:  hmacAuths,

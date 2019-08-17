@@ -495,3 +495,35 @@ func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
+
+// CACertificate represents a CACertificate in Kong.
+// It adds some helper methods along with Meta to the
+// original CACertificate object.
+type CACertificate struct {
+	kong.CACertificate `yaml:",inline"`
+	Meta
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *CACertificate) Equal(c2 *CACertificate) bool {
+	return reflect.DeepEqual(c1.CACertificate, c2.CACertificate)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *CACertificate) EqualWithOpts(c2 *CACertificate,
+	ignoreID bool, ignoreTS bool) bool {
+	c1Copy := c1.CACertificate.DeepCopy()
+	c2Copy := c2.CACertificate.DeepCopy()
+
+	if ignoreID {
+		c1Copy.ID = nil
+		c2Copy.ID = nil
+	}
+	if ignoreTS {
+		c1Copy.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copy, c2Copy)
+}
