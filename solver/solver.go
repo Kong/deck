@@ -50,6 +50,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'certificate' crud")
 	}
+	err = r.Register("ca_certificate", &drycrud.CACertificateCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'ca_certificate' crud")
+	}
 	err = r.Register("plugin", &drycrud.PluginCRUD{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'plugin' crud")
@@ -123,6 +127,14 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("certificate", certificate)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'certificate' crud")
+	}
+	caCertificate, err := cruds.NewCACertificateCRUD(client)
+	if err != nil {
+		return nil, errors.Wrap(err, "creating a caCertificate CRUD")
+	}
+	err = r.Register("ca_certificate", caCertificate)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'ca_certificate' crud")
 	}
 	plugin, err := cruds.NewPluginCRUD(client)
 	if err != nil {
