@@ -50,6 +50,13 @@ func Reset(state *utils.KongRawState, client *kong.Client) error {
 		}
 	}
 
+	for _, u := range state.CACertificates {
+		err := client.CACertificates.Delete(nil, u.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	for _, p := range state.Plugins {
 		// Delete global plugins explicitly since those will not
 		// DELETE ON CASCADE

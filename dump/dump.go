@@ -167,6 +167,15 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		}
 	}
 
+	for _, c := range raw.CACertificates {
+		err := kongState.CACertificates.Add(state.CACertificate{
+			CACertificate: *c,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting ca_certificate into state")
+		}
+	}
+
 	for _, p := range raw.Plugins {
 		relations := 0
 		if p.Service != nil {
@@ -259,6 +268,12 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.Certificates = certificates
+
+	caCerts, err := GetAllCACertificates(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.CACertificates = caCerts
 
 	snis, err := GetAllSNIs(client, config.SelectorTags)
 	if err != nil {
@@ -393,6 +408,26 @@ func GetAllCertificates(client *kong.Client, tags []string) ([]*kong.Certificate
 		opt = nextopt
 	}
 	return certificates, nil
+}
+
+// GetAllCACertificates queries Kong for all the CACertificates using client.
+func GetAllCACertificates(client *kong.Client,
+	tags []string) ([]*kong.CACertificate, error) {
+	var caCertificates []*kong.CACertificate
+	opt := newOpt(tags)
+
+	for {
+		s, nextopt, err := client.CACertificates.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		caCertificates = append(caCertificates, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return caCertificates, nil
 }
 
 // GetAllSNIs queries Kong for all the SNIs using client.
