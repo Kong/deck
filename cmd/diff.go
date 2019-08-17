@@ -25,11 +25,13 @@ the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := utils.GetKongClient(config)
+		targetState, selectTags, workspace, err :=
+			file.GetStateFromFile(diffCmdKongStateFile)
 		if err != nil {
 			return err
 		}
-		targetState, selectTags, err := file.GetStateFromFile(diffCmdKongStateFile)
+		config.Workspace = workspace
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}

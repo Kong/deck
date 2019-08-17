@@ -65,7 +65,7 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	ks, _, err := GetStateFromFile(filename)
+	ks, _, _, err := GetStateFromFile(filename)
 	assert.NotNil(err)
 	assert.Nil(ks)
 }
@@ -97,7 +97,7 @@ func TestReadKongStateFromStdin(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	ks, _, err := GetStateFromFile(filename)
+	ks, _, _, err := GetStateFromFile(filename)
 	assert.NotNil(ks)
 	assert.Nil(err)
 
