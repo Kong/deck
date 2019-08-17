@@ -58,7 +58,7 @@ func init() {
 
 	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
 		"HTTP Address of Kong's Admin API.\n"+
-			"This value can also be set using DECK_KONG_ADDR"+
+			"This value can also be set using DECK_KONG_ADDR\n"+
 			" environment variable.")
 	viper.BindPFlag("kong-addr",
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
@@ -94,7 +94,7 @@ func init() {
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
 		"Enable verbose verbose logging levels\n"+
-			"Setting this value to 2 outputs all HTTP reqeust/response "+
+			"Setting this value to 2 outputs all HTTP reqeust/response\n"+
 			"between decK and Kong.")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))
