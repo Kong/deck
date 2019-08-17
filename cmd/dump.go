@@ -4,8 +4,6 @@ package cmd
 
 import (
 	"net/http"
-	"net/url"
-	"path"
 
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
@@ -58,16 +56,6 @@ The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		// for a specific workspace, change the URL
-		if dumpWorkspace != "" {
-			u, err := url.Parse(config.Address)
-			if err != nil {
-				return err
-			}
-			u.Path = path.Join(u.Path, dumpWorkspace)
-			config.Address = u.String()
-		}
-
 		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
@@ -87,13 +75,12 @@ configure Kong.`,
 			}
 
 			for _, workspace := range workspaces {
-				// TODO dry this out
-				u, err := url.Parse(config.Address)
+				config.Workspace = workspace
+				client, err := utils.GetKongClient(config)
 				if err != nil {
 					return err
 				}
-				u.Path = path.Join(u.Path, workspace)
-				config.Address = u.String()
+
 				ks, err := dump.GetState(client, dumpConfig)
 				if err != nil {
 					return errors.Wrap(err, "reading configuration from Kong")
@@ -107,6 +94,15 @@ configure Kong.`,
 		}
 
 		// Kong OSS
+		// or Kong Enterprise single workspace
+		if dumpWorkspace != "" {
+			config.Workspace = dumpWorkspace
+			client, err = utils.GetKongClient(config)
+			if err != nil {
+				return err
+			}
+		}
+
 		ks, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading configuration from Kong")

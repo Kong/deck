@@ -5,7 +5,9 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 
@@ -58,7 +60,8 @@ func (e ErrArray) Error() string {
 
 // KongClientConfig holds config details to use to talk to a Kong server.
 type KongClientConfig struct {
-	Address string
+	Address   string
+	Workspace string
 
 	Headers []string
 
@@ -125,7 +128,16 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 			rt:      defaultTransport,
 		}
 	}
-	kongClient, err := kong.NewClient(kong.String(opt.Address), c)
+
+	url, err := url.Parse(opt.Address)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse kong address")
+	}
+	if opt.Workspace != "" {
+		url.Path = path.Join(url.Path, opt.Workspace)
+	}
+
+	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating client for Kong's Admin API")
 	}
