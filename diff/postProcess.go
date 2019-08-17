@@ -270,6 +270,59 @@ func (crud *certificatePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	return nil, nil
 }
 
+type caCertificatePostAction struct{}
+
+// Create creates the CACertificate in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.CACertificate, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud *caCertificatePostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.CACertificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.CACertificates.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the CACertificate from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.CACertificate, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud *caCertificatePostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.CACertificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.CACertificates.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the CACertificate in state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.CACertificate, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud *caCertificatePostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.CACertificate)
+	if !ok {
+		panic("whoops")
+	}
+	s.CACertificates.Update(*svc)
+	return nil, nil
+}
+
 type pluginPostAction struct{}
 
 // Create creates the Plugin in state.

@@ -56,6 +56,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'certificate' crud")
 	}
+	err = s.postProcess.Register("ca_certificate", &caCertificatePostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'ca_certificate' crud")
+	}
 	err = s.postProcess.Register("plugin", &pluginPostAction{})
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'plugin' crud")
@@ -160,6 +164,10 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
+	err = sc.deleteCACertificates()
+	if err != nil {
+		return err
+	}
 	sc.wait()
 	err = sc.createUpdateCertificates()
 	if err != nil {
@@ -239,6 +247,10 @@ func (sc *Syncer) createUpdate() error {
 	}
 	sc.wait()
 	err = sc.createUpdatePlugins()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateCACertificates()
 	if err != nil {
 		return err
 	}
