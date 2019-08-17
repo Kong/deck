@@ -78,7 +78,7 @@ configure Kong.`,
 			if dumpWorkspace != "" {
 				return errors.New("workspace cannot be specified with --all-workspace flag")
 			}
-			if dumpCmdKongStateFile != "" {
+			if dumpCmdKongStateFile != "kong.yaml" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
 			workspaces, err := listWorkspaces(client, config.Address)
