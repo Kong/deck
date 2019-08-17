@@ -26,8 +26,9 @@ type KongRawState struct {
 	Upstreams []*kong.Upstream
 	Targets   []*kong.Target
 
-	Certificates []*kong.Certificate
-	SNIs         []*kong.SNI
+	Certificates   []*kong.Certificate
+	SNIs           []*kong.SNI
+	CACertificates []*kong.CACertificate
 
 	Consumers      []*kong.Consumer
 	CustomEntities []*custom.Entity

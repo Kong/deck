@@ -31,6 +31,11 @@ type Certificate struct {
 	kong.Certificate `yaml:",inline,omitempty"`
 }
 
+// CACertificate represents a Kong CACertificate.
+type CACertificate struct {
+	kong.CACertificate `yaml:",inline,omitempty"`
+}
+
 // Plugin represents a plugin in Kong.
 type Plugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
@@ -54,12 +59,13 @@ type Info struct {
 
 // Content represents a serialized Kong state.
 type Content struct {
-	FormatVersion string        `yaml:"_format_version,omitempty"`
-	Info          Info          `yaml:"_info,omitempty"`
-	Workspace     string        `yaml:"_workspace,omitempty"`
-	Services      []Service     `yaml:",omitempty"`
-	Upstreams     []Upstream    `yaml:",omitempty"`
-	Certificates  []Certificate `yaml:",omitempty"`
-	Plugins       []Plugin      `yaml:",omitempty"`
-	Consumers     []Consumer    `yaml:",omitempty"`
+	FormatVersion  string          `yaml:"_format_version,omitempty"`
+	Info           Info            `yaml:"_info,omitempty"`
+	Workspace      string          `yaml:"_workspace,omitempty"`
+	Services       []Service       `yaml:",omitempty"`
+	Upstreams      []Upstream      `yaml:",omitempty"`
+	Certificates   []Certificate   `yaml:",omitempty"`
+	CACertificates []CACertificate `yaml:"ca_certificates,omitempty"`
+	Plugins        []Plugin        `yaml:",omitempty"`
+	Consumers      []Consumer      `yaml:",omitempty"`
 }

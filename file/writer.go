@@ -151,6 +151,22 @@ func KongStateToFile(kongState *state.KongState,
 			*file.Certificates[j].Cert) < 0
 	})
 
+	caCertificates, err := kongState.CACertificates.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, c := range caCertificates {
+		c := CACertificate{CACertificate: c.CACertificate}
+		c.ID = nil
+		c.CreatedAt = nil
+		utils.RemoveTags(&c.CACertificate, selectTags)
+		file.CACertificates = append(file.CACertificates, c)
+	}
+	sort.SliceStable(file.CACertificates, func(i, j int) bool {
+		return strings.Compare(*file.CACertificates[i].Cert,
+			*file.CACertificates[j].Cert) < 0
+	})
+
 	consumers, err := kongState.Consumers.GetAll()
 	if err != nil {
 		return err

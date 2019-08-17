@@ -233,6 +233,33 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 			return nil, nil, "", err
 		}
 	}
+	for _, c := range fileContent.CACertificates {
+		if utils.Empty(c.ID) {
+			c.ID = kong.String("placeholder-" +
+				strconv.FormatUint(count.Inc(), 10))
+		}
+		if utils.Empty(c.Cert) {
+			return nil, nil, "",
+				errors.Errorf("all ca_certificates must have a cert")
+		}
+
+		_, err := kongState.CACertificates.Get(*c.Cert)
+		if err != state.ErrNotFound {
+			return nil, nil, "",
+				errors.Errorf("duplicate ca_certificate definitions"+
+					" found for the following ca_certificate:\n'%s'", *c.Cert)
+		}
+		if err = utils.MergeTags(&c.CACertificate, selectTags); err != nil {
+			return nil, nil, "",
+				errors.Wrap(err, "merging selector tag with object")
+		}
+		err = kongState.CACertificates.Add(state.CACertificate{
+			CACertificate: c.CACertificate,
+		})
+		if err != nil {
+			return nil, nil, "", err
+		}
+	}
 
 	for _, c := range fileContent.Consumers {
 		if utils.Empty(c.ID) {
