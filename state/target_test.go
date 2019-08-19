@@ -55,7 +55,7 @@ func TestTargetGetUpdate(t *testing.T) {
 	err = collection.Update(*re)
 	assert.Nil(err)
 
-	re, err = collection.Get("my-target")
+	re, err = collection.GetByUpstreamIDAndTarget("upstream1-id", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 }
@@ -85,7 +85,7 @@ func TestTargetGetMemoryReference(t *testing.T) {
 
 	re.Weight = kong.Int(1)
 
-	re, err = collection.Get("my-target")
+	re, err = collection.GetByUpstreamIDAndTarget("upstream1-id", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 	assert.Nil(re.Weight)
@@ -102,9 +102,12 @@ func TestTargetsInvalidType(t *testing.T) {
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
 	txn := collection.memdb.Txn(true)
-	err = txn.Insert(targetTableName, &upstream)
-	assert.NotNil(err)
-	txn.Abort()
+	_ = txn.Insert(targetTableName, &upstream)
+	txn.Commit()
+
+	assert.Panics(func() {
+		_, _ = collection.Get("first")
+	})
 
 	type badTarget struct {
 		kong.Target
@@ -128,7 +131,7 @@ func TestTargetsInvalidType(t *testing.T) {
 	txn.Commit()
 
 	assert.Panics(func() {
-		collection.Get("target")
+		collection.Get("id")
 	})
 }
 
@@ -148,7 +151,7 @@ func TestTargetDelete(t *testing.T) {
 	err = collection.Add(target)
 	assert.Nil(err)
 
-	re, err := collection.Get("my-target")
+	re, err := collection.GetByUpstreamIDAndTarget("upstream1-id", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 

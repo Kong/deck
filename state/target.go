@@ -42,12 +42,14 @@ var targetTableSchema = &memdb.TableSchema{
 				},
 			},
 		},
-		"target": {
-			Name:   "target",
-			Unique: true,
+		"upstreamIDTarget": {
+			Name: "upstreamIDTarget",
 			Indexer: &indexers.SubFieldIndexer{
 				Fields: []indexers.Field{
 					{
+						Struct: "Upstream",
+						Sub:    "ID",
+					}, {
 						Struct: "Target",
 						Sub:    "Target",
 					},
@@ -91,10 +93,9 @@ func (k *TargetsCollection) Add(target Target) error {
 	return nil
 }
 
-// Get gets a target by Target or ID.
+// Get gets a target by ID.
 func (k *TargetsCollection) Get(ID string) (*Target, error) {
-	res, err := multiIndexLookup(k.memdb, targetTableName,
-		[]string{"target", id}, ID)
+	res, err := multiIndexLookup(k.memdb, targetTableName, []string{id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
@@ -105,6 +106,26 @@ func (k *TargetsCollection) Get(ID string) (*Target, error) {
 	if res == nil {
 		return nil, ErrNotFound
 	}
+	t, ok := res.(*Target)
+	if !ok {
+		panic("unexpected type found")
+	}
+	return &Target{Target: *t.DeepCopy()}, nil
+}
+
+// GetByUpstreamIDAndTarget get a target by upstreamID and target
+func (k *TargetsCollection) GetByUpstreamIDAndTarget(upstreamID, target string) (*Target, error) {
+	txn := k.memdb.Txn(false)
+	defer txn.Abort()
+
+	res, err := txn.First(targetTableName, "upstreamIDTarget", upstreamID, target)
+	if err != nil {
+		return nil, errors.Wrap(err, "target lookup failed")
+	}
+	if res == nil {
+		return nil, ErrNotFound
+	}
+
 	t, ok := res.(*Target)
 	if !ok {
 		panic("unexpected type found")
@@ -164,9 +185,9 @@ func (k *TargetsCollection) Update(target Target) error {
 	return nil
 }
 
-// Delete deletes a target by it's Target or ID.
-func (k *TargetsCollection) Delete(nameOrID string) error {
-	target, err := k.Get(nameOrID)
+// Delete deletes a target by it's ID.
+func (k *TargetsCollection) Delete(ID string) error {
+	target, err := k.Get(ID)
 
 	if err != nil {
 		return errors.Wrap(err, "looking up target")
