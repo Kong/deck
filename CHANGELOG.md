@@ -1,9 +1,68 @@
 # Table of Contents
 
+- [v0.5.0](#v050---20190818)
 - [v0.4.0](#v040---20190610)
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.5.0] - 2019/08/18
+
+### Summary
+
+This release brings the following features:
+- Consumer credentials are now supported
+- Support for Kong 1.3
+- Kong Enterprise workspace support
+- Reading configuration from multiple files in a directories
+
+### Breaking changes
+
+No breaking changes have been introduced in this release.
+
+### Added
+
+- **Consumer credentials**  
+  The following entities associate with a consumer in Kong are now supported [#12](https://github.com/hbagdi/deck/issues/12):
+  - `key-auth`
+  - `basic-auth`
+  - `hmac-auth`
+  - `jwt`
+  - `acl`
+  
+- decK's exported YAML is now compatible with Kong's declarative config
+  file.
+- **Homebrew support**  
+  decK can now be installed using Homebrew on macOS:
+  ```
+  brew tap hbagdi/deck
+  brew install deck
+  ```
+- **Multiple state files**  
+  decK can now read the configuration of Kong from multiple YAML files in a directory. You can split your configuration
+  into files in any way you would like.
+  [#22](https://github.com/hbagdi/deck/issues/22)
+- Upcoming Kong 1.3 is now supported.
+  [#36](https://github.com/hbagdi/deck/issues/36)
+- **Kong Enterprise only features:**  
+  Workspaces are now natively supported in decK
+  - `-w/--workspace` flag can be specified in the `dump` command to
+    export configuration of a single workspace.
+  - `--all-workspaces` flag in `dump` command will export all workspaces
+    in Kong Enteprise. Each workspace lives in a separate state file.
+  - `diff` and `sync` command now support workspaces via the `_workspace`
+    attribute in the state file.
+
+### Fixed
+
+- decK now supports TCP services in Kong.
+  [#44](https://github.com/hbagdi/deck/issues/44)
+- Add missing `interval` field in Upstream entity's
+  unhealthy active healthchecks
+  [#45](https://github.com/hbagdi/deck/pull/45)
+- Docker image now contains only the binary and not the entire source code.
+  [#34](https://github.com/hbagdi/deck/pull/34)  
+  Thanks to [David Cruz](https://github.com/davidcv5) for the contribution.
 
 ## [v0.4.0] - 2019/06/10
 
@@ -106,6 +165,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.5.0]: https://github.com/hbagdi/deck/compare/v0.4.0...v0.5.0
 [v0.4.0]: https://github.com/hbagdi/deck/compare/v0.3.0...v0.4.0
 [v0.3.0]: https://github.com/hbagdi/deck/compare/v0.2.0...v0.3.0
 [v0.2.0]: https://github.com/hbagdi/deck/compare/v0.1.0...v0.2.0
