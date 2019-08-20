@@ -175,7 +175,7 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				t.ID = kong.String("placeholder-" +
 					strconv.FormatUint(count.Inc(), 10))
 			}
-			_, err := kongState.Targets.Get(*t.Target.Target)
+			_, err := kongState.Targets.GetByUpstreamNameAndTarget(*u.Name, *t.Target.Target)
 			if err != state.ErrNotFound {
 				return nil, nil, "", errors.Errorf("duplicate target definitions"+
 					" found for: '%s'", *t.Target.Target)

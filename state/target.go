@@ -1,7 +1,7 @@
 package state
 
 import (
-	memdb "github.com/hashicorp/go-memdb"
+	"github.com/hashicorp/go-memdb"
 	"github.com/hbagdi/deck/state/indexers"
 	"github.com/pkg/errors"
 )
@@ -11,6 +11,8 @@ const (
 	targetsByUpstreamName = "targetsByUpstreamName"
 	targetsByUpstreamID   = "targetsByUpstreamID"
 )
+
+var errInvalidUpstream = errors.New("upstream with ID and name is required in target")
 
 var targetTableSchema = &memdb.TableSchema{
 	Name: targetTableName,
@@ -42,12 +44,15 @@ var targetTableSchema = &memdb.TableSchema{
 				},
 			},
 		},
-		"target": {
-			Name:   "target",
+		"upstreamNameTarget": {
+			Name:   "upstreamNameTarget",
 			Unique: true,
 			Indexer: &indexers.SubFieldIndexer{
 				Fields: []indexers.Field{
 					{
+						Struct: "Upstream",
+						Sub:    "Name",
+					}, {
 						Struct: "Target",
 						Sub:    "Target",
 					},
@@ -81,6 +86,10 @@ func NewTargetsCollection() (*TargetsCollection, error) {
 
 // Add adds a target to TargetsCollection.
 func (k *TargetsCollection) Add(target Target) error {
+	if err := k.validateTarget(&target); err != nil {
+		return err
+	}
+
 	txn := k.memdb.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(targetTableName, &target)
@@ -91,10 +100,9 @@ func (k *TargetsCollection) Add(target Target) error {
 	return nil
 }
 
-// Get gets a target by Target or ID.
+// Get gets a target by ID.
 func (k *TargetsCollection) Get(ID string) (*Target, error) {
-	res, err := multiIndexLookup(k.memdb, targetTableName,
-		[]string{"target", id}, ID)
+	res, err := multiIndexLookup(k.memdb, targetTableName, []string{id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
@@ -105,6 +113,26 @@ func (k *TargetsCollection) Get(ID string) (*Target, error) {
 	if res == nil {
 		return nil, ErrNotFound
 	}
+	t, ok := res.(*Target)
+	if !ok {
+		panic("unexpected type found")
+	}
+	return &Target{Target: *t.DeepCopy()}, nil
+}
+
+// GetByUpstreamNameAndTarget get a target by upstreamName and target
+func (k *TargetsCollection) GetByUpstreamNameAndTarget(upstreamName, target string) (*Target, error) {
+	txn := k.memdb.Txn(false)
+	defer txn.Abort()
+
+	res, err := txn.First(targetTableName, "upstreamNameTarget", upstreamName, target)
+	if err != nil {
+		return nil, errors.Wrap(err, "target lookup failed")
+	}
+	if res == nil {
+		return nil, ErrNotFound
+	}
+
 	t, ok := res.(*Target)
 	if !ok {
 		panic("unexpected type found")
@@ -154,6 +182,10 @@ func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
 
 // Update updates a target
 func (k *TargetsCollection) Update(target Target) error {
+	if err := k.validateTarget(&target); err != nil {
+		return err
+	}
+
 	txn := k.memdb.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(targetTableName, &target)
@@ -164,9 +196,9 @@ func (k *TargetsCollection) Update(target Target) error {
 	return nil
 }
 
-// Delete deletes a target by it's Target or ID.
-func (k *TargetsCollection) Delete(nameOrID string) error {
-	target, err := k.Get(nameOrID)
+// Delete deletes a target by it's ID.
+func (k *TargetsCollection) Delete(ID string) error {
+	target, err := k.Get(ID)
 
 	if err != nil {
 		return errors.Wrap(err, "looking up target")
@@ -203,4 +235,13 @@ func (k *TargetsCollection) GetAll() ([]*Target, error) {
 	}
 	txn.Commit()
 	return res, nil
+}
+
+func (k *TargetsCollection) validateTarget(target *Target) error {
+	if target.Upstream == nil ||
+		target.Upstream.ID == nil || *target.Upstream.ID == "" ||
+		target.Upstream.Name == nil || *target.Upstream.Name == "" {
+		return errInvalidUpstream
+	}
+	return nil
 }

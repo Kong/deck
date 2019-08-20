@@ -36,7 +36,7 @@ func (sc *Syncer) deleteTarget(target *state.Target) (*Event, error) {
 			target)
 	}
 	// lookup by Name
-	_, err := sc.targetState.Targets.Get(*target.Target.Target)
+	_, err := sc.targetState.Targets.GetByUpstreamNameAndTarget(*target.Upstream.Name, *target.Target.Target)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -74,7 +74,7 @@ func (sc *Syncer) createUpdateTargets() error {
 
 func (sc *Syncer) createUpdateTarget(target *state.Target) (*Event, error) {
 	target = &state.Target{Target: *target.DeepCopy()}
-	currentTarget, err := sc.currentState.Targets.Get(*target.Target.Target)
+	currentTarget, err := sc.currentState.Targets.GetByUpstreamNameAndTarget(*target.Upstream.Name, *target.Target.Target)
 	if err == state.ErrNotFound {
 		// target not present, create it
 

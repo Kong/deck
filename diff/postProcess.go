@@ -175,11 +175,18 @@ func (crud *targetPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
 	if !ok {
 		panic("whoops")
 	}
-	svc, ok := arg[1].(*state.Target)
+	target, ok := arg[1].(*state.Target)
 	if !ok {
 		panic("whoops")
 	}
-	s.Targets.Add(*svc)
+
+	u, err := s.Upstreams.Get(*target.Upstream.ID)
+	if err != nil {
+		return nil, err
+	}
+	target.Upstream = u.DeepCopy()
+
+	s.Targets.Add(*target)
 	return nil, nil
 }
 
@@ -209,11 +216,18 @@ func (crud *targetPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if !ok {
 		panic("whoops")
 	}
-	svc, ok := arg[1].(*state.Target)
+	target, ok := arg[1].(*state.Target)
 	if !ok {
 		panic("whoops")
 	}
-	s.Targets.Update(*svc)
+
+	u, err := s.Upstreams.Get(*target.Upstream.ID)
+	if err != nil {
+		return nil, err
+	}
+	target.Upstream = u.DeepCopy()
+
+	s.Targets.Update(*target)
 	return nil, nil
 }
 
