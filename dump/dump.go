@@ -418,7 +418,18 @@ func GetAllCACertificates(client *kong.Client,
 
 	for {
 		s, nextopt, err := client.CACertificates.List(nil, opt)
+		// Compatibility for Kong < 1.3
+		// This core entitiy was not present in the past
+		// and the Admin API request will error with 404 Not Found
+		// If we do get the error, we return back an empty array of
+		// CACertificates, effectively disabling the entity for versions
+		// which don't have it.
+		// A better solution would be to have a version check, and based
+		// on the version, the entities are loaded and synced.
 		if err != nil {
+			if kong.IsNotFoundErr(err) {
+				return caCertificates, nil
+			}
 			return nil, err
 		}
 		caCertificates = append(caCertificates, s...)
