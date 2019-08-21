@@ -73,6 +73,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.KeyAuths {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for key-auth '%v'",
 					*cred.Consumer.ID, *cred.ID)
@@ -86,6 +91,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.HMACAuths {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for hmac-auth '%v'",
 					*cred.Consumer.ID, *cred.ID)
@@ -99,6 +109,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.JWTAuths {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for jwt '%v'",
 					*cred.Consumer.ID, *cred.ID)
@@ -112,6 +127,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.BasicAuths {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for basic-auth '%v'",
 					*cred.Consumer.ID, *cred.ID)
@@ -125,6 +145,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.Oauth2Creds {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for oauth2 '%v'",
 					*cred.Consumer.ID, *cred.ID)
@@ -138,6 +163,11 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 		for _, cred := range raw.ACLGroups {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
+				// key could belong to a consumer which is not part
+				// of this sub-set of the entire data-base
+				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+					continue
+				}
 				return nil, errors.Wrapf(err,
 					"looking up consumer '%v' for acl '%v'",
 					*cred.Consumer.ID, *cred.Group)
