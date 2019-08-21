@@ -88,6 +88,10 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
 	}
+	err = s.postProcess.Register("oauth2-cred", &oauth2CredPostAction{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'oauth2-cred' crud")
+	}
 	return s, nil
 }
 
@@ -135,6 +139,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	err = sc.deleteBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteOauth2Creds()
 	if err != nil {
 		return err
 	}
@@ -213,6 +221,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	err = sc.createUpdateBasicAuths()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateOauth2Creds()
 	if err != nil {
 		return err
 	}
