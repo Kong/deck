@@ -228,6 +228,16 @@ func KongStateToFile(kongState *state.KongState,
 			k.Consumer = nil
 			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
 		}
+		oauth2Creds, err := kongState.Oauth2Creds.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range oauth2Creds {
+			k.ID = nil
+			k.CreatedAt = nil
+			k.Consumer = nil
+			c.Oauth2Creds = append(c.Oauth2Creds, &k.Oauth2Credential)
+		}
 		aclGroups, err := kongState.ACLGroups.GetAllByConsumerID(*c.ID)
 		if err != nil {
 			return err
