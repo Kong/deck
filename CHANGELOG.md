@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.8.0](#v080---20190821)
 - [v0.7.0](#v070---20190813)
 - [v0.6.2](#v062---20190809)
 - [v0.6.1](#v061---20190809)
@@ -11,6 +12,14 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.8.0] - 2019/08/21
+
+### Added
+
+- Oauth2Credential type and service has been added
+  which can be used to create Oauth2 credentials in Kong for some
+  Oauth2 flows.
 
 ## [v0.7.0] - 2019/08/13
 
@@ -165,6 +174,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.8.0]: https://github.com/hbagdi/go-kong/compare/v0.7.0...v0.8.0
 [v0.7.0]: https://github.com/hbagdi/go-kong/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/hbagdi/go-kong/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/hbagdi/go-kong/compare/v0.6.0...v0.6.1
