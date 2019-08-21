@@ -122,6 +122,19 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 				return nil, errors.Wrap(err, "inserting basic-auth into state")
 			}
 		}
+		for _, cred := range raw.Oauth2Creds {
+			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
+			if err != nil {
+				return nil, errors.Wrapf(err,
+					"looking up consumer '%v' for oauth2 '%v'",
+					*cred.Consumer.ID, *cred.ID)
+			}
+			cred.Consumer = consumer.DeepCopy()
+			err = kongState.Oauth2Creds.Add(state.Oauth2Credential{Oauth2Credential: *cred})
+			if err != nil {
+				return nil, errors.Wrap(err, "inserting oauth2-cred into state")
+			}
+		}
 		for _, cred := range raw.ACLGroups {
 			consumer, err := kongState.Consumers.Get(*cred.Consumer.ID)
 			if err != nil {
@@ -324,6 +337,12 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 	state.BasicAuths = basicAuths
+
+	oauth2Creds, err := GetAllOauth2Creds(client, config.SelectorTags)
+	if err != nil {
+		return nil, err
+	}
+	state.Oauth2Creds = oauth2Creds
 
 	aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
 	if err != nil {
@@ -606,6 +625,28 @@ func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, er
 		opt = nextopt
 	}
 	return jwtAuths, nil
+}
+
+// GetAllOauth2Creds queries Kong for all oauth2 credentials using client.
+func GetAllOauth2Creds(client *kong.Client,
+	tags []string) ([]*kong.Oauth2Credential, error) {
+	var oauth2Creds []*kong.Oauth2Credential
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.Oauth2Credentials.List(nil, opt)
+		if err != nil {
+			return nil, err
+		}
+		oauth2Creds = append(oauth2Creds, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return oauth2Creds, nil
 }
 
 // GetAllACLGroups queries Kong for all ACL groups using client.
