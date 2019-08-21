@@ -373,6 +373,26 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 				return nil, nil, "", err
 			}
 		}
+		for _, cred := range c.Oauth2Creds {
+			if utils.Empty(cred.ID) {
+				cred.ID = kong.String("placeholder-" +
+					strconv.FormatUint(count.Inc(), 10))
+			}
+			if utils.Empty(cred.ClientID) {
+				return nil, nil, "", errors.New("client_id field is missing" +
+					"for oauth2_credential")
+			}
+			_, err := kongState.Oauth2Creds.Get(*cred.ClientID)
+			if err != state.ErrNotFound {
+				return nil, nil, "", errors.Errorf("duplicate oauth2 definitions"+
+					" found for clientID: '%s'", *cred.ClientID)
+			}
+			cred.Consumer = c.Consumer.DeepCopy()
+			err = kongState.Oauth2Creds.Add(state.Oauth2Credential{Oauth2Credential: *cred})
+			if err != nil {
+				return nil, nil, "", err
+			}
+		}
 		for _, cred := range c.ACLGroups {
 			if utils.Empty(cred.ID) {
 				cred.ID = kong.String("placeholder-" +
