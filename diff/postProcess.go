@@ -693,3 +693,56 @@ func (crud *aclGroupPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
 	s.ACLGroups.Update(*svc)
 	return nil, nil
 }
+
+type oauth2CredPostAction struct{}
+
+// Create creates the oauth2-cred from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Oauth2Credential, will be added.
+// If the args are of incorrect types, Create will panic.
+func (crud oauth2CredPostAction) Create(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Oauth2Credential)
+	if !ok {
+		panic("whoops")
+	}
+	s.Oauth2Creds.Add(*svc)
+	return nil, nil
+}
+
+// Delete deletes the oauth2-cred from state.
+// The first arg should be of type *state.KongState, the state from
+// which the second arg, of type *state.Oauth2Credential, will be deleted.
+// If the args are of incorrect types, Delete will panic.
+func (crud oauth2CredPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Oauth2Credential)
+	if !ok {
+		panic("whoops")
+	}
+	s.Oauth2Creds.Delete(*svc.ID)
+	return nil, nil
+}
+
+// Update updates the oauth2-cred from state.
+// The first arg should be of type *state.KongState, the state in
+// which the second arg, of type *state.Oauth2Credential, will be updated.
+// If the args are of incorrect types, Update will panic.
+func (crud oauth2CredPostAction) Update(arg ...crud.Arg) (crud.Arg, error) {
+	s, ok := arg[0].(*state.KongState)
+	if !ok {
+		panic("whoops")
+	}
+	svc, ok := arg[1].(*state.Oauth2Credential)
+	if !ok {
+		panic("whoops")
+	}
+	s.Oauth2Creds.Update(*svc)
+	return nil, nil
+}
