@@ -44,7 +44,7 @@ type EntityCRUDDefinition struct {
 	PrimaryKey string `yaml:"primary_key" json:"primary_key"`
 }
 
-var r = regexp.MustCompile("(?:\\$\\{)(\\w+)(?:\\})")
+var r = regexp.MustCompile(`(?:\$\{)(\w+)(?:\})`)
 
 func render(template string, entity Entity) (string, error) {
 	result := template

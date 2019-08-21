@@ -122,6 +122,7 @@ func TestOauth2CredentialGet(T *testing.T) {
 	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx, consumer.ID,
 		String("foo-clientid"))
 	assert.Nil(err)
+	assert.NotNil(oauth2Cred)
 
 	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx, consumer.ID,
 		String("does-not-exists"))

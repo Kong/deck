@@ -124,7 +124,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	v interface{}) (*Response, error) {
 	var err error
 	if req == nil {
-		return nil, errors.New("Request object cannot be nil")
+		return nil, errors.New("request cannot be nil")
 	}
 	if ctx == nil {
 		ctx = defaultCtx
@@ -149,8 +149,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	}
 	// Call Close on exit
 	defer func() {
-		var e error
-		e = resp.Body.Close()
+		e := resp.Body.Close()
 		if e != nil {
 			err = e
 		}

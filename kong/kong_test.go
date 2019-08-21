@@ -16,7 +16,7 @@ func TestKongStatus(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(client)
 
-	status, err := client.Status(nil)
+	status, err := client.Status(defaultCtx)
 	assert.Nil(err)
 	assert.NotNil(status)
 }
@@ -28,7 +28,7 @@ func TestRoot(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(client)
 
-	root, err := client.Root(nil)
+	root, err := client.Root(defaultCtx)
 	assert.Nil(err)
 	assert.NotNil(root)
 	assert.NotNil(root["version"])
@@ -52,7 +52,7 @@ func runWhenKong(t *testing.T, semverRange string) {
 		if err != nil {
 			t.Error(err)
 		}
-		res, err := client.Root(nil)
+		res, err := client.Root(defaultCtx)
 		if err != nil {
 			t.Error(err)
 		}

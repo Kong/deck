@@ -130,12 +130,3 @@ func cidrPortArrayToString(arr []*CIDRPort) string {
 	buf.WriteString(" ]")
 	return buf.String()
 }
-
-func contains(slice []*string, s string) bool {
-	for _, el := range slice {
-		if *el == s {
-			return true
-		}
-	}
-	return false
-}
