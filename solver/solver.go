@@ -82,6 +82,10 @@ func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
 	}
+	err = r.Register("oauth2-cred", &drycrud.Oauth2CredCRUD{})
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'oauth2-cred' crud")
+	}
 	return &r, nil
 }
 
@@ -191,6 +195,14 @@ func buildRegistry(client *kong.Client) (*crud.Registry, error) {
 	err = r.Register("acl-group", aclGroups)
 	if err != nil {
 		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
+	}
+	oauth2Cred, err := cruds.NewOauth2CredCRUD(client)
+	if err != nil {
+		return nil, errors.Wrapf(err, "creating 'oauth2-cred' crud")
+	}
+	err = r.Register("oauth2-cred", oauth2Cred)
+	if err != nil {
+		return nil, errors.Wrapf(err, "registering 'oauth2-cred' crud")
 	}
 	return &r, nil
 }
