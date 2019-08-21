@@ -45,6 +45,22 @@ func (c HMACAuth) id() *string {
 	return c.ID
 }
 
+// Oauth2Credential represents a Oauth2 credential in Kong.
+// +k8s:deepcopy-gen=true
+type Oauth2Credential struct {
+	Consumer     *Consumer `json:"consumer,omitempty" yaml:"consumer,omitempty"`
+	CreatedAt    *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID           *string   `json:"id,omitempty" yaml:"id,omitempty"`
+	Name         *string   `json:"name,omitempty" yaml:"name,omitempty"`
+	ClientID     *string   `json:"client_id,omitempty" yaml:"client_id,omitempty"`
+	ClientSecret *string   `json:"client_secret,omitempty" yaml:"client_secret,omitempty"`
+	RedirectURIs []*string `json:"redirect_uris,omitempty" yaml:"redirect_uris,omitempty"`
+}
+
+func (c Oauth2Credential) id() *string {
+	return c.ID
+}
+
 // JWTAuth represents a JWT credential in Kong.
 // +k8s:deepcopy-gen=true
 type JWTAuth struct {

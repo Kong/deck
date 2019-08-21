@@ -18,6 +18,7 @@ var (
 		"hmac-auth":  "hmac-auth",
 		"jwt-auth":   "jwt",
 		"acl":        "acls",
+		"oauth2":     "oauth2",
 	}
 )
 

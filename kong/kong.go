@@ -47,6 +47,8 @@ type Client struct {
 	JWTAuths    *JWTAuthService
 	ACLs        *ACLService
 
+	Oauth2Credentials *Oauth2Service
+
 	logger         io.Writer
 	debug          bool
 	CustomEntities *CustomEntityService
@@ -100,6 +102,8 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.HMACAuths = (*HMACAuthService)(&kong.common)
 	kong.JWTAuths = (*JWTAuthService)(&kong.common)
 	kong.ACLs = (*ACLService)(&kong.common)
+
+	kong.Oauth2Credentials = (*Oauth2Service)(&kong.common)
 
 	kong.CustomEntities = (*CustomEntityService)(&kong.common)
 	kong.Registry = custom.NewDefaultRegistry()
