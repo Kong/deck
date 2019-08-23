@@ -23,7 +23,7 @@ func (s *PluginService) Create(ctx context.Context,
 		queryPath = queryPath + "/" + *plugin.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, queryPath, nil, plugin)
+	req, err := s.client.NewRequest(method, queryPath, nil, plugin)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (s *PluginService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/plugins/%v", *usernameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *PluginService) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/plugins/%v", *plugin.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, plugin)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, plugin)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *PluginService) Delete(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/plugins/%v", *usernameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

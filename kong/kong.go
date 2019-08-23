@@ -223,7 +223,7 @@ func (c *Client) SetLogger(w io.Writer) {
 // Status returns the status of a Kong node
 func (c *Client) Status(ctx context.Context) (*Status, error) {
 
-	req, err := c.newRequest("GET", "/status", nil, nil)
+	req, err := c.NewRequest("GET", "/status", nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (c *Client) Status(ctx context.Context) (*Status, error) {
 // Root returns the response of GET request on root of
 // Admin API (GET /).
 func (c *Client) Root(ctx context.Context) (map[string]interface{}, error) {
-	req, err := c.newRequest("GET", "/", nil, nil)
+	req, err := c.NewRequest("GET", "/", nil, nil)
 	if err != nil {
 		return nil, err
 	}

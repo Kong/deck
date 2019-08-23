@@ -27,7 +27,7 @@ func (s *Svcservice) Create(ctx context.Context,
 		endpoint = endpoint + "/" + *service.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, endpoint, nil, service)
+	req, err := s.client.NewRequest(method, endpoint, nil, service)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Svcservice) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/services/%v", *nameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (s *Svcservice) GetForRoute(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/routes/%v/service", *routeID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (s *Svcservice) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/services/%v", *service.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, service)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, service)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (s *Svcservice) Delete(ctx context.Context, nameOrID *string) error {
 	}
 
 	endpoint := fmt.Sprintf("/services/%v", *nameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

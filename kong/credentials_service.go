@@ -51,7 +51,7 @@ func (s *credentialService) Create(ctx context.Context, credType string,
 		}
 	}
 
-	req, err := s.client.newRequest(method, endpoint, nil, credential)
+	req, err := s.client.NewRequest(method, endpoint, nil, credential)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (s *credentialService) Get(ctx context.Context, credType string,
 		return nil, fmt.Errorf("unknown credential type: %v", credType)
 	}
 	endpoint := "/consumers/" + *consumerUsernameOrID + "/" + subPath + "/" + *credIdentifier
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (s *credentialService) Update(ctx context.Context, credType string,
 
 	endpoint = endpoint + credID
 
-	req, err := s.client.newRequest("PATCH", endpoint, nil, credential)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, credential)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (s *credentialService) Delete(ctx context.Context, credType string,
 	endpoint := "/consumers/" + *consumerUsernameOrID + "/" + subPath + "/" +
 		*credIdentifier
 
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

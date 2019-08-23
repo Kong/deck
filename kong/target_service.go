@@ -28,7 +28,7 @@ func (s *TargetService) Create(ctx context.Context,
 	// 	queryPath = queryPath + "/" + *target.ID
 	// 	method = "PUT"
 	// }
-	req, err := s.client.newRequest(method, queryPath, nil, target)
+	req, err := s.client.NewRequest(method, queryPath, nil, target)
 
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *TargetService) Delete(ctx context.Context,
 
 	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v",
 		*upstreamNameOrID, *targetOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (s *TargetService) MarkHealthy(ctx context.Context,
 
 	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v/healthy",
 		*upstreamNameOrID, *tid)
-	req, err := s.client.newRequest("POST", endpoint, nil, nil)
+	req, err := s.client.NewRequest("POST", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -165,7 +165,7 @@ func (s *TargetService) MarkUnhealthy(ctx context.Context,
 
 	endpoint := fmt.Sprintf("/upstreams/%v/targets/%v/unhealthy",
 		*upstreamNameOrID, *tid)
-	req, err := s.client.newRequest("POST", endpoint, nil, nil)
+	req, err := s.client.NewRequest("POST", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

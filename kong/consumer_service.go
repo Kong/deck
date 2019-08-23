@@ -23,7 +23,7 @@ func (s *ConsumerService) Create(ctx context.Context,
 		queryPath = queryPath + "/" + *consumer.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, queryPath, nil, consumer)
+	req, err := s.client.NewRequest(method, queryPath, nil, consumer)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (s *ConsumerService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/consumers/%v", *usernameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *ConsumerService) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/consumers/%v", *consumer.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, consumer)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, consumer)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *ConsumerService) Delete(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/consumers/%v", *usernameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

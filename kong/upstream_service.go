@@ -23,7 +23,7 @@ func (s *UpstreamService) Create(ctx context.Context,
 		queryPath = queryPath + "/" + *upstream.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, queryPath, nil, upstream)
+	req, err := s.client.NewRequest(method, queryPath, nil, upstream)
 
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (s *UpstreamService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/upstreams/%v", *upstreamNameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *UpstreamService) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/upstreams/%v", *upstream.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, upstream)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, upstream)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (s *UpstreamService) Delete(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/upstreams/%v", *upstreamNameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

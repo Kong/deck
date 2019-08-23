@@ -27,7 +27,7 @@ func (s *RouteService) Create(ctx context.Context,
 		endpoint = endpoint + "/" + *route.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, endpoint, nil, route)
+	req, err := s.client.NewRequest(method, endpoint, nil, route)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *RouteService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/routes/%v", *nameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *RouteService) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/routes/%v", *route.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, route)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, route)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (s *RouteService) Delete(ctx context.Context, nameOrID *string) error {
 	}
 
 	endpoint := fmt.Sprintf("/routes/%v", *nameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

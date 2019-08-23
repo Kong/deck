@@ -23,7 +23,7 @@ func (s *CACertificateService) Create(ctx context.Context,
 		queryPath = queryPath + "/" + *certificate.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, queryPath, nil, certificate)
+	req, err := s.client.NewRequest(method, queryPath, nil, certificate)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (s *CACertificateService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/ca_certificates/%v", *ID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *CACertificateService) Update(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/ca_certificates/%v", *certificate.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, certificate)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, certificate)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (s *CACertificateService) Delete(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/ca_certificates/%v", *ID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

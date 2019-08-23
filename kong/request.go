@@ -9,7 +9,11 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-func (c *Client) newRequest(method, endpoint string, qs interface{},
+// NewRequest creates a request based on the inputs.
+// endpoint should be relative to the baseURL specified during
+// client creation.
+// body is always marshaled into JSON.
+func (c *Client) NewRequest(method, endpoint string, qs interface{},
 	body interface{}) (*http.Request, error) {
 
 	if endpoint == "" {

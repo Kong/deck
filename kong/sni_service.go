@@ -22,7 +22,7 @@ func (s *SNIService) Create(ctx context.Context, sni *SNI) (*SNI, error) {
 		queryPath = queryPath + "/" + *sni.ID
 		method = "PUT"
 	}
-	req, err := s.client.newRequest(method, queryPath, nil, sni)
+	req, err := s.client.NewRequest(method, queryPath, nil, sni)
 
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (s *SNIService) Get(ctx context.Context,
 	}
 
 	endpoint := fmt.Sprintf("/snis/%v", *usernameOrID)
-	req, err := s.client.newRequest("GET", endpoint, nil, nil)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (s *SNIService) Update(ctx context.Context, sni *SNI) (*SNI, error) {
 	}
 
 	endpoint := fmt.Sprintf("/snis/%v", *sni.ID)
-	req, err := s.client.newRequest("PATCH", endpoint, nil, sni)
+	req, err := s.client.NewRequest("PATCH", endpoint, nil, sni)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (s *SNIService) Delete(ctx context.Context, usernameOrID *string) error {
 	}
 
 	endpoint := fmt.Sprintf("/snis/%v", *usernameOrID)
-	req, err := s.client.newRequest("DELETE", endpoint, nil, nil)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}
