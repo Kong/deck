@@ -1,6 +1,7 @@
 package kong
 
 import (
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -40,6 +41,32 @@ func TestRoot(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(root)
 	assert.NotNil(root["version"])
+}
+
+func TestDo(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	req, err := client.NewRequest("GET", "/does-not-exist", nil, nil)
+	assert.Nil(err)
+	assert.NotNil(req)
+	resp, err := client.Do(nil, req, nil)
+	assert.Equal(err, err404{})
+	assert.NotNil(resp)
+	assert.Equal(404, resp.StatusCode)
+
+	req, err = client.NewRequest("POST", "/", nil, nil)
+	assert.Nil(err)
+	assert.NotNil(req)
+	resp, err = client.Do(nil, req, nil)
+	assert.NotNil(resp)
+	body, err := ioutil.ReadAll(resp.Body)
+	assert.Nil(err)
+	assert.Empty(body)
+	assert.Equal(405, resp.StatusCode)
 }
 
 func TestMain(m *testing.M) {

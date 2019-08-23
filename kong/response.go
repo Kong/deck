@@ -17,7 +17,7 @@ func newResponse(res *http.Response) *Response {
 }
 
 func hasError(res *http.Response) error {
-	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+	if res.StatusCode >= 200 && res.StatusCode <= 399 {
 		return nil
 	}
 

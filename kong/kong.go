@@ -151,9 +151,11 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	// log the response
 	c.logResponse(resp)
 
+	response := newResponse(resp)
+
 	///check for API errors
 	if err = hasError(resp); err != nil {
-		return nil, err
+		return response, err
 	}
 	// Call Close on exit
 	defer func() {
@@ -162,7 +164,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 			err = e
 		}
 	}()
-	response := newResponse(resp)
 
 	// response
 	if v != nil {
