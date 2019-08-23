@@ -9,6 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewClient(t *testing.T) {
+	assert := assert.New(t)
+
+	client, err := NewClient(String("foo/bar"), nil)
+	assert.Nil(client)
+	assert.NotNil(err)
+}
+
 func TestKongStatus(T *testing.T) {
 	assert := assert.New(T)
 

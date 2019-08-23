@@ -3,11 +3,13 @@ package kong
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"os"
+
+	"github.com/pkg/errors"
 
 	"github.com/hbagdi/go-kong/kong/custom"
 )
@@ -79,12 +81,18 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	}
 	kong := new(Client)
 	kong.client = client
+	var rootURL string
 	if baseURL != nil {
-		//TODO validate URL
-		kong.baseURL = *baseURL
+		rootURL = *baseURL
 	} else {
-		kong.baseURL = defaultBaseURL
+		rootURL = defaultBaseURL
 	}
+	url, err := url.ParseRequestURI(rootURL)
+	if err != nil {
+		return nil, errors.Wrap(err, "parsing URL")
+	}
+	kong.baseURL = url.String()
+
 	kong.common.client = kong
 	kong.Consumers = (*ConsumerService)(&kong.common)
 	kong.Services = (*Svcservice)(&kong.common)
@@ -137,7 +145,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	//Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "making HTTP reqeust")
 	}
 
 	// log the response
