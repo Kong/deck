@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.9.0](#v090---20190824)
 - [v0.8.0](#v080---20190821)
 - [v0.7.0](#v070---20190813)
 - [v0.6.2](#v062---20190809)
@@ -12,6 +13,24 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.9.0] - 2019/08/24
+
+### Breaking changes
+
+- `client.Do()` returns a response object even on errors so that
+  clients can inspect the response directly when needed.
+  The error condition has changed to include HTTP status codes 300 to 399
+  as success and not failure.
+  [b1f9eda31](https://github.com/hbagdi/go-kong/commit/b1f9eda311e1d9c9d6b0f5a5e33a3d399d85faf6)
+- `String()` method has been dropped from all types defined in this package.
+
+### Added
+
+- `NewRequest()` method helping with creating HTTP requests is now exported
+- URLs parsed inside the package are more robust.
+- New method `GetByCustomID` has been introduced to fetch Consumers by
+  `custom_id`.
 
 ## [v0.8.0] - 2019/08/21
 
@@ -174,6 +193,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.9.0]: https://github.com/hbagdi/go-kong/compare/v0.8.0...v0.9.0
 [v0.8.0]: https://github.com/hbagdi/go-kong/compare/v0.7.0...v0.8.0
 [v0.7.0]: https://github.com/hbagdi/go-kong/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/hbagdi/go-kong/compare/v0.6.1...v0.6.2
