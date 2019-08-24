@@ -1,40 +1,30 @@
 package kong
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestString(t *testing.T) {
-	assert := assert.New(t)
+func TestConfigurationDeepCopyInto(T *testing.T) {
+	assert := assert.New(T)
 
-	s := String("foo")
-	assert.Equal("foo", *s)
-}
+	var c Configuration
+	byt := []byte(`{"int":42,"float":4.2,"strings":["foo","bar"]}`)
+	if err := json.Unmarshal(byt, &c); err != nil {
+		panic(err)
+	}
 
-func TestBool(t *testing.T) {
-	assert := assert.New(t)
+	c2 := c.DeepCopy()
+	assert.Equal(c, c2)
 
-	b := Bool(true)
-	assert.Equal(true, *b)
-}
+	// Both are independent now
+	c["int"] = 24
+	assert.Equal(24, c["int"])
+	assert.Equal(float64(42), c2["int"])
 
-func TestInt(t *testing.T) {
-	assert := assert.New(t)
-
-	i := Int(42)
-	assert.Equal(42, *i)
-}
-
-func TestStringSlice(t *testing.T) {
-	assert := assert.New(t)
-
-	arrp := StringSlice()
-	assert.Empty(arrp)
-
-	arrp = StringSlice("foo", "bar")
-	assert.Equal(2, len(arrp))
-	assert.Equal("foo", *arrp[0])
-	assert.Equal("bar", *arrp[1])
+	c["strings"] = []string{"fubar"}
+	assert.Equal([]string{"fubar"}, c["strings"].([]string))
+	assert.Equal([]interface{}{"foo", "bar"}, c2["strings"])
 }
