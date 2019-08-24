@@ -18,6 +18,7 @@ func TestConsumersService(T *testing.T) {
 
 	consumer := &Consumer{
 		Username: String("foo"),
+		CustomID: String("custom_id_foo"),
 	}
 
 	createdConsumer, err := client.Consumers.Create(defaultCtx, consumer)
@@ -25,6 +26,16 @@ func TestConsumersService(T *testing.T) {
 	assert.NotNil(createdConsumer)
 
 	consumer, err = client.Consumers.Get(defaultCtx, createdConsumer.ID)
+	assert.Nil(err)
+	assert.NotNil(consumer)
+
+	consumer, err = client.Consumers.GetByCustomID(defaultCtx,
+		String("does-not-exist"))
+	assert.NotNil(err)
+	assert.Nil(consumer)
+
+	consumer, err = client.Consumers.GetByCustomID(defaultCtx,
+		String("custom_id_foo"))
 	assert.Nil(err)
 	assert.NotNil(consumer)
 

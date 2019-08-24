@@ -59,6 +59,40 @@ func (s *ConsumerService) Get(ctx context.Context,
 	return &consumer, nil
 }
 
+// GetByCustomID fetches a Consumer in Kong.
+func (s *ConsumerService) GetByCustomID(ctx context.Context,
+	customID *string) (*Consumer, error) {
+
+	if isEmptyString(customID) {
+		return nil, errors.New("customID cannot be nil for Get operation")
+	}
+
+	type QS struct {
+		CustomID string `url:"custom_id,omitempty"`
+	}
+
+	req, err := s.client.NewRequest("GET", "/consumers",
+		&QS{CustomID: *customID}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	type Response struct {
+		Data []Consumer
+	}
+	var resp Response
+	_, err = s.client.Do(ctx, req, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(resp.Data) == 0 {
+		return nil, err404{}
+	}
+
+	return &resp.Data[0], nil
+}
+
 // Update updates a Consumer in Kong
 func (s *ConsumerService) Update(ctx context.Context,
 	consumer *Consumer) (*Consumer, error) {
