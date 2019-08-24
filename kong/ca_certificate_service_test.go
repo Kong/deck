@@ -75,16 +75,19 @@ func TestCACertificatesService(T *testing.T) {
 		Cert: String("bar"),
 	}
 
-	createdCertificate, err := client.CACertificates.Create(defaultCtx, certificate)
+	createdCertificate, err := client.CACertificates.Create(defaultCtx,
+		certificate)
 	assert.NotNil(err) // invalid cert and key
 	assert.Nil(createdCertificate)
 
 	certificate.Cert = String(caCert1)
-	createdCertificate, err = client.CACertificates.Create(defaultCtx, certificate)
+	createdCertificate, err = client.CACertificates.Create(defaultCtx,
+		certificate)
 	assert.Nil(err)
 	assert.NotNil(createdCertificate)
 
-	certificate, err = client.CACertificates.Get(defaultCtx, createdCertificate.ID)
+	certificate, err = client.CACertificates.Get(defaultCtx,
+		createdCertificate.ID)
 	assert.Nil(err)
 	assert.NotNil(certificate)
 
@@ -103,7 +106,8 @@ func TestCACertificatesService(T *testing.T) {
 		ID:   String(id),
 	}
 
-	createdCertificate, err = client.CACertificates.Create(defaultCtx, certificate)
+	createdCertificate, err = client.CACertificates.Create(defaultCtx,
+		certificate)
 	assert.Nil(err)
 	assert.NotNil(createdCertificate)
 	assert.Equal(id, *createdCertificate.ID)
@@ -125,7 +129,8 @@ func TestCACertificateWithTags(T *testing.T) {
 		Tags: StringSlice("tag1", "tag2"),
 	}
 
-	createdCertificate, err := client.CACertificates.Create(defaultCtx, certificate)
+	createdCertificate, err := client.CACertificates.Create(defaultCtx,
+		certificate)
 	assert.Nil(err)
 	assert.NotNil(createdCertificate)
 	assert.Equal(StringSlice("tag1", "tag2"), createdCertificate.Tags)
@@ -157,14 +162,16 @@ func TestCACertificateListEndpoint(T *testing.T) {
 
 	// create fixturs
 	for i := 0; i < len(certificates); i++ {
-		certificate, err := client.CACertificates.Create(defaultCtx, certificates[i])
+		certificate, err := client.CACertificates.Create(defaultCtx,
+			certificates[i])
 		assert.Nil(err)
 		assert.NotNil(certificate)
 		certificates[i] = certificate
 	}
 
-	certificatesFromKong, next, err := client.CACertificates.List(defaultCtx, nil)
-	assert.Nil(err)
+	certificatesFromKong, next, err :=
+		client.CACertificates.List(defaultCtx, nil)
+
 	assert.Nil(next)
 	assert.NotNil(certificatesFromKong)
 	assert.Equal(3, len(certificatesFromKong))
@@ -176,7 +183,9 @@ func TestCACertificateListEndpoint(T *testing.T) {
 	certificatesFromKong = []*CACertificate{}
 
 	// first page
-	page1, next, err := client.CACertificates.List(defaultCtx, &ListOpt{Size: 1})
+	page1, next, err := client.CACertificates.List(defaultCtx, &ListOpt{
+		Size: 1,
+	})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)

@@ -40,14 +40,16 @@ func TestBasicAuthCreate(T *testing.T) {
 
 	// no username is specified
 	basicAuth = &BasicAuth{}
-	basicAuth, err = client.BasicAuths.Create(defaultCtx, consumer.ID, basicAuth)
+	basicAuth, err = client.BasicAuths.Create(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.NotNil(err)
 	assert.Nil(basicAuth)
 
 	basicAuth = &BasicAuth{
 		Username: String("foo"),
 	}
-	basicAuth, err = client.BasicAuths.Create(defaultCtx, consumer.ID, basicAuth)
+	basicAuth, err = client.BasicAuths.Create(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.Nil(err)
 	assert.NotNil(basicAuth)
 	assert.NotEmpty(*basicAuth.Password)
@@ -113,11 +115,13 @@ func TestBasicAuthGet(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx, consumer.ID, basicAuth)
+	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.Nil(err)
 	assert.NotNil(createdBasicAuth)
 
-	basicAuth, err = client.BasicAuths.Get(defaultCtx, consumer.ID, basicAuth.ID)
+	basicAuth, err = client.BasicAuths.Get(defaultCtx,
+		consumer.ID, basicAuth.ID)
 	assert.Nil(err)
 	assert.Equal("my-username", *basicAuth.Username)
 
@@ -160,17 +164,20 @@ func TestBasicAuthUpdate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx, consumer.ID, basicAuth)
+	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.Nil(err)
 	assert.NotNil(createdBasicAuth)
 
-	basicAuth, err = client.BasicAuths.Get(defaultCtx, consumer.ID, basicAuth.ID)
+	basicAuth, err = client.BasicAuths.Get(defaultCtx,
+		consumer.ID, basicAuth.ID)
 	assert.Nil(err)
 	assert.Equal("my-username", *basicAuth.Username)
 
 	basicAuth.Username = String("my-new-username")
 	basicAuth.Password = String("my-new-password")
-	updatedBasicAuth, err := client.BasicAuths.Update(defaultCtx, consumer.ID, basicAuth)
+	updatedBasicAuth, err := client.BasicAuths.Update(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.Nil(err)
 	assert.NotNil(updatedBasicAuth)
 	assert.NotEqual("my-new-password", *updatedBasicAuth.Password)
@@ -201,14 +208,16 @@ func TestBasicAuthDelete(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx, consumer.ID, basicAuth)
+	createdBasicAuth, err := client.BasicAuths.Create(defaultCtx,
+		consumer.ID, basicAuth)
 	assert.Nil(err)
 	assert.NotNil(createdBasicAuth)
 
 	err = client.BasicAuths.Delete(defaultCtx, consumer.ID, basicAuth.Username)
 	assert.Nil(err)
 
-	basicAuth, err = client.BasicAuths.Get(defaultCtx, consumer.ID, basicAuth.Username)
+	basicAuth, err = client.BasicAuths.Get(defaultCtx,
+		consumer.ID, basicAuth.Username)
 	assert.NotNil(err)
 	assert.Nil(basicAuth)
 
@@ -289,8 +298,8 @@ func TestBasicAuthListMethods(T *testing.T) {
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
 
-	basicAuthsForConsumer, next, err := client.BasicAuths.ListForConsumer(defaultCtx,
-		consumer1.ID, nil)
+	basicAuthsForConsumer, next, err :=
+		client.BasicAuths.ListForConsumer(defaultCtx, consumer1.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(basicAuthsForConsumer)

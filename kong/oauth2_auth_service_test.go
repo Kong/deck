@@ -166,13 +166,15 @@ func TestOauth2CredentialUpdate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(createdOauth2Credential)
 
-	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx, consumer.ID, oauth2Cred.ID)
+	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx,
+		consumer.ID, oauth2Cred.ID)
 	assert.Nil(err)
 	assert.Equal("foo-name", *oauth2Cred.Name)
 
 	oauth2Cred.Name = String("new-foo-name")
 	oauth2Cred.ClientSecret = String("my-new-secret")
-	updatedOauth2Credential, err := client.Oauth2Credentials.Update(defaultCtx, consumer.ID, oauth2Cred)
+	updatedOauth2Credential, err :=
+		client.Oauth2Credentials.Update(defaultCtx, consumer.ID, oauth2Cred)
 	assert.Nil(err)
 	assert.NotNil(updatedOauth2Credential)
 	assert.Equal("new-foo-name", *updatedOauth2Credential.Name)
@@ -205,14 +207,17 @@ func TestOauth2CredentialDelete(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdOauth2Credential, err := client.Oauth2Credentials.Create(defaultCtx, consumer.ID, oauth2Cred)
+	createdOauth2Credential, err :=
+		client.Oauth2Credentials.Create(defaultCtx, consumer.ID, oauth2Cred)
 	assert.Nil(err)
 	assert.NotNil(createdOauth2Credential)
 
-	err = client.Oauth2Credentials.Delete(defaultCtx, consumer.ID, oauth2Cred.ClientID)
+	err = client.Oauth2Credentials.Delete(defaultCtx,
+		consumer.ID, oauth2Cred.ClientID)
 	assert.Nil(err)
 
-	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx, consumer.ID, oauth2Cred.ClientID)
+	oauth2Cred, err = client.Oauth2Credentials.Get(defaultCtx,
+		consumer.ID, oauth2Cred.ClientID)
 	assert.NotNil(err)
 	assert.Nil(oauth2Cred)
 
@@ -280,14 +285,16 @@ func TestOauth2CredentialListMethods(T *testing.T) {
 		oauth2Creds[i] = oauth2Cred
 	}
 
-	oauth2CredsFromKong, next, err := client.Oauth2Credentials.List(defaultCtx, nil)
+	oauth2CredsFromKong, next, err :=
+		client.Oauth2Credentials.List(defaultCtx, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(oauth2CredsFromKong)
 	assert.Equal(4, len(oauth2CredsFromKong))
 
 	// first page
-	page1, next, err := client.Oauth2Credentials.List(defaultCtx, &ListOpt{Size: 1})
+	page1, next, err :=
+		client.Oauth2Credentials.List(defaultCtx, &ListOpt{Size: 1})
 	assert.Nil(err)
 	assert.NotNil(next)
 	assert.NotNil(page1)
@@ -301,8 +308,8 @@ func TestOauth2CredentialListMethods(T *testing.T) {
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
 
-	oauth2CredsForConsumer, next, err := client.Oauth2Credentials.ListForConsumer(defaultCtx,
-		consumer1.ID, nil)
+	oauth2CredsForConsumer, next, err :=
+		client.Oauth2Credentials.ListForConsumer(defaultCtx, consumer1.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(oauth2CredsForConsumer)

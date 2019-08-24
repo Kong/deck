@@ -27,7 +27,8 @@ var (
 // create a credential in Kong, otherwise an ID
 // is auto-generated.
 func (s *credentialService) Create(ctx context.Context, credType string,
-	consumerUsernameOrID *string, credential interface{}) (json.RawMessage, error) {
+	consumerUsernameOrID *string,
+	credential interface{}) (json.RawMessage, error) {
 
 	if isEmptyString(consumerUsernameOrID) {
 		return nil, errors.New("consumerUsernameOrID cannot be nil")
@@ -66,7 +67,8 @@ func (s *credentialService) Create(ctx context.Context, credType string,
 
 // Get fetches a credential of credType with credIdentifier from Kong.
 func (s *credentialService) Get(ctx context.Context, credType string,
-	consumerUsernameOrID *string, credIdentifier *string) (json.RawMessage, error) {
+	consumerUsernameOrID *string,
+	credIdentifier *string) (json.RawMessage, error) {
 
 	if isEmptyString(credIdentifier) {
 		return nil, errors.New("credIdentifier cannot be nil for Get operation")
@@ -79,7 +81,8 @@ func (s *credentialService) Get(ctx context.Context, credType string,
 	if !ok {
 		return nil, fmt.Errorf("unknown credential type: %v", credType)
 	}
-	endpoint := "/consumers/" + *consumerUsernameOrID + "/" + subPath + "/" + *credIdentifier
+	endpoint := "/consumers/" + *consumerUsernameOrID + "/" +
+		subPath + "/" + *credIdentifier
 	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return nil, err
@@ -95,7 +98,8 @@ func (s *credentialService) Get(ctx context.Context, credType string,
 
 // Update updates credential in Kong
 func (s *credentialService) Update(ctx context.Context, credType string,
-	consumerUsernameOrID *string, credential interface{}) (json.RawMessage, error) {
+	consumerUsernameOrID *string,
+	credential interface{}) (json.RawMessage, error) {
 
 	if isEmptyString(consumerUsernameOrID) {
 		return nil, errors.New("consumerUsernameOrID cannot be nil")

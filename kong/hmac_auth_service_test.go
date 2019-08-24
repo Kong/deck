@@ -107,7 +107,8 @@ func TestHMACAuthGet(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx, consumer.ID, hmacAuth)
+	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx,
+		consumer.ID, hmacAuth)
 	assert.Nil(err)
 	assert.NotNil(createdHMACAuth)
 
@@ -155,7 +156,8 @@ func TestHMACAuthUpdate(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx, consumer.ID, hmacAuth)
+	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx,
+		consumer.ID, hmacAuth)
 	assert.Nil(err)
 	assert.NotNil(createdHMACAuth)
 
@@ -165,7 +167,8 @@ func TestHMACAuthUpdate(T *testing.T) {
 
 	hmacAuth.Username = String("my-new-username")
 	hmacAuth.Secret = String("my-new-secret")
-	updatedHMACAuth, err := client.HMACAuths.Update(defaultCtx, consumer.ID, hmacAuth)
+	updatedHMACAuth, err := client.HMACAuths.Update(defaultCtx,
+		consumer.ID, hmacAuth)
 	assert.Nil(err)
 	assert.NotNil(updatedHMACAuth)
 	assert.Equal("my-new-secret", *updatedHMACAuth.Secret)
@@ -196,14 +199,16 @@ func TestHMACAuthDelete(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(consumer)
 
-	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx, consumer.ID, hmacAuth)
+	createdHMACAuth, err := client.HMACAuths.Create(defaultCtx,
+		consumer.ID, hmacAuth)
 	assert.Nil(err)
 	assert.NotNil(createdHMACAuth)
 
 	err = client.HMACAuths.Delete(defaultCtx, consumer.ID, hmacAuth.Username)
 	assert.Nil(err)
 
-	hmacAuth, err = client.HMACAuths.Get(defaultCtx, consumer.ID, hmacAuth.Username)
+	hmacAuth, err = client.HMACAuths.Get(defaultCtx,
+		consumer.ID, hmacAuth.Username)
 	assert.NotNil(err)
 	assert.Nil(hmacAuth)
 
@@ -284,8 +289,8 @@ func TestHMACAuthListMethods(T *testing.T) {
 	assert.NotNil(page2)
 	assert.Equal(3, len(page2))
 
-	hmacAuthsForConsumer, next, err := client.HMACAuths.ListForConsumer(defaultCtx,
-		consumer1.ID, nil)
+	hmacAuthsForConsumer, next, err :=
+		client.HMACAuths.ListForConsumer(defaultCtx, consumer1.ID, nil)
 	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(hmacAuthsForConsumer)
