@@ -20,7 +20,7 @@ env:
   - KONG_VERSION=1.0.3
   - KONG_VERSION=1.1.2
   - KONG_VERSION=1.2.0
-  - KONG_VERSION=1.3.0rc1
+  - KONG_VERSION=1.3.0
 
 before_install:
   - psql -c 'create database kong;' -U postgres
