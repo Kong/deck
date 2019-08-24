@@ -1,10 +1,28 @@
 # Table of Contents
 
+- [v0.5.1](#v051---20190824)
 - [v0.5.0](#v050---20190818)
 - [v0.4.0](#v040---20190610)
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.5.1] - 2019/08/24
+
+### Added
+
+- `oauth2` credentials associated with consumers are now supported.
+  [#67](https://github.com/hbagdi/deck/pull/67)
+
+### Fixed
+
+- The same target can be associated with multiple upstreams.
+  [#57](https://github.com/hbagdi/deck/issues/57)
+- Fix compatibility with Kong < 1.3.
+  [#59](https://github.com/hbagdi/deck/issues/59)
+- Ignore credentials for consumers which are not in the sub-set of
+  the configuration being synced.
+  [#65](https://github.com/hbagdi/deck/issues/65)
 
 ## [v0.5.0] - 2019/08/18
 
@@ -165,6 +183,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.5.1]: https://github.com/hbagdi/deck/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/deck/compare/v0.4.0...v0.5.0
 [v0.4.0]: https://github.com/hbagdi/deck/compare/v0.3.0...v0.4.0
 [v0.3.0]: https://github.com/hbagdi/deck/compare/v0.2.0...v0.3.0
