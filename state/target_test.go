@@ -12,23 +12,40 @@ func TestTargetInsert(t *testing.T) {
 	collection, err := NewTargetsCollection()
 	assert.Nil(err)
 	assert.NotNil(collection)
-	var target Target
-	target.Target.Target = kong.String("my-target")
-	target.ID = kong.String("first")
-	err = collection.Add(target)
+
+	var t0 Target
+	t0.Target.Target = kong.String("my-target")
+	t0.ID = kong.String("first")
+	err = collection.Add(t0)
 	assert.NotNil(err)
 
-	var target2 Target
-	target2.Target.Target = kong.String("my-target")
-	target2.ID = kong.String("first")
-	target2.Upstream = &kong.Upstream{
+	var t1 Target
+	t1.Target.Target = kong.String("my-target")
+	t1.ID = kong.String("first")
+	t1.Upstream = &kong.Upstream{
 		ID:   kong.String("upstream1-id"),
 		Name: kong.String("upstream1-name"),
 	}
-	assert.NotNil(target2.Upstream)
-	err = collection.Add(target2)
-	assert.NotNil(target2.Upstream)
+	err = collection.Add(t1)
 	assert.Nil(err)
+
+	var t2 Target
+	t2.Target.Target = kong.String("my-target")
+	t2.ID = kong.String("second")
+	t2.Upstream = &kong.Upstream{
+		ID: kong.String("upstream1-id"),
+	}
+	err = collection.Add(t2)
+	assert.NotNil(err)
+
+	var t3 Target
+	t3.Target.Target = kong.String("my-target")
+	t3.ID = kong.String("third")
+	t3.Upstream = &kong.Upstream{
+		Name: kong.String("upstream1-name"),
+	}
+	err = collection.Add(t3)
+	assert.NotNil(err)
 }
 
 func TestTargetGetUpdate(t *testing.T) {
@@ -48,14 +65,14 @@ func TestTargetGetUpdate(t *testing.T) {
 	assert.NotNil(target.Upstream)
 	assert.Nil(err)
 
-	re, err := collection.Get("first")
+	re, err := collection.Get("upstream1-id", "first")
 	assert.Nil(err)
 	assert.NotNil(re)
 	assert.Equal("my-target", *re.Target.Target)
 	err = collection.Update(*re)
 	assert.Nil(err)
 
-	re, err = collection.Get("my-target")
+	re, err = collection.Get("upstream1-name", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 }
@@ -78,14 +95,14 @@ func TestTargetGetMemoryReference(t *testing.T) {
 	err = collection.Add(target)
 	assert.Nil(err)
 
-	re, err := collection.Get("first")
+	re, err := collection.Get("upstream1-name", "first")
 	assert.Nil(err)
 	assert.NotNil(re)
 	assert.Equal("my-target", *re.Target.Target)
 
 	re.Weight = kong.Int(1)
 
-	re, err = collection.Get("my-target")
+	re, err = collection.Get("upstream1-name", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 	assert.Nil(re.Weight)
@@ -128,7 +145,7 @@ func TestTargetsInvalidType(t *testing.T) {
 	txn.Commit()
 
 	assert.Panics(func() {
-		collection.Get("target")
+		collection.Get("upstream-name", "id")
 	})
 }
 
@@ -148,14 +165,14 @@ func TestTargetDelete(t *testing.T) {
 	err = collection.Add(target)
 	assert.Nil(err)
 
-	re, err := collection.Get("my-target")
+	re, err := collection.Get("upstream1-name", "my-target")
 	assert.Nil(err)
 	assert.NotNil(re)
 
-	err = collection.Delete(*re.ID)
+	err = collection.Delete("upstream1-name", *re.ID)
 	assert.Nil(err)
 
-	err = collection.Delete(*re.ID)
+	err = collection.Delete("upstream1-name", *re.ID)
 	assert.NotNil(err)
 }
 

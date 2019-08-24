@@ -196,7 +196,7 @@ func (crud *targetPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !ok {
 		panic("whoops")
 	}
-	s.Targets.Delete(*svc.ID)
+	s.Targets.Delete(*svc.Upstream.ID, *svc.ID)
 	return nil, nil
 }
 
