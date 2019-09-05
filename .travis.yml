@@ -4,7 +4,7 @@ sudo: true
 language: go
 
 go:
- - "1.12"
+ - "1.13"
 
 notifications:
   email: false
