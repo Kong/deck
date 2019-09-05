@@ -1,5 +1,5 @@
 #!/bin/bash -e
-VERSION="50b56122"
+VERSION="kubernetes-1.15.3"
 
 if [[ ! -d /tmp/code-generator ]];
 then
