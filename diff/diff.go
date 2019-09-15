@@ -29,6 +29,10 @@ type Syncer struct {
 	stopChan  chan struct{}
 
 	InFlightOps int32
+
+	SilenceWarnings bool
+
+	once sync.Once
 }
 
 // NewSyncer constructs a Syncer.

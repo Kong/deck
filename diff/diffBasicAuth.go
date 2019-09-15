@@ -2,11 +2,26 @@ package diff
 
 import (
 	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
+
+const (
+	basicAuthPasswordWarning = "Warning: please note that changes in " +
+		"password of basic-auth credentials are not detected by decK!!"
+)
+
+func (sc *Syncer) warnBasicAuth() {
+	sc.once.Do(func() {
+		if sc.SilenceWarnings {
+			return
+		}
+		print.UpdatePrintln(basicAuthPasswordWarning)
+	})
+}
 
 func (sc *Syncer) deleteBasicAuths() error {
 	currentBasicAuths, err := sc.currentState.BasicAuths.GetAll()
@@ -30,6 +45,7 @@ func (sc *Syncer) deleteBasicAuths() error {
 }
 
 func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
+	sc.warnBasicAuth()
 	if basicAuth.Consumer == nil ||
 		(utils.Empty(basicAuth.Consumer.ID)) {
 		return nil, errors.Errorf("basic-auth has no associated consumer: %+v",
@@ -73,6 +89,7 @@ func (sc *Syncer) createUpdateBasicAuths() error {
 }
 
 func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
+	sc.warnBasicAuth()
 	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
 	currentBasicAuth, err := sc.currentState.BasicAuths.Get(*basicAuth.Username)
 	if err == state.ErrNotFound {
