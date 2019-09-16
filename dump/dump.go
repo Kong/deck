@@ -75,7 +75,7 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 			if err != nil {
 				// key could belong to a consumer which is not part
 				// of this sub-set of the entire data-base
-				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+				if err == state.ErrNotFound {
 					continue
 				}
 				return nil, errors.Wrapf(err,
@@ -129,7 +129,7 @@ func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 			if err != nil {
 				// key could belong to a consumer which is not part
 				// of this sub-set of the entire data-base
-				if err == state.ErrNotFound && len(config.SelectorTags) > 0 {
+				if err == state.ErrNotFound {
 					continue
 				}
 				return nil, errors.Wrapf(err,
