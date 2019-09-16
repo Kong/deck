@@ -1,11 +1,36 @@
 # Table of Contents
 
+- [v0.5.2](#v052---20190915)
 - [v0.5.1](#v051---20190824)
 - [v0.5.0](#v050---20190818)
 - [v0.4.0](#v040---20190610)
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.5.2] - 2019/09/15
+
+### Added
+
+- `-w/--workspace` flag has been added to the `reset` command to reset a
+  specific workspace in Kong Enterprise.
+  [#74](https://github.com/hbagdi/deck/issues/74)
+- `--all-workspaces` flag has been added to the `reset` command to reset
+  all workspaces in Kong Enterprise.
+  [#74](https://github.com/hbagdi/deck/issues/74)
+- A warning is logged when basic-auth credentials are being synced.
+  [#49](https://github.com/hbagdi/deck/issues/49)
+
+### Fixed
+
+- Kong Enterprise Developer Portal exposes the credentials (basic/key) of
+  Developers on the Admin API, but doesn't expose the consumers causing
+  issues during export. decK now ignores these credentials in Kong Enterprise.
+  [#75](https://github.com/hbagdi/deck/issues/75)
+
+### Internal
+
+- Go version has been bumped to 1.13.
 
 ## [v0.5.1] - 2019/08/24
 
@@ -183,6 +208,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.5.2]: https://github.com/hbagdi/deck/compare/v0.5.1...v0.5.2
 [v0.5.1]: https://github.com/hbagdi/deck/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/deck/compare/v0.4.0...v0.5.0
 [v0.4.0]: https://github.com/hbagdi/deck/compare/v0.3.0...v0.4.0
