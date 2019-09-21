@@ -13,7 +13,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// getContent reads reads all the YAML files in the directory or the
+// getContent reads reads all the YAML and JSON files in the directory or the
 // file, depending on what fileOrDir represents, merges the content of
 // these files and renders a Content.
 func getContent(fileOrDir string) (*Content, error) {
@@ -35,7 +35,7 @@ func getContent(fileOrDir string) (*Content, error) {
 	return &res, nil
 }
 
-// getReaders returns back io.Readers representing all the YAML
+// getReaders returns back io.Readers representing all the YAML and JSON
 // files in a directory. If fileOrDir is a single file, then it
 // returns back the reader for the file.
 // If fileOrDir is equal to "-" string, then it returns back a io.Reader
@@ -53,10 +53,10 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 
 	var files []string
 	if finfo.IsDir() {
-		files, err = yamlFilesInDir(fileOrDir)
+		files, err = configFilesInDir(fileOrDir)
 		if err != nil {
 			return nil,
-				errors.Wrap(err, "getting YAML files from directory")
+				errors.Wrap(err, "getting files from directory")
 		}
 	} else {
 		files = append(files, fileOrDir)
@@ -90,11 +90,11 @@ func readContent(reader io.Reader) (*Content, error) {
 	return &content, nil
 }
 
-// yamlFilesInDir traverses the directory rooted at dir and
+// configFilesInDir traverses the directory rooted at dir and
 // returns all the files with a case-insensitive extension of `yml` or `yaml`.
-func yamlFilesInDir(dir string) ([]string, error) {
+func configFilesInDir(dir string) ([]string, error) {
 	var res []string
-	yamlExt := regexp.MustCompile("[Yy]([Aa])?[Mm][Ll]")
+	exts := regexp.MustCompile("[Yy]([Aa])?[Mm][Ll]|[Jj][Ss][Oo][Nn]")
 	err := filepath.Walk(
 		dir,
 		func(path string, info os.FileInfo, err error) error {
@@ -104,7 +104,7 @@ func yamlFilesInDir(dir string) ([]string, error) {
 			if info.IsDir() {
 				return nil
 			}
-			if yamlExt.MatchString(path) {
+			if exts.MatchString(path) {
 				res = append(res, path)
 			}
 			return nil

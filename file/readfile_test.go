@@ -9,7 +9,7 @@ import (
 	"github.com/hbagdi/go-kong/kong"
 )
 
-func Test_yamlFilesInDir(t *testing.T) {
+func Test_configFilesInDir(t *testing.T) {
 	type args struct {
 		dir string
 	}
@@ -38,19 +38,20 @@ func Test_yamlFilesInDir(t *testing.T) {
 				"testdata/emptyfiles/Baz.YamL",
 				"testdata/emptyfiles/bar.yaml",
 				"testdata/emptyfiles/foo.yml",
+				"testdata/emptyfiles/foobar.json",
 			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := yamlFilesInDir(tt.args.dir)
+			got, err := configFilesInDir(tt.args.dir)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("yamlFilesInDir() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("configFilesInDir() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("yamlFilesInDir() = %v, want %v", got, tt.want)
+				t.Errorf("configFilesInDir() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -86,12 +87,19 @@ func Test_getReaders(t *testing.T) {
 			name:    "valid directory",
 			args:    args{"testdata/emptyfiles"},
 			want:    nil,
-			wantLen: 3,
+			wantLen: 4,
 			wantErr: false,
 		},
 		{
 			name:    "valid file",
 			args:    args{"testdata/file.yaml"},
+			want:    nil,
+			wantLen: 1,
+			wantErr: false,
+		},
+		{
+			name:    "valid JSON file",
+			args:    args{"testdata/file.json"},
 			want:    nil,
 			wantLen: 1,
 			wantErr: false,
@@ -151,6 +159,12 @@ func Test_getContent(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "bad JSON",
+			args:    args{"testdata/badjson"},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "single file",
 			args: args{"testdata/file.yaml"},
 			want: &Content{
@@ -184,7 +198,7 @@ func Test_getContent(t *testing.T) {
 			name: "valid directory",
 			args: args{"testdata/valid"},
 			want: &Content{
-				Info: Info{
+				Info: &Info{
 					SelectorTags: []string{"tag1"},
 				},
 				Services: []Service{
@@ -219,6 +233,16 @@ func Test_getContent(t *testing.T) {
 					},
 				},
 				Consumers: []Consumer{
+					{
+						Consumer: kong.Consumer{
+							Username: kong.String("foo"),
+						},
+					},
+					{
+						Consumer: kong.Consumer{
+							Username: kong.String("bar"),
+						},
+					},
 					{
 						Consumer: kong.Consumer{
 							Username: kong.String("harry"),

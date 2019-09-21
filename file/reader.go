@@ -16,7 +16,7 @@ var count counter.Counter
 // GetStateFromFile reads in a file with filename and constructs
 // a state. If filename is `-`, then it will read from os.Stdin.
 // If filename represents a directory, it will traverse the tree
-// rooted at filename, read all the files with .yaml and .yml extensions
+// rooted at filename, read all the files with .yaml, .yml and .json extensions
 // and generate a state after a merge of the content from all the files.
 //
 // It will return an error if the file representation is invalid
@@ -49,7 +49,10 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 	if err != nil {
 		return nil, nil, "", errors.Wrap(err, "creating defaulter")
 	}
-	selectTags := fileContent.Info.SelectorTags
+	var selectTags []string
+	if fileContent.Info != nil {
+		selectTags = fileContent.Info.SelectorTags
+	}
 	workspace := fileContent.Workspace
 	kongState, err := state.NewKongState()
 	if err != nil {
@@ -415,7 +418,7 @@ func GetStateFromContent(fileContent *Content) (*state.KongState,
 		}
 	}
 
-	return kongState, fileContent.Info.SelectorTags, workspace, nil
+	return kongState, selectTags, workspace, nil
 }
 
 func processPlugin(p *Plugin, tags []string) (bool, error) {
