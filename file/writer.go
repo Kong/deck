@@ -1,21 +1,24 @@
 package file
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
+	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )
 
 // KongStateToFile writes a state object to file with filename.
 // It will omit timestamps and IDs while writing.
 func KongStateToFile(kongState *state.KongState,
+	selectTags []string, workspace, filename string, format Format) error {
 	// TODO break-down this giant function
-	selectTags []string, workspace, filename string) error {
 	var file Content
 
 	if workspace != "" {
@@ -257,22 +260,45 @@ func KongStateToFile(kongState *state.KongState,
 		return strings.Compare(*file.Consumers[i].Username,
 			*file.Consumers[j].Username) < 0
 	})
-	file.Info.SelectorTags = selectTags
+	if len(selectTags) > 0 {
+		file.Info = &Info{
+			SelectorTags: selectTags,
+		}
+	}
 	// hardcoded as only one version exists currently
 	file.FormatVersion = "1.1"
 
-	c, err := yaml.Marshal(file)
-	if err != nil {
-		return err
+	var c []byte
+	switch format {
+	case YAML:
+		c, err = yaml.Marshal(file)
+		if err != nil {
+			return err
+		}
+	case JSON:
+		c, err = json.MarshalIndent(file, "", "  ")
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("unkown file format: " + string(format))
 	}
 
 	if filename == "-" {
 		_, err = fmt.Print(string(c))
 	} else {
+		filename = addExtToFilename(filename, string(format))
 		err = ioutil.WriteFile(filename, c, 0600)
 	}
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func addExtToFilename(filename, format string) string {
+	if filepath.Ext(filename) == "" {
+		filename = filename + "." + strings.ToLower(format)
+	}
+	return filename
 }

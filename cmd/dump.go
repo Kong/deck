@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
@@ -15,6 +16,7 @@ import (
 
 var (
 	dumpCmdKongStateFile string
+	dumpCmdStateFormat   string
 	dumpWorkspace        string
 	dumpAllWorkspaces    bool
 )
@@ -61,12 +63,14 @@ configure Kong.`,
 			return err
 		}
 
+		format := file.Format(strings.ToUpper(dumpCmdStateFormat))
+
 		// Kong Enterprise dump all workspace
 		if dumpAllWorkspaces {
 			if dumpWorkspace != "" {
 				return errors.New("workspace cannot be specified with --all-workspace flag")
 			}
-			if dumpCmdKongStateFile != "kong.yaml" {
+			if dumpCmdKongStateFile != "kong" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
 			workspaces, err := listWorkspaces(client, config.Address)
@@ -86,7 +90,7 @@ configure Kong.`,
 					return errors.Wrap(err, "reading configuration from Kong")
 				}
 				if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
-					workspace, workspace+".yaml"); err != nil {
+					workspace, workspace, format); err != nil {
 					return err
 				}
 			}
@@ -108,7 +112,7 @@ configure Kong.`,
 			return errors.Wrap(err, "reading configuration from Kong")
 		}
 		if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
-			dumpWorkspace, dumpCmdKongStateFile); err != nil {
+			dumpWorkspace, dumpCmdKongStateFile, format); err != nil {
 			return err
 		}
 		return nil
@@ -118,8 +122,10 @@ configure Kong.`,
 func init() {
 	rootCmd.AddCommand(dumpCmd)
 	dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
-		"kong.yaml", "write Kong configuration to FILE. "+
+		"kong", "file to which to write Kong's configuration."+
 			"Use '-' to write to stdout.")
+	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
+		"yaml", "output file format: json or yaml")
 	dumpCmd.Flags().StringVarP(&dumpWorkspace, "workspace", "w",
 		"", "dump configuration of a specific workspace"+
 			"(Kong Enterprise only).")

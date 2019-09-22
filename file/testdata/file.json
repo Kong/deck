@@ -1,0 +1,10 @@
+{
+  "consumers": [
+    {
+      "username": "foo"
+    },
+    {
+      "username": "bar"
+    }
+  ]
+}
