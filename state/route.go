@@ -52,29 +52,11 @@ var routeTableSchema = &memdb.TableSchema{
 }
 
 // RoutesCollection stores and indexes Kong Services.
-type RoutesCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewRoutesCollection instantiates a RoutesCollection.
-func NewRoutesCollection() (*RoutesCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			routeTableName: routeTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new RouteCollection")
-	}
-	return &RoutesCollection{
-		memdb: m,
-	}, nil
-}
+type RoutesCollection collection
 
 // Add adds a route to RoutesCollection
 func (k *RoutesCollection) Add(route Route) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(routeTableName, &route)
 	if err != nil {
@@ -86,7 +68,7 @@ func (k *RoutesCollection) Add(route Route) error {
 
 // Get gets a route by name or ID.
 func (k *RoutesCollection) Get(ID string) (*Route, error) {
-	res, err := multiIndexLookup(k.memdb, routeTableName,
+	res, err := multiIndexLookup(k.db, routeTableName,
 		[]string{"name", id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *RoutesCollection) Get(ID string) (*Route, error) {
 // by its name.
 func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(routeTableName, routesByServiceName, name)
 	if err != nil {
 		return nil, err
@@ -129,7 +111,7 @@ func (k *RoutesCollection) GetAllByServiceName(name string) ([]*Route,
 // by its id.
 func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(routeTableName, routesByServiceID, id)
 	if err != nil {
 		return nil, err
@@ -147,7 +129,7 @@ func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
 
 // Update updates a route
 func (k *RoutesCollection) Update(route Route) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(routeTableName, &route)
 	if err != nil {
@@ -165,7 +147,7 @@ func (k *RoutesCollection) Delete(nameOrID string) error {
 		return errors.Wrap(err, "looking up route")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(routeTableName, route)
@@ -178,7 +160,7 @@ func (k *RoutesCollection) Delete(nameOrID string) error {
 
 // GetAll gets a route by name or ID.
 func (k *RoutesCollection) GetAll() ([]*Route, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(routeTableName, all, true)

@@ -29,29 +29,11 @@ var consumerTableSchema = &memdb.TableSchema{
 }
 
 // ConsumersCollection stores and indexes Kong Consumers.
-type ConsumersCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewConsumersCollection instantiates a ConsumersCollection.
-func NewConsumersCollection() (*ConsumersCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			consumerTableName: consumerTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new ConsumerCollection")
-	}
-	return &ConsumersCollection{
-		memdb: m,
-	}, nil
-}
+type ConsumersCollection collection
 
 // Add adds a consumer to the collection
 func (k *ConsumersCollection) Add(consumer Consumer) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(consumerTableName, &consumer)
 	if err != nil {
@@ -63,7 +45,7 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 
 // Get gets a consumer by name or ID.
 func (k *ConsumersCollection) Get(userNameOrID string) (*Consumer, error) {
-	res, err := multiIndexLookup(k.memdb, consumerTableName,
+	res, err := multiIndexLookup(k.db, consumerTableName,
 		[]string{"Username", id}, userNameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -88,7 +70,7 @@ func (k *ConsumersCollection) Get(userNameOrID string) (*Consumer, error) {
 func (k *ConsumersCollection) Update(consumer Consumer) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(consumerTableName, &consumer)
 	if err != nil {
@@ -106,7 +88,7 @@ func (k *ConsumersCollection) Delete(usernameOrID string) error {
 		return errors.Wrap(err, "looking up consumer")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(consumerTableName, consumer)
@@ -119,7 +101,7 @@ func (k *ConsumersCollection) Delete(usernameOrID string) error {
 
 // GetAll gets a consumer by name or ID.
 func (k *ConsumersCollection) GetAll() ([]*Consumer, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(consumerTableName, all, true)

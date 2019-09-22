@@ -7,31 +7,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func certsCollection() *CertificatesCollection {
+	return state().Certificates
+}
+
 func TestCertificateInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
 
 	var certificate Certificate
 	certificate.ID = kong.String("first")
 	certificate.Cert = kong.String("firstCert")
 	certificate.Key = kong.String("firstKey")
-	err = collection.Add(certificate)
+	err := collection.Add(certificate)
 	assert.Nil(err)
 }
 
 func TestCertificateGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
 
 	var certificate Certificate
 	certificate.Cert = kong.String("firstCert")
 	certificate.Key = kong.String("firstKey")
 	certificate.ID = kong.String("first")
-	err = collection.Add(certificate)
+	err := collection.Add(certificate)
 	assert.Nil(err)
 
 	se, err := collection.GetByCertKey("firstCert", "firstKey")
@@ -56,14 +56,13 @@ func TestCertificateGetUpdate(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestCertificateGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
+
 	var cert Certificate
 	cert.Cert = kong.String("my-cert")
 	cert.Key = kong.String("my-key")
 	cert.ID = kong.String("first")
-	err = collection.Add(cert)
+	err := collection.Add(cert)
 	assert.Nil(err)
 
 	c, err := collection.Get("first")
@@ -79,16 +78,13 @@ func TestCertificateGetMemoryReference(t *testing.T) {
 
 func TestCertificatesInvalidType(t *testing.T) {
 	assert := assert.New(t)
-
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
-	err = txn.Insert(certificateTableName, &upstream)
+	txn := collection.db.Txn(true)
+	err := txn.Insert(certificateTableName, &upstream)
 	assert.NotNil(err)
 	txn.Abort()
 
@@ -105,7 +101,7 @@ func TestCertificatesInvalidType(t *testing.T) {
 		},
 	}
 
-	txn = collection.memdb.Txn(true)
+	txn = collection.db.Txn(true)
 	err = txn.Insert(certificateTableName, &certificate)
 	assert.Nil(err)
 	txn.Commit()
@@ -121,15 +117,13 @@ func TestCertificatesInvalidType(t *testing.T) {
 
 func TestCertificateDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
 
 	var certificate Certificate
 	certificate.ID = kong.String("first")
 	certificate.Cert = kong.String("firstCert")
 	certificate.Key = kong.String("firstKey")
-	err = collection.Add(certificate)
+	err := collection.Add(certificate)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -163,15 +157,13 @@ func TestCertificateDelete(t *testing.T) {
 
 func TestCertificateGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := certsCollection()
 
 	var certificate Certificate
 	certificate.ID = kong.String("first")
 	certificate.Cert = kong.String("firstCert")
 	certificate.Key = kong.String("firstKey")
-	err = collection.Add(certificate)
+	err := collection.Add(certificate)
 	assert.Nil(err)
 
 	var certificate2 Certificate

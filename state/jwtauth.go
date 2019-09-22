@@ -52,29 +52,11 @@ var jwtAuthTableSchema = &memdb.TableSchema{
 }
 
 // JWTAuthsCollection stores and indexes key-auth credentials.
-type JWTAuthsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewJWTAuthsCollection instantiates a JWTAuthsCollection.
-func NewJWTAuthsCollection() (*JWTAuthsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			jwtAuthTableName: jwtAuthTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new JWTAuthsCollection")
-	}
-	return &JWTAuthsCollection{
-		memdb: m,
-	}, nil
-}
+type JWTAuthsCollection collection
 
 // Add adds a key-auth credential to JWTAuthsCollection
 func (k *JWTAuthsCollection) Add(jwtAuth JWTAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(jwtAuthTableName, &jwtAuth)
 	if err != nil {
@@ -86,7 +68,7 @@ func (k *JWTAuthsCollection) Add(jwtAuth JWTAuth) error {
 
 // Get gets a key-auth credential by key or ID.
 func (k *JWTAuthsCollection) Get(keyOrID string) (*JWTAuth, error) {
-	res, err := multiIndexLookup(k.memdb, jwtAuthTableName,
+	res, err := multiIndexLookup(k.db, jwtAuthTableName,
 		[]string{"key", id}, keyOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *JWTAuthsCollection) Get(keyOrID string) (*JWTAuth, error) {
 // belong to a Consumer with username.
 func (k *JWTAuthsCollection) GetAllByConsumerUsername(username string) ([]*JWTAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(jwtAuthTableName, jwtAuthsByConsumerUsername, username)
 	if err != nil {
 		return nil, err
@@ -129,7 +111,7 @@ func (k *JWTAuthsCollection) GetAllByConsumerUsername(username string) ([]*JWTAu
 // belong to a Consumer with id.
 func (k *JWTAuthsCollection) GetAllByConsumerID(id string) ([]*JWTAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(jwtAuthTableName, jwtAuthsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -147,7 +129,7 @@ func (k *JWTAuthsCollection) GetAllByConsumerID(id string) ([]*JWTAuth,
 
 // Update updates an existing key-auth credential.
 func (k *JWTAuthsCollection) Update(jwtAuth JWTAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(jwtAuthTableName, &jwtAuth)
 	if err != nil {
@@ -165,7 +147,7 @@ func (k *JWTAuthsCollection) Delete(keyOrID string) error {
 		return errors.Wrap(err, "looking up jwtAuth")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(jwtAuthTableName, jwtAuth)
@@ -178,7 +160,7 @@ func (k *JWTAuthsCollection) Delete(keyOrID string) error {
 
 // GetAll gets all key-auth credentials.
 func (k *JWTAuthsCollection) GetAll() ([]*JWTAuth, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(jwtAuthTableName, all, true)

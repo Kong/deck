@@ -30,29 +30,11 @@ var certificateTableSchema = &memdb.TableSchema{
 }
 
 // CertificatesCollection stores and indexes Kong Certificates.
-type CertificatesCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewCertificatesCollection instantiates a CertificatesCollection.
-func NewCertificatesCollection() (*CertificatesCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			certificateTableName: certificateTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new CertificateCollection")
-	}
-	return &CertificatesCollection{
-		memdb: m,
-	}, nil
-}
+type CertificatesCollection collection
 
 // Add adds a certificate to the collection
 func (k *CertificatesCollection) Add(certificate Certificate) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(certificateTableName, &certificate)
 	if err != nil {
@@ -64,7 +46,7 @@ func (k *CertificatesCollection) Add(certificate Certificate) error {
 
 // Get gets a certificate by name or ID.
 func (k *CertificatesCollection) Get(id string) (*Certificate, error) {
-	res, err := multiIndexLookup(k.memdb, certificateTableName,
+	res, err := multiIndexLookup(k.db, certificateTableName,
 		[]string{"id"}, id)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -87,7 +69,7 @@ func (k *CertificatesCollection) Get(id string) (*Certificate, error) {
 // the same key and cert from the collection.
 func (k *CertificatesCollection) GetByCertKey(cert,
 	key string) (*Certificate, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	res, err := txn.First(certificateTableName, "certkey", cert, key)
@@ -113,7 +95,7 @@ func (k *CertificatesCollection) GetByCertKey(cert,
 func (k *CertificatesCollection) Update(certificate Certificate) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(certificateTableName, &certificate)
 	if err != nil {
@@ -131,7 +113,7 @@ func (k *CertificatesCollection) Delete(ID string) error {
 		return errors.Wrap(err, "looking up certificate")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(certificateTableName, certificate)
@@ -150,7 +132,7 @@ func (k *CertificatesCollection) DeleteByCertKey(cert, key string) error {
 		return errors.Wrap(err, "looking up certificate")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(certificateTableName, certificate)
@@ -163,7 +145,7 @@ func (k *CertificatesCollection) DeleteByCertKey(cert, key string) error {
 
 // GetAll gets a certificate by name or ID.
 func (k *CertificatesCollection) GetAll() ([]*Certificate, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(certificateTableName, all, true)

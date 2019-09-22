@@ -1,8 +1,18 @@
 package state
 
+import (
+	memdb "github.com/hashicorp/go-memdb"
+	"github.com/pkg/errors"
+)
+
+type collection struct {
+	db *memdb.MemDB
+}
+
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
+	common         collection
 	Services       *ServicesCollection
 	Routes         *RoutesCollection
 	Upstreams      *UpstreamsCollection
@@ -20,81 +30,49 @@ type KongState struct {
 	Oauth2Creds *Oauth2CredsCollection
 }
 
+var schema = &memdb.DBSchema{
+	Tables: map[string]*memdb.TableSchema{
+		serviceTableName:     serviceTableSchema,
+		routeTableName:       routeTableSchema,
+		upstreamTableName:    upstreamTableSchema,
+		targetTableName:      targetTableSchema,
+		certificateTableName: certificateTableSchema,
+		caCertTableName:      caCertTableSchema,
+		pluginTableName:      pluginTableSchema,
+		consumerTableName:    consumerTableSchema,
+		keyAuthTableName:     keyAuthTableSchema,
+		hmacAuthTableName:    hmacAuthTableSchema,
+		basicAuthTableName:   basicAuthTableSchema,
+		jwtAuthTableName:     jwtAuthTableSchema,
+		oauth2CredTableName:  oauth2CredTableSchema,
+		aclGroupTableName:    aclGroupTableSchema,
+	},
+}
+
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
-	services, err := NewServicesCollection()
+	memDB, err := memdb.NewMemDB(schema)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "creating new ServiceCollection")
 	}
-	routes, err := NewRoutesCollection()
-	if err != nil {
-		return nil, err
-	}
-	upstreams, err := NewUpstreamsCollection()
-	if err != nil {
-		return nil, err
-	}
-	targets, err := NewTargetsCollection()
-	if err != nil {
-		return nil, err
-	}
-	certificates, err := NewCertificatesCollection()
-	if err != nil {
-		return nil, err
-	}
-	caCertificates, err := NewCACertificatesCollection()
-	if err != nil {
-		return nil, err
-	}
-	plugins, err := NewPluginsCollection()
-	if err != nil {
-		return nil, err
-	}
-	consumers, err := NewConsumersCollection()
-	if err != nil {
-		return nil, err
+	var state KongState
+	state.common = collection{
+		db: memDB,
 	}
 
-	keyAuths, err := NewKeyAuthsCollection()
-	if err != nil {
-		return nil, err
-	}
-	hmacAuths, err := NewHMACAuthsCollection()
-	if err != nil {
-		return nil, err
-	}
-	jwtAuths, err := NewJWTAuthsCollection()
-	if err != nil {
-		return nil, err
-	}
-	basicAuths, err := NewBasicAuthsCollection()
-	if err != nil {
-		return nil, err
-	}
-	aclGroups, err := NewACLGroupsCollection()
-	if err != nil {
-		return nil, err
-	}
-	oauth2Creds, err := NewOauth2CredsCollection()
-	if err != nil {
-		return nil, err
-	}
-
-	return &KongState{
-		Services:       services,
-		Routes:         routes,
-		Upstreams:      upstreams,
-		Targets:        targets,
-		Certificates:   certificates,
-		CACertificates: caCertificates,
-		Plugins:        plugins,
-		Consumers:      consumers,
-
-		KeyAuths:    keyAuths,
-		HMACAuths:   hmacAuths,
-		JWTAuths:    jwtAuths,
-		BasicAuths:  basicAuths,
-		ACLGroups:   aclGroups,
-		Oauth2Creds: oauth2Creds,
-	}, nil
+	state.Services = (*ServicesCollection)(&state.common)
+	state.Routes = (*RoutesCollection)(&state.common)
+	state.Upstreams = (*UpstreamsCollection)(&state.common)
+	state.Targets = (*TargetsCollection)(&state.common)
+	state.Certificates = (*CertificatesCollection)(&state.common)
+	state.CACertificates = (*CACertificatesCollection)(&state.common)
+	state.Plugins = (*PluginsCollection)(&state.common)
+	state.Consumers = (*ConsumersCollection)(&state.common)
+	state.KeyAuths = (*KeyAuthsCollection)(&state.common)
+	state.HMACAuths = (*HMACAuthsCollection)(&state.common)
+	state.JWTAuths = (*JWTAuthsCollection)(&state.common)
+	state.BasicAuths = (*BasicAuthsCollection)(&state.common)
+	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
+	state.Oauth2Creds = (*Oauth2CredsCollection)(&state.common)
+	return &state, nil
 }

@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func oauth2CredsCollection() *Oauth2CredsCollection {
+	return state().Oauth2Creds
+}
+
 func TestOauth2CredInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	var oauth2Cred Oauth2Credential
 	oauth2Cred.ClientID = kong.String("client-id")
 	oauth2Cred.ID = kong.String("first")
-	err = collection.Add(oauth2Cred)
+	err := collection.Add(oauth2Cred)
 	assert.NotNil(err)
 
 	oauth2Cred.Consumer = &kong.Consumer{
@@ -29,9 +31,7 @@ func TestOauth2CredInsert(t *testing.T) {
 
 func TestOauth2CredentialGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	var oauth2Cred Oauth2Credential
 	oauth2Cred.ClientID = kong.String("my-clientid")
@@ -41,7 +41,7 @@ func TestOauth2CredentialGet(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(oauth2Cred)
+	err := collection.Add(oauth2Cred)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -62,9 +62,7 @@ func TestOauth2CredentialGet(t *testing.T) {
 
 func TestOauth2CredentialUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	var oauth2Cred Oauth2Credential
 	oauth2Cred.ClientID = kong.String("my-clientid")
@@ -74,7 +72,7 @@ func TestOauth2CredentialUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(oauth2Cred)
+	err := collection.Add(oauth2Cred)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -96,9 +94,7 @@ func TestOauth2CredentialUpdate(t *testing.T) {
 
 func TestOauth2CredentialDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	var oauth2Cred Oauth2Credential
 	oauth2Cred.ClientID = kong.String("my-clientid1")
@@ -107,7 +103,7 @@ func TestOauth2CredentialDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(oauth2Cred)
+	err := collection.Add(oauth2Cred)
 	assert.Nil(err)
 
 	res, err := collection.Get("my-clientid1")
@@ -131,9 +127,7 @@ func TestOauth2CredentialDelete(t *testing.T) {
 
 func TestOauth2CredentialGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	populateWithOauth2CredentialFixtures(assert, collection)
 
@@ -144,9 +138,7 @@ func TestOauth2CredentialGetAll(t *testing.T) {
 
 func TestOauth2CredentialGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewOauth2CredsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := oauth2CredsCollection()
 
 	populateWithOauth2CredentialFixtures(assert, collection)
 

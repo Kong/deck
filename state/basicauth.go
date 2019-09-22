@@ -52,29 +52,11 @@ var basicAuthTableSchema = &memdb.TableSchema{
 }
 
 // BasicAuthsCollection stores and indexes basic-auth credentials.
-type BasicAuthsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewBasicAuthsCollection instantiates a BasicAuthsCollection.
-func NewBasicAuthsCollection() (*BasicAuthsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			basicAuthTableName: basicAuthTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new BasicAuthsCollection")
-	}
-	return &BasicAuthsCollection{
-		memdb: m,
-	}, nil
-}
+type BasicAuthsCollection collection
 
 // Add adds a basic-auth credential to BasicAuthsCollection
 func (k *BasicAuthsCollection) Add(basicAuth BasicAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(basicAuthTableName, &basicAuth)
 	if err != nil {
@@ -86,7 +68,7 @@ func (k *BasicAuthsCollection) Add(basicAuth BasicAuth) error {
 
 // Get gets a basic-auth credential by  or ID.
 func (k *BasicAuthsCollection) Get(usernameOrID string) (*BasicAuth, error) {
-	res, err := multiIndexLookup(k.memdb, basicAuthTableName,
+	res, err := multiIndexLookup(k.db, basicAuthTableName,
 		[]string{"username", id}, usernameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *BasicAuthsCollection) Get(usernameOrID string) (*BasicAuth, error) {
 // belong to a Consumer with username.
 func (k *BasicAuthsCollection) GetAllByConsumerUsername(username string) ([]*BasicAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(basicAuthTableName, basicAuthsByConsumerUsername, username)
 	if err != nil {
 		return nil, err
@@ -129,7 +111,7 @@ func (k *BasicAuthsCollection) GetAllByConsumerUsername(username string) ([]*Bas
 // belong to a Consumer with id.
 func (k *BasicAuthsCollection) GetAllByConsumerID(id string) ([]*BasicAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(basicAuthTableName, basicAuthsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -147,7 +129,7 @@ func (k *BasicAuthsCollection) GetAllByConsumerID(id string) ([]*BasicAuth,
 
 // Update updates an existing basic-auth credential.
 func (k *BasicAuthsCollection) Update(basicAuth BasicAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(basicAuthTableName, &basicAuth)
 	if err != nil {
@@ -165,7 +147,7 @@ func (k *BasicAuthsCollection) Delete(usernameOrID string) error {
 		return errors.Wrap(err, "looking up basicAuth")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(basicAuthTableName, basicAuth)
@@ -178,7 +160,7 @@ func (k *BasicAuthsCollection) Delete(usernameOrID string) error {
 
 // GetAll gets all basic-auth credentials.
 func (k *BasicAuthsCollection) GetAll() ([]*BasicAuth, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(basicAuthTableName, all, true)

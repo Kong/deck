@@ -29,29 +29,11 @@ var serviceTableSchema = &memdb.TableSchema{
 }
 
 // ServicesCollection stores and indexes Kong Services.
-type ServicesCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewServicesCollection instantiates a ServicesCollection.
-func NewServicesCollection() (*ServicesCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			serviceTableName: serviceTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new ServiceCollection")
-	}
-	return &ServicesCollection{
-		memdb: m,
-	}, nil
-}
+type ServicesCollection collection
 
 // Add adds a service to the collection
 func (k *ServicesCollection) Add(service Service) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
@@ -63,7 +45,7 @@ func (k *ServicesCollection) Add(service Service) error {
 
 // Get gets a service by name or ID.
 func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
-	res, err := multiIndexLookup(k.memdb, serviceTableName,
+	res, err := multiIndexLookup(k.db, serviceTableName,
 		[]string{"name", id}, nameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -88,7 +70,7 @@ func (k *ServicesCollection) Get(nameOrID string) (*Service, error) {
 func (k *ServicesCollection) Update(service Service) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(serviceTableName, &service)
 	if err != nil {
@@ -106,7 +88,7 @@ func (k *ServicesCollection) Delete(nameOrID string) error {
 		return errors.Wrap(err, "looking up service")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(serviceTableName, service)
@@ -119,7 +101,7 @@ func (k *ServicesCollection) Delete(nameOrID string) error {
 
 // GetAll gets a service by name or ID.
 func (k *ServicesCollection) GetAll() ([]*Service, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(serviceTableName, all, true)

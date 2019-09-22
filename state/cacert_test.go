@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func caCertsCollection() *CACertificatesCollection {
+	return state().CACertificates
+}
+
 func TestCACertificateInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCACertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := caCertsCollection()
 
 	var caCert CACertificate
 	caCert.ID = kong.String("first")
 	caCert.Cert = kong.String("firstCert")
-	err = collection.Add(caCert)
+	err := collection.Add(caCert)
 	assert.Nil(err)
 
 	err = collection.Add(caCert)
@@ -25,14 +27,12 @@ func TestCACertificateInsert(t *testing.T) {
 
 func TestCACertificateGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCACertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := caCertsCollection()
 
 	var caCert CACertificate
 	caCert.Cert = kong.String("firstCert")
 	caCert.ID = kong.String("first")
-	err = collection.Add(caCert)
+	err := collection.Add(caCert)
 	assert.Nil(err)
 
 	se, err := collection.Get("firstCert")
@@ -54,14 +54,12 @@ func TestCACertificateGetUpdate(t *testing.T) {
 
 func TestCACertificateDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCACertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := caCertsCollection()
 
 	var caCert CACertificate
 	caCert.ID = kong.String("first")
 	caCert.Cert = kong.String("firstCert")
-	err = collection.Add(caCert)
+	err := collection.Add(caCert)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -94,14 +92,12 @@ func TestCACertificateDelete(t *testing.T) {
 
 func TestCACertificateGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewCACertificatesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := caCertsCollection()
 
 	var caCert CACertificate
 	caCert.ID = kong.String("first")
 	caCert.Cert = kong.String("firstCert")
-	err = collection.Add(caCert)
+	err := collection.Add(caCert)
 	assert.Nil(err)
 
 	var certificate2 CACertificate

@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func jwtAuthsCollection() *JWTAuthsCollection {
+	return state().JWTAuths
+}
+
 func TestJWTAuthInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	var jwtAuth JWTAuth
 	jwtAuth.Key = kong.String("my-key")
 	jwtAuth.ID = kong.String("first")
-	err = collection.Add(jwtAuth)
+	err := collection.Add(jwtAuth)
 	assert.NotNil(err)
 
 	var jwtAuth2 JWTAuth
@@ -32,9 +34,7 @@ func TestJWTAuthInsert(t *testing.T) {
 
 func TestJWTAuthGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	var jwtAuth JWTAuth
 	jwtAuth.Key = kong.String("my-key")
@@ -44,7 +44,7 @@ func TestJWTAuthGet(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(jwtAuth)
+	err := collection.Add(jwtAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -65,9 +65,7 @@ func TestJWTAuthGet(t *testing.T) {
 
 func TestJWTAuthUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	var jwtAuth JWTAuth
 	jwtAuth.Key = kong.String("my-key")
@@ -77,7 +75,7 @@ func TestJWTAuthUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(jwtAuth)
+	err := collection.Add(jwtAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -99,9 +97,7 @@ func TestJWTAuthUpdate(t *testing.T) {
 
 func TestJWTAuthDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	var jwtAuth JWTAuth
 	jwtAuth.Key = kong.String("my-key1")
@@ -110,7 +106,7 @@ func TestJWTAuthDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(jwtAuth)
+	err := collection.Add(jwtAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("my-key1")
@@ -134,9 +130,7 @@ func TestJWTAuthDelete(t *testing.T) {
 
 func TestJWTAuthGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	populateWithJWTAuthFixtures(assert, collection)
 
@@ -147,9 +141,7 @@ func TestJWTAuthGetAll(t *testing.T) {
 
 func TestJWTAuthGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewJWTAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := jwtAuthsCollection()
 
 	populateWithJWTAuthFixtures(assert, collection)
 

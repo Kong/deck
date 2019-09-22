@@ -7,16 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func routesCollection() *RoutesCollection {
+	return state().Routes
+}
+
 func TestRouteInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
+
 	var route Route
 	route.Name = kong.String("my-route")
 	route.ID = kong.String("first")
 	route.Hosts = kong.StringSlice("example.com", "demo.example.com")
-	err = collection.Add(route)
+	err := collection.Add(route)
 	assert.NotNil(err)
 
 	var route2 Route
@@ -35,9 +38,8 @@ func TestRouteInsert(t *testing.T) {
 
 func TestRouteGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
+
 	var route Route
 	route.Name = kong.String("my-route")
 	route.ID = kong.String("first")
@@ -47,7 +49,7 @@ func TestRouteGetUpdate(t *testing.T) {
 		Name: kong.String("service1-name"),
 	}
 	assert.NotNil(route.Service)
-	err = collection.Add(route)
+	err := collection.Add(route)
 	assert.NotNil(route.Service)
 	assert.Nil(err)
 
@@ -68,14 +70,12 @@ func TestRouteGetUpdate(t *testing.T) {
 func TestRoutesInvalidType(t *testing.T) {
 	assert := assert.New(t)
 
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
 
 	var service Service
 	service.Name = kong.String("my-service")
 	service.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
+	txn := collection.db.Txn(true)
 	txn.Insert(routeTableName, &service)
 	txn.Commit()
 
@@ -92,9 +92,8 @@ func TestRoutesInvalidType(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestRouteGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
+
 	var route Route
 	route.Name = kong.String("my-route")
 	route.ID = kong.String("first")
@@ -104,7 +103,7 @@ func TestRouteGetMemoryReference(t *testing.T) {
 		Name: kong.String("service1-name"),
 	}
 	assert.NotNil(route.Service)
-	err = collection.Add(route)
+	err := collection.Add(route)
 	assert.NotNil(route.Service)
 	assert.Nil(err)
 
@@ -123,9 +122,7 @@ func TestRouteGetMemoryReference(t *testing.T) {
 
 func TestRouteDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
 
 	var route Route
 	route.Name = kong.String("my-route")
@@ -135,7 +132,7 @@ func TestRouteDelete(t *testing.T) {
 		ID:   kong.String("service1-id"),
 		Name: kong.String("service1-name"),
 	}
-	err = collection.Add(route)
+	err := collection.Add(route)
 	assert.Nil(err)
 
 	re, err := collection.Get("my-route")
@@ -152,9 +149,7 @@ func TestRouteDelete(t *testing.T) {
 
 func TestRouteGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
 
 	var route Route
 	route.Name = kong.String("my-route1")
@@ -164,7 +159,7 @@ func TestRouteGetAll(t *testing.T) {
 		ID:   kong.String("service1-id"),
 		Name: kong.String("service1-name"),
 	}
-	err = collection.Add(route)
+	err := collection.Add(route)
 	assert.Nil(err)
 
 	var route2 Route
@@ -186,9 +181,7 @@ func TestRouteGetAll(t *testing.T) {
 
 func TestRouteGetAllByServiceName(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewRoutesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := routesCollection()
 
 	targets := []*Route{
 		{
@@ -234,11 +227,11 @@ func TestRouteGetAllByServiceName(t *testing.T) {
 	}
 
 	for _, target := range targets {
-		err = collection.Add(*target)
+		err := collection.Add(*target)
 		assert.Nil(err)
 	}
 
-	targets, err = collection.GetAllByServiceID("upstream1-id")
+	targets, err := collection.GetAllByServiceID("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 

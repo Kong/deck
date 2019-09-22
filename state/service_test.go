@@ -7,15 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func servicesCollection() *ServicesCollection {
+	return state().Services
+}
+
 func TestServiceInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
+
 	var service Service
 	service.ID = kong.String("first")
 	service.Host = kong.String("example.com")
-	err = collection.Add(service)
+	err := collection.Add(service)
 	assert.NotNil(err)
 
 	var service2 Service
@@ -30,14 +33,12 @@ func TestServiceInsert(t *testing.T) {
 
 func TestServiceGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	var service Service
 	service.Name = kong.String("my-service")
 	service.ID = kong.String("first")
-	err = collection.Add(service)
+	err := collection.Add(service)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -58,14 +59,12 @@ func TestServiceGetUpdate(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestServiceGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	var service Service
 	service.Name = kong.String("my-service")
 	service.ID = kong.String("first")
-	err = collection.Add(service)
+	err := collection.Add(service)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -81,15 +80,12 @@ func TestServiceGetMemoryReference(t *testing.T) {
 
 func TestServicesInvalidType(t *testing.T) {
 	assert := assert.New(t)
-
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	var route Route
 	route.Name = kong.String("my-route")
 	route.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
+	txn := collection.db.Txn(true)
 	txn.Insert(serviceTableName, &route)
 	txn.Commit()
 
@@ -103,15 +99,13 @@ func TestServicesInvalidType(t *testing.T) {
 
 func TestServiceDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	var service Service
 	service.Name = kong.String("my-service")
 	service.ID = kong.String("first")
 	service.Host = kong.String("example.com")
-	err = collection.Add(service)
+	err := collection.Add(service)
 	assert.Nil(err)
 
 	se, err := collection.Get("my-service")
@@ -128,9 +122,7 @@ func TestServiceDelete(t *testing.T) {
 
 func TestServiceGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	services := []Service{
 		{
@@ -163,9 +155,7 @@ func TestServiceGetAll(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestServiceGetAllMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewServicesCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := servicesCollection()
 
 	services := []Service{
 		{

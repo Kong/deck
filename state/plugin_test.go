@@ -7,23 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func pluginsCollection() *PluginsCollection {
+	return state().Plugins
+}
+
 func TestPluginInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
+
 	var plugin Plugin
 	plugin.Name = kong.String("my-plugin")
 	plugin.ID = kong.String("first")
-	err = collection.Add(plugin)
+	err := collection.Add(plugin)
 	assert.Nil(err)
 }
 
 func TestPluginGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
+
 	var plugin Plugin
 	plugin.Name = kong.String("my-plugin")
 	plugin.ID = kong.String("first")
@@ -32,7 +34,7 @@ func TestPluginGetUpdate(t *testing.T) {
 		Name: kong.String("service1-name"),
 	}
 	assert.NotNil(plugin.Service)
-	err = collection.Add(plugin)
+	err := collection.Add(plugin)
 	assert.NotNil(plugin.Service)
 	assert.Nil(err)
 
@@ -106,9 +108,7 @@ func TestGetPluginByProp(t *testing.T) {
 		},
 	}
 	assert := assert.New(t)
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
 
 	for _, p := range plugins {
 		assert.Nil(collection.Add(p))
@@ -142,14 +142,12 @@ func TestGetPluginByProp(t *testing.T) {
 func TestPluginsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
 
 	var service Service
 	service.Name = kong.String("my-service")
 	service.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
+	txn := collection.db.Txn(true)
 	txn.Insert(pluginTableName, &service)
 	txn.Commit()
 
@@ -160,9 +158,7 @@ func TestPluginsInvalidType(t *testing.T) {
 
 func TestPluginDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
 
 	var plugin Plugin
 	plugin.ID = kong.String("first")
@@ -175,7 +171,7 @@ func TestPluginDelete(t *testing.T) {
 		ID:   kong.String("service1-id"),
 		Name: kong.String("service1-name"),
 	}
-	err = collection.Add(plugin)
+	err := collection.Add(plugin)
 	assert.Nil(err)
 
 	p, err := collection.Get("first")
@@ -192,9 +188,7 @@ func TestPluginDelete(t *testing.T) {
 
 func TestPluginGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewPluginsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := pluginsCollection()
 
 	plugins := []*Plugin{
 		{

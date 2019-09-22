@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func keyAuthsCollection() *KeyAuthsCollection {
+	return state().KeyAuths
+}
+
 func TestKeyAuthInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	var keyAuth KeyAuth
 	keyAuth.Key = kong.String("my-secret-apikey")
 	keyAuth.ID = kong.String("first")
-	err = collection.Add(keyAuth)
+	err := collection.Add(keyAuth)
 	assert.NotNil(err)
 
 	var keyAuth2 KeyAuth
@@ -32,9 +34,7 @@ func TestKeyAuthInsert(t *testing.T) {
 
 func TestKeyAuthGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	var keyAuth KeyAuth
 	keyAuth.Key = kong.String("my-apikey")
@@ -44,7 +44,7 @@ func TestKeyAuthGet(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(keyAuth)
+	err := collection.Add(keyAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -65,9 +65,7 @@ func TestKeyAuthGet(t *testing.T) {
 
 func TestKeyAuthUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	var keyAuth KeyAuth
 	keyAuth.Key = kong.String("my-apikey")
@@ -77,7 +75,7 @@ func TestKeyAuthUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(keyAuth)
+	err := collection.Add(keyAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -99,9 +97,7 @@ func TestKeyAuthUpdate(t *testing.T) {
 
 func TestKeyAuthDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	var keyAuth KeyAuth
 	keyAuth.Key = kong.String("my-apikey1")
@@ -110,7 +106,7 @@ func TestKeyAuthDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(keyAuth)
+	err := collection.Add(keyAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("my-apikey1")
@@ -134,9 +130,7 @@ func TestKeyAuthDelete(t *testing.T) {
 
 func TestKeyAuthGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	populateWithKeyAuthFixtures(assert, collection)
 
@@ -147,9 +141,7 @@ func TestKeyAuthGetAll(t *testing.T) {
 
 func TestKeyAuthGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewKeyAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := keyAuthsCollection()
 
 	populateWithKeyAuthFixtures(assert, collection)
 

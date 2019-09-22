@@ -51,29 +51,11 @@ var aclGroupTableSchema = &memdb.TableSchema{
 }
 
 // ACLGroupsCollection stores and indexes acl-group credentials.
-type ACLGroupsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewACLGroupsCollection instantiates a ACLGroupsCollection.
-func NewACLGroupsCollection() (*ACLGroupsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			aclGroupTableName: aclGroupTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new ACLGroupsCollection")
-	}
-	return &ACLGroupsCollection{
-		memdb: m,
-	}, nil
-}
+type ACLGroupsCollection collection
 
 // Add adds aclGroup to ACLGroupsCollection
 func (k *ACLGroupsCollection) Add(aclGroup ACLGroup) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(aclGroupTableName, &aclGroup)
 	if err != nil {
@@ -85,7 +67,7 @@ func (k *ACLGroupsCollection) Add(aclGroup ACLGroup) error {
 
 // GetByID gets an acl-group with id.
 func (k *ACLGroupsCollection) GetByID(id string) (*ACLGroup, error) {
-	res, err := multiIndexLookup(k.memdb, aclGroupTableName,
+	res, err := multiIndexLookup(k.db, aclGroupTableName,
 		[]string{"id"}, id)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *ACLGroupsCollection) GetByID(id string) (*ACLGroup, error) {
 func (k *ACLGroupsCollection) Get(consumerUsernameOrID,
 	groupOrID string) (*ACLGroup, error) {
 
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	indices := []string{aclGroupsByConsumerUsername, aclGroupsByConsumerID}
@@ -142,7 +124,7 @@ func (k *ACLGroupsCollection) Get(consumerUsernameOrID,
 // belong to a Consumer with username.
 func (k *ACLGroupsCollection) GetAllByConsumerUsername(username string) ([]*ACLGroup,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(aclGroupTableName, aclGroupsByConsumerUsername, username)
 	if err != nil {
 		return nil, err
@@ -162,7 +144,7 @@ func (k *ACLGroupsCollection) GetAllByConsumerUsername(username string) ([]*ACLG
 // belong to a Consumer with id.
 func (k *ACLGroupsCollection) GetAllByConsumerID(id string) ([]*ACLGroup,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(aclGroupTableName, aclGroupsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -180,7 +162,7 @@ func (k *ACLGroupsCollection) GetAllByConsumerID(id string) ([]*ACLGroup,
 
 // Update updates an existing acl-group credential.
 func (k *ACLGroupsCollection) Update(aclGroup ACLGroup) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(aclGroupTableName, &aclGroup)
 	if err != nil {
@@ -198,7 +180,7 @@ func (k *ACLGroupsCollection) DeleteByID(ID string) error {
 		return errors.Wrap(err, "looking up aclGroup")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(aclGroupTableName, aclGroup)
@@ -211,7 +193,7 @@ func (k *ACLGroupsCollection) DeleteByID(ID string) error {
 
 // GetAll gets all acl-groups.
 func (k *ACLGroupsCollection) GetAll() ([]*ACLGroup, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(aclGroupTableName, all, true)

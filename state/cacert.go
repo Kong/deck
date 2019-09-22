@@ -30,29 +30,11 @@ var caCertTableSchema = &memdb.TableSchema{
 }
 
 // CACertificatesCollection stores and indexes Kong CACertificates.
-type CACertificatesCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewCACertificatesCollection instantiates a CACertificatesCollection.
-func NewCACertificatesCollection() (*CACertificatesCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			caCertTableName: caCertTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new CACertificateCollection")
-	}
-	return &CACertificatesCollection{
-		memdb: m,
-	}, nil
-}
+type CACertificatesCollection collection
 
 // Add adds a caCert to the collection
 func (k *CACertificatesCollection) Add(caCert CACertificate) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(caCertTableName, &caCert)
 	if err != nil {
@@ -64,7 +46,7 @@ func (k *CACertificatesCollection) Add(caCert CACertificate) error {
 
 // Get gets a caCertificate by cert or ID.
 func (k *CACertificatesCollection) Get(certOrID string) (*CACertificate, error) {
-	res, err := multiIndexLookup(k.memdb, caCertTableName,
+	res, err := multiIndexLookup(k.db, caCertTableName,
 		[]string{"id", "cert"}, certOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -88,7 +70,7 @@ func (k *CACertificatesCollection) Get(certOrID string) (*CACertificate, error) 
 func (k *CACertificatesCollection) Update(caCert CACertificate) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(caCertTableName, &caCert)
 	if err != nil {
@@ -106,7 +88,7 @@ func (k *CACertificatesCollection) Delete(certOrID string) error {
 		return errors.Wrap(err, "looking up caCert")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(caCertTableName, caCert)
@@ -119,7 +101,7 @@ func (k *CACertificatesCollection) Delete(certOrID string) error {
 
 // GetAll gets a caCertificate by name or ID.
 func (k *CACertificatesCollection) GetAll() ([]*CACertificate, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(caCertTableName, all, true)
