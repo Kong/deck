@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func aclGroupsCollection() *ACLGroupsCollection {
+	return state().ACLGroups
+}
+
 func TestACLGroupInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	var aclGroup ACLGroup
 	aclGroup.Group = kong.String("my-group")
 	aclGroup.ID = kong.String("first")
-	err = collection.Add(aclGroup)
+	err := collection.Add(aclGroup)
 	assert.NotNil(err)
 
 	var aclGroup2 ACLGroup
@@ -32,9 +34,7 @@ func TestACLGroupInsert(t *testing.T) {
 
 func TestACLGroupGetByID(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	var aclGroup ACLGroup
 	aclGroup.Group = kong.String("my-group")
@@ -44,7 +44,7 @@ func TestACLGroupGetByID(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(aclGroup)
+	err := collection.Add(aclGroup)
 	assert.Nil(err)
 
 	res, err := collection.GetByID("first")
@@ -63,9 +63,7 @@ func TestACLGroupGetByID(t *testing.T) {
 
 func TestACLGroupGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	populateWithACLGroupFixtures(assert, collection)
 
@@ -84,9 +82,7 @@ func TestACLGroupGet(t *testing.T) {
 
 func TestACLGroupUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	var aclGroup ACLGroup
 	aclGroup.Group = kong.String("my-group")
@@ -96,7 +92,7 @@ func TestACLGroupUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(aclGroup)
+	err := collection.Add(aclGroup)
 	assert.Nil(err)
 
 	res, err := collection.Get("consumer1-id", "first")
@@ -118,9 +114,7 @@ func TestACLGroupUpdate(t *testing.T) {
 
 func TestACLGroupDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	var aclGroup ACLGroup
 	aclGroup.Group = kong.String("my-group1")
@@ -129,7 +123,7 @@ func TestACLGroupDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(aclGroup)
+	err := collection.Add(aclGroup)
 	assert.Nil(err)
 
 	res, err := collection.Get("consumer1-name", "my-group1")
@@ -153,9 +147,7 @@ func TestACLGroupDelete(t *testing.T) {
 
 func TestACLGroupGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	populateWithACLGroupFixtures(assert, collection)
 
@@ -166,9 +158,7 @@ func TestACLGroupGetAll(t *testing.T) {
 
 func TestACLGroupGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewACLGroupsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := aclGroupsCollection()
 
 	populateWithACLGroupFixtures(assert, collection)
 

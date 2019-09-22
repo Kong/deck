@@ -52,29 +52,11 @@ var hmacAuthTableSchema = &memdb.TableSchema{
 }
 
 // HMACAuthsCollection stores and indexes hmac-auth credentials.
-type HMACAuthsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewHMACAuthsCollection instantiates a HMACAuthsCollection.
-func NewHMACAuthsCollection() (*HMACAuthsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			hmacAuthTableName: hmacAuthTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new HMACAuthsCollection")
-	}
-	return &HMACAuthsCollection{
-		memdb: m,
-	}, nil
-}
+type HMACAuthsCollection collection
 
 // Add adds a hmac-auth credential to HMACAuthsCollection
 func (k *HMACAuthsCollection) Add(hmacAuth HMACAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(hmacAuthTableName, &hmacAuth)
 	if err != nil {
@@ -86,7 +68,7 @@ func (k *HMACAuthsCollection) Add(hmacAuth HMACAuth) error {
 
 // Get gets a hmac-auth credential by  or ID.
 func (k *HMACAuthsCollection) Get(usernameOrID string) (*HMACAuth, error) {
-	res, err := multiIndexLookup(k.memdb, hmacAuthTableName,
+	res, err := multiIndexLookup(k.db, hmacAuthTableName,
 		[]string{"username", id}, usernameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *HMACAuthsCollection) Get(usernameOrID string) (*HMACAuth, error) {
 // belong to a Consumer with username.
 func (k *HMACAuthsCollection) GetAllByConsumerUsername(username string) ([]*HMACAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(hmacAuthTableName, hmacAuthsByConsumerUsername, username)
 	if err != nil {
 		return nil, err
@@ -129,7 +111,7 @@ func (k *HMACAuthsCollection) GetAllByConsumerUsername(username string) ([]*HMAC
 // belong to a Consumer with id.
 func (k *HMACAuthsCollection) GetAllByConsumerID(id string) ([]*HMACAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(hmacAuthTableName, hmacAuthsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -147,7 +129,7 @@ func (k *HMACAuthsCollection) GetAllByConsumerID(id string) ([]*HMACAuth,
 
 // Update updates an existing hmac-auth credential.
 func (k *HMACAuthsCollection) Update(hmacAuth HMACAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(hmacAuthTableName, &hmacAuth)
 	if err != nil {
@@ -165,7 +147,7 @@ func (k *HMACAuthsCollection) Delete(usernameOrID string) error {
 		return errors.Wrap(err, "looking up hmacAuth")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(hmacAuthTableName, hmacAuth)
@@ -178,7 +160,7 @@ func (k *HMACAuthsCollection) Delete(usernameOrID string) error {
 
 // GetAll gets all hmac-auth credentials.
 func (k *HMACAuthsCollection) GetAll() ([]*HMACAuth, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(hmacAuthTableName, all, true)

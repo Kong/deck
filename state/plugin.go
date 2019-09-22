@@ -145,29 +145,11 @@ var pluginTableSchema = &memdb.TableSchema{
 }
 
 // PluginsCollection stores and indexes Kong Services.
-type PluginsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewPluginsCollection instantiates a PluginsCollection.
-func NewPluginsCollection() (*PluginsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			pluginTableName: pluginTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new PluginCollection")
-	}
-	return &PluginsCollection{
-		memdb: m,
-	}, nil
-}
+type PluginsCollection collection
 
 // Add adds a plugin to PluginsCollection
 func (k *PluginsCollection) Add(plugin Plugin) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(pluginTableName, &plugin)
 	if err != nil {
@@ -179,7 +161,7 @@ func (k *PluginsCollection) Add(plugin Plugin) error {
 
 // Get gets a plugin by name or ID.
 func (k *PluginsCollection) Get(ID string) (*Plugin, error) {
-	res, err := multiIndexLookup(k.memdb, pluginTableName,
+	res, err := multiIndexLookup(k.db, pluginTableName,
 		[]string{"name", id}, ID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -202,7 +184,7 @@ func (k *PluginsCollection) Get(ID string) (*Plugin, error) {
 // (key-auth, ratelimiting, etc).
 func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(pluginTableName, "name", name)
 	if err != nil {
 		return nil, err
@@ -225,7 +207,7 @@ func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin,
 // If routeName is empty, a plugin for the route with serviceName is searched.
 func (k *PluginsCollection) GetByProp(name, serviceName,
 	routeName string, consumerUsername string) (*Plugin, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Commit()
 	res, err := txn.First(pluginTableName, "fields",
 		name, serviceName, routeName, consumerUsername)
@@ -249,7 +231,7 @@ func (k *PluginsCollection) GetByProp(name, serviceName,
 // by its id.
 func (k *PluginsCollection) GetAllByServiceID(id string) ([]*Plugin,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(pluginTableName, pluginsByServiceID, id)
 	if err != nil {
 		return nil, err
@@ -269,7 +251,7 @@ func (k *PluginsCollection) GetAllByServiceID(id string) ([]*Plugin,
 // by its id.
 func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(pluginTableName, pluginsByRouteID, id)
 	if err != nil {
 		return nil, err
@@ -289,7 +271,7 @@ func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
 // by its id.
 func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(pluginTableName, pluginsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -307,7 +289,7 @@ func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
 
 // Update updates a plugin
 func (k *PluginsCollection) Update(plugin Plugin) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(pluginTableName, &plugin)
 	if err != nil {
@@ -325,7 +307,7 @@ func (k *PluginsCollection) Delete(nameOrID string) error {
 		return errors.Wrap(err, "looking up plugin")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(pluginTableName, plugin)
@@ -338,7 +320,7 @@ func (k *PluginsCollection) Delete(nameOrID string) error {
 
 // GetAll gets a plugin by name or ID.
 func (k *PluginsCollection) GetAll() ([]*Plugin, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(pluginTableName, all, true)

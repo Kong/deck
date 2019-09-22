@@ -7,15 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func basicAuthsCollection() *BasicAuthsCollection {
+	return state().BasicAuths
+}
+
 func TestBasicAuthInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	var basicAuth BasicAuth
 	basicAuth.ID = kong.String("first")
-	err = collection.Add(basicAuth)
+	err := collection.Add(basicAuth)
 	assert.NotNil(err)
 
 	basicAuth.Username = kong.String("my-username")
@@ -35,9 +37,7 @@ func TestBasicAuthInsert(t *testing.T) {
 
 func TestBasicAuthGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	var basicAuth BasicAuth
 	basicAuth.Username = kong.String("my-username")
@@ -47,7 +47,7 @@ func TestBasicAuthGet(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(basicAuth)
+	err := collection.Add(basicAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -68,9 +68,7 @@ func TestBasicAuthGet(t *testing.T) {
 
 func TestBasicAuthUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	var basicAuth BasicAuth
 	basicAuth.Username = kong.String("my-username")
@@ -80,7 +78,7 @@ func TestBasicAuthUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(basicAuth)
+	err := collection.Add(basicAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -104,9 +102,7 @@ func TestBasicAuthUpdate(t *testing.T) {
 
 func TestBasicAuthDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	var basicAuth BasicAuth
 	basicAuth.Username = kong.String("my-username1")
@@ -115,7 +111,7 @@ func TestBasicAuthDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(basicAuth)
+	err := collection.Add(basicAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("my-username1")
@@ -139,9 +135,7 @@ func TestBasicAuthDelete(t *testing.T) {
 
 func TestBasicAuthGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	populateWithBasicAuthFixtures(assert, collection)
 
@@ -152,9 +146,7 @@ func TestBasicAuthGetAll(t *testing.T) {
 
 func TestBasicAuthGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewBasicAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := basicAuthsCollection()
 
 	populateWithBasicAuthFixtures(assert, collection)
 

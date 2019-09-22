@@ -7,15 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func hmacAuthsCollection() *HMACAuthsCollection {
+	return state().HMACAuths
+}
+
 func TestHMACAuthInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	var hmacAuth HMACAuth
 	hmacAuth.ID = kong.String("first")
-	err = collection.Add(hmacAuth)
+	err := collection.Add(hmacAuth)
 	assert.NotNil(err)
 
 	hmacAuth.Username = kong.String("my-username")
@@ -35,9 +37,7 @@ func TestHMACAuthInsert(t *testing.T) {
 
 func TestHMACAuthGet(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	var hmacAuth HMACAuth
 	hmacAuth.Username = kong.String("my-username")
@@ -47,7 +47,7 @@ func TestHMACAuthGet(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(hmacAuth)
+	err := collection.Add(hmacAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -68,9 +68,7 @@ func TestHMACAuthGet(t *testing.T) {
 
 func TestHMACAuthUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	var hmacAuth HMACAuth
 	hmacAuth.Username = kong.String("my-username")
@@ -80,7 +78,7 @@ func TestHMACAuthUpdate(t *testing.T) {
 		Username: kong.String("consumer1-name"),
 	}
 
-	err = collection.Add(hmacAuth)
+	err := collection.Add(hmacAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("first")
@@ -104,9 +102,7 @@ func TestHMACAuthUpdate(t *testing.T) {
 
 func TestHMACAuthDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	var hmacAuth HMACAuth
 	hmacAuth.Username = kong.String("my-username1")
@@ -115,7 +111,7 @@ func TestHMACAuthDelete(t *testing.T) {
 		ID:       kong.String("consumer1-id"),
 		Username: kong.String("consumer1-name"),
 	}
-	err = collection.Add(hmacAuth)
+	err := collection.Add(hmacAuth)
 	assert.Nil(err)
 
 	res, err := collection.Get("my-username1")
@@ -139,9 +135,7 @@ func TestHMACAuthDelete(t *testing.T) {
 
 func TestHMACAuthGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	populateWithHMACAuthFixtures(assert, collection)
 
@@ -152,9 +146,7 @@ func TestHMACAuthGetAll(t *testing.T) {
 
 func TestHMACAuthGetByConsumer(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewHMACAuthsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := hmacAuthsCollection()
 
 	populateWithHMACAuthFixtures(assert, collection)
 

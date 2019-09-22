@@ -7,14 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func upstreamsCollection() *UpstreamsCollection {
+	return state().Upstreams
+}
+
 func TestUpstreamInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
+
 	var upstream Upstream
 	upstream.ID = kong.String("first")
-	err = collection.Add(upstream)
+	err := collection.Add(upstream)
 	assert.NotNil(err)
 
 	var upstream2 Upstream
@@ -28,14 +31,12 @@ func TestUpstreamInsert(t *testing.T) {
 
 func TestUpstreamGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	err = collection.Add(upstream)
+	err := collection.Add(upstream)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -60,14 +61,12 @@ func TestUpstreamGetUpdate(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestUpstreamGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	err = collection.Add(upstream)
+	err := collection.Add(upstream)
 	assert.Nil(err)
 
 	se, err := collection.Get("first")
@@ -83,14 +82,12 @@ func TestUpstreamGetMemoryReference(t *testing.T) {
 func TestUpstreamsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
 
 	var route Route
 	route.Name = kong.String("my-route")
 	route.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
+	txn := collection.db.Txn(true)
 	txn.Insert(upstreamTableName, &route)
 	txn.Commit()
 
@@ -101,14 +98,12 @@ func TestUpstreamsInvalidType(t *testing.T) {
 
 func TestUpstreamDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	err = collection.Add(upstream)
+	err := collection.Add(upstream)
 	assert.Nil(err)
 
 	se, err := collection.Get("my-upstream")
@@ -127,14 +122,12 @@ func TestUpstreamDelete(t *testing.T) {
 
 func TestUpstreamGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewUpstreamsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := upstreamsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream1")
 	upstream.ID = kong.String("first")
-	err = collection.Add(upstream)
+	err := collection.Add(upstream)
 	assert.Nil(err)
 
 	var upstream2 Upstream

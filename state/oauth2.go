@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	oauth2TableName               = "oauth2Cred"
+	oauth2CredTableName           = "oauth2Cred"
 	oauth2CredsByConsumerUsername = "oauth2CredsByConsumerUsername"
 	oauth2CredsByConsumerID       = "oauth2CredsByConsumerID"
 )
 
 var oauth2CredTableSchema = &memdb.TableSchema{
-	Name: oauth2TableName,
+	Name: oauth2CredTableName,
 	Indexes: map[string]*memdb.IndexSchema{
 		id: {
 			Name:    id,
@@ -52,31 +52,13 @@ var oauth2CredTableSchema = &memdb.TableSchema{
 }
 
 // Oauth2CredsCollection stores and indexes oauth2 credentials.
-type Oauth2CredsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewOauth2CredsCollection instantiates a Oauth2CredsCollection.
-func NewOauth2CredsCollection() (*Oauth2CredsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			oauth2TableName: oauth2CredTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new Oauth2CredsCollection")
-	}
-	return &Oauth2CredsCollection{
-		memdb: m,
-	}, nil
-}
+type Oauth2CredsCollection collection
 
 // Add adds an oauth2 credential to Oauth2CredsCollection
 func (k *Oauth2CredsCollection) Add(oauth2Cred Oauth2Credential) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(oauth2TableName, &oauth2Cred)
+	err := txn.Insert(oauth2CredTableName, &oauth2Cred)
 	if err != nil {
 		return errors.Wrap(err, "insert failed")
 	}
@@ -86,7 +68,7 @@ func (k *Oauth2CredsCollection) Add(oauth2Cred Oauth2Credential) error {
 
 // Get gets an oauth2 credential by client_id or ID.
 func (k *Oauth2CredsCollection) Get(clientIDorID string) (*Oauth2Credential, error) {
-	res, err := multiIndexLookup(k.memdb, oauth2TableName,
+	res, err := multiIndexLookup(k.db, oauth2CredTableName,
 		[]string{"ClientID", id}, clientIDorID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,8 +91,8 @@ func (k *Oauth2CredsCollection) Get(clientIDorID string) (*Oauth2Credential, err
 // belong to a Consumer with username.
 func (k *Oauth2CredsCollection) GetAllByConsumerUsername(
 	username string) ([]*Oauth2Credential, error) {
-	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(oauth2TableName, oauth2CredsByConsumerUsername,
+	txn := k.db.Txn(false)
+	iter, err := txn.Get(oauth2CredTableName, oauth2CredsByConsumerUsername,
 		username)
 	if err != nil {
 		return nil, err
@@ -130,8 +112,8 @@ func (k *Oauth2CredsCollection) GetAllByConsumerUsername(
 // belong to a Consumer with id.
 func (k *Oauth2CredsCollection) GetAllByConsumerID(id string) ([]*Oauth2Credential,
 	error) {
-	txn := k.memdb.Txn(false)
-	iter, err := txn.Get(oauth2TableName, oauth2CredsByConsumerID, id)
+	txn := k.db.Txn(false)
+	iter, err := txn.Get(oauth2CredTableName, oauth2CredsByConsumerID, id)
 	if err != nil {
 		return nil, err
 	}
@@ -148,9 +130,9 @@ func (k *Oauth2CredsCollection) GetAllByConsumerID(id string) ([]*Oauth2Credenti
 
 // Update updates an existing oauth2 credential.
 func (k *Oauth2CredsCollection) Update(oauth2Cred Oauth2Credential) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(oauth2TableName, &oauth2Cred)
+	err := txn.Insert(oauth2CredTableName, &oauth2Cred)
 	if err != nil {
 		return errors.Wrap(err, "update failed")
 	}
@@ -166,10 +148,10 @@ func (k *Oauth2CredsCollection) Delete(clientIDorID string) error {
 		return errors.Wrap(err, "looking up oauth2Cred")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err = txn.Delete(oauth2TableName, oauth2Cred)
+	err = txn.Delete(oauth2CredTableName, oauth2Cred)
 	if err != nil {
 		return errors.Wrap(err, "delete failed")
 	}
@@ -179,10 +161,10 @@ func (k *Oauth2CredsCollection) Delete(clientIDorID string) error {
 
 // GetAll gets all oauth2 credentials.
 func (k *Oauth2CredsCollection) GetAll() ([]*Oauth2Credential, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
-	iter, err := txn.Get(oauth2TableName, all, true)
+	iter, err := txn.Get(oauth2CredTableName, all, true)
 	if err != nil {
 		return nil, errors.Wrapf(err, "oauth2Cred lookup failed")
 	}

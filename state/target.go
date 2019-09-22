@@ -61,25 +61,7 @@ var targetTableSchema = &memdb.TableSchema{
 }
 
 // TargetsCollection stores and indexes Kong Upstreams.
-type TargetsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewTargetsCollection instantiates a TargetsCollection.
-func NewTargetsCollection() (*TargetsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			targetTableName: targetTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new TargetCollection")
-	}
-	return &TargetsCollection{
-		memdb: m,
-	}, nil
-}
+type TargetsCollection collection
 
 // Add adds a target to TargetsCollection.
 func (k *TargetsCollection) Add(target Target) error {
@@ -87,7 +69,7 @@ func (k *TargetsCollection) Add(target Target) error {
 		return err
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(targetTableName, &target)
 	if err != nil {
@@ -101,7 +83,7 @@ func (k *TargetsCollection) Add(target Target) error {
 func (k *TargetsCollection) Get(upstreamNameOrID,
 	targetOrID string) (*Target, error) {
 
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	indices := []string{targetsByUpstreamName, targetsByUpstreamID}
@@ -134,7 +116,7 @@ func (k *TargetsCollection) Get(upstreamNameOrID,
 // by its name.
 func (k *TargetsCollection) GetAllByUpstreamName(
 	name string) ([]*Target, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(targetTableName, targetsByUpstreamName, name)
 	if err != nil {
 		return nil, err
@@ -154,7 +136,7 @@ func (k *TargetsCollection) GetAllByUpstreamName(
 // by its ID.
 func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(targetTableName, targetsByUpstreamID, id)
 	if err != nil {
 		return nil, err
@@ -176,7 +158,7 @@ func (k *TargetsCollection) Update(target Target) error {
 		return err
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(targetTableName, &target)
 	if err != nil {
@@ -194,7 +176,7 @@ func (k *TargetsCollection) Delete(upstreamNameOrID, targetOrID string) error {
 		return errors.Wrap(err, "looking up target")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(targetTableName, target)
@@ -207,7 +189,7 @@ func (k *TargetsCollection) Delete(upstreamNameOrID, targetOrID string) error {
 
 // GetAll gets a target by Target or ID.
 func (k *TargetsCollection) GetAll() ([]*Target, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(targetTableName, all, true)

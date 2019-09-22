@@ -7,16 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func targetsCollection() *TargetsCollection {
+	return state().Targets
+}
+
 func TestTargetInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
 
 	var t0 Target
 	t0.Target.Target = kong.String("my-target")
 	t0.ID = kong.String("first")
-	err = collection.Add(t0)
+	err := collection.Add(t0)
 	assert.NotNil(err)
 
 	var t1 Target
@@ -50,9 +52,8 @@ func TestTargetInsert(t *testing.T) {
 
 func TestTargetGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
+
 	var target Target
 	target.Target.Target = kong.String("my-target")
 	target.ID = kong.String("first")
@@ -61,7 +62,7 @@ func TestTargetGetUpdate(t *testing.T) {
 		Name: kong.String("upstream1-name"),
 	}
 	assert.NotNil(target.Upstream)
-	err = collection.Add(target)
+	err := collection.Add(target)
 	assert.NotNil(target.Upstream)
 	assert.Nil(err)
 
@@ -82,9 +83,8 @@ func TestTargetGetUpdate(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestTargetGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
+
 	var target Target
 	target.Target.Target = kong.String("my-target")
 	target.ID = kong.String("first")
@@ -92,7 +92,7 @@ func TestTargetGetMemoryReference(t *testing.T) {
 		ID:   kong.String("upstream1-id"),
 		Name: kong.String("upstream1-name"),
 	}
-	err = collection.Add(target)
+	err := collection.Add(target)
 	assert.Nil(err)
 
 	re, err := collection.Get("upstream1-name", "first")
@@ -111,15 +111,13 @@ func TestTargetGetMemoryReference(t *testing.T) {
 func TestTargetsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
 
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
-	err = txn.Insert(targetTableName, &upstream)
+	txn := collection.db.Txn(true)
+	err := txn.Insert(targetTableName, &upstream)
 	assert.NotNil(err)
 	txn.Abort()
 
@@ -139,7 +137,7 @@ func TestTargetsInvalidType(t *testing.T) {
 		},
 	}
 
-	txn = collection.memdb.Txn(true)
+	txn = collection.db.Txn(true)
 	err = txn.Insert(targetTableName, &target)
 	assert.Nil(err)
 	txn.Commit()
@@ -151,9 +149,7 @@ func TestTargetsInvalidType(t *testing.T) {
 
 func TestTargetDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
 
 	var target Target
 	target.Target.Target = kong.String("my-target")
@@ -162,7 +158,7 @@ func TestTargetDelete(t *testing.T) {
 		ID:   kong.String("upstream1-id"),
 		Name: kong.String("upstream1-name"),
 	}
-	err = collection.Add(target)
+	err := collection.Add(target)
 	assert.Nil(err)
 
 	re, err := collection.Get("upstream1-name", "my-target")
@@ -178,9 +174,7 @@ func TestTargetDelete(t *testing.T) {
 
 func TestTargetGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
 
 	var target Target
 	target.Target.Target = kong.String("my-target1")
@@ -189,7 +183,7 @@ func TestTargetGetAll(t *testing.T) {
 		ID:   kong.String("upstream1-id"),
 		Name: kong.String("upstream1-name"),
 	}
-	err = collection.Add(target)
+	err := collection.Add(target)
 	assert.Nil(err)
 
 	var target2 Target
@@ -210,9 +204,7 @@ func TestTargetGetAll(t *testing.T) {
 
 func TestTargetGetAllByUpstreamName(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewTargetsCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := targetsCollection()
 
 	targets := []*Target{
 		{
@@ -258,11 +250,11 @@ func TestTargetGetAllByUpstreamName(t *testing.T) {
 	}
 
 	for _, target := range targets {
-		err = collection.Add(*target)
+		err := collection.Add(*target)
 		assert.Nil(err)
 	}
 
-	targets, err = collection.GetAllByUpstreamID("upstream1-id")
+	targets, err := collection.GetAllByUpstreamID("upstream1-id")
 	assert.Nil(err)
 	assert.Equal(2, len(targets))
 

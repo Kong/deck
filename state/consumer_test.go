@@ -7,28 +7,29 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func consumersCollection() *ConsumersCollection {
+	return state().Consumers
+}
+
 func TestConsumerInsert(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
+
 	var consumer Consumer
 	consumer.ID = kong.String("first")
 	consumer.Username = kong.String("my-name")
-	err = collection.Add(consumer)
+	err := collection.Add(consumer)
 	assert.Nil(err)
 }
 
 func TestConsumerGetUpdate(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
 
 	var consumer Consumer
 	consumer.ID = kong.String("first")
 	consumer.Username = kong.String("my-name")
-	err = collection.Add(consumer)
+	err := collection.Add(consumer)
 	assert.Nil(err)
 
 	c, err := collection.Get("first")
@@ -51,14 +52,12 @@ func TestConsumerGetUpdate(t *testing.T) {
 // is different from the one stored in MemDB.
 func TestConsumerGetMemoryReference(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
 
 	var consumer Consumer
 	consumer.ID = kong.String("first")
 	consumer.Username = kong.String("my-name")
-	err = collection.Add(consumer)
+	err := collection.Add(consumer)
 	assert.Nil(err)
 
 	c, err := collection.Get("first")
@@ -73,16 +72,13 @@ func TestConsumerGetMemoryReference(t *testing.T) {
 
 func TestConsumersInvalidType(t *testing.T) {
 	assert := assert.New(t)
-
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
 
 	type c2 Consumer
 	var c c2
 	c.Username = kong.String("my-name")
 	c.ID = kong.String("first")
-	txn := collection.memdb.Txn(true)
+	txn := collection.db.Txn(true)
 	assert.Nil(txn.Insert(consumerTableName, &c))
 	txn.Commit()
 
@@ -96,14 +92,12 @@ func TestConsumersInvalidType(t *testing.T) {
 
 func TestConsumerDelete(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
 
 	var consumer Consumer
 	consumer.ID = kong.String("first")
 	consumer.Username = kong.String("my-consumer")
-	err = collection.Add(consumer)
+	err := collection.Add(consumer)
 	assert.Nil(err)
 
 	c, err := collection.Get("my-consumer")
@@ -120,9 +114,7 @@ func TestConsumerDelete(t *testing.T) {
 
 func TestConsumerGetAll(t *testing.T) {
 	assert := assert.New(t)
-	collection, err := NewConsumersCollection()
-	assert.Nil(err)
-	assert.NotNil(collection)
+	collection := consumersCollection()
 
 	consumers := []Consumer{
 		{

@@ -27,29 +27,11 @@ var upstreamTableSchema = &memdb.TableSchema{
 }
 
 // UpstreamsCollection stores and indexes Kong Upstreams.
-type UpstreamsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewUpstreamsCollection instantiates a UpstreamsCollection.
-func NewUpstreamsCollection() (*UpstreamsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			upstreamTableName: upstreamTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new UpstreamCollection")
-	}
-	return &UpstreamsCollection{
-		memdb: m,
-	}, nil
-}
+type UpstreamsCollection collection
 
 // Add adds an upstream to the collection.
 func (k *UpstreamsCollection) Add(upstream Upstream) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(upstreamTableName, &upstream)
 	if err != nil {
@@ -61,7 +43,7 @@ func (k *UpstreamsCollection) Add(upstream Upstream) error {
 
 // Get gets an upstream by name or ID.
 func (k *UpstreamsCollection) Get(nameOrID string) (*Upstream, error) {
-	res, err := multiIndexLookup(k.memdb, upstreamTableName,
+	res, err := multiIndexLookup(k.db, upstreamTableName,
 		[]string{"name", id}, nameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -84,7 +66,7 @@ func (k *UpstreamsCollection) Get(nameOrID string) (*Upstream, error) {
 func (k *UpstreamsCollection) Update(upstream Upstream) error {
 	// TODO check if entity is already present or not, throw error if present
 	// TODO abstract this in the go-memdb library itself
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(upstreamTableName, &upstream)
 	if err != nil {
@@ -102,7 +84,7 @@ func (k *UpstreamsCollection) Delete(nameOrID string) error {
 		return errors.Wrap(err, "looking up upstream")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(upstreamTableName, upstream)
@@ -115,7 +97,7 @@ func (k *UpstreamsCollection) Delete(nameOrID string) error {
 
 // GetAll gets all upstreams in the state.
 func (k *UpstreamsCollection) GetAll() ([]*Upstream, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(upstreamTableName, all, true)

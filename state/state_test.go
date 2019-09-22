@@ -12,3 +12,11 @@ func TestNewState(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(state)
 }
+
+func state() *KongState {
+	s, err := NewKongState()
+	if err != nil {
+		panic(err)
+	}
+	return s
+}

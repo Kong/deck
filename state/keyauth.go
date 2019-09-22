@@ -52,29 +52,11 @@ var keyAuthTableSchema = &memdb.TableSchema{
 }
 
 // KeyAuthsCollection stores and indexes key-auth credentials.
-type KeyAuthsCollection struct {
-	memdb *memdb.MemDB
-}
-
-// NewKeyAuthsCollection instantiates a KeyAuthsCollection.
-func NewKeyAuthsCollection() (*KeyAuthsCollection, error) {
-	var schema = &memdb.DBSchema{
-		Tables: map[string]*memdb.TableSchema{
-			keyAuthTableName: keyAuthTableSchema,
-		},
-	}
-	m, err := memdb.NewMemDB(schema)
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new KeyAuthsCollection")
-	}
-	return &KeyAuthsCollection{
-		memdb: m,
-	}, nil
-}
+type KeyAuthsCollection collection
 
 // Add adds a key-auth credential to KeyAuthsCollection
 func (k *KeyAuthsCollection) Add(keyAuth KeyAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(keyAuthTableName, &keyAuth)
 	if err != nil {
@@ -86,7 +68,7 @@ func (k *KeyAuthsCollection) Add(keyAuth KeyAuth) error {
 
 // Get gets a key-auth credential by key or ID.
 func (k *KeyAuthsCollection) Get(keyOrID string) (*KeyAuth, error) {
-	res, err := multiIndexLookup(k.memdb, keyAuthTableName,
+	res, err := multiIndexLookup(k.db, keyAuthTableName,
 		[]string{"key", id}, keyOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
@@ -109,7 +91,7 @@ func (k *KeyAuthsCollection) Get(keyOrID string) (*KeyAuth, error) {
 // belong to a Consumer with username.
 func (k *KeyAuthsCollection) GetAllByConsumerUsername(username string) ([]*KeyAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(keyAuthTableName, keyAuthsByConsumerUsername, username)
 	if err != nil {
 		return nil, err
@@ -129,7 +111,7 @@ func (k *KeyAuthsCollection) GetAllByConsumerUsername(username string) ([]*KeyAu
 // belong to a Consumer with id.
 func (k *KeyAuthsCollection) GetAllByConsumerID(id string) ([]*KeyAuth,
 	error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	iter, err := txn.Get(keyAuthTableName, keyAuthsByConsumerID, id)
 	if err != nil {
 		return nil, err
@@ -147,7 +129,7 @@ func (k *KeyAuthsCollection) GetAllByConsumerID(id string) ([]*KeyAuth,
 
 // Update updates an existing key-auth credential.
 func (k *KeyAuthsCollection) Update(keyAuth KeyAuth) error {
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 	err := txn.Insert(keyAuthTableName, &keyAuth)
 	if err != nil {
@@ -165,7 +147,7 @@ func (k *KeyAuthsCollection) Delete(keyOrID string) error {
 		return errors.Wrap(err, "looking up keyAuth")
 	}
 
-	txn := k.memdb.Txn(true)
+	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	err = txn.Delete(keyAuthTableName, keyAuth)
@@ -178,7 +160,7 @@ func (k *KeyAuthsCollection) Delete(keyOrID string) error {
 
 // GetAll gets all key-auth credentials.
 func (k *KeyAuthsCollection) GetAll() ([]*KeyAuth, error) {
-	txn := k.memdb.Txn(false)
+	txn := k.db.Txn(false)
 	defer txn.Abort()
 
 	iter, err := txn.Get(keyAuthTableName, all, true)
