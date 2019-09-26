@@ -96,6 +96,20 @@ plugins:
   - https
 consumers:
 - username: harry
+  keyauth_credentials:
+  - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
+  hmacauth_credentials:
+  - username: hmac-user
+    secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
+  jwt_secrets:
+  - algorithm: HS256
+    key: MKWeR0nu9OAUR9HrjpUG82Hbfz7ZXsIw
+    secret: 6gkrxTKAraykMSpmnLNEGiEE3Yz8XL6U
+  basicauth_credentials:
+  - username: user1
+    password: this-password-cant-be-changed
+  acls:
+  - group: foo-group
 - username: yolo
   tags:
   - internal-user
