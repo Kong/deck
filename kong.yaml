@@ -9,12 +9,14 @@ services:
   - team-svc1
   routes:
   - name: r1
+    https_redirect_status_code: 301
     paths:
     - /r1
 - name: svc2
   host: mockbin.org
   routes:
   - name: r2
+    https_redirect_status_code: 301
     paths:
     - /r2
 - name: svc3
@@ -22,12 +24,14 @@ services:
   port: 80
   routes:
   - name: r3
+    https_redirect_status_code: 301
     paths:
     - /r3
     methods:
     - GET
 upstreams:
 - name: upstream1
+  algorithm: round-robin
   targets:
   - target: 198.51.100.11:80
   - target: 198.51.100.12:80
