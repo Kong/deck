@@ -1,4 +1,4 @@
-FROM golang:1.13 AS build
+FROM golang:1.13.0 AS build
 WORKDIR /deck
 COPY . . 
 RUN go mod download
