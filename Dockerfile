@@ -30,4 +30,3 @@ COPY --from=build /deck/deck /usr/local/bin
 USER $USER
 
 ENTRYPOINT ["deck"]
-CMD ["help"]
