@@ -1,6 +1,7 @@
 FROM golang:1.13.0 AS build
 WORKDIR /deck
-COPY . . 
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o deck
 
