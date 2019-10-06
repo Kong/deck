@@ -1,0 +1,28 @@
+name: Go
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.13.0
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.0
+      id: go
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Install binary
+      run: |
+        curl -sL https://github.com/hbagdi/deck/releases/download/v0.4.0/deck_0.4.0_linux_amd64.tar.gz -o deck.tar.gz
+        tar -xf deck.tar.gz -C /tmp
+        cp /tmp/deck /usr/local/bin/
+
+    - name: execute test commands
+      run: deck --help
+    
+ 
