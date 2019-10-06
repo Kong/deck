@@ -11,7 +11,7 @@ RUN apk update \
     && apk upgrade \
     && apk --no-cache add ca-certificates
 
-ENV USER=appuser
+ENV USER=deck
 ENV GROUP=deck
 ENV UID=9999
 ENV GID=9999
