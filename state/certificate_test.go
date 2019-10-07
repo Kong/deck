@@ -16,11 +16,20 @@ func TestCertificateInsert(t *testing.T) {
 	collection := certsCollection()
 
 	var certificate Certificate
+	assert.NotNil(collection.Add(certificate))
+
 	certificate.ID = kong.String("first")
-	certificate.Cert = kong.String("firstCert")
+	assert.NotNil(collection.Add(certificate))
+
 	certificate.Key = kong.String("firstKey")
+	assert.NotNil(collection.Add(certificate))
+
+	certificate.Cert = kong.String("firstCert")
 	err := collection.Add(certificate)
 	assert.Nil(err)
+
+	// re-insert
+	assert.NotNil(collection.Add(certificate))
 }
 
 func TestCertificateGetUpdate(t *testing.T) {
@@ -37,16 +46,33 @@ func TestCertificateGetUpdate(t *testing.T) {
 	se, err := collection.GetByCertKey("firstCert", "firstKey")
 	assert.Nil(err)
 	assert.NotNil(se)
+	se.ID = nil
+	assert.NotNil(collection.Update(*se))
+
+	se.ID = kong.String("first")
+	se.Key = nil
 	se.Cert = kong.String("firstCert-updated")
+	err = collection.Update(*se)
+	assert.NotNil(err)
+
+	se.Key = kong.String("firstKey-updated")
 	err = collection.Update(*se)
 	assert.Nil(err)
 
-	se, err = collection.GetByCertKey("firstCert-updated", "firstKey")
+	se, err = collection.Get("")
+	assert.Nil(se)
+	assert.NotNil(err)
+
+	se, err = collection.GetByCertKey("firstCert-updated", "firstKey-updated")
 	assert.Nil(err)
 	assert.NotNil(se)
 	assert.Equal("firstCert-updated", *se.Cert)
 
-	se, err = collection.GetByCertKey("not-present", "firstKey")
+	se, err = collection.GetByCertKey("", "")
+	assert.NotNil(err)
+	assert.Nil(se)
+
+	se, err = collection.GetByCertKey("not-present", "firstsdfsdfKey")
 	assert.Equal(ErrNotFound, err)
 	assert.Nil(se)
 }
@@ -113,6 +139,9 @@ func TestCertificatesInvalidType(t *testing.T) {
 	assert.Panics(func() {
 		collection.GetByCertKey("Cert", "Key")
 	})
+	assert.Panics(func() {
+		collection.GetAll()
+	})
 }
 
 func TestCertificateDelete(t *testing.T) {
@@ -148,11 +177,22 @@ func TestCertificateDelete(t *testing.T) {
 	assert.NotNil(se)
 	assert.Equal("firstCert", *se.Cert)
 
+	assert.NotNil(collection.DeleteByCertKey("", ""))
+
+	assert.NotNil(collection.DeleteByCertKey("foo", "bar"))
+
 	err = collection.DeleteByCertKey(*se.Cert, *se.Key)
 	assert.Nil(err)
 
+	err = collection.Delete("")
+	assert.NotNil(err)
+
 	err = collection.Delete(*se.ID)
 	assert.NotNil(err)
+
+	se, err = collection.Get("first")
+	assert.NotNil(err)
+	assert.Nil(se)
 }
 
 func TestCertificateGetAll(t *testing.T) {
