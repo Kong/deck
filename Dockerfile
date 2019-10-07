@@ -11,10 +11,10 @@ RUN apk update \
     && apk upgrade \
     && apk --no-cache add ca-certificates
 
-ENV USER=deck
-ENV GROUP=deck
-ENV UID=9999
-ENV GID=9999
+ARG USER=deck
+ARG GROUP=deck
+ARG UID=9999
+ARG GID=9999
 
 RUN addgroup --gid "$GID" "$GROUP" \
     && adduser \
