@@ -15,8 +15,8 @@ const (
 var jwtAuthTableSchema = &memdb.TableSchema{
 	Name: jwtAuthTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -69,7 +69,7 @@ func (k *JWTAuthsCollection) Add(jwtAuth JWTAuth) error {
 // Get gets a key-auth credential by key or ID.
 func (k *JWTAuthsCollection) Get(keyOrID string) (*JWTAuth, error) {
 	res, err := multiIndexLookup(k.db, jwtAuthTableName,
-		[]string{"key", id}, keyOrID)
+		[]string{"key", "id"}, keyOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}

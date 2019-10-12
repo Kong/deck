@@ -12,8 +12,8 @@ const (
 var consumerTableSchema = &memdb.TableSchema{
 	Name: consumerTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},

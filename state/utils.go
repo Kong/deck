@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	id  = "id"
 	all = "all"
 )
 

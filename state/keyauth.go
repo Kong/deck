@@ -15,8 +15,8 @@ const (
 var keyAuthTableSchema = &memdb.TableSchema{
 	Name: keyAuthTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -69,7 +69,7 @@ func (k *KeyAuthsCollection) Add(keyAuth KeyAuth) error {
 // Get gets a key-auth credential by key or ID.
 func (k *KeyAuthsCollection) Get(keyOrID string) (*KeyAuth, error) {
 	res, err := multiIndexLookup(k.db, keyAuthTableName,
-		[]string{"key", id}, keyOrID)
+		[]string{"key", "id"}, keyOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}

@@ -12,8 +12,8 @@ const (
 var upstreamTableSchema = &memdb.TableSchema{
 	Name: upstreamTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},

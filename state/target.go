@@ -17,8 +17,8 @@ var errInvalidUpstream = errors.New("upstream.ID is required in target")
 var targetTableSchema = &memdb.TableSchema{
 	Name: targetTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},

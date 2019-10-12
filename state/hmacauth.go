@@ -15,8 +15,8 @@ const (
 var hmacAuthTableSchema = &memdb.TableSchema{
 	Name: hmacAuthTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -69,7 +69,7 @@ func (k *HMACAuthsCollection) Add(hmacAuth HMACAuth) error {
 // Get gets a hmac-auth credential by  or ID.
 func (k *HMACAuthsCollection) Get(usernameOrID string) (*HMACAuth, error) {
 	res, err := multiIndexLookup(k.db, hmacAuthTableName,
-		[]string{"username", id}, usernameOrID)
+		[]string{"username", "id"}, usernameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}

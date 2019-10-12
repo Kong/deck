@@ -15,8 +15,8 @@ const (
 var aclGroupTableSchema = &memdb.TableSchema{
 	Name: aclGroupTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},

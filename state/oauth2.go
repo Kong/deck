@@ -15,8 +15,8 @@ const (
 var oauth2CredTableSchema = &memdb.TableSchema{
 	Name: oauth2CredTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -69,7 +69,7 @@ func (k *Oauth2CredsCollection) Add(oauth2Cred Oauth2Credential) error {
 // Get gets an oauth2 credential by client_id or ID.
 func (k *Oauth2CredsCollection) Get(clientIDorID string) (*Oauth2Credential, error) {
 	res, err := multiIndexLookup(k.db, oauth2CredTableName,
-		[]string{"ClientID", id}, clientIDorID)
+		[]string{"ClientID", "id"}, clientIDorID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}

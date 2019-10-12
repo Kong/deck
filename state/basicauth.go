@@ -15,8 +15,8 @@ const (
 var basicAuthTableSchema = &memdb.TableSchema{
 	Name: basicAuthTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -69,7 +69,7 @@ func (k *BasicAuthsCollection) Add(basicAuth BasicAuth) error {
 // Get gets a basic-auth credential by  or ID.
 func (k *BasicAuthsCollection) Get(usernameOrID string) (*BasicAuth, error) {
 	res, err := multiIndexLookup(k.db, basicAuthTableName,
-		[]string{"username", id}, usernameOrID)
+		[]string{"username", "id"}, usernameOrID)
 	if err == ErrNotFound {
 		return nil, ErrNotFound
 	}
