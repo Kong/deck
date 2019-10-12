@@ -3,17 +3,19 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/hbagdi/deck/state/indexers"
+	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 )
 
+var (
+	errPluginNameRequired = errors.New("name of plugin required")
+)
+
 const (
-	pluginTableName           = "plugin"
-	pluginsByServiceName      = "pluginsByServiceName"
-	pluginsByServiceID        = "pluginsByServiceID"
-	pluginsByRouteName        = "pluginsByRouteName"
-	pluginsByRouteID          = "pluginsByRouteID"
-	pluginsByConsumerUsername = "pluginsByConsumerUsername"
-	pluginsByConsumerID       = "pluginsByConsumerID"
+	pluginTableName     = "plugin"
+	pluginsByServiceID  = "pluginsByServiceID"
+	pluginsByRouteID    = "pluginsByRouteID"
+	pluginsByConsumerID = "pluginsByConsumerID"
 )
 
 var pluginTableSchema = &memdb.TableSchema{
@@ -24,18 +26,12 @@ var pluginTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		pluginsByServiceName: {
-			Name: pluginsByServiceName,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Service",
-						Sub:    "Name",
-					},
-				},
-			},
-			AllowMissing: true,
+		"name": {
+			Name:    "name",
+			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
+		all: allIndex,
+		// foreign
 		pluginsByServiceID: {
 			Name: pluginsByServiceID,
 			Indexer: &indexers.SubFieldIndexer{
@@ -43,18 +39,6 @@ var pluginTableSchema = &memdb.TableSchema{
 					{
 						Struct: "Service",
 						Sub:    "ID",
-					},
-				},
-			},
-			AllowMissing: true,
-		},
-		pluginsByRouteName: {
-			Name: pluginsByRouteName,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Route",
-						Sub:    "Name",
 					},
 				},
 			},
@@ -72,18 +56,6 @@ var pluginTableSchema = &memdb.TableSchema{
 			},
 			AllowMissing: true,
 		},
-		pluginsByConsumerUsername: {
-			Name: pluginsByConsumerUsername,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "Username",
-					},
-				},
-			},
-			AllowMissing: true,
-		},
 		pluginsByConsumerID: {
 			Name: pluginsByConsumerID,
 			Indexer: &indexers.SubFieldIndexer{
@@ -96,10 +68,10 @@ var pluginTableSchema = &memdb.TableSchema{
 			},
 			AllowMissing: true,
 		},
-		"name": {
-			Name:    "name",
-			Indexer: &memdb.StringFieldIndex{Field: "Name"},
-		},
+		// combined foreign fields
+		// FIXME bug: collision if svc/route/consumer has the same ID
+		// and same type of plugin is created. Consider the case when only
+		// of the association is present
 		"fields": {
 			Name: "fields",
 			Indexer: &indexers.SubFieldIndexer{
@@ -110,37 +82,19 @@ var pluginTableSchema = &memdb.TableSchema{
 					},
 					{
 						Struct: "Service",
-						Sub:    "Name",
+						Sub:    "ID",
 					},
 					{
 						Struct: "Route",
-						Sub:    "Name",
+						Sub:    "ID",
 					},
 					{
 						Struct: "Consumer",
-						Sub:    "Username",
+						Sub:    "ID",
 					},
 				},
 			},
-			AllowMissing: true,
 		},
-		"foreignfields": {
-			Name: "foreignfields",
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Service",
-						Sub:    "Name",
-					},
-					{
-						Struct: "Route",
-						Sub:    "Name",
-					},
-				},
-			},
-			AllowMissing: true,
-		},
-		all: allIndex,
 	},
 }
 
@@ -151,169 +105,221 @@ type PluginsCollection collection
 func (k *PluginsCollection) Add(plugin Plugin) error {
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(pluginTableName, &plugin)
+
+	err := insertPlugin(txn, plugin)
 	if err != nil {
-		return errors.Wrap(err, "insert failed")
+		return err
 	}
+
 	txn.Commit()
 	return nil
 }
 
-// Get gets a plugin by name or ID.
-func (k *PluginsCollection) Get(ID string) (*Plugin, error) {
-	res, err := multiIndexLookup(k.db, pluginTableName,
-		[]string{"name", id}, ID)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
+func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(plugin.ID) {
+		return errIDRequired
+	}
+	if utils.Empty(plugin.Name) {
+		return errPluginNameRequired
 	}
 
+	// err out if plugin with same ID is present
+	_, err := getPluginByID(txn, *plugin.ID)
+	if err == nil {
+		return ErrAlreadyExists
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	// err out if another plugin with exact same combination is present
+	sID, rID, cID := "", "", ""
+	if plugin.Service != nil && !utils.Empty(plugin.Service.ID) {
+		sID = *plugin.Service.ID
+	}
+	if plugin.Route != nil && !utils.Empty(plugin.Route.ID) {
+		rID = *plugin.Route.ID
+	}
+	if plugin.Consumer != nil && !utils.Empty(plugin.Consumer.ID) {
+		cID = *plugin.Consumer.ID
+	}
+	_, err = getPluginBy(txn, *plugin.Name, sID, rID, cID)
+	if err == nil {
+		return ErrAlreadyExists
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	// all good
+	err = txn.Insert(pluginTableName, &plugin)
 	if err != nil {
-		return nil, errors.Wrap(err, "plugin lookup failed")
+		return err
+	}
+	return nil
+}
+
+func getPluginByID(txn *memdb.Txn, id string) (*Plugin, error) {
+	res, err := multiIndexLookupUsingTxn(txn, pluginTableName,
+		[]string{"id"}, id)
+	if err != nil {
+		return nil, err
+	}
+
+	plugin, ok := res.(*Plugin)
+	if !ok {
+		panic(unexpectedType)
+	}
+	return &Plugin{Plugin: *plugin.DeepCopy()}, nil
+}
+
+// Get gets a plugin by id.
+func (k *PluginsCollection) Get(id string) (*Plugin, error) {
+	if id == "" {
+		return nil, errIDRequired
+	}
+
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+
+	plugin, err := getPluginByID(txn, id)
+	if err != nil {
+		return nil, err
+	}
+	return plugin, nil
+}
+
+// GetAllByName returns all plugins of a specific type
+// (key-auth, ratelimiting, etc).
+func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin, error) {
+	return k.getAllPluginsBy("name", name)
+}
+
+func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
+	*Plugin, error) {
+	if name == "" {
+		return nil, errPluginNameRequired
+	}
+
+	res, err := txn.First(pluginTableName, "fields",
+		name, svcID, routeID, consumerID)
+	if err != nil {
+		return nil, err
 	}
 	if res == nil {
 		return nil, ErrNotFound
 	}
 	p, ok := res.(*Plugin)
 	if !ok {
-		panic("unexpected type found")
+		panic(unexpectedType)
 	}
 	return &Plugin{Plugin: *p.DeepCopy()}, nil
 }
 
-// GetAllByName returns all plugins of a specific type
-// (key-auth, ratelimiting, etc).
-func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin,
-	error) {
+// GetByProp returns a plugin which matches all the properties passed in
+// the arguments. If serviceID, routeID and consumerID are empty strings, then
+// a global plugin is searched.
+// Otherwise, a plugin with name and the supplied foreign references is
+// searchd.
+// name is required.
+func (k *PluginsCollection) GetByProp(name, serviceID,
+	routeID string, consumerID string) (*Plugin, error) {
 	txn := k.db.Txn(false)
-	iter, err := txn.Get(pluginTableName, "name", name)
+	defer txn.Abort()
+
+	return getPluginBy(txn, name, serviceID, routeID, consumerID)
+}
+
+func (k *PluginsCollection) getAllPluginsBy(index, identifier string) (
+	[]*Plugin, error) {
+	if identifier == "" {
+		return nil, errIDRequired
+	}
+
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+
+	iter, err := txn.Get(pluginTableName, index, identifier)
 	if err != nil {
 		return nil, err
 	}
 	var res []*Plugin
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Plugin)
+		p, ok := el.(*Plugin)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
-		res = append(res, s)
+		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
 	}
 	return res, nil
-}
-
-// GetByProp returns a plugin which matches all the properties passed in
-// the arguments. If serviceName and routeName are empty strings, then
-// a global plugin is searched.
-// If serviceName is empty, a plugin for the route with routeName is searched.
-// If routeName is empty, a plugin for the route with serviceName is searched.
-func (k *PluginsCollection) GetByProp(name, serviceName,
-	routeName string, consumerUsername string) (*Plugin, error) {
-	txn := k.db.Txn(false)
-	defer txn.Commit()
-	res, err := txn.First(pluginTableName, "fields",
-		name, serviceName, routeName, consumerUsername)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
-	}
-	if err != nil {
-		return nil, errors.Wrap(err, "plugin lookup failed")
-	}
-	if res == nil {
-		return nil, ErrNotFound
-	}
-	p, ok := res.(*Plugin)
-	if !ok {
-		panic("unexpected type found")
-	}
-	return &Plugin{Plugin: *p.DeepCopy()}, nil
 }
 
 // GetAllByServiceID returns all plugins referencing a service
 // by its id.
 func (k *PluginsCollection) GetAllByServiceID(id string) ([]*Plugin,
 	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(pluginTableName, pluginsByServiceID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*Plugin
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		p, ok := el.(*Plugin)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
-	}
-	return res, nil
+	return k.getAllPluginsBy(pluginsByServiceID, id)
 }
 
 // GetAllByRouteID returns all plugins referencing a service
 // by its id.
 func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
 	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(pluginTableName, pluginsByRouteID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*Plugin
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		p, ok := el.(*Plugin)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
-	}
-	return res, nil
+	return k.getAllPluginsBy(pluginsByRouteID, id)
 }
 
 // GetAllByConsumerID returns all plugins referencing a consumer
 // by its id.
 func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
 	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(pluginTableName, pluginsByConsumerID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*Plugin
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		p, ok := el.(*Plugin)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
-	}
-	return res, nil
+	return k.getAllPluginsBy(pluginsByConsumerID, id)
 }
 
 // Update updates a plugin
 func (k *PluginsCollection) Update(plugin Plugin) error {
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(plugin.ID) {
+		return errIDRequired
+	}
+
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(pluginTableName, &plugin)
+
+	err := deletePlugin(txn, *plugin.ID)
 	if err != nil {
-		return errors.Wrap(err, "update failed")
+		return err
 	}
+
+	err = insertPlugin(txn, plugin)
+	if err != nil {
+		return err
+	}
+
 	txn.Commit()
 	return nil
 }
 
-// Delete deletes a plugin by name or ID.
-func (k *PluginsCollection) Delete(nameOrID string) error {
-	plugin, err := k.Get(nameOrID)
-
+func deletePlugin(txn *memdb.Txn, id string) error {
+	plugin, err := getPluginByID(txn, id)
 	if err != nil {
-		return errors.Wrap(err, "looking up plugin")
+		return err
+	}
+	return txn.Delete(pluginTableName, plugin)
+}
+
+// Delete deletes a plugin by ID.
+func (k *PluginsCollection) Delete(id string) error {
+	if id == "" {
+		return errIDRequired
 	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err = txn.Delete(pluginTableName, plugin)
+	err := deletePlugin(txn, id)
 	if err != nil {
-		return errors.Wrap(err, "delete failed")
+		return err
 	}
+
 	txn.Commit()
 	return nil
 }
@@ -325,17 +331,16 @@ func (k *PluginsCollection) GetAll() ([]*Plugin, error) {
 
 	iter, err := txn.Get(pluginTableName, all, true)
 	if err != nil {
-		return nil, errors.Wrapf(err, "plugin lookup failed")
+		return nil, err
 	}
 
 	var res []*Plugin
 	for el := iter.Next(); el != nil; el = iter.Next() {
 		p, ok := el.(*Plugin)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &Plugin{Plugin: *p.DeepCopy()})
 	}
-	txn.Commit()
 	return res, nil
 }

@@ -11,18 +11,281 @@ func pluginsCollection() *PluginsCollection {
 	return state().Plugins
 }
 
-func TestPluginInsert(t *testing.T) {
-	assert := assert.New(t)
-	collection := pluginsCollection()
-
-	var plugin Plugin
-	plugin.Name = kong.String("my-plugin")
-	plugin.ID = kong.String("first")
-	err := collection.Add(plugin)
-	assert.Nil(err)
+func TestPluginsCollection_Add(t *testing.T) {
+	type args struct {
+		plugin Plugin
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "errors when ID is nil",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						Name: kong.String("foo"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors when Name is nil",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID: kong.String("id1"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "inserts with a name and ID",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id2"),
+						Name: kong.String("bar-name"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "errors on re-insert when same ID is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id3"),
+						Name: kong.String("foo-name"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors on re-insert when id is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id3"),
+						Name: kong.String("foobar-name"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors on re-insert when when same association is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id4-new"),
+						Name: kong.String("key-auth"),
+						Route: &kong.Route{
+							ID: kong.String("route1"),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors on re-insert when when same (multiple) association is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id5-new"),
+						Name: kong.String("key-auth"),
+						Route: &kong.Route{
+							ID: kong.String("route1"),
+						},
+						Service: &kong.Service{
+							ID: kong.String("svc1"),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	k := pluginsCollection()
+	plugin1 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id3"),
+			Name: kong.String("foo-name"),
+		},
+	}
+	plugin2 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id4"),
+			Name: kong.String("key-auth"),
+			Route: &kong.Route{
+				ID: kong.String("route1"),
+			},
+		},
+	}
+	plugin3 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id5"),
+			Name: kong.String("key-auth"),
+			Route: &kong.Route{
+				ID: kong.String("route1"),
+			},
+			Service: &kong.Service{
+				ID: kong.String("svc1"),
+			},
+		},
+	}
+	k.Add(plugin1)
+	k.Add(plugin2)
+	k.Add(plugin3)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := k.Add(tt.args.plugin); (err != nil) != tt.wantErr {
+				t.Errorf("PluginsCollection.Add() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }
 
-func TestPluginGetUpdate(t *testing.T) {
+func TestPluginsCollection_Update(t *testing.T) {
+	type args struct {
+		plugin Plugin
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "errors when ID is nil",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						Name: kong.String("foo"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors when Name is nil",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID: kong.String("id1"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors when the plugin is not present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("does-not-exist-yet"),
+						Name: kong.String("bar-name"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "updates when ID is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("id3"),
+						Name: kong.String("foo-name-new"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "errors on update when when same association is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("new-id"),
+						Name: kong.String("key-auth"),
+						Route: &kong.Route{
+							ID: kong.String("route1"),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "errors on update when when same (multiple) association is present",
+			args: args{
+				plugin: Plugin{
+					Plugin: kong.Plugin{
+						ID:   kong.String("new-id"),
+						Name: kong.String("key-auth"),
+						Route: &kong.Route{
+							ID: kong.String("route1"),
+						},
+						Service: &kong.Service{
+							ID: kong.String("svc1"),
+						},
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	k := pluginsCollection()
+	plugin1 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id1"),
+			Name: kong.String("foo-name"),
+		},
+	}
+	plugin2 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id2"),
+			Name: kong.String("key-auth"),
+			Route: &kong.Route{
+				ID: kong.String("route1"),
+			},
+		},
+	}
+	plugin3 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id3"),
+			Name: kong.String("key-auth"),
+			Route: &kong.Route{
+				ID: kong.String("route1"),
+			},
+			Service: &kong.Service{
+				ID: kong.String("svc1"),
+			},
+		},
+	}
+	k.Add(plugin1)
+	k.Add(plugin2)
+	k.Add(plugin3)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := k.Update(tt.args.plugin); (err != nil) != tt.wantErr {
+				t.Errorf("PluginsCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPluginGet(t *testing.T) {
 	assert := assert.New(t)
 	collection := pluginsCollection()
 
@@ -46,13 +309,6 @@ func TestPluginGetUpdate(t *testing.T) {
 		ID:   kong.String("service2-id"),
 		Name: kong.String("service2-name"),
 	}
-	err = collection.Update(*re)
-	assert.Nil(err)
-
-	re, err = collection.Get("my-plugin")
-	assert.Nil(err)
-	assert.NotNil(re)
-	assert.Equal("service2-id", *re.Service.ID)
 
 	re, err = collection.Get("does-not-exists")
 	assert.Equal(ErrNotFound, err)
@@ -75,7 +331,7 @@ func TestGetPluginByProp(t *testing.T) {
 				ID:   kong.String("2"),
 				Name: kong.String("key-auth"),
 				Service: &kong.Service{
-					Name: kong.String("svc1"),
+					ID: kong.String("svc1"),
 				},
 				Config: map[string]interface{}{
 					"key2": "value2",
@@ -87,7 +343,7 @@ func TestGetPluginByProp(t *testing.T) {
 				ID:   kong.String("3"),
 				Name: kong.String("key-auth"),
 				Route: &kong.Route{
-					Name: kong.String("route1"),
+					ID: kong.String("route1"),
 				},
 				Config: map[string]interface{}{
 					"key3": "value3",
@@ -99,7 +355,7 @@ func TestGetPluginByProp(t *testing.T) {
 				ID:   kong.String("4"),
 				Name: kong.String("key-auth"),
 				Consumer: &kong.Consumer{
-					Username: kong.String("consumer1"),
+					ID: kong.String("consumer1"),
 				},
 				Config: map[string]interface{}{
 					"key4": "value4",
@@ -114,7 +370,11 @@ func TestGetPluginByProp(t *testing.T) {
 		assert.Nil(collection.Add(p))
 	}
 
-	plugin, err := collection.GetByProp("foo", "", "", "")
+	plugin, err := collection.GetByProp("", "", "", "")
+	assert.Nil(plugin)
+	assert.NotNil(err)
+
+	plugin, err = collection.GetByProp("foo", "", "", "")
 	assert.Nil(plugin)
 	assert.Equal(ErrNotFound, err)
 
@@ -152,7 +412,10 @@ func TestPluginsInvalidType(t *testing.T) {
 	txn.Commit()
 
 	assert.Panics(func() {
-		collection.Get("my-service")
+		collection.Get("first")
+	})
+	assert.Panics(func() {
+		collection.GetAll()
 	})
 }
 
@@ -184,6 +447,8 @@ func TestPluginDelete(t *testing.T) {
 
 	err = collection.Delete(*p.ID)
 	assert.NotNil(err)
+
+	assert.NotNil(collection.Delete(""))
 }
 
 func TestPluginGetAll(t *testing.T) {
@@ -244,6 +509,19 @@ func TestPluginGetAll(t *testing.T) {
 	allPlugins, err := collection.GetAll()
 	assert.Nil(err)
 	assert.Equal(len(plugins), len(allPlugins))
+
+	allPlugins, err = collection.GetAllByName("")
+	assert.NotNil(err)
+	assert.Nil(allPlugins)
+	allPlugins, err = collection.GetAllByConsumerID("")
+	assert.NotNil(err)
+	assert.Nil(allPlugins)
+	allPlugins, err = collection.GetAllByRouteID("")
+	assert.NotNil(err)
+	assert.Nil(allPlugins)
+	allPlugins, err = collection.GetAllByServiceID("")
+	assert.NotNil(err)
+	assert.Nil(allPlugins)
 
 	allPlugins, err = collection.GetAllByName("key-auth")
 	assert.Nil(err)
