@@ -6,6 +6,17 @@ import (
 	"github.com/hbagdi/go-kong/kong"
 )
 
+// entity abstracts out common fields in a credentials.
+// TODO generalize for each and every entity.
+type entity interface {
+	// ID of the cred.
+	GetID() string
+	// ID2 is the second endpoint key.
+	GetID2() string
+	// Consumer returns consumer ID associated with the cred.
+	GetConsumer() string
+}
+
 // Meta contains additional information for an entity
 // type Meta struct {
 // 	Name   *string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -352,6 +363,33 @@ func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
 
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *KeyAuth) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Key field for KeyAuth.
+func (k1 *KeyAuth) GetID2() string {
+	if k1.Key == nil {
+		return ""
+	}
+	return *k1.Key
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *KeyAuth) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
+}
+
 // HMACAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original HMACAuth object.
 type HMACAuth struct {
@@ -385,6 +423,33 @@ func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
 		h2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(h1Copy, h2Copy)
+}
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (h1 *HMACAuth) GetID() string {
+	if h1.ID == nil {
+		return ""
+	}
+	return *h1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Username field for HMACAuth.
+func (h1 *HMACAuth) GetID2() string {
+	if h1.Username == nil {
+		return ""
+	}
+	return *h1.Username
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (h1 *HMACAuth) GetConsumer() string {
+	if h1.Consumer == nil || h1.Consumer.ID == nil {
+		return ""
+	}
+	return *h1.Consumer.ID
 }
 
 // JWTAuth represents a jwt credential in Kong.
