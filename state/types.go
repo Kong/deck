@@ -681,3 +681,30 @@ func (k1 *Oauth2Credential) EqualWithOpts(k2 *Oauth2Credential, ignoreID,
 	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *Oauth2Credential) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the ClientID field for Oauth2Credential.
+func (k1 *Oauth2Credential) GetID2() string {
+	if k1.ClientID == nil {
+		return ""
+	}
+	return *k1.ClientID
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *Oauth2Credential) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
+}

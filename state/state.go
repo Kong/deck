@@ -38,6 +38,7 @@ func NewKongState() (*KongState, error) {
 	hmacAuthTemp := newHMACAuthsCollection(collection{})
 	basicAuthTemp := newBasicAuthsCollection(collection{})
 	jwtAuthTemp := newJWTAuthsCollection(collection{})
+	oauth2CredsTemp := newOauth2CredsCollection(collection{})
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
@@ -50,13 +51,13 @@ func NewKongState() (*KongState, error) {
 			pluginTableName:      pluginTableSchema,
 			consumerTableName:    consumerTableSchema,
 
-			keyAuthTemp.TableName():   keyAuthTemp.Schema(),
-			hmacAuthTemp.TableName():  hmacAuthTemp.Schema(),
-			basicAuthTemp.TableName(): basicAuthTemp.Schema(),
-			jwtAuthTemp.TableName():   jwtAuthTemp.Schema(),
+			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
+			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
+			basicAuthTemp.TableName():   basicAuthTemp.Schema(),
+			jwtAuthTemp.TableName():     jwtAuthTemp.Schema(),
+			oauth2CredsTemp.TableName(): oauth2CredsTemp.Schema(),
 
-			oauth2CredTableName: oauth2CredTableSchema,
-			aclGroupTableName:   aclGroupTableSchema,
+			aclGroupTableName: aclGroupTableSchema,
 		},
 	}
 
@@ -82,8 +83,8 @@ func NewKongState() (*KongState, error) {
 	state.HMACAuths = newHMACAuthsCollection(state.common)
 	state.BasicAuths = newBasicAuthsCollection(state.common)
 	state.JWTAuths = newJWTAuthsCollection(state.common)
+	state.Oauth2Creds = newOauth2CredsCollection(state.common)
 
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
-	state.Oauth2Creds = (*Oauth2CredsCollection)(&state.common)
 	return &state, nil
 }

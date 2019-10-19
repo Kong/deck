@@ -1,127 +1,53 @@
 package state
 
-import (
-	memdb "github.com/hashicorp/go-memdb"
-	"github.com/hbagdi/deck/state/indexers"
-	"github.com/pkg/errors"
-)
-
-const (
-	oauth2CredTableName           = "oauth2Cred"
-	oauth2CredsByConsumerUsername = "oauth2CredsByConsumerUsername"
-	oauth2CredsByConsumerID       = "oauth2CredsByConsumerID"
-)
-
-var oauth2CredTableSchema = &memdb.TableSchema{
-	Name: oauth2CredTableName,
-	Indexes: map[string]*memdb.IndexSchema{
-		"id": {
-			Name:    "id",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "ID"},
-		},
-		oauth2CredsByConsumerUsername: {
-			Name: oauth2CredsByConsumerUsername,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "Username",
-					},
-				},
-			},
-		},
-		oauth2CredsByConsumerID: {
-			Name: oauth2CredsByConsumerID,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "ID",
-					},
-				},
-			},
-		},
-		"ClientID": {
-			Name:    "ClientID",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "ClientID"},
-		},
-		all: allIndex,
-	},
-}
-
 // Oauth2CredsCollection stores and indexes oauth2 credentials.
-type Oauth2CredsCollection collection
-
-// Add adds an oauth2 credential to Oauth2CredsCollection
-func (k *Oauth2CredsCollection) Add(oauth2Cred Oauth2Credential) error {
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-	err := txn.Insert(oauth2CredTableName, &oauth2Cred)
-	if err != nil {
-		return errors.Wrap(err, "insert failed")
-	}
-	txn.Commit()
-	return nil
+type Oauth2CredsCollection struct {
+	credentialsCollection
 }
 
-// Get gets an oauth2 credential by client_id or ID.
-func (k *Oauth2CredsCollection) Get(clientIDorID string) (*Oauth2Credential, error) {
-	res, err := multiIndexLookup(k.db, oauth2CredTableName,
-		[]string{"ClientID", "id"}, clientIDorID)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
+func newOauth2CredsCollection(common collection) *Oauth2CredsCollection {
+	return &Oauth2CredsCollection{
+		credentialsCollection: credentialsCollection{
+			collection: common,
+			CredType:   "oauth2",
+		},
 	}
-
-	if err != nil {
-		return nil, errors.Wrap(err, "oauth2Cred lookup failed")
-	}
-	if res == nil {
-		return nil, ErrNotFound
-	}
-	oauth2Cred, ok := res.(*Oauth2Credential)
-	if !ok {
-		panic("unexpected type found")
-	}
-	return &Oauth2Credential{Oauth2Credential: *oauth2Cred.DeepCopy()}, nil
 }
 
-// GetAllByConsumerUsername returns all oauth2 credentials
-// belong to a Consumer with username.
-func (k *Oauth2CredsCollection) GetAllByConsumerUsername(
-	username string) ([]*Oauth2Credential, error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(oauth2CredTableName, oauth2CredsByConsumerUsername,
-		username)
+// Add adds a oauth2 credential to Oauth2CredsCollection
+func (k *Oauth2CredsCollection) Add(keyAuth Oauth2Credential) error {
+	cred := (entity)(&keyAuth)
+	return k.credentialsCollection.Add(cred)
+}
+
+// Get gets a oauth2 credential by key or ID.
+func (k *Oauth2CredsCollection) Get(keyOrID string) (*Oauth2Credential, error) {
+	cred, err := k.credentialsCollection.Get(keyOrID)
 	if err != nil {
 		return nil, err
 	}
-	var res []*Oauth2Credential
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*Oauth2Credential)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &Oauth2Credential{Oauth2Credential: *r.DeepCopy()})
+
+	keyAuth, ok := cred.(*Oauth2Credential)
+	if !ok {
+		panic(unexpectedType)
 	}
-	return res, nil
+	return &Oauth2Credential{Oauth2Credential: *keyAuth.DeepCopy()}, nil
 }
 
 // GetAllByConsumerID returns all oauth2 credentials
 // belong to a Consumer with id.
 func (k *Oauth2CredsCollection) GetAllByConsumerID(id string) ([]*Oauth2Credential,
 	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(oauth2CredTableName, oauth2CredsByConsumerID, id)
+	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err
 	}
+
 	var res []*Oauth2Credential
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*Oauth2Credential)
+	for _, cred := range creds {
+		r, ok := cred.(*Oauth2Credential)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &Oauth2Credential{Oauth2Credential: *r.DeepCopy()})
 	}
@@ -129,54 +55,30 @@ func (k *Oauth2CredsCollection) GetAllByConsumerID(id string) ([]*Oauth2Credenti
 }
 
 // Update updates an existing oauth2 credential.
-func (k *Oauth2CredsCollection) Update(oauth2Cred Oauth2Credential) error {
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-	err := txn.Insert(oauth2CredTableName, &oauth2Cred)
-	if err != nil {
-		return errors.Wrap(err, "update failed")
-	}
-	txn.Commit()
-	return nil
+func (k *Oauth2CredsCollection) Update(keyAuth Oauth2Credential) error {
+	cred := (entity)(&keyAuth)
+	return k.credentialsCollection.Update(cred)
 }
 
-// Delete deletes an oauth2 credential by client_id or ID.
-func (k *Oauth2CredsCollection) Delete(clientIDorID string) error {
-	oauth2Cred, err := k.Get(clientIDorID)
-
-	if err != nil {
-		return errors.Wrap(err, "looking up oauth2Cred")
-	}
-
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-
-	err = txn.Delete(oauth2CredTableName, oauth2Cred)
-	if err != nil {
-		return errors.Wrap(err, "delete failed")
-	}
-	txn.Commit()
-	return nil
+// Delete deletes a oauth2 credential by key or ID.
+func (k *Oauth2CredsCollection) Delete(keyOrID string) error {
+	return k.credentialsCollection.Delete(keyOrID)
 }
 
 // GetAll gets all oauth2 credentials.
 func (k *Oauth2CredsCollection) GetAll() ([]*Oauth2Credential, error) {
-	txn := k.db.Txn(false)
-	defer txn.Abort()
-
-	iter, err := txn.Get(oauth2CredTableName, all, true)
+	creds, err := k.credentialsCollection.GetAll()
 	if err != nil {
-		return nil, errors.Wrapf(err, "oauth2Cred lookup failed")
+		return nil, err
 	}
 
 	var res []*Oauth2Credential
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*Oauth2Credential)
+	for _, cred := range creds {
+		r, ok := cred.(*Oauth2Credential)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &Oauth2Credential{Oauth2Credential: *r.DeepCopy()})
 	}
-	txn.Commit()
 	return res, nil
 }
