@@ -30,27 +30,31 @@ type KongState struct {
 	Oauth2Creds *Oauth2CredsCollection
 }
 
-var schema = &memdb.DBSchema{
-	Tables: map[string]*memdb.TableSchema{
-		serviceTableName:     serviceTableSchema,
-		routeTableName:       routeTableSchema,
-		upstreamTableName:    upstreamTableSchema,
-		targetTableName:      targetTableSchema,
-		certificateTableName: certificateTableSchema,
-		caCertTableName:      caCertTableSchema,
-		pluginTableName:      pluginTableSchema,
-		consumerTableName:    consumerTableSchema,
-		keyAuthTableName:     keyAuthTableSchema,
-		hmacAuthTableName:    hmacAuthTableSchema,
-		basicAuthTableName:   basicAuthTableSchema,
-		jwtAuthTableName:     jwtAuthTableSchema,
-		oauth2CredTableName:  oauth2CredTableSchema,
-		aclGroupTableName:    aclGroupTableSchema,
-	},
-}
-
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
+
+	keyAuthTemp := newKeyAuthsCollection(collection{})
+
+	var schema = &memdb.DBSchema{
+		Tables: map[string]*memdb.TableSchema{
+			serviceTableName:     serviceTableSchema,
+			routeTableName:       routeTableSchema,
+			upstreamTableName:    upstreamTableSchema,
+			targetTableName:      targetTableSchema,
+			certificateTableName: certificateTableSchema,
+			caCertTableName:      caCertTableSchema,
+			pluginTableName:      pluginTableSchema,
+			consumerTableName:    consumerTableSchema,
+
+			keyAuthTemp.TableName(): keyAuthTemp.Schema(),
+			hmacAuthTableName:       hmacAuthTableSchema,
+			basicAuthTableName:      basicAuthTableSchema,
+			jwtAuthTableName:        jwtAuthTableSchema,
+			oauth2CredTableName:     oauth2CredTableSchema,
+			aclGroupTableName:       aclGroupTableSchema,
+		},
+	}
+
 	memDB, err := memdb.NewMemDB(schema)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating new ServiceCollection")
@@ -68,7 +72,8 @@ func NewKongState() (*KongState, error) {
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
-	state.KeyAuths = (*KeyAuthsCollection)(&state.common)
+
+	state.KeyAuths = newKeyAuthsCollection(state.common)
 	state.HMACAuths = (*HMACAuthsCollection)(&state.common)
 	state.JWTAuths = (*JWTAuthsCollection)(&state.common)
 	state.BasicAuths = (*BasicAuthsCollection)(&state.common)

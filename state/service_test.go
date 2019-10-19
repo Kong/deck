@@ -262,6 +262,34 @@ func TestServicesCollection_Update(t *testing.T) {
 	}
 }
 
+func TestServiceUpdate(t *testing.T) {
+	assert := assert.New(t)
+	k := servicesCollection()
+	svc1 := Service{
+		Service: kong.Service{
+			ID:   kong.String("foo-id"),
+			Name: kong.String("foo-name"),
+			Host: kong.String("example.com"),
+		},
+	}
+	assert.Nil(k.Add(svc1))
+
+	svc1.Name = kong.String("bar-name")
+	assert.Nil(k.Update(svc1))
+
+	r, err := k.Get("foo-id")
+	assert.Nil(err)
+	assert.NotNil(r)
+
+	r, err = k.Get("bar-name")
+	assert.Nil(err)
+	assert.NotNil(r)
+
+	r, err = k.Get("foo-name")
+	assert.NotNil(err)
+	assert.Nil(r)
+}
+
 // Regression test
 // to ensure that the memory reference of the pointer returned by Get()
 // is different from the one stored in MemDB.

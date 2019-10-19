@@ -75,7 +75,7 @@ func (k *credentialsCollection) Add(cred entity) error {
 
 	// TODO detect unique constraint violation for ID2
 
-	_, err := k.getCred(txn, cred.GetID())
+	_, err := k.getCred(txn, cred.GetID(), cred.GetID2())
 	if err == nil {
 		return ErrAlreadyExists
 	} else if err != ErrNotFound {
@@ -125,12 +125,12 @@ func (k *credentialsCollection) Update(cred entity) error {
 }
 
 func (k *credentialsCollection) deleteCred(txn *memdb.Txn, nameOrID string) error {
-	service, err := k.getCred(txn, nameOrID)
+	cred, err := k.getCred(txn, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	err = txn.Delete(k.CredType, service)
+	err = txn.Delete(k.CredType, cred)
 	if err != nil {
 		return err
 	}
