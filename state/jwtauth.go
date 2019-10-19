@@ -1,181 +1,84 @@
 package state
 
-import (
-	memdb "github.com/hashicorp/go-memdb"
-	"github.com/hbagdi/deck/state/indexers"
-	"github.com/pkg/errors"
-)
-
-const (
-	jwtAuthTableName           = "jwtAuth"
-	jwtAuthsByConsumerUsername = "jwtAuthsByConsumerUsername"
-	jwtAuthsByConsumerID       = "jwtAuthsByConsumerID"
-)
-
-var jwtAuthTableSchema = &memdb.TableSchema{
-	Name: jwtAuthTableName,
-	Indexes: map[string]*memdb.IndexSchema{
-		"id": {
-			Name:    "id",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "ID"},
-		},
-		jwtAuthsByConsumerUsername: {
-			Name: jwtAuthsByConsumerUsername,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "Username",
-					},
-				},
-			},
-		},
-		jwtAuthsByConsumerID: {
-			Name: jwtAuthsByConsumerID,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "ID",
-					},
-				},
-			},
-		},
-		"key": {
-			Name:    "key",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "Key"},
-		},
-		all: allIndex,
-	},
+// JWTAuthsCollection stores and indexes jwt-auth credentials.
+type JWTAuthsCollection struct {
+	credentialsCollection
 }
 
-// JWTAuthsCollection stores and indexes key-auth credentials.
-type JWTAuthsCollection collection
+func newJWTAuthsCollection(common collection) *JWTAuthsCollection {
+	return &JWTAuthsCollection{
+		credentialsCollection: credentialsCollection{
+			collection: common,
+			CredType:   "jwt-auth",
+		},
+	}
+}
 
-// Add adds a key-auth credential to JWTAuthsCollection
+// Add adds a jwt-auth credential to JWTAuthsCollection
 func (k *JWTAuthsCollection) Add(jwtAuth JWTAuth) error {
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-	err := txn.Insert(jwtAuthTableName, &jwtAuth)
-	if err != nil {
-		return errors.Wrap(err, "insert failed")
-	}
-	txn.Commit()
-	return nil
+	cred := (entity)(&jwtAuth)
+	return k.credentialsCollection.Add(cred)
 }
 
-// Get gets a key-auth credential by key or ID.
+// Get gets a jwt-auth credential by key or ID.
 func (k *JWTAuthsCollection) Get(keyOrID string) (*JWTAuth, error) {
-	res, err := multiIndexLookup(k.db, jwtAuthTableName,
-		[]string{"key", "id"}, keyOrID)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
+	cred, err := k.credentialsCollection.Get(keyOrID)
+	if err != nil {
+		return nil, err
 	}
 
-	if err != nil {
-		return nil, errors.Wrap(err, "jwtAuth lookup failed")
-	}
-	if res == nil {
-		return nil, ErrNotFound
-	}
-	jwtAuth, ok := res.(*JWTAuth)
+	jwtAuth, ok := cred.(*JWTAuth)
 	if !ok {
-		panic("unexpected type found")
+		panic(unexpectedType)
 	}
 	return &JWTAuth{JWTAuth: *jwtAuth.DeepCopy()}, nil
 }
 
-// GetAllByConsumerUsername returns all key-auth credentials
-// belong to a Consumer with username.
-func (k *JWTAuthsCollection) GetAllByConsumerUsername(username string) ([]*JWTAuth,
-	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(jwtAuthTableName, jwtAuthsByConsumerUsername, username)
-	if err != nil {
-		return nil, err
-	}
-	var res []*JWTAuth
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*JWTAuth)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &JWTAuth{JWTAuth: *r.DeepCopy()})
-	}
-	return res, nil
-}
-
-// GetAllByConsumerID returns all key-auth credentials
+// GetAllByConsumerID returns all jwt-auth credentials
 // belong to a Consumer with id.
 func (k *JWTAuthsCollection) GetAllByConsumerID(id string) ([]*JWTAuth,
 	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(jwtAuthTableName, jwtAuthsByConsumerID, id)
+	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err
 	}
+
 	var res []*JWTAuth
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*JWTAuth)
+	for _, cred := range creds {
+		r, ok := cred.(*JWTAuth)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &JWTAuth{JWTAuth: *r.DeepCopy()})
 	}
 	return res, nil
 }
 
-// Update updates an existing key-auth credential.
+// Update updates an existing jwt-auth credential.
 func (k *JWTAuthsCollection) Update(jwtAuth JWTAuth) error {
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-	err := txn.Insert(jwtAuthTableName, &jwtAuth)
-	if err != nil {
-		return errors.Wrap(err, "update failed")
-	}
-	txn.Commit()
-	return nil
+	cred := (entity)(&jwtAuth)
+	return k.credentialsCollection.Update(cred)
 }
 
-// Delete deletes a key-auth credential by key or ID.
+// Delete deletes a jwt-auth credential by key or ID.
 func (k *JWTAuthsCollection) Delete(keyOrID string) error {
-	jwtAuth, err := k.Get(keyOrID)
-
-	if err != nil {
-		return errors.Wrap(err, "looking up jwtAuth")
-	}
-
-	txn := k.db.Txn(true)
-	defer txn.Abort()
-
-	err = txn.Delete(jwtAuthTableName, jwtAuth)
-	if err != nil {
-		return errors.Wrap(err, "delete failed")
-	}
-	txn.Commit()
-	return nil
+	return k.credentialsCollection.Delete(keyOrID)
 }
 
-// GetAll gets all key-auth credentials.
+// GetAll gets all jwt-auth credentials.
 func (k *JWTAuthsCollection) GetAll() ([]*JWTAuth, error) {
-	txn := k.db.Txn(false)
-	defer txn.Abort()
-
-	iter, err := txn.Get(jwtAuthTableName, all, true)
+	creds, err := k.credentialsCollection.GetAll()
 	if err != nil {
-		return nil, errors.Wrapf(err, "jwtAuth lookup failed")
+		return nil, err
 	}
 
 	var res []*JWTAuth
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*JWTAuth)
+	for _, cred := range creds {
+		r, ok := cred.(*JWTAuth)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &JWTAuth{JWTAuth: *r.DeepCopy()})
 	}
-	txn.Commit()
 	return res, nil
 }

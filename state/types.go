@@ -487,6 +487,33 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 	return reflect.DeepEqual(j1Copy, j2Copy)
 }
 
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *JWTAuth) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Key field for JWTAuth.
+func (k1 *JWTAuth) GetID2() string {
+	if k1.Key == nil {
+		return ""
+	}
+	return *k1.Key
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *JWTAuth) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
+}
+
 // BasicAuth represents a basic-auth credential in Kong.
 // It adds some helper methods along with Meta to the original BasicAuth object.
 type BasicAuth struct {
