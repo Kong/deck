@@ -3,13 +3,18 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/hbagdi/deck/state/indexers"
+	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 )
 
+var (
+	errGroupRequired    = errors.New("name of ACL group required")
+	errConsumerRequired = errors.New("consumer required")
+)
+
 const (
-	aclGroupTableName           = "aclGroup"
-	aclGroupsByConsumerUsername = "aclGroupsByConsumerUsername"
-	aclGroupsByConsumerID       = "aclGroupsByConsumerID"
+	aclGroupTableName     = "aclGroup"
+	aclGroupsByConsumerID = "aclGroupsByConsumerID"
 )
 
 var aclGroupTableSchema = &memdb.TableSchema{
@@ -20,17 +25,12 @@ var aclGroupTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		aclGroupsByConsumerUsername: {
-			Name: aclGroupsByConsumerUsername,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Consumer",
-						Sub:    "Username",
-					},
-				},
-			},
+		"group": {
+			Name:    "group",
+			Indexer: &memdb.StringFieldIndex{Field: "Group"},
 		},
+		all: allIndex,
+		// foreign
 		aclGroupsByConsumerID: {
 			Name: aclGroupsByConsumerID,
 			Indexer: &indexers.SubFieldIndexer{
@@ -42,11 +42,6 @@ var aclGroupTableSchema = &memdb.TableSchema{
 				},
 			},
 		},
-		"group": {
-			Name:    "group",
-			Indexer: &memdb.StringFieldIndex{Field: "Group"},
-		},
-		all: allIndex,
 	},
 }
 
@@ -55,77 +50,98 @@ type ACLGroupsCollection collection
 
 // Add adds aclGroup to ACLGroupsCollection
 func (k *ACLGroupsCollection) Add(aclGroup ACLGroup) error {
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(aclGroup.ID) {
+		return errIDRequired
+	}
+
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(aclGroupTableName, &aclGroup)
+
+	err := insertACLGroup(txn, aclGroup)
 	if err != nil {
-		return errors.Wrap(err, "insert failed")
+		return err
 	}
+
 	txn.Commit()
 	return nil
 }
 
-// GetByID gets an acl-group with id.
-func (k *ACLGroupsCollection) GetByID(id string) (*ACLGroup, error) {
-	res, err := multiIndexLookup(k.db, aclGroupTableName,
-		[]string{"id"}, id)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
+func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
+	if utils.Empty(aclGroup.ID) {
+		return errIDRequired
 	}
 
+	// err out if group with same ID is present
+	_, err := getACLGroupByID(txn, *aclGroup.ID)
+	if err == nil {
+		return ErrAlreadyExists
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	// check if the same combination is present
+	if utils.Empty(aclGroup.Group) {
+		return errGroupRequired
+	}
+	if aclGroup.Consumer == nil || utils.Empty(aclGroup.Consumer.ID) {
+		return errConsumerRequired
+	}
+	_, err = getACLGroup(txn, *aclGroup.Consumer.ID, *aclGroup.Group)
+	if err == nil {
+		return ErrAlreadyExists
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	// all good
+	err = txn.Insert(aclGroupTableName, &aclGroup)
 	if err != nil {
-		return nil, errors.Wrap(err, "aclGroup lookup failed")
+		return err
 	}
-	if res == nil {
-		return nil, ErrNotFound
-	}
-	group, ok := res.(*ACLGroup)
-	if !ok {
-		panic("unexpected type found")
-	}
+	return nil
 
-	return &ACLGroup{ACLGroup: *group.DeepCopy()}, nil
 }
 
-// Get gets a acl-group for a consumer by group or ID.
-func (k *ACLGroupsCollection) Get(consumerUsernameOrID,
-	groupOrID string) (*ACLGroup, error) {
+func getACLGroupByID(txn *memdb.Txn, id string) (*ACLGroup, error) {
+	res, err := multiIndexLookupUsingTxn(txn, aclGroupTableName,
+		[]string{"id"}, id)
+	if err != nil {
+		return nil, err
+	}
+	aclGroup, ok := res.(*ACLGroup)
+	if !ok {
+		panic(unexpectedType)
+	}
+	return &ACLGroup{ACLGroup: *aclGroup.DeepCopy()}, nil
+}
 
+// GetByID gets an acl-group with id.
+func (k *ACLGroupsCollection) GetByID(id string) (*ACLGroup, error) {
+	if id == "" {
+		return nil, errIDRequired
+	}
 	txn := k.db.Txn(false)
 	defer txn.Abort()
+	return getACLGroupByID(txn, id)
+}
 
-	indices := []string{aclGroupsByConsumerUsername, aclGroupsByConsumerID}
-	var groups []*ACLGroup
-	// load all groups
-	for _, indexName := range indices {
-		iter, err := txn.Get(aclGroupTableName, indexName, consumerUsernameOrID)
-		if err != nil {
-			return nil, errors.Wrapf(err, "aclGroup lookup failed")
-		}
-		for el := iter.Next(); el != nil; el = iter.Next() {
-			r, ok := el.(*ACLGroup)
-			if !ok {
-				panic("unexpected type found")
-			}
-			groups = append(groups, &ACLGroup{ACLGroup: *r.DeepCopy()})
-		}
+func getACLGroup(txn *memdb.Txn, consumerID, groupOrID string) (*ACLGroup, error) {
+	groups, err := getAllACLGroupsByConsumerID(txn, consumerID)
+	if err != nil {
+		return nil, err
 	}
-	txn.Commit()
-	// linear search
 	for _, group := range groups {
 		if groupOrID == *group.ID || groupOrID == *group.Group {
 			return &ACLGroup{ACLGroup: *group.DeepCopy()}, nil
 		}
 	}
 	return nil, ErrNotFound
+
 }
 
-// GetAllByConsumerUsername returns all acl-group credentials
-// belong to a Consumer with username.
-func (k *ACLGroupsCollection) GetAllByConsumerUsername(username string) ([]*ACLGroup,
-	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(aclGroupTableName, aclGroupsByConsumerUsername, username)
+func getAllACLGroupsByConsumerID(txn *memdb.Txn, consumerID string) ([]*ACLGroup, error) {
+	iter, err := txn.Get(aclGroupTableName, aclGroupsByConsumerID, consumerID)
 	if err != nil {
 		return nil, err
 	}
@@ -133,60 +149,91 @@ func (k *ACLGroupsCollection) GetAllByConsumerUsername(username string) ([]*ACLG
 	for el := iter.Next(); el != nil; el = iter.Next() {
 		r, ok := el.(*ACLGroup)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &ACLGroup{ACLGroup: *r.DeepCopy()})
 	}
 	return res, nil
+}
+
+// Get gets a acl-group for a consumer by group or ID.
+func (k *ACLGroupsCollection) Get(consumerID,
+	groupOrID string) (*ACLGroup, error) {
+	if groupOrID == "" {
+		return nil, errIDRequired
+	}
+
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+	return getACLGroup(txn, consumerID, groupOrID)
+
 }
 
 // GetAllByConsumerID returns all acl-group credentials
 // belong to a Consumer with id.
 func (k *ACLGroupsCollection) GetAllByConsumerID(id string) ([]*ACLGroup,
 	error) {
+	if id == "" {
+		return nil, errIDRequired
+	}
+
 	txn := k.db.Txn(false)
-	iter, err := txn.Get(aclGroupTableName, aclGroupsByConsumerID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*ACLGroup
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*ACLGroup)
-		if !ok {
-			panic("unexpected type found")
-		}
-		res = append(res, &ACLGroup{ACLGroup: *r.DeepCopy()})
-	}
-	return res, nil
+	defer txn.Abort()
+
+	return getAllACLGroupsByConsumerID(txn, id)
 }
 
 // Update updates an existing acl-group credential.
 func (k *ACLGroupsCollection) Update(aclGroup ACLGroup) error {
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(aclGroup.ID) {
+		return errIDRequired
+	}
+
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(aclGroupTableName, &aclGroup)
+
+	err := deleteACLGroup(txn, *aclGroup.ID)
 	if err != nil {
-		return errors.Wrap(err, "update failed")
+		return err
 	}
+
+	err = insertACLGroup(txn, aclGroup)
+	if err != nil {
+		return err
+	}
+
 	txn.Commit()
 	return nil
 }
 
-// DeleteByID deletes an acl-group by ID.
-func (k *ACLGroupsCollection) DeleteByID(ID string) error {
-	aclGroup, err := k.GetByID(ID)
-
+func deleteACLGroup(txn *memdb.Txn, id string) error {
+	group, err := getACLGroupByID(txn, id)
 	if err != nil {
-		return errors.Wrap(err, "looking up aclGroup")
+		return err
+	}
+
+	err = txn.Delete(aclGroupTableName, group)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeleteByID deletes an acl-group by id.
+func (k *ACLGroupsCollection) Delete(id string) error {
+	if id == "" {
+		return errIDRequired
 	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err = txn.Delete(aclGroupTableName, aclGroup)
+	err := deleteACLGroup(txn, id)
 	if err != nil {
-		return errors.Wrap(err, "delete failed")
+		return err
 	}
+
 	txn.Commit()
 	return nil
 }
@@ -198,14 +245,14 @@ func (k *ACLGroupsCollection) GetAll() ([]*ACLGroup, error) {
 
 	iter, err := txn.Get(aclGroupTableName, all, true)
 	if err != nil {
-		return nil, errors.Wrapf(err, "aclGroup lookup failed")
+		return nil, err
 	}
 
 	var res []*ACLGroup
 	for el := iter.Next(); el != nil; el = iter.Next() {
 		r, ok := el.(*ACLGroup)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &ACLGroup{ACLGroup: *r.DeepCopy()})
 	}
