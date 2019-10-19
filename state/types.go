@@ -526,6 +526,33 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *BasicAuth) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Username field for BasicAuth.
+func (k1 *BasicAuth) GetID2() string {
+	if k1.Username == nil {
+		return ""
+	}
+	return *k1.Username
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *BasicAuth) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
+}
+
 // ACLGroup represents an ACL group for a consumer in Kong.
 // It adds some helper methods along with Meta to the original ACLGroup object.
 type ACLGroup struct {

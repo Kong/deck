@@ -153,10 +153,6 @@ func TestBasicAuthGetByConsumer(t *testing.T) {
 	basicAuths, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
 	assert.Equal(3, len(basicAuths))
-
-	basicAuths, err = collection.GetAllByConsumerUsername("consumer2-name")
-	assert.Nil(err)
-	assert.Equal(2, len(basicAuths))
 }
 
 func populateWithBasicAuthFixtures(assert *assert.Assertions,

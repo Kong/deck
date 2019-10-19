@@ -36,6 +36,7 @@ func NewKongState() (*KongState, error) {
 	// TODO FIXME clean up the mess
 	keyAuthTemp := newKeyAuthsCollection(collection{})
 	hmacAuthTemp := newHMACAuthsCollection(collection{})
+	basicAuthTemp := newBasicAuthsCollection(collection{})
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
@@ -48,12 +49,12 @@ func NewKongState() (*KongState, error) {
 			pluginTableName:      pluginTableSchema,
 			consumerTableName:    consumerTableSchema,
 
-			keyAuthTemp.TableName():  keyAuthTemp.Schema(),
-			hmacAuthTemp.TableName(): hmacAuthTemp.Schema(),
-			basicAuthTableName:       basicAuthTableSchema,
-			jwtAuthTableName:         jwtAuthTableSchema,
-			oauth2CredTableName:      oauth2CredTableSchema,
-			aclGroupTableName:        aclGroupTableSchema,
+			keyAuthTemp.TableName():   keyAuthTemp.Schema(),
+			hmacAuthTemp.TableName():  hmacAuthTemp.Schema(),
+			basicAuthTemp.TableName(): basicAuthTemp.Schema(),
+			jwtAuthTableName:          jwtAuthTableSchema,
+			oauth2CredTableName:       oauth2CredTableSchema,
+			aclGroupTableName:         aclGroupTableSchema,
 		},
 	}
 
@@ -77,8 +78,9 @@ func NewKongState() (*KongState, error) {
 
 	state.KeyAuths = newKeyAuthsCollection(state.common)
 	state.HMACAuths = newHMACAuthsCollection(state.common)
+	state.BasicAuths = newBasicAuthsCollection(state.common)
+
 	state.JWTAuths = (*JWTAuthsCollection)(&state.common)
-	state.BasicAuths = (*BasicAuthsCollection)(&state.common)
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
 	state.Oauth2Creds = (*Oauth2CredsCollection)(&state.common)
 	return &state, nil
