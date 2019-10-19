@@ -489,29 +489,29 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 
 // GetID returns ID.
 // If ID is empty, it returns an empty string.
-func (k1 *JWTAuth) GetID() string {
-	if k1.ID == nil {
+func (j1 *JWTAuth) GetID() string {
+	if j1.ID == nil {
 		return ""
 	}
-	return *k1.ID
+	return *j1.ID
 }
 
 // GetID2 returns the endpoint key of the entity,
 // the Key field for JWTAuth.
-func (k1 *JWTAuth) GetID2() string {
-	if k1.Key == nil {
+func (j1 *JWTAuth) GetID2() string {
+	if j1.Key == nil {
 		return ""
 	}
-	return *k1.Key
+	return *j1.Key
 }
 
 // GetConsumer returns the credential's Consumer's ID.
 // If Consumer's ID is empty, it returns an empty string.
-func (k1 *JWTAuth) GetConsumer() string {
-	if k1.Consumer == nil || k1.Consumer.ID == nil {
+func (j1 *JWTAuth) GetConsumer() string {
+	if j1.Consumer == nil || j1.Consumer.ID == nil {
 		return ""
 	}
-	return *k1.Consumer.ID
+	return *j1.Consumer.ID
 }
 
 // BasicAuth represents a basic-auth credential in Kong.
@@ -555,29 +555,29 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 
 // GetID returns ID.
 // If ID is empty, it returns an empty string.
-func (k1 *BasicAuth) GetID() string {
-	if k1.ID == nil {
+func (b1 *BasicAuth) GetID() string {
+	if b1.ID == nil {
 		return ""
 	}
-	return *k1.ID
+	return *b1.ID
 }
 
 // GetID2 returns the endpoint key of the entity,
 // the Username field for BasicAuth.
-func (k1 *BasicAuth) GetID2() string {
-	if k1.Username == nil {
+func (b1 *BasicAuth) GetID2() string {
+	if b1.Username == nil {
 		return ""
 	}
-	return *k1.Username
+	return *b1.Username
 }
 
 // GetConsumer returns the credential's Consumer's ID.
 // If Consumer's ID is empty, it returns an empty string.
-func (k1 *BasicAuth) GetConsumer() string {
-	if k1.Consumer == nil || k1.Consumer.ID == nil {
+func (b1 *BasicAuth) GetConsumer() string {
+	if b1.Consumer == nil || b1.Consumer.ID == nil {
 		return ""
 	}
-	return *k1.Consumer.ID
+	return *b1.Consumer.ID
 }
 
 // ACLGroup represents an ACL group for a consumer in Kong.

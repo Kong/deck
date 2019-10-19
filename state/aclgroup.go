@@ -220,7 +220,7 @@ func deleteACLGroup(txn *memdb.Txn, id string) error {
 	return nil
 }
 
-// DeleteByID deletes an acl-group by id.
+// Delete deletes an acl-group by id.
 func (k *ACLGroupsCollection) Delete(id string) error {
 	if id == "" {
 		return errIDRequired
