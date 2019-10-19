@@ -33,7 +33,9 @@ type KongState struct {
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
 
+	// TODO FIXME clean up the mess
 	keyAuthTemp := newKeyAuthsCollection(collection{})
+	hmacAuthTemp := newHMACAuthsCollection(collection{})
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
@@ -46,12 +48,12 @@ func NewKongState() (*KongState, error) {
 			pluginTableName:      pluginTableSchema,
 			consumerTableName:    consumerTableSchema,
 
-			keyAuthTemp.TableName(): keyAuthTemp.Schema(),
-			hmacAuthTableName:       hmacAuthTableSchema,
-			basicAuthTableName:      basicAuthTableSchema,
-			jwtAuthTableName:        jwtAuthTableSchema,
-			oauth2CredTableName:     oauth2CredTableSchema,
-			aclGroupTableName:       aclGroupTableSchema,
+			keyAuthTemp.TableName():  keyAuthTemp.Schema(),
+			hmacAuthTemp.TableName(): hmacAuthTemp.Schema(),
+			basicAuthTableName:       basicAuthTableSchema,
+			jwtAuthTableName:         jwtAuthTableSchema,
+			oauth2CredTableName:      oauth2CredTableSchema,
+			aclGroupTableName:        aclGroupTableSchema,
 		},
 	}
 
@@ -74,7 +76,7 @@ func NewKongState() (*KongState, error) {
 	state.Consumers = (*ConsumersCollection)(&state.common)
 
 	state.KeyAuths = newKeyAuthsCollection(state.common)
-	state.HMACAuths = (*HMACAuthsCollection)(&state.common)
+	state.HMACAuths = newHMACAuthsCollection(state.common)
 	state.JWTAuths = (*JWTAuthsCollection)(&state.common)
 	state.BasicAuths = (*BasicAuthsCollection)(&state.common)
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
