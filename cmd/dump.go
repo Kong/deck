@@ -19,6 +19,7 @@ var (
 	dumpCmdStateFormat   string
 	dumpWorkspace        string
 	dumpAllWorkspaces    bool
+	dumpWithID           bool
 )
 
 func listWorkspaces(client *kong.Client, baseURL string) ([]string, error) {
@@ -89,8 +90,13 @@ configure Kong.`,
 				if err != nil {
 					return errors.Wrap(err, "reading configuration from Kong")
 				}
-				if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
-					workspace, workspace, format); err != nil {
+				if err := file.KongStateToFile(ks, file.WriteConfig{
+					SelectTags: dumpConfig.SelectorTags,
+					Workspace:  workspace,
+					Filename:   workspace,
+					FileFormat: format,
+					WithID:     dumpWithID,
+				}); err != nil {
 					return err
 				}
 			}
@@ -111,8 +117,13 @@ configure Kong.`,
 		if err != nil {
 			return errors.Wrap(err, "reading configuration from Kong")
 		}
-		if err := file.KongStateToFile(ks, dumpConfig.SelectorTags,
-			dumpWorkspace, dumpCmdKongStateFile, format); err != nil {
+		if err := file.KongStateToFile(ks, file.WriteConfig{
+			SelectTags: dumpConfig.SelectorTags,
+			Workspace:  dumpWorkspace,
+			Filename:   dumpCmdKongStateFile,
+			FileFormat: format,
+			WithID:     dumpWithID,
+		}); err != nil {
 			return err
 		}
 		return nil
@@ -126,6 +137,8 @@ func init() {
 			"Use '-' to write to stdout.")
 	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml")
+	dumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
+		false, "write ID of all entities in the output")
 	dumpCmd.Flags().StringVarP(&dumpWorkspace, "workspace", "w",
 		"", "dump configuration of a specific workspace"+
 			"(Kong Enterprise only).")
