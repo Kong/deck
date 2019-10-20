@@ -234,3 +234,25 @@ func compareUpstreams(expected, actual []*Upstream) bool {
 
 	return (compareSlices(expectedNames, actualNames))
 }
+
+func TestUpstreamsWithHostHeader(T *testing.T) {
+	runWhenKong(T, ">=1.4.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name:       String("upstream-with-host-header"),
+		HostHeader: String("example.com"),
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+	assert.Equal("example.com", *createdUpstream.HostHeader)
+
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+}

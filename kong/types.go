@@ -142,6 +142,7 @@ type Healthcheck struct {
 type Upstream struct {
 	ID                 *string      `json:"id,omitempty" yaml:"id,omitempty"`
 	Name               *string      `json:"name,omitempty" yaml:"name,omitempty"`
+	HostHeader         *string      `json:"host_header,omitempty" yaml:"host_header,omitempty"`
 	Algorithm          *string      `json:"algorithm,omitempty" yaml:"algorithm,omitempty"`
 	Slots              *int         `json:"slots,omitempty" yaml:"slots,omitempty"`
 	Healthchecks       *Healthcheck `json:"healthchecks,omitempty" yaml:"healthchecks,omitempty"`
