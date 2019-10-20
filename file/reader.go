@@ -37,6 +37,22 @@ func GetStateFromFile(filename string) (*state.KongState,
 	return GetStateFromContent(fileContent)
 }
 
+// GetContentFromFile reads in a file with filename and constructs
+// a state. If filename is `-`, then it will read from os.Stdin.
+// If filename represents a directory, it will traverse the tree
+// rooted at filename, read all the files with .yaml, .yml and .json extensions
+// and generate a content after a merge of the content from all the files.
+//
+// It will return an error if the file representation is invalid
+// or if there is any error during processing.
+func GetContentFromFile(filename string) (*Content, error) {
+	if filename == "" {
+		return nil, errors.New("filename cannot be empty")
+	}
+
+	return getContent(filename)
+}
+
 // GetStateFromContent takes the serialized state and returns a Kong.
 // It will return an error if the file representation is invalid
 // or if there is any error during processing.

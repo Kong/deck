@@ -20,18 +20,27 @@ func SetStopCh(stopCh chan struct{}) {
 var dumpConfig dump.Config
 
 func sync(filename string, dry bool) error {
-	targetState, selectTags, workspace, err :=
-		file.GetStateFromFile(filename)
+	// read target file
+	targetContent, err := file.GetContentFromFile(filename)
 	if err != nil {
 		return err
 	}
-	config.Workspace = workspace
+	// prepare to read the current state from Kong
+	config.Workspace = targetContent.Workspace
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return err
 	}
-	dumpConfig.SelectorTags = selectTags
+	if targetContent.Info != nil {
+		dumpConfig.SelectorTags = targetContent.Info.SelectorTags
+	}
+	// read the current state
 	currentState, err := dump.GetState(client, dumpConfig)
+	if err != nil {
+		return err
+	}
+
+	targetState, _, _, err := file.GetStateFromContent(targetContent)
 	if err != nil {
 		return err
 	}
