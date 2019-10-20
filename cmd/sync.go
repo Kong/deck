@@ -40,7 +40,7 @@ to get Kong's state in sync with the input state.`,
 			return err
 		}
 
-		dumpConfig.SelectorTags = selectTags
+		dumpConfig.SelectorTags = append(dumpConfig.SelectorTags, selectTags...)
 		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
@@ -72,4 +72,8 @@ func init() {
 			"any plugins associated with consumers")
 	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations")
+	syncCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
+		"select-tag", []string{},
+		"only entities matching tags specified via this flag are synced.\n"+
+			"Multiple tags are ANDed together.")
 }

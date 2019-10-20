@@ -44,7 +44,7 @@ that will be created or updated or deleted.
 			return err
 		}
 
-		dumpConfig.SelectorTags = selectTags
+		dumpConfig.SelectorTags = append(dumpConfig.SelectorTags, selectTags...)
 		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
 			return err
@@ -75,4 +75,8 @@ func init() {
 			"any plugins associated with consumers")
 	diffCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations")
+	diffCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
+		"select-tag", []string{},
+		"only entities matching tags specified via this flag are diffed.\n"+
+			"Multiple tags are ANDed together.")
 }
