@@ -286,6 +286,8 @@ func newOpt(tags []string) *kong.ListOpt {
 // all the entities in KongRawState.
 func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
+	// TODO make these requests concurrent
+
 	var state utils.KongRawState
 	services, err := GetAllServices(client, config.SelectorTags)
 	if err != nil {

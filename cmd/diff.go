@@ -12,7 +12,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var diffCmdKongStateFile string
+var (
+	diffCmdKongStateFile string
+	diffCmdParallelism   int
+)
 
 // diffCmd represents the diff command
 var diffCmd = &cobra.Command{
@@ -41,7 +44,7 @@ that will be created or updated or deleted.
 			return err
 		}
 		s, _ := diff.NewSyncer(currentState, targetState)
-		errs := solver.Solve(stopChannel, s, client, true)
+		errs := solver.Solve(stopChannel, s, client, diffCmdParallelism, true)
 		if errs != nil {
 			return utils.ErrArray{Errors: errs}
 		}
@@ -64,4 +67,6 @@ func init() {
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
+	diffCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
+		10, "Maximum number of concurrent operations")
 }

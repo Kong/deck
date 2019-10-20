@@ -11,7 +11,7 @@ import (
 
 // Solve generates a diff and walks the graph.
 func Solve(doneCh chan struct{}, syncer *diff.Syncer,
-	client *kong.Client, dry bool) []error {
+	client *kong.Client, parallelism int, dry bool) []error {
 	var r *crud.Registry
 	var err error
 	if dry {
@@ -23,7 +23,7 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 		return append([]error{}, errors.Wrapf(err, "cannot build registry"))
 	}
 
-	return syncer.Run(doneCh, 10, func(e diff.Event) (crud.Arg, error) {
+	return syncer.Run(doneCh, parallelism, func(e diff.Event) (crud.Arg, error) {
 		return r.Do(e.Kind, e.Op, e)
 	})
 }

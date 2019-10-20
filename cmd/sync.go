@@ -12,7 +12,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var syncCmdKongStateFile string
+var (
+	syncCmdKongStateFile string
+	syncCmdParallelism   int
+)
 
 // syncCmd represents the sync command
 var syncCmd = &cobra.Command{
@@ -38,7 +41,8 @@ to get Kong's state in sync with the input state.`,
 			return err
 		}
 		syncer, _ := diff.NewSyncer(currentState, targetState)
-		errs := solver.Solve(stopChannel, syncer, client, false)
+		errs := solver.Solve(stopChannel, syncer, client, syncCmdParallelism,
+			false)
 		if errs != nil {
 			return utils.ErrArray{Errors: errs}
 		}
@@ -61,4 +65,6 @@ func init() {
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
+	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
+		10, "Maximum number of concurrent operations")
 }

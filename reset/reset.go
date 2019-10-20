@@ -8,10 +8,11 @@ import (
 
 // Reset deletes all entities in Kong.
 func Reset(state *utils.KongRawState, client *kong.Client) error {
-
 	if state == nil {
 		return errors.New("state cannot be empty")
 	}
+	// TODO parallelize these operations
+
 	// Delete routes before services
 	for _, r := range state.Routes {
 		err := client.Routes.Delete(nil, r.ID)
