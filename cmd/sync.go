@@ -31,10 +31,15 @@ to get Kong's state in sync with the input state.`,
 			return err
 		}
 		config.Workspace = workspace
+		if err := checkWorkspace(config); err != nil {
+			return err
+		}
+
 		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return err
 		}
+
 		dumpConfig.SelectorTags = selectTags
 		currentState, err := dump.GetState(client, dumpConfig)
 		if err != nil {
