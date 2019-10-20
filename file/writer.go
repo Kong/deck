@@ -66,7 +66,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			p.Service = nil
 			zeroOutID(&p, p.Name, config.WithID)
 			zeroOutTimestamps(&p)
-			utils.RemoveTags(&p.Plugin, selectTags)
+			utils.MustRemoveTags(&p.Plugin, selectTags)
 			s.Plugins = append(s.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(s.Plugins, func(i, j int) bool {
@@ -80,7 +80,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			r.Service = nil
 			zeroOutID(r, r.Name, config.WithID)
 			zeroOutTimestamps(r)
-			utils.RemoveTags(&r.Route, selectTags)
+			utils.MustRemoveTags(&r.Route, selectTags)
 			route := &Route{Route: r.Route}
 			for _, p := range plugins {
 				if p.Service != nil || p.Consumer != nil {
@@ -89,7 +89,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 				p.Route = nil
 				zeroOutID(&p, p.Name, config.WithID)
 				zeroOutTimestamps(&p)
-				utils.RemoveTags(&p.Plugin, selectTags)
+				utils.MustRemoveTags(&p.Plugin, selectTags)
 				route.Plugins = append(route.Plugins, &Plugin{Plugin: p.Plugin})
 			}
 			sort.SliceStable(route.Plugins, func(i, j int) bool {
@@ -102,7 +102,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		})
 		zeroOutID(&s, s.Name, config.WithID)
 		zeroOutTimestamps(&s)
-		utils.RemoveTags(&s.Service, selectTags)
+		utils.MustRemoveTags(&s.Service, selectTags)
 		file.Services = append(file.Services, s)
 	}
 	sort.SliceStable(file.Services, func(i, j int) bool {
@@ -123,7 +123,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		}
 		zeroOutID(r, r.Name, config.WithID)
 		zeroOutTimestamps(r)
-		utils.RemoveTags(&r.Route, selectTags)
+		utils.MustRemoveTags(&r.Route, selectTags)
 		route := &Route{Route: r.Route}
 		for _, p := range plugins {
 			if p.Service != nil || p.Consumer != nil {
@@ -132,7 +132,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			p.Route = nil
 			zeroOutID(p, p.Name, config.WithID)
 			zeroOutTimestamps(p)
-			utils.RemoveTags(&p.Plugin, selectTags)
+			utils.MustRemoveTags(&p.Plugin, selectTags)
 			route.Plugins = append(route.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(route.Plugins, func(i, j int) bool {
@@ -190,7 +190,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		if associations == 0 || associations > 1 {
 			zeroOutID(p, p.Name, config.WithID)
 			zeroOutTimestamps(p)
-			utils.RemoveTags(&p.Plugin, selectTags)
+			utils.MustRemoveTags(&p.Plugin, selectTags)
 			p := Plugin{Plugin: p.Plugin}
 			file.Plugins = append(file.Plugins, p)
 		}
@@ -213,7 +213,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			t.Upstream = nil
 			zeroOutID(t, t.Target.Target, config.WithID)
 			zeroOutTimestamps(t)
-			utils.RemoveTags(&t.Target, selectTags)
+			utils.MustRemoveTags(&t.Target, selectTags)
 			u.Targets = append(u.Targets, &Target{Target: t.Target})
 		}
 		sort.SliceStable(u.Targets, func(i, j int) bool {
@@ -221,7 +221,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		})
 		zeroOutID(&u, u.Name, config.WithID)
 		zeroOutTimestamps(&u)
-		utils.RemoveTags(&u.Upstream, selectTags)
+		utils.MustRemoveTags(&u.Upstream, selectTags)
 		file.Upstreams = append(file.Upstreams, u)
 	}
 	sort.SliceStable(file.Upstreams, func(i, j int) bool {
@@ -239,7 +239,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		})
 		zeroOutID(&c, c.Cert, config.WithID)
 		zeroOutTimestamps(&c)
-		utils.RemoveTags(&c.Certificate, selectTags)
+		utils.MustRemoveTags(&c.Certificate, selectTags)
 		file.Certificates = append(file.Certificates, c)
 	}
 	sort.SliceStable(file.Certificates, func(i, j int) bool {
@@ -254,7 +254,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		c := CACertificate{CACertificate: c.CACertificate}
 		zeroOutID(&c, c.Cert, config.WithID)
 		zeroOutTimestamps(&c)
-		utils.RemoveTags(&c.CACertificate, selectTags)
+		utils.MustRemoveTags(&c.CACertificate, selectTags)
 		file.CACertificates = append(file.CACertificates, c)
 	}
 	sort.SliceStable(file.CACertificates, func(i, j int) bool {
@@ -278,7 +278,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			zeroOutID(p, p.Name, config.WithID)
 			zeroOutTimestamps(p)
 			p.Consumer = nil
-			utils.RemoveTags(&p.Plugin, selectTags)
+			utils.MustRemoveTags(&p.Plugin, selectTags)
 			c.Plugins = append(c.Plugins, &Plugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
@@ -347,7 +347,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		}
 		zeroOutID(&c, c.Username, config.WithID)
 		zeroOutTimestamps(&c)
-		utils.RemoveTags(&c.Consumer, selectTags)
+		utils.MustRemoveTags(&c.Consumer, selectTags)
 		file.Consumers = append(file.Consumers, c)
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
