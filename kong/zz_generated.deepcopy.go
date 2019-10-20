@@ -43,6 +43,17 @@ func (in *ACLGroup) DeepCopyInto(out *ACLGroup) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -139,6 +150,17 @@ func (in *BasicAuth) DeepCopyInto(out *BasicAuth) {
 		in, out := &in.Password, &out.Password
 		*out = new(string)
 		**out = **in
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }
@@ -354,6 +376,17 @@ func (in *HMACAuth) DeepCopyInto(out *HMACAuth) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -462,6 +495,17 @@ func (in *JWTAuth) DeepCopyInto(out *JWTAuth) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	return
 }
 
@@ -497,6 +541,17 @@ func (in *KeyAuth) DeepCopyInto(out *KeyAuth) {
 		in, out := &in.Key, &out.Key
 		*out = new(string)
 		**out = **in
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
 	}
 	return
 }
@@ -546,6 +601,17 @@ func (in *Oauth2Credential) DeepCopyInto(out *Oauth2Credential) {
 	}
 	if in.RedirectURIs != nil {
 		in, out := &in.RedirectURIs, &out.RedirectURIs
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
+	if in.Tags != nil {
+		in, out := &in.Tags, &out.Tags
 		*out = make([]*string, len(*in))
 		for i := range *in {
 			if (*in)[i] != nil {

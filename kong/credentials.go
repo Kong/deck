@@ -11,6 +11,7 @@ type KeyAuth struct {
 	CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
 	Key       *string   `json:"key,omitempty" yaml:"key,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c KeyAuth) id() *string {
@@ -25,6 +26,7 @@ type BasicAuth struct {
 	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
 	Username  *string   `json:"username,omitempty" yaml:"username,omitempty"`
 	Password  *string   `json:"password,omitempty" yaml:"password,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c BasicAuth) id() *string {
@@ -39,6 +41,7 @@ type HMACAuth struct {
 	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
 	Username  *string   `json:"username,omitempty" yaml:"username,omitempty"`
 	Secret    *string   `json:"secret,omitempty" yaml:"secret,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c HMACAuth) id() *string {
@@ -55,6 +58,7 @@ type Oauth2Credential struct {
 	ClientID     *string   `json:"client_id,omitempty" yaml:"client_id,omitempty"`
 	ClientSecret *string   `json:"client_secret,omitempty" yaml:"client_secret,omitempty"`
 	RedirectURIs []*string `json:"redirect_uris,omitempty" yaml:"redirect_uris,omitempty"`
+	Tags         []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c Oauth2Credential) id() *string {
@@ -71,6 +75,7 @@ type JWTAuth struct {
 	Key          *string   `json:"key,omitempty" yaml:"key,omitempty"`
 	RSAPublicKey *string   `json:"rsa_public_key,omitempty" yaml:"rsa_public_key,omitempty"`
 	Secret       *string   `json:"secret,omitempty" yaml:"secret,omitempty"`
+	Tags         []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c JWTAuth) id() *string {
@@ -84,6 +89,7 @@ type ACLGroup struct {
 	CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
 	Group     *string   `json:"group,omitempty" yaml:"group,omitempty"`
+	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
 func (c ACLGroup) id() *string {
