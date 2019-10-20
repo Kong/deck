@@ -23,7 +23,7 @@ type Config struct {
 func GetState(client *kong.Client, config Config) (*state.KongState, error) {
 	raw, err := Get(client, config)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "loading entities from kong")
 	}
 	kongState, err := state.NewKongState()
 	if err != nil {
@@ -291,94 +291,94 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	var state utils.KongRawState
 	services, err := GetAllServices(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "services")
 	}
 
 	state.Services = services
 
 	routes, err := GetAllRoutes(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "routes")
 	}
 	state.Routes = routes
 
 	plugins, err := GetAllPlugins(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "plugins")
 	}
 	state.Plugins = plugins
 
 	certificates, err := GetAllCertificates(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "certificates")
 	}
 	state.Certificates = certificates
 
 	caCerts, err := GetAllCACertificates(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "ca-certificates")
 	}
 	state.CACertificates = caCerts
 
 	snis, err := GetAllSNIs(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "snis")
 	}
 	state.SNIs = snis
 
 	if !config.SkipConsumers {
 		consumers, err := GetAllConsumers(client, config.SelectorTags)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "consumers")
 		}
 		state.Consumers = consumers
 	}
 
 	upstreams, err := GetAllUpstreams(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "upstreams")
 	}
 	state.Upstreams = upstreams
 
 	targets, err := GetAllTargets(client, upstreams, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "targets")
 	}
 	state.Targets = targets
 
 	keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "key-auth credentials")
 	}
 	state.KeyAuths = keyAuths
 
 	hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "HMAC credentials")
 	}
 	state.HMACAuths = hmacAuths
 
 	jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "JWT credentials")
 	}
 	state.JWTAuths = jwtAuths
 
 	basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "basic-auth credentials")
 	}
 	state.BasicAuths = basicAuths
 
 	oauth2Creds, err := GetAllOauth2Creds(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "oauth2 credentials")
 	}
 	state.Oauth2Creds = oauth2Creds
 
 	aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "ACL groups")
 	}
 	state.ACLGroups = aclGroups
 
