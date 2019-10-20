@@ -1,6 +1,12 @@
 package cmd
 
-import "github.com/hbagdi/deck/dump"
+import (
+	"github.com/hbagdi/deck/diff"
+	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/solver"
+	"github.com/hbagdi/deck/utils"
+)
 
 var stopChannel chan struct{}
 
@@ -12,3 +18,27 @@ func SetStopCh(stopCh chan struct{}) {
 }
 
 var dumpConfig dump.Config
+
+func sync(filename string, dry bool) error {
+	targetState, selectTags, workspace, err :=
+		file.GetStateFromFile(filename)
+	if err != nil {
+		return err
+	}
+	config.Workspace = workspace
+	client, err := utils.GetKongClient(config)
+	if err != nil {
+		return err
+	}
+	dumpConfig.SelectorTags = selectTags
+	currentState, err := dump.GetState(client, dumpConfig)
+	if err != nil {
+		return err
+	}
+	s, _ := diff.NewSyncer(currentState, targetState)
+	errs := solver.Solve(stopChannel, s, client, dry)
+	if errs != nil {
+		return utils.ErrArray{Errors: errs}
+	}
+	return nil
+}
