@@ -47,6 +47,7 @@ func TestBasicAuthCreate(T *testing.T) {
 
 	basicAuth = &BasicAuth{
 		Username: String("foo"),
+		Password: String("bar"),
 	}
 	basicAuth, err = client.BasicAuths.Create(defaultCtx,
 		consumer.ID, basicAuth)
@@ -104,6 +105,7 @@ func TestBasicAuthGet(T *testing.T) {
 	basicAuth := &BasicAuth{
 		ID:       String(uuid),
 		Username: String("my-username"),
+		Password: String("my-password"),
 	}
 
 	// consumer for the basic-auth:
@@ -153,6 +155,7 @@ func TestBasicAuthUpdate(T *testing.T) {
 	basicAuth := &BasicAuth{
 		ID:       String(uuid),
 		Username: String("my-username"),
+		Password: String("my-password"),
 	}
 
 	// consumer for the basic-auth:
@@ -197,6 +200,7 @@ func TestBasicAuthDelete(T *testing.T) {
 	basicAuth := &BasicAuth{
 		ID:       String(uuid),
 		Username: String("my-username"),
+		Password: String("my-password"),
 	}
 
 	// consumer for the basic-auth:
@@ -252,18 +256,22 @@ func TestBasicAuthListMethods(T *testing.T) {
 	basicAuths := []*BasicAuth{
 		{
 			Username: String("username11"),
+			Password: String("password11"),
 			Consumer: consumer1,
 		},
 		{
 			Username: String("username12"),
+			Password: String("password12"),
 			Consumer: consumer1,
 		},
 		{
 			Username: String("username21"),
+			Password: String("password21"),
 			Consumer: consumer2,
 		},
 		{
 			Username: String("username22"),
+			Password: String("password22"),
 			Consumer: consumer2,
 		},
 	}
