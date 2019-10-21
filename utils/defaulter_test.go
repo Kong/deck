@@ -15,6 +15,10 @@ func TestDefaulter(t *testing.T) {
 	assert.NotNil(d.Register(nil))
 	assert.NotNil(d.Set(nil))
 
+	assert.Panics(func() {
+		d.MustSet(d)
+	})
+
 	type Foo struct {
 		A string
 		B []string
@@ -43,6 +47,9 @@ func TestDefaulter(t *testing.T) {
 		A string
 	}
 	assert.NotNil(d.Set(&Bar{}))
+	assert.Panics(func() {
+		d.MustSet(&Bar{})
+	})
 }
 
 func TestServiceSetTest(t *testing.T) {

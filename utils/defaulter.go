@@ -116,8 +116,16 @@ func (d *Defaulter) Set(arg interface{}) error {
 	}
 	err := mergo.Merge(arg, defValue, mergo.WithTransformers(kongTransformer{}))
 	if err != nil {
-		err = errors.Wrap(err, "error overriding upstream")
+		err = errors.Wrap(err, "merging")
 	}
 	return err
 	// return defaulter.Set(arg, defValue)
+}
+
+// MustSet is like Set but panics if there is an error.
+func (d *Defaulter) MustSet(arg interface{}) {
+	err := d.Set(arg)
+	if err != nil {
+		panic(err)
+	}
 }
