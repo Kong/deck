@@ -5,6 +5,7 @@ import (
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
 	"github.com/hbagdi/deck/solver"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 )
 
@@ -35,7 +36,11 @@ func sync(filename string, dry bool) error {
 		dumpConfig.SelectorTags = targetContent.Info.SelectorTags
 	}
 	// read the current state
-	currentState, err := dump.GetState(client, dumpConfig)
+	rawState, err := dump.Get(client, dumpConfig)
+	if err != nil {
+		return err
+	}
+	currentState, err := state.Get(rawState)
 	if err != nil {
 		return err
 	}

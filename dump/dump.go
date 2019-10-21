@@ -1,10 +1,8 @@
 package dump
 
 import (
-	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // Config can be used to skip exporting certain entities
@@ -16,170 +14,6 @@ type Config struct {
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
-}
-
-// ensureConsumer checks if the consumer is part of the state or not.
-// This is necessary because credentials are not tagged in Kong until Kong 1.4.
-// If a consumer is not part of the sub-set decK is currently working on,
-// decK shouldn't export the credentials for it as well.
-func ensureConsumer(kongState *state.KongState, consumerID, credID string) (bool, error) {
-	_, err := kongState.Consumers.Get(consumerID)
-	if err != nil {
-		if err == state.ErrNotFound {
-			return false, nil
-		}
-		return false, errors.Wrapf(err,
-			"looking up consumer '%v' for credential '%v'",
-			consumerID, credID)
-	}
-	return true, nil
-}
-
-// GetState queries Kong for all entities using client and
-// constructs a structured state.
-func GetState(client *kong.Client, config Config) (*state.KongState, error) {
-	raw, err := Get(client, config)
-	if err != nil {
-		return nil, err
-	}
-	kongState, err := state.NewKongState()
-	if err != nil {
-		return nil, errors.Wrap(err, "creating new in-memory state of Kong")
-	}
-	for _, s := range raw.Services {
-		err := kongState.Services.Add(state.Service{Service: *s})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting service into state")
-		}
-	}
-	for _, r := range raw.Routes {
-		err = kongState.Routes.Add(state.Route{Route: *r})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting route into state")
-		}
-	}
-	if !config.SkipConsumers {
-		for _, c := range raw.Consumers {
-			err := kongState.Consumers.Add(state.Consumer{Consumer: *c})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting consumer into state")
-			}
-		}
-		for _, cred := range raw.KeyAuths {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.KeyAuths.Add(state.KeyAuth{KeyAuth: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting key-auth into state")
-			}
-		}
-		for _, cred := range raw.HMACAuths {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.HMACAuths.Add(state.HMACAuth{HMACAuth: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting hmac-auth into state")
-			}
-		}
-		for _, cred := range raw.JWTAuths {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.JWTAuths.Add(state.JWTAuth{JWTAuth: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting jwt into state")
-			}
-		}
-		for _, cred := range raw.BasicAuths {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.BasicAuths.Add(state.BasicAuth{BasicAuth: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting basic-auth into state")
-			}
-		}
-		for _, cred := range raw.Oauth2Creds {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.Oauth2Creds.Add(state.Oauth2Credential{Oauth2Credential: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting oauth2-cred into state")
-			}
-		}
-		for _, cred := range raw.ACLGroups {
-			ok, err := ensureConsumer(kongState, *cred.Consumer.ID, *cred.ID)
-			if err != nil {
-				return nil, err
-			}
-			if !ok {
-				continue
-			}
-			err = kongState.ACLGroups.Add(state.ACLGroup{ACLGroup: *cred})
-			if err != nil {
-				return nil, errors.Wrap(err, "inserting basic-auth into state")
-			}
-		}
-	}
-	for _, u := range raw.Upstreams {
-		err := kongState.Upstreams.Add(state.Upstream{Upstream: *u})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting upstream into state")
-		}
-	}
-	for _, t := range raw.Targets {
-		err = kongState.Targets.Add(state.Target{Target: *t})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting target into state")
-		}
-	}
-
-	for _, c := range raw.Certificates {
-		err := kongState.Certificates.Add(state.Certificate{Certificate: *c})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting certificate into state")
-		}
-	}
-
-	for _, c := range raw.CACertificates {
-		err := kongState.CACertificates.Add(state.CACertificate{
-			CACertificate: *c,
-		})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting ca_certificate into state")
-		}
-	}
-
-	for _, p := range raw.Plugins {
-		err := kongState.Plugins.Add(state.Plugin{Plugin: *p})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting plugins into state")
-		}
-	}
-	return kongState, nil
 }
 
 func newOpt(tags []string) *kong.ListOpt {
@@ -232,14 +66,6 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	}
 	state.SNIs = snis
 
-	if !config.SkipConsumers {
-		consumers, err := GetAllConsumers(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.Consumers = consumers
-	}
-
 	upstreams, err := GetAllUpstreams(client, config.SelectorTags)
 	if err != nil {
 		return nil, err
@@ -252,41 +78,49 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	}
 	state.Targets = targets
 
-	keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
-	}
-	state.KeyAuths = keyAuths
+	if !config.SkipConsumers {
+		consumers, err := GetAllConsumers(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.Consumers = consumers
 
-	hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
-	}
-	state.HMACAuths = hmacAuths
+		keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.KeyAuths = keyAuths
 
-	jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
-	}
-	state.JWTAuths = jwtAuths
+		hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.HMACAuths = hmacAuths
 
-	basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
-	}
-	state.BasicAuths = basicAuths
+		jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.JWTAuths = jwtAuths
 
-	oauth2Creds, err := GetAllOauth2Creds(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
-	}
-	state.Oauth2Creds = oauth2Creds
+		basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.BasicAuths = basicAuths
 
-	aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
-	if err != nil {
-		return nil, err
+		oauth2Creds, err := GetAllOauth2Creds(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.Oauth2Creds = oauth2Creds
+
+		aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
+		if err != nil {
+			return nil, err
+		}
+		state.ACLGroups = aclGroups
 	}
-	state.ACLGroups = aclGroups
 
 	return &state, nil
 }

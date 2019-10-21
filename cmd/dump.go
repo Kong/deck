@@ -8,6 +8,7 @@ import (
 
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
@@ -86,10 +87,15 @@ configure Kong.`,
 					return err
 				}
 
-				ks, err := dump.GetState(client, dumpConfig)
+				rawState, err := dump.Get(client, dumpConfig)
 				if err != nil {
 					return errors.Wrap(err, "reading configuration from Kong")
 				}
+				ks, err := state.Get(rawState)
+				if err != nil {
+					return errors.Wrap(err, "building state")
+				}
+
 				if err := file.KongStateToFile(ks, file.WriteConfig{
 					SelectTags: dumpConfig.SelectorTags,
 					Workspace:  workspace,
@@ -113,9 +119,13 @@ configure Kong.`,
 			}
 		}
 
-		ks, err := dump.GetState(client, dumpConfig)
+		rawState, err := dump.Get(client, dumpConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading configuration from Kong")
+		}
+		ks, err := state.Get(rawState)
+		if err != nil {
+			return errors.Wrap(err, "building state")
 		}
 		if err := file.KongStateToFile(ks, file.WriteConfig{
 			SelectTags: dumpConfig.SelectorTags,
