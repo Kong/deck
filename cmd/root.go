@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/utils"
@@ -45,7 +46,22 @@ It can be used to export, import or sync entities to Kong.`,
 // sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
+	var wg sync.WaitGroup
+	var err error
+	wg.Add(2)
+
+	go func() {
+		sendAnalytics()
+		wg.Done()
+	}()
+
+	go func() {
+		err = rootCmd.Execute()
+		wg.Done()
+	}()
+
+	wg.Wait()
+	if err != nil {
 		os.Exit(1)
 	}
 }
