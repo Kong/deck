@@ -12,10 +12,7 @@ before_script:
  - go get golang.org/x/lint/golint
 
 script:
- - diff -u <(echo -n) <(gofmt -d -s .)
- - golint -set_exit_status $(go list ./...)
- - go vet .
- - go test -v ./...
+  - ./.ci/check.sh
 
 cache:
   directories:
