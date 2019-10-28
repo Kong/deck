@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.10.0](#v0100---20191027)
 - [v0.9.0](#v090---20190824)
 - [v0.8.0](#v080---20190821)
 - [v0.7.0](#v070---20190813)
@@ -13,6 +14,23 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.10.0] - 2019/10/27
+
+### Summary
+
+- This release adds support for Kong 1.4.
+
+### Added
+
+- `HostHeader` field has been added to Upstream struct.
+- `Tags` field has been added to the following types:
+  - `KeyAuth`
+  - `Basicauth`
+  - `HMACAuth`
+  - `Oauth2Credential`
+  - `ACLGroup`
+  - `JWTAuth`
 
 ## [v0.9.0] - 2019/08/24
 
@@ -193,6 +211,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.10.0]: https://github.com/hbagdi/go-kong/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/hbagdi/go-kong/compare/v0.8.0...v0.9.0
 [v0.8.0]: https://github.com/hbagdi/go-kong/compare/v0.7.0...v0.8.0
 [v0.7.0]: https://github.com/hbagdi/go-kong/compare/v0.6.2...v0.7.0
