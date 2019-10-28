@@ -176,10 +176,60 @@ func copyToFoo(p Plugin) foo {
 	return f
 }
 
+func copyFromFoo(f foo, p *Plugin) {
+	if f.ID != nil {
+		p.ID = f.ID
+	}
+	if f.Name != nil {
+		p.Name = f.Name
+	}
+	if f.Enabled != nil {
+		p.Enabled = f.Enabled
+	}
+	if f.RunOn != nil {
+		p.RunOn = f.RunOn
+	}
+	if f.Protocols != nil {
+		p.Protocols = f.Protocols
+	}
+	if f.Tags != nil {
+		p.Tags = f.Tags
+	}
+	if f.Config != nil {
+		p.Config = f.Config
+	}
+	if f.Consumer != "" {
+		p.Consumer = &kong.Consumer{
+			ID: kong.String(f.Consumer),
+		}
+	}
+	if f.Route != "" {
+		p.Route = &kong.Route{
+			ID: kong.String(f.Route),
+		}
+	}
+	if f.Service != "" {
+		p.Service = &kong.Service{
+			ID: kong.String(f.Service),
+		}
+	}
+}
+
 // MarshalYAML is a custom marshal method to handle
 // foreign references.
 func (p Plugin) MarshalYAML() (interface{}, error) {
 	return copyToFoo(p), nil
+}
+
+// UnmarshalYAML is a custom marshal method to handle
+// foreign references.
+func (p *Plugin) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var f foo
+	if err := unmarshal(&f); err != nil {
+		return err
+	}
+	copyFromFoo(f, p)
+	return nil
 }
 
 // MarshalJSON is a custom marshal method to handle
@@ -187,6 +237,18 @@ func (p Plugin) MarshalYAML() (interface{}, error) {
 func (p Plugin) MarshalJSON() ([]byte, error) {
 	f := copyToFoo(p)
 	return json.Marshal(f)
+}
+
+// UnmarshalJSON is a custom marshal method to handle
+// foreign references.
+func (p *Plugin) UnmarshalJSON(b []byte) error {
+	var f foo
+	err := json.Unmarshal(b, &f)
+	if err != nil {
+		return err
+	}
+	copyFromFoo(f, p)
+	return nil
 }
 
 // id is used for sorting.
