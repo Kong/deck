@@ -35,6 +35,7 @@ func sync(filename string, dry bool) error {
 	if targetContent.Info != nil {
 		dumpConfig.SelectorTags = targetContent.Info.SelectorTags
 	}
+
 	// read the current state
 	rawState, err := dump.Get(client, dumpConfig)
 	if err != nil {
@@ -45,10 +46,16 @@ func sync(filename string, dry bool) error {
 		return err
 	}
 
-	targetState, _, _, err := file.GetStateFromContent(targetContent)
+	// read the target state
+	rawState, err = file.Get(targetContent, currentState)
 	if err != nil {
 		return err
 	}
+	targetState, err := state.Get(rawState)
+	if err != nil {
+		return err
+	}
+
 	s, _ := diff.NewSyncer(currentState, targetState)
 	errs := solver.Solve(stopChannel, s, client, dry)
 	if errs != nil {

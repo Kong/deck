@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,9 +66,9 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	ks, _, _, err := GetStateFromFile(filename)
+	c, err := GetContentFromFile(filename)
 	assert.NotNil(err)
-	assert.Nil(ks)
+	assert.Nil(c)
 }
 
 func TestReadKongStateFromStdin(t *testing.T) {
@@ -97,16 +98,13 @@ func TestReadKongStateFromStdin(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	ks, _, _, err := GetStateFromFile(filename)
-	assert.NotNil(ks)
+	c, err := GetContentFromFile(filename)
+	assert.NotNil(c)
 	assert.Nil(err)
 
-	services, err := ks.Services.GetAll()
-	if err != nil {
-		panic(err)
-	}
-	assert.Equal("test.com", *services[0].Host)
-	assert.NotEqual("not.the.same.as.test.com", *services[0].Host)
-	assert.Equal("test service", *services[0].Name)
-	assert.NotEqual("not the same as 'test service'", *services[0].Name)
+	assert.Equal(kong.Service{
+		Name: kong.String("test service"),
+		Host: kong.String("test.com"),
+	},
+		c.Services[0].Service)
 }
