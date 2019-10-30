@@ -9,8 +9,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // RouteCRUD implements Actions interface
@@ -36,8 +34,7 @@ func routeFromStuct(arg diff.Event) *state.Route {
 func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
-	print.CreatePrintln("creating route", *route.Name)
-	route.ID = kong.String(utils.UUID())
+	print.CreatePrintln("creating route", route.Identifier())
 	return route, nil
 }
 
@@ -48,7 +45,7 @@ func (s *RouteCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *RouteCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStuct(event)
-	print.DeletePrintln("deleting route", *route.Name)
+	print.DeletePrintln("deleting route", route.Identifier())
 	return route, nil
 }
 
@@ -66,16 +63,11 @@ func (s *RouteCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
 	oldRoute.UpdatedAt = nil
-	oldRoute.Service = &kong.Service{Name: oldRoute.Service.Name}
-	oldRoute.ID = nil
-
-	route.ID = nil
-	route.Service = &kong.Service{Name: route.Service.Name}
 
 	diffString, err := getDiff(oldRoute.Route, route.Route)
 	if err != nil {
 		return nil, err
 	}
-	print.UpdatePrintf("updating route %s\n%s", *route.Name, diffString)
+	print.UpdatePrintf("updating route %s\n%s", route.Identifier(), diffString)
 	return route, nil
 }

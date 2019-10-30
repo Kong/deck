@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // CertificateCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *CertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 
-	print.CreatePrintln("creating certificate", *certificate.Cert)
-	certificate.ID = kong.String(utils.UUID())
+	print.CreatePrintln("creating certificate", certificate.Identifier())
 	return certificate, nil
 }
 
@@ -46,7 +43,7 @@ func (s *CertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 
-	print.DeletePrintln("deleting certificate", *certificate.Cert)
+	print.DeletePrintln("deleting certificate", certificate.Identifier())
 	return certificate, nil
 }
 
@@ -68,6 +65,6 @@ func (s *CertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	print.UpdatePrintf("updating certificate %s\n%s", *certificate.Cert, diff)
+	print.UpdatePrintf("updating certificate %s\n%s", certificate.Identifier(), diff)
 	return certificate, nil
 }
