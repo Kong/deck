@@ -3,8 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -29,14 +27,9 @@ func (sc *Syncer) deleteOauth2Creds() error {
 	return nil
 }
 
-func (sc *Syncer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (*Event, error) {
-	if oauth2Cred.Consumer == nil ||
-		(utils.Empty(oauth2Cred.Consumer.ID)) {
-		return nil, errors.Errorf("oauth2-cred has no associated consumer: %+v",
-			*oauth2Cred.Name)
-	}
-	// lookup by Name
-	_, err := sc.targetState.Oauth2Creds.Get(*oauth2Cred.ClientID)
+func (sc *Syncer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
+	*Event, error) {
+	_, err := sc.targetState.Oauth2Creds.Get(*oauth2Cred.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -73,21 +66,10 @@ func (sc *Syncer) createUpdateOauth2Creds() error {
 
 func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*Event, error) {
 	oauth2Cred = &state.Oauth2Credential{Oauth2Credential: *oauth2Cred.DeepCopy()}
-	currentOauth2Cred, err := sc.currentState.Oauth2Creds.Get(*oauth2Cred.ClientID)
+	currentOauth2Cred, err := sc.currentState.Oauth2Creds.Get(*oauth2Cred.ID)
 	if err == state.ErrNotFound {
 		// oauth2Cred not present, create it
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*oauth2Cred.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"could not find consumer '%v' for oauth2-cred %+v",
-				*oauth2Cred.Consumer.Username, *oauth2Cred.Name)
-		}
-		oauth2Cred.Consumer = &consumer.Consumer
-		// XXX
-
-		oauth2Cred.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "oauth2-cred",
@@ -101,22 +83,8 @@ func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*E
 	currentOauth2Cred = &state.Oauth2Credential{Oauth2Credential: *currentOauth2Cred.DeepCopy()}
 	// found, check if update needed
 
-	currentOauth2Cred.Consumer = &kong.Consumer{
-		Username: currentOauth2Cred.Consumer.Username,
-	}
-	oauth2Cred.Consumer = &kong.Consumer{Username: oauth2Cred.Consumer.Username}
-	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, true, true, false) {
-		oauth2Cred.ID = kong.String(*currentOauth2Cred.ID)
+	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, false, true, false) {
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*oauth2Cred.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"looking up service '%v' for oauth2-cred '%v'",
-				*oauth2Cred.Consumer.Username, *oauth2Cred.Name)
-		}
-		oauth2Cred.Consumer.ID = consumer.ID
-		// XXX
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "oauth2-cred",

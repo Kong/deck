@@ -3,8 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -31,11 +29,7 @@ func (sc *Syncer) deleteUpstreams() error {
 }
 
 func (sc *Syncer) deleteUpstream(upstream *state.Upstream) (*Event, error) {
-	// lookup by name
-	if utils.Empty(upstream.Name) {
-		return nil, errors.New("'name' attribute for a upstream cannot be nil")
-	}
-	_, err := sc.targetState.Upstreams.Get(*upstream.Name)
+	_, err := sc.targetState.Upstreams.Get(*upstream.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -77,8 +71,6 @@ func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*Event,
 	currentUpstream, err := sc.currentState.Upstreams.Get(*upstream.Name)
 
 	if err == state.ErrNotFound {
-		// upstream not present, create it
-		upstreamCopy.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "upstream",
@@ -91,8 +83,7 @@ func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*Event,
 	}
 
 	// found, check if update needed
-	if !currentUpstream.EqualWithOpts(upstreamCopy, true, true) {
-		upstreamCopy.ID = kong.String(*currentUpstream.ID)
+	if !currentUpstream.EqualWithOpts(upstreamCopy, false, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "upstream",

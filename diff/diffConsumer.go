@@ -3,8 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -31,11 +29,7 @@ func (sc *Syncer) deleteConsumers() error {
 }
 
 func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*Event, error) {
-	// lookup by name
-	if utils.Empty(consumer.Username) {
-		return nil, errors.New("'name' attribute for a consumer cannot be nil")
-	}
-	_, err := sc.targetState.Consumers.Get(*consumer.Username)
+	_, err := sc.targetState.Consumers.Get(*consumer.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -44,7 +38,8 @@ func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up consumer '%v'", *consumer.Username)
+		return nil, errors.Wrapf(err, "looking up consumer '%v'",
+			consumer.Identifier())
 	}
 	return nil, nil
 }
@@ -72,11 +67,10 @@ func (sc *Syncer) createUpdateConsumers() error {
 
 func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*Event, error) {
 	consumerCopy := &state.Consumer{Consumer: *consumer.DeepCopy()}
-	currentConsumer, err := sc.currentState.Consumers.Get(*consumer.Username)
+	currentConsumer, err := sc.currentState.Consumers.Get(*consumer.ID)
 
 	if err == state.ErrNotFound {
 		// consumer not present, create it
-		consumerCopy.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "consumer",
@@ -85,12 +79,11 @@ func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*Event, error)
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "error looking up consumer %v",
-			*consumer.Username)
+			consumer.Identifier())
 	}
 
 	// found, check if update needed
-	if !currentConsumer.EqualWithOpts(consumerCopy, true, true) {
-		consumerCopy.ID = kong.String(*currentConsumer.ID)
+	if !currentConsumer.EqualWithOpts(consumerCopy, false, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "consumer",

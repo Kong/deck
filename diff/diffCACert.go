@@ -3,7 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -31,7 +30,7 @@ func (sc *Syncer) deleteCACertificates() error {
 
 func (sc *Syncer) deleteCACertificate(
 	caCert *state.CACertificate) (*Event, error) {
-	_, err := sc.targetState.CACertificates.Get(*caCert.Cert)
+	_, err := sc.targetState.CACertificates.Get(*caCert.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -41,7 +40,7 @@ func (sc *Syncer) deleteCACertificate(
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "looking up caCertificate '%v'",
-			*caCert.Cert)
+			caCert.Identifier())
 	}
 	return nil, nil
 }
@@ -70,12 +69,10 @@ func (sc *Syncer) createUpdateCACertificates() error {
 func (sc *Syncer) createUpdateCACertificate(
 	caCert *state.CACertificate) (*Event, error) {
 	caCertCopy := &state.CACertificate{CACertificate: *caCert.DeepCopy()}
-	currentCACert, err :=
-		sc.currentState.CACertificates.Get(*caCert.Cert)
+	currentCACert, err := sc.currentState.CACertificates.Get(*caCert.ID)
 
 	if err == state.ErrNotFound {
 		// caCertificate not present, create it
-		caCertCopy.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "ca_certificate",
@@ -84,12 +81,11 @@ func (sc *Syncer) createUpdateCACertificate(
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "error looking up caCertificate %v",
-			*caCert.Cert)
+			caCert.Identifier())
 	}
 
 	// found, check if update needed
-	if !currentCACert.EqualWithOpts(caCertCopy, true, true) {
-		caCertCopy.ID = kong.String(*currentCACert.ID)
+	if !currentCACert.EqualWithOpts(caCertCopy, false, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "ca_certificate",

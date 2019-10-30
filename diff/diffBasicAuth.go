@@ -4,8 +4,6 @@ import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -46,13 +44,7 @@ func (sc *Syncer) deleteBasicAuths() error {
 
 func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
 	sc.warnBasicAuth()
-	if basicAuth.Consumer == nil ||
-		(utils.Empty(basicAuth.Consumer.ID)) {
-		return nil, errors.Errorf("basic-auth has no associated consumer: %+v",
-			*basicAuth.Username)
-	}
-	// lookup by Name
-	_, err := sc.targetState.BasicAuths.Get(*basicAuth.Username)
+	_, err := sc.targetState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -91,21 +83,10 @@ func (sc *Syncer) createUpdateBasicAuths() error {
 func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
 	sc.warnBasicAuth()
 	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
-	currentBasicAuth, err := sc.currentState.BasicAuths.Get(*basicAuth.Username)
+	currentBasicAuth, err := sc.currentState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {
 		// basicAuth not present, create it
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*basicAuth.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"could not find consumer '%v' for basic-auth %+v",
-				*basicAuth.Consumer.Username, *basicAuth.Username)
-		}
-		basicAuth.Consumer = &consumer.Consumer
-		// XXX
-
-		basicAuth.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "basic-auth",
@@ -116,25 +97,10 @@ func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, err
 		return nil, errors.Wrapf(err, "error looking up basic-auth %v",
 			*basicAuth.Username)
 	}
-	currentBasicAuth = &state.BasicAuth{BasicAuth: *currentBasicAuth.DeepCopy()}
 	// found, check if update needed
 
-	currentBasicAuth.Consumer = &kong.Consumer{
-		Username: currentBasicAuth.Consumer.Username,
-	}
-	basicAuth.Consumer = &kong.Consumer{Username: basicAuth.Consumer.Username}
-	if !currentBasicAuth.EqualWithOpts(basicAuth, true, true, true, false) {
-		basicAuth.ID = kong.String(*currentBasicAuth.ID)
+	if !currentBasicAuth.EqualWithOpts(basicAuth, false, true, true, false) {
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*basicAuth.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"looking up service '%v' for basic-auth '%v'",
-				*basicAuth.Consumer.Username, *basicAuth.Username)
-		}
-		basicAuth.Consumer.ID = consumer.ID
-		// XXX
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "basic-auth",
