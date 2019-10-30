@@ -31,5 +31,3 @@ require (
 )
 
 go 1.13
-
-replace github.com/hashicorp/go-memdb => github.com/hbagdi/go-memdb v0.0.0-20190920041452-92e457f524d8

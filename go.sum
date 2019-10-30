@@ -15,6 +15,8 @@ github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASu
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/hashicorp/go-immutable-radix v1.1.0 h1:vN9wG1D6KG6YHRTWr8512cxGOVgTMEfgEdSj/hr8MPc=
 github.com/hashicorp/go-immutable-radix v1.1.0/go.mod h1:0y9vanUI8NX6FsYoO3zeMjhV/C5i9g4Q3DwcSNZ4P60=
+github.com/hashicorp/go-memdb v1.0.4 h1:sIdJHAEtV3//iXcUb4LumSQeorYos5V0ptvqvQvFgDA=
+github.com/hashicorp/go-memdb v1.0.4/go.mod h1:LWQ8R70vPrS4OEY9k28D2z8/Zzyu34NVzeRibGAzHO0=
 github.com/hashicorp/go-uuid v1.0.0 h1:RS8zrF7PhGwyNPOtxSClXXj9HA8feRnJzgnI1RJCSnM=
 github.com/hashicorp/go-uuid v1.0.0/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hashicorp/golang-lru v0.5.0 h1:CL2msUPvZTLb5O648aiLNJw3hnBxN2+1Jq8rCOH9wdo=
@@ -25,8 +27,6 @@ github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/hbagdi/go-kong v0.10.0 h1:FQzMx9d+lRc/poUzjnOb5aOvZqjuTQPpNw8O2Exv440=
 github.com/hbagdi/go-kong v0.10.0/go.mod h1:NzIC8BWQK05XAHLZsXO931W1N6E1giEEt5xqRMEPlto=
-github.com/hbagdi/go-memdb v0.0.0-20190920041452-92e457f524d8 h1:xqH3Eh1s8UvmKE+UjNYg/WxKUMjUiuzuiG+36+d/0uM=
-github.com/hbagdi/go-memdb v0.0.0-20190920041452-92e457f524d8/go.mod h1:LWQ8R70vPrS4OEY9k28D2z8/Zzyu34NVzeRibGAzHO0=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/imdario/mergo v0.3.7 h1:Y+UAYTZ7gDEuOfhxKWy+dvb5dRQ6rJjFSdX2HZY1/gI=
