@@ -5,7 +5,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/hashicorp/go-memdb v1.0.4
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
-	github.com/hbagdi/go-kong v0.9.0
+	github.com/hbagdi/go-kong v0.10.0
 	github.com/imdario/mergo v0.3.7
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
