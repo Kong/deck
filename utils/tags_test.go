@@ -22,6 +22,10 @@ func TestMergeTags(t *testing.T) {
 	err := MergeTags(f, []string{"tag1"})
 	assert.NotNil(err)
 
+	assert.Panics(func() {
+		MustMergeTags(f, []string{"tag1"})
+	})
+
 	var bar Bar
 	err = MergeTags(&bar, []string{"tag1"})
 	assert.Nil(err)
@@ -65,6 +69,10 @@ func TestRemoveTags(t *testing.T) {
 	var f Foo
 	err := RemoveTags(f, []string{"tag1"})
 	assert.NotNil(err)
+
+	assert.Panics(func() {
+		MustRemoveTags(f, []string{"tag1"})
+	})
 
 	var bar Bar
 	err = RemoveTags(&bar, []string{"tag1"})

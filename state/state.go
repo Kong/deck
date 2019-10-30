@@ -30,27 +30,37 @@ type KongState struct {
 	Oauth2Creds *Oauth2CredsCollection
 }
 
-var schema = &memdb.DBSchema{
-	Tables: map[string]*memdb.TableSchema{
-		serviceTableName:     serviceTableSchema,
-		routeTableName:       routeTableSchema,
-		upstreamTableName:    upstreamTableSchema,
-		targetTableName:      targetTableSchema,
-		certificateTableName: certificateTableSchema,
-		caCertTableName:      caCertTableSchema,
-		pluginTableName:      pluginTableSchema,
-		consumerTableName:    consumerTableSchema,
-		keyAuthTableName:     keyAuthTableSchema,
-		hmacAuthTableName:    hmacAuthTableSchema,
-		basicAuthTableName:   basicAuthTableSchema,
-		jwtAuthTableName:     jwtAuthTableSchema,
-		oauth2CredTableName:  oauth2CredTableSchema,
-		aclGroupTableName:    aclGroupTableSchema,
-	},
-}
-
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
+
+	// TODO FIXME clean up the mess
+	keyAuthTemp := newKeyAuthsCollection(collection{})
+	hmacAuthTemp := newHMACAuthsCollection(collection{})
+	basicAuthTemp := newBasicAuthsCollection(collection{})
+	jwtAuthTemp := newJWTAuthsCollection(collection{})
+	oauth2CredsTemp := newOauth2CredsCollection(collection{})
+
+	var schema = &memdb.DBSchema{
+		Tables: map[string]*memdb.TableSchema{
+			serviceTableName:     serviceTableSchema,
+			routeTableName:       routeTableSchema,
+			upstreamTableName:    upstreamTableSchema,
+			targetTableName:      targetTableSchema,
+			certificateTableName: certificateTableSchema,
+			caCertTableName:      caCertTableSchema,
+			pluginTableName:      pluginTableSchema,
+			consumerTableName:    consumerTableSchema,
+
+			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
+			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
+			basicAuthTemp.TableName():   basicAuthTemp.Schema(),
+			jwtAuthTemp.TableName():     jwtAuthTemp.Schema(),
+			oauth2CredsTemp.TableName(): oauth2CredsTemp.Schema(),
+
+			aclGroupTableName: aclGroupTableSchema,
+		},
+	}
+
 	memDB, err := memdb.NewMemDB(schema)
 	if err != nil {
 		return nil, errors.Wrap(err, "creating new ServiceCollection")
@@ -68,11 +78,13 @@ func NewKongState() (*KongState, error) {
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
-	state.KeyAuths = (*KeyAuthsCollection)(&state.common)
-	state.HMACAuths = (*HMACAuthsCollection)(&state.common)
-	state.JWTAuths = (*JWTAuthsCollection)(&state.common)
-	state.BasicAuths = (*BasicAuthsCollection)(&state.common)
+
+	state.KeyAuths = newKeyAuthsCollection(state.common)
+	state.HMACAuths = newHMACAuthsCollection(state.common)
+	state.BasicAuths = newBasicAuthsCollection(state.common)
+	state.JWTAuths = newJWTAuthsCollection(state.common)
+	state.Oauth2Creds = newOauth2CredsCollection(state.common)
+
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
-	state.Oauth2Creds = (*Oauth2CredsCollection)(&state.common)
 	return &state, nil
 }

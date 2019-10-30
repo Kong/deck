@@ -15,31 +15,49 @@ func TestUpstreamInsert(t *testing.T) {
 	assert := assert.New(t)
 	collection := upstreamsCollection()
 
+	// name is required
 	var upstream Upstream
 	upstream.ID = kong.String("first")
 	err := collection.Add(upstream)
 	assert.NotNil(err)
 
+	// happy path
+	upstream.Name = kong.String("my-upstream")
+	assert.Nil(collection.Add(upstream))
+
+	// ID is required
 	var upstream2 Upstream
 	upstream2.Name = kong.String("my-upstream")
-	upstream2.ID = kong.String("first")
-	assert.NotNil(upstream2.Upstream)
 	err = collection.Add(upstream2)
-	assert.NotNil(upstream2.Upstream)
-	assert.Nil(err)
+	assert.NotNil(err)
+
+	// re-insert
+	upstream2.ID = kong.String("first")
+	assert.NotNil(collection.Add(upstream2))
+
+	upstream2.ID = kong.String("same-name-but-differnt-id")
+	assert.NotNil(collection.Add(upstream2))
 }
 
 func TestUpstreamGetUpdate(t *testing.T) {
 	assert := assert.New(t)
 	collection := upstreamsCollection()
 
+	se, err := collection.Get("does-not-exist")
+	assert.NotNil(err)
+	assert.Nil(se)
+
+	se, err = collection.Get("")
+	assert.NotNil(err)
+	assert.Nil(se)
+
 	var upstream Upstream
 	upstream.Name = kong.String("my-upstream")
 	upstream.ID = kong.String("first")
-	err := collection.Add(upstream)
+	err = collection.Add(upstream)
 	assert.Nil(err)
 
-	se, err := collection.Get("first")
+	se, err = collection.Get("first")
 	assert.Nil(err)
 	assert.NotNil(se)
 
@@ -50,6 +68,10 @@ func TestUpstreamGetUpdate(t *testing.T) {
 	se, err = collection.Get("my-updated-upstream")
 	assert.Nil(err)
 	assert.NotNil(se)
+
+	se.ID = nil
+	err = collection.Update(*se)
+	assert.NotNil(err)
 
 	se, err = collection.Get("my-upstream")
 	assert.Equal(ErrNotFound, err)
@@ -94,6 +116,9 @@ func TestUpstreamsInvalidType(t *testing.T) {
 	assert.Panics(func() {
 		collection.Get("my-route")
 	})
+	assert.Panics(func() {
+		collection.GetAll()
+	})
 }
 
 func TestUpstreamDelete(t *testing.T) {
@@ -112,6 +137,9 @@ func TestUpstreamDelete(t *testing.T) {
 
 	err = collection.Delete(*se.ID)
 	assert.Nil(err)
+
+	err = collection.Delete("")
+	assert.NotNil(err)
 
 	_, err = collection.Get("my-upstream")
 	assert.Equal(ErrNotFound, err)

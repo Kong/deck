@@ -50,12 +50,20 @@ func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	assert.NotEmpty(t, ks)
 	// YAML
 	output := captureOutput(func() {
-		KongStateToFile(ks, nil, "foo", filename, YAML)
+		KongStateToFile(ks, WriteConfig{
+			Workspace:  "foo",
+			Filename:   filename,
+			FileFormat: YAML,
+		})
 	})
 	assert.Equal("_format_version: \"1.1\"\n_workspace: foo\n", output)
 	// JSON
 	output = captureOutput(func() {
-		KongStateToFile(ks, nil, "foo", filename, JSON)
+		KongStateToFile(ks, WriteConfig{
+			Workspace:  "foo",
+			Filename:   filename,
+			FileFormat: JSON,
+		})
 	})
 	expected := `{
   "_format_version": "1.1",
@@ -75,13 +83,20 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 	ks.Services.Add(service)
 	// YAML
 	output := captureOutput(func() {
-		KongStateToFile(ks, nil, "", filename, YAML)
+		KongStateToFile(ks, WriteConfig{
+			Filename:   filename,
+			FileFormat: YAML,
+		})
 	})
 	expected := fmt.Sprintf("_format_version: \"1.1\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
 	assert.Equal(expected, output)
 	// JSON
 	output = captureOutput(func() {
-		KongStateToFile(ks, nil, "foo", filename, JSON)
+		KongStateToFile(ks, WriteConfig{
+			Workspace:  "foo",
+			Filename:   filename,
+			FileFormat: JSON,
+		})
 	})
 	expected = `{
   "_format_version": "1.1",
@@ -118,7 +133,10 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 	ks.Routes.Add(route)
 	// YAML
 	output := captureOutput(func() {
-		KongStateToFile(ks, nil, "", filename, YAML)
+		KongStateToFile(ks, WriteConfig{
+			Filename:   filename,
+			FileFormat: YAML,
+		})
 	})
 	expected := fmt.Sprintf(`_format_version: "1.1"
 services:
@@ -133,7 +151,11 @@ services:
 	assert.Equal(expected, output)
 	// JSON
 	output = captureOutput(func() {
-		KongStateToFile(ks, nil, "foo", filename, JSON)
+		KongStateToFile(ks, WriteConfig{
+			Workspace:  "foo",
+			Filename:   filename,
+			FileFormat: JSON,
+		})
 	})
 	expected = `{
   "_format_version": "1.1",

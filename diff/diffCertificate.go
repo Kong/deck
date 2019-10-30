@@ -3,7 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -31,8 +30,7 @@ func (sc *Syncer) deleteCertificates() error {
 
 func (sc *Syncer) deleteCertificate(
 	certificate *state.Certificate) (*Event, error) {
-	_, err := sc.targetState.Certificates.GetByCertKey(*certificate.Cert,
-		*certificate.Key)
+	_, err := sc.targetState.Certificates.Get(*certificate.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -42,7 +40,7 @@ func (sc *Syncer) deleteCertificate(
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "looking up certificate '%v'",
-			*certificate.Cert)
+			certificate.Identifier())
 	}
 	return nil, nil
 }
@@ -71,13 +69,10 @@ func (sc *Syncer) createUpdateCertificates() error {
 func (sc *Syncer) createUpdateCertificate(
 	certificate *state.Certificate) (*Event, error) {
 	certificateCopy := &state.Certificate{Certificate: *certificate.DeepCopy()}
-	currentCertificate, err :=
-		sc.currentState.Certificates.GetByCertKey(*certificate.Cert,
-			*certificate.Key)
+	currentCertificate, err := sc.currentState.Certificates.Get(*certificate.ID)
 
 	if err == state.ErrNotFound {
 		// certificate not present, create it
-		certificateCopy.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "certificate",
@@ -86,12 +81,11 @@ func (sc *Syncer) createUpdateCertificate(
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "error looking up certificate %v",
-			*certificate.Cert)
+			certificate.Identifier())
 	}
 
 	// found, check if update needed
-	if !currentCertificate.EqualWithOpts(certificateCopy, true, true) {
-		certificateCopy.ID = kong.String(*currentCertificate.ID)
+	if !currentCertificate.EqualWithOpts(certificateCopy, false, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "certificate",

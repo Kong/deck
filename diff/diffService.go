@@ -3,8 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -31,11 +29,7 @@ func (sc *Syncer) deleteServices() error {
 }
 
 func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
-	// lookup by name
-	if utils.Empty(service.Name) {
-		return nil, errors.New("'name' attribute for a service cannot be nil")
-	}
-	_, err := sc.targetState.Services.Get(*service.Name)
+	_, err := sc.targetState.Services.Get(*service.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -44,7 +38,8 @@ func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up service '%v'", *service.Name)
+		return nil, errors.Wrapf(err, "looking up service '%v'",
+			service.Identifier())
 	}
 	return nil, nil
 }
@@ -72,11 +67,9 @@ func (sc *Syncer) createUpdateServices() error {
 
 func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
 	serviceCopy := &state.Service{Service: *service.DeepCopy()}
-	currentService, err := sc.currentState.Services.Get(*service.Name)
+	currentService, err := sc.currentState.Services.Get(*service.ID)
 
 	if err == state.ErrNotFound {
-		// service not present, create it
-		serviceCopy.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "service",
@@ -89,8 +82,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
 	}
 
 	// found, check if update needed
-	if !currentService.EqualWithOpts(serviceCopy, true, true) {
-		serviceCopy.ID = kong.String(*currentService.ID)
+	if !currentService.EqualWithOpts(serviceCopy, false, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "service",

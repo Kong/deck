@@ -30,23 +30,22 @@ func formatPluginMessage(plugin *state.Plugin) (message string) {
 		message = "global plugin " + *plugin.Name
 		return
 	}
-	message = "plugin " + *plugin.Name
-	if plugin.Service != nil && plugin.Route != nil {
-		message += " on service " + *plugin.Service.Name +
-			" and route " + *plugin.Route.Name
-		return
-	}
+	message = "plugin " + *plugin.Name + " on"
+	associations := []string{}
 	if plugin.Service != nil {
-		message += " on service " + *plugin.Service.Name
-		return
+		associations = append(associations, " service "+*plugin.Service.ID)
 	}
 	if plugin.Route != nil {
-		message += " on route " + *plugin.Route.Name
-		return
+		associations = append(associations, " route "+*plugin.Route.ID)
 	}
 	if plugin.Consumer != nil {
-		message += " on consumer " + *plugin.Consumer.Username
-		return
+		associations = append(associations, " consumer "+*plugin.Consumer.ID)
+	}
+	for i := 0; i < len(associations); i++ {
+		message += associations[i]
+		if i < len(associations)-1 {
+			message += ","
+		}
 	}
 	return
 }

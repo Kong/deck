@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // HMACAuthCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *HMACAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStruct(event)
 	print.CreatePrintln("creating hmac-auth with username ", *hmacAuth.Username,
-		" for consumer", *hmacAuth.Consumer.Username)
-	hmacAuth.ID = kong.String(utils.UUID())
+		" for consumer", *hmacAuth.Consumer.ID)
 	return hmacAuth, nil
 }
 
@@ -46,7 +43,7 @@ func (s *HMACAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStruct(event)
 	print.DeletePrintln("deleting hmac-auth with username ", *hmacAuth.Username,
-		" for consumer", *hmacAuth.Consumer.Username)
+		" for consumer", *hmacAuth.Consumer.ID)
 	return hmacAuth, nil
 }
 
@@ -63,11 +60,6 @@ func (s *HMACAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
-	oldRoute.Consumer = &kong.Consumer{Username: oldRoute.Consumer.Username}
-	oldRoute.ID = nil
-
-	hmacAuth.ID = nil
-	hmacAuth.Consumer = &kong.Consumer{Username: hmacAuth.Consumer.Username}
 
 	diffString, err := getDiff(oldRoute.HMACAuth, hmacAuth.HMACAuth)
 	if err != nil {

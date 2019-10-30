@@ -41,15 +41,6 @@ func (s *PluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
-	if plugin.Service != nil {
-		plugin.Service = &kong.Service{ID: plugin.Service.ID}
-	}
-	if plugin.Route != nil {
-		plugin.Route = &kong.Route{ID: plugin.Route.ID}
-	}
-	if plugin.Consumer != nil {
-		plugin.Consumer = &kong.Consumer{ID: plugin.Consumer.ID}
-	}
 	createdPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {
 		return nil, err
@@ -79,15 +70,6 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
-	if plugin.Service != nil {
-		plugin.Service = &kong.Service{ID: plugin.Service.ID}
-	}
-	if plugin.Route != nil {
-		plugin.Route = &kong.Route{ID: plugin.Route.ID}
-	}
-	if plugin.Consumer != nil {
-		plugin.Consumer = &kong.Consumer{ID: plugin.Consumer.ID}
-	}
 	updatedPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {
 		return nil, err

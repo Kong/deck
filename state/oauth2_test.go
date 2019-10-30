@@ -145,10 +145,6 @@ func TestOauth2CredentialGetByConsumer(t *testing.T) {
 	oauth2Creds, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
 	assert.Equal(3, len(oauth2Creds))
-
-	oauth2Creds, err = collection.GetAllByConsumerUsername("consumer2-name")
-	assert.Nil(err)
-	assert.Equal(2, len(oauth2Creds))
 }
 
 func populateWithOauth2CredentialFixtures(assert *assert.Assertions,

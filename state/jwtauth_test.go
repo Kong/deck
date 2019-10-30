@@ -148,10 +148,6 @@ func TestJWTAuthGetByConsumer(t *testing.T) {
 	jwtAuths, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
 	assert.Equal(3, len(jwtAuths))
-
-	jwtAuths, err = collection.GetAllByConsumerUsername("consumer2-name")
-	assert.Nil(err)
-	assert.Equal(2, len(jwtAuths))
 }
 
 func populateWithJWTAuthFixtures(assert *assert.Assertions,

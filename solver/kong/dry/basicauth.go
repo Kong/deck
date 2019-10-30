@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // BasicAuthCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *BasicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	print.CreatePrintln("creating basic-auth with username ", *basicAuth.Username,
-		" for consumer", *basicAuth.Consumer.Username)
-	basicAuth.ID = kong.String(utils.UUID())
+		" for consumer", *basicAuth.Consumer.ID)
 	return basicAuth, nil
 }
 
@@ -46,7 +43,7 @@ func (s *BasicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	print.DeletePrintln("deleting basic-auth with username ", *basicAuth.Username,
-		" for consumer", *basicAuth.Consumer.Username)
+		" for consumer", *basicAuth.Consumer.ID)
 	return basicAuth, nil
 }
 
@@ -63,16 +60,12 @@ func (s *BasicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
-	oldRoute.Consumer = &kong.Consumer{Username: oldRoute.Consumer.Username}
-	oldRoute.ID = nil
-
-	basicAuth.ID = nil
-	basicAuth.Consumer = &kong.Consumer{Username: basicAuth.Consumer.Username}
 
 	diffString, err := getDiff(oldRoute.BasicAuth, basicAuth.BasicAuth)
 	if err != nil {
 		return nil, err
 	}
-	print.UpdatePrintf("updating basic-auth %s\n%s", *basicAuth.Username, diffString)
+	print.UpdatePrintf("updating basic-auth %s\n%s", *basicAuth.Username,
+		diffString)
 	return basicAuth, nil
 }

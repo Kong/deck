@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // KeyAuthCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *KeyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 	print.CreatePrintln("creating key-auth", stripKey(*keyAuth.Key),
-		"(last 5) for consumer", *keyAuth.Consumer.Username)
-	keyAuth.ID = kong.String(utils.UUID())
+		"(last 5) for consumer", *keyAuth.Consumer.ID)
 	return keyAuth, nil
 }
 
@@ -46,7 +43,7 @@ func (s *KeyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 	print.DeletePrintln("deleting key-auth", stripKey(*keyAuth.Key),
-		"(last 5) for consumer", *keyAuth.Consumer.Username)
+		"(last 5) for consumer", *keyAuth.Consumer.ID)
 	return keyAuth, nil
 }
 
@@ -63,11 +60,6 @@ func (s *KeyAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
-	oldRoute.Consumer = &kong.Consumer{Username: oldRoute.Consumer.Username}
-	oldRoute.ID = nil
-
-	keyAuth.ID = nil
-	keyAuth.Consumer = &kong.Consumer{Username: keyAuth.Consumer.Username}
 
 	diffString, err := getDiff(oldRoute.KeyAuth, keyAuth.KeyAuth)
 	if err != nil {

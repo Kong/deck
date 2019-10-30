@@ -673,7 +673,7 @@ func (crud *aclGroupPostAction) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !ok {
 		panic("whoops")
 	}
-	s.ACLGroups.DeleteByID(*svc.ID)
+	s.ACLGroups.Delete(*svc.ID)
 	return nil, nil
 }
 

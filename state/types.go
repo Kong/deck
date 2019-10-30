@@ -6,6 +6,17 @@ import (
 	"github.com/hbagdi/go-kong/kong"
 )
 
+// entity abstracts out common fields in a credentials.
+// TODO generalize for each and every entity.
+type entity interface {
+	// ID of the cred.
+	GetID() string
+	// ID2 is the second endpoint key.
+	GetID2() string
+	// Consumer returns consumer ID associated with the cred.
+	GetConsumer() string
+}
+
 // Meta contains additional information for an entity
 // type Meta struct {
 // 	Name   *string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -45,6 +56,14 @@ type Service struct {
 	Meta
 }
 
+// Identifier returns the endpoint key name or ID.
+func (s1 *Service) Identifier() string {
+	if s1.Name != nil {
+		return *s1.Name
+	}
+	return *s1.ID
+}
+
 // Equal returns true if s1 and s2 are equal.
 func (s1 *Service) Equal(s2 *Service) bool {
 	return reflect.DeepEqual(s1.Service, s2.Service)
@@ -77,6 +96,14 @@ func (s1 *Service) EqualWithOpts(s2 *Service,
 type Route struct {
 	kong.Route `yaml:",inline"`
 	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (r1 *Route) Identifier() string {
+	if r1.Name != nil {
+		return *r1.Name
+	}
+	return *r1.ID
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -118,6 +145,14 @@ type Upstream struct {
 	Meta
 }
 
+// Identifier returns the endpoint key name or ID.
+func (u1 *Upstream) Identifier() string {
+	if u1.Name != nil {
+		return *u1.Name
+	}
+	return *u1.ID
+}
+
 // Equal returns true if u1 and u2 are equal.
 func (u1 *Upstream) Equal(u2 *Upstream) bool {
 	return reflect.DeepEqual(u1.Upstream, u2.Upstream)
@@ -147,6 +182,14 @@ func (u1 *Upstream) EqualWithOpts(u2 *Upstream,
 type Target struct {
 	kong.Target `yaml:",inline"`
 	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (t1 *Target) Identifier() string {
+	if t1.Target.Target != nil {
+		return *t1.Target.Target
+	}
+	return *t1.ID
 }
 
 // Equal returns true if t1 and t2 are equal.
@@ -186,6 +229,14 @@ type Certificate struct {
 	Meta
 }
 
+// Identifier returns the endpoint key name or ID.
+func (c1 *Certificate) Identifier() string {
+	if c1.ID != nil {
+		return *c1.ID
+	}
+	return *c1.Cert
+}
+
 // Equal returns true if c1 and c2 are equal.
 func (c1 *Certificate) Equal(c2 *Certificate) bool {
 	return reflect.DeepEqual(c1.Certificate, c2.Certificate)
@@ -223,6 +274,14 @@ func (s1 *SNI) Equal(s2 *SNI) bool {
 	return reflect.DeepEqual(s1.SNI, s2.SNI)
 }
 
+// Identifier returns the endpoint key name or ID.
+func (s1 *SNI) Identifier() string {
+	if s1.Name != nil {
+		return *s1.Name
+	}
+	return *s1.ID
+}
+
 // EqualWithOpts returns true if s1 and s2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
@@ -251,6 +310,14 @@ func (s1 *SNI) EqualWithOpts(s2 *SNI, ignoreID,
 type Plugin struct {
 	kong.Plugin `yaml:",inline"`
 	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (p1 *Plugin) Identifier() string {
+	if p1.Name != nil {
+		return *p1.Name
+	}
+	return *p1.ID
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -291,6 +358,14 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 type Consumer struct {
 	kong.Consumer `yaml:",inline"`
 	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (c1 *Consumer) Identifier() string {
+	if c1.Username != nil {
+		return *c1.Username
+	}
+	return *c1.ID
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -352,6 +427,33 @@ func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
 
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *KeyAuth) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Key field for KeyAuth.
+func (k1 *KeyAuth) GetID2() string {
+	if k1.Key == nil {
+		return ""
+	}
+	return *k1.Key
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *KeyAuth) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
+}
+
 // HMACAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original HMACAuth object.
 type HMACAuth struct {
@@ -387,6 +489,33 @@ func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
 	return reflect.DeepEqual(h1Copy, h2Copy)
 }
 
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (h1 *HMACAuth) GetID() string {
+	if h1.ID == nil {
+		return ""
+	}
+	return *h1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Username field for HMACAuth.
+func (h1 *HMACAuth) GetID2() string {
+	if h1.Username == nil {
+		return ""
+	}
+	return *h1.Username
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (h1 *HMACAuth) GetConsumer() string {
+	if h1.Consumer == nil || h1.Consumer.ID == nil {
+		return ""
+	}
+	return *h1.Consumer.ID
+}
+
 // JWTAuth represents a jwt credential in Kong.
 // It adds some helper methods along with Meta to the original JWTAuth object.
 type JWTAuth struct {
@@ -420,6 +549,33 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 		j2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(j1Copy, j2Copy)
+}
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (j1 *JWTAuth) GetID() string {
+	if j1.ID == nil {
+		return ""
+	}
+	return *j1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Key field for JWTAuth.
+func (j1 *JWTAuth) GetID2() string {
+	if j1.Key == nil {
+		return ""
+	}
+	return *j1.Key
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (j1 *JWTAuth) GetConsumer() string {
+	if j1.Consumer == nil || j1.Consumer.ID == nil {
+		return ""
+	}
+	return *j1.Consumer.ID
 }
 
 // BasicAuth represents a basic-auth credential in Kong.
@@ -459,6 +615,33 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 		b2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
+}
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (b1 *BasicAuth) GetID() string {
+	if b1.ID == nil {
+		return ""
+	}
+	return *b1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the Username field for BasicAuth.
+func (b1 *BasicAuth) GetID2() string {
+	if b1.Username == nil {
+		return ""
+	}
+	return *b1.Username
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (b1 *BasicAuth) GetConsumer() string {
+	if b1.Consumer == nil || b1.Consumer.ID == nil {
+		return ""
+	}
+	return *b1.Consumer.ID
 }
 
 // ACLGroup represents an ACL group for a consumer in Kong.
@@ -502,6 +685,14 @@ func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
 type CACertificate struct {
 	kong.CACertificate `yaml:",inline"`
 	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (c1 *CACertificate) Identifier() string {
+	if c1.ID != nil {
+		return *c1.ID
+	}
+	return *c1.Cert
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -561,4 +752,31 @@ func (k1 *Oauth2Credential) EqualWithOpts(k2 *Oauth2Credential, ignoreID,
 		k2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
+}
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (k1 *Oauth2Credential) GetID() string {
+	if k1.ID == nil {
+		return ""
+	}
+	return *k1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// the ClientID field for Oauth2Credential.
+func (k1 *Oauth2Credential) GetID2() string {
+	if k1.ClientID == nil {
+		return ""
+	}
+	return *k1.ClientID
+}
+
+// GetConsumer returns the credential's Consumer's ID.
+// If Consumer's ID is empty, it returns an empty string.
+func (k1 *Oauth2Credential) GetConsumer() string {
+	if k1.Consumer == nil || k1.Consumer.ID == nil {
+		return ""
+	}
+	return *k1.Consumer.ID
 }

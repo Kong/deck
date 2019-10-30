@@ -3,7 +3,7 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/hbagdi/deck/state/indexers"
-	"github.com/pkg/errors"
+	"github.com/hbagdi/deck/utils"
 )
 
 const (
@@ -13,8 +13,8 @@ const (
 var caCertTableSchema = &memdb.TableSchema{
 	Name: caCertTableName,
 	Indexes: map[string]*memdb.IndexSchema{
-		id: {
-			Name:    id,
+		"id": {
+			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
@@ -34,67 +34,115 @@ type CACertificatesCollection collection
 
 // Add adds a caCert to the collection
 func (k *CACertificatesCollection) Add(caCert CACertificate) error {
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(caCert.ID) {
+		return errIDRequired
+	}
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(caCertTableName, &caCert)
+
+	var searchBy []string
+	searchBy = append(searchBy, *caCert.ID)
+	if !utils.Empty(caCert.Cert) {
+		searchBy = append(searchBy, *caCert.Cert)
+	}
+	_, err := getCACert(txn, searchBy...)
+	if err == nil {
+		return ErrAlreadyExists
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	err = txn.Insert(caCertTableName, &caCert)
 	if err != nil {
-		return errors.Wrap(err, "insert failed")
+		return err
 	}
 	txn.Commit()
 	return nil
 }
 
+func getCACert(txn *memdb.Txn, IDs ...string) (*CACertificate, error) {
+	for _, id := range IDs {
+		res, err := multiIndexLookupUsingTxn(txn, caCertTableName,
+			[]string{"cert", "id"}, id)
+		if err == ErrNotFound {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		caCert, ok := res.(*CACertificate)
+		if !ok {
+			panic(unexpectedType)
+		}
+		return &CACertificate{CACertificate: *caCert.DeepCopy()}, nil
+	}
+	return nil, ErrNotFound
+}
+
 // Get gets a caCertificate by cert or ID.
 func (k *CACertificatesCollection) Get(certOrID string) (*CACertificate, error) {
-	res, err := multiIndexLookup(k.db, caCertTableName,
-		[]string{"id", "cert"}, certOrID)
-	if err == ErrNotFound {
-		return nil, ErrNotFound
+	if certOrID == "" {
+		return nil, errIDRequired
 	}
 
-	if err != nil {
-		return nil, errors.Wrap(err, "caCertificate lookup failed")
-	}
-	if res == nil {
-		return nil, ErrNotFound
-	}
-	c, ok := res.(*CACertificate)
-	if !ok {
-		panic("unexpected type found")
-	}
-	return &CACertificate{CACertificate: *c.DeepCopy()}, nil
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+	return getCACert(txn, certOrID)
 }
 
 // Update udpates an existing caCert.
 // It returns an error if the caCert is not already present.
 func (k *CACertificatesCollection) Update(caCert CACertificate) error {
-	// TODO check if entity is already present or not, throw error if present
-	// TODO abstract this in the go-memdb library itself
+	// TODO abstract this check in the go-memdb library itself
+	if utils.Empty(caCert.ID) {
+		return errIDRequired
+	}
+
 	txn := k.db.Txn(true)
 	defer txn.Abort()
-	err := txn.Insert(caCertTableName, &caCert)
+
+	err := deleteCACert(txn, *caCert.ID)
 	if err != nil {
-		return errors.Wrap(err, "update failed")
+		return err
 	}
+
+	err = txn.Insert(caCertTableName, &caCert)
+	if err != nil {
+		return err
+	}
+
 	txn.Commit()
+	return nil
+}
+
+func deleteCACert(txn *memdb.Txn, certOrID string) error {
+	caCert, err := getCACert(txn, certOrID)
+	if err != nil {
+		return err
+	}
+
+	err = txn.Delete(caCertTableName, caCert)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // Delete deletes a caCertificate by looking up it's cert and key.
 func (k *CACertificatesCollection) Delete(certOrID string) error {
-	caCert, err := k.Get(certOrID)
-
-	if err != nil {
-		return errors.Wrap(err, "looking up caCert")
+	if certOrID == "" {
+		return errIDRequired
 	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err = txn.Delete(caCertTableName, caCert)
+	err := deleteCACert(txn, certOrID)
 	if err != nil {
-		return errors.Wrap(err, "delete failed")
+		return err
 	}
+
 	txn.Commit()
 	return nil
 }
@@ -106,14 +154,14 @@ func (k *CACertificatesCollection) GetAll() ([]*CACertificate, error) {
 
 	iter, err := txn.Get(caCertTableName, all, true)
 	if err != nil {
-		return nil, errors.Wrapf(err, "caCertificate lookup failed")
+		return nil, err
 	}
 
 	var res []*CACertificate
 	for el := iter.Next(); el != nil; el = iter.Next() {
 		c, ok := el.(*CACertificate)
 		if !ok {
-			panic("unexpected type found")
+			panic(unexpectedType)
 		}
 		res = append(res, &CACertificate{CACertificate: *c.DeepCopy()})
 	}

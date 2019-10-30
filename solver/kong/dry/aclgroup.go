@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // ACLGroupCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *ACLGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	aclGroup := aclGroupFromStruct(event)
 	print.CreatePrintln("creating acl", *aclGroup.Group,
-		"for consumer", *aclGroup.Consumer.Username)
-	aclGroup.ID = kong.String(utils.UUID())
+		"for consumer", *aclGroup.Consumer.ID)
 	return aclGroup, nil
 }
 
@@ -46,7 +43,7 @@ func (s *ACLGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	aclGroup := aclGroupFromStruct(event)
 	print.DeletePrintln("deleting acl", *aclGroup.Group,
-		"for consumer", *aclGroup.Consumer.Username)
+		"for consumer", *aclGroup.Consumer.ID)
 	return aclGroup, nil
 }
 
@@ -63,11 +60,6 @@ func (s *ACLGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
-	oldRoute.Consumer = &kong.Consumer{Username: oldRoute.Consumer.Username}
-	oldRoute.ID = nil
-
-	aclGroup.ID = nil
-	aclGroup.Consumer = &kong.Consumer{Username: aclGroup.Consumer.Username}
 
 	diffString, err := getDiff(oldRoute.ACLGroup, aclGroup.ACLGroup)
 	if err != nil {

@@ -3,8 +3,8 @@ module github.com/hbagdi/deck
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/fatih/color v1.7.0
-	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
-	github.com/hashicorp/go-memdb v0.0.0-20181108192425-032f93b25bec
+	github.com/hashicorp/go-memdb v1.0.4
+	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/hbagdi/go-kong v0.9.0
 	github.com/imdario/mergo v0.3.7
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
@@ -31,3 +31,5 @@ require (
 )
 
 go 1.13
+
+replace github.com/hashicorp/go-memdb => github.com/hbagdi/go-memdb v0.0.0-20190920041452-92e457f524d8

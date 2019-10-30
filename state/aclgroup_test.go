@@ -16,6 +16,8 @@ func TestACLGroupInsert(t *testing.T) {
 	collection := aclGroupsCollection()
 
 	var aclGroup ACLGroup
+	assert.NotNil(collection.Add(aclGroup))
+
 	aclGroup.Group = kong.String("my-group")
 	aclGroup.ID = kong.String("first")
 	err := collection.Add(aclGroup)
@@ -25,8 +27,23 @@ func TestACLGroupInsert(t *testing.T) {
 	aclGroup2.Group = kong.String("my-group")
 	aclGroup2.ID = kong.String("first")
 	aclGroup2.Consumer = &kong.Consumer{
-		ID:       kong.String("consumer-id"),
-		Username: kong.String("my-username"),
+		ID: kong.String("consumer-id"),
+	}
+	err = collection.Add(aclGroup2)
+	assert.Nil(err)
+
+	// re-insert
+	err = collection.Add(aclGroup2)
+	assert.NotNil(err)
+
+	// re-insert with a different ID
+	aclGroup2.ID = kong.String("second")
+	err = collection.Add(aclGroup2)
+	assert.NotNil(err)
+
+	// re-insert for different consumer
+	aclGroup2.Consumer = &kong.Consumer{
+		ID: kong.String("consumer2-id"),
 	}
 	err = collection.Add(aclGroup2)
 	assert.Nil(err)
@@ -40,8 +57,7 @@ func TestACLGroupGetByID(t *testing.T) {
 	aclGroup.Group = kong.String("my-group")
 	aclGroup.ID = kong.String("first")
 	aclGroup.Consumer = &kong.Consumer{
-		ID:       kong.String("consumer1-id"),
-		Username: kong.String("consumer1-name"),
+		ID: kong.String("consumer1-id"),
 	}
 
 	err := collection.Add(aclGroup)
@@ -75,7 +91,7 @@ func TestACLGroupGet(t *testing.T) {
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = collection.Get("consumer1-name", "my-group12")
+	res, err = collection.Get("consumer1-id", "my-group12")
 	assert.Nil(err)
 	assert.NotNil(res)
 }
@@ -88,8 +104,7 @@ func TestACLGroupUpdate(t *testing.T) {
 	aclGroup.Group = kong.String("my-group")
 	aclGroup.ID = kong.String("first")
 	aclGroup.Consumer = &kong.Consumer{
-		ID:       kong.String("consumer1-id"),
-		Username: kong.String("consumer1-name"),
+		ID: kong.String("consumer1-id"),
 	}
 
 	err := collection.Add(aclGroup)
@@ -120,28 +135,27 @@ func TestACLGroupDelete(t *testing.T) {
 	aclGroup.Group = kong.String("my-group1")
 	aclGroup.ID = kong.String("first")
 	aclGroup.Consumer = &kong.Consumer{
-		ID:       kong.String("consumer1-id"),
-		Username: kong.String("consumer1-name"),
+		ID: kong.String("consumer1-id"),
 	}
 	err := collection.Add(aclGroup)
 	assert.Nil(err)
 
-	res, err := collection.Get("consumer1-name", "my-group1")
+	res, err := collection.Get("consumer1-id", "my-group1")
 	assert.Nil(err)
 	assert.NotNil(res)
 
-	err = collection.DeleteByID(*res.ID)
+	err = collection.Delete(*res.ID)
 	assert.Nil(err)
 
-	res, err = collection.Get("consumer1-name", "my-group1")
+	res, err = collection.Get("consumer1-id", "my-group1")
 	assert.NotNil(err)
 	assert.Nil(res)
 
 	// delete a non-existing one
-	err = collection.DeleteByID("first")
+	err = collection.Delete("first")
 	assert.NotNil(err)
 
-	err = collection.DeleteByID("my-group1")
+	err = collection.Delete("my-group1")
 	assert.NotNil(err)
 }
 
@@ -165,10 +179,6 @@ func TestACLGroupGetByConsumer(t *testing.T) {
 	aclGroups, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
 	assert.Equal(3, len(aclGroups))
-
-	aclGroups, err = collection.GetAllByConsumerUsername("consumer2-name")
-	assert.Nil(err)
-	assert.Equal(2, len(aclGroups))
 }
 
 func populateWithACLGroupFixtures(assert *assert.Assertions,
@@ -180,8 +190,7 @@ func populateWithACLGroupFixtures(assert *assert.Assertions,
 				Group: kong.String("my-group11"),
 				ID:    kong.String("first"),
 				Consumer: &kong.Consumer{
-					ID:       kong.String("consumer1-id"),
-					Username: kong.String("consumer1-name"),
+					ID: kong.String("consumer1-id"),
 				},
 			},
 		},
@@ -190,8 +199,7 @@ func populateWithACLGroupFixtures(assert *assert.Assertions,
 				Group: kong.String("my-group12"),
 				ID:    kong.String("second"),
 				Consumer: &kong.Consumer{
-					ID:       kong.String("consumer1-id"),
-					Username: kong.String("consumer1-name"),
+					ID: kong.String("consumer1-id"),
 				},
 			},
 		},
@@ -200,8 +208,7 @@ func populateWithACLGroupFixtures(assert *assert.Assertions,
 				Group: kong.String("my-group13"),
 				ID:    kong.String("third"),
 				Consumer: &kong.Consumer{
-					ID:       kong.String("consumer1-id"),
-					Username: kong.String("consumer1-name"),
+					ID: kong.String("consumer1-id"),
 				},
 			},
 		},
@@ -210,8 +217,7 @@ func populateWithACLGroupFixtures(assert *assert.Assertions,
 				Group: kong.String("my-group21"),
 				ID:    kong.String("fourth"),
 				Consumer: &kong.Consumer{
-					ID:       kong.String("consumer2-id"),
-					Username: kong.String("consumer2-name"),
+					ID: kong.String("consumer2-id"),
 				},
 			},
 		},
@@ -220,8 +226,7 @@ func populateWithACLGroupFixtures(assert *assert.Assertions,
 				Group: kong.String("my-group22"),
 				ID:    kong.String("fifth"),
 				Consumer: &kong.Consumer{
-					ID:       kong.String("consumer2-id"),
-					Username: kong.String("consumer2-name"),
+					ID: kong.String("consumer2-id"),
 				},
 			},
 		},

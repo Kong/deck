@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // UpstreamCRUD implements Actions interface
@@ -34,7 +32,6 @@ func (s *UpstreamCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	upstream := upstreamFromStuct(event)
 
 	print.CreatePrintln("creating upstream", *upstream.Name)
-	upstream.ID = kong.String(utils.UUID())
 	return upstream, nil
 }
 

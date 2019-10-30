@@ -16,10 +16,15 @@ func TestConsumerInsert(t *testing.T) {
 	collection := consumersCollection()
 
 	var consumer Consumer
+
+	assert.NotNil(collection.Add(consumer))
+
 	consumer.ID = kong.String("first")
+	assert.Nil(collection.Add(consumer))
+
+	//re-insert
 	consumer.Username = kong.String("my-name")
-	err := collection.Add(consumer)
-	assert.Nil(err)
+	assert.NotNil(collection.Add(consumer))
 }
 
 func TestConsumerGetUpdate(t *testing.T) {
@@ -32,12 +37,24 @@ func TestConsumerGetUpdate(t *testing.T) {
 	err := collection.Add(consumer)
 	assert.Nil(err)
 
-	c, err := collection.Get("first")
+	c, err := collection.Get("")
+	assert.NotNil(err)
+	assert.Nil(c)
+
+	c, err = collection.Get("first")
 	assert.Nil(err)
 	assert.NotNil(c)
+
+	c.ID = nil
 	c.Username = kong.String("my-updated-name")
 	err = collection.Update(*c)
-	assert.Nil(err)
+	assert.NotNil(err)
+
+	c.ID = kong.String("does-not-exist")
+	assert.NotNil(collection.Update(*c))
+
+	c.ID = kong.String("first")
+	assert.Nil(collection.Update(*c))
 
 	c, err = collection.Get("my-name")
 	assert.NotNil(err)
@@ -105,8 +122,11 @@ func TestConsumerDelete(t *testing.T) {
 	assert.NotNil(c)
 	assert.Equal("first", *c.ID)
 
-	err = collection.Delete(*c.ID)
+	err = collection.Delete("first")
 	assert.Nil(err)
+
+	err = collection.Delete("")
+	assert.NotNil(err)
 
 	err = collection.Delete(*c.ID)
 	assert.NotNil(err)

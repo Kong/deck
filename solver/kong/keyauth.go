@@ -41,14 +41,7 @@ func keyAuthFromStuct(arg diff.Event) *state.KeyAuth {
 func (s *KeyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStuct(event)
-	cid := ""
-	if !utils.Empty(keyAuth.Consumer.Username) {
-		cid = *keyAuth.Consumer.Username
-	}
-	if !utils.Empty(keyAuth.Consumer.ID) {
-		cid = *keyAuth.Consumer.ID
-	}
-	createdKeyAuth, err := s.client.KeyAuths.Create(nil, &cid,
+	createdKeyAuth, err := s.client.KeyAuths.Create(nil, keyAuth.Consumer.ID,
 		&keyAuth.KeyAuth)
 	if err != nil {
 		return nil, err
@@ -85,14 +78,8 @@ func (s *KeyAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStuct(event)
 
-	cid := ""
-	if !utils.Empty(keyAuth.Consumer.Username) {
-		cid = *keyAuth.Consumer.Username
-	}
-	if !utils.Empty(keyAuth.Consumer.ID) {
-		cid = *keyAuth.Consumer.ID
-	}
-	updatedKeyAuth, err := s.client.KeyAuths.Create(nil, &cid, &keyAuth.KeyAuth)
+	updatedKeyAuth, err := s.client.KeyAuths.Create(nil, keyAuth.Consumer.ID,
+		&keyAuth.KeyAuth)
 	if err != nil {
 		return nil, err
 	}

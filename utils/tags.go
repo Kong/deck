@@ -6,6 +6,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MustMergeTags is same as MergeTags but panics if there is an error.
+func MustMergeTags(obj interface{}, tags []string) {
+	err := MergeTags(obj, tags)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // MergeTags merges Tags in the object with tags.
 func MergeTags(obj interface{}, tags []string) error {
 	if len(tags) == 0 {
@@ -33,6 +41,14 @@ func MergeTags(obj interface{}, tags []string) error {
 		}
 	}
 	return nil
+}
+
+// MustRemoveTags is same as RemoveTags but panics if there is an error.
+func MustRemoveTags(obj interface{}, tags []string) {
+	err := RemoveTags(obj, tags)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // RemoveTags removes tags from the Tags in obj.

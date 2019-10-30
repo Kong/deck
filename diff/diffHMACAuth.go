@@ -3,8 +3,6 @@ package diff
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -30,13 +28,7 @@ func (sc *Syncer) deleteHMACAuths() error {
 }
 
 func (sc *Syncer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
-	if hmacAuth.Consumer == nil ||
-		(utils.Empty(hmacAuth.Consumer.ID)) {
-		return nil, errors.Errorf("hmac-auth has no associated consumer: %+v",
-			*hmacAuth.Username)
-	}
-	// lookup by Name
-	_, err := sc.targetState.HMACAuths.Get(*hmacAuth.Username)
+	_, err := sc.targetState.HMACAuths.Get(*hmacAuth.ID)
 	if err == state.ErrNotFound {
 		return &Event{
 			Op:   crud.Delete,
@@ -74,21 +66,10 @@ func (sc *Syncer) createUpdateHMACAuths() error {
 
 func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
 	hmacAuth = &state.HMACAuth{HMACAuth: *hmacAuth.DeepCopy()}
-	currentHMACAuth, err := sc.currentState.HMACAuths.Get(*hmacAuth.Username)
+	currentHMACAuth, err := sc.currentState.HMACAuths.Get(*hmacAuth.ID)
 	if err == state.ErrNotFound {
 		// hmacAuth not present, create it
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*hmacAuth.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"could not find consumer '%v' for hmac-auth %+v",
-				*hmacAuth.Consumer.Username, *hmacAuth.Username)
-		}
-		hmacAuth.Consumer = &consumer.Consumer
-		// XXX
-
-		hmacAuth.ID = nil
 		return &Event{
 			Op:   crud.Create,
 			Kind: "hmac-auth",
@@ -99,25 +80,10 @@ func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error)
 		return nil, errors.Wrapf(err, "error looking up hmac-auth %v",
 			*hmacAuth.Username)
 	}
-	currentHMACAuth = &state.HMACAuth{HMACAuth: *currentHMACAuth.DeepCopy()}
 	// found, check if update needed
 
-	currentHMACAuth.Consumer = &kong.Consumer{
-		Username: currentHMACAuth.Consumer.Username,
-	}
-	hmacAuth.Consumer = &kong.Consumer{Username: hmacAuth.Consumer.Username}
-	if !currentHMACAuth.EqualWithOpts(hmacAuth, true, true, false) {
-		hmacAuth.ID = kong.String(*currentHMACAuth.ID)
+	if !currentHMACAuth.EqualWithOpts(hmacAuth, false, true, false) {
 
-		// XXX fill foreign
-		consumer, err := sc.currentState.Consumers.Get(*hmacAuth.Consumer.Username)
-		if err != nil {
-			return nil, errors.Wrapf(err,
-				"looking up service '%v' for hmac-auth '%v'",
-				*hmacAuth.Consumer.Username, *hmacAuth.Username)
-		}
-		hmacAuth.Consumer.ID = consumer.ID
-		// XXX
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "hmac-auth",

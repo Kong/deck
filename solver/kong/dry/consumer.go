@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // ConsumerCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *ConsumerCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	Consumer := consumerFromStuct(event)
 
-	print.CreatePrintln("creating consumer", *Consumer.Username)
-	Consumer.ID = kong.String(utils.UUID())
+	print.CreatePrintln("creating consumer", Consumer.Identifier())
 	return Consumer, nil
 }
 
@@ -46,7 +43,7 @@ func (s *ConsumerCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	Consumer := consumerFromStuct(event)
 
-	print.DeletePrintln("deleting consumer", *Consumer.Username)
+	print.DeletePrintln("deleting consumer", Consumer.Identifier())
 	return Consumer, nil
 }
 
@@ -68,6 +65,6 @@ func (s *ConsumerCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if err != nil {
 		return nil, err
 	}
-	print.UpdatePrintf("updating consumer %s\n%s", *Consumer.Username, diff)
+	print.UpdatePrintf("updating consumer %s\n%s", Consumer.Identifier(), diff)
 	return Consumer, nil
 }

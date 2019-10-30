@@ -3,7 +3,11 @@ package cmd
 import (
 	"net/http"
 
+	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
+	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/solver"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 )
@@ -44,6 +48,52 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	}
 	if err != nil {
 		return errors.Wrapf(err, "checking workspace '%v' in Kong", workspace)
+	}
+	return nil
+}
+
+func syncMain(filename string, dry bool, parallelism int) error {
+	// read target file
+	targetContent, err := file.GetContentFromFile(filename)
+	if err != nil {
+		return err
+	}
+	// prepare to read the current state from Kong
+	config.Workspace = targetContent.Workspace
+
+	client, err := utils.GetKongClient(config)
+	if err != nil {
+		return err
+	}
+
+	if targetContent.Info != nil {
+		dumpConfig.SelectorTags = targetContent.Info.SelectorTags
+	}
+
+	// read the current state
+	rawState, err := dump.Get(client, dumpConfig)
+	if err != nil {
+		return err
+	}
+	currentState, err := state.Get(rawState)
+	if err != nil {
+		return err
+	}
+
+	// read the target state
+	rawState, err = file.Get(targetContent, currentState)
+	if err != nil {
+		return err
+	}
+	targetState, err := state.Get(rawState)
+	if err != nil {
+		return err
+	}
+
+	s, _ := diff.NewSyncer(currentState, targetState)
+	errs := solver.Solve(stopChannel, s, client, parallelism, dry)
+	if errs != nil {
+		return utils.ErrArray{Errors: errs}
 	}
 	return nil
 }

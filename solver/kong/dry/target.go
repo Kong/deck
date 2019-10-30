@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // TargetCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *TargetCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	target := targetFromStuct(event)
 	print.CreatePrintln("creating target", *target.Target.Target,
-		"on upstream", *target.Upstream.Name)
-	target.ID = kong.String(utils.UUID())
+		"on upstream", *target.Upstream.ID)
 	return target, nil
 }
 
@@ -46,7 +43,7 @@ func (s *TargetCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	target := targetFromStuct(event)
 	print.DeletePrintln("deleting target", *target.Target.Target,
-		"from upstream", *target.Upstream.Name)
+		"from upstream", *target.Upstream.ID)
 	return target, nil
 }
 
@@ -62,8 +59,8 @@ func (s *TargetCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 		panic("unexpected type, expected *state.Target")
 	}
 	print.DeletePrintln("deleting target", *oldTarget.Target.Target,
-		"from upstream", *oldTarget.Upstream.Name)
+		"from upstream", *oldTarget.Upstream.ID)
 	print.CreatePrintln("creating target", *target.Target.Target,
-		"on upstream", *target.Upstream.Name)
+		"on upstream", *target.Upstream.ID)
 	return target, nil
 }

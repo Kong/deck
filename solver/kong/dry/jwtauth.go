@@ -5,8 +5,6 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
 )
 
 // JWTAuthCRUD implements Actions interface
@@ -33,8 +31,7 @@ func (s *JWTAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	jwtAuth := jwtAuthFromStruct(event)
 	print.CreatePrintln("creating jwt-secret", *jwtAuth.Key,
-		"for consumer", *jwtAuth.Consumer.Username)
-	jwtAuth.ID = kong.String(utils.UUID())
+		"for consumer", *jwtAuth.Consumer.ID)
 	return jwtAuth, nil
 }
 
@@ -46,7 +43,7 @@ func (s *JWTAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	jwtAuth := jwtAuthFromStruct(event)
 	print.DeletePrintln("deleting jwt-secret", *jwtAuth.Key,
-		"for consumer", *jwtAuth.Consumer.Username)
+		"for consumer", *jwtAuth.Consumer.ID)
 	return jwtAuth, nil
 }
 
@@ -63,11 +60,6 @@ func (s *JWTAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	}
 	// TODO remove this hack
 	oldRoute.CreatedAt = nil
-	oldRoute.Consumer = &kong.Consumer{Username: oldRoute.Consumer.Username}
-	oldRoute.ID = nil
-
-	jwtAuth.ID = nil
-	jwtAuth.Consumer = &kong.Consumer{Username: jwtAuth.Consumer.Username}
 
 	diffString, err := getDiff(oldRoute.JWTAuth, jwtAuth.JWTAuth)
 	if err != nil {

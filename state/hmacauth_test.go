@@ -74,8 +74,7 @@ func TestHMACAuthUpdate(t *testing.T) {
 	hmacAuth.Username = kong.String("my-username")
 	hmacAuth.ID = kong.String("first")
 	hmacAuth.Consumer = &kong.Consumer{
-		ID:       kong.String("consumer1-id"),
-		Username: kong.String("consumer1-name"),
+		ID: kong.String("consumer1-id"),
 	}
 
 	err := collection.Add(hmacAuth)
@@ -153,10 +152,6 @@ func TestHMACAuthGetByConsumer(t *testing.T) {
 	hmacAuths, err := collection.GetAllByConsumerID("consumer1-id")
 	assert.Nil(err)
 	assert.Equal(3, len(hmacAuths))
-
-	hmacAuths, err = collection.GetAllByConsumerUsername("consumer2-name")
-	assert.Nil(err)
-	assert.Equal(2, len(hmacAuths))
 }
 
 func populateWithHMACAuthFixtures(assert *assert.Assertions,
