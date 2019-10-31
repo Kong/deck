@@ -88,9 +88,9 @@ certificates:
   tags:
   - cloudops-managed
   snis:
-  - demo1.example.com
-  - demo2.example.com
-  - demo3.example.com
+  - name: demo1.example.com
+  - name: demo2.example.com
+  - name: demo3.example.com
 plugins:
 - name: prometheus
   enabled: true
