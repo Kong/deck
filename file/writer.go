@@ -64,8 +64,8 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 				continue
 			}
 			p.Service = nil
-			zeroOutID(&p, p.Name, config.WithID)
-			zeroOutTimestamps(&p)
+			zeroOutID(p, p.Name, config.WithID)
+			zeroOutTimestamps(p)
 			utils.MustRemoveTags(&p.Plugin, selectTags)
 			s.Plugins = append(s.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
@@ -87,8 +87,8 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 					continue
 				}
 				p.Route = nil
-				zeroOutID(&p, p.Name, config.WithID)
-				zeroOutTimestamps(&p)
+				zeroOutID(p, p.Name, config.WithID)
+				zeroOutTimestamps(p)
 				utils.MustRemoveTags(&p.Plugin, selectTags)
 				route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
 			}
