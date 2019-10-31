@@ -168,10 +168,6 @@ const contentSchema = `{
       "type": "object"
     },
     "Certificate": {
-      "required": [
-        "cert",
-        "key"
-      ],
       "properties": {
         "cert": {
           "type": "string"
@@ -262,6 +258,10 @@ const contentSchema = `{
       "type": "object"
     },
     "FCertificate": {
+      "required": [
+        "cert",
+        "key"
+      ],
       "properties": {
         "cert": {
           "type": "string"
@@ -277,7 +277,12 @@ const contentSchema = `{
         },
         "snis": {
           "items": {
-            "type": "string"
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "type": "array"
         },

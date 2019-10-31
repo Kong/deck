@@ -63,10 +63,22 @@ func main() {
 	schema.Definitions["Consumer"].AnyOf = anyOfUsernameOrID
 	schema.Definitions["Upstream"].Required = []string{"name"}
 	schema.Definitions["FTarget"].Required = []string{"target"}
-
-	schema.Definitions["Certificate"].Required = []string{"cert", "key"}
 	schema.Definitions["FCACertificate"].Required = []string{"cert"}
 	schema.Definitions["FPlugin"].Required = []string{"name"}
+
+	schema.Definitions["FCertificate"].Required = []string{"cert", "key"}
+	schema.Definitions["FCertificate"].Properties["snis"] = &jsonschema.Type{
+		Type: "array",
+		Items: &jsonschema.Type{
+			Type: "object",
+			Properties: map[string]*jsonschema.Type{
+				"name": {
+					Type: "string",
+				},
+			},
+		},
+	}
+
 	// creds
 	schema.Definitions["ACLGroup"].Required = []string{"group"}
 	schema.Definitions["BasicAuth"].Required = []string{"username", "password"}
