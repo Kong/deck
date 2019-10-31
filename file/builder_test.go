@@ -781,6 +781,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				BasicAuths: []*kong.BasicAuth{
@@ -791,6 +792,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				HMACAuths: []*kong.HMACAuth{
@@ -801,6 +803,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				JWTAuths: []*kong.JWTAuth{
@@ -811,6 +814,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				Oauth2Creds: []*kong.Oauth2Credential{
@@ -821,6 +825,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				ACLGroups: []*kong.ACLGroup{
@@ -830,6 +835,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 			},
@@ -923,6 +929,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				BasicAuths: []*kong.BasicAuth{
@@ -933,6 +940,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				HMACAuths: []*kong.HMACAuth{
@@ -943,6 +951,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				JWTAuths: []*kong.JWTAuth{
@@ -953,6 +962,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				Oauth2Creds: []*kong.Oauth2Credential{
@@ -963,6 +973,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				ACLGroups: []*kong.ACLGroup{
@@ -972,6 +983,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 			},
