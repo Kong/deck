@@ -181,10 +181,18 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	sc.wait()
-	err = sc.createUpdateCertificates()
+	// TODO  Handle the following:
+	// If a cert is changed but SNIs are the same,
+	// the operation order will be to create the new cert and delete the old
+	// cert. Creation will fail because the SNIs will still
+	// be associated with the old cert.
+	// This can be solved if SNI are also treated as a resource in this
+	// codebase.
+	err = sc.deleteCertificates()
 	if err != nil {
 		return err
 	}
+	sc.wait()
 	return nil
 }
 
@@ -197,7 +205,13 @@ func (sc *Syncer) createUpdate() error {
 	// can be all changed at the same time, then have a barrier
 	// and then execute changes for routes, targets and snis.
 	// services should be created before routes
-	err := sc.createUpdateServices()
+
+	err := sc.createUpdateCertificates()
+	if err != nil {
+		return err
+	}
+	sc.wait()
+	err = sc.createUpdateServices()
 	if err != nil {
 		return err
 	}
@@ -246,18 +260,6 @@ func (sc *Syncer) createUpdate() error {
 	}
 	sc.wait()
 	err = sc.createUpdateTargets()
-	if err != nil {
-		return err
-	}
-	sc.wait()
-	// If a cert is changed but SNIs are the same,
-	// the operations will be to create the new cert and delete the old
-	// cert. Creation will fail because the SNIs will still
-	// be associated with the old cert.
-	// This is currently an exception only for certificate entity.
-	// This can be solved if SNI are also treated as a resource in this
-	// codebase.
-	err = sc.deleteCertificates()
 	if err != nil {
 		return err
 	}
