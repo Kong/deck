@@ -83,6 +83,10 @@ func readContent(reader io.Reader) (*Content, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = validate(bytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "validating file content")
+	}
 	err = yaml.Unmarshal(bytes, &content)
 	if err != nil {
 		return nil, err
