@@ -87,26 +87,10 @@ func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 		panic("unexpected type, expected *state.plugin")
 	}
 	oldPlugin := oldPluginObj.DeepCopy()
+
 	// TODO remove this hack
 	oldPlugin.CreatedAt = nil
-	if oldPlugin.Service != nil {
-		oldPlugin.Service = &kong.Service{Name: oldPlugin.Service.Name}
-	}
-	if plugin.Service != nil {
-		plugin.Service = &kong.Service{Name: plugin.Service.Name}
-	}
-	if oldPlugin.Route != nil {
-		oldPlugin.Route = &kong.Route{Name: oldPlugin.Route.Name}
-	}
-	if plugin.Route != nil {
-		plugin.Route = &kong.Route{Name: plugin.Route.Name}
-	}
-	if oldPlugin.Consumer != nil {
-		oldPlugin.Consumer = &kong.Consumer{Username: oldPlugin.Consumer.Username}
-	}
-	if plugin.Consumer != nil {
-		plugin.Consumer = &kong.Consumer{Username: plugin.Consumer.Username}
-	}
+
 	diff, err := getDiff(oldPlugin, &plugin.Plugin)
 	if err != nil {
 		return nil, err
