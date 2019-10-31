@@ -247,7 +247,7 @@ func Test_stateBuilder_services(t *testing.T) {
 					Info: &Info{
 						SelectorTags: []string{"tag1"},
 					},
-					Services: []Service{
+					Services: []FService{
 						{
 							Service: kong.Service{
 								Name: kong.String("foo"),
@@ -277,7 +277,7 @@ func Test_stateBuilder_services(t *testing.T) {
 			name: "process a non-existent service",
 			fields: fields{
 				targetContent: &Content{
-					Services: []Service{
+					Services: []FService{
 						{
 							Service: kong.Service{
 								Name: kong.String("foo"),
@@ -692,7 +692,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			name: "generates ID for a non-existing consumer",
 			fields: fields{
 				targetContent: &Content{
-					Consumers: []Consumer{
+					Consumers: []FConsumer{
 						{
 							Consumer: kong.Consumer{
 								Username: kong.String("foo"),
@@ -719,7 +719,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			name: "generates ID for a non-existing credential",
 			fields: fields{
 				targetContent: &Content{
-					Consumers: []Consumer{
+					Consumers: []FConsumer{
 						{
 							Consumer: kong.Consumer{
 								Username: kong.String("foo"),
@@ -844,7 +844,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			name: "matches ID of an existing consumer",
 			fields: fields{
 				targetContent: &Content{
-					Consumers: []Consumer{
+					Consumers: []FConsumer{
 						{
 							Consumer: kong.Consumer{
 								Username: kong.String("foo"),
@@ -867,7 +867,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			name: "matches ID of an existing credential",
 			fields: fields{
 				targetContent: &Content{
-					Consumers: []Consumer{
+					Consumers: []FConsumer{
 						{
 							Consumer: kong.Consumer{
 								Username: kong.String("foo"),
@@ -1019,7 +1019,7 @@ func Test_stateBuilder_certificates(t *testing.T) {
 			name: "generates ID for a non-existing certificate",
 			fields: fields{
 				targetContent: &Content{
-					Certificates: []Certificate{
+					Certificates: []FCertificate{
 						{
 							Certificate: kong.Certificate{
 								Cert: kong.String("foo"),
@@ -1044,7 +1044,7 @@ func Test_stateBuilder_certificates(t *testing.T) {
 			name: "matches ID of an existing certificate",
 			fields: fields{
 				targetContent: &Content{
-					Certificates: []Certificate{
+					Certificates: []FCertificate{
 						{
 							Certificate: kong.Certificate{
 								Cert: kong.String("foo"),
@@ -1096,7 +1096,7 @@ func Test_stateBuilder_caCertificates(t *testing.T) {
 			name: "generates ID for a non-existing CACertificate",
 			fields: fields{
 				targetContent: &Content{
-					CACertificates: []CACertificate{
+					CACertificates: []FCACertificate{
 						{
 							CACertificate: kong.CACertificate{
 								Cert: kong.String("foo"),
@@ -1119,7 +1119,7 @@ func Test_stateBuilder_caCertificates(t *testing.T) {
 			name: "matches ID of an existing CACertificate",
 			fields: fields{
 				targetContent: &Content{
-					CACertificates: []CACertificate{
+					CACertificates: []FCACertificate{
 						{
 							CACertificate: kong.CACertificate{
 								Cert: kong.String("foo"),
@@ -1172,7 +1172,7 @@ func Test_stateBuilder_upstream(t *testing.T) {
 					Info: &Info{
 						SelectorTags: []string{"tag1"},
 					},
-					Upstreams: []Upstream{
+					Upstreams: []FUpstream{
 						{
 							Upstream: kong.Upstream{
 								Name:  kong.String("foo"),
@@ -1236,7 +1236,7 @@ func Test_stateBuilder_upstream(t *testing.T) {
 			name: "matches ID of an existing service",
 			fields: fields{
 				targetContent: &Content{
-					Upstreams: []Upstream{
+					Upstreams: []FUpstream{
 						{
 							Upstream: kong.Upstream{
 								Name: kong.String("foo"),

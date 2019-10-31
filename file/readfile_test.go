@@ -168,13 +168,13 @@ func Test_getContent(t *testing.T) {
 			name: "single file",
 			args: args{"testdata/file.yaml"},
 			want: &Content{
-				Services: []Service{
+				Services: []FService{
 					{
 						Service: kong.Service{
 							Name: kong.String("svc2"),
 							Host: kong.String("2.example.com"),
 						},
-						Routes: []*Route{
+						Routes: []*FRoute{
 							{
 								Route: kong.Route{
 									Name:  kong.String("r2"),
@@ -184,7 +184,7 @@ func Test_getContent(t *testing.T) {
 						},
 					},
 				},
-				Plugins: []Plugin{
+				Plugins: []FPlugin{
 					{
 						Plugin: kong.Plugin{
 							Name: kong.String("prometheus"),
@@ -201,13 +201,13 @@ func Test_getContent(t *testing.T) {
 				Info: &Info{
 					SelectorTags: []string{"tag1"},
 				},
-				Services: []Service{
+				Services: []FService{
 					{
 						Service: kong.Service{
 							Name: kong.String("svc2"),
 							Host: kong.String("2.example.com"),
 						},
-						Routes: []*Route{
+						Routes: []*FRoute{
 							{
 								Route: kong.Route{
 									Name:  kong.String("r2"),
@@ -222,7 +222,7 @@ func Test_getContent(t *testing.T) {
 							Host: kong.String("1.example.com"),
 							Tags: kong.StringSlice("team-svc1"),
 						},
-						Routes: []*Route{
+						Routes: []*FRoute{
 							{
 								Route: kong.Route{
 									Name:  kong.String("r1"),
@@ -232,7 +232,7 @@ func Test_getContent(t *testing.T) {
 						},
 					},
 				},
-				Consumers: []Consumer{
+				Consumers: []FConsumer{
 					{
 						Consumer: kong.Consumer{
 							Username: kong.String("foo"),
@@ -249,7 +249,7 @@ func Test_getContent(t *testing.T) {
 						},
 					},
 				},
-				Plugins: []Plugin{
+				Plugins: []FPlugin{
 					{
 						Plugin: kong.Plugin{
 							Name: kong.String("prometheus"),

@@ -39,7 +39,7 @@ protocols:
 )
 
 func TestPluginUnmarshalYAML(t *testing.T) {
-	var p Plugin
+	var p FPlugin
 	assert := assert.New(t)
 	assert.Nil(yaml.Unmarshal([]byte(yamlString), &p))
 	assert.Equal(kong.Plugin{
@@ -61,7 +61,7 @@ func TestPluginUnmarshalYAML(t *testing.T) {
 }
 
 func TestPluginUnmarshalJSON(t *testing.T) {
-	var p Plugin
+	var p FPlugin
 	assert := assert.New(t)
 	assert.Nil(json.Unmarshal([]byte(jsonString), &p))
 	assert.Equal(kong.Plugin{

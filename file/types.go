@@ -20,15 +20,15 @@ const (
 	YAML = "YAML"
 )
 
-// Service represents a Kong Service and it's associated routes and plugins.
-type Service struct {
+// FService represents a Kong Service and it's associated routes and plugins.
+type FService struct {
 	kong.Service `yaml:",inline,omitempty"`
-	Routes       []*Route  `json:"routes,omitempty" yaml:",omitempty"`
-	Plugins      []*Plugin `json:"plugins,omitempty" yaml:",omitempty"`
+	Routes       []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
+	Plugins      []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.
-func (s Service) id() string {
+func (s FService) id() string {
 	if s.ID != nil {
 		return *s.ID
 	}
@@ -38,14 +38,14 @@ func (s Service) id() string {
 	return ""
 }
 
-// Route represents a Kong Route and it's associated plugins.
-type Route struct {
+// FRoute represents a Kong Route and it's associated plugins.
+type FRoute struct {
 	kong.Route `yaml:",inline,omitempty"`
-	Plugins    []*Plugin `json:"plugins,omitempty" yaml:",omitempty"`
+	Plugins    []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.
-func (r Route) id() string {
+func (r FRoute) id() string {
 	if r.ID != nil {
 		return *r.ID
 	}
@@ -55,14 +55,14 @@ func (r Route) id() string {
 	return ""
 }
 
-// Upstream represents a Kong Upstream and it's associated targets.
-type Upstream struct {
+// FUpstream represents a Kong Upstream and it's associated targets.
+type FUpstream struct {
 	kong.Upstream `yaml:",inline,omitempty"`
-	Targets       []*Target `json:"targets,omitempty" yaml:",omitempty"`
+	Targets       []*FTarget `json:"targets,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.
-func (u Upstream) id() string {
+func (u FUpstream) id() string {
 	if u.ID != nil {
 		return *u.ID
 	}
@@ -72,13 +72,13 @@ func (u Upstream) id() string {
 	return ""
 }
 
-// Target represents a Kong Target.
-type Target struct {
+// FTarget represents a Kong Target.
+type FTarget struct {
 	kong.Target `yaml:",inline,omitempty"`
 }
 
 // id is used for sorting.
-func (t Target) id() string {
+func (t FTarget) id() string {
 	if t.ID != nil {
 		return *t.ID
 	}
@@ -88,13 +88,13 @@ func (t Target) id() string {
 	return ""
 }
 
-// Certificate represents a Kong Certificate.
-type Certificate struct {
+// FCertificate represents a Kong Certificate.
+type FCertificate struct {
 	kong.Certificate `yaml:",inline,omitempty"`
 }
 
 // id is used for sorting.
-func (c Certificate) id() string {
+func (c FCertificate) id() string {
 	if c.ID != nil {
 		return *c.ID
 	}
@@ -104,13 +104,13 @@ func (c Certificate) id() string {
 	return ""
 }
 
-// CACertificate represents a Kong CACertificate.
-type CACertificate struct {
+// FCACertificate represents a Kong CACertificate.
+type FCACertificate struct {
 	kong.CACertificate `yaml:",inline,omitempty"`
 }
 
 // id is used for sorting.
-func (c CACertificate) id() string {
+func (c FCACertificate) id() string {
 	if c.ID != nil {
 		return *c.ID
 	}
@@ -120,8 +120,8 @@ func (c CACertificate) id() string {
 	return ""
 }
 
-// Plugin represents a plugin in Kong.
-type Plugin struct {
+// FPlugin represents a plugin in Kong.
+type FPlugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
 }
 
@@ -141,7 +141,7 @@ type foo struct {
 	Tags      []*string          `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
-func copyToFoo(p Plugin) foo {
+func copyToFoo(p FPlugin) foo {
 	f := foo{}
 	if p.ID != nil {
 		f.ID = p.ID
@@ -176,7 +176,7 @@ func copyToFoo(p Plugin) foo {
 	return f
 }
 
-func copyFromFoo(f foo, p *Plugin) {
+func copyFromFoo(f foo, p *FPlugin) {
 	if f.ID != nil {
 		p.ID = f.ID
 	}
@@ -217,13 +217,13 @@ func copyFromFoo(f foo, p *Plugin) {
 
 // MarshalYAML is a custom marshal method to handle
 // foreign references.
-func (p Plugin) MarshalYAML() (interface{}, error) {
+func (p FPlugin) MarshalYAML() (interface{}, error) {
 	return copyToFoo(p), nil
 }
 
 // UnmarshalYAML is a custom marshal method to handle
 // foreign references.
-func (p *Plugin) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (p *FPlugin) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var f foo
 	if err := unmarshal(&f); err != nil {
 		return err
@@ -234,14 +234,14 @@ func (p *Plugin) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 // MarshalJSON is a custom marshal method to handle
 // foreign references.
-func (p Plugin) MarshalJSON() ([]byte, error) {
+func (p FPlugin) MarshalJSON() ([]byte, error) {
 	f := copyToFoo(p)
 	return json.Marshal(f)
 }
 
 // UnmarshalJSON is a custom marshal method to handle
 // foreign references.
-func (p *Plugin) UnmarshalJSON(b []byte) error {
+func (p *FPlugin) UnmarshalJSON(b []byte) error {
 	var f foo
 	err := json.Unmarshal(b, &f)
 	if err != nil {
@@ -252,7 +252,7 @@ func (p *Plugin) UnmarshalJSON(b []byte) error {
 }
 
 // id is used for sorting.
-func (p Plugin) id() string {
+func (p FPlugin) id() string {
 	if p.ID != nil {
 		return *p.ID
 	}
@@ -271,10 +271,10 @@ func (p Plugin) id() string {
 	return key
 }
 
-// Consumer represents a consumer in Kong.
-type Consumer struct {
+// FConsumer represents a consumer in Kong.
+type FConsumer struct {
 	kong.Consumer `yaml:",inline,omitempty"`
-	Plugins       []*Plugin                `json:"plugins,omitempty" yaml:",omitempty"`
+	Plugins       []*FPlugin               `json:"plugins,omitempty" yaml:",omitempty"`
 	KeyAuths      []*kong.KeyAuth          `json:"keyauth_credentials,omitempty" yaml:"keyauth_credentials,omitempty"`
 	HMACAuths     []*kong.HMACAuth         `json:"hmacauth_credentials,omitempty" yaml:"hmacauth_credentials,omitempty"`
 	JWTAuths      []*kong.JWTAuth          `json:"jwt_secrets,omitempty" yaml:"jwt_secrets,omitempty"`
@@ -284,7 +284,7 @@ type Consumer struct {
 }
 
 // id is used for sorting.
-func (c Consumer) id() string {
+func (c FConsumer) id() string {
 	if c.ID != nil {
 		return *c.ID
 	}
@@ -299,17 +299,19 @@ type Info struct {
 	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
 }
 
+//go:generate go run ./codegen/main.go
+
 // Content represents a serialized Kong state.
 type Content struct {
 	FormatVersion string `json:"_format_version,omitempty" yaml:"_format_version,omitempty"`
 	Info          *Info  `json:"_info,omitempty" yaml:"_info,omitempty"`
 	Workspace     string `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
 
-	Services       []Service       `json:"services,omitempty" yaml:",omitempty"`
-	Routes         []Route         `json:"routes,omitempty" yaml:",omitempty"`
-	Upstreams      []Upstream      `json:"upstreams,omitempty" yaml:",omitempty"`
-	Certificates   []Certificate   `json:"certificates,omitempty" yaml:",omitempty"`
-	CACertificates []CACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
-	Plugins        []Plugin        `json:"plugins,omitempty" yaml:",omitempty"`
-	Consumers      []Consumer      `json:"consumers,omitempty" yaml:",omitempty"`
+	Services       []FService       `json:"services,omitempty" yaml:",omitempty"`
+	Routes         []FRoute         `json:"routes,omitempty" yaml:",omitempty"`
+	Consumers      []FConsumer      `json:"consumers,omitempty" yaml:",omitempty"`
+	Plugins        []FPlugin        `json:"plugins,omitempty" yaml:",omitempty"`
+	Upstreams      []FUpstream      `json:"upstreams,omitempty" yaml:",omitempty"`
+	Certificates   []FCertificate   `json:"certificates,omitempty" yaml:",omitempty"`
+	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 }
