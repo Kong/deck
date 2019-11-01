@@ -16,12 +16,14 @@ var (
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
 	Use:   "validate",
-	Short: "Diff the current entities in Kong with the on on disks",
-	Long: `Diff is like a dry run of 'decK sync' command.
+	Short: "Validate the state file",
+	Long: `Validate reads the state file and ensures the validity.
 
-It will load entities form Kong and then perform a diff on those with
-the entities present in files locally. This allows you to see the entities
-that will be created or updated or deleted.
+It will read all the state files that are passed in. If there are YAML/JSON
+parsing issues, they will be reported. It also checks for foreign relationships
+and alerts if there are broken relationships, missing links present.
+No communication takes places between decK and Kong during the execution of
+this command.
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// read target file
