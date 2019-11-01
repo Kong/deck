@@ -237,7 +237,6 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		sort.SliceStable(c.SNIs, func(i, j int) bool {
 			return strings.Compare(*c.SNIs[i], *c.SNIs[j]) < 0
 		})
-		zeroOutID(&c, c.Cert, config.WithID)
 		zeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.Certificate, selectTags)
 		file.Certificates = append(file.Certificates, c)
