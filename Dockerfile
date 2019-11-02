@@ -4,7 +4,10 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 ADD . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o deck
+ARG COMMIT
+ARG TAG
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o deck \
+      -ldflags "-s -w -X github.com/hbagdi/deck/cmd.VERSION=$TAG -X github.com/hbagdi/deck/cmd.COMMIT=$COMMIT"
 
 FROM alpine:3.10
 RUN adduser --disabled-password --gecos "" deckuser

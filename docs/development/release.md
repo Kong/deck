@@ -26,8 +26,10 @@
   Make sure only version and checksum is changed and rest all is left as is.
   Commit and push for the Homebrew release.
 - Docker release  
-  - Run `docker build . -t hbagdi/deck:v0.5.0`. Substitute `v0.5.0` with
-    the version you are releasing.
+  - Run the command:
+    `docker build --build-arg TAG=v0.5.0 --build-arg COMMIT=bar -t hbagdi/deck:v0.5.0`.
+    Substitue `v0.5.0` with the version you are releasing and `bar` with the 
+    Git short hash of the tag.
   - Run `docker push hbagdi/deck:v0.5.0`
   - If needed, do the following for a new release (not for a back-ported
     patch release):
