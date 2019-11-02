@@ -59,6 +59,7 @@ func main() {
 	}
 	schema := reflector.Reflect(file.Content{})
 	schema.Definitions["Service"].AnyOf = anyOfNameOrID
+
 	schema.Definitions["Route"].AnyOf = anyOfNameOrID
 	schema.Definitions["Consumer"].AnyOf = anyOfUsernameOrID
 	schema.Definitions["Upstream"].Required = []string{"name"}
@@ -66,7 +67,7 @@ func main() {
 	schema.Definitions["FCACertificate"].Required = []string{"cert"}
 	schema.Definitions["FPlugin"].Required = []string{"name"}
 
-	schema.Definitions["FCertificate"].Required = []string{"cert", "key"}
+	schema.Definitions["FCertificate"].Required = []string{"id", "cert", "key"}
 	schema.Definitions["FCertificate"].Properties["snis"] = &jsonschema.Type{
 		Type: "array",
 		Items: &jsonschema.Type{
@@ -94,6 +95,8 @@ func main() {
 	schema.Definitions["FPlugin"].Properties["consumer"] = stringType
 	schema.Definitions["FPlugin"].Properties["service"] = stringType
 	schema.Definitions["FPlugin"].Properties["route"] = stringType
+
+	schema.Definitions["FService"].Properties["client_certificate"] = stringType
 
 	jsonSchema, err := json.MarshalIndent(schema, "", "  ")
 	if err != nil {

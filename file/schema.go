@@ -259,6 +259,7 @@ const contentSchema = `{
     },
     "FCertificate": {
       "required": [
+        "id",
         "cert",
         "key"
       ],
@@ -521,8 +522,7 @@ const contentSchema = `{
     "FService": {
       "properties": {
         "client_certificate": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/Certificate"
+          "type": "string"
         },
         "connect_timeout": {
           "type": "integer"
