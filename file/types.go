@@ -3,6 +3,7 @@ package file
 import (
 	"encoding/json"
 
+	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 )
 
@@ -22,9 +23,9 @@ const (
 
 // FService represents a Kong Service and it's associated routes and plugins.
 type FService struct {
-	kong.Service `yaml:",inline,omitempty"`
-	Routes       []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
-	Plugins      []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
+	kong.Service
+	Routes  []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
+	Plugins []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.
@@ -36,6 +37,110 @@ func (s FService) id() string {
 		return *s.Name
 	}
 	return ""
+}
+
+type service struct {
+	ClientCertificate *string    `json:"client_certificate,omitempty" yaml:"client_certificate,omitempty"`
+	ConnectTimeout    *int       `json:"connect_timeout,omitempty" yaml:"connect_timeout,omitempty"`
+	CreatedAt         *int       `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Host              *string    `json:"host,omitempty" yaml:"host,omitempty"`
+	ID                *string    `json:"id,omitempty" yaml:"id,omitempty"`
+	Name              *string    `json:"name,omitempty" yaml:"name,omitempty"`
+	Path              *string    `json:"path,omitempty" yaml:"path,omitempty"`
+	Port              *int       `json:"port,omitempty" yaml:"port,omitempty"`
+	Protocol          *string    `json:"protocol,omitempty" yaml:"protocol,omitempty"`
+	ReadTimeout       *int       `json:"read_timeout,omitempty" yaml:"read_timeout,omitempty"`
+	Retries           *int       `json:"retries,omitempty" yaml:"retries,omitempty"`
+	UpdatedAt         *int       `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
+	WriteTimeout      *int       `json:"write_timeout,omitempty" yaml:"write_timeout,omitempty"`
+	Tags              []*string  `json:"tags,omitempty" yaml:"tags,omitempty"`
+	Routes            []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
+	Plugins           []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
+}
+
+func copyToService(fService FService) service {
+	s := service{}
+	if fService.ClientCertificate != nil &&
+		!utils.Empty(fService.ClientCertificate.ID) {
+		s.ClientCertificate = kong.String(*fService.ClientCertificate.ID)
+	}
+	s.ConnectTimeout = fService.ConnectTimeout
+	s.CreatedAt = fService.CreatedAt
+	s.Host = fService.Host
+	s.ID = fService.ID
+	s.Name = fService.Name
+	s.Path = fService.Path
+	s.Port = fService.Port
+	s.Protocol = fService.Protocol
+	s.ReadTimeout = fService.ReadTimeout
+	s.Retries = fService.Retries
+	s.UpdatedAt = fService.UpdatedAt
+	s.WriteTimeout = fService.WriteTimeout
+	s.Tags = fService.Tags
+	s.Routes = fService.Routes
+	s.Plugins = fService.Plugins
+
+	return s
+}
+
+func copyFromService(service service, fService *FService) {
+	if service.ClientCertificate != nil &&
+		!utils.Empty(service.ClientCertificate) {
+		fService.ClientCertificate = &kong.Certificate{
+			ID: kong.String(*service.ClientCertificate),
+		}
+	}
+	fService.ConnectTimeout = service.ConnectTimeout
+	fService.CreatedAt = service.CreatedAt
+	fService.Host = service.Host
+	fService.ID = service.ID
+	fService.Name = service.Name
+	fService.Path = service.Path
+	fService.Port = service.Port
+	fService.Protocol = service.Protocol
+	fService.ReadTimeout = service.ReadTimeout
+	fService.Retries = service.Retries
+	fService.UpdatedAt = service.UpdatedAt
+	fService.WriteTimeout = service.WriteTimeout
+	fService.Tags = service.Tags
+	fService.Routes = service.Routes
+	fService.Plugins = service.Plugins
+}
+
+// MarshalYAML is a custom marshal to handle
+// SNI.
+func (s FService) MarshalYAML() (interface{}, error) {
+	return copyToService(s), nil
+}
+
+// UnmarshalYAML is a custom marshal method to handle
+// foreign references.
+func (s *FService) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var service service
+	if err := unmarshal(&service); err != nil {
+		return err
+	}
+	copyFromService(service, s)
+	return nil
+}
+
+// MarshalJSON is a custom marshal method to handle
+// foreign references.
+func (s FService) MarshalJSON() ([]byte, error) {
+	service := copyToService(s)
+	return json.Marshal(service)
+}
+
+// UnmarshalJSON is a custom marshal method to handle
+// foreign references.
+func (s *FService) UnmarshalJSON(b []byte) error {
+	var service service
+	err := json.Unmarshal(b, &service)
+	if err != nil {
+		return err
+	}
+	copyFromService(service, s)
+	return nil
 }
 
 // FRoute represents a Kong Route and it's associated plugins.
