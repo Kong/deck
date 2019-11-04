@@ -61,6 +61,10 @@ func syncMain(filename string, dry bool, parallelism int) error {
 	// prepare to read the current state from Kong
 	config.Workspace = targetContent.Workspace
 
+	if err := checkWorkspace(config); err != nil {
+		return err
+	}
+
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return err
