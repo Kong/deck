@@ -35,7 +35,7 @@ func TestUpstreamInsert(t *testing.T) {
 	upstream2.ID = kong.String("first")
 	assert.NotNil(collection.Add(upstream2))
 
-	upstream2.ID = kong.String("same-name-but-differnt-id")
+	upstream2.ID = kong.String("same-name-but-different-id")
 	assert.NotNil(collection.Add(upstream2))
 }
 

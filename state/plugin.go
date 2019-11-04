@@ -219,7 +219,7 @@ func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
 // the arguments. If serviceID, routeID and consumerID are empty strings, then
 // a global plugin is searched.
 // Otherwise, a plugin with name and the supplied foreign references is
-// searchd.
+// searched.
 // name is required.
 func (k *PluginsCollection) GetByProp(name, serviceID,
 	routeID string, consumerID string) (*Plugin, error) {

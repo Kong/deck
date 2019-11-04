@@ -371,7 +371,7 @@ func writeFile(content Content, filename string, format Format) error {
 			return err
 		}
 	default:
-		return errors.New("unkown file format: " + string(format))
+		return errors.New("unknown file format: " + string(format))
 	}
 
 	if filename == "-" {
