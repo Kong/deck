@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.6.0](#v060---20191103)
 - [v0.5.2](#v052---20190915)
 - [v0.5.1](#v051---20190824)
 - [v0.5.0](#v050---20190818)
@@ -7,6 +8,68 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.6.0] - 2019/11/03
+
+### Breaking changes
+
+- `ID` field is required for `Certificate` entity. Previous state files will
+  break if `ID` is not present on this entity. You can use `dump` command
+  to generate new state files which includes the `ID` field.
+- SNIs are exported under the `name` key under Certificate entity to match
+  Kong's declarative configuration format.
+
+### Added
+
+- Kong's configuration can now be synced/diffed/dumped using JSON format,
+  in addition to the existing YAML format. Use the `--format` flag to specify
+  the format.
+  [#35](https://github.com/hbagdi/deck/issues/35)
+- Plugins associated with multiple entities e.g. a plugin for a combination of
+  route and a consumer in Kong are now supported.
+  [#13](https://github.com/hbagdi/deck/issues/13)
+- JSON-schema based validation is now performed on the input file(s) for every
+  command.
+- New `validate` command has been added to validate an existing state file.
+  This performs a JSON-schema based sanity check on the file along-with foreign
+  reference checks to check for dangling pointers.
+- Service-less routes are now supported by decK.
+- `name` is no longer a required field  for routes and services entities
+  in Kong. If a `name` is not present, decK exports the entity with it's `ID`.
+- Client-certificates on Service entity are now a supported.
+- Credential entities like key-auth, basic-auth now support tagging.
+- `--parallelism` flag has been added to `sync` and `diff` commands to control
+  the number of concurrenty request to Kong's Admin API.
+  [#85](https://github.com/hbagdi/deck/issues/85)
+- `diff` and `sync` show a descriptive error when a workspace doesn't exist
+  for Kong Enterprise.
+  [102ed5dd](https://github.com/hbagdi/deck/commit/102ed5dd6f8ef)
+- `--select-tag` flag has been added to `diff` and `sync` command for use-cases
+  where the tags are not part of the state file. It is not recommended to
+  use these flags unless you know what you are doing.
+  [#81](https://github.com/hbagdi/deck/issues/81)
+- ID for any entity can now be specified. decK previously ignored the ID for
+  any entity if one was specified. Entities can also be exported with the `ID`
+  field set using `--with-id` flag on the `dump` command.
+  [#29](https://github.com/hbagdi/deck/issues/29)
+
+### Fixed
+
+- decK runs as non-root user in the Docker image.
+  [#82](https://github.com/hbagdi/deck/issues/82)
+- SNIs are now exported same as Kong's format i.e. they are exported under a
+  `name` key under the certificates entity.
+  [#76](https://github.com/hbagdi/deck/issues/76)
+- Errors are made more descriptive in few commands.
+- decK's binary inside the Docker image now contains versioning information.
+  [#38](https://github.com/hbagdi/deck/issues/38)
+
+
+### Internal
+
+- Go has been bumped up to `1.13.4`.
+- `go-kong` has been bumped up to `v0.10.0`.
+- Reduced memory allocation, which should result in less GC pressure.
 
 ## [v0.5.2] - 2019/09/15
 
@@ -208,6 +271,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.6.0]: https://github.com/hbagdi/deck/compare/v0.5.2...v0.6.0
 [v0.5.2]: https://github.com/hbagdi/deck/compare/v0.5.1...v0.5.2
 [v0.5.1]: https://github.com/hbagdi/deck/compare/v0.5.0...v0.5.1
 [v0.5.0]: https://github.com/hbagdi/deck/compare/v0.4.0...v0.5.0
