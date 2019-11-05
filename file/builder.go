@@ -421,6 +421,7 @@ func (b *stateBuilder) upstreams() {
 	}
 
 	for _, u := range b.targetContent.Upstreams {
+		u := u
 		if utils.Empty(u.ID) {
 			ups, err := b.currentState.Upstreams.Get(*u.Name)
 			if err == state.ErrNotFound {

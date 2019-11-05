@@ -1294,6 +1294,116 @@ func Test_stateBuilder_upstream(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "multiple upstreams are handled correctly",
+			fields: fields{
+				targetContent: &Content{
+					Upstreams: []FUpstream{
+						{
+							Upstream: kong.Upstream{
+								Name: kong.String("foo"),
+							},
+						},
+						{
+							Upstream: kong.Upstream{
+								Name: kong.String("bar"),
+							},
+						},
+					},
+				},
+				currentState: emptyState(),
+			},
+			want: &utils.KongRawState{
+				Upstreams: []*kong.Upstream{
+					{
+						ID:    kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Name:  kong.String("foo"),
+						Slots: kong.Int(10000),
+						Healthchecks: &kong.Healthcheck{
+							Active: &kong.ActiveHealthcheck{
+								Concurrency: kong.Int(10),
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 302},
+									Interval:     kong.Int(0),
+									Successes:    kong.Int(0),
+								},
+								HTTPPath:               kong.String("/"),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Type:                   kong.String("http"),
+								Timeout:                kong.Int(1),
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									Interval:     kong.Int(0),
+									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+								},
+							},
+							Passive: &kong.PassiveHealthcheck{
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+										306, 307, 308},
+									Successes: kong.Int(0),
+								},
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									HTTPStatuses: []int{429, 500, 503},
+								},
+							},
+						},
+						HashOn:           kong.String("none"),
+						HashFallback:     kong.String("none"),
+						HashOnCookiePath: kong.String("/"),
+					},
+					{
+						ID:    kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						Name:  kong.String("bar"),
+						Slots: kong.Int(10000),
+						Healthchecks: &kong.Healthcheck{
+							Active: &kong.ActiveHealthcheck{
+								Concurrency: kong.Int(10),
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 302},
+									Interval:     kong.Int(0),
+									Successes:    kong.Int(0),
+								},
+								HTTPPath:               kong.String("/"),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Type:                   kong.String("http"),
+								Timeout:                kong.Int(1),
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									Interval:     kong.Int(0),
+									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+								},
+							},
+							Passive: &kong.PassiveHealthcheck{
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+										306, 307, 308},
+									Successes: kong.Int(0),
+								},
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									HTTPStatuses: []int{429, 500, 503},
+								},
+							},
+						},
+						HashOn:           kong.String("none"),
+						HashFallback:     kong.String("none"),
+						HashOnCookiePath: kong.String("/"),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
