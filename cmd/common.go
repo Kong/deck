@@ -36,7 +36,7 @@ func checkWorkspace(config utils.KongClientConfig) error {
 		return err
 	}
 
-	req, err := http.NewRequest("GET", config.Address+"/workspace/"+workspace,
+	req, err := http.NewRequest("GET", config.Address+"/workspaces/"+workspace,
 		nil)
 	if err != nil {
 		return err
