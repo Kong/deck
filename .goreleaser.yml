@@ -36,4 +36,4 @@ brews:
    description: Declarative configuration for Kong
    skip_upload: true
    test: |
-       system "#{bin}/program --version"
+       system "#{bin}/deck version"
