@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.6.1](#v061---20191108)
 - [v0.6.0](#v060---20191103)
 - [v0.5.2](#v052---20190915)
 - [v0.5.1](#v051---20190824)
@@ -8,6 +9,17 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.6.1] - 2019/11/08
+
+### Fixed
+
+- Check for workspace makes call the right endpoint
+  [#94](https://github.com/hbagdi/deck/issues/94)
+- Error checking is performed correctly when ensuring existence of a workspace
+  [#95](https://github.com/hbagdi/deck/issues/95)
+- Multiple upstream definitions are read correctly and synced up
+  [#96](https://github.com/hbagdi/deck/issues/96)
 
 ## [v0.6.0] - 2019/11/03
 
@@ -271,6 +283,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.6.1]: https://github.com/hbagdi/deck/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/hbagdi/deck/compare/v0.5.2...v0.6.0
 [v0.5.2]: https://github.com/hbagdi/deck/compare/v0.5.1...v0.5.2
 [v0.5.1]: https://github.com/hbagdi/deck/compare/v0.5.0...v0.5.1
