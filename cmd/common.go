@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
@@ -109,5 +110,9 @@ func syncMain(filename string, dry bool, parallelism int) error {
 	printFn("  Created: %v\n", stats.CreateOps)
 	printFn("  Updated: %v\n", stats.UpdateOps)
 	printFn("  Deleted: %v\n", stats.DeleteOps)
+	if diffCmdNonZeroExitCode &&
+		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
+		os.Exit(2)
+	}
 	return nil
 }

@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	diffCmdKongStateFile string
-	diffCmdParallelism   int
+	diffCmdKongStateFile   string
+	diffCmdParallelism     int
+	diffCmdNonZeroExitCode bool
 )
 
 // diffCmd represents the diff command
@@ -48,4 +49,8 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are diffed.\n"+
 			"Multiple tags are ANDed together.")
+	diffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",
+		false, "return exit code 2 if there is a diff present,\n"+
+			"exit code 0 if no diff is found,\n"+
+			"and exit code 1 if an error occurs.")
 }
