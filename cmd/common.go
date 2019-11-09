@@ -3,6 +3,7 @@ package cmd
 import (
 	"net/http"
 
+	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
@@ -99,9 +100,14 @@ func syncMain(filename string, dry bool, parallelism int) error {
 	}
 
 	s, _ := diff.NewSyncer(currentState, targetState)
-	errs := solver.Solve(stopChannel, s, client, parallelism, dry)
+	stats, errs := solver.Solve(stopChannel, s, client, parallelism, dry)
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
 	}
+	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
+	printFn("Summary:\n")
+	printFn("  Created: %v\n", stats.CreateOps)
+	printFn("  Updated: %v\n", stats.UpdateOps)
+	printFn("  Deleted: %v\n", stats.DeleteOps)
 	return nil
 }
