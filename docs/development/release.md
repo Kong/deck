@@ -27,7 +27,7 @@
   Commit and push for the Homebrew release.
 - Docker release  
   - Run the command:
-    `docker build --build-arg TAG=v0.5.0 --build-arg COMMIT=bar -t hbagdi/deck:v0.5.0`.
+    `docker build --build-arg TAG=v0.5.0 --build-arg COMMIT=bar -t hbagdi/deck:v0.5.0 .`.
     Substitue `v0.5.0` with the version you are releasing and `bar` with the 
     Git short hash of the tag.
   - Run `docker push hbagdi/deck:v0.5.0`
