@@ -37,7 +37,8 @@ upstreams:
   - target: 198.51.100.12:80
   - target: 198.51.100.13:80
 certificates:
-- cert: |
+- id: 13c562a1-191c-4464-9b18-e5222b46035b
+  cert: |
     -----BEGIN CERTIFICATE-----
     MIIC1jCCAb4CCQCt23nwvxSCvjANBgkqhkiG9w0BAQsFADAtMRYwFAYDVQQDDA0q
     LmV4YW1wbGUuY29tMRMwEQYDVQQKDAprb25naHEub3JnMB4XDTE4MTIzMTIwMTkw
