@@ -9,9 +9,16 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Stats holds the stats related to a Solve.
+type Stats struct {
+	CreateOps int
+	UpdateOps int
+	DeleteOps int
+}
+
 // Solve generates a diff and walks the graph.
 func Solve(doneCh chan struct{}, syncer *diff.Syncer,
-	client *kong.Client, parallelism int, dry bool) []error {
+	client *kong.Client, parallelism int, dry bool) (Stats, []error) {
 	var r *crud.Registry
 	var err error
 	if dry {
@@ -20,12 +27,28 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 		r, err = buildRegistry(client)
 	}
 	if err != nil {
-		return append([]error{}, errors.Wrapf(err, "cannot build registry"))
+		return Stats{}, append([]error{},
+			errors.Wrapf(err, "cannot build registry"))
 	}
+	var stats Stats
 
-	return syncer.Run(doneCh, parallelism, func(e diff.Event) (crud.Arg, error) {
-		return r.Do(e.Kind, e.Op, e)
+	errs := syncer.Run(doneCh, parallelism, func(e diff.Event) (crud.Arg, error) {
+		result, err := r.Do(e.Kind, e.Op, e)
+		if err == nil {
+			switch e.Op {
+			case crud.Create:
+				stats.CreateOps = stats.CreateOps + 1
+			case crud.Update:
+				stats.UpdateOps = stats.UpdateOps + 1
+			case crud.Delete:
+				stats.DeleteOps = stats.DeleteOps + 1
+			default:
+				return nil, err
+			}
+		}
+		return result, err
 	})
+	return stats, errs
 }
 
 func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
