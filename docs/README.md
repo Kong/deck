@@ -1,39 +1,95 @@
 # decK Documentation
 
-Following are the main commands in decK:
+decK provides declarative configuration and drift detection for Kong.
 
-## dump
+## Table of content
 
-This command can be used to export all of Kong's configuration into a single
-YAML file. All entitites are exported by default.
+- [Design](#design)
+- [Guides](#guides)
+- [References](#references)
+- [Security](#security)
+- [FAQS](#frequently-asked-questions-faqs)
+- [Roadmap](#roadmap)
+- [Getting help](#getting-help)
+- [Reporting a bug](#reporting-a-bug)
 
-`--select-tag` can be used to export entities with the specific tag only.
-This flag can be used in the following cases:
+## Design
 
-- If you would like to manage only a subset of entities in Kong.
-- If multiple teams would like to configure Kong, one team can export
-  and sync it's configuration without being aware of any other teams'
-  configuration.
+- [Terminology](terminology.md)
+- [Architecture](design-architecture.md)
 
-If you are a Kong Enterprise user, you can specify a specific workspace that
-you want to export using `--workspace` flag or use `--all-workspaces` flag
-to export routing configuration of all workspaces.
+## Guides
 
-## diff
+- [Installation](guides/installation.md)
+- [Getting started with decK](guides/getting-started.md)
+- [Backup and restore of Kong's configuration](guides/backup-restore.md)
+- [Configuration as code and Git-ops using decK](guides/ci-driven-configuration.md)
+- [Distributed configuration with decK](guides/distributed-configuration.md)
+- [Best practices for using decK](guides/best-practices.md)
+- [Using decK with Kong Enterprise](guides/kong-enterprise.md)
+- [Using multiple files to store configuration](guides/multi-file-state.md)
 
-This command compares the content of the input file against the current
-configuration fo Kong.
-You can use this command for drift detection i.e. if the configuration
-of Kong is out of sync with configuration of the input file.
+## References
 
-## sync
+The command-line `--help` flag on the main command or a sub-command (like diff,
+sync, reset, etc.) shows the help text along with supported flags for those
+commands.
 
-This command will create, update or delete entities in Kong to exactly match
-as described via the input file. You can use `diff` command to display
-the actions that decK will take and then use `sync` commmand to actually
-perform these actions.
+A gist of all commands that are available in decK can be found
+[here](commands.md).
 
-## reset
+## Frequently Asked Questions (FAQs)
 
-This command will delete all the entities in Kong. Please use this
-command with extreme caution as the actions are irreversible.
+You can find answers to FAQs [here](faqs.md).
+
+## Roadmap
+
+decK's roadmap is public and can be found under the open
+[Github issues](https://github.com/hbagdi/deck/issues) and
+[milestones](https://github.com/hbagdi/deck/milestones).
+
+If you would like a feature to be added to decK, please open a Github issue,
+or add a `+1` reaction to an existing open issues, if you feel that's
+an addition you would like to see in decK.
+Features with more reactions take a higher precedence usually.
+
+## Security
+
+decK does not offer to secure your Kong deployment but only configures it.
+It encourages you to protect your Kong's Admin API with authentication but
+doesn't offer such a service itself.
+
+decK's state file can contain sensitive data such as private keys of
+certificates, credentials, etc. It is left up to the user to manage
+and store the state file in a secure fashion.
+
+If you believe that you have found a security vulnerability in decK, please
+submit a detailed report, along-with reproducible steps
+to Harry Bagdi (email address is first name last name At gmail Dot com).
+I will try to respond in a timely manner and will really appreciate it you
+report the issue privately first.
+
+## Getting help
+
+One of the design goals of decK is deliver a good developer experience to you.
+And part of it is getting the required help when you need it.
+To seek help, use the following resources:
+- `--help` flag gives you the necessary help in the terminal itself and should
+  solve most of your problems.
+- Please read through the pages under the `docs` directory of this repository.
+- If you still need help, please open a
+  [Github issue](https://github.com/hbagdi/deck/issues/new) to ask your
+  question.
+- decK has a very wide adoption by Kong's community and you can seek help
+  from the larger community at [Kong Nation](https://discuss.konghq.com).
+
+One thing I humbly ask for when you need help or run into a bug is patience.
+I'll do my best to respond you at the earliest possible.
+
+## Reporting a bug
+
+If you believe you have run into a bug with decK, please open
+a [Github issue](https://github.com/hbagdi/deck/issues/new).
+
+If you think you've found a security issue with decK, please read the
+[Security](#security) section.
