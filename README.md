@@ -87,8 +87,11 @@ docker pull hbagdi/deck
 
 ## Documentation
 
-Documentation can be found in the [docs](docs/README.md) directory.
-You can use `--help` flag to get help in the terminal itself.
+You can use `--help` flag once you've decK installed on your system
+to get help in the terminal itself.
+
+The project's documentation site is
+[https://deck.yolo42.com](https://deck.yolo42.com).
 
 ## License
 
