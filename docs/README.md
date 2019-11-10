@@ -2,6 +2,12 @@
 
 decK provides declarative configuration and drift detection for Kong.
 
+## Summary
+
+Here is an introductory screen-cast explaining decK:
+
+[![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
+
 ## Table of content
 
 - [Design](#design)
