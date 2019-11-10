@@ -1,1 +1,5 @@
 theme: jekyll-theme-slate
+google_analytics_id: UA-39705803-13
+show_downloads: true
+title: decK
+description: Declarative configuration for Kong and Kong Enterprise
