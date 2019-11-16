@@ -317,14 +317,14 @@ func Test_stateBuilder_services(t *testing.T) {
 	}
 }
 
-func Test_stateBuilder_ingestRoutes(t *testing.T) {
+func Test_stateBuilder_ingestRoute(t *testing.T) {
 	assert := assert.New(t)
 	rand.Seed(42)
 	type fields struct {
 		currentState *state.KongState
 	}
 	type args struct {
-		routes []kong.Route
+		route FRoute
 	}
 	tests := []struct {
 		name      string
@@ -339,8 +339,8 @@ func Test_stateBuilder_ingestRoutes(t *testing.T) {
 				currentState: emptyState(),
 			},
 			args: args{
-				routes: []kong.Route{
-					{
+				route: FRoute{
+					Route: kong.Route{
 						Name: kong.String("foo"),
 					},
 				},
@@ -365,8 +365,8 @@ func Test_stateBuilder_ingestRoutes(t *testing.T) {
 				currentState: existingRouteState(),
 			},
 			args: args{
-				routes: []kong.Route{
-					{
+				route: FRoute{
+					Route: kong.Route{
 						Name: kong.String("foo"),
 					},
 				},
@@ -395,7 +395,7 @@ func Test_stateBuilder_ingestRoutes(t *testing.T) {
 			d, _ := utils.GetKongDefaulter()
 			b.defaulter = d
 			b.intermediate, _ = state.NewKongState()
-			if err := b.ingestRoutes(tt.args.routes); (err != nil) != tt.wantErr {
+			if err := b.ingestRoute(tt.args.route); (err != nil) != tt.wantErr {
 				t.Errorf("stateBuilder.ingestPlugins() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			assert.Equal(tt.wantState, b.rawState)
@@ -1400,6 +1400,211 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						HashOn:           kong.String("none"),
 						HashFallback:     kong.String("none"),
 						HashOnCookiePath: kong.String("/"),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &stateBuilder{
+				targetContent: tt.fields.targetContent,
+				currentState:  tt.fields.currentState,
+			}
+			d, _ := utils.GetKongDefaulter()
+			b.defaulter = d
+			b.build()
+			assert.Equal(tt.want, b.rawState)
+		})
+	}
+}
+
+func Test_stateBuilder(t *testing.T) {
+	assert := assert.New(t)
+	rand.Seed(42)
+	type fields struct {
+		targetContent *Content
+		currentState  *state.KongState
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *utils.KongRawState
+	}{
+		{
+			name: "end to end test with all entities",
+			fields: fields{
+				targetContent: &Content{
+					Info: &Info{
+						SelectorTags: []string{"tag1"},
+					},
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("foo-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name: kong.String("foo-route1"),
+									},
+								},
+								{
+									Route: kong.Route{
+										ID:   kong.String("d125e79a-297c-414b-bc00-ad3a87be6c2b"),
+										Name: kong.String("foo-route2"),
+									},
+								},
+							},
+						},
+						{
+							Service: kong.Service{
+								Name: kong.String("bar-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name: kong.String("bar-route1"),
+									},
+								},
+								{
+									Route: kong.Route{
+										Name: kong.String("bar-route2"),
+									},
+								},
+							},
+						},
+					},
+					Upstreams: []FUpstream{
+						{
+							Upstream: kong.Upstream{
+								Name:  kong.String("foo"),
+								Slots: kong.Int(42),
+							},
+						},
+					},
+				},
+				currentState: existingServiceState(),
+			},
+			want: &utils.KongRawState{
+				Services: []*kong.Service{
+					{
+						ID:             kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Name:           kong.String("foo-service"),
+						Port:           kong.Int(80),
+						Retries:        kong.Int(5),
+						Protocol:       kong.String("http"),
+						ConnectTimeout: kong.Int(60000),
+						WriteTimeout:   kong.Int(60000),
+						ReadTimeout:    kong.Int(60000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+					{
+						ID:             kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						Name:           kong.String("bar-service"),
+						Port:           kong.Int(80),
+						Retries:        kong.Int(5),
+						Protocol:       kong.String("http"),
+						ConnectTimeout: kong.Int(60000),
+						WriteTimeout:   kong.Int(60000),
+						ReadTimeout:    kong.Int(60000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+				},
+				Routes: []*kong.Route{
+					{
+						ID:            kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Name:          kong.String("foo-route1"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:            kong.String("d125e79a-297c-414b-bc00-ad3a87be6c2b"),
+						Name:          kong.String("foo-route2"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:            kong.String("0cc0d614-4c88-4535-841a-cbe0709b0758"),
+						Name:          kong.String("bar-route1"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:            kong.String("083f61d3-75bc-42b4-9df4-f91929e18fda"),
+						Name:          kong.String("bar-route2"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+				},
+				Upstreams: []*kong.Upstream{
+					{
+						ID:    kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						Name:  kong.String("foo"),
+						Slots: kong.Int(42),
+						Healthchecks: &kong.Healthcheck{
+							Active: &kong.ActiveHealthcheck{
+								Concurrency: kong.Int(10),
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 302},
+									Interval:     kong.Int(0),
+									Successes:    kong.Int(0),
+								},
+								HTTPPath:               kong.String("/"),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Type:                   kong.String("http"),
+								Timeout:                kong.Int(1),
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									Interval:     kong.Int(0),
+									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+								},
+							},
+							Passive: &kong.PassiveHealthcheck{
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+										306, 307, 308},
+									Successes: kong.Int(0),
+								},
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									HTTPStatuses: []int{429, 500, 503},
+								},
+							},
+						},
+						HashOn:           kong.String("none"),
+						HashFallback:     kong.String("none"),
+						HashOnCookiePath: kong.String("/"),
+						Tags:             kong.StringSlice("tag1"),
 					},
 				},
 			},
