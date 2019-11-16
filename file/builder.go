@@ -48,8 +48,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	b.routes()
 	b.upstreams()
 	b.consumers()
-	b.plugins() //left
-	// credentials left
+	b.plugins()
 
 	// result
 	if b.err != nil {
@@ -362,17 +361,6 @@ func (b *stateBuilder) services() {
 			return
 		}
 
-		// routes for the service
-		var routes []kong.Route
-		for _, r := range s.Routes {
-			r.Service = &kong.Service{ID: kong.String(*s.ID)}
-			routes = append(routes, r.Route)
-		}
-		if err := b.ingestRoutes(routes); err != nil {
-			b.err = err
-			return
-		}
-
 		// plugins for the service
 		var plugins []kong.Plugin
 		for _, p := range s.Plugins {
@@ -383,6 +371,16 @@ func (b *stateBuilder) services() {
 			b.err = err
 			return
 		}
+
+		// routes for the service
+		for _, r := range s.Routes {
+			r := r
+			r.Service = &kong.Service{ID: kong.String(*s.ID)}
+			if err := b.ingestRoute(*r); err != nil {
+				b.err = err
+				return
+			}
+		}
 	}
 }
 
@@ -391,27 +389,12 @@ func (b *stateBuilder) routes() {
 		return
 	}
 
-	var routes []kong.Route
 	for _, r := range b.targetContent.Routes {
 		r := r
-		routes = append(routes, r.Route)
-
-		if err := b.ingestRoutes(routes); err != nil {
+		if err := b.ingestRoute(r); err != nil {
 			b.err = err
 			return
 		}
-
-		// plugins for the route
-		var plugins []kong.Plugin
-		for _, p := range r.Plugins {
-			p.Route = &kong.Route{ID: kong.String(*r.ID)}
-			plugins = append(plugins, p.Plugin)
-		}
-		if err := b.ingestPlugins(plugins); err != nil {
-			b.err = err
-			return
-		}
-		b.rawState.Routes = append(b.rawState.Routes, &r.Route)
 	}
 }
 
@@ -523,27 +506,36 @@ func (b *stateBuilder) plugins() {
 	}
 }
 
-func (b *stateBuilder) ingestRoutes(routes []kong.Route) error {
-	for _, r := range routes {
-		r := r
-		if utils.Empty(r.ID) {
-			route, err := b.currentState.Routes.Get(*r.Name)
-			if err == state.ErrNotFound {
-				r.ID = uuid()
-			} else if err != nil {
-				return err
-			} else {
-				r.ID = kong.String(*route.ID)
-			}
-		}
-		utils.MustMergeTags(&r, b.selectTags)
-		b.defaulter.MustSet(&r)
-		b.rawState.Routes = append(b.rawState.Routes, &r)
-
-		err := b.intermediate.Routes.Add(state.Route{Route: r})
-		if err != nil {
+func (b *stateBuilder) ingestRoute(r FRoute) error {
+	if utils.Empty(r.ID) {
+		route, err := b.currentState.Routes.Get(*r.Name)
+		if err == state.ErrNotFound {
+			r.ID = uuid()
+		} else if err != nil {
 			return err
+		} else {
+			r.ID = kong.String(*route.ID)
 		}
+	}
+
+	utils.MustMergeTags(&r, b.selectTags)
+	b.defaulter.MustSet(&r.Route)
+
+	b.rawState.Routes = append(b.rawState.Routes, &r.Route)
+	err := b.intermediate.Routes.Add(state.Route{Route: r.Route})
+	if err != nil {
+		return err
+	}
+
+	// plugins for the route
+	var plugins []kong.Plugin
+	for _, p := range r.Plugins {
+		p := p
+		p.Route = &kong.Route{ID: kong.String(*r.ID)}
+		plugins = append(plugins, p.Plugin)
+	}
+	if err := b.ingestPlugins(plugins); err != nil {
+		return err
 	}
 	return nil
 }
