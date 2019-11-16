@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.6.2](#v062---20191116)
 - [v0.6.1](#v061---20191108)
 - [v0.6.0](#v060---20191103)
 - [v0.5.2](#v052---20190915)
@@ -9,6 +10,15 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.6.2] - 2019/11/16
+
+### Fixed
+
+- Service-less routes are correctly processed
+  [#103](https://github.com/hbagdi/deck/issues/103)
+- Plugins for routes are correctly processed
+  [#104](https://github.com/hbagdi/deck/issues/104)
 
 ## [v0.6.1] - 2019/11/08
 
@@ -283,6 +293,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.6.2]: https://github.com/hbagdi/deck/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/hbagdi/deck/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/hbagdi/deck/compare/v0.5.2...v0.6.0
 [v0.5.2]: https://github.com/hbagdi/deck/compare/v0.5.1...v0.5.2
