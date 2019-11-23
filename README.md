@@ -3,6 +3,7 @@
 decK provides declarative configuration and drift detection for Kong.
 
 [![Build Status](https://travis-ci.com/hbagdi/deck.svg?branch=master)](https://travis-ci.com/hbagdi/deck)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhbagdi%2Fdeck.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhbagdi%2Fdeck?ref=badge_shield)
 
 [![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
 
@@ -97,3 +98,6 @@ The project's documentation site is
 
 decK is licensed with Apache License Version 2.0. Please read the LICENSE
 file for more details.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhbagdi%2Fdeck.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhbagdi%2Fdeck?ref=badge_large)
