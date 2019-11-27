@@ -22,11 +22,6 @@ This can be very useful in a variety of scenarios, some examples include:
 In such  case, you can use decK's `select-tag` feature to export, sync, reset
 only a sub-set of configuration.
 
-## Explainer video
-
-TODO add link to Kong Summit 2019 talk on "Declarative configuration and
-drift detection for Kong".
-
 ## Tags
 
 Tags, introduced in Kong 1.1, provide a way to associate metadata with entities

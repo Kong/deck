@@ -15,6 +15,7 @@ Here is an introductory screen-cast explaining decK:
 - [References](#references)
 - [Security](#security)
 - [FAQS](#frequently-asked-questions-faqs)
+- [Explainer video](#explainer-video)
 - [Roadmap](#roadmap)
 - [Getting help](#getting-help)
 - [Reporting a bug](#reporting-a-bug)
@@ -47,6 +48,13 @@ A gist of all commands that are available in decK can be found
 ## Frequently Asked Questions (FAQs)
 
 You can find answers to FAQs [here](faqs.md).
+
+## Explainer video
+
+Harry Bagdi gave a talk on motivation behind decK and demonstrated a few key
+features of decK at Kong Summit 2019. Following is a recording of that session:
+
+[![decK talk by Harry Bagdi](https://img.youtube.com/vi/fzpNC5vWE3g/0.jpg)](https://www.youtube.com/watch?v=fzpNC5vWE3g)
 
 ## Roadmap
 
