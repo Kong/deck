@@ -145,7 +145,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	//Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "making HTTP reqeust")
+		return nil, errors.Wrap(err, "making HTTP request")
 	}
 
 	// log the response
