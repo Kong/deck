@@ -157,7 +157,7 @@ func TestCACertificateWithTags(T *testing.T) {
 	assert.NotNil(client)
 
 	certificate := &CACertificate{
-		Cert: String(cert3),
+		Cert: String(caCert3),
 		Tags: StringSlice("tag1", "tag2"),
 	}
 
