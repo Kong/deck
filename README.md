@@ -93,7 +93,11 @@ to get help in the terminal itself.
 The project's documentation site is
 [https://deck.yolo42.com](https://deck.yolo42.com).
 
+## Changelog
+
+Changelog can be found in the [CHANGELOG.md](CHANGELOG.md) file.
+
 ## License
 
-decK is licensed with Apache License Version 2.0. Please read the LICENSE
-file for more details.
+decK is licensed with Apache License Version 2.0.
+Please read the [LICENSE](LICENSE) file for more details.

@@ -13,10 +13,12 @@ Here is an introductory screen-cast explaining decK:
 - [Design](#design)
 - [Guides](#guides)
 - [References](#references)
-- [Security](#security)
 - [FAQS](#frequently-asked-questions-faqs)
 - [Explainer video](#explainer-video)
+- [Changelog](#changelog)
+- [Licensing](#licensing)
 - [Roadmap](#roadmap)
+- [Security](#security)
 - [Getting help](#getting-help)
 - [Reporting a bug](#reporting-a-bug)
 
@@ -55,6 +57,17 @@ Harry Bagdi gave a talk on motivation behind decK and demonstrated a few key
 features of decK at Kong Summit 2019. Following is a recording of that session:
 
 [![decK talk by Harry Bagdi](https://img.youtube.com/vi/fzpNC5vWE3g/0.jpg)](https://www.youtube.com/watch?v=fzpNC5vWE3g)
+
+## Changelog
+
+Changelog can be found in the
+[CHANGELOG.md](https://github.com/hbagdi/deck/blob/master/CHANGELOG.md) file.
+
+## Licensing
+
+decK is licensed with Apache License Version 2.0.
+Please read the
+[LICENSE](https://github.com/hbagdi/deck/blob/master/LICENSE) file for more details.
 
 ## Roadmap
 
