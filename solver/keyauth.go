@@ -1,4 +1,4 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
@@ -6,23 +6,11 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// KeyAuthCRUD implements Actions interface
-// from the github.com/kong/crud package for the Route entitiy of Kong.
-type KeyAuthCRUD struct {
+// keyAuthCRUD implements crud.Actions interface.
+type keyAuthCRUD struct {
 	client *kong.Client
-}
-
-// NewKeyAuthCRUD creates a new KeyAuthCRUD. Client is required.
-func NewKeyAuthCRUD(client *kong.Client) (*KeyAuthCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &KeyAuthCRUD{
-		client: client,
-	}, nil
 }
 
 func keyAuthFromStuct(arg diff.Event) *state.KeyAuth {
@@ -38,7 +26,7 @@ func keyAuthFromStuct(arg diff.Event) *state.KeyAuth {
 // The arg should be of type diff.Event, containing the keyAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *KeyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStuct(event)
 	createdKeyAuth, err := s.client.KeyAuths.Create(nil, keyAuth.Consumer.ID,
@@ -53,7 +41,7 @@ func (s *KeyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the keyAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *KeyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStuct(event)
 	cid := ""
@@ -74,7 +62,7 @@ func (s *KeyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the keyAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *KeyAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStuct(event)
 

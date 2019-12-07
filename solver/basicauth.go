@@ -1,4 +1,4 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
@@ -6,23 +6,11 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// BasicAuthCRUD implements Actions interface
-// from the github.com/kong/crud package for the Route entitiy of Kong.
-type BasicAuthCRUD struct {
+// basicAuthCRUD implements crud.Actions interface.
+type basicAuthCRUD struct {
 	client *kong.Client
-}
-
-// NewBasicAuthCRUD creates a new BasicAuthCRUD. Client is required.
-func NewBasicAuthCRUD(client *kong.Client) (*BasicAuthCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &BasicAuthCRUD{
-		client: client,
-	}, nil
 }
 
 func basicAuthFromStuct(arg diff.Event) *state.BasicAuth {
@@ -38,7 +26,7 @@ func basicAuthFromStuct(arg diff.Event) *state.BasicAuth {
 // The arg should be of type diff.Event, containing the basicAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *BasicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStuct(event)
 	cid := ""
@@ -60,7 +48,7 @@ func (s *BasicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the basicAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *BasicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStuct(event)
 	cid := ""
@@ -81,7 +69,7 @@ func (s *BasicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the basicAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *BasicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStuct(event)
 

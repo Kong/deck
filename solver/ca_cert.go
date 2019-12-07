@@ -1,27 +1,15 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// CACertificateCRUD implements Actions interface
-// from the github.com/kong/crud package for the Certificate entitiy of Kong.
-type CACertificateCRUD struct {
+// caCertificateCRUD implements crud.Actions interface.
+type caCertificateCRUD struct {
 	client *kong.Client
-}
-
-// NewCACertificateCRUD creates a new CACertificateCRUD. Client is required.
-func NewCACertificateCRUD(client *kong.Client) (*CACertificateCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &CACertificateCRUD{
-		client: client,
-	}, nil
 }
 
 func caCertFromStuct(arg diff.Event) *state.CACertificate {
@@ -36,7 +24,7 @@ func caCertFromStuct(arg diff.Event) *state.CACertificate {
 // The arg should be of type diff.Event, containing the certificate to be created,
 // else the function will panic.
 // It returns a the created *state.CACertificate.
-func (s *CACertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStuct(event)
 	createdCertificate, err := s.client.CACertificates.Create(nil,
@@ -51,7 +39,7 @@ func (s *CACertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.CACertificate.
-func (s *CACertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStuct(event)
 	err := s.client.CACertificates.Delete(nil, certificate.ID)
@@ -65,7 +53,7 @@ func (s *CACertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be updated,
 // else the function will panic.
 // It returns a the updated *state.CACertificate.
-func (s *CACertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStuct(event)
 	updatedCertificate, err := s.client.CACertificates.Create(nil,

@@ -3,6 +3,8 @@ package solver
 import (
 	"encoding/json"
 
+	"github.com/hbagdi/deck/crud"
+	"github.com/hbagdi/deck/diff"
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 )
@@ -34,4 +36,12 @@ func getDiff(a, b interface{}) (string, error) {
 		formatter.AsciiFormatterConfig{})
 	diffString, err := formatter.Format(d)
 	return diffString, err
+}
+
+func eventFromArg(arg crud.Arg) diff.Event {
+	event, ok := arg.(diff.Event)
+	if !ok {
+		panic("unexpected type, expected diff.Event")
+	}
+	return event
 }

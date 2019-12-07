@@ -1,4 +1,4 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
@@ -6,23 +6,11 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// Oauth2CredCRUD implements Actions interface
-// from the github.com/kong/crud package for the Route entitiy of Kong.
-type Oauth2CredCRUD struct {
+// oauth2CredCRUD implements crud.Actions interface.
+type oauth2CredCRUD struct {
 	client *kong.Client
-}
-
-// NewOauth2CredCRUD creates a new Oauth2CredCRUD. Client is required.
-func NewOauth2CredCRUD(client *kong.Client) (*Oauth2CredCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &Oauth2CredCRUD{
-		client: client,
-	}, nil
 }
 
 func oauth2CredFromStuct(arg diff.Event) *state.Oauth2Credential {
@@ -38,7 +26,7 @@ func oauth2CredFromStuct(arg diff.Event) *state.Oauth2Credential {
 // The arg should be of type diff.Event, containing the oauth2Cred to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *Oauth2CredCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *oauth2CredCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStuct(event)
 	cid := ""
@@ -60,7 +48,7 @@ func (s *Oauth2CredCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the oauth2Cred to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *Oauth2CredCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *oauth2CredCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStuct(event)
 	cid := ""
@@ -81,7 +69,7 @@ func (s *Oauth2CredCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the oauth2Cred to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *Oauth2CredCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *oauth2CredCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStuct(event)
 

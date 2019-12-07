@@ -1,27 +1,15 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// CertificateCRUD implements Actions interface
-// from the github.com/kong/crud package for the Certificate entitiy of Kong.
-type CertificateCRUD struct {
+// certificateCRUD implements crud.Actions interface.
+type certificateCRUD struct {
 	client *kong.Client
-}
-
-// NewCertificateCRUD creates a new CertificateCRUD. Client is required.
-func NewCertificateCRUD(client *kong.Client) (*CertificateCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &CertificateCRUD{
-		client: client,
-	}, nil
 }
 
 func certificateFromStuct(arg diff.Event) *state.Certificate {
@@ -36,7 +24,7 @@ func certificateFromStuct(arg diff.Event) *state.Certificate {
 // The arg should be of type diff.Event, containing the certificate to be created,
 // else the function will panic.
 // It returns a the created *state.Certificate.
-func (s *CertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *certificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 	createdCertificate, err := s.client.Certificates.Create(nil, &certificate.Certificate)
@@ -50,7 +38,7 @@ func (s *CertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Certificate.
-func (s *CertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *certificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 	err := s.client.Certificates.Delete(nil, certificate.ID)
@@ -64,7 +52,7 @@ func (s *CertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be updated,
 // else the function will panic.
 // It returns a the updated *state.Certificate.
-func (s *CertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *certificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := certificateFromStuct(event)
 

@@ -1,4 +1,4 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
@@ -6,23 +6,11 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// HMACAuthCRUD implements Actions interface
-// from the github.com/kong/crud package for the Route entitiy of Kong.
-type HMACAuthCRUD struct {
+// hmacAuthCRUD implements crud.Actions interface.
+type hmacAuthCRUD struct {
 	client *kong.Client
-}
-
-// NewHMACAuthCRUD creates a new HMACAuthCRUD. Client is required.
-func NewHMACAuthCRUD(client *kong.Client) (*HMACAuthCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &HMACAuthCRUD{
-		client: client,
-	}, nil
 }
 
 func hmacAuthFromStuct(arg diff.Event) *state.HMACAuth {
@@ -38,7 +26,7 @@ func hmacAuthFromStuct(arg diff.Event) *state.HMACAuth {
 // The arg should be of type diff.Event, containing the hmacAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *HMACAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *hmacAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStuct(event)
 	cid := ""
@@ -60,7 +48,7 @@ func (s *HMACAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the hmacAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *HMACAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *hmacAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStuct(event)
 	cid := ""
@@ -81,7 +69,7 @@ func (s *HMACAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the hmacAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *HMACAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *hmacAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStuct(event)
 

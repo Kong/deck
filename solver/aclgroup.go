@@ -1,4 +1,4 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
@@ -6,23 +6,11 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// ACLGroupCRUD implements Actions interface
-// from the github.com/kong/crud package for the Route entitiy of Kong.
-type ACLGroupCRUD struct {
+// aclGroupCRUD implements crud.Actions interface.
+type aclGroupCRUD struct {
 	client *kong.Client
-}
-
-// NewACLGroupCRUD creates a new ACLGroupCRUD. Client is required.
-func NewACLGroupCRUD(client *kong.Client) (*ACLGroupCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &ACLGroupCRUD{
-		client: client,
-	}, nil
 }
 
 func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
@@ -38,7 +26,7 @@ func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
 // The arg should be of type diff.Event, containing the aclGroup to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *ACLGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	aclGroup := aclGroupFromStuct(event)
 	cid := ""
@@ -60,7 +48,7 @@ func (s *ACLGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the aclGroup to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *ACLGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	aclGroup := aclGroupFromStuct(event)
 	cid := ""
@@ -81,7 +69,7 @@ func (s *ACLGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the aclGroup to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *ACLGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	aclGroup := aclGroupFromStuct(event)
 

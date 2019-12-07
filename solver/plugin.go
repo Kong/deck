@@ -1,27 +1,15 @@
-package kong
+package solver
 
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-// PluginCRUD implements Actions interface
-// from the github.com/kong/crud package for the Plugin entitiy of Kong.
-type PluginCRUD struct {
+// pluginCRUD implements crud.Actions interface.
+type pluginCRUD struct {
 	client *kong.Client
-}
-
-// NewPluginCRUD creates a new PluginCRUD. Client is required.
-func NewPluginCRUD(client *kong.Client) (*PluginCRUD, error) {
-	if client == nil {
-		return nil, errors.New("client is required")
-	}
-	return &PluginCRUD{
-		client: client,
-	}, nil
 }
 
 func pluginFromStuct(arg diff.Event) *state.Plugin {
@@ -37,7 +25,7 @@ func pluginFromStuct(arg diff.Event) *state.Plugin {
 // The arg should be of type diff.Event, containing the plugin to be created,
 // else the function will panic.
 // It returns a the created *state.Plugin.
-func (s *PluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
@@ -52,7 +40,7 @@ func (s *PluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the plugin to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Plugin.
-func (s *PluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 	err := s.client.Plugins.Delete(nil, plugin.ID)
@@ -66,7 +54,7 @@ func (s *PluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the plugin to be updated,
 // else the function will panic.
 // It returns a the updated *state.Plugin.
-func (s *PluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	plugin := pluginFromStuct(event)
 
