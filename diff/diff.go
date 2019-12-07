@@ -40,62 +40,20 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
 
-	err := s.postProcess.Register("service", &servicePostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'service' crud")
-	}
-	err = s.postProcess.Register("route", &routePostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'route' crud")
-	}
-	err = s.postProcess.Register("upstream", &upstreamPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'upstream' crud")
-	}
-	err = s.postProcess.Register("target", &targetPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'target' crud")
-	}
-	err = s.postProcess.Register("certificate", &certificatePostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'certificate' crud")
-	}
-	err = s.postProcess.Register("ca_certificate", &caCertificatePostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'ca_certificate' crud")
-	}
-	err = s.postProcess.Register("plugin", &pluginPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'plugin' crud")
-	}
-	err = s.postProcess.Register("consumer", &consumerPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'consumer' crud")
-	}
-	err = s.postProcess.Register("key-auth", &keyAuthPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
-	}
-	err = s.postProcess.Register("hmac-auth", &hmacAuthPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
-	}
-	err = s.postProcess.Register("jwt-auth", &jwtAuthPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
-	}
-	err = s.postProcess.Register("basic-auth", &basicAuthPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
-	}
-	err = s.postProcess.Register("acl-group", &aclGroupPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
-	}
-	err = s.postProcess.Register("oauth2-cred", &oauth2CredPostAction{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'oauth2-cred' crud")
-	}
+	s.postProcess.MustRegister("service", &servicePostAction{current})
+	s.postProcess.MustRegister("route", &routePostAction{current})
+	s.postProcess.MustRegister("upstream", &upstreamPostAction{current})
+	s.postProcess.MustRegister("target", &targetPostAction{current})
+	s.postProcess.MustRegister("certificate", &certificatePostAction{current})
+	s.postProcess.MustRegister("ca_certificate", &caCertificatePostAction{current})
+	s.postProcess.MustRegister("plugin", &pluginPostAction{current})
+	s.postProcess.MustRegister("consumer", &consumerPostAction{current})
+	s.postProcess.MustRegister("key-auth", &keyAuthPostAction{current})
+	s.postProcess.MustRegister("hmac-auth", &hmacAuthPostAction{current})
+	s.postProcess.MustRegister("jwt-auth", &jwtAuthPostAction{current})
+	s.postProcess.MustRegister("basic-auth", &basicAuthPostAction{current})
+	s.postProcess.MustRegister("acl-group", &aclGroupPostAction{current})
+	s.postProcess.MustRegister("oauth2-cred", &oauth2CredPostAction{current})
 	return s, nil
 }
 
@@ -387,8 +345,7 @@ func (sc *Syncer) handleEvent(d Do, event Event, a int) error {
 	if res == nil {
 		return errors.New("result of event is nil")
 	}
-	_, err = sc.postProcess.Do(event.Kind,
-		event.Op, sc.currentState, res)
+	_, err = sc.postProcess.Do(event.Kind, event.Op, res)
 	if err != nil {
 		return errors.Wrap(err, "while post processing event")
 	}
