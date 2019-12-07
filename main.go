@@ -11,8 +11,6 @@ import (
 	"github.com/hbagdi/deck/cmd"
 )
 
-var entities = []string{"key-auth", "hmac-auth", "jwt", "oauth2", "acl"}
-
 func registerSignalHandler() {
 	sigs := make(chan os.Signal, 1)
 	done := make(chan struct{})
