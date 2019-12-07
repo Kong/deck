@@ -31,6 +31,14 @@ func (r *Registry) Register(kind Kind, a Actions) error {
 	return nil
 }
 
+// MustRegister is same as Register but panics on error.
+func (r *Registry) MustRegister(kind Kind, a Actions) {
+	err := r.Register(kind, a)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Get returns actions associated with kind.
 // An error will be returned if kind was never registered.
 func (r *Registry) Get(kind Kind) (Actions, error) {

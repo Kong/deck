@@ -53,6 +53,24 @@ func TestRegistryRegister(t *testing.T) {
 	assert.NotNil(err)
 }
 
+func TestRegistryMustRegister(t *testing.T) {
+	assert := assert.New(t)
+	var r Registry
+	var a Actions = newTestActionFixture("yolo")
+
+	assert.Panics(func() {
+		r.MustRegister("", nil)
+	})
+
+	assert.NotPanics(func() {
+		r.MustRegister("foo", a)
+	})
+
+	assert.Panics(func() {
+		r.MustRegister("foo", a)
+	})
+}
+
 func TestRegistryGet(t *testing.T) {
 	assert := assert.New(t)
 	var r Registry
