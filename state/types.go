@@ -17,6 +17,18 @@ type entity interface {
 	GetConsumer() string
 }
 
+// ConsoleString contains methods to be used to print
+// entity to console.
+type ConsoleString interface {
+	// Console returns a string to uniquely identify an
+	// entity in human-readable form.
+	// It should have the ID or endpoint key along-with
+	// foreign references if they exist.
+	// It will be used to communicate to the human user
+	// that this entity is undergoing some change.
+	Console() string
+}
+
 // Meta contains additional information for an entity
 // type Meta struct {
 // 	Name   *string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -64,6 +76,12 @@ func (s1 *Service) Identifier() string {
 	return *s1.ID
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (s1 *Service) Console() string {
+	return s1.Identifier()
+}
+
 // Equal returns true if s1 and s2 are equal.
 func (s1 *Service) Equal(s2 *Service) bool {
 	return reflect.DeepEqual(s1.Service, s2.Service)
@@ -104,6 +122,12 @@ func (r1 *Route) Identifier() string {
 		return *r1.Name
 	}
 	return *r1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (r1 *Route) Console() string {
+	return r1.Identifier()
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -153,6 +177,12 @@ func (u1 *Upstream) Identifier() string {
 	return *u1.ID
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (u1 *Upstream) Console() string {
+	return u1.Identifier()
+}
+
 // Equal returns true if u1 and u2 are equal.
 func (u1 *Upstream) Equal(u2 *Upstream) bool {
 	return reflect.DeepEqual(u1.Upstream, u2.Upstream)
@@ -190,6 +220,21 @@ func (t1 *Target) Identifier() string {
 		return *t1.Target.Target
 	}
 	return *t1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (t1 *Target) Console() string {
+	res := t1.Identifier()
+	if t1.Upstream != nil {
+		if t1.Upstream.ID != nil {
+			res = res + " for upstream " + *t1.Upstream.ID
+		}
+		if t1.Upstream.Name != nil {
+			res = res + " for upstream " + *t1.Upstream.Name
+		}
+	}
+	return res
 }
 
 // Equal returns true if t1 and t2 are equal.
@@ -237,6 +282,12 @@ func (c1 *Certificate) Identifier() string {
 	return *c1.Cert
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *Certificate) Console() string {
+	return c1.Identifier()
+}
+
 // Equal returns true if c1 and c2 are equal.
 func (c1 *Certificate) Equal(c2 *Certificate) bool {
 	return reflect.DeepEqual(c1.Certificate, c2.Certificate)
@@ -282,6 +333,12 @@ func (s1 *SNI) Identifier() string {
 	return *s1.ID
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (s1 *SNI) Console() string {
+	return s1.Identifier()
+}
+
 // EqualWithOpts returns true if s1 and s2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
@@ -318,6 +375,36 @@ func (p1 *Plugin) Identifier() string {
 		return *p1.Name
 	}
 	return *p1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (p1 *Plugin) Console() string {
+	res := *p1.Name + " "
+
+	if p1.Service == nil && p1.Route == nil && p1.Consumer == nil {
+		return res + "(global)"
+	}
+	associations := []string{}
+	if p1.Service != nil {
+		associations = append(associations, "service "+*p1.Service.ID)
+	}
+	if p1.Route != nil {
+		associations = append(associations, "route "+*p1.Route.ID)
+	}
+	if p1.Consumer != nil {
+		associations = append(associations, "consumer "+*p1.Consumer.ID)
+	}
+	if len(associations) > 0 {
+		res += "for "
+	}
+	for i := 0; i < len(associations); i++ {
+		res += associations[i]
+		if i < len(associations)-1 {
+			res += " and "
+		}
+	}
+	return res
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -368,6 +455,12 @@ func (c1 *Consumer) Identifier() string {
 	return *c1.ID
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *Consumer) Console() string {
+	return c1.Identifier()
+}
+
 // Equal returns true if c1 and c2 are equal.
 func (c1 *Consumer) Equal(c2 *Consumer) bool {
 	return reflect.DeepEqual(c1.Consumer, c2.Consumer)
@@ -392,11 +485,38 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 	return reflect.DeepEqual(c1Copt, c2Copy)
 }
 
+func forConsumerString(c *kong.Consumer) string {
+	if c != nil {
+		if c.Username != nil {
+			return " for consumer " + *c.Username
+		}
+		if c.ID != nil {
+			return " for consumer " + *c.ID
+		}
+	}
+	return ""
+}
+
 // KeyAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original KeyAuth object.
 type KeyAuth struct {
 	kong.KeyAuth `yaml:",inline"`
 	Meta
+}
+
+// stripKey returns the last 5 characters of key.
+// If key is less than or equal to 5 characters, then the key is returned as is.
+func stripKey(key string) string {
+	if len(key) <= 5 {
+		return key
+	}
+	return string(key[len(key)-5:])
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (k1 *KeyAuth) Console() string {
+	return stripKey(*k1.Key) + forConsumerString(k1.Consumer)
 }
 
 // Equal returns true if k1 and k2 are equal.
@@ -461,6 +581,12 @@ type HMACAuth struct {
 	Meta
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (h1 *HMACAuth) Console() string {
+	return *h1.Username + forConsumerString(h1.Consumer)
+}
+
 // Equal returns true if h1 and h2 are equal.
 func (h1 *HMACAuth) Equal(h2 *HMACAuth) bool {
 	return reflect.DeepEqual(h1.HMACAuth, h2.HMACAuth)
@@ -523,6 +649,12 @@ type JWTAuth struct {
 	Meta
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (j1 *JWTAuth) Console() string {
+	return *j1.Key + forConsumerString(j1.Consumer)
+}
+
 // Equal returns true if j1 and j2 are equal.
 func (j1 *JWTAuth) Equal(j2 *JWTAuth) bool {
 	return reflect.DeepEqual(j1.JWTAuth, j2.JWTAuth)
@@ -583,6 +715,12 @@ func (j1 *JWTAuth) GetConsumer() string {
 type BasicAuth struct {
 	kong.BasicAuth `yaml:",inline"`
 	Meta
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (b1 *BasicAuth) Console() string {
+	return *b1.Username + forConsumerString(b1.Consumer)
 }
 
 // Equal returns true if b1 and b2 are equal.
@@ -651,6 +789,12 @@ type ACLGroup struct {
 	Meta
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (b1 *ACLGroup) Console() string {
+	return *b1.Group + forConsumerString(b1.Consumer)
+}
+
 // Equal returns true if b1 and b2 are equal.
 func (b1 *ACLGroup) Equal(b2 *ACLGroup) bool {
 	return reflect.DeepEqual(b1.ACLGroup, b2.ACLGroup)
@@ -695,6 +839,12 @@ func (c1 *CACertificate) Identifier() string {
 	return *c1.Cert
 }
 
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *CACertificate) Console() string {
+	return c1.Identifier()
+}
+
 // Equal returns true if c1 and c2 are equal.
 func (c1 *CACertificate) Equal(c2 *CACertificate) bool {
 	return reflect.DeepEqual(c1.CACertificate, c2.CACertificate)
@@ -724,6 +874,12 @@ func (c1 *CACertificate) EqualWithOpts(c2 *CACertificate,
 type Oauth2Credential struct {
 	kong.Oauth2Credential `yaml:",inline"`
 	Meta
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (k1 *Oauth2Credential) Console() string {
+	return *k1.Name + forConsumerString(k1.Consumer)
 }
 
 // Equal returns true if k1 and k2 are equal.

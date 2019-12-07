@@ -443,3 +443,10 @@ func TestACLGroupEqual(t *testing.T) {
 	assert.False(k1.EqualWithOpts(&k2, false, true, false))
 	assert.False(k1.EqualWithOpts(&k2, false, false, true))
 }
+
+func TestStripKey(t *testing.T) {
+	assert := assert.New(t)
+	assert.Equal("hello", stripKey("hello"))
+	assert.Equal("yolo", stripKey("yolo"))
+	assert.Equal("world", stripKey("hello world"))
+}
