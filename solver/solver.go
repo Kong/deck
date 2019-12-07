@@ -83,12 +83,12 @@ func buildRegistry(client *kong.Client) *crud.Registry {
 	r.MustRegister("certificate", &certificateCRUD{client: client})
 	r.MustRegister("ca_ertificate", &caCertificateCRUD{client: client})
 	r.MustRegister("plugin", &pluginCRUD{client: client})
-	r.MustRegister("consumer", &pluginCRUD{client: client})
+	r.MustRegister("consumer", &consumerCRUD{client: client})
 	r.MustRegister("key-auth", &keyAuthCRUD{client: client})
 	r.MustRegister("hmac-auth", &hmacAuthCRUD{client: client})
 	r.MustRegister("jwt-auth", &jwtAuthCRUD{client: client})
 	r.MustRegister("basic-auth", &basicAuthCRUD{client: client})
-	r.MustRegister("acl", &aclGroupCRUD{client: client})
+	r.MustRegister("acl-group", &aclGroupCRUD{client: client})
 	r.MustRegister("oauth2-cred", &oauth2CredCRUD{client: client})
 	return &r
 }
