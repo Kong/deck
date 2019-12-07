@@ -3,8 +3,9 @@ package solver
 import (
 	"github.com/hbagdi/deck/crud"
 	"github.com/hbagdi/deck/diff"
+	"github.com/hbagdi/deck/print"
 	cruds "github.com/hbagdi/deck/solver/kong"
-	drycrud "github.com/hbagdi/deck/solver/kong/dry"
+	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )
@@ -21,95 +22,63 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 	client *kong.Client, parallelism int, dry bool) (Stats, []error) {
 	var r *crud.Registry
 	var err error
-	if dry {
-		r, err = buildDryRegistry(client)
-	} else {
-		r, err = buildRegistry(client)
-	}
+
+	r, err = buildRegistry(client)
 	if err != nil {
 		return Stats{}, append([]error{},
 			errors.Wrapf(err, "cannot build registry"))
 	}
+
 	var stats Stats
+	recordOp := func(op crud.Op) {
+		switch op {
+		case crud.Create:
+			stats.CreateOps = stats.CreateOps + 1
+		case crud.Update:
+			stats.UpdateOps = stats.UpdateOps + 1
+		case crud.Delete:
+			stats.DeleteOps = stats.DeleteOps + 1
+		}
+	}
 
 	errs := syncer.Run(doneCh, parallelism, func(e diff.Event) (crud.Arg, error) {
-		result, err := r.Do(e.Kind, e.Op, e)
-		if err == nil {
-			switch e.Op {
-			case crud.Create:
-				stats.CreateOps = stats.CreateOps + 1
-			case crud.Update:
-				stats.UpdateOps = stats.UpdateOps + 1
-			case crud.Delete:
-				stats.DeleteOps = stats.DeleteOps + 1
-			default:
+		var err error
+		var result crud.Arg
+
+		c := e.Obj.(state.ConsoleString)
+		switch e.Op {
+		case crud.Create:
+			print.CreatePrintln("creating", e.Kind, c.Console())
+		case crud.Update:
+			diffString, err := getDiff(e.OldObj, e.Obj)
+			if err != nil {
 				return nil, err
 			}
+			print.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+		case crud.Delete:
+			print.DeletePrintln("deleting", e.Kind, c.Console())
+		default:
+			panic("unknown operation " + e.Op.String())
 		}
-		return result, err
+
+		if !dry {
+			// sync mode
+			// fire the request to Kong
+			result, err = r.Do(e.Kind, e.Op, e)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			// diff mode
+			// return the new obj as is
+			result = e.Obj
+		}
+		// record operation in both: diff and sync commands
+		recordOp(e.Op)
+
+		return result, nil
 	})
 	return stats, errs
-}
-
-func buildDryRegistry(client *kong.Client) (*crud.Registry, error) {
-	var r crud.Registry
-	err := r.Register("service", &drycrud.ServiceCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'service' crud")
-	}
-	err = r.Register("route", &drycrud.RouteCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'route' crud")
-	}
-	err = r.Register("upstream", &drycrud.UpstreamCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'upstream' crud")
-	}
-	err = r.Register("target", &drycrud.TargetCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'target' crud")
-	}
-	err = r.Register("certificate", &drycrud.CertificateCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'certificate' crud")
-	}
-	err = r.Register("ca_certificate", &drycrud.CACertificateCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'ca_certificate' crud")
-	}
-	err = r.Register("plugin", &drycrud.PluginCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'plugin' crud")
-	}
-	err = r.Register("consumer", &drycrud.ConsumerCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'consumer' crud")
-	}
-	err = r.Register("key-auth", &drycrud.KeyAuthCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'key-auth' crud")
-	}
-	err = r.Register("hmac-auth", &drycrud.HMACAuthCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'hmac-auth' crud")
-	}
-	err = r.Register("jwt-auth", &drycrud.JWTAuthCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'jwt-auth' crud")
-	}
-	err = r.Register("basic-auth", &drycrud.BasicAuthCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'basic-auth' crud")
-	}
-	err = r.Register("acl-group", &drycrud.ACLGroupCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'acl-group' crud")
-	}
-	err = r.Register("oauth2-cred", &drycrud.Oauth2CredCRUD{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "registering 'oauth2-cred' crud")
-	}
-	return &r, nil
 }
 
 func buildRegistry(client *kong.Client) (*crud.Registry, error) {

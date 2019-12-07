@@ -1,30 +1,16 @@
-package dry
+package solver
 
 import (
 	"encoding/json"
 
-	"github.com/hbagdi/deck/crud"
-	arg "github.com/hbagdi/deck/diff"
-	diff "github.com/yudai/gojsondiff"
+	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 )
 
-var differ *diff.Differ
+var (
+	differ = gojsondiff.New()
+)
 
-func init() {
-	differ = diff.New()
-}
-
-// TODO abstract this out
-func eventFromArg(a crud.Arg) arg.Event {
-	argStruct, ok := a.(arg.Event)
-	if !ok {
-		panic("unexpected type, expected Event")
-	}
-	return argStruct
-}
-
-// TODO add a diff of from to, like Port changed from 80 to 443
 func getDiff(a, b interface{}) (string, error) {
 	aJSON, err := json.Marshal(a)
 	if err != nil {
