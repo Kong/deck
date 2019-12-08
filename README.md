@@ -50,7 +50,7 @@ decK provides declarative configuration and drift detection for Kong.
 
 ## Compatibility
 
-decK is compatible with Kong 1.x. 
+decK is compatible with Kong 1.x and Kong Enterprise >= 0.35.
 
 ## Installation
 
