@@ -11,6 +11,15 @@ const contentSchema = `{
       "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/Info"
     },
+    "_plugin_configs": {
+      "patternProperties": {
+        ".*": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
     "_workspace": {
       "type": "string"
     },
@@ -374,6 +383,9 @@ const contentSchema = `{
         "name"
       ],
       "properties": {
+        "_config": {
+          "type": "string"
+        },
         "config": {
           "additionalProperties": true,
           "type": "object"

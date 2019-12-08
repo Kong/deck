@@ -324,6 +324,8 @@ func (c FCACertificate) id() string {
 // FPlugin represents a plugin in Kong.
 type FPlugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
+
+	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
 }
 
 // foo is a shadow type of Plugin.
@@ -340,6 +342,8 @@ type foo struct {
 	RunOn     *string            `json:"run_on,omitempty" yaml:"run_on,omitempty"`
 	Protocols []*string          `json:"protocols,omitempty" yaml:"protocols,omitempty"`
 	Tags      []*string          `json:"tags,omitempty" yaml:"tags,omitempty"`
+
+	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
 }
 
 func copyToFoo(p FPlugin) foo {
@@ -364,6 +368,9 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.Config != nil {
 		f.Config = p.Config
+	}
+	if p.ConfigSource != nil {
+		f.ConfigSource = p.ConfigSource
 	}
 	if p.Plugin.Consumer != nil {
 		f.Consumer = *p.Plugin.Consumer.ID
@@ -398,6 +405,9 @@ func copyFromFoo(f foo, p *FPlugin) {
 	}
 	if f.Config != nil {
 		p.Config = f.Config
+	}
+	if f.ConfigSource != nil {
+		p.ConfigSource = f.ConfigSource
 	}
 	if f.Consumer != "" {
 		p.Consumer = &kong.Consumer{
@@ -515,4 +525,6 @@ type Content struct {
 	Upstreams      []FUpstream      `json:"upstreams,omitempty" yaml:",omitempty"`
 	Certificates   []FCertificate   `json:"certificates,omitempty" yaml:",omitempty"`
 	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
+
+	PluginConfigs map[string]kong.Configuration `json:"_plugin_configs,omitempty" yaml:"_plugin_configs,omitempty"`
 }

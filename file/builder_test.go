@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"math/rand"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/hbagdi/deck/state"
@@ -515,7 +516,7 @@ func Test_stateBuilder_ingestPlugins(t *testing.T) {
 		currentState *state.KongState
 	}
 	type args struct {
-		plugins []kong.Plugin
+		plugins []FPlugin
 	}
 	tests := []struct {
 		name      string
@@ -530,9 +531,11 @@ func Test_stateBuilder_ingestPlugins(t *testing.T) {
 				currentState: emptyState(),
 			},
 			args: args{
-				plugins: []kong.Plugin{
+				plugins: []FPlugin{
 					{
-						Name: kong.String("foo"),
+						Plugin: kong.Plugin{
+							Name: kong.String("foo"),
+						},
 					},
 				},
 			},
@@ -553,23 +556,29 @@ func Test_stateBuilder_ingestPlugins(t *testing.T) {
 				currentState: existingPluginState(),
 			},
 			args: args{
-				plugins: []kong.Plugin{
+				plugins: []FPlugin{
 					{
-						Name: kong.String("foo"),
-					},
-					{
-						Name: kong.String("bar"),
-						Consumer: &kong.Consumer{
-							ID: kong.String("f77ca8c7-581d-45a4-a42c-c003234228e1"),
+						Plugin: kong.Plugin{
+							Name: kong.String("foo"),
 						},
 					},
 					{
-						Name: kong.String("foo"),
-						Consumer: &kong.Consumer{
-							ID: kong.String("f77ca8c7-581d-45a4-a42c-c003234228e1"),
+						Plugin: kong.Plugin{
+							Name: kong.String("bar"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("f77ca8c7-581d-45a4-a42c-c003234228e1"),
+							},
 						},
-						Route: &kong.Route{
-							ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
+					},
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("foo"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("f77ca8c7-581d-45a4-a42c-c003234228e1"),
+							},
+							Route: &kong.Route{
+								ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
+							},
 						},
 					},
 				},
@@ -1620,6 +1629,87 @@ func Test_stateBuilder(t *testing.T) {
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
+		})
+	}
+}
+
+func Test_stateBuilder_fillPluginConfig(t *testing.T) {
+	type fields struct {
+		targetContent *Content
+	}
+	type args struct {
+		plugin *FPlugin
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+		result  FPlugin
+	}{
+		{
+			name:    "nil arg throws an error",
+			wantErr: true,
+		},
+		{
+			name: "no _plugin_config throws an error",
+			fields: fields{
+				targetContent: &Content{},
+			},
+			args: args{
+				plugin: &FPlugin{
+					ConfigSource: kong.String("foo"),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "no _plugin_config throws an error",
+			fields: fields{
+				targetContent: &Content{
+					PluginConfigs: map[string]kong.Configuration{
+						"foo": {
+							"k2":  "v3",
+							"k3:": "v3",
+						},
+					},
+				},
+			},
+			args: args{
+				plugin: &FPlugin{
+					ConfigSource: kong.String("foo"),
+					Plugin: kong.Plugin{
+						Config: kong.Configuration{
+							"k1": "v1",
+							"k2": "v2",
+						},
+					},
+				},
+			},
+			result: FPlugin{
+				ConfigSource: kong.String("foo"),
+				Plugin: kong.Plugin{
+					Config: kong.Configuration{
+						"k1":  "v1",
+						"k2":  "v2",
+						"k3:": "v3",
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &stateBuilder{
+				targetContent: tt.fields.targetContent,
+			}
+			if err := b.fillPluginConfig(tt.args.plugin); (err != nil) != tt.wantErr {
+				t.Errorf("stateBuilder.fillPluginConfig() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && !reflect.DeepEqual(tt.result, tt.args.plugin) {
+				assert.Equal(t, tt.result, *tt.args.plugin)
+			}
 		})
 	}
 }

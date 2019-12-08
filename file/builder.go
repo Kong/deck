@@ -137,10 +137,10 @@ func (b *stateBuilder) consumers() {
 		}
 
 		// plugins for the Consumer
-		var plugins []kong.Plugin
+		var plugins []FPlugin
 		for _, p := range c.Plugins {
 			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
-			plugins = append(plugins, p.Plugin)
+			plugins = append(plugins, *p)
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
 			b.err = err
@@ -362,10 +362,10 @@ func (b *stateBuilder) services() {
 		}
 
 		// plugins for the service
-		var plugins []kong.Plugin
+		var plugins []FPlugin
 		for _, p := range s.Plugins {
 			p.Service = &kong.Service{ID: kong.String(*s.ID)}
-			plugins = append(plugins, p.Plugin)
+			plugins = append(plugins, *p)
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
 			b.err = err
@@ -459,7 +459,7 @@ func (b *stateBuilder) plugins() {
 		return
 	}
 
-	var plugins []kong.Plugin
+	var plugins []FPlugin
 	for _, p := range b.targetContent.Plugins {
 		p := p
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
@@ -498,7 +498,7 @@ func (b *stateBuilder) plugins() {
 			}
 			p.Route = &kong.Route{ID: kong.String(*s.ID)}
 		}
-		plugins = append(plugins, p.Plugin)
+		plugins = append(plugins, p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		b.err = err
@@ -528,11 +528,10 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 
 	// plugins for the route
-	var plugins []kong.Plugin
+	var plugins []FPlugin
 	for _, p := range r.Plugins {
-		p := p
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
-		plugins = append(plugins, p.Plugin)
+		plugins = append(plugins, *p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		return err
@@ -540,11 +539,11 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	return nil
 }
 
-func (b *stateBuilder) ingestPlugins(plugins []kong.Plugin) error {
+func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
 		if utils.Empty(p.ID) {
-			cID, rID, sID := pluginRelations(&p)
+			cID, rID, sID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
 				sID, rID, cID)
 			if err == state.ErrNotFound {
@@ -559,8 +558,31 @@ func (b *stateBuilder) ingestPlugins(plugins []kong.Plugin) error {
 			p.Config = make(map[string]interface{})
 		}
 		p.Config = ensureJSON(p.Config)
+		err := b.fillPluginConfig(&p)
+		if err != nil {
+			return err
+		}
 		utils.MustMergeTags(&p, b.selectTags)
-		b.rawState.Plugins = append(b.rawState.Plugins, &p)
+		b.rawState.Plugins = append(b.rawState.Plugins, &p.Plugin)
+	}
+	return nil
+}
+
+func (b *stateBuilder) fillPluginConfig(plugin *FPlugin) error {
+	if plugin == nil {
+		return errors.New("plugin is nil")
+	}
+	if !utils.Empty(plugin.ConfigSource) {
+		conf, ok := b.targetContent.PluginConfigs[*plugin.ConfigSource]
+		if !ok {
+			return errors.Errorf("_plugin_config '%v' not found",
+				*plugin.ConfigSource)
+		}
+		for k, v := range conf {
+			if _, ok := plugin.Config[k]; !ok {
+				plugin.Config[k] = v
+			}
+		}
 	}
 	return nil
 }
