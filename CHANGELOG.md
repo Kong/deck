@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.7.0](#v070---20191207)
 - [v0.6.2](#v062---20191116)
 - [v0.6.1](#v061---20191108)
 - [v0.6.0](#v060---20191103)
@@ -10,6 +11,31 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.7.0] - 2019/12/07
+
+### Breaking changes
+
+- `sync` command now shows the progress of the sync. Previously, the command
+  did not output anything but errors.
+
+### Added
+
+- Configuration of multiple plugin instances can now be de-duplicated using
+  `_plugin_configs` field in the state file.
+  [#93](https://github.com/hbagdi/deck/issues/93)
+- A summary is now presented at the end of a `diff` or `sync`
+  operation showing the count of resources created/updated/deleted.
+  [#101](https://github.com/hbagdi/deck/issues/101)
+- `sync` command now shows the progress of the sync as the sync takes place,
+  making it easier to track progress in large environments.
+  [#100](https://github.com/hbagdi/deck/issues/100)
+- `--non-zero-exit-code` flag hsa been added to `diff` command. Using
+  this flag causes decK to exit with a non-zero exit code if a diff is
+  detected, making it easier to script decK in CI pipelines.
+  [#98](https://github.com/hbagdi/deck/issues/98)
+- A new docs website has been setup for the project:
+  [https://deck.yolo42.com](https://deck.yolo42.com)
 
 ## [v0.6.2] - 2019/11/16
 
@@ -293,6 +319,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.7.0]: https://github.com/hbagdi/deck/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/hbagdi/deck/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/hbagdi/deck/compare/v0.6.0...v0.6.1
 [v0.6.0]: https://github.com/hbagdi/deck/compare/v0.5.2...v0.6.0
