@@ -222,7 +222,6 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
 	}
 	return nil
@@ -241,7 +240,6 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
 	}
 	return nil
@@ -260,7 +258,6 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
 	}
 	return nil
@@ -279,7 +276,6 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
 	}
 	return nil
@@ -298,7 +294,6 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
 	}
 	return nil
@@ -319,7 +314,6 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
 	}
 	return nil
