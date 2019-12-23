@@ -3,6 +3,12 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
+	"regexp"
+)
+
+var (
+	kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
 )
 
 // Empty checks if a string referenced by s or s itself is empty.
@@ -35,4 +41,17 @@ func UUID() string {
 	hex.Encode(buf[24:], uuid[10:])
 
 	return string(buf)
+}
+
+// CleanKongVersion takes a version of Kong and returns back a string in
+// the form of `/major.minor` version. There are various dashes and dots
+// and other descriptors in Kong version strings, which has often created
+// confusion in code and incorrect parsing, and hence this function does
+// not return the patch version (on which shouldn't rely on anyways).
+func CleanKongVersion(version string) (string, error) {
+	matches := kongVersionRegex.FindStringSubmatch(version)
+	if len(matches) < 1 {
+		return "", fmt.Errorf("unknown Kong version")
+	}
+	return matches[0], nil
 }
