@@ -3,10 +3,18 @@ package file
 import (
 	"fmt"
 
+	"github.com/blang/semver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 )
+
+// RenderConfig contains necessary information to render a correct
+// KongConfig from a file.
+type RenderConfig struct {
+	CurrentState *state.KongState
+	KongVersion  semver.Version
+}
 
 // GetContentFromFile reads in a file with filename and constructs
 // a state. If filename is `-`, then it will read from os.Stdin.
@@ -26,13 +34,14 @@ func GetContentFromFile(filename string) (*Content, error) {
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content,
-	currentState *state.KongState) (*utils.KongRawState, error) {
+func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
-	builder.currentState = currentState
+	builder.currentState = opt.CurrentState
+	builder.kongVersion = opt.KongVersion
+
 	d, err := utils.GetKongDefaulter()
 	if err != nil {
 		return nil, errors.Wrap(err, "creating defaulter")

@@ -1,6 +1,7 @@
 package file
 
 import (
+	"github.com/blang/semver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
@@ -12,6 +13,7 @@ type stateBuilder struct {
 	rawState      *utils.KongRawState
 	currentState  *state.KongState
 	defaulter     *utils.Defaulter
+	kongVersion   semver.Version
 
 	selectTags   []string
 	intermediate *state.KongState
@@ -19,6 +21,10 @@ type stateBuilder struct {
 
 	err error
 }
+
+var (
+	kong140Version = semver.MustParse("1.4.0")
+)
 
 // uuid generates a UUID string and returns a pointer to it.
 // It is a variable for testing purpose, to override and supply
@@ -222,7 +228,9 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
 	}
 	return nil
@@ -241,7 +249,9 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
 	}
 	return nil
@@ -260,7 +270,9 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
 	}
 	return nil
@@ -279,7 +291,9 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
 	}
 	return nil
@@ -298,7 +312,9 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
 	}
 	return nil
@@ -319,7 +335,9 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		utils.MustMergeTags(&cred, b.selectTags)
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
 	}
 	return nil

@@ -7,10 +7,15 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/blang/semver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	kong130Version = semver.MustParse("1.3.0")
 )
 
 func emptyState() *state.KongState {
@@ -691,6 +696,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 	type fields struct {
 		currentState  *state.KongState
 		targetContent *Content
+		kongVersion   *semver.Version
 	}
 	tests := []struct {
 		name   string
@@ -997,12 +1003,136 @@ func Test_stateBuilder_consumers(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "does not inject tags if Kong version is older than 1.4",
+			fields: fields{
+				targetContent: &Content{
+					Consumers: []FConsumer{
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("foo"),
+							},
+							KeyAuths: []*kong.KeyAuth{
+								{
+									Key: kong.String("foo-apikey"),
+								},
+							},
+							BasicAuths: []*kong.BasicAuth{
+								{
+									Username: kong.String("basic-username"),
+									Password: kong.String("basic-password"),
+								},
+							},
+							HMACAuths: []*kong.HMACAuth{
+								{
+									Username: kong.String("hmac-username"),
+									Secret:   kong.String("hmac-secret"),
+								},
+							},
+							JWTAuths: []*kong.JWTAuth{
+								{
+									Key:    kong.String("jwt-key"),
+									Secret: kong.String("jwt-secret"),
+								},
+							},
+							Oauth2Creds: []*kong.Oauth2Credential{
+								{
+									ClientID: kong.String("oauth2-clientid"),
+									Name:     kong.String("oauth2-name"),
+								},
+							},
+							ACLGroups: []*kong.ACLGroup{
+								{
+									Group: kong.String("foo-group"),
+								},
+							},
+						},
+					},
+					Info: &Info{
+						SelectorTags: []string{"tag1"},
+					},
+				},
+				currentState: existingConsumerCredState(),
+				kongVersion:  &kong130Version,
+			},
+			want: &utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Username: kong.String("foo"),
+						Tags:     kong.StringSlice("tag1"),
+					},
+				},
+				KeyAuths: []*kong.KeyAuth{
+					{
+						ID:  kong.String("5f1ef1ea-a2a5-4a1b-adbb-b0d3434013e5"),
+						Key: kong.String("foo-apikey"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				BasicAuths: []*kong.BasicAuth{
+					{
+						ID:       kong.String("92f4c849-960b-43af-aad3-f307051408d3"),
+						Username: kong.String("basic-username"),
+						Password: kong.String("basic-password"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				HMACAuths: []*kong.HMACAuth{
+					{
+						ID:       kong.String("e5d81b73-bf9e-42b0-9d68-30a1d791b9c9"),
+						Username: kong.String("hmac-username"),
+						Secret:   kong.String("hmac-secret"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				JWTAuths: []*kong.JWTAuth{
+					{
+						ID:     kong.String("917b9402-1be0-49d2-b482-ca4dccc2054e"),
+						Key:    kong.String("jwt-key"),
+						Secret: kong.String("jwt-secret"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				Oauth2Creds: []*kong.Oauth2Credential{
+					{
+						ID:       kong.String("4eef5285-3d6a-4f6b-b659-8957a940e2ca"),
+						ClientID: kong.String("oauth2-clientid"),
+						Name:     kong.String("oauth2-name"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				ACLGroups: []*kong.ACLGroup{
+					{
+						ID:    kong.String("b7c9352a-775a-4ba5-9869-98e926a3e6cb"),
+						Group: kong.String("foo-group"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
+				kongVersion:   kong140Version,
+			}
+			if tt.fields.kongVersion != nil {
+				b.kongVersion = *tt.fields.kongVersion
 			}
 			d, _ := utils.GetKongDefaulter()
 			b.defaulter = d

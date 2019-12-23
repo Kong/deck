@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
@@ -59,6 +60,13 @@ func checkWorkspace(config utils.KongClientConfig) error {
 }
 
 func syncMain(filename string, dry bool, parallelism int) error {
+
+	// load Kong version before workspace
+	kongVersion, err := kongVersion(config)
+	if err != nil {
+		return errors.Wrap(err, "reading Kong version")
+	}
+
 	// read target file
 	targetContent, err := file.GetContentFromFile(filename)
 	if err != nil {
@@ -91,7 +99,10 @@ func syncMain(filename string, dry bool, parallelism int) error {
 	}
 
 	// read the target state
-	rawState, err = file.Get(targetContent, currentState)
+	rawState, err = file.Get(targetContent, file.RenderConfig{
+		CurrentState: currentState,
+		KongVersion:  kongVersion,
+	})
 	if err != nil {
 		return err
 	}
@@ -115,4 +126,19 @@ func syncMain(filename string, dry bool, parallelism int) error {
 		os.Exit(2)
 	}
 	return nil
+}
+
+func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
+	client, err := utils.GetKongClient(config)
+	if err != nil {
+		return semver.Version{}, err
+	}
+
+	root, err := client.Root(nil)
+	if err != nil {
+		return semver.Version{}, err
+	}
+
+	v, err := utils.CleanKongVersion(root["version"].(string))
+	return semver.Make(v)
 }

@@ -3,6 +3,7 @@ module github.com/hbagdi/deck
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/alecthomas/jsonschema v0.0.0-20190626084004-00dfc6288dec
+	github.com/blang/semver v0.0.0-20190414102917-ba2c2ddd8906
 	github.com/fatih/color v1.7.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/hashicorp/go-memdb v1.0.4

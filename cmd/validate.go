@@ -38,7 +38,9 @@ this command.
 			return err
 		}
 
-		rawState, err := file.Get(targetContent, dummyEmptyState)
+		rawState, err := file.Get(targetContent, file.RenderConfig{
+			CurrentState: dummyEmptyState,
+		})
 		if err != nil {
 			return err
 		}
