@@ -27,6 +27,7 @@ func sendAnalytics() {
 	ctx, _ := context.WithDeadline(context.Background(),
 		time.Now().Add(3*time.Second))
 	req, _ := http.NewRequestWithContext(ctx, "GET", URL, nil)
+	req.Header["deck-version"] = []string{VERSION}
 
 	http.DefaultClient.Do(req)
 }
