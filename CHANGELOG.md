@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.7.1](#v071---20191224)
 - [v0.7.0](#v070---20191207)
 - [v0.6.2](#v062---20191116)
 - [v0.6.1](#v061---20191108)
@@ -11,6 +12,14 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v0.7.1] - 2019/12/24
+
+### Fixed
+
+- Backward compatibility for credentials; tags are no longer injected into
+  credentials for Kong versions below 1.4
+  [#114](https://github.com/hbagdi/deck/issues/114)
 
 ## [v0.7.0] - 2019/12/07
 
@@ -319,6 +328,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v0.7.1]: https://github.com/hbagdi/deck/compare/v0.7.0...v0.7.1
 [v0.7.0]: https://github.com/hbagdi/deck/compare/v0.6.2...v0.7.0
 [v0.6.2]: https://github.com/hbagdi/deck/compare/v0.6.1...v0.6.2
 [v0.6.1]: https://github.com/hbagdi/deck/compare/v0.6.0...v0.6.1
