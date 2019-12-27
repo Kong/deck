@@ -140,5 +140,5 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	}
 
 	v, err := utils.CleanKongVersion(root["version"].(string))
-	return semver.Make(v)
+	return semver.ParseTolerant(v)
 }
