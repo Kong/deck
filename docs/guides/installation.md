@@ -22,7 +22,7 @@ the Github [release page](https://github.com/hbagdi/deck/releases)
 or install by downloading a compressed archive, which contains the binary:
 
 ```shel
-$ curl -sL https://github.com/hbagdi/deck/releases/download/v0.7.1/deck_0.7.1_linux_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/hbagdi/deck/releases/download/v0.7.2/deck_0.7.2_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
 ```
