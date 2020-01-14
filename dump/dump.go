@@ -81,6 +81,10 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	}
 	state.Targets = targets
 
+	if config.SkipConsumers {
+		state.Plugins = ExcludeConsumersPlugins(state.Plugins)
+	}
+
 	if !config.SkipConsumers {
 		consumers, err := GetAllConsumers(client, config.SelectorTags)
 		if err != nil {
@@ -443,4 +447,16 @@ func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, erro
 		opt = nextopt
 	}
 	return aclGroups, nil
+}
+
+// ExcludeConsumersPlugins filter out consumer plugins
+func ExcludeConsumersPlugins(plugins []*kong.Plugin) []*kong.Plugin {
+	var filtered []*kong.Plugin
+	for _, p := range plugins {
+		if p.Consumer != nil && p.Consumer.ID != nil {
+			continue
+		}
+		filtered = append(filtered, p)
+	}
+	return filtered
 }
