@@ -810,6 +810,11 @@ func (in *Route) DeepCopyInto(out *Route) {
 			}
 		}
 	}
+	if in.PathHandling != nil {
+		in, out := &in.PathHandling, &out.PathHandling
+		*out = new(string)
+		**out = **in
+	}
 	if in.PreserveHost != nil {
 		in, out := &in.PreserveHost, &out.PreserveHost
 		*out = new(bool)
