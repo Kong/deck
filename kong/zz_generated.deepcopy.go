@@ -413,6 +413,11 @@ func (in *Healthcheck) DeepCopyInto(out *Healthcheck) {
 		*out = new(PassiveHealthcheck)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.Threshold != nil {
+		in, out := &in.Threshold, &out.Threshold
+		*out = new(float64)
+		**out = **in
+	}
 	return
 }
 

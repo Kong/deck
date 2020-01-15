@@ -133,8 +133,9 @@ type PassiveHealthcheck struct {
 // in Kong.
 // +k8s:deepcopy-gen=true
 type Healthcheck struct {
-	Active  *ActiveHealthcheck  `json:"active,omitempty" yaml:"active,omitempty"`
-	Passive *PassiveHealthcheck `json:"passive,omitempty" yaml:"passive,omitempty"`
+	Active    *ActiveHealthcheck  `json:"active,omitempty" yaml:"active,omitempty"`
+	Passive   *PassiveHealthcheck `json:"passive,omitempty" yaml:"passive,omitempty"`
+	Threshold *float64            `json:"threshold,omitempty" yaml:"threshold,omitempty"`
 }
 
 // Upstream represents a Consumer in Kong.
