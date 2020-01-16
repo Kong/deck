@@ -49,7 +49,11 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "plugins")
 	}
-	state.Plugins = plugins
+	if config.SkipConsumers {
+		state.Plugins = excludeConsumersPlugins(plugins)
+	} else {
+		state.Plugins = plugins
+	}
 
 	certificates, err := GetAllCertificates(client, config.SelectorTags)
 	if err != nil {
@@ -80,10 +84,6 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, errors.Wrap(err, "targets")
 	}
 	state.Targets = targets
-
-	if config.SkipConsumers {
-		state.Plugins = ExcludeConsumersPlugins(state.Plugins)
-	}
 
 	if !config.SkipConsumers {
 		consumers, err := GetAllConsumers(client, config.SelectorTags)
@@ -449,11 +449,11 @@ func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, erro
 	return aclGroups, nil
 }
 
-// ExcludeConsumersPlugins filter out consumer plugins
-func ExcludeConsumersPlugins(plugins []*kong.Plugin) []*kong.Plugin {
+// excludeConsumersPlugins filter out consumer plugins
+func excludeConsumersPlugins(plugins []*kong.Plugin) []*kong.Plugin {
 	var filtered []*kong.Plugin
 	for _, p := range plugins {
-		if p.Consumer != nil && p.Consumer.ID != nil {
+		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			continue
 		}
 		filtered = append(filtered, p)
