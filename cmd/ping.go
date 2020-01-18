@@ -1,5 +1,3 @@
-// Copyright © 2018 Harry Bagdi <harrybagdi@gmail.com>
-
 package cmd
 
 import (
