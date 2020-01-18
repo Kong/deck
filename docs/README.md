@@ -26,6 +26,7 @@ Here is an introductory screen-cast explaining decK:
 
 - [Terminology](terminology.md)
 - [Architecture](design-architecture.md)
+- [Compatibility promise](compatibility-promise.md)
 
 ## Guides
 
