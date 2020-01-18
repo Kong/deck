@@ -473,6 +473,9 @@ const contentSchema = `{
         "name": {
           "type": "string"
         },
+        "path_handling": {
+          "type": "string"
+        },
         "paths": {
           "items": {
             "type": "string"
@@ -725,6 +728,9 @@ const contentSchema = `{
         "passive": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/PassiveHealthcheck"
+        },
+        "threshold": {
+          "type": "number"
         }
       },
       "additionalProperties": false,
@@ -920,6 +926,9 @@ const contentSchema = `{
           "type": "array"
         },
         "name": {
+          "type": "string"
+        },
+        "path_handling": {
           "type": "string"
         },
         "paths": {
