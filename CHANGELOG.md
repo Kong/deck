@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.0.0](#v100---20200118)
 - [v0.7.2](#v072---20191229)
 - [v0.7.1](#v071---20191224)
 - [v0.7.0](#v070---20191207)
@@ -13,6 +14,23 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.0.0] - 2020/01/18
+
+### Fixed
+
+- decK doesn't error out if bundled plugins in Kong are disabled
+  [#121](https://github.com/hbagdi/deck/pull/121)
+- Consumer-specific plugins are excluded when `--skip-consumers` is used
+  [#119](https://github.com/hbagdi/deck/issues/119)
+
+### Internal
+
+- `go-kong` has been upgraded to v0.11.0, which brings in support for
+  Kong 2.0.
+- All other dependencies have also been upgraded, but these have no
+  user-visible changes.
+  [b603f9](https://github.com/hbagdi/deck/commit/b603f9)
 
 ## [v0.7.2] - 2019/12/29
 
@@ -337,6 +355,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.0.0]: https://github.com/hbagdi/deck/compare/v0.7.2...v1.0.0
 [v0.7.2]: https://github.com/hbagdi/deck/compare/v0.7.1...v0.7.2
 [v0.7.1]: https://github.com/hbagdi/deck/compare/v0.7.0...v0.7.1
 [v0.7.0]: https://github.com/hbagdi/deck/compare/v0.6.2...v0.7.0
