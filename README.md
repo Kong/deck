@@ -14,7 +14,7 @@ go get github.com/hbagdi/go-kong/kong
 
 ## Compatibility
 
-`go-kong` is compatible with Kong 1.x versions.
+`go-kong` is compatible with Kong 1.x and 2.x.
 Semantic versioning is followed for versioning `go-kong`.
 
 ## License
