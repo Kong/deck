@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.11.0](#v0110---20200117)
 - [v0.10.0](#v0100---20191027)
 - [v0.9.0](#v090---20190824)
 - [v0.8.0](#v080---20190821)
@@ -14,6 +15,17 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.11.0] - 2020/01/17
+
+### Summary
+
+- This release adds support for Kong 2.0.0.
+
+### Added
+
+- `Threshold` field has been added to Upstream struct.
+- `PathHandling` field has been added to Route struct.
 
 ## [v0.10.0] - 2019/10/27
 
@@ -211,6 +223,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.11.0]: https://github.com/hbagdi/go-kong/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/hbagdi/go-kong/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/hbagdi/go-kong/compare/v0.8.0...v0.9.0
 [v0.8.0]: https://github.com/hbagdi/go-kong/compare/v0.7.0...v0.8.0
