@@ -331,6 +331,9 @@ func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error)
 
 	for {
 		s, nextopt, err := client.KeyAuths.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return keyAuths, nil
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -352,6 +355,9 @@ func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, erro
 
 	for {
 		s, nextopt, err := client.HMACAuths.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return hmacAuths, nil
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -373,6 +379,9 @@ func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error)
 
 	for {
 		s, nextopt, err := client.JWTAuths.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return jwtAuths, nil
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -387,23 +396,26 @@ func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error)
 
 // GetAllBasicAuths queries Kong for all basic-auth credentials using client.
 func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
-	var jwtAuths []*kong.BasicAuth
+	var basicAuths []*kong.BasicAuth
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
 		s, nextopt, err := client.BasicAuths.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return basicAuths, nil
+		}
 		if err != nil {
 			return nil, err
 		}
-		jwtAuths = append(jwtAuths, s...)
+		basicAuths = append(basicAuths, s...)
 		if nextopt == nil {
 			break
 		}
 		opt = nextopt
 	}
-	return jwtAuths, nil
+	return basicAuths, nil
 }
 
 // GetAllOauth2Creds queries Kong for all oauth2 credentials using client.
@@ -416,6 +428,9 @@ func GetAllOauth2Creds(client *kong.Client,
 
 	for {
 		s, nextopt, err := client.Oauth2Credentials.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return oauth2Creds, nil
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -437,6 +452,9 @@ func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, erro
 
 	for {
 		s, nextopt, err := client.ACLs.List(nil, opt)
+		if kong.IsNotFoundErr(err) {
+			return aclGroups, nil
+		}
 		if err != nil {
 			return nil, err
 		}
