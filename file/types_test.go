@@ -2,6 +2,7 @@ package file
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -168,6 +169,110 @@ func Test_copyFromCert(t *testing.T) {
 
 			if !reflect.DeepEqual(tt.args.certificate, tt.want) {
 				t.Errorf("copyFromCert() = %v, want %v", tt.args.certificate, tt.want)
+			}
+		})
+	}
+}
+
+func Test_unwrapURL(t *testing.T) {
+	type args struct {
+		urlString string
+		fService  *FService
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			args: args{
+				urlString: "https://foo.com:8008/bar",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Port:     kong.Int(8008),
+						Protocol: kong.String("https"),
+						Path:     kong.String("/bar"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "https://foo.com/bar",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("https"),
+						Path:     kong.String("/bar"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "https://foo.com/",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("https"),
+						Path:     kong.String("/"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "grpc://foocom",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foocom"),
+						Protocol: kong.String("grpc"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "foo.com/sdf",
+				fService: &FService{
+					Service: kong.Service{},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			args: args{
+				urlString: "foo.com",
+				fService: &FService{
+					Service: kong.Service{},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			args: args{
+				urlString: "42:",
+				fService: &FService{
+					Service: kong.Service{},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			in := FService{}
+			if err := unwrapURL(tt.args.urlString, &in); (err != nil) != tt.wantErr {
+				t.Errorf("unwrapURL() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			fmt.Printf("\n\n%+v", in)
+			if !reflect.DeepEqual(tt.args.fService, &in) {
+				t.Errorf("unwrapURL() got = %v, want = %v", &in, tt.args.fService)
 			}
 		})
 	}

@@ -2,9 +2,13 @@ package file
 
 import (
 	"encoding/json"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
+	"github.com/pkg/errors"
 )
 
 // Format is a file format for Kong's configuration.
@@ -26,6 +30,9 @@ type FService struct {
 	kong.Service
 	Routes  []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
+
+	// sugar property
+	URL *string `json:"url,omitempty" yaml:",omitempty"`
 }
 
 // id is used for sorting.
@@ -56,6 +63,9 @@ type service struct {
 	Tags              []*string  `json:"tags,omitempty" yaml:"tags,omitempty"`
 	Routes            []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins           []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
+
+	// sugar property
+	URL *string `json:"url,omitempty" yaml:",omitempty"`
 }
 
 func copyToService(fService FService) service {
@@ -83,21 +93,61 @@ func copyToService(fService FService) service {
 	return s
 }
 
-func copyFromService(service service, fService *FService) {
+func unwrapURL(urlString string, fService *FService) error {
+	parsed, err := url.Parse(urlString)
+	if err != nil {
+		return errors.New("invaid url: " + urlString)
+	}
+	if parsed.Scheme == "" {
+		return errors.New("invalid url:" + urlString)
+	}
+
+	fService.Protocol = kong.String(parsed.Scheme)
+	if parsed.Host != "" {
+		hostPort := strings.Split(parsed.Host, ":")
+		fService.Host = kong.String(hostPort[0])
+		if len(hostPort) > 1 {
+			port, err := strconv.Atoi(hostPort[1])
+			if err == nil {
+				fService.Port = kong.Int(port)
+			}
+		}
+	}
+	if parsed.Path != "" {
+		fService.Path = kong.String(parsed.Path)
+	}
+	return nil
+}
+
+func copyFromService(service service, fService *FService) error {
 	if service.ClientCertificate != nil &&
 		!utils.Empty(service.ClientCertificate) {
 		fService.ClientCertificate = &kong.Certificate{
 			ID: kong.String(*service.ClientCertificate),
 		}
 	}
+	if !utils.Empty(service.URL) {
+		err := unwrapURL(*service.URL, fService)
+		if err != nil {
+			return err
+		}
+	}
 	fService.ConnectTimeout = service.ConnectTimeout
 	fService.CreatedAt = service.CreatedAt
-	fService.Host = service.Host
 	fService.ID = service.ID
 	fService.Name = service.Name
-	fService.Path = service.Path
-	fService.Port = service.Port
-	fService.Protocol = service.Protocol
+	if service.Protocol != nil {
+		fService.Protocol = service.Protocol
+	}
+	if service.Host != nil {
+		fService.Host = service.Host
+	}
+	if service.Port != nil {
+		fService.Port = service.Port
+	}
+	if service.Path != nil {
+		fService.Path = service.Path
+	}
 	fService.ReadTimeout = service.ReadTimeout
 	fService.Retries = service.Retries
 	fService.UpdatedAt = service.UpdatedAt
@@ -105,6 +155,7 @@ func copyFromService(service service, fService *FService) {
 	fService.Tags = service.Tags
 	fService.Routes = service.Routes
 	fService.Plugins = service.Plugins
+	return nil
 }
 
 // MarshalYAML is a custom marshal to handle
@@ -120,8 +171,7 @@ func (s *FService) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&service); err != nil {
 		return err
 	}
-	copyFromService(service, s)
-	return nil
+	return copyFromService(service, s)
 }
 
 // MarshalJSON is a custom marshal method to handle
@@ -139,8 +189,7 @@ func (s *FService) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-	copyFromService(service, s)
-	return nil
+	return copyFromService(service, s)
 }
 
 // FRoute represents a Kong Route and it's associated plugins.
