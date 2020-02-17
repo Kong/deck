@@ -38,6 +38,7 @@ Here is an introductory screen-cast explaining decK:
 - [Best practices for using decK](guides/best-practices.md)
 - [Using decK with Kong Enterprise](guides/kong-enterprise.md)
 - [Using multiple files to store configuration](guides/multi-file-state.md)
+- [Deduplicate plugin configuration](guides/deduplicate-plugin-configuration.md)
 
 ## References
 
