@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.0.2](#v102---20200221)
 - [v1.0.1](#v101---20200214)
 - [v1.0.0](#v100---20200118)
 - [v0.7.2](#v072---20191229)
@@ -15,6 +16,13 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.0.2] - 2020/02/21
+
+### Fixed
+
+- Fix broken `ca_certificate` entity support
+  [#127](https://github.com/hbagdi/deck/pull/127)
 
 ## [v1.0.1] - 2020/02/14
 
@@ -363,6 +371,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.0.2]: https://github.com/hbagdi/deck/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/hbagdi/deck/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/hbagdi/deck/compare/v0.7.2...v1.0.0
 [v0.7.2]: https://github.com/hbagdi/deck/compare/v0.7.1...v0.7.2
