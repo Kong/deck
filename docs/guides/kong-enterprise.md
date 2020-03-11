@@ -59,8 +59,8 @@ This creates one configuration file per workspace.
 
 ### Sync
 
-If a workspace is not present, decK will attempt to create the workspace
-before doing a sync.
+If a workspace is not present, decK will error out.
+You should ensure that a workspace already exists before using decK.
 
 `diff` and `sync` command work with workspaces and the workspace to sync
 to is determined via the `_workspace` property inside the state file.
