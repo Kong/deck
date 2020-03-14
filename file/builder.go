@@ -83,6 +83,9 @@ func (b *stateBuilder) certificates() {
 			}
 		}
 		utils.MustMergeTags(&c.Certificate, b.selectTags)
+		if c.Certificate.SNIs == nil {
+			c.Certificate.SNIs = []*string{}
+		}
 
 		b.rawState.Certificates = append(b.rawState.Certificates,
 			&c.Certificate)
