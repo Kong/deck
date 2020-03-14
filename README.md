@@ -70,7 +70,7 @@ the Github [release page](https://github.com/hbagdi/deck/releases)
 or install by downloading the binary:
 
 ```shel
-$ curl -sL https://github.com/hbagdi/deck/releases/download/v1.0.0/deck_1.0.0_linux_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/hbagdi/deck/releases/download/v1.0.3/deck_1.0.3_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
 ```
