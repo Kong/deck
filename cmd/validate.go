@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	validateCmdKongStateFile string
+	validateCmdKongStateFile []string
 )
 
 // validateCmd represents the diff command
@@ -26,7 +26,7 @@ this command.
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// read target file
 		// this does json schema validation as well
-		targetContent, err := file.GetContentFromFile(validateCmdKongStateFile)
+		targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
 		if err != nil {
 			return err
 		}
@@ -51,7 +51,7 @@ this command.
 		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if validateCmdKongStateFile == "" {
+		if len(validateCmdKongStateFile) == 0 {
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
 		}
@@ -61,7 +61,7 @@ this command.
 
 func init() {
 	rootCmd.AddCommand(validateCmd)
-	validateCmd.Flags().StringVarP(&validateCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration. "+
+	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
+		"state", "s", []string{"kong.yaml"}, "file containing Kong's configuration. "+
 			"Use '-' to read from stdin.")
 }
