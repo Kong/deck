@@ -195,6 +195,48 @@ func Test_getContent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "multiple files",
+			args: args{[]string{"testdata/file.yaml", "testdata/file.json"}},
+			want: &Content{
+				Services: []FService{
+					{
+						Service: kong.Service{
+							Name: kong.String("svc2"),
+							Host: kong.String("2.example.com"),
+						},
+						Routes: []*FRoute{
+							{
+								Route: kong.Route{
+									Name:  kong.String("r2"),
+									Paths: kong.StringSlice("/r2"),
+								},
+							},
+						},
+					},
+				},
+				Plugins: []FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("prometheus"),
+						},
+					},
+				},
+				Consumers: []FConsumer{
+					{
+						Consumer: kong.Consumer{
+							Username: kong.String("foo"),
+						},
+					},
+					{
+						Consumer: kong.Consumer{
+							Username: kong.String("bar"),
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "valid directory",
 			args: args{[]string{"testdata/valid"}},
 			want: &Content{
