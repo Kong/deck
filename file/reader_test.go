@@ -40,9 +40,9 @@ func Test_ensureJSON(t *testing.T) {
 }
 
 func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
-	var filename = "-"
+	var filenames = []string{"-"}
 	assert := assert.New(t)
-	assert.Equal("-", filename)
+	assert.Equal("-", filenames[0])
 
 	var content bytes.Buffer
 	content.Write([]byte("hunter2\n"))
@@ -66,15 +66,15 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	c, err := GetContentFromFile(filename)
+	c, err := GetContentFromFiles(filenames)
 	assert.NotNil(err)
 	assert.Nil(c)
 }
 
 func TestReadKongStateFromStdin(t *testing.T) {
-	var filename = "-"
+	var filenames = []string{"-"}
 	assert := assert.New(t)
-	assert.Equal("-", filename)
+	assert.Equal("-", filenames[0])
 
 	var content bytes.Buffer
 	content.Write([]byte("services:\n- host: test.com\n  name: test service\n"))
@@ -98,7 +98,7 @@ func TestReadKongStateFromStdin(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	c, err := GetContentFromFile(filename)
+	c, err := GetContentFromFiles(filenames)
 	assert.NotNil(c)
 	assert.Nil(err)
 

@@ -126,7 +126,7 @@ func Test_getReaders(t *testing.T) {
 
 func Test_getContent(t *testing.T) {
 	type args struct {
-		fileOrDir string
+		filenames []string
 	}
 	tests := []struct {
 		name    string
@@ -136,37 +136,37 @@ func Test_getContent(t *testing.T) {
 	}{
 		{
 			name:    "directory does not exist",
-			args:    args{"testdata/does-not-exist"},
+			args:    args{[]string{"testdata/does-not-exist"}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "empty directory",
-			args:    args{"testdata/emptydir"},
+			args:    args{[]string{"testdata/emptydir"}},
 			want:    &Content{},
 			wantErr: false,
 		},
 		{
 			name:    "directory with empty files",
-			args:    args{"testdata/emptyfiles"},
+			args:    args{[]string{"testdata/emptyfiles"}},
 			want:    &Content{},
 			wantErr: false,
 		},
 		{
 			name:    "bad yaml",
-			args:    args{"testdata/badyaml"},
+			args:    args{[]string{"testdata/badyaml"}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "bad JSON",
-			args:    args{"testdata/badjson"},
+			args:    args{[]string{"testdata/badjson"}},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name: "single file",
-			args: args{"testdata/file.yaml"},
+			args: args{[]string{"testdata/file.yaml"}},
 			want: &Content{
 				Services: []FService{
 					{
@@ -196,7 +196,7 @@ func Test_getContent(t *testing.T) {
 		},
 		{
 			name: "valid directory",
-			args: args{"testdata/valid"},
+			args: args{[]string{"testdata/valid"}},
 			want: &Content{
 				Info: &Info{
 					SelectorTags: []string{"tag1"},
@@ -262,7 +262,7 @@ func Test_getContent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getContent(tt.args.fileOrDir)
+			got, err := getContent(tt.args.filenames)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
