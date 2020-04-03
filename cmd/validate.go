@@ -62,6 +62,7 @@ this command.
 func init() {
 	rootCmd.AddCommand(validateCmd)
 	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
-		"state", "s", []string{"kong.yaml"}, "file containing Kong's configuration. "+
+		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 }

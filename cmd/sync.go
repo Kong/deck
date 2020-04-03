@@ -32,7 +32,8 @@ to get Kong's state in sync with the input state.`,
 func init() {
 	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringSliceVarP(&syncCmdKongStateFile,
-		"state", "s", []string{"kong.yaml"}, "file containing Kong's configuration. "+
+		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
