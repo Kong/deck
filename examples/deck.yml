@@ -1,0 +1,10 @@
+# sample configuration file for global parameters of deck CLI.
+kong-addr: http://localhost:8001
+headers:
+- "key1:value1"
+no-color: false
+verbose: 0
+
+# tls-skip-verify: false
+# tls-server-name: my-server-name.example.com
+# ca_cert : custom PEM encoded CA cert
