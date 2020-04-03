@@ -16,7 +16,7 @@ type RenderConfig struct {
 	KongVersion  semver.Version
 }
 
-// GetContentFromFile reads in a file with filename and constructs
+// GetContentFromFiles reads in a file with a slice of filenames and constructs
 // a state. If filename is `-`, then it will read from os.Stdin.
 // If filename represents a directory, it will traverse the tree
 // rooted at filename, read all the files with .yaml, .yml and .json extensions
@@ -24,12 +24,12 @@ type RenderConfig struct {
 //
 // It will return an error if the file representation is invalid
 // or if there is any error during processing.
-func GetContentFromFile(filename string) (*Content, error) {
-	if filename == "" {
+func GetContentFromFiles(filenames []string) (*Content, error) {
+	if len(filenames) == 0 {
 		return nil, errors.New("filename cannot be empty")
 	}
 
-	return getContent(filename)
+	return getContent(filenames)
 }
 
 // Get process the fileContent and renders a RawState.

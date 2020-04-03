@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	syncCmdKongStateFile string
+	syncCmdKongStateFile []string
 	syncCmdParallelism   int
 )
 
@@ -21,7 +21,7 @@ to get Kong's state in sync with the input state.`,
 		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if syncCmdKongStateFile == "" {
+		if len(syncCmdKongStateFile) == 0 {
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
 		}
@@ -31,8 +31,9 @@ to get Kong's state in sync with the input state.`,
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-	syncCmd.Flags().StringVarP(&syncCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration. "+
+	syncCmd.Flags().StringSliceVarP(&syncCmdKongStateFile,
+		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+

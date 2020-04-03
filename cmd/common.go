@@ -59,7 +59,7 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	return nil
 }
 
-func syncMain(filename string, dry bool, parallelism int) error {
+func syncMain(filenames []string, dry bool, parallelism int) error {
 
 	// load Kong version before workspace
 	kongVersion, err := kongVersion(config)
@@ -68,7 +68,7 @@ func syncMain(filename string, dry bool, parallelism int) error {
 	}
 
 	// read target file
-	targetContent, err := file.GetContentFromFile(filename)
+	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
 	}

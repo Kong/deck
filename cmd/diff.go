@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	diffCmdKongStateFile   string
+	diffCmdKongStateFile   []string
 	diffCmdParallelism     int
 	diffCmdNonZeroExitCode bool
 )
@@ -25,7 +25,7 @@ that will be created or updated or deleted.
 		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if diffCmdKongStateFile == "" {
+		if len(diffCmdKongStateFile) == 0 {
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
 		}
@@ -35,8 +35,9 @@ that will be created or updated or deleted.
 
 func init() {
 	rootCmd.AddCommand(diffCmd)
-	diffCmd.Flags().StringVarP(&diffCmdKongStateFile,
-		"state", "s", "kong.yaml", "file containing Kong's configuration. "+
+	diffCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
+		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+

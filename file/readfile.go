@@ -13,16 +13,22 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// getContent reads reads all the YAML and JSON files in the directory or the
-// file, depending on what fileOrDir represents, merges the content of
+// getContent reads all the YAML and JSON files in the directory or the
+// file, depending on the type of each item in filenames, merges the content of
 // these files and renders a Content.
-func getContent(fileOrDir string) (*Content, error) {
-	readers, err := getReaders(fileOrDir)
-	if err != nil {
-		return nil, err
+func getContent(filenames []string) (*Content, error) {
+	var allReaders []io.Reader
+	for _, fileOrDir := range filenames {
+		readers, err := getReaders(fileOrDir)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range readers {
+			allReaders = append(allReaders, r)
+		}
 	}
 	var res Content
-	for _, r := range readers {
+	for _, r := range allReaders {
 		content, err := readContent(r)
 		if err != nil {
 			return nil, errors.Wrap(err, "reading file")

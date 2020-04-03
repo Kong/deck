@@ -14,6 +14,9 @@ multiple files if:
 You can specify an entire directory for decK to consumer using the `--state`
 flag.
 
+You also can specify multiple files, comma-separated (`--state file.yml,file2.yml,directory`)
+or using the flag many times (`-s file.yml -s file2.yml -s directory`)
+
 Under the hood, decK combines the YAML/JSON files in a very dumb fashion,
 meaning it just concatenates the various arrays in the file together, before
 starting to process the state.
