@@ -1,9 +1,12 @@
 package dump
 
 import (
+	"context"
+
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 // Config can be used to skip exporting certain entities
@@ -29,117 +32,167 @@ func newOpt(tags []string) *kong.ListOpt {
 // all the entities in KongRawState.
 func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
-	// TODO make these requests concurrent
-
 	var state utils.KongRawState
-	services, err := GetAllServices(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "services")
-	}
 
-	state.Services = services
+	group, ctx := errgroup.WithContext(context.Background())
 
-	routes, err := GetAllRoutes(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "routes")
-	}
-	state.Routes = routes
+	group.Go(func() error {
+		services, err := GetAllServices(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "services")
+		}
+		state.Services = services
+		return nil
+	})
 
-	plugins, err := GetAllPlugins(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "plugins")
-	}
-	if config.SkipConsumers {
-		state.Plugins = excludeConsumersPlugins(plugins)
-	} else {
-		state.Plugins = plugins
-	}
+	group.Go(func() error {
+		routes, err := GetAllRoutes(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "routes")
+		}
+		state.Routes = routes
+		return nil
+	})
 
-	certificates, err := GetAllCertificates(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "certificates")
-	}
-	state.Certificates = certificates
+	group.Go(func() error {
+		plugins, err := GetAllPlugins(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "plugins")
+		}
+		if config.SkipConsumers {
+			state.Plugins = excludeConsumersPlugins(plugins)
+		} else {
+			state.Plugins = plugins
+		}
+		return nil
+	})
 
-	caCerts, err := GetAllCACertificates(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "ca-certificates")
-	}
-	state.CACertificates = caCerts
+	group.Go(func() error {
+		certificates, err := GetAllCertificates(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "certificates")
+		}
+		state.Certificates = certificates
+		return nil
+	})
 
-	snis, err := GetAllSNIs(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "snis")
-	}
-	state.SNIs = snis
+	group.Go(func() error {
+		caCerts, err := GetAllCACertificates(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "ca-certificates")
+		}
+		state.CACertificates = caCerts
+		return nil
+	})
 
-	upstreams, err := GetAllUpstreams(client, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "upstreams")
-	}
-	state.Upstreams = upstreams
+	group.Go(func() error {
+		snis, err := GetAllSNIs(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "snis")
+		}
+		state.SNIs = snis
+		return nil
+	})
 
-	targets, err := GetAllTargets(client, upstreams, config.SelectorTags)
-	if err != nil {
-		return nil, errors.Wrap(err, "targets")
-	}
-	state.Targets = targets
+	group.Go(func() error {
+		upstreams, err := GetAllUpstreams(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "upstreams")
+		}
+		state.Upstreams = upstreams
+		targets, err := GetAllTargets(ctx, client, upstreams, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "targets")
+		}
+		state.Targets = targets
+		return nil
+	})
 
 	if !config.SkipConsumers {
-		consumers, err := GetAllConsumers(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.Consumers = consumers
 
-		keyAuths, err := GetAllKeyAuths(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.KeyAuths = keyAuths
+		group.Go(func() error {
+			consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "consumers")
+			}
+			state.Consumers = consumers
+			return nil
+		})
 
-		hmacAuths, err := GetAllHMACAuths(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.HMACAuths = hmacAuths
+		group.Go(func() error {
+			keyAuths, err := GetAllKeyAuths(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "key-auths")
+			}
+			state.KeyAuths = keyAuths
+			return nil
+		})
 
-		jwtAuths, err := GetAllJWTAuths(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.JWTAuths = jwtAuths
+		group.Go(func() error {
+			hmacAuths, err := GetAllHMACAuths(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "hmac-auths")
+			}
+			state.HMACAuths = hmacAuths
+			return nil
+		})
 
-		basicAuths, err := GetAllBasicAuths(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.BasicAuths = basicAuths
+		group.Go(func() error {
+			jwtAuths, err := GetAllJWTAuths(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "jwts")
+			}
+			state.JWTAuths = jwtAuths
+			return nil
+		})
 
-		oauth2Creds, err := GetAllOauth2Creds(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.Oauth2Creds = oauth2Creds
+		group.Go(func() error {
+			basicAuths, err := GetAllBasicAuths(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "basic-auths")
+			}
+			state.BasicAuths = basicAuths
+			return nil
+		})
 
-		aclGroups, err := GetAllACLGroups(client, config.SelectorTags)
-		if err != nil {
-			return nil, err
-		}
-		state.ACLGroups = aclGroups
+		group.Go(func() error {
+			oauth2Creds, err := GetAllOauth2Creds(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "oauth2")
+			}
+			state.Oauth2Creds = oauth2Creds
+			return nil
+		})
+
+		group.Go(func() error {
+			aclGroups, err := GetAllACLGroups(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "acls")
+			}
+			state.ACLGroups = aclGroups
+			return nil
+		})
+	}
+	err := group.Wait()
+	if err != nil {
+		return nil, err
 	}
 
 	return &state, nil
 }
 
 // GetAllServices queries Kong for all the services using client.
-func GetAllServices(client *kong.Client, tags []string) ([]*kong.Service, error) {
+func GetAllServices(ctx context.Context, client *kong.Client,
+	tags []string) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Services.List(nil, opt)
+		s, nextopt, err := client.Services.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		services = append(services, s...)
@@ -152,13 +205,17 @@ func GetAllServices(client *kong.Client, tags []string) ([]*kong.Service, error)
 }
 
 // GetAllRoutes queries Kong for all the routes using client.
-func GetAllRoutes(client *kong.Client, tags []string) ([]*kong.Route, error) {
+func GetAllRoutes(ctx context.Context, client *kong.Client,
+	tags []string) ([]*kong.Route, error) {
 	var routes []*kong.Route
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Routes.List(nil, opt)
+		s, nextopt, err := client.Routes.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		routes = append(routes, s...)
@@ -171,13 +228,17 @@ func GetAllRoutes(client *kong.Client, tags []string) ([]*kong.Route, error) {
 }
 
 // GetAllPlugins queries Kong for all the plugins using client.
-func GetAllPlugins(client *kong.Client, tags []string) ([]*kong.Plugin, error) {
+func GetAllPlugins(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.Plugin, error) {
 	var plugins []*kong.Plugin
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Plugins.List(nil, opt)
+		s, nextopt, err := client.Plugins.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		plugins = append(plugins, s...)
@@ -190,13 +251,17 @@ func GetAllPlugins(client *kong.Client, tags []string) ([]*kong.Plugin, error) {
 }
 
 // GetAllCertificates queries Kong for all the certificates using client.
-func GetAllCertificates(client *kong.Client, tags []string) ([]*kong.Certificate, error) {
+func GetAllCertificates(ctx context.Context, client *kong.Client,
+	tags []string) ([]*kong.Certificate, error) {
 	var certificates []*kong.Certificate
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Certificates.List(nil, opt)
+		s, nextopt, err := client.Certificates.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		for _, cert := range s {
@@ -213,7 +278,8 @@ func GetAllCertificates(client *kong.Client, tags []string) ([]*kong.Certificate
 }
 
 // GetAllCACertificates queries Kong for all the CACertificates using client.
-func GetAllCACertificates(client *kong.Client,
+func GetAllCACertificates(ctx context.Context,
+	client *kong.Client,
 	tags []string) ([]*kong.CACertificate, error) {
 	var caCertificates []*kong.CACertificate
 	opt := newOpt(tags)
@@ -234,6 +300,9 @@ func GetAllCACertificates(client *kong.Client,
 			}
 			return nil, err
 		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		caCertificates = append(caCertificates, s...)
 		if nextopt == nil {
 			break
@@ -244,13 +313,17 @@ func GetAllCACertificates(client *kong.Client,
 }
 
 // GetAllSNIs queries Kong for all the SNIs using client.
-func GetAllSNIs(client *kong.Client, tags []string) ([]*kong.SNI, error) {
+func GetAllSNIs(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.SNI, error) {
 	var snis []*kong.SNI
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.SNIs.List(nil, opt)
+		s, nextopt, err := client.SNIs.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		snis = append(snis, s...)
@@ -264,13 +337,20 @@ func GetAllSNIs(client *kong.Client, tags []string) ([]*kong.SNI, error) {
 
 // GetAllConsumers queries Kong for all the consumers using client.
 // Please use this method with caution if you have a lot of consumers.
-func GetAllConsumers(client *kong.Client, tags []string) ([]*kong.Consumer, error) {
+func GetAllConsumers(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.Consumer, error) {
 	var consumers []*kong.Consumer
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Consumers.List(nil, opt)
+		s, nextopt, err := client.Consumers.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		consumers = append(consumers, s...)
@@ -283,13 +363,17 @@ func GetAllConsumers(client *kong.Client, tags []string) ([]*kong.Consumer, erro
 }
 
 // GetAllUpstreams queries Kong for all the Upstreams using client.
-func GetAllUpstreams(client *kong.Client, tags []string) ([]*kong.Upstream, error) {
+func GetAllUpstreams(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.Upstream, error) {
 	var upstreams []*kong.Upstream
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.Upstreams.List(nil, opt)
+		s, nextopt, err := client.Upstreams.List(ctx, opt)
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		upstreams = append(upstreams, s...)
@@ -304,15 +388,18 @@ func GetAllUpstreams(client *kong.Client, tags []string) ([]*kong.Upstream, erro
 // GetAllTargets queries Kong for all the Targets of upstreams using client.
 // Targets are queries per upstream as there exists no endpoint in Kong
 // to list all targets of all upstreams.
-func GetAllTargets(client *kong.Client,
+func GetAllTargets(ctx context.Context, client *kong.Client,
 	upstreams []*kong.Upstream, tags []string) ([]*kong.Target, error) {
 	var targets []*kong.Target
 	opt := newOpt(tags)
 
 	for _, upstream := range upstreams {
 		for {
-			t, nextopt, err := client.Targets.List(nil, upstream.ID, opt)
+			t, nextopt, err := client.Targets.List(ctx, upstream.ID, opt)
 			if err != nil {
+				return nil, err
+			}
+			if err := ctx.Err(); err != nil {
 				return nil, err
 			}
 			targets = append(targets, t...)
@@ -327,18 +414,22 @@ func GetAllTargets(client *kong.Client,
 }
 
 // GetAllKeyAuths queries Kong for all key-auth credentials using client.
-func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
+func GetAllKeyAuths(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
 	var keyAuths []*kong.KeyAuth
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.KeyAuths.List(nil, opt)
+		s, nextopt, err := client.KeyAuths.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return keyAuths, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		keyAuths = append(keyAuths, s...)
@@ -351,18 +442,22 @@ func GetAllKeyAuths(client *kong.Client, tags []string) ([]*kong.KeyAuth, error)
 }
 
 // GetAllHMACAuths queries Kong for all hmac-auth credentials using client.
-func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
+func GetAllHMACAuths(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
 	var hmacAuths []*kong.HMACAuth
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.HMACAuths.List(nil, opt)
+		s, nextopt, err := client.HMACAuths.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return hmacAuths, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		hmacAuths = append(hmacAuths, s...)
@@ -375,18 +470,22 @@ func GetAllHMACAuths(client *kong.Client, tags []string) ([]*kong.HMACAuth, erro
 }
 
 // GetAllJWTAuths queries Kong for all jwt credentials using client.
-func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
+func GetAllJWTAuths(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
 	var jwtAuths []*kong.JWTAuth
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.JWTAuths.List(nil, opt)
+		s, nextopt, err := client.JWTAuths.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return jwtAuths, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		jwtAuths = append(jwtAuths, s...)
@@ -399,18 +498,22 @@ func GetAllJWTAuths(client *kong.Client, tags []string) ([]*kong.JWTAuth, error)
 }
 
 // GetAllBasicAuths queries Kong for all basic-auth credentials using client.
-func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
+func GetAllBasicAuths(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
 	var basicAuths []*kong.BasicAuth
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.BasicAuths.List(nil, opt)
+		s, nextopt, err := client.BasicAuths.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return basicAuths, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		basicAuths = append(basicAuths, s...)
@@ -423,7 +526,7 @@ func GetAllBasicAuths(client *kong.Client, tags []string) ([]*kong.BasicAuth, er
 }
 
 // GetAllOauth2Creds queries Kong for all oauth2 credentials using client.
-func GetAllOauth2Creds(client *kong.Client,
+func GetAllOauth2Creds(ctx context.Context, client *kong.Client,
 	tags []string) ([]*kong.Oauth2Credential, error) {
 	var oauth2Creds []*kong.Oauth2Credential
 	// tags are not supported on credentials
@@ -431,11 +534,14 @@ func GetAllOauth2Creds(client *kong.Client,
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.Oauth2Credentials.List(nil, opt)
+		s, nextopt, err := client.Oauth2Credentials.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return oauth2Creds, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		oauth2Creds = append(oauth2Creds, s...)
@@ -448,18 +554,22 @@ func GetAllOauth2Creds(client *kong.Client,
 }
 
 // GetAllACLGroups queries Kong for all ACL groups using client.
-func GetAllACLGroups(client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
+func GetAllACLGroups(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
 	var aclGroups []*kong.ACLGroup
 	// tags are not supported on credentials
 	// opt := newOpt(tags)
 	opt := newOpt(nil)
 
 	for {
-		s, nextopt, err := client.ACLs.List(nil, opt)
+		s, nextopt, err := client.ACLs.List(ctx, opt)
 		if kong.IsNotFoundErr(err) {
 			return aclGroups, nil
 		}
 		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		aclGroups = append(aclGroups, s...)
