@@ -6,7 +6,7 @@ env:
 #  - GOPROXY=https://proxy.golang.org
 
 go:
- - "1.13"
+ - "1.14"
 
 before_script:
  - go get golang.org/x/lint/golint
