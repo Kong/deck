@@ -73,22 +73,11 @@ func (sc *Syncer) diff() error {
 
 func (sc *Syncer) delete() error {
 	var err error
+
 	err = sc.deletePlugins()
 	if err != nil {
 		return err
 	}
-	sc.wait()
-	// routes should be deleted before services
-	err = sc.deleteRoutes()
-	if err != nil {
-		return err
-	}
-	sc.wait()
-	err = sc.deleteServices()
-	if err != nil {
-		return err
-	}
-	sc.wait()
 	err = sc.deleteKeyAuths()
 	if err != nil {
 		return err
@@ -113,25 +102,7 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
-	sc.wait()
-	err = sc.deleteConsumers()
-	if err != nil {
-		return err
-	}
-	sc.wait()
-	// targets should be deleted before upstreams
-	// If an upstream is deleted, deleting a target will give back a 404.
-
-	// TODO implement the following optimization:
-	// If an upstream is deleted, do not make API calls to delete for it's
-	// targets as they will be onCascade deleted in Kong, saving a few
-	// round trip calls to Kong.
 	err = sc.deleteTargets()
-	if err != nil {
-		return err
-	}
-	sc.wait()
-	err = sc.deleteUpstreams()
 	if err != nil {
 		return err
 	}
@@ -139,12 +110,52 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
+
+	// barrier for foreign relations
+	// plugins must be deleted before services, routes and consumers
+	// routes must be deleted before service can be deleted
+	// credentials must be deleted before consumers
+	// targets must be deleted before upstream
+
+	// PLEASE NOTE that if the order is not preserved, then decK will error
+	// out because deleting a child entity whose parent is already deleted
+	// will return a 404
 	sc.wait()
+
+	err = sc.deleteRoutes()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteConsumers()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteUpstreams()
+	if err != nil {
+		return err
+	}
+
+	// barrier for foreign relations
+	// routes must be deleted before services
+	sc.wait()
+
+	err = sc.deleteServices()
+	if err != nil {
+		return err
+	}
+
+	// barrier for foreign relations
+	// services must be deleted before certificates (client_certificate)
+	sc.wait()
+
 	err = sc.deleteCertificates()
 	if err != nil {
 		return err
 	}
+
+	// finish delete before returning
 	sc.wait()
+
 	return nil
 }
 
@@ -152,17 +163,34 @@ func (sc *Syncer) createUpdate() error {
 	// TODO write an interface and register by types,
 	// then execute in a particular order
 
-	// TODO optimize: increase parallelism
-	// Unrelated entities like services, upstreams and certificates
-	// can be all changed at the same time, then have a barrier
-	// and then execute changes for routes, targets and snis.
-	// services should be created before routes
-
 	err := sc.createUpdateCertificates()
 	if err != nil {
 		return err
 	}
+	err = sc.createUpdateCACertificates()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateConsumers()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateUpstreams()
+	if err != nil {
+		return err
+	}
+
+	// barrier for foreign relations
+	// upstreams must be created before targets
+	// certificates must be created before SNIs
+	// consumers must be created before creds of all kinds
+	// certificates must be created before services (client_certificate)
 	sc.wait()
+
+	err = sc.createUpdateTargets()
+	if err != nil {
+		return err
+	}
 	err = sc.createUpdateSNIs()
 	if err != nil {
 		return err
@@ -171,17 +199,6 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
-	sc.wait()
-	err = sc.createUpdateRoutes()
-	if err != nil {
-		return err
-	}
-	sc.wait()
-	err = sc.createUpdateConsumers()
-	if err != nil {
-		return err
-	}
-	sc.wait()
 	err = sc.createUpdateKeyAuths()
 	if err != nil {
 		return err
@@ -206,29 +223,28 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
-	// TODO this barrier can be removed
-	// TODO open up barriers and optimize
+
+	// barrier for foreign relations
+	// services must be created before routes
 	sc.wait()
-	// upstreams should be created before targets
-	err = sc.createUpdateUpstreams()
+
+	err = sc.createUpdateRoutes()
 	if err != nil {
 		return err
 	}
+
+	// barrier for foreign relations
+	// services, routes and consumers must be created before plugins
 	sc.wait()
-	err = sc.createUpdateTargets()
-	if err != nil {
-		return err
-	}
-	sc.wait()
+
 	err = sc.createUpdatePlugins()
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateCACertificates()
-	if err != nil {
-		return err
-	}
+
+	// finish createUpdate before returning
 	sc.wait()
+
 	return nil
 }
 
@@ -249,7 +265,7 @@ func (sc *Syncer) eventCompleted(e Event) {
 func (sc *Syncer) wait() {
 	for atomic.LoadInt32(&sc.InFlightOps) != 0 {
 		// TODO hack?
-		time.Sleep(5 * time.Millisecond)
+		time.Sleep(1 * time.Millisecond)
 	}
 }
 
