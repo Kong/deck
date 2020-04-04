@@ -81,6 +81,7 @@ func buildRegistry(client *kong.Client) *crud.Registry {
 	r.MustRegister("upstream", &upstreamCRUD{client: client})
 	r.MustRegister("target", &targetCRUD{client: client})
 	r.MustRegister("certificate", &certificateCRUD{client: client})
+	r.MustRegister("sni", &sniCRUD{client: client})
 	r.MustRegister("ca_certificate", &caCertificateCRUD{client: client})
 	r.MustRegister("plugin", &pluginCRUD{client: client})
 	r.MustRegister("consumer", &consumerCRUD{client: client})

@@ -995,6 +995,30 @@ const contentSchema = `{
         }
       ]
     },
+    "SNI": {
+      "properties": {
+        "certificate": {
+          "$ref": "#/definitions/Certificate"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Service": {
       "properties": {
         "client_certificate": {

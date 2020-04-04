@@ -244,7 +244,12 @@ func (t FTarget) id() string {
 
 // FCertificate represents a Kong Certificate.
 type FCertificate struct {
-	kong.Certificate `yaml:",inline,omitempty"`
+	ID        *string    `json:"id,omitempty" yaml:"id,omitempty"`
+	Cert      *string    `json:"cert,omitempty" yaml:"cert,omitempty"`
+	Key       *string    `json:"key,omitempty" yaml:"key,omitempty"`
+	CreatedAt *int64     `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Tags      []*string  `json:"tags,omitempty" yaml:"tags,omitempty"`
+	SNIs      []kong.SNI `json:"snis,omitempty" yaml:"snis,omitempty"`
 }
 
 // id is used for sorting.
@@ -256,102 +261,6 @@ func (c FCertificate) id() string {
 		return *c.Cert
 	}
 	return ""
-}
-
-// Custom (Un)marshaling methods exist due to:
-// https://github.com/hbagdi/deck/issues/76
-
-type sni struct {
-	Name *string `json:"name,omitempty" yaml:"name,omitempty"`
-}
-
-type cert struct {
-	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
-	Cert      *string   `json:"cert,omitempty" yaml:"cert,omitempty"`
-	Key       *string   `json:"key,omitempty" yaml:"key,omitempty"`
-	CreatedAt *int64    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	SNIs      []*sni    `json:"snis,omitempty" yaml:"snis,omitempty"`
-	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
-}
-
-func copyToCert(certificate FCertificate) cert {
-	c := cert{}
-	if certificate.ID != nil {
-		c.ID = certificate.ID
-	}
-	if certificate.Key != nil {
-		c.Key = certificate.Key
-	}
-	if certificate.Cert != nil {
-		c.Cert = certificate.Cert
-	}
-	if certificate.CreatedAt != nil {
-		c.CreatedAt = certificate.CreatedAt
-	}
-	if certificate.Tags != nil {
-		c.Tags = certificate.Tags
-	}
-	for _, sniName := range certificate.SNIs {
-		c.SNIs = append(c.SNIs, &sni{Name: kong.String(*sniName)})
-	}
-	return c
-}
-
-func copyFromCert(cert cert, certificate *FCertificate) {
-	if cert.ID != nil {
-		certificate.ID = cert.ID
-	}
-	if cert.Key != nil {
-		certificate.Key = cert.Key
-	}
-	if cert.Cert != nil {
-		certificate.Cert = cert.Cert
-	}
-	if cert.CreatedAt != nil {
-		certificate.CreatedAt = cert.CreatedAt
-	}
-	if cert.Tags != nil {
-		certificate.Tags = cert.Tags
-	}
-	for _, sni := range cert.SNIs {
-		certificate.SNIs = append(certificate.SNIs, kong.String(*sni.Name))
-	}
-}
-
-// MarshalYAML is a custom marshal to handle
-// SNI.
-func (c FCertificate) MarshalYAML() (interface{}, error) {
-	return copyToCert(c), nil
-}
-
-// UnmarshalYAML is a custom marshal method to handle
-// foreign references.
-func (c *FCertificate) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var cert cert
-	if err := unmarshal(&cert); err != nil {
-		return err
-	}
-	copyFromCert(cert, c)
-	return nil
-}
-
-// MarshalJSON is a custom marshal method to handle
-// foreign references.
-func (c FCertificate) MarshalJSON() ([]byte, error) {
-	cert := copyToCert(c)
-	return json.Marshal(cert)
-}
-
-// UnmarshalJSON is a custom marshal method to handle
-// foreign references.
-func (c *FCertificate) UnmarshalJSON(b []byte) error {
-	var cert cert
-	err := json.Unmarshal(b, &cert)
-	if err != nil {
-		return err
-	}
-	copyFromCert(cert, c)
-	return nil
 }
 
 // FCACertificate represents a Kong CACertificate.

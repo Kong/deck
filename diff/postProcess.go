@@ -86,6 +86,23 @@ func (crud *certificatePostAction) Update(args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.Certificates.Update(*args[0].(*state.Certificate))
 }
 
+type sniPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *sniPostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.SNIs.Add(*args[0].(*state.SNI))
+}
+
+func (crud *sniPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	sni := args[0].(*state.SNI)
+	return nil, crud.currentState.SNIs.Delete(*sni.ID)
+}
+
+func (crud *sniPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.SNIs.Update(*args[0].(*state.SNI))
+}
+
 type caCertificatePostAction struct {
 	currentState *state.KongState
 }

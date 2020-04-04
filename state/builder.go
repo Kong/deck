@@ -139,6 +139,13 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 		}
 	}
 
+	for _, s := range raw.SNIs {
+		err := kongState.SNIs.Add(SNI{SNI: *s})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting sni into state")
+		}
+	}
+
 	for _, c := range raw.CACertificates {
 		err := kongState.CACertificates.Add(CACertificate{
 			CACertificate: *c,

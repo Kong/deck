@@ -137,6 +137,36 @@ func existingCertificateState() *state.KongState {
 	return s
 }
 
+func existingCertificateAndSNIState() *state.KongState {
+	s, _ := state.NewKongState()
+	s.Certificates.Add(state.Certificate{
+		Certificate: kong.Certificate{
+			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Cert: kong.String("foo"),
+			Key:  kong.String("bar"),
+		},
+	})
+	s.SNIs.Add(state.SNI{
+		SNI: kong.SNI{
+			ID:   kong.String("a53e9598-3a5e-4c12-a672-71a4cdcf7a47"),
+			Name: kong.String("foo.example.com"),
+			Certificate: &kong.Certificate{
+				ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			},
+		},
+	})
+	s.SNIs.Add(state.SNI{
+		SNI: kong.SNI{
+			ID:   kong.String("5f8e6848-4cb9-479a-a27e-860e1a77f875"),
+			Name: kong.String("bar.example.com"),
+			Certificate: &kong.Certificate{
+				ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			},
+		},
+	})
+	return s
+}
+
 func existingCACertificateState() *state.KongState {
 	s, _ := state.NewKongState()
 	s.CACertificates.Add(state.CACertificate{
@@ -1160,10 +1190,8 @@ func Test_stateBuilder_certificates(t *testing.T) {
 				targetContent: &Content{
 					Certificates: []FCertificate{
 						{
-							Certificate: kong.Certificate{
-								Cert: kong.String("foo"),
-								Key:  kong.String("bar"),
-							},
+							Cert: kong.String("foo"),
+							Key:  kong.String("bar"),
 						},
 					},
 				},
@@ -1175,7 +1203,6 @@ func Test_stateBuilder_certificates(t *testing.T) {
 						ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
 						Cert: kong.String("foo"),
 						Key:  kong.String("bar"),
-						SNIs: []*string{},
 					},
 				},
 			},
@@ -1186,9 +1213,38 @@ func Test_stateBuilder_certificates(t *testing.T) {
 				targetContent: &Content{
 					Certificates: []FCertificate{
 						{
-							Certificate: kong.Certificate{
-								Cert: kong.String("foo"),
-								Key:  kong.String("bar"),
+							Cert: kong.String("foo"),
+							Key:  kong.String("bar"),
+						},
+					},
+				},
+				currentState: existingCertificateState(),
+			},
+			want: &utils.KongRawState{
+				Certificates: []*kong.Certificate{
+					{
+						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Cert: kong.String("foo"),
+						Key:  kong.String("bar"),
+					},
+				},
+			},
+		},
+		{
+			name: "generates ID for SNIs",
+			fields: fields{
+				targetContent: &Content{
+					Certificates: []FCertificate{
+						{
+							Cert: kong.String("foo"),
+							Key:  kong.String("bar"),
+							SNIs: []kong.SNI{
+								{
+									Name: kong.String("foo.example.com"),
+								},
+								{
+									Name: kong.String("bar.example.com"),
+								},
 							},
 						},
 					},
@@ -1201,7 +1257,69 @@ func Test_stateBuilder_certificates(t *testing.T) {
 						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						Cert: kong.String("foo"),
 						Key:  kong.String("bar"),
-						SNIs: []*string{},
+					},
+				},
+				SNIs: []*kong.SNI{
+					{
+						ID:   kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Name: kong.String("foo.example.com"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+					{
+						ID:   kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						Name: kong.String("bar.example.com"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "matches ID for SNIs",
+			fields: fields{
+				targetContent: &Content{
+					Certificates: []FCertificate{
+						{
+							Cert: kong.String("foo"),
+							Key:  kong.String("bar"),
+							SNIs: []kong.SNI{
+								{
+									Name: kong.String("foo.example.com"),
+								},
+								{
+									Name: kong.String("bar.example.com"),
+								},
+							},
+						},
+					},
+				},
+				currentState: existingCertificateAndSNIState(),
+			},
+			want: &utils.KongRawState{
+				Certificates: []*kong.Certificate{
+					{
+						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Cert: kong.String("foo"),
+						Key:  kong.String("bar"),
+					},
+				},
+				SNIs: []*kong.SNI{
+					{
+						ID:   kong.String("a53e9598-3a5e-4c12-a672-71a4cdcf7a47"),
+						Name: kong.String("foo.example.com"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+					{
+						ID:   kong.String("5f8e6848-4cb9-479a-a27e-860e1a77f875"),
+						Name: kong.String("bar.example.com"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
 					},
 				},
 			},

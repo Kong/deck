@@ -45,6 +45,7 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("upstream", &upstreamPostAction{current})
 	s.postProcess.MustRegister("target", &targetPostAction{current})
 	s.postProcess.MustRegister("certificate", &certificatePostAction{current})
+	s.postProcess.MustRegister("sni", &sniPostAction{current})
 	s.postProcess.MustRegister("ca_certificate", &caCertificatePostAction{current})
 	s.postProcess.MustRegister("plugin", &pluginPostAction{current})
 	s.postProcess.MustRegister("consumer", &consumerPostAction{current})
@@ -139,13 +140,6 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	sc.wait()
-	// TODO  Handle the following:
-	// If a cert is changed but SNIs are the same,
-	// the operation order will be to create the new cert and delete the old
-	// cert. Creation will fail because the SNIs will still
-	// be associated with the old cert.
-	// This can be solved if SNI are also treated as a resource in this
-	// codebase.
 	err = sc.deleteCertificates()
 	if err != nil {
 		return err
@@ -169,6 +163,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	sc.wait()
+	err = sc.createUpdateSNIs()
+	if err != nil {
+		return err
+	}
 	err = sc.createUpdateServices()
 	if err != nil {
 		return err
