@@ -18,6 +18,7 @@ type KongState struct {
 	Upstreams      *UpstreamsCollection
 	Targets        *TargetsCollection
 	Certificates   *CertificatesCollection
+	SNIs           *SNIsCollection
 	CACertificates *CACertificatesCollection
 	Plugins        *PluginsCollection
 	Consumers      *ConsumersCollection
@@ -47,6 +48,7 @@ func NewKongState() (*KongState, error) {
 			upstreamTableName:    upstreamTableSchema,
 			targetTableName:      targetTableSchema,
 			certificateTableName: certificateTableSchema,
+			sniTableName:         sniTableSchema,
 			caCertTableName:      caCertTableSchema,
 			pluginTableName:      pluginTableSchema,
 			consumerTableName:    consumerTableSchema,
@@ -75,6 +77,7 @@ func NewKongState() (*KongState, error) {
 	state.Upstreams = (*UpstreamsCollection)(&state.common)
 	state.Targets = (*TargetsCollection)(&state.common)
 	state.Certificates = (*CertificatesCollection)(&state.common)
+	state.SNIs = (*SNIsCollection)(&state.common)
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
