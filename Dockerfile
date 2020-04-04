@@ -9,7 +9,7 @@ ARG TAG
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o deck \
       -ldflags "-s -w -X github.com/hbagdi/deck/cmd.VERSION=$TAG -X github.com/hbagdi/deck/cmd.COMMIT=$COMMIT"
 
-FROM alpine:3.10
+FROM alpine:3.11
 RUN adduser --disabled-password --gecos "" deckuser
 RUN apk --no-cache add ca-certificates
 USER deckuser
