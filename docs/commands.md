@@ -1,4 +1,6 @@
-# decK commands
+# decK CLI
+
+## Commands
 
 This document describes the various commands that are available in decK.
 The command-line `--help` flag on the main command or a sub-command (like diff,
@@ -15,7 +17,7 @@ these commands:
 - [version](#version)
 - [help](#help)
 
-## ping
+### ping
 
 This command can be used to verify connectivity between Kong and decK.
 Under the hood, it sends a `GET /` request to Kong to verify if Kong's
@@ -24,7 +26,7 @@ If decK is being used in automated environment (like in a CI), it is
 recommended that you use this command before a diff/sync to ensure
 connectivity.
 
-## dump
+### dump
 
 This command can be used to export all of Kong's configuration into a single
 YAML file. All entities are exported by default.
@@ -41,37 +43,45 @@ If you are a Kong Enterprise user, you can specify a specific workspace that
 you want to export using `--workspace` flag or use `--all-workspaces` flag
 to export routing configuration of all workspaces.
 
-## diff
+### diff
 
 This command compares the content of the input file against the current
 configuration of Kong.
 You can use this command for drift detection i.e. if the configuration
 of Kong is out of sync with configuration of the input file.
 
-## sync
+### sync
 
 This command will create, update or delete entities in Kong to exactly match
 as described via the input file. You can use `diff` command to display
 the actions that decK will take and then use `sync` command to actually
 perform these actions.
 
-## validate
+### validate
 
 This command can be used to validate an existing state file or a set of files.
 It can catch most errors including validation of the YAML/JSON file itself and
 catching duplicates or malformed entities.
 
-## reset
+### reset
 
 This command will delete all the entities in Kong. Please use this
 command with extreme caution as the actions are irreversible.
 
-## version
+### version
 
 This command shows the version information of the decK binary that is currently
 in use.
 
-## help
+### help
 
 This command shows the help text of decK. Use `--help` flag on any of the
 above command to get help in your terminal itself.
+
+## Other settings
+
+### Analytics
+
+decK collects anonymized data to track feature adoption.
+You can opt out of this by setting the environment variable
+`DECK_ANALYTICS` to `off`.
