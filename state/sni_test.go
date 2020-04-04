@@ -217,15 +217,26 @@ func TestSNIsInvalidType(t *testing.T) {
 
 	collection := snisCollection()
 
-	var service Service
-	service.Name = kong.String("my-service")
-	service.ID = kong.String("first")
+	type derivedSNI struct {
+		SNI
+	}
+
+	var sni derivedSNI
+	sni.SNI = SNI{
+		SNI: kong.SNI{
+			ID:   kong.String("foo-id"),
+			Name: kong.String("foo-name"),
+			Certificate: &kong.Certificate{
+				ID: kong.String("cert1-id"),
+			},
+		},
+	}
 	txn := collection.db.Txn(true)
-	txn.Insert(sniTableName, &service)
+	txn.Insert(sniTableName, &sni)
 	txn.Commit()
 
 	assert.Panics(func() {
-		collection.Get("my-service")
+		collection.Get("foo-id")
 	})
 	assert.Panics(func() {
 		collection.GetAll()
