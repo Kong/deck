@@ -199,7 +199,11 @@ func GetAllCertificates(client *kong.Client, tags []string) ([]*kong.Certificate
 		if err != nil {
 			return nil, err
 		}
-		certificates = append(certificates, s...)
+		for _, cert := range s {
+			c := cert
+			c.SNIs = nil
+			certificates = append(certificates, cert)
+		}
 		if nextopt == nil {
 			break
 		}

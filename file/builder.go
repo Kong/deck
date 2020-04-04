@@ -69,7 +69,6 @@ func (b *stateBuilder) certificates() {
 	}
 
 	for _, c := range b.targetContent.Certificates {
-		c := c
 		if utils.Empty(c.ID) {
 			cert, err := b.currentState.Certificates.GetByCertKey(*c.Cert,
 				*c.Key)
@@ -82,15 +81,51 @@ func (b *stateBuilder) certificates() {
 				c.ID = kong.String(*cert.ID)
 			}
 		}
-		utils.MustMergeTags(&c.Certificate, b.selectTags)
-		if c.Certificate.SNIs == nil {
-			c.Certificate.SNIs = []*string{}
+		utils.MustMergeTags(&c, b.selectTags)
+
+		snisFromCert := c.SNIs
+
+		kongCert := kong.Certificate{
+			ID:        c.ID,
+			Key:       c.Key,
+			Cert:      c.Cert,
+			Tags:      c.Tags,
+			CreatedAt: c.CreatedAt,
+		}
+		b.rawState.Certificates = append(b.rawState.Certificates, &kongCert)
+
+		// snis associated with the certificate
+		var snis []kong.SNI
+		for _, sni := range snisFromCert {
+			sni.Certificate = &kong.Certificate{ID: kong.String(*c.ID)}
+			snis = append(snis, sni)
+		}
+		if err := b.ingestSNIs(snis); err != nil {
+			b.err = err
+			return
 		}
 
-		b.rawState.Certificates = append(b.rawState.Certificates,
-			&c.Certificate)
 		b.certIDs[*c.ID] = true
 	}
+}
+
+func (b *stateBuilder) ingestSNIs(snis []kong.SNI) error {
+	for _, sni := range snis {
+		sni := sni
+		if utils.Empty(sni.ID) {
+			currentSNI, err := b.currentState.SNIs.Get(*sni.Name)
+			if err == state.ErrNotFound {
+				sni.ID = uuid()
+			} else if err != nil {
+				return err
+			} else {
+				sni.ID = kong.String(*currentSNI.ID)
+			}
+		}
+		utils.MustMergeTags(&sni, b.selectTags)
+		b.rawState.SNIs = append(b.rawState.SNIs, &sni)
+	}
+	return nil
 }
 
 func (b *stateBuilder) caCertificates() {

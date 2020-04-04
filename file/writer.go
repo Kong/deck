@@ -233,12 +233,28 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 	for _, c := range certificates {
-		c := FCertificate{Certificate: c.Certificate}
+		c := FCertificate{
+			ID:   c.ID,
+			Cert: c.Cert,
+			Key:  c.Key,
+			Tags: c.Tags,
+		}
+		snis, err := kongState.SNIs.GetAllByCertID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, s := range snis {
+			s.Certificate = nil
+			zeroOutID(s, s.Name, config.WithID)
+			zeroOutTimestamps(s)
+			utils.MustRemoveTags(&s.SNI, selectTags)
+			c.SNIs = append(c.SNIs, s.SNI)
+		}
 		sort.SliceStable(c.SNIs, func(i, j int) bool {
-			return strings.Compare(*c.SNIs[i], *c.SNIs[j]) < 0
+			return strings.Compare(*c.SNIs[i].Name, *c.SNIs[j].Name) < 0
 		})
 		zeroOutTimestamps(&c)
-		utils.MustRemoveTags(&c.Certificate, selectTags)
+		utils.MustRemoveTags(&c, selectTags)
 		file.Certificates = append(file.Certificates, c)
 	}
 	sort.SliceStable(file.Certificates, func(i, j int) bool {
