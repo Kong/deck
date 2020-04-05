@@ -5,7 +5,6 @@ import "github.com/hbagdi/go-kong/kong"
 var (
 	serviceDefaults = kong.Service{
 		Port:           kong.Int(80),
-		Retries:        kong.Int(5),
 		Protocol:       kong.String("http"),
 		ConnectTimeout: kong.Int(60000),
 		WriteTimeout:   kong.Int(60000),
@@ -30,10 +29,9 @@ var (
 					Interval:     kong.Int(0),
 					Successes:    kong.Int(0),
 				},
-				HTTPPath:               kong.String("/"),
-				HTTPSVerifyCertificate: kong.Bool(true),
-				Type:                   kong.String("http"),
-				Timeout:                kong.Int(1),
+				HTTPPath: kong.String("/"),
+				Type:     kong.String("http"),
+				Timeout:  kong.Int(1),
 				Unhealthy: &kong.Unhealthy{
 					HTTPFailures: kong.Int(0),
 					TCPFailures:  kong.Int(0),

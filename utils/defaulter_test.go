@@ -69,13 +69,26 @@ func TestServiceSetTest(t *testing.T) {
 			want: &serviceDefaults,
 		},
 		{
+			desc: "retries can be set to 0",
+			arg: &kong.Service{
+				Retries: kong.Int(0),
+			},
+			want: &kong.Service{
+				Port:           kong.Int(80),
+				Retries:        kong.Int(0),
+				Protocol:       kong.String("http"),
+				ConnectTimeout: kong.Int(60000),
+				WriteTimeout:   kong.Int(60000),
+				ReadTimeout:    kong.Int(60000),
+			},
+		},
+		{
 			desc: "timeout value value is not overridden",
 			arg: &kong.Service{
 				WriteTimeout: kong.Int(42),
 			},
 			want: &kong.Service{
 				Port:           kong.Int(80),
-				Retries:        kong.Int(5),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
 				WriteTimeout:   kong.Int(42),
@@ -89,7 +102,6 @@ func TestServiceSetTest(t *testing.T) {
 			},
 			want: &kong.Service{
 				Port:           kong.Int(80),
-				Retries:        kong.Int(5),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/foo"),
 				ConnectTimeout: kong.Int(60000),
@@ -108,7 +120,6 @@ func TestServiceSetTest(t *testing.T) {
 				Name:           kong.String("foo"),
 				Host:           kong.String("example.com"),
 				Port:           kong.Int(80),
-				Retries:        kong.Int(5),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/bar"),
 				ConnectTimeout: kong.Int(60000),
@@ -255,10 +266,9 @@ func TestUpstreamSetTest(t *testing.T) {
 							Interval:     kong.Int(0),
 							Successes:    kong.Int(0),
 						},
-						HTTPPath:               kong.String("/"),
-						HTTPSVerifyCertificate: kong.Bool(true),
-						Type:                   kong.String("http"),
-						Timeout:                kong.Int(1),
+						HTTPPath: kong.String("/"),
+						Type:     kong.String("http"),
+						Timeout:  kong.Int(1),
 						Unhealthy: &kong.Unhealthy{
 							HTTPFailures: kong.Int(0),
 							TCPFailures:  kong.Int(0),
@@ -296,6 +306,117 @@ func TestUpstreamSetTest(t *testing.T) {
 						Healthy: &kong.Healthy{
 							Interval: kong.Int(1),
 						},
+					},
+				},
+			},
+			want: &kong.Upstream{
+				Name:  kong.String("foo"),
+				Slots: kong.Int(10000),
+				Healthchecks: &kong.Healthcheck{
+					Active: &kong.ActiveHealthcheck{
+						Concurrency: kong.Int(10),
+						Healthy: &kong.Healthy{
+							HTTPStatuses: []int{200, 302},
+							Interval:     kong.Int(1),
+							Successes:    kong.Int(0),
+						},
+						HTTPPath: kong.String("/"),
+						Type:     kong.String("http"),
+						Timeout:  kong.Int(1),
+						Unhealthy: &kong.Unhealthy{
+							HTTPFailures: kong.Int(0),
+							TCPFailures:  kong.Int(0),
+							Timeouts:     kong.Int(0),
+							HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+							Interval:     kong.Int(0),
+						},
+					},
+					Passive: &kong.PassiveHealthcheck{
+						Healthy: &kong.Healthy{
+							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+								306, 307, 308},
+							Successes: kong.Int(0),
+						},
+						Unhealthy: &kong.Unhealthy{
+							HTTPFailures: kong.Int(0),
+							TCPFailures:  kong.Int(0),
+							Timeouts:     kong.Int(0),
+							HTTPStatuses: []int{429, 500, 503},
+						},
+					},
+				},
+				HashOn:           kong.String("none"),
+				HashFallback:     kong.String("none"),
+				HashOnCookiePath: kong.String("/"),
+			},
+		},
+		{
+			desc: "Healthchecks.Active.HTTPSVerifyCertificate can be set to false",
+			arg: &kong.Upstream{
+				Name: kong.String("foo"),
+				Healthchecks: &kong.Healthcheck{
+					Active: &kong.ActiveHealthcheck{
+						Healthy: &kong.Healthy{
+							Interval: kong.Int(1),
+						},
+						HTTPSVerifyCertificate: kong.Bool(false),
+					},
+				},
+			},
+			want: &kong.Upstream{
+				Name:  kong.String("foo"),
+				Slots: kong.Int(10000),
+				Healthchecks: &kong.Healthcheck{
+					Active: &kong.ActiveHealthcheck{
+						Concurrency: kong.Int(10),
+						Healthy: &kong.Healthy{
+							HTTPStatuses: []int{200, 302},
+							Interval:     kong.Int(1),
+							Successes:    kong.Int(0),
+						},
+						HTTPPath:               kong.String("/"),
+						HTTPSVerifyCertificate: kong.Bool(false),
+						Type:                   kong.String("http"),
+						Timeout:                kong.Int(1),
+						Unhealthy: &kong.Unhealthy{
+							HTTPFailures: kong.Int(0),
+							TCPFailures:  kong.Int(0),
+							Timeouts:     kong.Int(0),
+							HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+							Interval:     kong.Int(0),
+						},
+					},
+					Passive: &kong.PassiveHealthcheck{
+						Healthy: &kong.Healthy{
+							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+								306, 307, 308},
+							Successes: kong.Int(0),
+						},
+						Unhealthy: &kong.Unhealthy{
+							HTTPFailures: kong.Int(0),
+							TCPFailures:  kong.Int(0),
+							Timeouts:     kong.Int(0),
+							HTTPStatuses: []int{429, 500, 503},
+						},
+					},
+				},
+				HashOn:           kong.String("none"),
+				HashFallback:     kong.String("none"),
+				HashOnCookiePath: kong.String("/"),
+			},
+		},
+		{
+			desc: "Healthchecks.Active.HTTPSVerifyCertificate can be set to true",
+			arg: &kong.Upstream{
+				Name: kong.String("foo"),
+				Healthchecks: &kong.Healthcheck{
+					Active: &kong.ActiveHealthcheck{
+						Healthy: &kong.Healthy{
+							Interval: kong.Int(1),
+						},
+						HTTPSVerifyCertificate: kong.Bool(true),
 					},
 				},
 			},
