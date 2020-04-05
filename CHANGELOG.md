@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.1.0](#v110---20200405)
 - [v1.0.3](#v103---20200314)
 - [v1.0.2](#v102---20200221)
 - [v1.0.1](#v101---20200214)
@@ -17,6 +18,36 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.1.0] - 2020/04/05
+
+### Added
+
+- Added support for multiple files or directories to `-s/--state`
+  flag. Use `-s` multiple times or specify multiple files/directories using
+  a comma separated list.
+  [#137](https://github.com/hbagdi/deck/pull/137)
+- **Performance**
+  decK should be much faster than before. Requests to Kong are
+  now concurrent. `dump`, `sync`, `diff` and `reset`
+  commands will be faster than before, by at least 2x.
+- SNI entity in Kong is not supported natively supported
+  [#139](https://github.com/hbagdi/deck/pull/139). Most users will not observe
+  any changes. `id` and `tags` are now supported for the SNI entity in Kong.
+
+### Under the hood
+
+- Go has been upgraded to 1.14.1
+- Alpine base image for Docker has been upgraded to 3.11
+- Multiple other dependencies have also been upgraded, but these have no
+  user-visible changes.
+
+### Fixed
+
+- Default values for `retries` in Service entity and
+  `HTTPSVerifyCertificate` in Upstream entity have been removed.
+  These values can be set to `0` and `false` respectively now.
+  [#134](https://github.com/hbagdi/deck/issues/134)
 
 ## [v1.0.3] - 2020/03/14
 
@@ -379,6 +410,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.1.0]: https://github.com/hbagdi/deck/compare/v1.0.3...v1.1.0
 [v1.0.3]: https://github.com/hbagdi/deck/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/hbagdi/deck/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/hbagdi/deck/compare/v1.0.0...v1.0.1
