@@ -106,6 +106,10 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
+	err = sc.deleteSNIs()
+	if err != nil {
+		return err
+	}
 	err = sc.deleteCACertificates()
 	if err != nil {
 		return err
