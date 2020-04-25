@@ -1,0 +1,16 @@
+linters:
+  enable:
+  - megacheck
+  - govet
+  - bodyclose
+  - unparam
+  - unconvert
+  - misspell
+  - lll
+  - gofmt
+  - gochecknoinits
+  - golint
+  - gosec
+  - nakedret
+  - gomnd
+  - maligned
