@@ -140,7 +140,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	req = req.WithContext(ctx)
 
 	// log the request
-	c.logRequest(req)
+	err = c.logRequest(req)
+	if err != nil {
+		return nil, err
+	}
 
 	//Make the request
 	resp, err := c.client.Do(req)
@@ -149,7 +152,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	}
 
 	// log the response
-	c.logResponse(resp)
+	err = c.logResponse(resp)
+	if err != nil {
+		return nil, err
+	}
 
 	response := newResponse(resp)
 

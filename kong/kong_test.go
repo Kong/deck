@@ -1,6 +1,7 @@
 package kong
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -53,7 +54,7 @@ func TestDo(T *testing.T) {
 	req, err := client.NewRequest("GET", "/does-not-exist", nil, nil)
 	assert.Nil(err)
 	assert.NotNil(req)
-	resp, err := client.Do(nil, req, nil)
+	resp, err := client.Do(context.Background(), req, nil)
 	assert.Equal(err, err404{})
 	assert.NotNil(resp)
 	assert.Equal(404, resp.StatusCode)
@@ -61,7 +62,8 @@ func TestDo(T *testing.T) {
 	req, err = client.NewRequest("POST", "/", nil, nil)
 	assert.Nil(err)
 	assert.NotNil(req)
-	resp, err = client.Do(nil, req, nil)
+	resp, err = client.Do(context.Background(), req, nil)
+	assert.NotNil(err)
 	assert.NotNil(resp)
 	body, err := ioutil.ReadAll(resp.Body)
 	assert.Nil(err)

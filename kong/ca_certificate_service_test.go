@@ -204,6 +204,7 @@ func TestCACertificateListEndpoint(T *testing.T) {
 	certificatesFromKong, next, err :=
 		client.CACertificates.List(defaultCtx, nil)
 
+	assert.Nil(err)
 	assert.Nil(next)
 	assert.NotNil(certificatesFromKong)
 	assert.Equal(3, len(certificatesFromKong))

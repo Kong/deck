@@ -21,7 +21,7 @@ func hasError(res *http.Response) error {
 		return nil
 	}
 
-	if res.StatusCode == 404 {
+	if res.StatusCode == http.StatusNotFound {
 		return err404{}
 	}
 
