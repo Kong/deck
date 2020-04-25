@@ -1,21 +1,18 @@
-dist: trusty
-sudo: true
+dist: xenial
+sudo: false
 
 language: go
 
 go:
- - "1.13"
+ - "1.14"
 
 notifications:
   email: false
 
 addons:
-  postgresql: "9.5"
+  postgresql: "9.6"
 
 env:
-  global:
-  - GO111MODULE=on
-  - GOPROXY=https://proxy.golang.org
   matrix:
   - KONG_VERSION=1.0.3
   - KONG_VERSION=1.1.2

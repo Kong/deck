@@ -11,11 +11,11 @@ sudo apt-get install openssl libpcre3 procps perl wget
 
 SWITCH="1.3.100"
 
-URL="https://kong.bintray.com/kong-deb/kong-${KONG_VERSION}.trusty.all.deb"
+URL="https://kong.bintray.com/kong-deb/kong-${KONG_VERSION}.xenial.all.deb"
 
 if [[ "$KONG_VERSION" > "$SWITCH" ]];
 then
-URL="https://kong.bintray.com/kong-deb/kong-${KONG_VERSION}.trusty.amd64.deb"
+URL="https://kong.bintray.com/kong-deb/kong-${KONG_VERSION}.xenial.amd64.deb"
 fi
 
 /usr/bin/curl -sL $URL -o kong.deb
