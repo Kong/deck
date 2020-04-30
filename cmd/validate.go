@@ -23,14 +23,7 @@ and alerts if there are broken relationships, missing links present.
 No communication takes places between decK and Kong during the execution of
 this command.
 `,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 0 {
-			return errors.New("validate command cannot take any positional arguments. " +
-				"Try using a flag instead.\n" +
-				"For usage information: deck validate -h")
-		}
-		return nil
-	},
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// read target file
 		// this does json schema validation as well

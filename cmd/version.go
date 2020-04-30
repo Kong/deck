@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -21,14 +20,7 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version of decK",
 	Long: `version prints the version of decK along with git short
 commit hash of the source tree`,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 0 {
-			return errors.New("version command cannot take any positional arguments. " +
-				"Try using a flag instead.\n" +
-				"For usage information: deck version -h")
-		}
-		return nil
-	},
+	Args: validateNoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)
 	},

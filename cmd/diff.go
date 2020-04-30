@@ -21,14 +21,7 @@ It will load entities form Kong and then perform a diff on those with
 the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.
 `,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 0 {
-			return errors.New("diff command cannot take any positional arguments. " +
-				"Try using a flag instead.\n" +
-				"For usage information: deck diff -h")
-		}
-		return nil
-	},
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism)
 	},
