@@ -56,6 +56,14 @@ and writes them to a file on disk.
 
 The file can then be read using the Sync o Diff command to again
 configure Kong.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.New("dump command cannot take any positional arguments. " +
+				"Try using a flag instead.\n" +
+				"For usage information: deck dump -h")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		client, err := utils.GetKongClient(config)

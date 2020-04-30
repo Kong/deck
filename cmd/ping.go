@@ -14,6 +14,14 @@ var pingCmd = &cobra.Command{
 	Short: "Verify connectivity with Kong",
 	Long: `Ping command can be used to verify if decK
 can connect to Kong's Admin API or not.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.New("ping command cannot take any positional arguments. " +
+				"Try using a flag instead.\n" +
+				"For usage information: deck ping -h")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetKongClient(config)
 		if err != nil {

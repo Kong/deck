@@ -27,6 +27,14 @@ Use this command with extreme care as it is equivalent to running
 "kong migrations reset" on your Kong instance.
 
 By default, this command will ask for a confirmation prompt.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.New("reset command cannot take any positional arguments. " +
+				"Try using a flag instead.\n" +
+				"For usage information: deck reset -h")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !resetCmdForce {
 			ok, err := confirm()

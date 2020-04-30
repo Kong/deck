@@ -17,6 +17,14 @@ var syncCmd = &cobra.Command{
 		"to match the state file",
 	Long: `Sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			return errors.New("sync command cannot take any positional arguments. " +
+				"Try specifying a flag instead.\n" +
+				"For usage information: deck sync -h")
+		}
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism)
 	},
