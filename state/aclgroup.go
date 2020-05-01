@@ -100,7 +100,6 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 		return err
 	}
 	return nil
-
 }
 
 func getACLGroupByID(txn *memdb.Txn, id string) (*ACLGroup, error) {
@@ -137,7 +136,6 @@ func getACLGroup(txn *memdb.Txn, consumerID, groupOrID string) (*ACLGroup, error
 		}
 	}
 	return nil, ErrNotFound
-
 }
 
 func getAllACLGroupsByConsumerID(txn *memdb.Txn, consumerID string) ([]*ACLGroup, error) {
@@ -166,7 +164,6 @@ func (k *ACLGroupsCollection) Get(consumerID,
 	txn := k.db.Txn(false)
 	defer txn.Abort()
 	return getACLGroup(txn, consumerID, groupOrID)
-
 }
 
 // GetAllByConsumerID returns all acl-group credentials

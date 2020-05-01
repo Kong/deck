@@ -109,7 +109,6 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	})
 
 	if !config.SkipConsumers {
-
 		group.Go(func() error {
 			consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
 			if err != nil {

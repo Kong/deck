@@ -86,6 +86,7 @@ func TestOauth2CredentialUpdate(t *testing.T) {
 
 	res, err = collection.Get("my-clientid")
 	assert.NotNil(err)
+	assert.Nil(res)
 
 	res, err = collection.Get("my-clientid2")
 	assert.Nil(err)

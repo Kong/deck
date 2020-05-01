@@ -262,7 +262,7 @@ func (sc *Syncer) queueEvent(e Event) error {
 	}
 }
 
-func (sc *Syncer) eventCompleted(e Event) {
+func (sc *Syncer) eventCompleted() {
 	atomic.AddInt32(&sc.InFlightOps, -1)
 }
 
@@ -280,8 +280,9 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 	}
 
 	var wg sync.WaitGroup
+	const eventBuffer = 10
 
-	sc.eventChan = make(chan Event, 10)
+	sc.eventChan = make(chan Event, eventBuffer)
 	sc.stopChan = make(chan struct{})
 	sc.errChan = make(chan error)
 
@@ -289,13 +290,13 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 	// start the consumers
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
-		go func(a int) {
-			err := sc.eventLoop(d, a)
+		go func() {
+			err := sc.eventLoop(d)
 			if err != nil {
 				sc.errChan <- err
 			}
 			wg.Done()
-		}(i)
+		}()
 	}
 
 	// start the producer
@@ -344,10 +345,10 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 // TODO remove crud.Arg
 type Do func(a Event) (crud.Arg, error)
 
-func (sc *Syncer) eventLoop(d Do, a int) error {
+func (sc *Syncer) eventLoop(d Do) error {
 	for event := range sc.eventChan {
-		err := sc.handleEvent(d, event, a)
-		sc.eventCompleted(event)
+		err := sc.handleEvent(d, event)
+		sc.eventCompleted()
 		if err != nil {
 			return err
 		}
@@ -355,7 +356,7 @@ func (sc *Syncer) eventLoop(d Do, a int) error {
 	return nil
 }
 
-func (sc *Syncer) handleEvent(d Do, event Event, a int) error {
+func (sc *Syncer) handleEvent(d Do, event Event) error {
 	res, err := d(event)
 	if err != nil {
 		return errors.Wrapf(err, "while processing event")

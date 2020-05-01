@@ -25,7 +25,7 @@ func (s *MethodIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 	if len(resp) != 1 {
 		return false, nil, fmt.Errorf("function call returned unexpected result")
 	}
-	key = fmt.Sprintf("%s", resp[0])
+	key = resp[0].String()
 
 	if key == "" {
 		return false, nil, nil

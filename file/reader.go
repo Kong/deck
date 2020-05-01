@@ -35,7 +35,6 @@ func GetContentFromFiles(filenames []string) (*Content, error) {
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
 func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
-
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent

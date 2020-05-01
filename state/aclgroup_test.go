@@ -121,6 +121,7 @@ func TestACLGroupUpdate(t *testing.T) {
 
 	res, err = collection.Get("consumer1-id", "my-group")
 	assert.NotNil(err)
+	assert.Nil(res)
 
 	res, err = collection.Get("consumer1-id", "my-group2")
 	assert.Nil(err)

@@ -77,7 +77,6 @@ func getService(txn *memdb.Txn, IDs ...string) (*Service, error) {
 		return &Service{Service: *service.DeepCopy()}, nil
 	}
 	return nil, ErrNotFound
-
 }
 
 // Get gets a service by name or ID.

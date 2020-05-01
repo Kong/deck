@@ -16,11 +16,14 @@ func Empty(s *string) bool {
 	return s == nil || *s == ""
 }
 
-// UUID will generate a random v14 unique identifier based upon random nunbers
+// UUID will generate a random v14 unique identifier based upon random numbers
 func UUID() string {
 	version := byte(4)
 	uuid := make([]byte, 16)
-	rand.Read(uuid)
+	_, err := rand.Read(uuid)
+	if err != nil {
+		panic("failed to read from random generator: " + err.Error())
+	}
 
 	// Set version
 	uuid[6] = (uuid[6] & 0x0f) | (version << 4)

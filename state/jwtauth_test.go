@@ -89,6 +89,7 @@ func TestJWTAuthUpdate(t *testing.T) {
 
 	res, err = collection.Get("my-key")
 	assert.NotNil(err)
+	assert.Nil(res)
 
 	res, err = collection.Get("my-key2")
 	assert.Nil(err)

@@ -2,13 +2,21 @@ package utils
 
 import "github.com/hbagdi/go-kong/kong"
 
+const (
+	defaultPort        = 80
+	defaultTimeout     = 60000
+	defaultSlots       = 10000
+	defaultWeight      = 100
+	defaultConcurrency = 10
+)
+
 var (
 	serviceDefaults = kong.Service{
-		Port:           kong.Int(80),
+		Port:           kong.Int(defaultPort),
 		Protocol:       kong.String("http"),
-		ConnectTimeout: kong.Int(60000),
-		WriteTimeout:   kong.Int(60000),
-		ReadTimeout:    kong.Int(60000),
+		ConnectTimeout: kong.Int(defaultTimeout),
+		WriteTimeout:   kong.Int(defaultTimeout),
+		ReadTimeout:    kong.Int(defaultTimeout),
 	}
 	routeDefaults = kong.Route{
 		PreserveHost:  kong.Bool(false),
@@ -17,13 +25,13 @@ var (
 		Protocols:     kong.StringSlice("http", "https"),
 	}
 	targetDefaults = kong.Target{
-		Weight: kong.Int(100),
+		Weight: kong.Int(defaultWeight),
 	}
 	upstreamDefaults = kong.Upstream{
-		Slots: kong.Int(10000),
+		Slots: kong.Int(defaultSlots),
 		Healthchecks: &kong.Healthcheck{
 			Active: &kong.ActiveHealthcheck{
-				Concurrency: kong.Int(10),
+				Concurrency: kong.Int(defaultConcurrency),
 				Healthy: &kong.Healthy{
 					HTTPStatuses: []int{200, 302},
 					Interval:     kong.Int(0),

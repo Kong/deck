@@ -17,7 +17,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-var stopChannel chan struct{}
+const (
+	exitCodeDiffDetection = 2
+)
+
+var (
+	stopChannel chan struct{}
+	dumpConfig  dump.Config
+)
 
 // SetStopCh sets the stop channel for long running commands.
 // This is useful for cases when a process needs to be cancelled gracefully
@@ -25,8 +32,6 @@ var stopChannel chan struct{}
 func SetStopCh(stopCh chan struct{}) {
 	stopChannel = stopCh
 }
-
-var dumpConfig dump.Config
 
 // checkWorkspace checks if workspace exists in Kong.
 func checkWorkspace(config utils.KongClientConfig) error {
@@ -50,11 +55,11 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	if err != nil {
 		return errors.Wrapf(err, "checking workspace '%v' in Kong", workspace)
 	}
-	if resp.StatusCode == 404 {
+	if resp.StatusCode == http.StatusNotFound {
 		return errors.Errorf("workspace '%v' does not exist in Kong, "+
 			"please create it before running decK.", workspace)
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf("unexpected error code while retrieving "+
 			"workspace '%v' : %v", workspace, resp.StatusCode)
 	}
@@ -125,7 +130,7 @@ func syncMain(filenames []string, dry bool, parallelism int) error {
 	printFn("  Deleted: %v\n", stats.DeleteOps)
 	if diffCmdNonZeroExitCode &&
 		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
-		os.Exit(2)
+		os.Exit(exitCodeDiffDetection)
 	}
 	return nil
 }
@@ -142,6 +147,9 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	}
 
 	v, err := utils.CleanKongVersion(root["version"].(string))
+	if err != nil {
+		return semver.Version{}, err
+	}
 	return semver.ParseTolerant(v)
 }
 

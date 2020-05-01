@@ -48,7 +48,8 @@ It can be used to export, import or sync entities to Kong.`,
 func Execute() {
 	var wg sync.WaitGroup
 	var err error
-	wg.Add(2)
+	const threads = 2
+	wg.Add(threads)
 
 	go func() {
 		sendAnalytics()
@@ -66,6 +67,7 @@ func Execute() {
 	}
 }
 
+//nolint:errcheck
 func init() {
 	cobra.OnInitialize(initConfig)
 
@@ -142,7 +144,10 @@ func initConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	viper.AutomaticEnv() // read in environment variables that match
 	// If a config file is found, read it in.
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Println(err)
+	}
 	config.Address = viper.GetString("kong-addr")
 	config.TLSServerName = viper.GetString("tls-server-name")
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
