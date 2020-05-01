@@ -20,6 +20,7 @@ var versionCmd = &cobra.Command{
 	Short: "Print the version of decK",
 	Long: `version prints the version of decK along with git short
 commit hash of the source tree`,
+	Args: validateNoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)
 	},

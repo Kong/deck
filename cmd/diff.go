@@ -21,6 +21,7 @@ It will load entities form Kong and then perform a diff on those with
 the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.
 `,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism)
 	},

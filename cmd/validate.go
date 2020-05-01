@@ -23,6 +23,7 @@ and alerts if there are broken relationships, missing links present.
 No communication takes places between decK and Kong during the execution of
 this command.
 `,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// read target file
 		// this does json schema validation as well

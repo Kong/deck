@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
@@ -141,4 +143,12 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 
 	v, err := utils.CleanKongVersion(root["version"].(string))
 	return semver.ParseTolerant(v)
+}
+
+func validateNoArgs(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return errors.New("positional arguments are not valid for this command, please use flags instead\n" +
+			"Run 'deck --help' for usage.")
+	}
+	return nil
 }

@@ -17,6 +17,7 @@ var syncCmd = &cobra.Command{
 		"to match the state file",
 	Long: `Sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism)
 	},

@@ -27,6 +27,7 @@ Use this command with extreme care as it is equivalent to running
 "kong migrations reset" on your Kong instance.
 
 By default, this command will ask for a confirmation prompt.`,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !resetCmdForce {
 			ok, err := confirm()
