@@ -1,0 +1,33 @@
+linters:
+  enable:
+  - megacheck
+  - govet
+  - bodyclose
+  - unparam
+  - unconvert
+  - misspell
+  - lll
+  - gofmt
+  - golint
+  - gosec
+  - nakedret
+  - maligned
+  - dogsled
+  - depguard
+issues:
+  exclude-rules:
+  - linters:
+    - staticcheck
+    text: "SA1012" # do not pass a nil Context
+  - linters:
+    - gosec
+    text:  "weak cryptographic primitive"
+    path: "state/indexers/md5Indexer.*"
+  - linters:
+    - gosec
+    text:  "weak random number generator"
+    path: _test\.go
+  - linters:
+    - errcheck
+    text:  "Error return value" # ignore err not checked in test files
+    path: _test\.go
