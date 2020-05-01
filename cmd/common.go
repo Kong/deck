@@ -147,9 +147,8 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
-		return errors.New("This command cannot take any positional arguments. " +
-			"Try using a flag instead.\n" +
-			"For usage information: deck <command> -h")
+		return errors.New("positional arguments are not valid for this command, please use flags instead\n" +
+			"Run 'deck --help' for usage.")
 	}
 	return nil
 }
