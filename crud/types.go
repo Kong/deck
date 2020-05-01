@@ -1,7 +1,5 @@
 package crud
 
-type t string
-
 // Op represents
 type Op struct {
 	name string

@@ -26,7 +26,7 @@ func TestMeta(t *testing.T) {
 	assert.True(ok)
 	assert.Equal("string-pointer", *res2)
 
-	// can retrive a previous value
+	// can retrieve a previous value
 	r = m.GetMeta("foo")
 	res, ok = r.(string)
 	assert.True(ok)

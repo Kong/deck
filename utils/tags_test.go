@@ -31,15 +31,15 @@ func TestMergeTags(t *testing.T) {
 	assert.Nil(err)
 
 	f = Foo{Tags: []*string{&a, &b}}
-	MergeTags(&f, []string{"tag1", "tag2", "tag3"})
+	assert.Nil(MergeTags(&f, []string{"tag1", "tag2", "tag3"}))
 	assert.True(equalArray([]*string{&a, &b, &c}, f.Tags))
 
 	f = Foo{Tags: []*string{}}
-	MergeTags(&f, []string{"tag1", "tag2", "tag3"})
+	assert.Nil(MergeTags(&f, []string{"tag1", "tag2", "tag3"}))
 	assert.True(equalArray([]*string{&a, &b, &c}, f.Tags))
 
 	f = Foo{Tags: []*string{&a, &b}}
-	MergeTags(&f, nil)
+	assert.Nil(MergeTags(&f, nil))
 	assert.True(equalArray([]*string{&a, &b}, f.Tags))
 }
 

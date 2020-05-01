@@ -18,9 +18,8 @@ type Stats struct {
 // Solve generates a diff and walks the graph.
 func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 	client *kong.Client, parallelism int, dry bool) (Stats, []error) {
-	var r *crud.Registry
 
-	r = buildRegistry(client)
+	r := buildRegistry(client)
 
 	var stats Stats
 	recordOp := func(op crud.Op) {

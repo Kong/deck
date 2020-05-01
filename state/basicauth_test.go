@@ -93,6 +93,7 @@ func TestBasicAuthUpdate(t *testing.T) {
 
 	res, err = collection.Get("my-username")
 	assert.NotNil(err)
+	assert.Nil(res)
 
 	res, err = collection.Get("my-username2")
 	assert.Nil(err)

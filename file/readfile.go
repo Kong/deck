@@ -23,9 +23,7 @@ func getContent(filenames []string) (*Content, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, r := range readers {
-			allReaders = append(allReaders, r)
-		}
+		allReaders = append(allReaders, readers...)
 	}
 	var res Content
 	for _, r := range allReaders {

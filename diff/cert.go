@@ -23,7 +23,6 @@ func (sc *Syncer) deleteCertificates() error {
 				return err
 			}
 		}
-
 	}
 	return nil
 }

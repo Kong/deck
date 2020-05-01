@@ -84,7 +84,6 @@ func (sc *Syncer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*Event, error)
 	// found, check if update needed
 
 	if !currentACLGroup.EqualWithOpts(aclGroup, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "acl-group",

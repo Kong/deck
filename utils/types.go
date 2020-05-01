@@ -65,14 +65,14 @@ type KongClientConfig struct {
 	Address   string
 	Workspace string
 
-	Headers []string
-
-	TLSSkipVerify bool
 	TLSServerName string
 
 	TLSCACert string
 
-	Debug bool
+	TLSSkipVerify bool
+	Debug         bool
+
+	Headers []string
 }
 
 // HeaderRoundTripper injects Headers into requests

@@ -8,12 +8,19 @@ import (
 )
 
 func sendAnalytics() {
+	const (
+		minOSArgs        = 2
+		analyticsTimeout = 3 * time.Second
+	)
+
 	if os.Getenv("DECK_ANALYTICS") == "off" {
 		return
 	}
-	if len(os.Args) < 2 {
+
+	if len(os.Args) < minOSArgs {
 		return
 	}
+
 	cmd := os.Args[1]
 	if cmd == "help" ||
 		cmd == "ping" ||
@@ -24,10 +31,12 @@ func sendAnalytics() {
 	// HTTP to avoid latency due to handshake
 	URL := "http://d.yolo42.com/" + cmd
 
-	ctx, _ := context.WithDeadline(context.Background(),
-		time.Now().Add(3*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(),
+		time.Now().Add(analyticsTimeout))
+	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, "GET", URL, nil)
 	req.Header["deck-version"] = []string{VERSION}
 
-	http.DefaultClient.Do(req)
+	resp, _ := http.DefaultClient.Do(req)
+	resp.Body.Close()
 }

@@ -33,30 +33,6 @@ var allIndex = &memdb.IndexSchema{
 	},
 }
 
-// multiIndexLookup can be used to search for an entity
-// based on search on multiple indexes with same key.
-func multiIndexLookup(memdb *memdb.MemDB, tableName string,
-	indices []string,
-	args ...interface{}) (interface{}, error) {
-
-	txn := memdb.Txn(false)
-	defer txn.Abort()
-
-	for _, indexName := range indices {
-		res, err := txn.First(tableName, indexName, args...)
-		if res == nil && err == nil {
-			continue
-		}
-		if err != nil {
-			return nil, err
-		}
-		if res != nil {
-			return res, nil
-		}
-	}
-	return nil, ErrNotFound
-}
-
 // multiIndexLookupUsingTxn can be used to search for an entity
 // based on search on multiple indexes with same key.
 func multiIndexLookupUsingTxn(txn *memdb.Txn, tableName string,

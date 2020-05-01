@@ -507,10 +507,11 @@ type KeyAuth struct {
 // stripKey returns the last 5 characters of key.
 // If key is less than or equal to 5 characters, then the key is returned as is.
 func stripKey(key string) string {
-	if len(key) <= 5 {
+	const keyIdentifierLength = 5
+	if len(key) <= keyIdentifierLength {
 		return key
 	}
-	return string(key[len(key)-5:])
+	return key[len(key)-keyIdentifierLength:]
 }
 
 // Console returns an entity's identity in a human
