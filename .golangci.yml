@@ -14,3 +14,4 @@ linters:
   - nakedret
   - gomnd
   - maligned
+  - errcheck
