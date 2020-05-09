@@ -123,6 +123,34 @@ func TestUpstreamWithPassiveUnHealthyInterval(T *testing.T) {
 	assert.NotNil(err)
 	assert.Nil(createdUpstream)
 }
+func TestUpstreamWithPassiveHealthy(T *testing.T) {
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	upstream := &Upstream{
+		Name: String("upstream-foo"),
+		Healthchecks: &Healthcheck{
+			Passive: &PassiveHealthcheck{
+				Type: String("http"),
+				Healthy: &Healthy{
+					HTTPStatuses: []int{200, 201},
+					Successes:    Int(3),
+				},
+			},
+		},
+	}
+
+	createdUpstream, err := client.Upstreams.Create(defaultCtx, upstream)
+	assert.Nil(err)
+	assert.NotNil(createdUpstream)
+	assert.Equal("http", *createdUpstream.Healthchecks.Passive.Type)
+
+	err = client.Upstreams.Delete(defaultCtx, createdUpstream.ID)
+	assert.Nil(err)
+}
 
 func TestUpstreamWithAlgorithm(T *testing.T) {
 	runWhenKong(T, ">=1.3.0")

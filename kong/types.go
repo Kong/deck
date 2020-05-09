@@ -127,6 +127,7 @@ type ActiveHealthcheck struct {
 // +k8s:deepcopy-gen=true
 type PassiveHealthcheck struct {
 	Healthy   *Healthy   `json:"healthy,omitempty" yaml:"healthy,omitempty"`
+	Type      *string    `json:"type,omitempty" yaml:"type,omitempty"`
 	Unhealthy *Unhealthy `json:"unhealthy,omitempty" yaml:"unhealthy,omitempty"`
 }
 
