@@ -2,6 +2,7 @@ package kong
 
 import (
 	"bytes"
+	"net/http"
 	"strings"
 )
 
@@ -50,4 +51,43 @@ func stringArrayToString(arr []*string) string {
 	}
 	buf.WriteString(" ]")
 	return buf.String()
+}
+
+// headerRoundTripper injects Headers into requests
+// made via RT.
+type headerRoundTripper struct {
+	headers http.Header
+	rt      http.RoundTripper
+}
+
+// RoundTrip satisfies the RoundTripper interface.
+func (t headerRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	newRequest := new(http.Request)
+	*newRequest = *req
+	newRequest.Header = make(http.Header, len(req.Header))
+	for k, s := range req.Header {
+		newRequest.Header[k] = append([]string(nil), s...)
+	}
+	for k, v := range t.headers {
+		newRequest.Header[k] = v
+	}
+	return t.rt.RoundTrip(newRequest)
+}
+
+// RoundTripperWithHTTPHeaders returns a client which injects headers
+// before sending any request.
+func HTTPClientWithHeaders(client *http.Client,
+	headers http.Header) http.Client {
+	var res http.Client
+	if client == nil {
+		defaultTransport := http.DefaultTransport.(*http.Transport)
+		res.Transport = defaultTransport
+	} else {
+		res = *client
+	}
+	res.Transport = headerRoundTripper{
+		headers: headers,
+		rt:      client.Transport,
+	}
+	return res
 }
