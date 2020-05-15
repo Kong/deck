@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -78,6 +79,19 @@ func TestMain(m *testing.M) {
 }
 
 var currentVersion semver.Version
+var r = regexp.MustCompile(`^[0-9]+\.[0-9]+`)
+
+func cleanVersionString(version string) string {
+	res := r.FindString(version)
+	if res == "" {
+		panic("unexpected version of kong")
+	}
+	res += ".0"
+	if strings.Contains(version, "enterprise") {
+		res += "-enterprise"
+	}
+	return res
+}
 
 // runWhenKong skips the current test if the version of Kong doesn't
 // fall in the semverRange.
@@ -94,10 +108,7 @@ func runWhenKong(t *testing.T, semverRange string) {
 			t.Error(err)
 		}
 		v := res["version"].(string)
-		rcIndex := strings.Index(v, "rc")
-		if rcIndex != -1 {
-			v = v[:rcIndex]
-		}
+		v = cleanVersionString(v)
 		currentVersion, err = semver.Parse(v)
 		if err != nil {
 			t.Error(err)
