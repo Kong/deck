@@ -2,7 +2,7 @@
 
 decK provides declarative configuration and drift detection for Kong.
 
-[![Build Status](https://travis-ci.com/hbagdi/deck.svg?branch=master)](https://travis-ci.com/hbagdi/deck)
+[![Build Status](https://github.com/hbagdi/deck/workflows/CI%20Test/badge.svg)](https://github.com/hbagdi/deck/actions?query=branch%3Amaster+event%3Apush)
 
 [![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
 
