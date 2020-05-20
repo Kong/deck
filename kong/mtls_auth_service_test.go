@@ -1,3 +1,5 @@
+// +build enterprise
+
 package kong
 
 import (
@@ -7,7 +9,6 @@ import (
 )
 
 func TestMTLSCreate(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -74,7 +75,6 @@ func TestMTLSCreate(T *testing.T) {
 }
 
 func TestMTLSCreateWithID(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -108,7 +108,6 @@ func TestMTLSCreateWithID(T *testing.T) {
 }
 
 func TestMTLSGet(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -151,7 +150,6 @@ func TestMTLSGet(T *testing.T) {
 }
 
 func TestMTLSUpdate(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -191,7 +189,6 @@ func TestMTLSUpdate(T *testing.T) {
 }
 
 func TestMTLSDelete(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -228,7 +225,6 @@ func TestMTLSDelete(T *testing.T) {
 }
 
 func TestMTLSListMethods(T *testing.T) {
-	runWhenEnterprise(T, ">=0.36.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)

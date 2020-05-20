@@ -147,3 +147,18 @@ func runWhenEnterprise(t *testing.T, semverRange string) {
 	runWhenKong(t, semverRange)
 
 }
+
+func TestRunWhenEnterprise(T *testing.T) {
+	runWhenEnterprise(T, ">=0.33.0")
+	assert := assert.New(T)
+
+	client, err := NewClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	root, err := client.Root(defaultCtx)
+	assert.Nil(err)
+	assert.NotNil(root)
+	v := root["version"].(string)
+	assert.Contains(v, "enterprise")
+}

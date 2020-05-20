@@ -1,3 +1,5 @@
+// +build enterprise
+
 package kong
 
 import (
@@ -8,7 +10,6 @@ import (
 )
 
 func TestWorkspaceService(T *testing.T) {
-	runWhenEnterprise(T, ">=0.33.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -60,7 +61,6 @@ func TestWorkspaceService(T *testing.T) {
 }
 
 func TestWorkspaceServiceList(T *testing.T) {
-	runWhenEnterprise(T, ">=0.33.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
@@ -99,7 +99,6 @@ func TestWorkspaceServiceList(T *testing.T) {
 }
 
 func TestWorkspaceServiceListAll(T *testing.T) {
-	runWhenEnterprise(T, ">=0.33.0")
 	assert := assert.New(T)
 
 	client, err := NewClient(nil, nil)
