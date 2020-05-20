@@ -35,4 +35,9 @@ var defaultCustomEntities = []custom.EntityCRUDDefinition{
 		CRUDPath:   "/consumers/${consumer_id}/oauth2",
 		PrimaryKey: "id",
 	},
+	{
+		Name:       "mtls-auth",
+		CRUDPath:   "/consumers/${consumer_id}/mtls-auth",
+		PrimaryKey: "id",
+	},
 }

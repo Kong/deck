@@ -48,6 +48,7 @@ type Client struct {
 	BasicAuths  *BasicAuthService
 	HMACAuths   *HMACAuthService
 	JWTAuths    *JWTAuthService
+	MTLSAuths   *MTLSAuthService
 	ACLs        *ACLService
 
 	Oauth2Credentials *Oauth2Service
@@ -111,6 +112,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.BasicAuths = (*BasicAuthService)(&kong.common)
 	kong.HMACAuths = (*HMACAuthService)(&kong.common)
 	kong.JWTAuths = (*JWTAuthService)(&kong.common)
+	kong.MTLSAuths = (*MTLSAuthService)(&kong.common)
 	kong.ACLs = (*ACLService)(&kong.common)
 
 	kong.Oauth2Credentials = (*Oauth2Service)(&kong.common)

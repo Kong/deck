@@ -19,6 +19,7 @@ var (
 		"jwt-auth":   "jwt",
 		"acl":        "acls",
 		"oauth2":     "oauth2",
+		"mtls-auth":  "mtls-auth",
 	}
 )
 

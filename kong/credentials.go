@@ -82,6 +82,21 @@ func (c JWTAuth) id() *string {
 	return c.ID
 }
 
+// MTLSAuth represents a MTLS credential in Kong.
+// +k8s:deepcopy-gen=true
+type MTLSAuth struct {
+	Consumer      *Consumer      `json:"consumer,omitempty" yaml:"consumer,omitempty"`
+	CreatedAt     *int           `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID            *string        `json:"id,omitempty" yaml:"id,omitempty"`
+	SubjectName   *string        `json:"subject_name,omitempty" yaml:"subject_name,omitempty"`
+	CACertificate *CACertificate `json:"ca_certificate,omitempty" yaml:"ca_certificate,omitempty"`
+	Tags          []*string      `json:"tags,omitempty" yaml:"tags,omitempty"`
+}
+
+func (c MTLSAuth) id() *string {
+	return c.ID
+}
+
 // ACLGroup represents an ACL group for a consumer in Kong.
 // +k8s:deepcopy-gen=true
 type ACLGroup struct {
