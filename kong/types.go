@@ -208,3 +208,15 @@ type Plugin struct {
 	Protocols []*string     `json:"protocols,omitempty" yaml:"protocols,omitempty"`
 	Tags      []*string     `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
+
+// Enterprise Entities
+
+// Workspace represents a Workspace in Kong.
+type Workspace struct {
+	CreatedAt *int                   `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string                `json:"id,omitempty" yaml:"id,omitempty"`
+	Name      *string                `json:"name,omitempty" yaml:"name,omitempty"`
+	Comment   *string                `json:"comment,omitempty" yaml:"comment,omitempty"`
+	Config    map[string]interface{} `json:"config,omitempty" yaml:"config,omitempty"`
+	Meta      map[string]interface{} `json:"meta,omitempty" yaml:"meta,omitempty"`
+}

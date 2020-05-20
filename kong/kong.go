@@ -41,6 +41,7 @@ type Client struct {
 	SNIs           *SNIService
 	Upstreams      *UpstreamService
 	Targets        *TargetService
+	Workspaces     *WorkspaceService
 
 	credentials *credentialService
 	KeyAuths    *KeyAuthService
@@ -103,6 +104,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.SNIs = (*SNIService)(&kong.common)
 	kong.Upstreams = (*UpstreamService)(&kong.common)
 	kong.Targets = (*TargetService)(&kong.common)
+	kong.Workspaces = (*WorkspaceService)(&kong.common)
 
 	kong.credentials = (*credentialService)(&kong.common)
 	kong.KeyAuths = (*KeyAuthService)(&kong.common)

@@ -108,8 +108,9 @@ func runWhenKong(t *testing.T, semverRange string) {
 			t.Error(err)
 		}
 		v := res["version"].(string)
-		v = cleanVersionString(v)
-		currentVersion, err = semver.Parse(v)
+
+		currentVersion, err = semver.Parse(cleanVersionString(v))
+
 		if err != nil {
 			t.Error(err)
 		}
@@ -122,5 +123,27 @@ func runWhenKong(t *testing.T, semverRange string) {
 	if !r(currentVersion) {
 		t.Skip()
 	}
+
+}
+
+// runWhenEnterprise skips a test if the version
+// of Kong running is not enterprise edition. Skips
+// the current test if the version of Kong doesn't
+// fall within the semver range.
+func runWhenEnterprise(t *testing.T, semverRange string) {
+	client, err := NewClient(nil, nil)
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := client.Root(defaultCtx)
+	if err != nil {
+		t.Error(err)
+	}
+	v := res["version"].(string)
+
+	if !strings.Contains(v, "enterprise-edition") {
+		t.Skip()
+	}
+	runWhenKong(t, semverRange)
 
 }
