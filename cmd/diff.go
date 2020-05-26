@@ -9,6 +9,7 @@ var (
 	diffCmdKongStateFile   []string
 	diffCmdParallelism     int
 	diffCmdNonZeroExitCode bool
+	diffWorkspace          string
 )
 
 // diffCmd represents the diff command
@@ -23,7 +24,7 @@ that will be created or updated or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism, 0)
+		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism, 0, diffWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {
@@ -40,6 +41,10 @@ func init() {
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
+	diffCmd.Flags().StringVarP(&diffWorkspace, "workspace", "w",
+		"", "Diff configuration with a specific workspace "+
+			"(Kong Enterprise only).\n"+
+			"This takes precedence over _workspace fields in state files.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
