@@ -90,5 +90,6 @@ func buildRegistry(client *kong.Client) *crud.Registry {
 	r.MustRegister("basic-auth", &basicAuthCRUD{client: client})
 	r.MustRegister("acl-group", &aclGroupCRUD{client: client})
 	r.MustRegister("oauth2-cred", &oauth2CredCRUD{client: client})
+	r.MustRegister("mtls-auth", &mtlsAuthCRUD{client: client})
 	return &r
 }

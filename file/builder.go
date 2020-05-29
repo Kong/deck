@@ -250,6 +250,16 @@ func (b *stateBuilder) consumers() {
 			b.err = err
 			return
 		}
+
+		var mtlsAuths []kong.MTLSAuth
+		for _, cred := range c.MTLSAuths {
+			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			mtlsAuths = append(mtlsAuths, *cred)
+		}
+		if err := b.ingestMTLSAuths(mtlsAuths); err != nil {
+			b.err = err
+			return
+		}
 	}
 }
 
@@ -377,6 +387,32 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
+	}
+	return nil
+}
+
+func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
+	for _, cred := range creds {
+		cred := cred
+		if utils.Empty(cred.ID) {
+			// this cannot work: there already is no ID
+			// however there's nothing else we can use to search the cred,
+			// as it has no unique fields. This always generates a random uuid()
+			//existingCred, err := b.currentState.MTLSAuths.Get(*cred.ID)
+			//if err == state.ErrNotFound {
+			var err error
+			if true {
+				cred.ID = uuid()
+			} else if err != nil {
+				return err
+			} else {
+				//cred.ID = kong.String(*existingCred.ID)
+			}
+		}
+		if b.kongVersion.GTE(kong140Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
 	}
 	return nil
 }

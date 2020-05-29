@@ -171,6 +171,16 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 			state.ACLGroups = aclGroups
 			return nil
 		})
+
+		group.Go(func() error {
+			mtlsAuths, err := GetAllMTLSAuths(ctx, client, config.SelectorTags)
+			if err != nil {
+				return errors.Wrap(err, "mtls-auths")
+			}
+			state.MTLSAuths = mtlsAuths
+			return nil
+		})
+
 	}
 	err := group.Wait()
 	if err != nil {
@@ -578,6 +588,34 @@ func GetAllACLGroups(ctx context.Context,
 		opt = nextopt
 	}
 	return aclGroups, nil
+}
+
+// GetAllMTLSAuths queries Kong for all basic-auth credentials using client.
+func GetAllMTLSAuths(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.MTLSAuth, error) {
+	var mtlsAuths []*kong.MTLSAuth
+	// tags are not supported on credentials
+	// opt := newOpt(tags)
+	opt := newOpt(nil)
+
+	for {
+		s, nextopt, err := client.MTLSAuths.List(ctx, opt)
+		if kong.IsNotFoundErr(err) {
+			return mtlsAuths, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		mtlsAuths = append(mtlsAuths, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return mtlsAuths, nil
 }
 
 // excludeConsumersPlugins filter out consumer plugins

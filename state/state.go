@@ -29,6 +29,7 @@ type KongState struct {
 	BasicAuths  *BasicAuthsCollection
 	ACLGroups   *ACLGroupsCollection
 	Oauth2Creds *Oauth2CredsCollection
+	MTLSAuths   *MTLSAuthsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -40,6 +41,7 @@ func NewKongState() (*KongState, error) {
 	basicAuthTemp := newBasicAuthsCollection(collection{})
 	jwtAuthTemp := newJWTAuthsCollection(collection{})
 	oauth2CredsTemp := newOauth2CredsCollection(collection{})
+	mtlsAuthTemp := newMTLSAuthsCollection(collection{})
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
@@ -58,6 +60,7 @@ func NewKongState() (*KongState, error) {
 			basicAuthTemp.TableName():   basicAuthTemp.Schema(),
 			jwtAuthTemp.TableName():     jwtAuthTemp.Schema(),
 			oauth2CredsTemp.TableName(): oauth2CredsTemp.Schema(),
+			mtlsAuthTemp.TableName():    mtlsAuthTemp.Schema(),
 
 			aclGroupTableName: aclGroupTableSchema,
 		},
@@ -87,6 +90,7 @@ func NewKongState() (*KongState, error) {
 	state.BasicAuths = newBasicAuthsCollection(state.common)
 	state.JWTAuths = newJWTAuthsCollection(state.common)
 	state.Oauth2Creds = newOauth2CredsCollection(state.common)
+	state.MTLSAuths = newMTLSAuthsCollection(state.common)
 
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
 	return &state, nil

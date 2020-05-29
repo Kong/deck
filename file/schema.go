@@ -365,6 +365,13 @@ const contentSchema = `{
           },
           "type": "array"
         },
+        "mtlsauth_credentials": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/MTLSAuth"
+          },
+          "type": "array"
+        },
         "tags": {
           "items": {
             "type": "string"
@@ -904,6 +911,36 @@ const contentSchema = `{
             "type": "string"
           },
           "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MTLSAuth": {
+      "required": [
+        "subject_name"
+      ],
+      "properties": {
+        "consumer": {
+          "$ref": "#/definitions/Consumer"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "subject_name": {
+          "type": "string"
+        },
+        "ca_certificate": {
+          "$ref": "#/definitions/FCACertificate"
         },
         "tags": {
           "items": {

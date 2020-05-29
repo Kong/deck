@@ -111,6 +111,15 @@ func existingConsumerCredState() *state.KongState {
 			},
 		},
 	})
+	s.MTLSAuths.Add(state.MTLSAuth{
+		MTLSAuth: kong.MTLSAuth{
+			ID:          kong.String("92f4c829-968b-42af-afd3-f337051508d3"),
+			SubjectName: kong.String("test@example.com"),
+			Consumer: &kong.Consumer{
+				ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			},
+		},
+	})
 	return s
 }
 
@@ -801,6 +810,11 @@ func Test_stateBuilder_consumers(t *testing.T) {
 									Group: kong.String("foo-group"),
 								},
 							},
+							MTLSAuths: []*kong.MTLSAuth{
+								{
+									SubjectName: kong.String("test@example.com"),
+								},
+							},
 						},
 					},
 					Info: &Info{
@@ -881,6 +895,16 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Tags: kong.StringSlice("tag1"),
 					},
 				},
+				MTLSAuths: []*kong.MTLSAuth{
+					{
+						ID:          kong.String("f9af75ec-d91e-426f-af3f-406c718caaed"),
+						SubjectName: kong.String("test@example.com"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+				},
 			},
 		},
 		{
@@ -947,6 +971,11 @@ func Test_stateBuilder_consumers(t *testing.T) {
 							ACLGroups: []*kong.ACLGroup{
 								{
 									Group: kong.String("foo-group"),
+								},
+							},
+							MTLSAuths: []*kong.MTLSAuth{
+								{
+									SubjectName: kong.String("test@example.com"),
 								},
 							},
 						},
@@ -1029,6 +1058,16 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Tags: kong.StringSlice("tag1"),
 					},
 				},
+				MTLSAuths: []*kong.MTLSAuth{
+					{
+						ID:          kong.String("f9af75ec-d91e-426f-af3f-406c718caaed"),
+						SubjectName: kong.String("test@example.com"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+				},
 			},
 		},
 		{
@@ -1072,6 +1111,11 @@ func Test_stateBuilder_consumers(t *testing.T) {
 							ACLGroups: []*kong.ACLGroup{
 								{
 									Group: kong.String("foo-group"),
+								},
+							},
+							MTLSAuths: []*kong.MTLSAuth{
+								{
+									SubjectName: kong.String("test@example.com"),
 								},
 							},
 						},
@@ -1144,6 +1188,15 @@ func Test_stateBuilder_consumers(t *testing.T) {
 					{
 						ID:    kong.String("b7c9352a-775a-4ba5-9869-98e926a3e6cb"),
 						Group: kong.String("foo-group"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						},
+					},
+				},
+				MTLSAuths: []*kong.MTLSAuth{
+					{
+						ID:          kong.String("92f4c829-968b-42af-afd3-f337051508d3"),
+						SubjectName: kong.String("test@example.com"),
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},

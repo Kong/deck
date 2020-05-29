@@ -360,6 +360,16 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			zeroOutTimestamps(k)
 			c.ACLGroups = append(c.ACLGroups, &k.ACLGroup)
 		}
+		mtlsAuths, err := kongState.MTLSAuths.GetAllByConsumerID(*c.ID)
+		if err != nil {
+			return err
+		}
+		for _, k := range mtlsAuths {
+			zeroOutID(k, nil, config.WithID)
+			zeroOutTimestamps(k)
+			k.Consumer = nil
+			c.MTLSAuths = append(c.MTLSAuths, &k.MTLSAuth)
+		}
 		zeroOutID(&c, c.Username, config.WithID)
 		zeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.Consumer, selectTags)

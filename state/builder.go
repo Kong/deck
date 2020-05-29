@@ -119,6 +119,19 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 			return nil, errors.Wrap(err, "inserting basic-auth into state")
 		}
 	}
+	for _, cred := range raw.MTLSAuths {
+		ok, err := ensureConsumer(*cred.Consumer.ID)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			continue
+		}
+		err = kongState.MTLSAuths.Add(MTLSAuth{MTLSAuth: *cred})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting mtls-auth into state")
+		}
+	}
 	for _, u := range raw.Upstreams {
 		err := kongState.Upstreams.Add(Upstream{Upstream: *u})
 		if err != nil {
