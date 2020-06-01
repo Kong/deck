@@ -232,12 +232,12 @@ const contentSchema = `{
       "anyOf": [
         {
           "required": [
-            "id"
+            "username"
           ]
         },
         {
           "required": [
-            "username"
+            "id"
           ]
         }
       ]
@@ -376,7 +376,19 @@ const contentSchema = `{
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "username"
+          ]
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
     },
     "FPlugin": {
       "required": [
@@ -532,7 +544,19 @@ const contentSchema = `{
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
     },
     "FService": {
       "properties": {
@@ -599,7 +623,19 @@ const contentSchema = `{
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
     },
     "FTarget": {
       "required": [
@@ -633,6 +669,9 @@ const contentSchema = `{
       "type": "object"
     },
     "FUpstream": {
+      "required": [
+        "name"
+      ],
       "properties": {
         "algorithm": {
           "type": "string"
@@ -985,12 +1024,12 @@ const contentSchema = `{
       "anyOf": [
         {
           "required": [
-            "id"
+            "name"
           ]
         },
         {
           "required": [
-            "name"
+            "id"
           ]
         }
       ]
@@ -1072,12 +1111,12 @@ const contentSchema = `{
       "anyOf": [
         {
           "required": [
-            "id"
+            "name"
           ]
         },
         {
           "required": [
-            "name"
+            "id"
           ]
         }
       ]
