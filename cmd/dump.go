@@ -112,6 +112,11 @@ configure Kong.`,
 		// or Kong Enterprise single workspace
 		if dumpWorkspace != "" {
 			config.Workspace = dumpWorkspace
+
+			if err := checkWorkspace(config); err != nil {
+				return err
+			}
+
 			client, err = utils.GetKongClient(config)
 			if err != nil {
 				return err
