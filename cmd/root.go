@@ -144,9 +144,10 @@ func initConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	viper.AutomaticEnv() // read in environment variables that match
 	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
-	if err != nil {
-		fmt.Println(err)
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			fmt.Println(err)
+		}
 	}
 	config.Address = viper.GetString("kong-addr")
 	config.TLSServerName = viper.GetString("tls-server-name")
