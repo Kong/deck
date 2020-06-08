@@ -116,6 +116,21 @@ func Test_unwrapURL(t *testing.T) {
 						Host:     kong.String("foo.com"),
 						Protocol: kong.String("https"),
 						Path:     kong.String("/bar"),
+						Port:     kong.Int(443),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "https://foo.com:4224/",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("https"),
+						Path:     kong.String("/"),
+						Port:     kong.Int(4224),
 					},
 				},
 			},
@@ -129,6 +144,33 @@ func Test_unwrapURL(t *testing.T) {
 						Host:     kong.String("foo.com"),
 						Protocol: kong.String("https"),
 						Path:     kong.String("/"),
+						Port:     kong.Int(443),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "http://foo.com:4242",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("http"),
+						Port:     kong.Int(4242),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				urlString: "http://foo.com",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("http"),
+						Port:     kong.Int(80),
 					},
 				},
 			},
@@ -141,6 +183,7 @@ func Test_unwrapURL(t *testing.T) {
 					Service: kong.Service{
 						Host:     kong.String("foocom"),
 						Protocol: kong.String("grpc"),
+						Port:     kong.Int(80),
 					},
 				},
 			},

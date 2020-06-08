@@ -103,6 +103,12 @@ func unwrapURL(urlString string, fService *FService) error {
 	}
 
 	fService.Protocol = kong.String(parsed.Scheme)
+
+	fService.Port = kong.Int(80)
+	if parsed.Scheme == "https" {
+		fService.Port = kong.Int(443)
+	}
+
 	if parsed.Host != "" {
 		hostPort := strings.Split(parsed.Host, ":")
 		fService.Host = kong.String(hostPort[0])
