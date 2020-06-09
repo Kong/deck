@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -130,8 +131,9 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 			rt:      defaultTransport,
 		}
 	}
+	address := cleanAddress(opt.Address)
 
-	url, err := url.Parse(opt.Address)
+	url, err := url.ParseRequestURI(address)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse kong address")
 	}
@@ -148,4 +150,9 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		kongClient.SetLogger(os.Stderr)
 	}
 	return kongClient, nil
+}
+
+func cleanAddress(address string) string {
+	re := regexp.MustCompile("[/]+$")
+	return re.ReplaceAllString(address, "")
 }
