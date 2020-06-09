@@ -95,7 +95,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-skip-verify"))
 
 	rootCmd.PersistentFlags().String("tls-server-name", "",
-		"Custom CA certificate to use to verify"+
+		"Name to use to verify the hostname in"+
 			"Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_TLS_SERVER_NAME"+
 			" environment variable.")
