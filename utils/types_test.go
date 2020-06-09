@@ -20,3 +20,52 @@ func TestErrArrayString(t *testing.T) {
 
 	assert.Equal(err.Error(), "2 errors occurred:\n\tfoo failed\n\tbar failed\n")
 }
+
+func Test_cleanAddress(t *testing.T) {
+	type args struct {
+		address string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			args: args{
+				address: "foo",
+			},
+			want: "foo",
+		},
+		{
+			args: args{
+				address: "http://localhost:8001",
+			},
+			want: "http://localhost:8001",
+		},
+		{
+			args: args{
+				address: "http://localhost:8001/",
+			},
+			want: "http://localhost:8001",
+		},
+		{
+			args: args{
+				address: "http://localhost:8001//",
+			},
+			want: "http://localhost:8001",
+		},
+		{
+			args: args{
+				address: "https://subdomain.example.com///",
+			},
+			want: "https://subdomain.example.com",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := cleanAddress(tt.args.address); got != tt.want {
+				t.Errorf("cleanAddress() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
