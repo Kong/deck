@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.2.0 // indirect
 	github.com/hashicorp/go-memdb v1.1.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/hbagdi/go-kong v0.11.0
+	github.com/hbagdi/go-kong v0.11.1-0.20200520215447-05279344daa9
 	github.com/imdario/mergo v0.3.9
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
