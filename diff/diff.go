@@ -28,9 +28,10 @@ type Syncer struct {
 	errChan   chan error
 	stopChan  chan struct{}
 
-	InFlightOps int32
+	inFlightOps int32
 
 	SilenceWarnings bool
+	StageDelaySec   int
 
 	once sync.Once
 }
@@ -253,7 +254,7 @@ func (sc *Syncer) createUpdate() error {
 }
 
 func (sc *Syncer) queueEvent(e Event) error {
-	atomic.AddInt32(&sc.InFlightOps, 1)
+	atomic.AddInt32(&sc.inFlightOps, 1)
 	select {
 	case sc.eventChan <- e:
 		return nil
@@ -263,11 +264,12 @@ func (sc *Syncer) queueEvent(e Event) error {
 }
 
 func (sc *Syncer) eventCompleted() {
-	atomic.AddInt32(&sc.InFlightOps, -1)
+	atomic.AddInt32(&sc.inFlightOps, -1)
 }
 
 func (sc *Syncer) wait() {
-	for atomic.LoadInt32(&sc.InFlightOps) != 0 {
+	time.Sleep(time.Duration(sc.StageDelaySec) * time.Second)
+	for atomic.LoadInt32(&sc.inFlightOps) != 0 {
 		// TODO hack?
 		time.Sleep(1 * time.Millisecond)
 	}

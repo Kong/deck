@@ -23,7 +23,7 @@ that will be created or updated or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism)
+		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism, 0)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {
