@@ -131,7 +131,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 			rt:      defaultTransport,
 		}
 	}
-	address := cleanAddress(opt.Address)
+	address := CleanAddress(opt.Address)
 
 	url, err := url.ParseRequestURI(address)
 	if err != nil {
@@ -152,7 +152,8 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	return kongClient, nil
 }
 
-func cleanAddress(address string) string {
+// CleanAddress removes trailling / from a URL.
+func CleanAddress(address string) string {
 	re := regexp.MustCompile("[/]+$")
 	return re.ReplaceAllString(address, "")
 }
