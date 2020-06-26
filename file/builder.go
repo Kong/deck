@@ -68,7 +68,8 @@ func (b *stateBuilder) certificates() {
 		return
 	}
 
-	for _, c := range b.targetContent.Certificates {
+	for i := range b.targetContent.Certificates {
+		c := b.targetContent.Certificates[i]
 		if utils.Empty(c.ID) {
 			cert, err := b.currentState.Certificates.GetByCertKey(*c.Cert,
 				*c.Key)

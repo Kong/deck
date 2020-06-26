@@ -31,3 +31,7 @@ issues:
     - errcheck
     text:  "Error return value" # ignore err not checked in test files
     path: _test\.go
+  - linters:
+    - gosec
+    text:  "Expect WriteFile permissions to be 0600 or less"
+    path: file/codegen/main.go
