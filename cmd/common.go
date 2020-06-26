@@ -46,21 +46,22 @@ func checkWorkspace(config utils.KongClientConfig) error {
 		return err
 	}
 
-	req, err := http.NewRequest("GET", config.Address+"/workspaces/"+workspace,
+	req, err := http.NewRequest("GET",
+		utils.CleanAddress(config.Address)+"/workspaces/"+workspace,
 		nil)
 	if err != nil {
 		return err
 	}
 	resp, err := client.Do(nil, req, nil)
-	if err != nil {
-		return errors.Wrapf(err, "checking workspace '%v' in Kong", workspace)
-	}
-	if resp.StatusCode == http.StatusNotFound {
+	if resp != nil && resp.StatusCode == http.StatusNotFound {
 		return errors.Errorf("workspace '%v' does not exist in Kong, "+
 			"please create it before running decK.", workspace)
 	}
+	if err != nil {
+		return errors.Wrapf(err, "failed to check workspace '%v' in Kong", workspace)
+	}
 	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("unexpected error code while retrieving "+
+		return errors.Errorf("unexpected status code while retrieving "+
 			"workspace '%v' : %v", workspace, resp.StatusCode)
 	}
 	return nil
