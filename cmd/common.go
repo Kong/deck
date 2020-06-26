@@ -67,7 +67,7 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	return nil
 }
 
-func syncMain(filenames []string, dry bool, parallelism int) error {
+func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 
 	// load Kong version before workspace
 	kongVersion, err := kongVersion(config)
@@ -120,6 +120,7 @@ func syncMain(filenames []string, dry bool, parallelism int) error {
 	}
 
 	s, _ := diff.NewSyncer(currentState, targetState)
+	s.StageDelaySec = delay
 	stats, errs := solver.Solve(stopChannel, s, client, parallelism, dry)
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}

@@ -8,6 +8,7 @@ import (
 var (
 	syncCmdKongStateFile []string
 	syncCmdParallelism   int
+	syncCmdDBUpdateDelay int
 )
 
 // syncCmd represents the sync command
@@ -19,7 +20,7 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism)
+		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism, syncCmdDBUpdateDelay)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(syncCmdKongStateFile) == 0 {
@@ -45,4 +46,8 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
 			"Multiple tags are ANDed together.")
+	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
+		0, "aritificial delay in seconds that is injected between insert operations \n"+
+			"for related entities (usually for cassandra deployments).\n"+
+			"See 'db_update_propagation' in kong.conf.")
 }
