@@ -395,19 +395,20 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
-			// this cannot work: there already is no ID
-			// however there's nothing else we can use to search the cred,
-			// as it has no unique fields. This always generates a random uuid()
-			//existingCred, err := b.currentState.MTLSAuths.Get(*cred.ID)
-			//if err == state.ErrNotFound {
-			var err error
-			if true {
-				cred.ID = uuid()
-			} else if err != nil {
-				return err
+			// normally, we'd want to look up existing resources in this case
+			// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
+			// so we just give up and complain about it
+			var consumerFriendlyName *string
+			if !utils.Empty(cred.Consumer.Username) {
+				consumerFriendlyName = cred.Consumer.Username
+			} else if !utils.Empty(cred.Consumer.CustomID) {
+				consumerFriendlyName = cred.Consumer.CustomID
 			} else {
-				//cred.ID = kong.String(*existingCred.ID)
+				// this shouldn't happen, but apparently can. failsafe in case:
+				consumerFriendlyName = cred.Consumer.ID
 			}
+			return errors.Errorf("mtls-auth for Consumer '%s' with SubjectName '%s' lacks ID",
+				*consumerFriendlyName, *cred.SubjectName)
 		}
 		if b.kongVersion.GTE(kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)

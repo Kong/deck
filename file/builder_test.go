@@ -812,6 +812,8 @@ func Test_stateBuilder_consumers(t *testing.T) {
 							},
 							MTLSAuths: []*kong.MTLSAuth{
 								{
+									// this isn't actually possible, so this given
+									// is expected to fail
 									SubjectName: kong.String("test@example.com"),
 								},
 							},
@@ -895,16 +897,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Tags: kong.StringSlice("tag1"),
 					},
 				},
-				MTLSAuths: []*kong.MTLSAuth{
-					{
-						ID:          kong.String("f9af75ec-d91e-426f-af3f-406c718caaed"),
-						SubjectName: kong.String("test@example.com"),
-						Consumer: &kong.Consumer{
-							ID: kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
-						},
-						Tags: kong.StringSlice("tag1"),
-					},
-				},
+				MTLSAuths: nil,
 			},
 		},
 		{
@@ -975,6 +968,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 							},
 							MTLSAuths: []*kong.MTLSAuth{
 								{
+									ID:          kong.String("533c259e-bf71-4d77-99d2-97944c70a6a4"),
 									SubjectName: kong.String("test@example.com"),
 								},
 							},
@@ -1060,7 +1054,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 				},
 				MTLSAuths: []*kong.MTLSAuth{
 					{
-						ID:          kong.String("f9af75ec-d91e-426f-af3f-406c718caaed"),
+						ID:          kong.String("533c259e-bf71-4d77-99d2-97944c70a6a4"),
 						SubjectName: kong.String("test@example.com"),
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
@@ -1115,6 +1109,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 							},
 							MTLSAuths: []*kong.MTLSAuth{
 								{
+									ID:          kong.String("533c259e-bf71-4d77-99d2-97944c70a6a4"),
 									SubjectName: kong.String("test@example.com"),
 								},
 							},
@@ -1195,7 +1190,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 				},
 				MTLSAuths: []*kong.MTLSAuth{
 					{
-						ID:          kong.String("92f4c829-968b-42af-afd3-f337051508d3"),
+						ID:          kong.String("533c259e-bf71-4d77-99d2-97944c70a6a4"),
 						SubjectName: kong.String("test@example.com"),
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
