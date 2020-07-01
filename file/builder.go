@@ -422,6 +422,10 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 			return errors.Errorf("mtls-auth for Consumer '%s' with SubjectName '%s' lacks ID",
 				*consumerFriendlyName, *cred.SubjectName)
 		}
+		// we only have these from eariler to print errors if needed
+		// they shouldn't go into the actual entity, so strip them out
+		cred.Consumer.CustomID = nil
+		cred.Consumer.Username = nil
 		if b.kongVersion.GTE(kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
