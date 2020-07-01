@@ -164,6 +164,27 @@ const contentSchema = `{
       "additionalProperties": false,
       "type": "object"
     },
+    "CACertificate": {
+      "properties": {
+        "cert": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "CIDRPort": {
       "properties": {
         "ip": {
@@ -352,6 +373,13 @@ const contentSchema = `{
           },
           "type": "array"
         },
+        "mtlsauth_credentials": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/MTLSAuth"
+          },
+          "type": "array"
+        },
         "oauth2_credentials": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
@@ -362,13 +390,6 @@ const contentSchema = `{
         "plugins": {
           "items": {
             "$ref": "#/definitions/FPlugin"
-          },
-          "type": "array"
-        },
-        "mtlsauth_credentials": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/MTLSAuth"
           },
           "type": "array"
         },
@@ -880,6 +901,34 @@ const contentSchema = `{
       "additionalProperties": false,
       "type": "object"
     },
+    "MTLSAuth": {
+      "properties": {
+        "ca_certificate": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/CACertificate"
+        },
+        "consumer": {
+          "$ref": "#/definitions/Consumer"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "subject_name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Oauth2Credential": {
       "required": [
         "name",
@@ -922,40 +971,13 @@ const contentSchema = `{
       "additionalProperties": false,
       "type": "object"
     },
-    "MTLSAuth": {
-      "required": [
-        "subject_name"
-      ],
-      "properties": {
-        "consumer": {
-          "$ref": "#/definitions/Consumer"
-        },
-        "created_at": {
-          "type": "integer"
-        },
-        "id": {
-          "type": "string"
-        },
-        "subject_name": {
-          "type": "string"
-        },
-        "ca_certificate": {
-          "$ref": "#/definitions/FCACertificate"
-        },
-        "tags": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
     "PassiveHealthcheck": {
       "properties": {
         "healthy": {
           "$ref": "#/definitions/Healthy"
+        },
+        "type": {
+          "type": "string"
         },
         "unhealthy": {
           "$ref": "#/definitions/Unhealthy"
