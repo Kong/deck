@@ -91,8 +91,7 @@ func main() {
 	schema.Definitions["ACLGroup"].Required = []string{"group"}
 	schema.Definitions["BasicAuth"].Required = []string{"username", "password"}
 	schema.Definitions["HMACAuth"].Required = []string{"username", "secret"}
-	schema.Definitions["JWTAuth"].Required = []string{"algorithm", "key",
-		"secret"}
+	schema.Definitions["JWTAuth"].Required = []string{}
 	schema.Definitions["KeyAuth"].Required = []string{"key"}
 	schema.Definitions["Oauth2Credential"].Required = []string{"name",
 		"client_id", "redirect_uris", "client_secret"}

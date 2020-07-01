@@ -809,11 +809,6 @@ const contentSchema = `{
       "type": "object"
     },
     "JWTAuth": {
-      "required": [
-        "algorithm",
-        "key",
-        "secret"
-      ],
       "properties": {
         "algorithm": {
           "type": "string"
