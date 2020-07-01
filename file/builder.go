@@ -253,7 +253,19 @@ func (b *stateBuilder) consumers() {
 
 		var mtlsAuths []kong.MTLSAuth
 		for _, cred := range c.MTLSAuths {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			var username *string
+			var customID *string
+			if !utils.Empty(c.Username) {
+				username = kong.String(*c.Username)
+			}
+			if !utils.Empty(c.CustomID) {
+				customID = kong.String(*c.CustomID)
+			}
+			cred.Consumer = &kong.Consumer{
+				ID:       kong.String(*c.ID),
+				Username: username,
+				CustomID: customID,
+			}
 			mtlsAuths = append(mtlsAuths, *cred)
 		}
 		if err := b.ingestMTLSAuths(mtlsAuths); err != nil {
