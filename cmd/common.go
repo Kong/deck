@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/hbagdi/deck/print"
+
 	"github.com/spf13/cobra"
 
 	"github.com/blang/semver"
@@ -34,7 +36,7 @@ func SetStopCh(stopCh chan struct{}) {
 }
 
 // checkWorkspace checks if workspace exists in Kong.
-func checkWorkspace(config utils.KongClientConfig) error {
+func checkWorkspace(config utils.KongClientConfig, create bool) error {
 
 	workspace := config.Workspace
 	if workspace == "" {
@@ -52,10 +54,33 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	if err != nil {
 		return err
 	}
+
 	resp, err := client.Do(nil, req, nil)
 	if resp != nil && resp.StatusCode == http.StatusNotFound {
-		return errors.Errorf("workspace '%v' does not exist in Kong, "+
-			"please create it before running decK.", workspace)
+		if create {
+			// create workspace
+			print.CreatePrintln("creating workspace", workspace)
+
+			req, err := http.NewRequest("PUT",
+				utils.CleanAddress(config.Address)+"/workspaces/"+workspace,
+				nil)
+			if err != nil {
+				return err
+			}
+
+			resp, err := client.Do(nil, req, nil)
+			if err != nil {
+				return errors.Wrapf(err, "failed to create workspace '%v' in Kong", workspace)
+			}
+			if resp.StatusCode != http.StatusOK {
+				return errors.Errorf("unexpected status code while creating "+
+					"workspace '%v' : %v", workspace, resp.StatusCode)
+			}
+
+			return nil
+		}
+
+		return errors.Errorf("workspace '%v' does not exist in Kong", workspace)
 	}
 	if err != nil {
 		return errors.Wrapf(err, "failed to check workspace '%v' in Kong", workspace)
@@ -64,6 +89,7 @@ func checkWorkspace(config utils.KongClientConfig) error {
 		return errors.Errorf("unexpected status code while retrieving "+
 			"workspace '%v' : %v", workspace, resp.StatusCode)
 	}
+
 	return nil
 }
 
@@ -83,7 +109,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 	// prepare to read the current state from Kong
 	config.Workspace = targetContent.Workspace
 
-	if err := checkWorkspace(config); err != nil {
+	if err := checkWorkspace(config, !dry); err != nil {
 		return err
 	}
 

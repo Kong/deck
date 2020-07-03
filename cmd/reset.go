@@ -71,7 +71,7 @@ By default, this command will ask for a confirmation prompt.`,
 		if resetWorkspace != "" {
 			config.Workspace = resetWorkspace
 
-			if err := checkWorkspace(config); err != nil {
+			if err := checkWorkspace(config, false); err != nil {
 				return err
 			}
 

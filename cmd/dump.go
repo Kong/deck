@@ -113,7 +113,7 @@ configure Kong.`,
 		if dumpWorkspace != "" {
 			config.Workspace = dumpWorkspace
 
-			if err := checkWorkspace(config); err != nil {
+			if err := checkWorkspace(config, false); err != nil {
 				return err
 			}
 
