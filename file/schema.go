@@ -373,7 +373,7 @@ const contentSchema = `{
           },
           "type": "array"
         },
-        "mtlsauth_credentials": {
+        "mtls_auth_credentials": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/MTLSAuth"
