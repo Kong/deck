@@ -456,7 +456,7 @@ type FConsumer struct {
 	BasicAuths    []*kong.BasicAuth        `json:"basicauth_credentials,omitempty" yaml:"basicauth_credentials,omitempty"`
 	Oauth2Creds   []*kong.Oauth2Credential `json:"oauth2_credentials,omitempty" yaml:"oauth2_credentials,omitempty"`
 	ACLGroups     []*kong.ACLGroup         `json:"acls,omitempty" yaml:"acls,omitempty"`
-	MTLSAuths     []*kong.MTLSAuth         `json:"mtlsauth_credentials,omitempty" yaml:"mtlsauth_credentials,omitempty"`
+	MTLSAuths     []*kong.MTLSAuth         `json:"mtls_auth_credentials,omitempty" yaml:"mtls_auth_credentials,omitempty"`
 }
 
 // id is used for sorting.
