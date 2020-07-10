@@ -83,8 +83,10 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 	// prepare to read the current state from Kong
 	config.Workspace = targetContent.Workspace
 
-	if err := checkWorkspace(config); err != nil {
-		return err
+	if !config.SkipCheck {
+		if err := checkWorkspace(config); err != nil {
+			return err
+		}
 	}
 
 	client, err := utils.GetKongClient(config)
@@ -138,9 +140,18 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 }
 
 func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
+
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return semver.Version{}, err
+	}
+
+	if config.Version != "" {
+		v, err := utils.CleanKongVersion(config.Version)
+		if err != nil {
+			return semver.Version{}, err
+		}
+		return semver.ParseTolerant(v)
 	}
 
 	root, err := client.Root(nil)
@@ -153,6 +164,7 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 		return semver.Version{}, err
 	}
 	return semver.ParseTolerant(v)
+
 }
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {

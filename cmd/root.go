@@ -81,6 +81,11 @@ func init() {
 	viper.BindPFlag("kong-addr",
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
 
+	rootCmd.PersistentFlags().String("version", "",
+		"Override version when using RBAC scoped users")
+	viper.BindPFlag("version",
+		rootCmd.PersistentFlags().Lookup("version"))
+
 	rootCmd.PersistentFlags().StringSlice("headers", []string{},
 		"HTTP Headers(key:value) to inject in all requests to Kong's Admin API.\n"+
 			"This flag can be specified multiple times to inject multiple headers.")
@@ -121,6 +126,11 @@ func init() {
 		"disable colorized output")
 	viper.BindPFlag("no-color",
 		rootCmd.PersistentFlags().Lookup("no-color"))
+
+	rootCmd.PersistentFlags().Bool("skip-check", false,
+		"Skip checks")
+	viper.BindPFlag("no-color",
+		rootCmd.PersistentFlags().Lookup("skip-check"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -150,12 +160,14 @@ func initConfig() {
 		}
 	}
 	config.Address = viper.GetString("kong-addr")
+	config.Version = viper.GetString("version")
 	config.TLSServerName = viper.GetString("tls-server-name")
 	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	config.TLSCACert = viper.GetString("ca-cert")
 	config.Headers = viper.GetStringSlice("headers")
 	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
+	config.SkipCheck = viper.GetBool("skip-check")
 
 	config.Debug = verbose >= 1
 }
