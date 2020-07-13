@@ -27,7 +27,7 @@
   thousands or millions.
 - Always run a `deck diff` command before running a `deck sync`
   to ensure the change that is taking place.
-- Adopt a [CI-driven configuration](ci-driven-configuration) practice.
+- Adopt a [CI-driven configuration](ci-driven-configuration.md) practice.
 - Always secure your Kong's Admin API with some kind of authentication method.
 - Do not write the state file by hand, it will be very error-prone.
   Instead using Kong's Admin API to
