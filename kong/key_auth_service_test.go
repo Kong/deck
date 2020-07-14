@@ -1,15 +1,16 @@
 package kong
 
 import (
+	"testing"
+
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestKeyAuthCreate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -50,7 +51,7 @@ func TestKeyAuthCreate(T *testing.T) {
 func TestKeyAuthCreateWithID(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -83,7 +84,7 @@ func TestKeyAuthCreateWithID(T *testing.T) {
 func TestKeyAuthGet(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -133,7 +134,7 @@ func TestKeyAuthGet(T *testing.T) {
 func TestKeyAuthUpdate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -175,7 +176,7 @@ func TestKeyAuthUpdate(T *testing.T) {
 func TestKeyAuthDelete(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -213,7 +214,7 @@ func TestKeyAuthDelete(T *testing.T) {
 func TestKeyAuthListMethods(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

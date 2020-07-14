@@ -1,15 +1,16 @@
 package kong
 
 import (
-	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestACLGroupCreate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -51,7 +52,7 @@ func TestACLGroupCreate(T *testing.T) {
 func TestACLGroupCreateWithID(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -83,7 +84,7 @@ func TestACLGroupCreateWithID(T *testing.T) {
 func TestACLGroupGet(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -129,7 +130,7 @@ func TestACLGroupGet(T *testing.T) {
 func TestACLGroupUpdate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -168,7 +169,7 @@ func TestACLGroupUpdate(T *testing.T) {
 func TestACLGroupDelete(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -204,7 +205,7 @@ func TestACLGroupDelete(T *testing.T) {
 func TestACLGroupListMethods(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

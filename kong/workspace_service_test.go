@@ -12,7 +12,7 @@ import (
 func TestWorkspaceService(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -63,7 +63,7 @@ func TestWorkspaceService(T *testing.T) {
 func TestWorkspaceServiceList(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -101,7 +101,7 @@ func TestWorkspaceServiceList(T *testing.T) {
 func TestWorkspaceServiceListAll(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

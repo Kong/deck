@@ -62,6 +62,7 @@ jobs:
       KONG_ENTERPRISE_REPO_PASSSWORD: ${{ secrets.KONG_ENTERPRISE_REPO_PASSSWORD }}
       KONG_LICENSE_DATA: ${{ secrets.KONG_LICENSE_DATA }}
       KONG_ANONYMOUS_REPORTS: "off"
+      KONG_ADMIN_TOKEN: kong
     runs-on: ubuntu-latest
     services:
       postgres:

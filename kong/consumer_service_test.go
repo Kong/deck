@@ -12,7 +12,7 @@ import (
 func TestConsumersService(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -68,7 +68,7 @@ func TestConsumerWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.1.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -89,7 +89,7 @@ func TestConsumerWithTags(T *testing.T) {
 func TestConsumerListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -159,7 +159,7 @@ func TestConsumerListWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.1.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

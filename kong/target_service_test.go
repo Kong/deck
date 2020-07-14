@@ -10,7 +10,7 @@ import (
 func TestTargetsUpstream(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -64,7 +64,7 @@ func TestTargetWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.1.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -89,7 +89,7 @@ func TestTargetWithTags(T *testing.T) {
 func TestTargetListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -183,7 +183,7 @@ func compareTargets(expected, actual []*Target) bool {
 func TestTargetMarkHealthy(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -214,7 +214,7 @@ func TestTargetMarkHealthy(T *testing.T) {
 func TestTargetMarkUnhealthy(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

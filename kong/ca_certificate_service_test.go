@@ -99,7 +99,7 @@ func TestCACertificatesService(T *testing.T) {
 	runWhenKong(T, ">=1.3.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -152,7 +152,7 @@ func TestCACertificateWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.3.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -175,7 +175,7 @@ func TestCACertificateListEndpoint(T *testing.T) {
 	runWhenKong(T, ">=1.3.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

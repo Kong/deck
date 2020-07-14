@@ -255,7 +255,7 @@ StncqiK5F5CsWRrwQCpoNDkOAQE/l7QZgBzYrXw4vQ==
 func TestCertificatesService(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -311,7 +311,7 @@ func TestCertificateWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.1.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -333,7 +333,7 @@ func TestCertificateWithTags(T *testing.T) {
 func TestCertificateListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

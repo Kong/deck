@@ -10,7 +10,7 @@ import (
 func TestUpstreamsService(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -55,7 +55,7 @@ func TestUpstreamWithTags(T *testing.T) {
 	runWhenKong(T, ">=1.1.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -77,7 +77,7 @@ func TestUpstreamWithTags(T *testing.T) {
 func TestUpstreamWithActiveUnHealthyInterval(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -104,7 +104,7 @@ func TestUpstreamWithActiveUnHealthyInterval(T *testing.T) {
 func TestUpstreamWithPassiveUnHealthyInterval(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -126,7 +126,7 @@ func TestUpstreamWithPassiveUnHealthyInterval(T *testing.T) {
 func TestUpstreamWithPassiveHealthy(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -156,7 +156,7 @@ func TestUpstreamWithAlgorithm(T *testing.T) {
 	runWhenKong(T, ">=1.3.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -177,7 +177,7 @@ func TestUpstreamWithAlgorithm(T *testing.T) {
 func TestUpstreamListEndpoint(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -267,7 +267,7 @@ func TestUpstreamsWithHostHeader(T *testing.T) {
 	runWhenKong(T, ">=1.4.0")
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

@@ -41,6 +41,8 @@ fi
 sudo dpkg -i kong.deb
 echo $KONG_LICENSE_DATA | sudo tee /etc/kong/license.json
 export KONG_LICENSE_PATH=/tmp/license.json
+export KONG_PASSWORD=kong
+export KONG_ENFORCE_RBAC=on
 
 sudo kong migrations bootstrap
 sudo kong version

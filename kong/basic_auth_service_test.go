@@ -10,7 +10,7 @@ import (
 func TestBasicAuthCreate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -62,7 +62,7 @@ func TestBasicAuthCreate(T *testing.T) {
 func TestBasicAuthCreateWithID(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -98,7 +98,7 @@ func TestBasicAuthCreateWithID(T *testing.T) {
 func TestBasicAuthGet(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -148,7 +148,7 @@ func TestBasicAuthGet(T *testing.T) {
 func TestBasicAuthUpdate(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -193,7 +193,7 @@ func TestBasicAuthUpdate(T *testing.T) {
 func TestBasicAuthDelete(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
@@ -232,7 +232,7 @@ func TestBasicAuthDelete(T *testing.T) {
 func TestBasicAuthListMethods(T *testing.T) {
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 

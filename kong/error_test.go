@@ -22,7 +22,7 @@ func TestIsNotFoundErrE2E(T *testing.T) {
 
 	assert := assert.New(T)
 
-	client, err := NewClient(nil, nil)
+	client, err := NewTestClient(nil, nil)
 	assert.Nil(err)
 	assert.NotNil(client)
 
