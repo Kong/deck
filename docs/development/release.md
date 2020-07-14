@@ -10,7 +10,7 @@
 - Commit and push the branch to Github. Ensure that the Markdown is rendered
   correctly. Make changes as needed. The link on the version itself won't
   resolve correctly as the tag is not yet created.
-- Once the changelog looks good, push the commit to master branch.
+- Once the changelog looks good, push the commit to main branch.
 - Ensure you have Goreleaser and Docker installed locally.
 
 ## Release
