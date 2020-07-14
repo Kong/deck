@@ -52,7 +52,7 @@ jobs:
         run: bash .ci/setup_kong.sh
       - name: Run tests
         run: go test -v ./...
-  test-entrprise:
+  test-enterprise:
     strategy:
       matrix:
         kong_version: ['enterprise-1.3.0.2', 'enterprise-1.5.0.2']
