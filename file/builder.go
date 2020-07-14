@@ -426,9 +426,11 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 		// they shouldn't go into the actual entity, so strip them out
 		cred.Consumer.CustomID = nil
 		cred.Consumer.Username = nil
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
+		// TODO: this is stub code, since mtls-auth doesn't actually have tag support yet
+		// They probably should, FTI-1706 tracks that request with the Kong Enterprise team
+		//if b.kongVersion.GTE(kong220Version) {
+		//	utils.MustMergeTags(&cred, b.selectTags)
+		//}
 		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
 	}
 	return nil
