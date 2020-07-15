@@ -253,18 +253,8 @@ func (b *stateBuilder) consumers() {
 
 		var mtlsAuths []kong.MTLSAuth
 		for _, cred := range c.MTLSAuths {
-			var username *string
-			var customID *string
-			if !utils.Empty(c.Username) {
-				username = kong.String(*c.Username)
-			}
-			if !utils.Empty(c.CustomID) {
-				customID = kong.String(*c.CustomID)
-			}
 			cred.Consumer = &kong.Consumer{
-				ID:       kong.String(*c.ID),
-				Username: username,
-				CustomID: customID,
+				ID: kong.String(*c.ID),
 			}
 			mtlsAuths = append(mtlsAuths, *cred)
 		}
@@ -406,26 +396,10 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 	for _, cred := range creds {
 		cred := cred
-		if utils.Empty(cred.ID) {
-			// normally, we'd want to look up existing resources in this case
-			// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
-			// so we just give up and complain about it
-			var consumerFriendlyName *string
-			if !utils.Empty(cred.Consumer.Username) {
-				consumerFriendlyName = cred.Consumer.Username
-			} else if !utils.Empty(cred.Consumer.CustomID) {
-				consumerFriendlyName = cred.Consumer.CustomID
-			} else {
-				// this shouldn't happen, but apparently can. failsafe in case:
-				consumerFriendlyName = cred.Consumer.ID
-			}
-			return errors.Errorf("mtls-auth for Consumer '%s' with SubjectName '%s' lacks ID",
-				*consumerFriendlyName, *cred.SubjectName)
-		}
-		// we only have these from eariler to print errors if needed
-		// they shouldn't go into the actual entity, so strip them out
-		cred.Consumer.CustomID = nil
-		cred.Consumer.Username = nil
+		// normally, we'd want to look up existing resources in this case
+		// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
+		// so we don't--schema validation requires it, but there's nothing more we can do here
+
 		// TODO: this is stub code, since mtls-auth doesn't actually have tag support yet
 		// They probably should, FTI-1706 tracks that request with the Kong Enterprise team
 		//if b.kongVersion.GTE(kong220Version) {

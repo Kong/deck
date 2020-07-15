@@ -96,6 +96,7 @@ func main() {
 	schema.Definitions["KeyAuth"].Required = []string{"key"}
 	schema.Definitions["Oauth2Credential"].Required = []string{"name",
 		"client_id", "redirect_uris", "client_secret"}
+	schema.Definitions["MTLSAuth"].Required = []string{"id", "subject_name"}
 
 	// Foreign references
 	stringType := &jsonschema.Type{Type: "string"}

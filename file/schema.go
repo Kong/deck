@@ -902,6 +902,10 @@ const contentSchema = `{
       "type": "object"
     },
     "MTLSAuth": {
+      "required": [
+        "id",
+        "subject_name"
+      ],
       "properties": {
         "ca_certificate": {
           "$schema": "http://json-schema.org/draft-04/schema#",
