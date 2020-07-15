@@ -810,13 +810,6 @@ func Test_stateBuilder_consumers(t *testing.T) {
 									Group: kong.String("foo-group"),
 								},
 							},
-							MTLSAuths: []*kong.MTLSAuth{
-								{
-									// this isn't actually possible, so this given
-									// is expected to fail
-									SubjectName: kong.String("test@example.com"),
-								},
-							},
 						},
 					},
 					Info: &Info{
