@@ -38,8 +38,8 @@ func init() {
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
-	syncCmd.Flags().StringVarP(&syncWorkspace, "workspace", "w",
-		"", "Sync configuration to a specific workspace "+
+	syncCmd.Flags().StringVar(&syncWorkspace, "workspace", "",
+		"Sync configuration to a specific workspace "+
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",

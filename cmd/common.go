@@ -11,6 +11,7 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/solver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
@@ -81,7 +82,9 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		return err
 	}
 	// prepare to read the current state from Kong
-	if len(workspace) > 0 {
+	if workspace != "" {
+		print.DeletePrintf("Warning: Specified workspace '%v' is different from "+
+			"workspace '%v' found in state file(s)\n", workspace, targetContent.Workspace)
 		config.Workspace = workspace
 	} else {
 		config.Workspace = targetContent.Workspace
