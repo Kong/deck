@@ -396,6 +396,13 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 	for _, cred := range creds {
 		cred := cred
+		// this is kind of a stub for future validation
+		// JSON schema validation already gets this, but the linter
+		// gets sad if it's not possible for this function to return
+		// an error
+		if utils.Empty(cred.ID) {
+			return errors.Errorf("mtls-auth lacks ID")
+		}
 		// normally, we'd want to look up existing resources in this case
 		// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
 		// so we don't--schema validation requires it, but there's nothing more we can do here
