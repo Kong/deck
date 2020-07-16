@@ -365,7 +365,6 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			return err
 		}
 		for _, k := range mtlsAuths {
-			zeroOutID(k, nil, config.WithID)
 			zeroOutTimestamps(k)
 			k.Consumer = nil
 			c.MTLSAuths = append(c.MTLSAuths, &k.MTLSAuth)
