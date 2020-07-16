@@ -1193,6 +1193,8 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			},
 		},
 	}
+	var empty []*string
+	tests[3].want.MTLSAuths[0].Tags = empty
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &stateBuilder{
