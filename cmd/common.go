@@ -1,10 +1,9 @@
 package cmd
 
 import (
+	"github.com/spf13/cobra"
 	"net/http"
 	"os"
-
-	"github.com/spf13/cobra"
 
 	"github.com/blang/semver"
 	"github.com/fatih/color"
@@ -69,12 +68,6 @@ func checkWorkspace(config utils.KongClientConfig) error {
 
 func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 
-	// load Kong version before workspace
-	kongVersion, err := kongVersion(config)
-	if err != nil {
-		return errors.Wrap(err, "reading Kong version")
-	}
-
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -83,7 +76,13 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 	// prepare to read the current state from Kong
 	config.Workspace = targetContent.Workspace
 
-	if !config.SkipCheck {
+	// load Kong version before workspace
+	kongVersion, err := kongVersion(config)
+	if err != nil {
+		return errors.Wrap(err, "reading Kong version")
+	}
+
+	if !config.SkipWorkspaceCrud {
 		if err := checkWorkspace(config); err != nil {
 			return err
 		}
@@ -146,17 +145,23 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 		return semver.Version{}, err
 	}
 
-	if config.Version != "" {
-		v, err := utils.CleanKongVersion(config.Version)
+	root, err := client.Root(nil)
+	if err != nil {
+		// try with workspace path
+		req, err := http.NewRequest("GET",
+			utils.CleanAddress(config.Address)+"/"+config.Workspace+"/kong",
+			nil)
+		var resp map[string]interface{}
+		_, err = client.Do(nil, req, &resp)
+		if err != nil {
+			return semver.Version{}, err
+		}
+
+		v, err := utils.CleanKongVersion(resp["version"].(string))
 		if err != nil {
 			return semver.Version{}, err
 		}
 		return semver.ParseTolerant(v)
-	}
-
-	root, err := client.Root(nil)
-	if err != nil {
-		return semver.Version{}, err
 	}
 
 	v, err := utils.CleanKongVersion(root["version"].(string))

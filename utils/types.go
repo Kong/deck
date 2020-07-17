@@ -64,7 +64,6 @@ func (e ErrArray) Error() string {
 // KongClientConfig holds config details to use to talk to a Kong server.
 type KongClientConfig struct {
 	Address   string
-	Version   string
 	Workspace string
 
 	TLSServerName string
@@ -74,7 +73,7 @@ type KongClientConfig struct {
 	TLSSkipVerify bool
 	Debug         bool
 
-	SkipCheck bool
+	SkipWorkspaceCrud bool
 
 	Headers []string
 }
