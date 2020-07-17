@@ -2,14 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/hbagdi/deck/file"
 	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 var (
-	pingCmdKongStateFile []string
+	pingWorkspace string
 )
 
 // pingCmd represents the ping command
@@ -20,21 +19,13 @@ var pingCmd = &cobra.Command{
 can connect to Kong's Admin API or not.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		_, err := utils.GetKongClient(config)
+		client, err := utils.GetKongClient(config)
 		if err != nil {
 			return errors.Wrap(err, "creating kong client")
 		}
-
-		version, err := kongVersion(config)
+		conf, err := client.Root(nil)
 		if err != nil {
-
-			targetContent, err := file.GetContentFromFiles(pingCmdKongStateFile)
-			if err != nil {
-				return errors.Wrap(err, "error reading Kong State File")
-			}
-			// prepare to read the current state from Kong
-			config.Workspace = targetContent.Workspace
-
+			config.Workspace = pingWorkspace
 			version, err := kongVersion(config)
 			if err != nil {
 				return errors.Wrap(err, "reading Kong version")
@@ -43,7 +34,10 @@ can connect to Kong's Admin API or not.`,
 			fmt.Println("Kong version: ", version)
 			return nil
 		}
-
+		version := conf["version"]
+		if version == nil {
+			return errors.New("version is nil from Kong")
+		}
 		fmt.Println("Successfully connected to Kong!")
 		fmt.Println("Kong version: ", version)
 		return nil
@@ -52,8 +46,8 @@ can connect to Kong's Admin API or not.`,
 
 func init() {
 	rootCmd.AddCommand(pingCmd)
-	rootCmd.Flags().StringSliceVarP(&pingCmdKongStateFile,
-		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
-			"This flag can be specified multiple times for multiple files.\n"+
-			"Use '-' to read from stdin.")
+	pingCmd.Flags().StringVarP(&pingWorkspace, "workspace", "w",
+		"", "Ping configuration with a specific workspace "+
+			"(Kong Enterprise only).\n"+
+			"Use this with an RBAC user.")
 }

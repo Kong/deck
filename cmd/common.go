@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"net/http"
 	"os"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -172,7 +172,6 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 		return semver.Version{}, err
 	}
 	return semver.ParseTolerant(v)
-
 }
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
