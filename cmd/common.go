@@ -151,6 +151,9 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 		req, err := http.NewRequest("GET",
 			utils.CleanAddress(config.Address)+"/"+config.Workspace+"/kong",
 			nil)
+		if err != nil {
+			return semver.Version{}, err
+		}
 		var resp map[string]interface{}
 		_, err = client.Do(nil, req, &resp)
 		if err != nil {
