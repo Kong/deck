@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/hbagdi/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -19,24 +18,11 @@ var pingCmd = &cobra.Command{
 can connect to Kong's Admin API or not.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := utils.GetKongClient(config)
+
+		config.Workspace = pingWorkspace
+		version, err := kongVersion(config)
 		if err != nil {
-			return errors.Wrap(err, "creating kong client")
-		}
-		conf, err := client.Root(nil)
-		if err != nil {
-			config.Workspace = pingWorkspace
-			version, err := kongVersion(config)
-			if err != nil {
-				return errors.Wrap(err, "reading Kong version")
-			}
-			fmt.Println("Successfully connected to Kong!")
-			fmt.Println("Kong version: ", version)
-			return nil
-		}
-		version := conf["version"]
-		if version == nil {
-			return errors.New("version is nil from Kong")
+			return errors.Wrap(err, "reading Kong version")
 		}
 		fmt.Println("Successfully connected to Kong!")
 		fmt.Println("Kong version: ", version)
