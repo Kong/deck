@@ -49,5 +49,5 @@ func init() {
 	pingCmd.Flags().StringVarP(&pingWorkspace, "workspace", "w",
 		"", "Ping configuration with a specific workspace "+
 			"(Kong Enterprise only).\n"+
-			"Use this with an RBAC user.")
+			"Useful when RBAC permissions are scoped to a workspace.")
 }
