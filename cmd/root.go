@@ -124,7 +124,7 @@ func init() {
 
 	rootCmd.PersistentFlags().Bool("skip-workspace-crud", false,
 		"Skip Workspace CRUD checks")
-	viper.BindPFlag("no-color",
+	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 }
 
