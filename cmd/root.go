@@ -123,7 +123,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("no-color"))
 
 	rootCmd.PersistentFlags().Bool("skip-workspace-crud", false,
-		"Skip Workspace CRUD checks")
+		"Skip API calls related to Workspaces (Kong Enterprise only)")
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 }
