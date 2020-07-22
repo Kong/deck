@@ -82,9 +82,9 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		return err
 	}
 	// prepare to read the current state from Kong
-	if workspace != "" {
-		print.DeletePrintf("Warning: Specified workspace '%v' is different from "+
-			"workspace '%v' found in state file(s)\n", workspace, targetContent.Workspace)
+	if workspace != targetContent.Workspace {
+		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
 		config.Workspace = workspace
 	} else {
 		config.Workspace = targetContent.Workspace
