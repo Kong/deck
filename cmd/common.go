@@ -1,10 +1,10 @@
 package cmd
 
 import (
+	"github.com/blang/semver"
 	"net/http"
 	"os"
 
-	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
@@ -140,11 +140,11 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 
 func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 
+	var version string
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return semver.Version{}, err
 	}
-
 	root, err := client.Root(nil)
 	if err != nil {
 		// try with workspace path
@@ -159,15 +159,12 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 		if err != nil {
 			return semver.Version{}, err
 		}
-
-		v, err := utils.CleanKongVersion(resp["version"].(string))
-		if err != nil {
-			return semver.Version{}, err
-		}
-		return semver.ParseTolerant(v)
+		version = resp["version"].(string)
+	} else {
+		version = root["version"].(string)
 	}
 
-	v, err := utils.CleanKongVersion(root["version"].(string))
+	v, err := utils.CleanKongVersion(version)
 	if err != nil {
 		return semver.Version{}, err
 	}
