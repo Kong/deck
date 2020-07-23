@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/blang/semver"
 	"net/http"
 	"os"
 
+	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
