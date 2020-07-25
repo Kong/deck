@@ -71,8 +71,12 @@ By default, this command will ask for a confirmation prompt.`,
 		if resetWorkspace != "" {
 			config.Workspace = resetWorkspace
 
-			if err := checkWorkspace(config, false); err != nil {
+			exists, err := workspaceExists(config)
+			if err != nil {
 				return err
+			}
+			if !exists {
+				return errors.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
 			}
 
 			workspaces = append(workspaces, resetWorkspace)
