@@ -920,6 +920,9 @@ const contentSchema = `{
         "healthy": {
           "$ref": "#/definitions/Healthy"
         },
+        "type": {
+          "type": "string"
+        },
         "unhealthy": {
           "$ref": "#/definitions/Unhealthy"
         }
