@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.12.0](#v0120---20200730)
 - [v0.11.0](#v0110---20200117)
 - [v0.10.0](#v0100---20191027)
 - [v0.9.0](#v090---20190824)
@@ -15,6 +16,36 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.12.0] - 2020/07/30
+
+### Summary
+
+This release adds support for Kong 2.1 series and
+a number of enterprise entities.
+
+### Added
+
+- Added `HTTPClientWithHeaders` helper function to inject authn/authz
+  related HTTP headers in requests to kong.
+
+- New fields in types:
+  - `Service` struct has three new fields:
+    - `TLSVerifyDepth`
+    - `TLSVerify`
+    - `CACertificates`
+  - `ClientCertificate` field has been added to `Upstream` struct.
+  - `Type` field has been added to `PassiveHealthcheck` struct.
+
+- Following new services for Kong Enterprise have been introduced:
+  - WorkspaceService to manage workspaces in kong
+  - AdminService to manage users of Kong Manager
+  - MTLSAuthService to manage MTLS credentials
+
+### Misc
+
+- Changed the branch name from `master` to `main`
+- Introduced linters to improve code health
 
 ## [v0.11.0] - 2020/01/17
 
@@ -223,6 +254,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.12.0]: https://github.com/hbagdi/go-kong/compare/v0.11.0...v0.12.0
 [v0.11.0]: https://github.com/hbagdi/go-kong/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/hbagdi/go-kong/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/hbagdi/go-kong/compare/v0.8.0...v0.9.0
