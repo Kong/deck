@@ -560,6 +560,12 @@ const contentSchema = `{
     },
     "FService": {
       "properties": {
+        "ca_certificates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "client_certificate": {
           "type": "string"
         },
@@ -611,6 +617,12 @@ const contentSchema = `{
             "type": "string"
           },
           "type": "array"
+        },
+        "tls_verify": {
+          "type": "boolean"
+        },
+        "tls_verify_depth": {
+          "type": "integer"
         },
         "updated_at": {
           "type": "integer"
@@ -675,6 +687,9 @@ const contentSchema = `{
       "properties": {
         "algorithm": {
           "type": "string"
+        },
+        "client_certificate": {
+          "$ref": "#/definitions/Certificate"
         },
         "created_at": {
           "type": "integer"
@@ -1063,6 +1078,12 @@ const contentSchema = `{
     },
     "Service": {
       "properties": {
+        "ca_certificates": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "client_certificate": {
           "$ref": "#/definitions/Certificate"
         },
@@ -1101,6 +1122,12 @@ const contentSchema = `{
             "type": "string"
           },
           "type": "array"
+        },
+        "tls_verify": {
+          "type": "boolean"
+        },
+        "tls_verify_depth": {
+          "type": "integer"
         },
         "updated_at": {
           "type": "integer"
@@ -1155,6 +1182,9 @@ const contentSchema = `{
       "properties": {
         "algorithm": {
           "type": "string"
+        },
+        "client_certificate": {
+          "$ref": "#/definitions/Certificate"
         },
         "created_at": {
           "type": "integer"
