@@ -11,6 +11,7 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/solver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
@@ -67,7 +68,7 @@ func checkWorkspace(config utils.KongClientConfig) error {
 	return nil
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int) error {
+func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
 	// load Kong version before workspace
 	kongVersion, err := kongVersion(config)
@@ -81,7 +82,13 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 		return err
 	}
 	// prepare to read the current state from Kong
-	config.Workspace = targetContent.Workspace
+	if workspace != targetContent.Workspace {
+		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
+		config.Workspace = workspace
+	} else {
+		config.Workspace = targetContent.Workspace
+	}
 
 	if err := checkWorkspace(config); err != nil {
 		return err
