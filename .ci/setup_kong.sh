@@ -4,7 +4,7 @@ set -e
 # download Kong deb
 
 sudo apt-get update
-sudo apt-get install openssl libpcre3 procps perl wget
+sudo apt-get install openssl libpcre3 procps perl wget zlibc
 
 function setup_kong(){
   SWITCH="1.3.100"
