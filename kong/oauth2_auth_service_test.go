@@ -138,6 +138,7 @@ func TestOauth2CredentialGet(T *testing.T) {
 }
 
 func TestOauth2CredentialUpdate(T *testing.T) {
+	runWhenKong(T, "<2.1.0")
 	assert := assert.New(T)
 
 	client, err := NewTestClient(nil, nil)
