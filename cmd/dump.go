@@ -113,8 +113,12 @@ configure Kong.`,
 		if dumpWorkspace != "" {
 			config.Workspace = dumpWorkspace
 
-			if err := checkWorkspace(config); err != nil {
+			exists, err := workspaceExists(config)
+			if err != nil {
 				return err
+			}
+			if !exists {
+				return errors.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
 			}
 
 			client, err = utils.GetKongClient(config)
