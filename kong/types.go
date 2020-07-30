@@ -20,6 +20,9 @@ type Service struct {
 	UpdatedAt         *int         `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 	WriteTimeout      *int         `json:"write_timeout,omitempty" yaml:"write_timeout,omitempty"`
 	Tags              []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
+	TLSVerify         *bool        `json:"tls_verify,omitempty" yaml:"tls_verify,omitempty"`
+	TLSVerifyDepth    *int         `json:"tls_verify_depth,omitempty" yaml:"tls_verify_depth,omitempty"`
+	CACertificates    []*string    `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 }
 
 // CIDRPort represents a set of CIDR and a port.
@@ -146,6 +149,7 @@ type Upstream struct {
 	ID                 *string      `json:"id,omitempty" yaml:"id,omitempty"`
 	Name               *string      `json:"name,omitempty" yaml:"name,omitempty"`
 	HostHeader         *string      `json:"host_header,omitempty" yaml:"host_header,omitempty"`
+	ClientCertificate  *Certificate `json:"client_certificate,omitempty" yaml:"client_certificate,omitempty"`
 	Algorithm          *string      `json:"algorithm,omitempty" yaml:"algorithm,omitempty"`
 	Slots              *int         `json:"slots,omitempty" yaml:"slots,omitempty"`
 	Healthchecks       *Healthcheck `json:"healthchecks,omitempty" yaml:"healthchecks,omitempty"`
