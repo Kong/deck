@@ -164,6 +164,27 @@ const contentSchema = `{
       "additionalProperties": false,
       "type": "object"
     },
+    "CACertificate": {
+      "properties": {
+        "cert": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "CIDRPort": {
       "properties": {
         "ip": {
@@ -349,6 +370,13 @@ const contentSchema = `{
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/KeyAuth"
+          },
+          "type": "array"
+        },
+        "mtls_auth_credentials": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/MTLSAuth"
           },
           "type": "array"
         },
@@ -861,6 +889,38 @@ const contentSchema = `{
           "type": "string"
         },
         "key": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MTLSAuth": {
+      "required": [
+        "id",
+        "subject_name"
+      ],
+      "properties": {
+        "ca_certificate": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/CACertificate"
+        },
+        "consumer": {
+          "$ref": "#/definitions/Consumer"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "subject_name": {
           "type": "string"
         },
         "tags": {
