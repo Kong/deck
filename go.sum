@@ -69,8 +69,6 @@ github.com/hashicorp/golang-lru v0.5.4 h1:YDjusn29QI/Das2iO9M0BHnIbxPeyuCHsjMW+l
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
 github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hbagdi/go-kong v0.11.1-0.20200520215447-05279344daa9 h1:++MeCYRxkOL/hX1mho2r4S1BZInO/X2SP3gjCOhm9/8=
-github.com/hbagdi/go-kong v0.11.1-0.20200520215447-05279344daa9/go.mod h1:qEtSDLbiWs8n2NzpRsNE46Z8LsWpGj2ELrMmIESYIyc=
 github.com/hbagdi/go-kong v0.12.0 h1:X8xHsisHnsj5r7lzlCdBNIfVfNA20c/OLmGYV4jPuWA=
 github.com/hbagdi/go-kong v0.12.0/go.mod h1:qEtSDLbiWs8n2NzpRsNE46Z8LsWpGj2ELrMmIESYIyc=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
