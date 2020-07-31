@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	basicAuthPasswordWarning = "Warning: please note that changes in " +
-		"password of basic-auth credentials are not detected by decK!!"
+	basicAuthPasswordWarning = "Warning: import/export of basic-auth" +
+		"credentials using decK doesn't work due to hashing of passwords in Kong."
 )
 
 func (sc *Syncer) warnBasicAuth() {

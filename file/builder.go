@@ -68,7 +68,8 @@ func (b *stateBuilder) certificates() {
 		return
 	}
 
-	for _, c := range b.targetContent.Certificates {
+	for i := range b.targetContent.Certificates {
+		c := b.targetContent.Certificates[i]
 		if utils.Empty(c.ID) {
 			cert, err := b.currentState.Certificates.GetByCertKey(*c.Cert,
 				*c.Key)
@@ -258,10 +259,8 @@ func (b *stateBuilder) consumers() {
 			}
 			mtlsAuths = append(mtlsAuths, *cred)
 		}
-		if err := b.ingestMTLSAuths(mtlsAuths); err != nil {
-			b.err = err
-			return
-		}
+
+		b.ingestMTLSAuths(mtlsAuths)
 	}
 }
 
@@ -393,19 +392,13 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 	return nil
 }
 
-func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
+func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
 	for _, cred := range creds {
 		cred := cred
-		// this is kind of a stub for future validation
-		// JSON schema validation already gets this, but the linter
-		// gets sad if it's not possible for this function to return
-		// an error
-		if utils.Empty(cred.ID) {
-			return errors.Errorf("mtls-auth lacks ID")
-		}
 		// normally, we'd want to look up existing resources in this case
 		// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
-		// so we don't--schema validation requires it, but there's nothing more we can do here
+		// so we don't--schema validation requires the ID
+		// there's nothing more to do here
 
 		// TODO: this is stub code, since mtls-auth doesn't actually have tag support yet
 		// They probably should, FTI-1706 tracks that request with the Kong Enterprise team
@@ -414,7 +407,6 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) error {
 		//}
 		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
 	}
-	return nil
 }
 
 func (b *stateBuilder) services() {

@@ -1052,7 +1052,6 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
-						Tags: kong.StringSlice("tag1"),
 					},
 				},
 			},

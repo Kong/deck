@@ -63,13 +63,13 @@ features of decK at Kong Summit 2019. Following is a recording of that session:
 ## Changelog
 
 Changelog can be found in the
-[CHANGELOG.md](https://github.com/hbagdi/deck/blob/master/CHANGELOG.md) file.
+[CHANGELOG.md](https://github.com/hbagdi/deck/blob/main/CHANGELOG.md) file.
 
 ## Licensing
 
 decK is licensed with Apache License Version 2.0.
 Please read the
-[LICENSE](https://github.com/hbagdi/deck/blob/master/LICENSE) file for more details.
+[LICENSE](https://github.com/hbagdi/deck/blob/main/LICENSE) file for more details.
 
 ## Roadmap
 

@@ -25,7 +25,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "deck",
-	Short: "Administer your Kong declaritively",
+	Short: "Administer your Kong declaratively",
 	Long: `decK helps you manage Kong clusters with a declarative
 configuration file.
 
@@ -95,7 +95,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-skip-verify"))
 
 	rootCmd.PersistentFlags().String("tls-server-name", "",
-		"Name to use to verify the hostname in"+
+		"Name to use to verify the hostname in "+
 			"Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_TLS_SERVER_NAME"+
 			" environment variable.")
@@ -103,7 +103,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-server-name"))
 
 	rootCmd.PersistentFlags().String("ca-cert", "",
-		"Custom CA certificate to use to verify"+
+		"Custom CA certificate to use to verify "+
 			"Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_CA_CERT"+
 			" environment variable.")
@@ -112,7 +112,7 @@ func init() {
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
 		"Enable verbose verbose logging levels\n"+
-			"Setting this value to 2 outputs all HTTP reqeust/response\n"+
+			"Setting this value to 2 outputs all HTTP requests/responses\n"+
 			"between decK and Kong.")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))

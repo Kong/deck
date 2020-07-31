@@ -20,10 +20,24 @@ type Config struct {
 	SelectorTags []string
 }
 
+func deduplicate(stringSlice []string) []string {
+	existing := map[string]struct{}{}
+	result := []string{}
+
+	for _, s := range stringSlice {
+		if _, exists := existing[s]; !exists {
+			existing[s] = struct{}{}
+			result = append(result, s)
+		}
+	}
+
+	return result
+}
+
 func newOpt(tags []string) *kong.ListOpt {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
-	opt.Tags = kong.StringSlice(tags...)
+	opt.Tags = kong.StringSlice(deduplicate(tags)...)
 	opt.MatchAllTags = true
 	return opt
 }

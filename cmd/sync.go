@@ -8,6 +8,8 @@ import (
 var (
 	syncCmdKongStateFile []string
 	syncCmdParallelism   int
+	syncCmdDBUpdateDelay int
+	syncWorkspace        string
 )
 
 // syncCmd represents the sync command
@@ -19,7 +21,7 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism)
+		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(syncCmdKongStateFile) == 0 {
@@ -36,6 +38,10 @@ func init() {
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
+	syncCmd.Flags().StringVar(&syncWorkspace, "workspace", "",
+		"Sync configuration to a specific workspace "+
+			"(Kong Enterprise only).\n"+
+			"This takes precedence over _workspace fields in state files.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
@@ -45,4 +51,8 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
 			"Multiple tags are ANDed together.")
+	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
+		0, "aritificial delay in seconds that is injected between insert operations \n"+
+			"for related entities (usually for cassandra deployments).\n"+
+			"See 'db_update_propagation' in kong.conf.")
 }
