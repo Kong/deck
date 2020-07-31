@@ -121,6 +121,11 @@ func init() {
 		"disable colorized output")
 	viper.BindPFlag("no-color",
 		rootCmd.PersistentFlags().Lookup("no-color"))
+
+	rootCmd.PersistentFlags().Bool("skip-workspace-crud", false,
+		"Skip API calls related to Workspaces (Kong Enterprise only)")
+	viper.BindPFlag("skip-workspace-crud",
+		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -156,6 +161,7 @@ func initConfig() {
 	config.Headers = viper.GetStringSlice("headers")
 	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
+	config.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 
 	config.Debug = verbose >= 1
 }

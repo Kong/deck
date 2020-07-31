@@ -74,6 +74,8 @@ type KongClientConfig struct {
 	TLSSkipVerify bool
 	Debug         bool
 
+	SkipWorkspaceCrud bool
+
 	Headers []string
 }
 

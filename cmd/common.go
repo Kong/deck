@@ -1,9 +1,8 @@
 package cmd
 
 import (
+	"net/http"
 	"os"
-
-	"github.com/spf13/cobra"
 
 	"github.com/blang/semver"
 	"github.com/fatih/color"
@@ -16,6 +15,7 @@ import (
 	"github.com/hbagdi/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -43,6 +43,11 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 		return true, nil
 	}
 
+	if config.SkipWorkspaceCrud {
+		// if RBAC user, skip check
+		return true, nil
+	}
+
 	// remove workspace to be able to call top-level /workspaces endpoint
 	config.Workspace = ""
 	rootClient, err := utils.GetKongClient(config)
@@ -64,12 +69,6 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 
 func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
-	// load Kong version before workspace
-	kongVersion, err := kongVersion(config)
-	if err != nil {
-		return errors.Wrap(err, "reading Kong version")
-	}
-
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -82,12 +81,18 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	}
 
 	// prepare to read the current state from Kong
-	if workspace != targetContent.Workspace {
+	if workspace != targetContent.Workspace && workspace != "" {
 		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
 			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
 		config.Workspace = workspace
 	} else {
 		config.Workspace = targetContent.Workspace
+	}
+
+	// load Kong version after workspace
+	kongVersion, err := kongVersion(config)
+	if err != nil {
+		return errors.Wrap(err, "reading Kong version")
 	}
 
 	workspaceExists, err := workspaceExists(config)
@@ -117,6 +122,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 			return err
 		}
 	} else {
+
 		print.CreatePrintln("creating workspace", targetContent.Workspace)
 
 		// inject empty state
@@ -131,6 +137,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 				return err
 			}
 		}
+
 	}
 
 	// read the target state
@@ -165,17 +172,40 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 }
 
 func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
+
+	var version string
+
+	workspace := config.Workspace
+
+	// remove workspace to be able to call top-level / endpoint
+	config.Workspace = ""
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return semver.Version{}, err
 	}
-
 	root, err := client.Root(nil)
 	if err != nil {
-		return semver.Version{}, err
+		if workspace == "" {
+			return semver.Version{}, err
+		}
+		// try with workspace path
+		req, err := http.NewRequest("GET",
+			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
+			nil)
+		if err != nil {
+			return semver.Version{}, err
+		}
+		var resp map[string]interface{}
+		_, err = client.Do(nil, req, &resp)
+		if err != nil {
+			return semver.Version{}, err
+		}
+		version = resp["version"].(string)
+	} else {
+		version = root["version"].(string)
 	}
 
-	v, err := utils.CleanKongVersion(root["version"].(string))
+	v, err := utils.CleanKongVersion(version)
 	if err != nil {
 		return semver.Version{}, err
 	}
