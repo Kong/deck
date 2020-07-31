@@ -251,6 +251,16 @@ func (b *stateBuilder) consumers() {
 			b.err = err
 			return
 		}
+
+		var mtlsAuths []kong.MTLSAuth
+		for _, cred := range c.MTLSAuths {
+			cred.Consumer = &kong.Consumer{
+				ID: kong.String(*c.ID),
+			}
+			mtlsAuths = append(mtlsAuths, *cred)
+		}
+
+		b.ingestMTLSAuths(mtlsAuths)
 	}
 }
 
@@ -380,6 +390,23 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
 	}
 	return nil
+}
+
+func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
+	for _, cred := range creds {
+		cred := cred
+		// normally, we'd want to look up existing resources in this case
+		// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
+		// so we don't--schema validation requires the ID
+		// there's nothing more to do here
+
+		// TODO: this is stub code, since mtls-auth doesn't actually have tag support yet
+		// They probably should, FTI-1706 tracks that request with the Kong Enterprise team
+		//if b.kongVersion.GTE(kong220Version) {
+		//	utils.MustMergeTags(&cred, b.selectTags)
+		//}
+		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
+	}
 }
 
 func (b *stateBuilder) services() {

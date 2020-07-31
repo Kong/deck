@@ -246,3 +246,19 @@ func (crud oauth2CredPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
 func (crud oauth2CredPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.Oauth2Creds.Update(*args[0].(*state.Oauth2Credential))
 }
+
+type mtlsAuthPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *mtlsAuthPostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.MTLSAuths.Add(*args[0].(*state.MTLSAuth))
+}
+
+func (crud *mtlsAuthPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.MTLSAuths.Delete(*((args[0].(*state.MTLSAuth)).ID))
+}
+
+func (crud *mtlsAuthPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.MTLSAuths.Update(*args[0].(*state.MTLSAuth))
+}

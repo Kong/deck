@@ -937,3 +937,70 @@ func (k1 *Oauth2Credential) GetConsumer() string {
 	}
 	return *k1.Consumer.ID
 }
+
+// MTLSAuth represents an mtls-auth credential in Kong.
+// It adds some helper methods along with Meta to the original MTLSAuth object.
+type MTLSAuth struct {
+	kong.MTLSAuth `yaml:",inline"`
+	Meta
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (b1 *MTLSAuth) Console() string {
+	return *b1.SubjectName + forConsumerString(b1.Consumer)
+}
+
+// Equal returns true if b1 and b2 are equal.
+func (b1 *MTLSAuth) Equal(b2 *MTLSAuth) bool {
+	return reflect.DeepEqual(b1.MTLSAuth, b2.MTLSAuth)
+}
+
+// EqualWithOpts returns true if j1 and j2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	b1Copy := b1.MTLSAuth.DeepCopy()
+	b2Copy := b2.MTLSAuth.DeepCopy()
+
+	if ignoreID {
+		b1Copy.ID = nil
+		b2Copy.ID = nil
+	}
+	if ignoreTS {
+		b1Copy.CreatedAt = nil
+		b2Copy.CreatedAt = nil
+	}
+	if ignoreForeign {
+		b1Copy.Consumer = nil
+		b2Copy.Consumer = nil
+	}
+	return reflect.DeepEqual(b1Copy, b2Copy)
+}
+
+// GetID returns ID.
+// If ID is empty, it returns an empty string.
+func (b1 *MTLSAuth) GetID() string {
+	if b1.ID == nil {
+		return ""
+	}
+	return *b1.ID
+}
+
+// GetID2 returns the endpoint key of the entity,
+// BUT NO SUCH THING EXISTS 😱
+// TODO: this is kind of a pointless clone of GetID for MTLSAuth. the mtls-auth
+// entity cannot be referenced by anything other than its ID (it has no unique
+// fields), but the entity interface requires this function. this duplication
+// doesn't appear to be harmful, but it's weird.
+func (b1 *MTLSAuth) GetID2() string {
+	return (*b1).GetID()
+}
+
+func (b1 *MTLSAuth) GetConsumer() string {
+	if b1.Consumer == nil || b1.Consumer.ID == nil {
+		return ""
+	}
+	return *b1.Consumer.ID
+}

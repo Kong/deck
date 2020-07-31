@@ -56,6 +56,7 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("basic-auth", &basicAuthPostAction{current})
 	s.postProcess.MustRegister("acl-group", &aclGroupPostAction{current})
 	s.postProcess.MustRegister("oauth2-cred", &oauth2CredPostAction{current})
+	s.postProcess.MustRegister("mtls-auth", &mtlsAuthPostAction{current})
 	return s, nil
 }
 
@@ -100,6 +101,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 	err = sc.deleteACLGroups()
+	if err != nil {
+		return err
+	}
+	err = sc.deleteMTLSAuths()
 	if err != nil {
 		return err
 	}
@@ -225,6 +230,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	err = sc.createUpdateACLGroups()
+	if err != nil {
+		return err
+	}
+	err = sc.createUpdateMTLSAuths()
 	if err != nil {
 		return err
 	}
