@@ -267,7 +267,6 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	}
 	for _, c := range caCertificates {
 		c := FCACertificate{CACertificate: c.CACertificate}
-		zeroOutID(&c, c.Cert, config.WithID)
 		zeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.CACertificate, selectTags)
 		file.CACertificates = append(file.CACertificates, c)
