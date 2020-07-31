@@ -989,12 +989,13 @@ func (b1 *MTLSAuth) GetID() string {
 }
 
 // GetID2 returns the endpoint key of the entity,
-// the SubjectName field for MTLSAuth.
+// BUT NO SUCH THING EXISTS 😱
+// TODO: this is kind of a pointless clone of GetID for MTLSAuth. the mtls-auth
+// entity cannot be referenced by anything other than its ID (it has no unique
+// fields), but the entity interface requires this function. this duplication
+// doesn't appear to be harmful, but it's weird.
 func (b1 *MTLSAuth) GetID2() string {
-	if b1.SubjectName == nil {
-		return ""
-	}
-	return *b1.SubjectName
+	return (*b1).GetID()
 }
 
 func (b1 *MTLSAuth) GetConsumer() string {
