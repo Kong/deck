@@ -9,9 +9,11 @@ import (
 	"github.com/hbagdi/deck/diff"
 	"github.com/hbagdi/deck/dump"
 	"github.com/hbagdi/deck/file"
+	"github.com/hbagdi/deck/print"
 	"github.com/hbagdi/deck/solver"
 	"github.com/hbagdi/deck/state"
 	"github.com/hbagdi/deck/utils"
+	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -32,60 +34,70 @@ func SetStopCh(stopCh chan struct{}) {
 	stopChannel = stopCh
 }
 
-// checkWorkspace checks if workspace exists in Kong.
-func checkWorkspace(config utils.KongClientConfig) error {
+// workspaceExists checks if workspace exists in Kong.
+func workspaceExists(config utils.KongClientConfig) (bool, error) {
 
 	workspace := config.Workspace
 	if workspace == "" {
-		return nil
+		// default workspace always exists
+		return true, nil
 	}
 
-	client, err := utils.GetKongClient(config)
-	if err != nil {
-		return err
+	if config.SkipWorkspaceCrud {
+		// if RBAC user, skip check
+		return true, nil
 	}
 
-	req, err := http.NewRequest("GET",
-		utils.CleanAddress(config.Address)+"/workspaces/"+workspace,
-		nil)
+	// remove workspace to be able to call top-level /workspaces endpoint
+	config.Workspace = ""
+	rootClient, err := utils.GetKongClient(config)
 	if err != nil {
-		return err
+		return false, err
 	}
-	resp, err := client.Do(nil, req, nil)
-	if resp != nil && resp.StatusCode == http.StatusNotFound {
-		return errors.Errorf("workspace '%v' does not exist in Kong, "+
-			"please create it before running decK.", workspace)
-	}
+
+	_, err = rootClient.Workspaces.Get(nil, &workspace)
 	if err != nil {
-		return errors.Wrapf(err, "failed to check workspace '%v' in Kong", workspace)
+		if kong.IsNotFoundErr(err) {
+			return false, nil
+		}
+
+		return false, errors.Wrap(err, "error when getting workspace")
 	}
-	if resp.StatusCode != http.StatusOK {
-		return errors.Errorf("unexpected status code while retrieving "+
-			"workspace '%v' : %v", workspace, resp.StatusCode)
-	}
-	return nil
+
+	return true, nil
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int) error {
+func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
 	}
-	// prepare to read the current state from Kong
-	config.Workspace = targetContent.Workspace
 
-	// load Kong version before workspace
+	rootClient, err := utils.GetKongClient(config)
+	if err != nil {
+		return err
+	}
+
+	// prepare to read the current state from Kong
+	if workspace != targetContent.Workspace && workspace != "" {
+		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
+		config.Workspace = workspace
+	} else {
+		config.Workspace = targetContent.Workspace
+	}
+
+	// load Kong version after workspace
 	kongVersion, err := kongVersion(config)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
 
-	if !config.SkipWorkspaceCrud {
-		if err := checkWorkspace(config); err != nil {
-			return err
-		}
+	workspaceExists, err := workspaceExists(config)
+	if err != nil {
+		return err
 	}
 
 	client, err := utils.GetKongClient(config)
@@ -98,17 +110,38 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 	}
 
 	// read the current state
-	rawState, err := dump.Get(client, dumpConfig)
-	if err != nil {
-		return err
-	}
-	currentState, err := state.Get(rawState)
-	if err != nil {
-		return err
+	var currentState *state.KongState
+	if workspaceExists {
+		rawState, err := dump.Get(client, dumpConfig)
+		if err != nil {
+			return err
+		}
+
+		currentState, err = state.Get(rawState)
+		if err != nil {
+			return err
+		}
+	} else {
+
+		print.CreatePrintln("creating workspace", targetContent.Workspace)
+
+		// inject empty state
+		currentState, err = state.NewKongState()
+		if err != nil {
+			return err
+		}
+
+		if !dry {
+			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &targetContent.Workspace})
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
 	// read the target state
-	rawState, err = file.Get(targetContent, file.RenderConfig{
+	rawState, err := file.Get(targetContent, file.RenderConfig{
 		CurrentState: currentState,
 		KongVersion:  kongVersion,
 	})
@@ -141,6 +174,11 @@ func syncMain(filenames []string, dry bool, parallelism, delay int) error {
 func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 
 	var version string
+
+	workspace := config.Workspace
+
+	// remove workspace to be able to call top-level / endpoint
+	config.Workspace = ""
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return semver.Version{}, err
@@ -149,7 +187,7 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	if err != nil {
 		// try with workspace path
 		req, err := http.NewRequest("GET",
-			utils.CleanAddress(config.Address)+"/"+config.Workspace+"/kong",
+			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
 			nil)
 		if err != nil {
 			return semver.Version{}, err
