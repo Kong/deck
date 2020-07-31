@@ -185,6 +185,9 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	}
 	root, err := client.Root(nil)
 	if err != nil {
+		if workspace == "" {
+			return semver.Version{}, err
+		}
 		// try with workspace path
 		req, err := http.NewRequest("GET",
 			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
