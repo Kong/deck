@@ -77,12 +77,12 @@ $ sudo cp /tmp/deck /usr/local/bin/
 
 ### Docker image
 
-Docker image is hosted on [Docker Hub](https://hub.docker.com/r/hbagdi/deck).
+Docker image is hosted on [Docker Hub](https://hub.docker.com/r/kong/deck).
 
 You can get the image with the command:
 
 ```
-docker pull hbagdi/deck
+docker pull kong/deck
 ```
 
 ## Documentation
@@ -90,8 +90,8 @@ docker pull hbagdi/deck
 You can use `--help` flag once you've decK installed on your system
 to get help in the terminal itself.
 
-The project's documentation site is
-[https://deck.yolo42.com](https://deck.yolo42.com).
+The project's documentation is hosted at
+[https://docs.konghq.com/deck/overview](https://docs.konghq.com/deck/overview).
 
 ## Changelog
 
