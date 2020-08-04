@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/hbagdi/go-kong/kong"
+import "github.com/kong/go-kong/kong"
 
 const (
 	defaultPort        = 80

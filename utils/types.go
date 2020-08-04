@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hbagdi/go-kong/kong"
-	"github.com/hbagdi/go-kong/kong/custom"
+	"github.com/kong/go-kong/kong"
+	"github.com/kong/go-kong/kong/custom"
 	"github.com/pkg/errors"
 )
 

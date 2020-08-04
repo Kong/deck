@@ -4,7 +4,7 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 )
 
 // targetCRUD implements crud.Actions interface.

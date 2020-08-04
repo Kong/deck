@@ -3,7 +3,7 @@ package state
 import (
 	"reflect"
 
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 )
 
 // entity abstracts out common fields in a credentials.

@@ -4,7 +4,7 @@ import (
 	"github.com/blang/semver"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
 )
 

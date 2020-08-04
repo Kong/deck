@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/kong/deck/state"
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kong/deck/utils"
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )

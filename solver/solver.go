@@ -5,7 +5,7 @@ import (
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
-	"github.com/hbagdi/go-kong/kong"
+	"github.com/kong/go-kong/kong"
 )
 
 // Stats holds the stats related to a Solve.
