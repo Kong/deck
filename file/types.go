@@ -61,6 +61,9 @@ type service struct {
 	UpdatedAt         *int       `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
 	WriteTimeout      *int       `json:"write_timeout,omitempty" yaml:"write_timeout,omitempty"`
 	Tags              []*string  `json:"tags,omitempty" yaml:"tags,omitempty"`
+	TLSVerify         *bool      `json:"tls_verify,omitempty" yaml:"tls_verify,omitempty"`
+	TLSVerifyDepth    *int       `json:"tls_verify_depth,omitempty" yaml:"tls_verify_depth,omitempty"`
+	CACertificates    []*string  `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 	Routes            []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins           []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 
@@ -74,6 +77,9 @@ func copyToService(fService FService) service {
 		!utils.Empty(fService.ClientCertificate.ID) {
 		s.ClientCertificate = kong.String(*fService.ClientCertificate.ID)
 	}
+	s.CACertificates = fService.CACertificates
+	s.TLSVerify = fService.TLSVerify
+	s.TLSVerifyDepth = fService.TLSVerifyDepth
 	s.ConnectTimeout = fService.ConnectTimeout
 	s.CreatedAt = fService.CreatedAt
 	s.Host = fService.Host
@@ -159,6 +165,9 @@ func copyFromService(service service, fService *FService) error {
 	fService.UpdatedAt = service.UpdatedAt
 	fService.WriteTimeout = service.WriteTimeout
 	fService.Tags = service.Tags
+	fService.CACertificates = service.CACertificates
+	fService.TLSVerify = service.TLSVerify
+	fService.TLSVerifyDepth = service.TLSVerifyDepth
 	fService.Routes = service.Routes
 	fService.Plugins = service.Plugins
 	return nil
