@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.13.0](#v0130---20200804)
 - [v0.12.0](#v0120---20200730)
 - [v0.11.0](#v0110---20200117)
 - [v0.10.0](#v0100---20191027)
@@ -16,6 +17,13 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.13.0] - 2020/08/04
+
+### Summary
+
+This release renames the package from `github.com/hbagdi/go-kong` to
+`github.com/kong/go-kong`.
 
 ## [v0.12.0] - 2020/07/30
 
@@ -254,6 +262,7 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.13.0]: https://github.com/hbagdi/go-kong/compare/v0.12.0...v0.13.0
 [v0.12.0]: https://github.com/hbagdi/go-kong/compare/v0.11.0...v0.12.0
 [v0.11.0]: https://github.com/hbagdi/go-kong/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/hbagdi/go-kong/compare/v0.9.0...v0.10.0
