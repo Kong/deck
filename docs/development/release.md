@@ -25,14 +25,24 @@
   Copy the deck.rb file to `homebrew-deck` directory.
   Make sure only version and checksum is changed and rest all is left as is.
   Commit and push for the Homebrew release.
-- Docker release  
-  - Run the command:
-    `docker build --build-arg TAG=v0.5.0 --build-arg COMMIT=bar -t hbagdi/deck:v0.5.0 .`.
-    Substitue `v0.5.0` with the version you are releasing and `bar` with the 
-    Git short hash of the tag.
-  - Run `docker push hbagdi/deck:v0.5.0`
-  - If needed, do the following for a new release (not for a back-ported
-    patch release):
-    - Run `docker tag hbagdi/deck:v0.5.0 hbagdi/deck:latest`
-    - Run `docker push hbagdi/deck:latest`
 
+## Docker release
+
+Assuming you are on the TAG commit, you need to perform the following:
+```
+export TAG=$(git describe --abbrev=0 --tags)
+export COMMIT=$(git rev-parse --short $TAG)
+docker build --build-arg TAG=$TAG --build-arg COMMIT=$COMMIT -t hbagdi/deck:$TAG .
+docker push hbagdi/deck:$TAG
+
+docker tag hbagdi/deck:$TAG kong/deck:$TAG
+docker push kong/deck:$TAG
+
+
+# if also the latest release (not for a back-ported patch release):
+docker tag hbagdi/deck:$TAG hbagdi/deck:latest
+docker push hbagdi/deck:latest
+
+docker tag hbagdi/deck:latest kong/deck:latest
+docker push kong/deck:latest
+```
