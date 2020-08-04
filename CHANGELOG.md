@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.2.0](#v120---20200804)
 - [v1.1.0](#v110---20200405)
 - [v1.0.3](#v103---20200314)
 - [v1.0.2](#v102---20200221)
@@ -18,6 +19,72 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.2.0] - 2020/08/04
+
+### Added
+
+- decK is now compatible with Kong 2.1:
+  - New Admin API properties for entities are added.
+  - Ordering of operations has changed to incorporate for new foreign-relations
+    [#192](https://github.com/hbagdi/deck/pull/192)
+- New flag `--db-update-propagation-delay` to add an artifical delay
+  between Admin API calls. This is introduced for better compatibility with
+  Cassandra backed installations of Kong.
+  [#160](https://github.com/hbagdi/deck/pull/160)
+  [#154](https://github.com/hbagdi/deck/pull/154)
+- decK now errors out if there are invalid positional arguments supplied to
+  any command.
+- Stricter validation of state files.
+  [#162](https://github.com/hbagdi/deck/pull/162)
+- ID property of CACertificate is always exported.
+  [#193](https://github.com/hbagdi/deck/pull/193)
+
+### Fixed
+
+- Ignore error for missing `.deck` config file
+  [#168](https://github.com/hbagdi/deck/pull/168)
+- Correctly populate port in Service's URL (a sugar attribute)
+  [#166](https://github.com/hbagdi/deck/pull/166)
+- Correct the help text for `--tls-server-name` flag
+  [#170](https://github.com/hbagdi/deck/pull/170)
+- Better sanitization of `--kong-addr` input
+  [#171](https://github.com/hbagdi/deck/pull/171)
+- Fix typos in the output of `--help`
+  [#174](https://github.com/hbagdi/deck/pull/174)
+- Improve language of warning message for basic-auth credentials
+  [#145](https://github.com/hbagdi/deck/pull/145)
+- Deduplicate `select_tags` input
+  [#183](https://github.com/hbagdi/deck/pull/183)
+
+
+### Enterprise-only
+
+- Added support for managing `mtls-auth` credentials.
+  [#175](https://github.com/hbagdi/deck/pull/175)
+- decK now automatically creates a workspace if one does not already exist
+  during a `sync` operation.
+  [#187](https://github.com/hbagdi/deck/pull/187)
+- Added `--workspace` flag to `ping` command. This can be used to verify
+  connectivity with Kong Enterprise when running as an RBAC role with lower
+  priviliges.
+- New `--workspace` flag for `diff` and `sync` command to provide workspace
+  via the CLI instead of state file. Workspace defined in state file will be
+  overriden if this flag is provided.
+- New `--skip-workspace-crud` flag to skip any workspace related operations.
+  This flag can be used when running as as an RBAC role with lower priviliges.
+  The content can be synced to specific workspaces but decK will not attempt
+  to create or verify existence of a workspace.
+  [#157](https://github.com/hbagdi/deck/pull/157)
+- Additional checks for existence of workspace before performing dump or reset
+  [#167](https://github.com/hbagdi/deck/pull/167)
+- Improve end-user error message when workspace doesn't exist
+
+#### Misc
+
+- CI changed from Travis to Github Actions
+- Improved code quality with addition of golangci-lint
+- Default branch for the project has been changed from `master` to `main`
 
 ## [v1.1.0] - 2020/04/05
 
@@ -410,6 +477,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.2.0]: https://github.com/hbagdi/deck/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/hbagdi/deck/compare/v1.0.3...v1.1.0
 [v1.0.3]: https://github.com/hbagdi/deck/compare/v1.0.2...v1.0.3
 [v1.0.2]: https://github.com/hbagdi/deck/compare/v1.0.1...v1.0.2
