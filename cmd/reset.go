@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hbagdi/deck/dump"
-	"github.com/hbagdi/deck/reset"
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/dump"
+	"github.com/kong/deck/reset"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

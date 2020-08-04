@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"github.com/hbagdi/deck/crud"
+	"github.com/kong/deck/crud"
 )
 
 // Event represents an event to perform

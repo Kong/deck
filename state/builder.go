@@ -1,7 +1,7 @@
 package state
 
 import (
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 )
 

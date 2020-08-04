@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/utils"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/pkg/errors"
 )

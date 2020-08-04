@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/hbagdi/deck/state"
+	"github.com/kong/deck/state"
 	"github.com/hbagdi/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )

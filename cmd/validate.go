@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/hbagdi/deck/file"
-	"github.com/hbagdi/deck/state"
+	"github.com/kong/deck/file"
+	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

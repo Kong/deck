@@ -2,7 +2,7 @@ package file
 
 import (
 	yaml "github.com/ghodss/yaml"
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/xeipuuv/gojsonschema"
 )

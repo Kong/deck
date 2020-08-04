@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/hbagdi/deck/state"
-	"github.com/hbagdi/deck/utils"
+	"github.com/kong/deck/state"
+	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v2"
 )

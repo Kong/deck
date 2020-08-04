@@ -3,8 +3,8 @@ package solver
 import (
 	"encoding/json"
 
-	"github.com/hbagdi/deck/crud"
-	"github.com/hbagdi/deck/diff"
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/diff"
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 )

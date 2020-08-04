@@ -9,7 +9,7 @@ import (
 	"text/template"
 
 	"github.com/alecthomas/jsonschema"
-	"github.com/hbagdi/deck/file"
+	"github.com/kong/deck/file"
 	"github.com/hbagdi/go-kong/kong"
 )
 

@@ -1,9 +1,9 @@
 package diff
 
 import (
-	"github.com/hbagdi/deck/crud"
-	"github.com/hbagdi/deck/print"
-	"github.com/hbagdi/deck/state"
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/print"
+	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
 )
 

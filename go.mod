@@ -1,4 +1,4 @@
-module github.com/hbagdi/deck
+module github.com/kong/deck
 
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2

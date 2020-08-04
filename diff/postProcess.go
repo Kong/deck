@@ -1,8 +1,8 @@
 package diff
 
 import (
-	"github.com/hbagdi/deck/crud"
-	"github.com/hbagdi/deck/state"
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/state"
 )
 
 type servicePostAction struct {

@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hbagdi/deck/cmd"
+	"github.com/kong/deck/cmd"
 )
 
 func registerSignalHandler() {
