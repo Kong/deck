@@ -2,7 +2,7 @@
 
 decK provides declarative configuration and drift detection for Kong.
 
-[![Build Status](https://github.com/hbagdi/deck/workflows/CI%20Test/badge.svg)](https://github.com/hbagdi/deck/actions?query=branch%3Amain+event%3Apush)
+[![Build Status](https://github.com/kong/deck/workflows/CI%20Test/badge.svg)](https://github.com/kong/deck/actions?query=branch%3Amain+event%3Apush)
 
 [![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
 
@@ -59,18 +59,18 @@ decK is compatible with Kong 1.x and Kong Enterprise >= 0.35.
 If you are on macOS, install decK using brew:
 
 ```shell
-$ brew tap hbagdi/deck
+$ brew tap kong/deck
 $ brew install deck
 ```
 
 ### Linux
 
 If you are Linux, you can either use the Debian or RPM archive from
-the Github [release page](https://github.com/hbagdi/deck/releases)
+the Github [release page](https://github.com/kong/deck/releases)
 or install by downloading the binary:
 
 ```shel
-$ curl -sL https://github.com/hbagdi/deck/releases/download/v1.2.0/deck_1.2.0_linux_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/kong/deck/releases/download/v1.2.0/deck_1.2.0_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
 ```
