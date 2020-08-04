@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.2.1](#v121---20200804)
 - [v1.2.0](#v120---20200804)
 - [v1.1.0](#v110---20200405)
 - [v1.0.3](#v103---20200314)
@@ -19,6 +20,16 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.2.1] - 2020/08/04
+
+### Summary
+
+decK has move under Kong's umbrella.
+Due to this change, the package path has changed from `github.com/hbagdi/deck`
+to `github.com/kong/deck`.
+This release contains the updated `go.mod` over v1.2.0. There are no
+other changes introduced in this release.
 
 ## [v1.2.0] - 2020/08/04
 
@@ -477,6 +488,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.2.1]: https://github.com/hbagdi/deck/compare/v1.2.0...v1.2.1
 [v1.2.0]: https://github.com/hbagdi/deck/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/hbagdi/deck/compare/v1.0.3...v1.1.0
 [v1.0.3]: https://github.com/hbagdi/deck/compare/v1.0.2...v1.0.3
