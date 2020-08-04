@@ -116,10 +116,6 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
-	err = sc.deleteCACertificates()
-	if err != nil {
-		return err
-	}
 
 	// barrier for foreign relations
 	// plugins must be deleted before services, routes and consumers
@@ -159,6 +155,12 @@ func (sc *Syncer) delete() error {
 	sc.wait()
 
 	err = sc.deleteCertificates()
+	if err != nil {
+		return err
+	}
+
+	// services must be deleted before ca_certificates
+	err = sc.deleteCACertificates()
 	if err != nil {
 		return err
 	}
