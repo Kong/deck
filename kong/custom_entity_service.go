@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/hbagdi/go-kong/kong/custom"
+	"github.com/kong/go-kong/kong/custom"
 )
 
 // CustomEntityService handles custom entities in Kong.

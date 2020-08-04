@@ -1,4 +1,4 @@
-module github.com/hbagdi/go-kong
+module github.com/kong/go-kong
 
 go 1.12
 
