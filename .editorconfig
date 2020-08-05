@@ -1,0 +1,3 @@
+[*.go]
+end_of_line = lf
+indent_size = 2
