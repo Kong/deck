@@ -162,8 +162,6 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	printFn("  Updated: %v\n", stats.UpdateOps)
 	printFn("  Deleted: %v\n", stats.DeleteOps)
 	if errs != nil {
-		printErr := color.New(color.FgRed, color.Bold).PrintfFunc()
-		printErr("  Errors: %v\n\n", len(errs))
 		return utils.ErrArray{Errors: errs}
 	}
 	if diffCmdNonZeroExitCode &&
