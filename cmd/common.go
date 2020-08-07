@@ -156,14 +156,14 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
 	stats, errs := solver.Solve(stopChannel, s, client, parallelism, dry)
-	if errs != nil {
-		return utils.ErrArray{Errors: errs}
-	}
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)
 	printFn("  Updated: %v\n", stats.UpdateOps)
 	printFn("  Deleted: %v\n", stats.DeleteOps)
+	if errs != nil {
+		return utils.ErrArray{Errors: errs}
+	}
 	if diffCmdNonZeroExitCode &&
 		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
 		os.Exit(exitCodeDiffDetection)
