@@ -43,6 +43,7 @@ type Client struct {
 	Targets        *TargetService
 	Workspaces     *WorkspaceService
 	Admins         *AdminService
+	RBACUsers      *RBACUserService
 
 	credentials *credentialService
 	KeyAuths    *KeyAuthService
@@ -108,6 +109,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Targets = (*TargetService)(&kong.common)
 	kong.Workspaces = (*WorkspaceService)(&kong.common)
 	kong.Admins = (*AdminService)(&kong.common)
+	kong.RBACUsers = (*RBACUserService)(&kong.common)
 
 	kong.credentials = (*credentialService)(&kong.common)
 	kong.KeyAuths = (*KeyAuthService)(&kong.common)
