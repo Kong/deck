@@ -281,8 +281,13 @@ func (sc *Syncer) eventCompleted() {
 func (sc *Syncer) wait() {
 	time.Sleep(time.Duration(sc.StageDelaySec) * time.Second)
 	for atomic.LoadInt32(&sc.inFlightOps) != 0 {
-		// TODO hack?
-		time.Sleep(1 * time.Millisecond)
+		select {
+		case <-sc.stopChan:
+			return
+		default:
+			// TODO hack?
+			time.Sleep(1 * time.Millisecond)
+		}
 	}
 }
 
