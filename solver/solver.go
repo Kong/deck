@@ -6,6 +6,7 @@ import (
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
+	"github.com/pkg/errors"
 )
 
 // Stats holds the stats related to a Solve.
@@ -58,7 +59,7 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 			// fire the request to Kong
 			result, err = r.Do(e.Kind, e.Op, e)
 			if err != nil {
-				return nil, err
+				return nil, errors.Wrapf(err, "%v %v %v failed", e.Op, e.Kind, c.Console())
 			}
 		} else {
 			// diff mode
