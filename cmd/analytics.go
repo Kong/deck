@@ -37,6 +37,9 @@ func sendAnalytics() {
 	req, _ := http.NewRequestWithContext(ctx, "GET", URL, nil)
 	req.Header["deck-version"] = []string{VERSION}
 
-	resp, _ := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
 	resp.Body.Close()
 }
