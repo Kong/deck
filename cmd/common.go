@@ -123,7 +123,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		}
 	} else {
 
-		print.CreatePrintln("creating workspace", targetContent.Workspace)
+		print.CreatePrintln("creating workspace", config.Workspace)
 
 		// inject empty state
 		currentState, err = state.NewKongState()
@@ -132,7 +132,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		}
 
 		if !dry {
-			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &targetContent.Workspace})
+			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &config.Workspace})
 			if err != nil {
 				return err
 			}
