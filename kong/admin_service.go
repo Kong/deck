@@ -176,8 +176,7 @@ func (s *AdminService) RegisterCredentials(ctx context.Context,
 		return errors.New("Password cannot be nil for a registration operation")
 	}
 
-	endpoint := fmt.Sprintf("/admins/register")
-	req, err := s.client.NewRequest("POST", endpoint, nil, admin)
+	req, err := s.client.NewRequest("POST", "/admins/register", nil, admin)
 	if err != nil {
 		return err
 	}

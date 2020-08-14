@@ -248,3 +248,13 @@ type RBACUser struct {
 	UserToken      *string `json:"user_token,omitempty" yaml:"user_token,omitempty"`
 	UserTokenIdent *string `json:"user_token_ident,omitempty" yaml:"user_token_ident,omitempty"`
 }
+
+// Workspace Entity represents a WorkspaceEntity in Kong
+type WorkspaceEntity struct {
+	EntityID         *string `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
+	EntityType       *string `json:"entity_type,omitempty" yaml:"entity_type,omitempty"`
+	UniqueFieldName  *string `json:"unique_field_name,omitempty" yaml:"unique_field_name,omitempty"`
+	UniqueFieldValue *string `json:"unique_field_value,omitempty" yaml:"unique_field_value,omitempty"`
+	WorkspaceID      *string `json:"workspace_id,omitempty" yaml:"workspace_id,omitempty"`
+	WorkspaceName    *string `json:"workspace_name,omitempty" yaml:"workspace_name,omitempty"`
+}
