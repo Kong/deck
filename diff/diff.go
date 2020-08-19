@@ -270,6 +270,7 @@ func (sc *Syncer) queueEvent(e Event) error {
 	case sc.eventChan <- e:
 		return nil
 	case <-sc.stopChan:
+		atomic.AddInt32(&sc.inFlightOps, -1)
 		return errEnqueueFailed
 	}
 }
@@ -281,8 +282,12 @@ func (sc *Syncer) eventCompleted() {
 func (sc *Syncer) wait() {
 	time.Sleep(time.Duration(sc.StageDelaySec) * time.Second)
 	for atomic.LoadInt32(&sc.inFlightOps) != 0 {
-		// TODO hack?
-		time.Sleep(1 * time.Millisecond)
+		select {
+		case <-sc.stopChan:
+			return
+		default:
+			time.Sleep(1 * time.Millisecond)
+		}
 	}
 }
 
