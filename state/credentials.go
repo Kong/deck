@@ -3,6 +3,7 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -78,7 +79,7 @@ func (k *credentialsCollection) Add(cred entity) error {
 
 	_, err := k.getCred(txn, cred.GetID(), cred.GetID2())
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("credential %v already exists", cred.GetID())
 	} else if err != ErrNotFound {
 		return err
 	}

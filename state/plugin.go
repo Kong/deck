@@ -127,7 +127,7 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	// err out if plugin with same ID is present
 	_, err := getPluginByID(txn, *plugin.ID)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("plugin %v already exists", plugin.Console())
 	} else if err != ErrNotFound {
 		return err
 	}
@@ -145,7 +145,7 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	}
 	_, err = getPluginBy(txn, *plugin.Name, sID, rID, cID)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("plugin %v already exists", plugin.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

@@ -82,7 +82,7 @@ func (k *TargetsCollection) Add(target Target) error {
 	}
 	_, err := getTarget(txn, *target.Upstream.ID, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("target %v already exists", target.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

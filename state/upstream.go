@@ -3,6 +3,7 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -46,7 +47,7 @@ func (k *UpstreamsCollection) Add(upstream Upstream) error {
 	}
 	_, err := getUpstream(txn, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("upstream %v already exists", upstream.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

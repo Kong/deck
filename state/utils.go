@@ -13,9 +13,6 @@ const (
 // returned when an entity is not found in the state.
 var ErrNotFound = errors.New("entity not found")
 
-// ErrAlreadyExists represents an entity is already present in the state.
-var ErrAlreadyExists = errors.New("entity already exists")
-
 // internal errors
 var errIDRequired = errors.New("ID is required")
 

@@ -4,6 +4,7 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -63,7 +64,7 @@ func (k *RoutesCollection) Add(route Route) error {
 	}
 	_, err := getRoute(txn, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("route %v already exists", route.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

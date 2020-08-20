@@ -58,7 +58,7 @@ func (k *CertificatesCollection) Add(certificate Certificate) error {
 
 	_, err := getCertificate(txn, *certificate.ID)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("certificate %v already exists", certificate.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

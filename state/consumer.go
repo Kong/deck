@@ -3,6 +3,7 @@ package state
 import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -47,7 +48,7 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	}
 	_, err := getConsumer(txn, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("consumer %v already exists", consumer.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

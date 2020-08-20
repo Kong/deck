@@ -75,7 +75,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	// err out if group with same ID is present
 	_, err := getACLGroupByID(txn, *aclGroup.ID)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("acl-group %v already exists", aclGroup.Console())
 	} else if err != ErrNotFound {
 		return err
 	}
@@ -89,7 +89,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	}
 	_, err = getACLGroup(txn, *aclGroup.Consumer.ID, *aclGroup.Group)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("acl-group %v already exists", aclGroup.Console())
 	} else if err != ErrNotFound {
 		return err
 	}

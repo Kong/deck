@@ -77,7 +77,7 @@ func (k *SNIsCollection) Add(sni SNI) error {
 	}
 	_, err := getSNI(txn, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return errors.Errorf("sni %v already exists", sni.Console())
 	} else if err != ErrNotFound {
 		return err
 	}
