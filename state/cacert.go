@@ -1,10 +1,11 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -49,7 +50,7 @@ func (k *CACertificatesCollection) Add(caCert CACertificate) error {
 	}
 	_, err := getCACert(txn, searchBy...)
 	if err == nil {
-		return errors.Errorf("ca-cert %v already exists", caCert.Console())
+		return fmt.Errorf("inserting ca-cert %v: %w", caCert.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

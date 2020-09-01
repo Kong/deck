@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
@@ -75,7 +77,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	// err out if group with same ID is present
 	_, err := getACLGroupByID(txn, *aclGroup.ID)
 	if err == nil {
-		return errors.Errorf("acl-group %v already exists", aclGroup.Console())
+		return fmt.Errorf("inserting acl-group %v: %w", aclGroup.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}
@@ -89,7 +91,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	}
 	_, err = getACLGroup(txn, *aclGroup.Consumer.ID, *aclGroup.Group)
 	if err == nil {
-		return errors.Errorf("acl-group %v already exists", aclGroup.Console())
+		return fmt.Errorf("inserting acl-group %v: %w", aclGroup.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

@@ -1,10 +1,11 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -64,7 +65,7 @@ func (k *RoutesCollection) Add(route Route) error {
 	}
 	_, err := getRoute(txn, searchBy...)
 	if err == nil {
-		return errors.Errorf("route %v already exists", route.Console())
+		return fmt.Errorf("inserting route %v: %w", route.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
@@ -77,7 +79,7 @@ func (k *SNIsCollection) Add(sni SNI) error {
 	}
 	_, err := getSNI(txn, searchBy...)
 	if err == nil {
-		return errors.Errorf("sni %v already exists", sni.Console())
+		return fmt.Errorf("inserting sni %v: %w", sni.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

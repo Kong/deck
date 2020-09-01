@@ -1,9 +1,10 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -48,7 +49,7 @@ func (k *ServicesCollection) Add(service Service) error {
 	}
 	_, err := getService(txn, searchBy...)
 	if err == nil {
-		return errors.Errorf("service %v already exists", service.Console())
+		return fmt.Errorf("inserting service %v: %w", service.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

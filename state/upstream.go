@@ -1,9 +1,10 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -47,7 +48,7 @@ func (k *UpstreamsCollection) Add(upstream Upstream) error {
 	}
 	_, err := getUpstream(txn, searchBy...)
 	if err == nil {
-		return errors.Errorf("upstream %v already exists", upstream.Console())
+		return fmt.Errorf("inserting upstream %v: %w", upstream.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}
