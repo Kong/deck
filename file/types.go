@@ -9,6 +9,7 @@ import (
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Format is a file format for Kong's configuration.
@@ -501,4 +502,9 @@ type Content struct {
 	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 
 	PluginConfigs map[string]kong.Configuration `json:"_plugin_configs,omitempty" yaml:"_plugin_configs,omitempty"`
+}
+
+func (c Content) String() string {
+	s, _ := yaml.Marshal(c)
+	return string(s)
 }

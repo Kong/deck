@@ -310,7 +310,7 @@ func Test_getContent(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getContent() = %v, want %v", got, tt.want)
+				t.Errorf("getContent() = %v\nwant = %v", got, tt.want)
 			}
 		})
 	}

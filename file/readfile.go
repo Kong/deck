@@ -3,7 +3,6 @@ package file
 import (
 	"bufio"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -27,13 +26,15 @@ func getContent(filenames []string) (*Content, error) {
 	}
 	var res Content
 	for _, r := range allReaders {
-		content, err := readContent(r)
+		contents, err := readContents(r)
 		if err != nil {
 			return nil, errors.Wrap(err, "reading file")
 		}
-		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
-		if err != nil {
-			return nil, errors.Wrap(err, "merging file contents")
+		for _, content := range contents {
+			err = mergo.Merge(&res, content, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, errors.Wrap(err, "merging file contents")
+			}
 		}
 	}
 	return &res, nil
@@ -77,25 +78,24 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 	return res, nil
 }
 
-// readContent reads all the byes until io.EOF and unmarshals the read
+// readContents reads all the bytes until io.EOF and unmarshals the read
 // bytes into Content.
-func readContent(reader io.Reader) (*Content, error) {
-	var content Content
-	var bytes []byte
+func readContents(reader io.Reader) ([]*Content, error) {
+	var contents []*Content
 	var err error
-	bytes, err = ioutil.ReadAll(reader)
-	if err != nil {
+
+	decoder := yaml.NewDecoder(reader)
+
+	for err == nil {
+		var content Content
+		err = decoder.Decode(&content)
+		contents = append(contents, &content)
+	}
+
+	if err != io.EOF {
 		return nil, err
 	}
-	err = validate(bytes)
-	if err != nil {
-		return nil, errors.Wrap(err, "validating file content")
-	}
-	err = yaml.Unmarshal(bytes, &content)
-	if err != nil {
-		return nil, err
-	}
-	return &content, nil
+	return contents, nil
 }
 
 // configFilesInDir traverses the directory rooted at dir and
