@@ -49,7 +49,7 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 
 	state, err := builder.build()
 	if err != nil {
-		return nil, errors.Wrap(err, "error building state")
+		return nil, errors.Wrap(err, "building state")
 	}
 	return state, nil
 }
