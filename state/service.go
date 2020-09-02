@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/utils"
 )
@@ -47,7 +49,7 @@ func (k *ServicesCollection) Add(service Service) error {
 	}
 	_, err := getService(txn, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return fmt.Errorf("inserting service %v: %w", service.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

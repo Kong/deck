@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
@@ -82,7 +84,7 @@ func (k *TargetsCollection) Add(target Target) error {
 	}
 	_, err := getTarget(txn, *target.Upstream.ID, searchBy...)
 	if err == nil {
-		return ErrAlreadyExists
+		return fmt.Errorf("inserting target %v: %w", target.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

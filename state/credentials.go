@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 )
@@ -78,7 +80,7 @@ func (k *credentialsCollection) Add(cred entity) error {
 
 	_, err := k.getCred(txn, cred.GetID(), cred.GetID2())
 	if err == nil {
-		return ErrAlreadyExists
+		return fmt.Errorf("inserting credential %v: %w", cred.GetID(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
 		return err
 	}

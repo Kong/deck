@@ -47,7 +47,11 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	}
 	builder.defaulter = d
 
-	return builder.build()
+	state, err := builder.build()
+	if err != nil {
+		return nil, errors.Wrap(err, "building state")
+	}
+	return state, nil
 }
 
 func ensureJSON(m map[string]interface{}) map[string]interface{} {
