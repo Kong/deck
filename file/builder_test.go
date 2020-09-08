@@ -1489,6 +1489,7 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
 								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
