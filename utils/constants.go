@@ -31,7 +31,7 @@ var (
 		Slots: kong.Int(defaultSlots),
 		Healthchecks: &kong.Healthcheck{
 			Active: &kong.ActiveHealthcheck{
-				Concurrency: kong.Int(defaultConcurrency),
+				Concurrency:            kong.Int(defaultConcurrency),
 				HTTPSVerifyCertificate: kong.Bool(true),
 				Healthy: &kong.Healthy{
 					HTTPStatuses: []int{200, 302},
