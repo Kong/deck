@@ -1551,7 +1551,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								Concurrency:            kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1617,7 +1618,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								Concurrency:            kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1659,7 +1661,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								Concurrency:            kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1860,7 +1863,8 @@ func Test_stateBuilder(t *testing.T) {
 						Slots: kong.Int(42),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								Concurrency:            kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
