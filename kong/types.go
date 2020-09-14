@@ -143,7 +143,7 @@ type Healthcheck struct {
 	Threshold *float64            `json:"threshold,omitempty" yaml:"threshold,omitempty"`
 }
 
-// Upstream represents a Consumer in Kong.
+// Upstream represents an Upstream in Kong.
 // +k8s:deepcopy-gen=true
 type Upstream struct {
 	ID                 *string      `json:"id,omitempty" yaml:"id,omitempty"`
