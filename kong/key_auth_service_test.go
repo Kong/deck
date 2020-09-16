@@ -300,3 +300,36 @@ func TestKeyAuthListMethods(T *testing.T) {
 	assert.Nil(client.Consumers.Delete(defaultCtx, consumer1.ID))
 	assert.Nil(client.Consumers.Delete(defaultCtx, consumer2.ID))
 }
+
+func TestKeyAuthCreateWithTTL(T *testing.T) {
+	runWhenKong(T, ">=1.4.0")
+	assert := assert.New(T)
+
+	client, err := NewTestClient(nil, nil)
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	keyAuth := &KeyAuth{
+		TTL: Int(10),
+		Key: String("my-apikey"),
+	}
+
+	// consumer for the key-auth:
+	consumer := &Consumer{
+		Username: String("foo"),
+	}
+
+	consumer, err = client.Consumers.Create(defaultCtx, consumer)
+	assert.Nil(err)
+	assert.NotNil(consumer)
+
+	createdKeyAuth, err := client.KeyAuths.Create(defaultCtx,
+		consumer.ID, keyAuth)
+	assert.Nil(err)
+	assert.NotNil(createdKeyAuth)
+
+	assert.True(*createdKeyAuth.TTL < 10)
+	assert.Equal("my-apikey", *createdKeyAuth.Key)
+
+	assert.Nil(client.Consumers.Delete(defaultCtx, consumer.ID))
+}

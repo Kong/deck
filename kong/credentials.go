@@ -11,6 +11,7 @@ type KeyAuth struct {
 	CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string   `json:"id,omitempty" yaml:"id,omitempty"`
 	Key       *string   `json:"key,omitempty" yaml:"key,omitempty"`
+	TTL       *int      `json:"ttl,omitempty" yaml:"ttl,omitempty"`
 	Tags      []*string `json:"tags,omitempty" yaml:"tags,omitempty"`
 }
 
