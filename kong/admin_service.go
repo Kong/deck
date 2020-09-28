@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // AdminService handles Admins in Kong.
@@ -188,6 +189,126 @@ func (s *AdminService) RegisterCredentials(ctx context.Context,
 	return nil
 }
 
-// TODO:
-// Once Kong Roles are implemented, respective CRUD operations on
-// those roles wrt Admins should be added here.
+// ListWorkspaces lists the workspaces associated with an admin
+func (s *AdminService) ListWorkspaces(ctx context.Context,
+	emailOrID *string) ([]*Workspace, error) {
+	endpoint := fmt.Sprintf("/admins/%v/workspaces", *emailOrID)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	var workspaces []*Workspace
+	_, err = s.client.Do(ctx, req, &workspaces)
+	if err != nil {
+		return nil, fmt.Errorf("error updating admin workspaces: %v", err)
+	}
+	return workspaces, nil
+}
+
+// ListRoles returns a slice of Kong RBAC roles associated with an Admin.
+func (s *AdminService) ListRoles(ctx context.Context,
+	emailOrID *string, opt *ListOpt) ([]*RBACRole, error) {
+
+	endpoint := fmt.Sprintf("/admins/%v/roles", *emailOrID)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var listRoles struct {
+		Roles []*RBACRole `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+	_, err = s.client.Do(ctx, req, &listRoles)
+	if err != nil {
+		return nil, fmt.Errorf("error listing admin roles: %v", err)
+	}
+
+	return listRoles.Roles, nil
+}
+
+// UpdateRoles creates or updates roles associated with an Admin
+func (s *AdminService) UpdateRoles(ctx context.Context,
+	emailOrID *string, roles []*RBACRole) ([]*RBACRole, error) {
+
+	var updateRoles struct {
+		NameOrID *string `json:"name_or_id,omitempty" yaml:"name_or_id,omitempty"`
+		Roles    *string `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+
+	// Flatten roles
+	var r []string
+	for _, role := range roles {
+		r = append(r, *role.Name)
+	}
+	updateRoles.NameOrID = emailOrID
+	updateRoles.Roles = String(strings.Join(r, ","))
+
+	endpoint := fmt.Sprintf("/admins/%v/roles", *emailOrID)
+	req, err := s.client.NewRequest("POST", endpoint, nil, updateRoles)
+	if err != nil {
+		return nil, err
+	}
+	var listRoles struct {
+		Roles []*RBACRole `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+	_, err = s.client.Do(ctx, req, &listRoles)
+	if err != nil {
+		return nil, fmt.Errorf("error updating admin roles: %v", err)
+	}
+	return listRoles.Roles, nil
+}
+
+// DeleteRoles deletes roles associated with an Admin
+func (s *AdminService) DeleteRoles(ctx context.Context,
+	emailOrID *string, roles []*RBACRole) error {
+
+	var updateRoles struct {
+		NameOrID *string `json:"name_or_id,omitempty" yaml:"name_or_id,omitempty"`
+		Roles    *string `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+
+	// Flatten roles
+	var r []string
+	for _, role := range roles {
+		r = append(r, *role.Name)
+	}
+	updateRoles.NameOrID = emailOrID
+	updateRoles.Roles = String(strings.Join(r, ","))
+
+	endpoint := fmt.Sprintf("/admins/%v/roles", *emailOrID)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, updateRoles)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	if err != nil {
+		return fmt.Errorf("error deleting admin roles: %v", err)
+	}
+
+	return nil
+}
+
+// GetConsumer fetches the Consumer that gets generated for an Admin when
+// the Admin is created.
+func (s *AdminService) GetConsumer(ctx context.Context,
+	emailOrID *string) (*Consumer, error) {
+
+	if isEmptyString(emailOrID) {
+		return nil, errors.New("emailOrID cannot be nil for GetConsumer operation")
+	}
+
+	endpoint := fmt.Sprintf("/admins/%v/consumer", *emailOrID)
+
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var consumer Consumer
+	_, err = s.client.Do(ctx, req, &consumer)
+	if err != nil {
+		return nil, err
+	}
+	return &consumer, nil
+}

@@ -258,3 +258,12 @@ type WorkspaceEntity struct {
 	WorkspaceID      *string `json:"workspace_id,omitempty" yaml:"workspace_id,omitempty"`
 	WorkspaceName    *string `json:"workspace_name,omitempty" yaml:"workspace_name,omitempty"`
 }
+
+// RBACRole represents an RBAC Role in Kong.
+type RBACRole struct {
+	CreatedAt *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Name      *string `json:"name,omitempty" yaml:"name,omitempty"`
+	Comment   *string `json:"comment,omitempty" yaml:"comment,omitempty"`
+	IsDefault *bool   `json:"is_default,omitempty" yaml:"is_default,omitempty"`
+}

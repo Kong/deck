@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // RBACUserService handles Users in Kong.
@@ -148,10 +149,89 @@ func (s *RBACUserService) ListAll(ctx context.Context) ([]*RBACUser, error) {
 	return users, nil
 }
 
-// TODO: After implementing the roles service add:
-// * AddRoles
-// * DeleteRoles
-// * ListRoles
+// AddRoles adds a comma separated list of roles to a User.
+func (s *RBACUserService) AddRoles(ctx context.Context,
+	nameOrID *string, roles []*RBACRole) ([]*RBACRole, error) {
+
+	var updateRoles struct {
+		NameOrID *string `json:"name_or_id,omitempty" yaml:"name_or_id,omitempty"`
+		Roles    *string `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+
+	// Flatten roles
+	var r []string
+	for _, role := range roles {
+		r = append(r, *role.Name)
+	}
+	updateRoles.NameOrID = nameOrID
+	updateRoles.Roles = String(strings.Join(r, ","))
+
+	endpoint := fmt.Sprintf("/rbac/users/%v/roles", *nameOrID)
+	req, err := s.client.NewRequest("POST", endpoint, nil, updateRoles)
+	if err != nil {
+		return nil, err
+	}
+	var listRoles struct {
+		Roles []*RBACRole `json:"roles,omitempty" yaml:"roles,omitempty"`
+		User  *RBACUser   `json:"user,omitempty" yaml:"user,omitempty"`
+	}
+	_, err = s.client.Do(ctx, req, &listRoles)
+	if err != nil {
+		return nil, fmt.Errorf("error updating roles: %v", err)
+	}
+	return listRoles.Roles, nil
+}
+
+// DeleteRoles deletes roles associated with a User
+func (s *RBACUserService) DeleteRoles(ctx context.Context,
+	nameOrID *string, roles []*RBACRole) error {
+
+	var updateRoles struct {
+		NameOrID *string `json:"name_or_id,omitempty" yaml:"name_or_id,omitempty"`
+		Roles    *string `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+
+	// Flatten roles
+	var r []string
+	for _, role := range roles {
+		r = append(r, *role.Name)
+	}
+	updateRoles.NameOrID = nameOrID
+	updateRoles.Roles = String(strings.Join(r, ","))
+
+	endpoint := fmt.Sprintf("/rbac/users/%v/roles", *nameOrID)
+	req, err := s.client.NewRequest("DELETE", endpoint, nil, updateRoles)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.Do(ctx, req, nil)
+	if err != nil {
+		return fmt.Errorf("error deleting roles: %v", err)
+	}
+
+	return nil
+}
+
+// ListRoles returns a slice of Kong RBAC roles associated with a User.
+func (s *RBACUserService) ListRoles(ctx context.Context,
+	nameOrID *string) ([]*RBACRole, error) {
+
+	endpoint := fmt.Sprintf("/rbac/users/%v/roles", *nameOrID)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var listRoles struct {
+		Roles []*RBACRole `json:"roles,omitempty" yaml:"roles,omitempty"`
+	}
+	_, err = s.client.Do(ctx, req, &listRoles)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving list of roles: %v", err)
+	}
+	return listRoles.Roles, nil
+}
 
 // TODO: After implementing the permissions service add:
 // * ListPermissions
