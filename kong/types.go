@@ -1,6 +1,9 @@
 package kong
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // Service represents a Service in Kong.
 // Read https://getkong.org/docs/0.13.x/admin-api/#Service-object
@@ -266,4 +269,80 @@ type RBACRole struct {
 	Name      *string `json:"name,omitempty" yaml:"name,omitempty"`
 	Comment   *string `json:"comment,omitempty" yaml:"comment,omitempty"`
 	IsDefault *bool   `json:"is_default,omitempty" yaml:"is_default,omitempty"`
+}
+
+// RBACEndpointPermission represents an RBAC Endpoint Permission in Kong Enterprise
+type RBACEndpointPermission struct {
+	CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Workspace *string   `json:"workspace,omitempty" yaml:"workspace,omitempty"`
+	Endpoint  *string   `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+	Actions   []*string `json:"actions,omitempty" yaml:"actions,omitempty"`
+	Negative  *bool     `json:"negative,omitempty" yaml:"negative,omitempty"`
+	Role      *RBACRole `json:"role,omitempty" yaml:"role,omitempty"`
+	Comment   *string   `json:"comment,omitempty" yaml:"comment,omitempty"`
+}
+
+// MarshalJSON marshals an endpoint permission into a suitable form for the Kong admin API
+func (e *RBACEndpointPermission) MarshalJSON() ([]byte, error) {
+	type ep struct {
+		CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+		Workspace *string   `json:"workspace,omitempty" yaml:"workspace,omitempty"`
+		Endpoint  *string   `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+		Actions   *string   `json:"actions,omitempty" yaml:"actions,omitempty"`
+		Negative  *bool     `json:"negative,omitempty" yaml:"negative,omitempty"`
+		Role      *RBACRole `json:"role,omitempty" yaml:"role,omitempty"`
+		Comment   *string   `json:"comment,omitempty" yaml:"comment,omitempty"`
+	}
+	var actions []string
+	for _, action := range e.Actions {
+		actions = append(actions, *action)
+	}
+	return json.Marshal(&ep{
+		CreatedAt: e.CreatedAt,
+		Workspace: e.Workspace,
+		Endpoint:  e.Endpoint,
+		Actions:   String(strings.Join(actions, ",")),
+		Comment:   e.Comment,
+	})
+}
+
+// RBACEntityPermission represents an RBAC Entity Permission in Kong Enterprise
+type RBACEntityPermission struct {
+	CreatedAt  *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	EntityID   *string   `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
+	EntityType *string   `json:"entity_type,omitempty" yaml:"entity_type,omitempty"`
+	Actions    []*string `json:"actions,omitempty" yaml:"actions,omitempty"`
+	Negative   *bool     `json:"negative,omitempty" yaml:"negative,omitempty"`
+	Role       *RBACRole `json:"role,omitempty" yaml:"role,omitempty"`
+	Comment    *string   `json:"comment,omitempty" yaml:"comment,omitempty"`
+}
+
+// MarshalJSON marshals an endpoint permission into a suitable form for the Kong admin API
+func (e *RBACEntityPermission) MarshalJSON() ([]byte, error) {
+	type ep struct {
+		CreatedAt  *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+		EntityID   *string   `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
+		EntityType *string   `json:"entity_type,omitempty" yaml:"entity_type,omitempty"`
+		Actions    *string   `json:"actions,omitempty" yaml:"actions,omitempty"`
+		Negative   *bool     `json:"negative,omitempty" yaml:"negative,omitempty"`
+		Role       *RBACRole `json:"role,omitempty" yaml:"role,omitempty"`
+		Comment    *string   `json:"comment,omitempty" yaml:"comment,omitempty"`
+	}
+	var actions []string
+	for _, action := range e.Actions {
+		actions = append(actions, *action)
+	}
+	return json.Marshal(&ep{
+		CreatedAt:  e.CreatedAt,
+		EntityID:   e.EntityID,
+		EntityType: e.EntityType,
+		Actions:    String(strings.Join(actions, ",")),
+		Comment:    e.Comment,
+	})
+}
+
+// PermissionsList is a list of permissions, both endpoint and entity, associated with a Role.
+type RBACPermissionsList struct {
+	Endpoints map[string]interface{} `json:"endpoints,omitempty" yaml:"endpoints,omitempty"`
+	Entities  map[string]interface{} `json:"entities,omitempty" yaml:"entities,omitempty"`
 }

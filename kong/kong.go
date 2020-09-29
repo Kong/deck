@@ -29,22 +29,24 @@ var (
 // Client talks to the Admin API or control plane of a
 // Kong cluster
 type Client struct {
-	client         *http.Client
-	baseURL        string
-	common         service
-	Consumers      *ConsumerService
-	Services       *Svcservice
-	Routes         *RouteService
-	CACertificates *CACertificateService
-	Certificates   *CertificateService
-	Plugins        *PluginService
-	SNIs           *SNIService
-	Upstreams      *UpstreamService
-	Targets        *TargetService
-	Workspaces     *WorkspaceService
-	Admins         *AdminService
-	RBACUsers      *RBACUserService
-	RBACRoles      *RBACRoleService
+	client                  *http.Client
+	baseURL                 string
+	common                  service
+	Consumers               *ConsumerService
+	Services                *Svcservice
+	Routes                  *RouteService
+	CACertificates          *CACertificateService
+	Certificates            *CertificateService
+	Plugins                 *PluginService
+	SNIs                    *SNIService
+	Upstreams               *UpstreamService
+	Targets                 *TargetService
+	Workspaces              *WorkspaceService
+	Admins                  *AdminService
+	RBACUsers               *RBACUserService
+	RBACRoles               *RBACRoleService
+	RBACEndpointPermissions *RBACEndpointPermissionService
+	RBACEntityPermissions   *RBACEntityPermissionService
 
 	credentials *credentialService
 	KeyAuths    *KeyAuthService
@@ -112,6 +114,8 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.Admins = (*AdminService)(&kong.common)
 	kong.RBACUsers = (*RBACUserService)(&kong.common)
 	kong.RBACRoles = (*RBACRoleService)(&kong.common)
+	kong.RBACEndpointPermissions = (*RBACEndpointPermissionService)(&kong.common)
+	kong.RBACEntityPermissions = (*RBACEntityPermissionService)(&kong.common)
 
 	kong.credentials = (*credentialService)(&kong.common)
 	kong.KeyAuths = (*KeyAuthService)(&kong.common)

@@ -233,5 +233,21 @@ func (s *RBACUserService) ListRoles(ctx context.Context,
 	return listRoles.Roles, nil
 }
 
-// TODO: After implementing the permissions service add:
-// * ListPermissions
+// ListPermissions returns the entity and endpoint permissions associated with a user.
+func (s *RBACUserService) ListPermissions(ctx context.Context,
+	nameOrID *string) (*RBACPermissionsList, error) {
+
+	endpoint := fmt.Sprintf("/rbac/users/%v/permissions", *nameOrID)
+	req, err := s.client.NewRequest("GET", endpoint, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var permissionsList RBACPermissionsList
+	_, err = s.client.Do(ctx, req, &permissionsList)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving list of permissions for role: %v", err)
+	}
+
+	return &permissionsList, nil
+}

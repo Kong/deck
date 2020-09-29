@@ -92,4 +92,79 @@ func TestRBACUserServiceWorkspace(T *testing.T) {
 	assert.Nil(err)
 }
 
-// TODO: After implementing roles service, test interaction with users
+func TestUserRoles(T *testing.T) {
+	runWhenEnterprise(T, ">=0.33.0", true)
+	assert := assert.New(T)
+	client, err := NewTestClient(nil, nil)
+
+	assert.Nil(err)
+	assert.NotNil(client)
+
+	roleA := &RBACRole{
+		Name: String("roleA"),
+	}
+	roleB := &RBACRole{
+		Name: String("roleB"),
+	}
+
+	createdRoleA, err := client.RBACRoles.Create(defaultCtx, roleA)
+	assert.Nil(err)
+	createdRoleB, err := client.RBACRoles.Create(defaultCtx, roleB)
+	assert.Nil(err)
+
+	ep := &RBACEndpointPermission{
+		Role: &RBACRole{
+			ID: createdRoleA.ID,
+		},
+		Endpoint: String("/rbac"),
+		Actions: []*string{
+			String("create"),
+			String("read"),
+		},
+	}
+
+	createdEndpointPermission, err := client.RBACEndpointPermissions.Create(defaultCtx, ep)
+	assert.Nil(err)
+	assert.NotNil(createdEndpointPermission)
+
+	user := &RBACUser{
+		Name:      String("newUser"),
+		Enabled:   Bool(true),
+		Comment:   String("testing"),
+		UserToken: String("foo"),
+	}
+
+	createdUser, err := client.RBACUsers.Create(defaultCtx, user)
+	assert.Nil(err)
+	assert.NotNil(createdUser)
+
+	roles := []*RBACRole{
+		createdRoleA,
+		createdRoleB,
+	}
+
+	updatedUser, err := client.RBACUsers.AddRoles(defaultCtx, createdUser.ID, roles)
+	assert.Nil(err)
+	assert.NotNil(updatedUser)
+
+	roleList, err := client.RBACUsers.ListRoles(defaultCtx, createdUser.ID)
+	assert.Nil(err)
+	assert.NotNil(roleList)
+	assert.Equal(2, len(roleList))
+
+	permissionsList, err := client.RBACUsers.ListPermissions(defaultCtx, createdUser.ID)
+	assert.Nil(err)
+	assert.NotNil(permissionsList)
+	assert.Equal(1, len(permissionsList.Endpoints))
+
+	err = client.RBACEndpointPermissions.Delete(
+		defaultCtx, createdRoleA.ID, String("default"), createdEndpointPermission.Endpoint)
+	assert.Nil(err)
+	err = client.RBACUsers.Delete(defaultCtx, createdUser.ID)
+	assert.Nil(err)
+	err = client.RBACRoles.Delete(defaultCtx, createdRoleA.ID)
+	assert.Nil(err)
+	err = client.RBACRoles.Delete(defaultCtx, createdRoleB.ID)
+	assert.Nil(err)
+
+}
