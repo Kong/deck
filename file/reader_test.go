@@ -99,12 +99,13 @@ func TestReadKongStateFromStdin(t *testing.T) {
 	os.Stdin = tmpfile
 
 	c, err := GetContentFromFiles(filenames)
-	assert.NotNil(c)
 	assert.Nil(err)
 
-	assert.Equal(kong.Service{
-		Name: kong.String("test service"),
-		Host: kong.String("test.com"),
-	},
-		c.Services[0].Service)
+	if assert.NotNil(c) && assert.NotEmpty(c.Services) {
+		assert.Equal(kong.Service{
+			Name: kong.String("test service"),
+			Host: kong.String("test.com"),
+		},
+			c.Services[0].Service)
+	}
 }

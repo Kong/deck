@@ -2,7 +2,9 @@ package file
 
 import (
 	"bufio"
+	"bytes"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -26,7 +28,16 @@ func getContent(filenames []string) (*Content, error) {
 	}
 	var res Content
 	for _, r := range allReaders {
-		contents, err := readContents(r)
+		rawContents, err := ioutil.ReadAll(r)
+		if err != nil {
+			return nil, err
+		}
+		err = validate(rawContents)
+		if err != nil {
+			return nil, errors.Wrap(err, "validating file content")
+		}
+
+		contents, err := readContents(bytes.NewReader(rawContents))
 		if err != nil {
 			return nil, errors.Wrap(err, "reading file")
 		}

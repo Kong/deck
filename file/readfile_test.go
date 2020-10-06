@@ -154,7 +154,13 @@ func Test_getContent(t *testing.T) {
 		},
 		{
 			name:    "bad yaml",
-			args:    args{[]string{"testdata/badyaml"}},
+			args:    args{[]string{"testdata/badyaml/bar.yml"}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "bad multi yaml",
+			args:    args{[]string{"testdata/badyaml/multi.yml"}},
 			want:    nil,
 			wantErr: true,
 		},

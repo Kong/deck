@@ -84,6 +84,21 @@ func yamlToJSON(m map[interface{}]interface{}) map[string]interface{} {
 		switch v2 := v.(type) {
 		case map[interface{}]interface{}:
 			res[fmt.Sprint(k)] = yamlToJSON(v2)
+		case []interface{}:
+			var array []interface{}
+			for _, element := range v2 {
+				switch el := element.(type) {
+				case map[interface{}]interface{}:
+					array = append(array, yamlToJSON(el))
+				default:
+					array = append(array, el)
+				}
+			}
+			if array != nil {
+				res[fmt.Sprint(k)] = array
+			} else {
+				res[fmt.Sprint(k)] = v
+			}
 		default:
 			res[fmt.Sprint(k)] = v
 		}
