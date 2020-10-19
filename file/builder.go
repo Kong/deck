@@ -268,6 +268,9 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.Key) {
+				return errors.Errorf("key-auth credential is invalid: no key")
+			}
 			existingCred, err := b.currentState.KeyAuths.Get(*cred.Key)
 			if err == state.ErrNotFound {
 				cred.ID = uuid()
@@ -289,6 +292,9 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.Username) {
+				return errors.Errorf("basic-auth credential is invalid: no username")
+			}
 			existingCred, err := b.currentState.BasicAuths.Get(*cred.Username)
 			if err == state.ErrNotFound {
 				cred.ID = uuid()
@@ -310,6 +316,9 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.Username) {
+				return errors.Errorf("hmac-auth credential is invalid: no username")
+			}
 			existingCred, err := b.currentState.HMACAuths.Get(*cred.Username)
 			if err == state.ErrNotFound {
 				cred.ID = uuid()
@@ -331,6 +340,9 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.Key) {
+				return errors.Errorf("jwt-auth credential is invalid: no key")
+			}
 			existingCred, err := b.currentState.JWTAuths.Get(*cred.Key)
 			if err == state.ErrNotFound {
 				cred.ID = uuid()
@@ -352,6 +364,9 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.ClientID) {
+				return errors.Errorf("oauth2 credential is invalid: no client_id")
+			}
 			existingCred, err := b.currentState.Oauth2Creds.Get(*cred.ClientID)
 			if err == state.ErrNotFound {
 				cred.ID = uuid()
@@ -373,6 +388,9 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 	for _, cred := range creds {
 		cred := cred
 		if utils.Empty(cred.ID) {
+			if utils.Empty(cred.Group) {
+				return errors.Errorf("acl credential is invalid: no group")
+			}
 			existingCred, err := b.currentState.ACLGroups.Get(
 				*cred.Consumer.ID,
 				*cred.Group)
