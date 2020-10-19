@@ -17,7 +17,7 @@ checksum:
 snapshot:
   name_template: "{{ .Tag }}"
 nfpms:
-- name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Arch }}'
+- file_name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Arch }}'
   homepage: https://github.com/kong/deck
   description: Declarative configuration for Kong
   maintainer: Harry Bagdi <harrybagdi@gmail.com>
