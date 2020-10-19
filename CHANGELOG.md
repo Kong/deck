@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.2.2](#v122---20201019)
 - [v1.2.1](#v121---20200804)
 - [v1.2.0](#v120---20200804)
 - [v1.1.0](#v110---20200405)
@@ -20,6 +21,27 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.2.2] - 2020/10/19
+
+### Added
+
+- decK now prints a change summary even if it encountered an error.
+  [#197](https://github.com/hbagdi/deck/pull/197)
+- decK now prints the ID of entities that it could not successfully sync.
+  [#199](https://github.com/hbagdi/deck/pull/199)
+- Issues sending analytics will now emit a panic.
+  [#200](https://github.com/hbagdi/deck/pull/200)
+- decK now creates the workspace specified with `--workspace` if it is not
+  already present.
+  [#201](https://github.com/hbagdi/deck/pull/201)
+- decK prints descriptive information about duplicated entities.
+  [#204](https://github.com/hbagdi/deck/pull/204)
+
+### Fixed
+
+- Resolved a concurrency bug during syncs.
+  [#202](https://github.com/hbagdi/deck/pull/202)
 
 ## [v1.2.1] - 2020/08/04
 
@@ -488,6 +510,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.2.2]: https://github.com/kong/deck/compare/v1.2.1...v1.2.2
 [v1.2.1]: https://github.com/hbagdi/deck/compare/v1.2.0...v1.2.1
 [v1.2.0]: https://github.com/hbagdi/deck/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/hbagdi/deck/compare/v1.0.3...v1.1.0
