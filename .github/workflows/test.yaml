@@ -9,7 +9,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.14'
+          go-version: '^1.15'
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup golangci-lint
