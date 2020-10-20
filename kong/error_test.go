@@ -10,7 +10,7 @@ import (
 func TestIsNotFoundErr(T *testing.T) {
 
 	assert := assert.New(T)
-	var e err404
+	var e error = &kongAPIError{httpCode: 404}
 	assert.True(IsNotFoundErr(e))
 	assert.False(IsNotFoundErr(nil))
 

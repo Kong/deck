@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 // ConsumerService handles Consumers in Kong.
@@ -87,7 +88,7 @@ func (s *ConsumerService) GetByCustomID(ctx context.Context,
 	}
 
 	if len(resp.Data) == 0 {
-		return nil, err404{}
+		return nil, &kongAPIError{httpCode: http.StatusNotFound, message: "Not found"}
 	}
 
 	return &resp.Data[0], nil

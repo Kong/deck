@@ -58,7 +58,7 @@ func TestDo(T *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(req)
 	resp, err := client.Do(context.Background(), req, nil)
-	assert.Equal(err, err404{})
+	assert.True(IsNotFoundErr(err))
 	assert.NotNil(resp)
 	assert.Equal(404, resp.StatusCode)
 
