@@ -75,32 +75,33 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		return err
 	}
 
-	rootClient, err := utils.GetKongClient(config)
+	rootClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
 		return err
 	}
 
+	var wsConfig utils.KongClientConfig
 	// prepare to read the current state from Kong
 	if workspace != targetContent.Workspace && workspace != "" {
 		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
 			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
-		config.Workspace = workspace
+		wsConfig = rootConfig.ForWorkspace(workspace)
 	} else {
-		config.Workspace = targetContent.Workspace
+		wsConfig = rootConfig.ForWorkspace(targetContent.Workspace)
 	}
 
 	// load Kong version after workspace
-	kongVersion, err := kongVersion(config)
+	kongVersion, err := kongVersion(wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
 
-	workspaceExists, err := workspaceExists(config)
+	workspaceExists, err := workspaceExists(wsConfig)
 	if err != nil {
 		return err
 	}
 
-	client, err := utils.GetKongClient(config)
+	wsClient, err := utils.GetKongClient(wsConfig)
 	if err != nil {
 		return err
 	}
@@ -112,7 +113,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
-		rawState, err := dump.Get(client, dumpConfig)
+		rawState, err := dump.Get(wsClient, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -123,7 +124,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		}
 	} else {
 
-		print.CreatePrintln("creating workspace", config.Workspace)
+		print.CreatePrintln("creating workspace", wsConfig.Workspace)
 
 		// inject empty state
 		currentState, err = state.NewKongState()
@@ -132,7 +133,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		}
 
 		if !dry {
-			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &config.Workspace})
+			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &rootConfig.Workspace})
 			if err != nil {
 				return err
 			}
@@ -155,7 +156,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
-	stats, errs := solver.Solve(stopChannel, s, client, parallelism, dry)
+	stats, errs := solver.Solve(stopChannel, s, wsClient, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)

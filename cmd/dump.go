@@ -59,7 +59,7 @@ configure Kong.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		client, err := utils.GetKongClient(config)
+		wsClient, err := utils.GetKongClient(rootConfig)
 		if err != nil {
 			return err
 		}
@@ -74,19 +74,18 @@ configure Kong.`,
 			if dumpCmdKongStateFile != "kong" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
-			workspaces, err := listWorkspaces(client, config.Address)
+			workspaces, err := listWorkspaces(wsClient, rootConfig.Address)
 			if err != nil {
 				return err
 			}
 
 			for _, workspace := range workspaces {
-				config.Workspace = workspace
-				client, err := utils.GetKongClient(config)
+				wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
 				if err != nil {
 					return err
 				}
 
-				rawState, err := dump.Get(client, dumpConfig)
+				rawState, err := dump.Get(wsClient, dumpConfig)
 				if err != nil {
 					return errors.Wrap(err, "reading configuration from Kong")
 				}
@@ -111,9 +110,9 @@ configure Kong.`,
 		// Kong OSS
 		// or Kong Enterprise single workspace
 		if dumpWorkspace != "" {
-			config.Workspace = dumpWorkspace
+			wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
 
-			exists, err := workspaceExists(config)
+			exists, err := workspaceExists(wsConfig)
 			if err != nil {
 				return err
 			}
@@ -121,13 +120,13 @@ configure Kong.`,
 				return errors.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
 			}
 
-			client, err = utils.GetKongClient(config)
+			wsClient, err = utils.GetKongClient(wsConfig)
 			if err != nil {
 				return err
 			}
 		}
 
-		rawState, err := dump.Get(client, dumpConfig)
+		rawState, err := dump.Get(wsClient, dumpConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading configuration from Kong")
 		}

@@ -19,8 +19,8 @@ can connect to Kong's Admin API or not.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		config.Workspace = pingWorkspace
-		version, err := kongVersion(config)
+		rootConfig.Workspace = pingWorkspace
+		version, err := kongVersion(rootConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading Kong version")
 		}

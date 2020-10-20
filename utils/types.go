@@ -79,6 +79,13 @@ type KongClientConfig struct {
 	Headers []string
 }
 
+// ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
+func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
+	result := *kc
+	result.Workspace = name
+	return result
+}
+
 // HeaderRoundTripper injects Headers into requests
 // made via RT.
 type HeaderRoundTripper struct {

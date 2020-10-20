@@ -39,17 +39,17 @@ By default, this command will ask for a confirmation prompt.`,
 			}
 		}
 
-		client, err := utils.GetKongClient(config)
+		rootClient, err := utils.GetKongClient(rootConfig)
 		if err != nil {
 			return err
 		}
 		// Kong OSS or default workspace
 		if !resetAllWorkspaces && resetWorkspace == "" {
-			state, err := dump.Get(client, dumpConfig)
+			state, err := dump.Get(rootClient, dumpConfig)
 			if err != nil {
 				return err
 			}
-			err = reset.Reset(state, client)
+			err = reset.Reset(state, rootClient)
 			if err != nil {
 				return err
 			}
@@ -63,15 +63,13 @@ By default, this command will ask for a confirmation prompt.`,
 		// Kong Enterprise
 		var workspaces []string
 		if resetAllWorkspaces {
-			workspaces, err = listWorkspaces(client, config.Address)
+			workspaces, err = listWorkspaces(rootClient, rootConfig.Address)
 			if err != nil {
 				return err
 			}
 		}
 		if resetWorkspace != "" {
-			config.Workspace = resetWorkspace
-
-			exists, err := workspaceExists(config)
+			exists, err := workspaceExists(rootConfig.ForWorkspace(resetWorkspace))
 			if err != nil {
 				return err
 			}
@@ -83,16 +81,15 @@ By default, this command will ask for a confirmation prompt.`,
 		}
 
 		for _, workspace := range workspaces {
-			config.Workspace = workspace
-			client, err := utils.GetKongClient(config)
+			wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
 			if err != nil {
 				return err
 			}
-			state, err := dump.Get(client, dumpConfig)
+			state, err := dump.Get(wsClient, dumpConfig)
 			if err != nil {
 				return err
 			}
-			err = reset.Reset(state, client)
+			err = reset.Reset(state, wsClient)
 			if err != nil {
 				return err
 			}

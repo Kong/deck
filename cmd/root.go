@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	cfgFile string
-	config  utils.KongClientConfig
-	verbose int
-	noColor bool
+	cfgFile    string
+	rootConfig utils.KongClientConfig
+	verbose    int
+	noColor    bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -32,7 +32,7 @@ configuration file.
 It can be used to export, import or sync entities to Kong.`,
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if _, err := url.ParseRequestURI(config.Address); err != nil {
+		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
 			return errors.WithStack(errors.Wrap(err, "invalid URL"))
 		}
 		if noColor {
@@ -154,14 +154,15 @@ func initConfig() {
 			fmt.Println(err)
 		}
 	}
-	config.Address = viper.GetString("kong-addr")
-	config.TLSServerName = viper.GetString("tls-server-name")
-	config.TLSSkipVerify = viper.GetBool("tls-skip-verify")
-	config.TLSCACert = viper.GetString("ca-cert")
-	config.Headers = viper.GetStringSlice("headers")
+
+	rootConfig.Address = viper.GetString("kong-addr")
+	rootConfig.TLSServerName = viper.GetString("tls-server-name")
+	rootConfig.TLSSkipVerify = viper.GetBool("tls-skip-verify")
+	rootConfig.TLSCACert = viper.GetString("ca-cert")
+	rootConfig.Headers = viper.GetStringSlice("headers")
+	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
+	rootConfig.Debug = verbose >= 1
+
 	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
-	config.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
-
-	config.Debug = verbose >= 1
 }
