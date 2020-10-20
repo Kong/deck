@@ -17,8 +17,8 @@ type Stats struct {
 }
 
 // Solve generates a diff and walks the graph.
-func Solve(doneCh chan struct{}, syncer *diff.Syncer,
-	client *kong.Client, parallelism int, dry bool) (Stats, []error) {
+func Solve(doneCh chan struct{}, syncer *diff.Syncer, client *kong.Client,
+	parallelism int, retries int, retryDelay int, dry bool) (Stats, []error) {
 
 	r := buildRegistry(client)
 
@@ -34,7 +34,7 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 		}
 	}
 
-	errs := syncer.Run(doneCh, parallelism, func(e diff.Event) (crud.Arg, error) {
+	errs := syncer.Run(doneCh, parallelism, retries, retryDelay, func(e diff.Event) (crud.Arg, error) {
 		var err error
 		var result crud.Arg
 

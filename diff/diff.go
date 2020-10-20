@@ -292,7 +292,9 @@ func (sc *Syncer) wait() {
 }
 
 // Run starts a diff and invokes d for every diff.
-func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
+func (sc *Syncer) Run(done <-chan struct{}, parallelism int, retries int,
+	retryDelay int, d Do) []error {
+
 	if parallelism < 1 {
 		return append([]error{}, errors.New("parallelism can not be negative"))
 	}
@@ -309,10 +311,7 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
 		go func() {
-			err := sc.eventLoop(d)
-			if err != nil {
-				sc.errChan <- err
-			}
+			sc.eventLoop(retries, retryDelay, d)
 			wg.Done()
 		}()
 	}
@@ -363,15 +362,23 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 // TODO remove crud.Arg
 type Do func(a Event) (crud.Arg, error)
 
-func (sc *Syncer) eventLoop(d Do) error {
+func (sc *Syncer) eventLoop(retries int, retryDelay int, d Do) {
 	for event := range sc.eventChan {
-		err := sc.handleEvent(d, event)
-		sc.eventCompleted()
+		var err error
+		for retries >= 0 {
+			err = sc.handleEvent(d, event)
+			if err == nil {
+				sc.eventCompleted()
+				break
+			}
+			retries--
+			time.Sleep(time.Duration(retryDelay) * time.Second)
+		}
+
 		if err != nil {
-			return err
+			sc.errChan <- err
 		}
 	}
-	return nil
 }
 
 func (sc *Syncer) handleEvent(d Do, event Event) error {
