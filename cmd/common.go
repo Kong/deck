@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"net/http"
 	"os"
 
@@ -36,35 +37,25 @@ func SetStopCh(stopCh chan struct{}) {
 
 // workspaceExists checks if workspace exists in Kong.
 func workspaceExists(config utils.KongClientConfig) (bool, error) {
-
-	workspace := config.Workspace
-	if workspace == "" {
-		// default workspace always exists
-		return true, nil
-	}
-
 	if config.SkipWorkspaceCrud {
 		// if RBAC user, skip check
 		return true, nil
 	}
 
-	// remove workspace to be able to call top-level /workspaces endpoint
-	config.Workspace = ""
-	rootClient, err := utils.GetKongClient(config)
+	wsClient, err := utils.GetKongClient(config)
 	if err != nil {
 		return false, err
 	}
 
-	_, err = rootClient.Workspaces.Get(nil, &workspace)
-	if err != nil {
-		if kong.IsNotFoundErr(err) {
-			return false, nil
-		}
-
-		return false, errors.Wrap(err, "error when getting workspace")
+	_, _, err = wsClient.Routes.List(context.TODO(), nil)
+	switch {
+	case kong.IsNotFoundErr(err):
+		return false, nil
+	case err == nil:
+		return true, nil
+	default:
+		return false, errors.Wrap(err, "checking if workspace exists")
 	}
-
-	return true, nil
 }
 
 func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
