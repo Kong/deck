@@ -37,6 +37,11 @@ func SetStopCh(stopCh chan struct{}) {
 
 // workspaceExists checks if workspace exists in Kong.
 func workspaceExists(config utils.KongClientConfig) (bool, error) {
+	if config.Workspace == "" {
+		// default workspace always exists
+		return true, nil
+	}
+
 	if config.SkipWorkspaceCrud {
 		// if RBAC user, skip check
 		return true, nil
