@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -19,8 +20,8 @@ can connect to Kong's Admin API or not.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		rootConfig.Workspace = pingWorkspace
-		version, err := kongVersion(rootConfig)
+		wsConfig := rootConfig.ForWorkspace(pingWorkspace)
+		version, err := kongVersion(wsConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading Kong version")
 		}
