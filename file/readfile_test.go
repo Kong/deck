@@ -315,3 +315,37 @@ func Test_getContent(t *testing.T) {
 		})
 	}
 }
+
+func Test_yamlUnmarshal(t *testing.T) {
+	stringToInterfaceMap := map[string]interface{}{}
+	bytes1 := `
+versions:
+  v1:
+    enabled: false
+`
+	mapOfMap := map[string]interface{}{}
+	err := yamlUnmarshal([]byte(bytes1), &mapOfMap)
+	if err != nil {
+		t.Errorf("yamlUnmarshal() error = %v (should be nil)", err)
+	}
+	subMap := mapOfMap["versions"]
+	if reflect.TypeOf(subMap) != reflect.TypeOf(stringToInterfaceMap) {
+		t.Errorf("yamlUnmarshal() expected type: %T, got: %T", stringToInterfaceMap, subMap)
+	}
+
+	bytes2 := `
+versions:
+- enabled: false
+  version: 1
+`
+	mapOfArrayOfMap := map[string]interface{}{}
+	err = yamlUnmarshal([]byte(bytes2), &mapOfArrayOfMap)
+	if err != nil {
+		t.Errorf("yamlUnmarshal() error = %v (should be nil)", err)
+	}
+	array := mapOfArrayOfMap["versions"].([]interface{})
+	element := array[0]
+	if reflect.TypeOf(element) != reflect.TypeOf(stringToInterfaceMap) {
+		t.Errorf("yamlUnmarshal() expected type: %T, got: %T", stringToInterfaceMap, element)
+	}
+}

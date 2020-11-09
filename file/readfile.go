@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"regexp"
 
+	ghodssyaml "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // getContent reads all the YAML and JSON files in the directory or the
@@ -91,11 +91,20 @@ func readContent(reader io.Reader) (*Content, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "validating file content")
 	}
-	err = yaml.Unmarshal(bytes, &content)
+	err = yamlUnmarshal(bytes, &content)
 	if err != nil {
 		return nil, err
 	}
 	return &content, nil
+}
+
+// yamlUnmarshal is a wrapper around yaml.Unmarshal to ensure that the right
+// yaml package is in use. Using ghodss/yaml ensures that no
+// `map[interface{}]interface{}` is present in go-kong.Plugin.Configuration.
+// If it is present, then it leads to a silent error. See Github Issue #144.
+// The verification for this is done using a test.
+func yamlUnmarshal(bytes []byte, v interface{}) error {
+	return ghodssyaml.Unmarshal(bytes, v)
 }
 
 // configFilesInDir traverses the directory rooted at dir and
