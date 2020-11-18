@@ -28,9 +28,9 @@
 ### Fixed
 
 - Sync operations now handle plugins with array configuration correctly.
-  [#229](https://github.com/hbagdi/deck/pull/229)
+  [#229](https://github.com/Kong/deck/pull/229)
 - Removed unecessary permissions requirement for checking workspace existence.
-  [#225](https://github.com/hbagdi/deck/pull/225)
+  [#225](https://github.com/Kong/deck/pull/225)
 
 ## [v1.2.2] - 2020/10/19
 
