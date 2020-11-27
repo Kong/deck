@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/cenkalti/backoff/v4"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/pkg/errors"
@@ -292,9 +293,7 @@ func (sc *Syncer) wait() {
 }
 
 // Run starts a diff and invokes d for every diff.
-func (sc *Syncer) Run(done <-chan struct{}, parallelism int, retries int,
-	retryDelay int, d Do) []error {
-
+func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 	if parallelism < 1 {
 		return append([]error{}, errors.New("parallelism can not be negative"))
 	}
@@ -311,7 +310,10 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, retries int,
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
 		go func() {
-			sc.eventLoop(retries, retryDelay, d)
+			err := sc.eventLoop(d)
+			if err != nil {
+				sc.errChan <- err
+			}
 			wg.Done()
 		}()
 	}
@@ -362,23 +364,34 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, retries int,
 // TODO remove crud.Arg
 type Do func(a Event) (crud.Arg, error)
 
-func (sc *Syncer) eventLoop(retries int, retryDelay int, d Do) {
+func (sc *Syncer) eventLoop(d Do) error {
 	for event := range sc.eventChan {
-		var err error
-		for retries >= 0 {
-			err = sc.handleEvent(d, event)
-			if err == nil {
-				sc.eventCompleted()
-				break
-			}
-			retries--
-			time.Sleep(time.Duration(retryDelay) * time.Second)
+		// Stop if program is terminated
+		select {
+		case <-sc.stopChan:
+			return nil
+		default:
 		}
 
+		// For various reasons, Kong can temporarily fail to process
+		// a valid request (e.g. when the database is under heavy load).
+		// We retry each request up to 3 times on failure, after around
+		// 1 second, 3 seconds, and 9 seconds (randomized exponential backoff).
+		exponentialBackoff := backoff.NewExponentialBackOff()
+		exponentialBackoff.InitialInterval = 1 * time.Second
+		exponentialBackoff.Multiplier = 3
+		backoffObject := backoff.WithMaxRetries(exponentialBackoff, 4)
+
+		err := backoff.Retry(func() error {
+			return sc.handleEvent(d, event)
+		}, backoffObject)
+
+		sc.eventCompleted()
 		if err != nil {
-			sc.errChan <- err
+			return err
 		}
 	}
+	return nil
 }
 
 func (sc *Syncer) handleEvent(d Do, event Event) error {

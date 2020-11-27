@@ -3,6 +3,7 @@ module github.com/kong/deck
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
 	github.com/blang/semver v0.0.0-20190414102917-ba2c2ddd8906
+	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0

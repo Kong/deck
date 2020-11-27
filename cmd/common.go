@@ -63,8 +63,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 	}
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int, retries int,
-	retryDelay int, workspace string) error {
+func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -153,7 +152,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, retries int,
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
-	stats, errs := solver.Solve(stopChannel, s, wsClient, parallelism, retries, retryDelay, dry)
+	stats, errs := solver.Solve(stopChannel, s, wsClient, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)

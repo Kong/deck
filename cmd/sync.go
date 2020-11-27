@@ -9,8 +9,6 @@ var (
 	syncCmdKongStateFile []string
 	syncCmdParallelism   int
 	syncCmdDBUpdateDelay int
-	syncCmdRetries       int
-	syncCmdRetryDelay    int
 	syncWorkspace        string
 )
 
@@ -23,8 +21,7 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism,
-			syncCmdDBUpdateDelay, syncCmdRetries, syncCmdRetryDelay, syncWorkspace)
+		return syncMain(syncCmdKongStateFile, false, syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(syncCmdKongStateFile) == 0 {
@@ -58,8 +55,4 @@ func init() {
 		0, "aritificial delay in seconds that is injected between insert operations \n"+
 			"for related entities (usually for cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
-	syncCmd.Flags().IntVar(&syncCmdRetries, "retries",
-		1, "Number of times decK will retry an insert or update operation")
-	syncCmd.Flags().IntVar(&syncCmdRetryDelay, "retry-delay",
-		0, "Number of seconds decK will wait before retrying an insert or update operation")
 }
