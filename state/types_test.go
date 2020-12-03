@@ -7,6 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// getTags returns a slice of test tags. If reversed is true, the tags are backwards!
+// backwards tag slices are useful for confirming that our equality checks ignore tag order
+func getTags(reversed bool) []*string {
+	fooString := "foo"
+	barString := "bar"
+	if reversed {
+		return []*string{&barString, &fooString}
+	}
+	return []*string{&fooString, &barString}
+}
+
 func TestMeta(t *testing.T) {
 	assert := assert.New(t)
 
@@ -49,6 +60,9 @@ func TestServiceEqual(t *testing.T) {
 	s2.Name = kong.String("bar")
 	assert.True(s1.Equal(&s2))
 	assert.True(s1.EqualWithOpts(&s2, false, false))
+	s1.Tags = getTags(true)
+	s2.Tags = getTags(false)
+	assert.True(s1.EqualWithOpts(&s2, false, false))
 
 	s1.ID = kong.String("fuu")
 	assert.False(s1.EqualWithOpts(&s2, false, false))
@@ -75,6 +89,9 @@ func TestRouteEqual(t *testing.T) {
 
 	r2.Name = kong.String("bar")
 	assert.True(r1.Equal(&r2))
+	assert.True(r1.EqualWithOpts(&r2, false, false, false))
+	r1.Tags = getTags(true)
+	r2.Tags = getTags(false)
 	assert.True(r1.EqualWithOpts(&r2, false, false, false))
 
 	r1.ID = kong.String("fuu")
@@ -121,6 +138,9 @@ func TestUpstreamEqual(t *testing.T) {
 	u2.Name = kong.String("bar")
 	assert.True(u1.Equal(&u2))
 	assert.True(u1.EqualWithOpts(&u2, false, false))
+	u1.Tags = getTags(true)
+	u2.Tags = getTags(false)
+	assert.True(u1.EqualWithOpts(&u2, false, false))
 
 	u1.ID = kong.String("fuu")
 	assert.False(u1.EqualWithOpts(&u2, false, false))
@@ -147,6 +167,9 @@ func TestTargetEqual(t *testing.T) {
 
 	t2.Target.Target = kong.String("bar")
 	assert.True(t1.Equal(&t2))
+	assert.True(t1.EqualWithOpts(&t2, false, false, false))
+	t1.Tags = getTags(true)
+	t2.Tags = getTags(false)
 	assert.True(t1.EqualWithOpts(&t2, false, false, false))
 
 	t1.ID = kong.String("fuu")
@@ -185,6 +208,9 @@ func TestCertificateEqual(t *testing.T) {
 	c2.Key = kong.String("keyfoo")
 	assert.True(c1.Equal(&c2))
 	assert.True(c1.EqualWithOpts(&c2, false, false))
+	c1.Tags = getTags(true)
+	c2.Tags = getTags(false)
+	assert.True(c1.EqualWithOpts(&c2, false, false))
 
 	c1.ID = kong.String("fuu")
 	assert.False(c1.EqualWithOpts(&c2, false, false))
@@ -211,6 +237,9 @@ func TestSNIEqual(t *testing.T) {
 
 	s2.Name = kong.String("bar")
 	assert.True(s1.Equal(&s2))
+	assert.True(s1.EqualWithOpts(&s2, false, false, false))
+	s1.Tags = getTags(true)
+	s2.Tags = getTags(false)
 	assert.True(s1.EqualWithOpts(&s2, false, false, false))
 
 	s1.ID = kong.String("fuu")
@@ -247,6 +276,9 @@ func TestPluginEqual(t *testing.T) {
 	p2.Name = kong.String("bar")
 	assert.True(p1.Equal(&p2))
 	assert.True(p1.EqualWithOpts(&p2, false, false, false))
+	p1.Tags = getTags(true)
+	p2.Tags = getTags(false)
+	assert.True(p1.EqualWithOpts(&p2, false, false, false))
 
 	p1.ID = kong.String("fuu")
 	assert.False(p1.EqualWithOpts(&p2, false, false, false))
@@ -282,6 +314,9 @@ func TestConsumerEqual(t *testing.T) {
 	c2.Username = kong.String("bar")
 	assert.True(c1.Equal(&c2))
 	assert.True(c1.EqualWithOpts(&c2, false, false))
+	c1.Tags = getTags(true)
+	c2.Tags = getTags(false)
+	assert.True(c1.EqualWithOpts(&c2, false, false))
 
 	c1.ID = kong.String("fuu")
 	assert.False(c1.EqualWithOpts(&c2, false, false))
@@ -308,6 +343,9 @@ func TestKeyAuthEqual(t *testing.T) {
 
 	k2.Key = kong.String("bar")
 	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+	k1.Tags = getTags(true)
+	k2.Tags = getTags(false)
 	assert.True(k1.EqualWithOpts(&k2, false, false, false))
 
 	k1.ID = kong.String("fuu")
@@ -339,6 +377,9 @@ func TestHMACAuthEqual(t *testing.T) {
 	k2.Username = kong.String("bar")
 	assert.True(k1.Equal(&k2))
 	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+	k1.Tags = getTags(true)
+	k2.Tags = getTags(false)
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
 
 	k1.ID = kong.String("fuu")
 	assert.False(k1.EqualWithOpts(&k2, false, false, false))
@@ -368,6 +409,9 @@ func TestJWTAuthEqual(t *testing.T) {
 
 	k2.Key = kong.String("bar")
 	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+	k1.Tags = getTags(true)
+	k2.Tags = getTags(false)
 	assert.True(k1.EqualWithOpts(&k2, false, false, false))
 
 	k1.ID = kong.String("fuu")
@@ -400,6 +444,9 @@ func TestBasicAuthEqual(t *testing.T) {
 	assert.True(k1.Equal(&k2))
 	assert.True(k1.EqualWithOpts(&k2, false, false, false, false))
 	assert.True(k1.EqualWithOpts(&k2, false, false, false, true))
+	k1.Tags = getTags(true)
+	k2.Tags = getTags(false)
+	assert.True(k1.EqualWithOpts(&k2, false, false, false, false))
 
 	k1.ID = kong.String("fuu")
 	assert.False(k1.EqualWithOpts(&k2, false, false, false, false))
@@ -429,6 +476,9 @@ func TestACLGroupEqual(t *testing.T) {
 
 	k2.Group = kong.String("bar")
 	assert.True(k1.Equal(&k2))
+	assert.True(k1.EqualWithOpts(&k2, false, false, false))
+	k1.Tags = getTags(true)
+	k2.Tags = getTags(false)
 	assert.True(k1.EqualWithOpts(&k2, false, false, false))
 
 	k1.ID = kong.String("fuu")
