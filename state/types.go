@@ -85,7 +85,7 @@ func (s1 *Service) Console() string {
 
 // Equal returns true if s1 and s2 are equal.
 func (s1 *Service) Equal(s2 *Service) bool {
-	return reflect.DeepEqual(s1.Service, s2.Service)
+	return s1.EqualWithOpts(s2, false, false)
 }
 
 // EqualWithOpts returns true if s1 and s2 are equal.
@@ -139,7 +139,7 @@ func (r1 *Route) Console() string {
 // Equal returns true if r1 and r2 are equal.
 // TODO add compare array without position
 func (r1 *Route) Equal(r2 *Route) bool {
-	return reflect.DeepEqual(r1.Route, r2.Route)
+	return r1.EqualWithOpts(r2, false, false, false)
 }
 
 // EqualWithOpts returns true if r1 and r2 are equal.
@@ -194,7 +194,7 @@ func (u1 *Upstream) Console() string {
 
 // Equal returns true if u1 and u2 are equal.
 func (u1 *Upstream) Equal(u2 *Upstream) bool {
-	return reflect.DeepEqual(u1.Upstream, u2.Upstream)
+	return u1.EqualWithOpts(u2, false, false)
 }
 
 // EqualWithOpts returns true if u1 and u2 are equal.
@@ -252,7 +252,7 @@ func (t1 *Target) Console() string {
 // Equal returns true if t1 and t2 are equal.
 // TODO add compare array without position
 func (t1 *Target) Equal(t2 *Target) bool {
-	return reflect.DeepEqual(t1.Target, t2.Target)
+	return t1.EqualWithOpts(t2, false, false, false)
 }
 
 // EqualWithOpts returns true if t1 and t2 are equal.
@@ -305,7 +305,7 @@ func (c1 *Certificate) Console() string {
 
 // Equal returns true if c1 and c2 are equal.
 func (c1 *Certificate) Equal(c2 *Certificate) bool {
-	return reflect.DeepEqual(c1.Certificate, c2.Certificate)
+	return c1.EqualWithOpts(c2, false, false)
 }
 
 // EqualWithOpts returns true if c1 and c2 are equal.
@@ -340,7 +340,7 @@ type SNI struct {
 // Equal returns true if s1 and s2 are equal.
 // TODO add compare array without position
 func (s1 *SNI) Equal(s2 *SNI) bool {
-	return reflect.DeepEqual(s1.SNI, s2.SNI)
+	return s1.EqualWithOpts(s2, false, false, false)
 }
 
 // Identifier returns the endpoint key name or ID.
@@ -431,7 +431,7 @@ func (p1 *Plugin) Console() string {
 // Equal returns true if r1 and r2 are equal.
 // TODO add compare array without position
 func (p1 *Plugin) Equal(p2 *Plugin) bool {
-	return reflect.DeepEqual(p1.Plugin, p2.Plugin)
+	return p1.EqualWithOpts(p2, false, false, false)
 }
 
 // EqualWithOpts returns true if p1 and p2 are equal.
@@ -487,7 +487,7 @@ func (c1 *Consumer) Console() string {
 
 // Equal returns true if c1 and c2 are equal.
 func (c1 *Consumer) Equal(c2 *Consumer) bool {
-	return reflect.DeepEqual(c1.Consumer, c2.Consumer)
+	return c1.EqualWithOpts(c2, false, false)
 }
 
 // EqualWithOpts returns true if c1 and c2 are equal.
@@ -549,7 +549,7 @@ func (k1 *KeyAuth) Console() string {
 
 // Equal returns true if k1 and k2 are equal.
 func (k1 *KeyAuth) Equal(k2 *KeyAuth) bool {
-	return reflect.DeepEqual(k1.KeyAuth, k2.KeyAuth)
+	return k1.EqualWithOpts(k2, false, false, false)
 }
 
 // EqualWithOpts returns true if k1 and k2 are equal.
@@ -620,7 +620,7 @@ func (h1 *HMACAuth) Console() string {
 
 // Equal returns true if h1 and h2 are equal.
 func (h1 *HMACAuth) Equal(h2 *HMACAuth) bool {
-	return reflect.DeepEqual(h1.HMACAuth, h2.HMACAuth)
+	return h1.EqualWithOpts(h2, false, false, false)
 }
 
 // EqualWithOpts returns true if h1 and h2 are equal.
@@ -691,7 +691,7 @@ func (j1 *JWTAuth) Console() string {
 
 // Equal returns true if j1 and j2 are equal.
 func (j1 *JWTAuth) Equal(j2 *JWTAuth) bool {
-	return reflect.DeepEqual(j1.JWTAuth, j2.JWTAuth)
+	return j1.EqualWithOpts(j2, false, false, false)
 }
 
 // EqualWithOpts returns true if j1 and j2 are equal.
@@ -762,7 +762,7 @@ func (b1 *BasicAuth) Console() string {
 
 // Equal returns true if b1 and b2 are equal.
 func (b1 *BasicAuth) Equal(b2 *BasicAuth) bool {
-	return reflect.DeepEqual(b1.BasicAuth, b2.BasicAuth)
+	return b1.EqualWithOpts(b2, false, false, false, false)
 }
 
 // EqualWithOpts returns true if j1 and j2 are equal.
@@ -837,7 +837,7 @@ func (b1 *ACLGroup) Console() string {
 
 // Equal returns true if b1 and b2 are equal.
 func (b1 *ACLGroup) Equal(b2 *ACLGroup) bool {
-	return reflect.DeepEqual(b1.ACLGroup, b2.ACLGroup)
+	return b1.EqualWithOpts(b2, false, false, false)
 }
 
 // EqualWithOpts returns true if j1 and j2 are equal.
@@ -890,7 +890,7 @@ func (c1 *CACertificate) Console() string {
 
 // Equal returns true if c1 and c2 are equal.
 func (c1 *CACertificate) Equal(c2 *CACertificate) bool {
-	return reflect.DeepEqual(c1.CACertificate, c2.CACertificate)
+	return c1.EqualWithOpts(c2, false, false)
 }
 
 // EqualWithOpts returns true if c1 and c2 are equal.
@@ -930,7 +930,7 @@ func (k1 *Oauth2Credential) Console() string {
 
 // Equal returns true if k1 and k2 are equal.
 func (k1 *Oauth2Credential) Equal(k2 *Oauth2Credential) bool {
-	return reflect.DeepEqual(k1.Oauth2Credential, k2.Oauth2Credential)
+	return k1.EqualWithOpts(k2, false, false, false)
 }
 
 // EqualWithOpts returns true if k1 and k2 are equal.
@@ -1001,7 +1001,7 @@ func (b1 *MTLSAuth) Console() string {
 
 // Equal returns true if b1 and b2 are equal.
 func (b1 *MTLSAuth) Equal(b2 *MTLSAuth) bool {
-	return reflect.DeepEqual(b1.MTLSAuth, b2.MTLSAuth)
+	return b1.EqualWithOpts(b2, false, false, false)
 }
 
 // EqualWithOpts returns true if j1 and j2 are equal.
