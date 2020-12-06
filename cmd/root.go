@@ -48,13 +48,8 @@ It can be used to export, import or sync entities to Kong.`,
 func Execute() {
 	var wg sync.WaitGroup
 	var err error
-	const threads = 2
+	const threads = 1
 	wg.Add(threads)
-
-	go func() {
-		sendAnalytics()
-		wg.Done()
-	}()
 
 	go func() {
 		err = rootCmd.Execute()
