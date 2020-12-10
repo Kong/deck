@@ -229,6 +229,7 @@ type Workspace struct {
 }
 
 // Admin represents an Admin in Kong.
+// +k8s:deepcopy-gen=true
 type Admin struct {
 	CreatedAt        *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID               *string `json:"id,omitempty" yaml:"id,omitempty"`
@@ -242,6 +243,7 @@ type Admin struct {
 }
 
 // RBACUser represents an RBAC user in Kong Enterprise
+// +k8s:deepcopy-gen=true
 type RBACUser struct {
 	CreatedAt      *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Comment        *string `json:"comment,omitempty" yaml:"comment,omitempty"`
@@ -253,6 +255,7 @@ type RBACUser struct {
 }
 
 // Workspace Entity represents a WorkspaceEntity in Kong
+// +k8s:deepcopy-gen=true
 type WorkspaceEntity struct {
 	EntityID         *string `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
 	EntityType       *string `json:"entity_type,omitempty" yaml:"entity_type,omitempty"`
@@ -263,6 +266,7 @@ type WorkspaceEntity struct {
 }
 
 // RBACRole represents an RBAC Role in Kong.
+// +k8s:deepcopy-gen=true
 type RBACRole struct {
 	CreatedAt *int    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
@@ -272,6 +276,7 @@ type RBACRole struct {
 }
 
 // RBACEndpointPermission represents an RBAC Endpoint Permission in Kong Enterprise
+// +k8s:deepcopy-gen=true
 type RBACEndpointPermission struct {
 	CreatedAt *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	Workspace *string   `json:"workspace,omitempty" yaml:"workspace,omitempty"`
@@ -307,6 +312,7 @@ func (e *RBACEndpointPermission) MarshalJSON() ([]byte, error) {
 }
 
 // RBACEntityPermission represents an RBAC Entity Permission in Kong Enterprise
+// +k8s:deepcopy-gen=true
 type RBACEntityPermission struct {
 	CreatedAt  *int      `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	EntityID   *string   `json:"entity_id,omitempty" yaml:"entity_id,omitempty"`
