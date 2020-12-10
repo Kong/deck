@@ -1030,6 +1030,62 @@ func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
+// RBACRole represents a route in Kong.
+// It adds some helper methods along with Meta to the original RBACRole object.
+type RBACRole struct {
+	kong.RBACRole `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (r1 *RBACRole) Identifier() string {
+	if r1.Name != nil {
+		return *r1.Name
+	}
+	return *r1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (r1 *RBACRole) Console() string {
+	return r1.Identifier()
+}
+
+// Equal returns true if r1 and r2 are equal.
+// TODO add compare array without position
+func (r1 *RBACRole) Equal(r2 *RBACRole) bool {
+	return r1.EqualWithOpts(r2, false, false, false)
+}
+
+// EqualWithOpts returns true if r1 and r2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (r1 *RBACRole) EqualWithOpts(r2 *RBACRole, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	r1Copy := r1.RBACRole.DeepCopy()
+	r2Copy := r2.RBACRole.DeepCopy()
+
+	sort.Slice(r1Copy.Tags, func(i, j int) bool { return *(r1Copy.Tags[i]) < *(r1Copy.Tags[j]) })
+	sort.Slice(r2Copy.Tags, func(i, j int) bool { return *(r2Copy.Tags[i]) < *(r2Copy.Tags[j]) })
+
+	if ignoreID {
+		r1Copy.ID = nil
+		r2Copy.ID = nil
+	}
+	if ignoreTS {
+		r1Copy.CreatedAt = nil
+		r2Copy.CreatedAt = nil
+
+		r1Copy.UpdatedAt = nil
+		r2Copy.UpdatedAt = nil
+	}
+	if ignoreForeign {
+		r1Copy.Service = nil
+		r2Copy.Service = nil
+	}
+	return reflect.DeepEqual(r1Copy, r2Copy)
+}
+
 // GetID returns ID.
 // If ID is empty, it returns an empty string.
 func (b1 *MTLSAuth) GetID() string {
