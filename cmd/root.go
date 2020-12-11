@@ -18,8 +18,6 @@ import (
 var (
 	cfgFile    string
 	rootConfig utils.KongClientConfig
-	verbose    int
-	noColor    bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -34,9 +32,6 @@ It can be used to export, import or sync entities to Kong.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
 			return errors.WithStack(errors.Wrap(err, "invalid URL"))
-		}
-		if noColor {
-			color.NoColor = true
 		}
 		return nil
 	},
@@ -161,8 +156,7 @@ func initConfig() {
 	rootConfig.TLSCACert = viper.GetString("ca-cert")
 	rootConfig.Headers = viper.GetStringSlice("headers")
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
-	rootConfig.Debug = verbose >= 1
+	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 
-	verbose = viper.GetInt("verbose")
-	noColor = viper.GetBool("no-color")
+	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 }
