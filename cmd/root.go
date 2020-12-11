@@ -155,6 +155,8 @@ func initConfig() {
 		}
 	}
 
+	verbose = viper.GetInt("verbose")
+
 	rootConfig.Address = viper.GetString("kong-addr")
 	rootConfig.TLSServerName = viper.GetString("tls-server-name")
 	rootConfig.TLSSkipVerify = viper.GetBool("tls-skip-verify")
@@ -163,6 +165,5 @@ func initConfig() {
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = verbose >= 1
 
-	verbose = viper.GetInt("verbose")
 	noColor = viper.GetBool("no-color")
 }
