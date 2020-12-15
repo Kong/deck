@@ -162,7 +162,13 @@ func (b *stateBuilder) consumers() {
 	for _, c := range b.targetContent.Consumers {
 		c := c
 		if utils.Empty(c.ID) {
-			consumer, err := b.currentState.Consumers.Get(*c.Username)
+			var consumer *state.Consumer
+			var err error
+			if !utils.Empty(c.Username) {
+				consumer, err = b.currentState.Consumers.Get(*c.Username)
+			} else if !utils.Empty(c.CustomID) {
+				consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
+			}
 			if err == state.ErrNotFound {
 				c.ID = uuid()
 			} else if err != nil {

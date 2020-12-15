@@ -33,12 +33,15 @@ var (
 		},
 	}
 
-	anyOfUsernameOrID = []*jsonschema.Type{
+	anyOfUsernameOrIDOrCustomID = []*jsonschema.Type{
 		{
 			Required: []string{"username"},
 		},
 		{
 			Required: []string{"id"},
+		},
+		{
+			Required: []string{"custom_id"},
 		},
 	}
 )
@@ -64,8 +67,8 @@ func main() {
 	schema.Definitions["Route"].AnyOf = anyOfNameOrID
 	schema.Definitions["FRoute"].AnyOf = anyOfNameOrID
 
-	schema.Definitions["Consumer"].AnyOf = anyOfUsernameOrID
-	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrID
+	schema.Definitions["Consumer"].AnyOf = anyOfUsernameOrIDOrCustomID
+	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrIDOrCustomID
 
 	schema.Definitions["Upstream"].Required = []string{"name"}
 	schema.Definitions["FUpstream"].Required = []string{"name"}

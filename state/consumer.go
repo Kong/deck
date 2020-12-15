@@ -25,6 +25,12 @@ var consumerTableSchema = &memdb.TableSchema{
 			Indexer:      &memdb.StringFieldIndex{Field: "Username"},
 			AllowMissing: true,
 		},
+		"CustomID": {
+			Name:         "CustomID",
+			Unique:       true,
+			Indexer:      &memdb.StringFieldIndex{Field: "CustomID"},
+			AllowMissing: true,
+		},
 		all: allIndex,
 	},
 }
@@ -47,7 +53,16 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	if !utils.Empty(consumer.Username) {
 		searchBy = append(searchBy, *consumer.Username)
 	}
-	_, err := getConsumer(txn, searchBy...)
+	_, err := getConsumer(txn, []string{"Username", "id"}, searchBy...)
+	if err == nil {
+		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
+	} else if err != ErrNotFound {
+		return err
+	}
+
+	if !utils.Empty(consumer.CustomID) {
+		_, err = getConsumer(txn, []string{"CustomID"}, *consumer.CustomID)
+	}
 	if err == nil {
 		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
@@ -62,10 +77,9 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	return nil
 }
 
-func getConsumer(txn *memdb.Txn, IDs ...string) (*Consumer, error) {
+func getConsumer(txn *memdb.Txn, indices []string, IDs ...string) (*Consumer, error) {
 	for _, id := range IDs {
-		res, err := multiIndexLookupUsingTxn(txn, consumerTableName,
-			[]string{"Username", "id"}, id)
+		res, err := multiIndexLookupUsingTxn(txn, consumerTableName, indices, id)
 		if err == ErrNotFound {
 			continue
 		}
@@ -89,7 +103,18 @@ func (k *ConsumersCollection) Get(userNameOrID string) (*Consumer, error) {
 
 	txn := k.db.Txn(false)
 	defer txn.Abort()
-	return getConsumer(txn, userNameOrID)
+	return getConsumer(txn, []string{"Username", "id"}, userNameOrID)
+}
+
+// GetByCustomID gets a consumer by CustomID
+func (k *ConsumersCollection) GetByCustomID(customID string) (*Consumer, error) {
+	if customID == "" {
+		return nil, fmt.Errorf("CustomID is required")
+	}
+
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+	return getConsumer(txn, []string{"CustomID"}, customID)
 }
 
 // Update udpates an existing consumer.
@@ -118,7 +143,7 @@ func (k *ConsumersCollection) Update(consumer Consumer) error {
 }
 
 func deleteConsumer(txn *memdb.Txn, userNameOrID string) error {
-	consumer, err := getConsumer(txn, userNameOrID)
+	consumer, err := getConsumer(txn, []string{"Username", "id"}, userNameOrID)
 	if err != nil {
 		return err
 	}

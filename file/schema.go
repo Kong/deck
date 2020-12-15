@@ -260,6 +260,11 @@ const contentSchema = `{
           "required": [
             "id"
           ]
+        },
+        {
+          "required": [
+            "custom_id"
+          ]
         }
       ]
     },
@@ -414,6 +419,11 @@ const contentSchema = `{
         {
           "required": [
             "id"
+          ]
+        },
+        {
+          "required": [
+            "custom_id"
           ]
         }
       ]
