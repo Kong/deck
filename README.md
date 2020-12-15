@@ -12,6 +12,7 @@ decK provides declarative configuration and drift detection for Kong.
 - [**Compatibility**](#compatibility)
 - [**Installation**](#installation)
 - [**Documentation**](#documentation)
+- [**Stale issue and pull request policy**](#stale-issue-and-pull-request-policy)
 - [**License**](#license)
 
 ## Features
@@ -96,6 +97,13 @@ The project's documentation is hosted at
 ## Changelog
 
 Changelog can be found in the [CHANGELOG.md](CHANGELOG.md) file.
+
+## Stale issue and pull request policy
+
+To ensure our backlog is organized and up to date, we will close issues and
+pull requests that have been inactive awaiting a community response for over 2
+weeks. If you wish to reopen a closed issue or PR to continue work, please
+leave a comment asking a team member to do so.
 
 ## License
 
