@@ -28,7 +28,7 @@ func TestHasError(T *testing.T) {
 				StatusCode: 404,
 				Body:       ioutil.NopCloser(strings.NewReader(`{"message": "potayto pohtato", "some": "other field"}`)),
 			},
-			want: &kongAPIError{
+			want: &APIError{
 				httpCode: 404,
 				message:  "potayto pohtato",
 			},
@@ -39,7 +39,7 @@ func TestHasError(T *testing.T) {
 				StatusCode: 404,
 				Body:       ioutil.NopCloser(strings.NewReader(`{"nothing": "nothing"}`)),
 			},
-			want: &kongAPIError{
+			want: &APIError{
 				httpCode: 404,
 				message:  "",
 			},
@@ -50,7 +50,7 @@ func TestHasError(T *testing.T) {
 				StatusCode: 404,
 				Body:       ioutil.NopCloser(strings.NewReader(``)),
 			},
-			want: &kongAPIError{
+			want: &APIError{
 				httpCode: 404,
 				message:  "<failed to parse response body: unexpected end of JSON input>",
 			},
@@ -61,7 +61,7 @@ func TestHasError(T *testing.T) {
 				StatusCode: 404,
 				Body:       ioutil.NopCloser(strings.NewReader(`This is not json`)),
 			},
-			want: &kongAPIError{
+			want: &APIError{
 				httpCode: 404,
 				message:  "<failed to parse response body: invalid character 'T' looking for beginning of value>",
 			},
