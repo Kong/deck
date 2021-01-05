@@ -13,7 +13,19 @@ import (
 
 var (
 	errEnqueueFailed = errors.New("failed to queue event")
+	backoffObject    backoff.BackOff
 )
+
+func init() {
+	// For various reasons, Kong can temporarily fail to process
+	// a valid request (e.g. when the database is under heavy load).
+	// We retry each request up to 3 times on failure, after around
+	// 1 second, 3 seconds, and 9 seconds (randomized exponential backoff).
+	exponentialBackoff := backoff.NewExponentialBackOff()
+	exponentialBackoff.InitialInterval = 1 * time.Second
+	exponentialBackoff.Multiplier = 3
+	backoffObject = backoff.WithMaxRetries(exponentialBackoff, 4)
+}
 
 // TODO get rid of the syncer struct and simply have a func for it
 
@@ -373,19 +385,7 @@ func (sc *Syncer) eventLoop(d Do) error {
 		default:
 		}
 
-		// For various reasons, Kong can temporarily fail to process
-		// a valid request (e.g. when the database is under heavy load).
-		// We retry each request up to 3 times on failure, after around
-		// 1 second, 3 seconds, and 9 seconds (randomized exponential backoff).
-		exponentialBackoff := backoff.NewExponentialBackOff()
-		exponentialBackoff.InitialInterval = 1 * time.Second
-		exponentialBackoff.Multiplier = 3
-		backoffObject := backoff.WithMaxRetries(exponentialBackoff, 4)
-
-		err := backoff.Retry(func() error {
-			return sc.handleEvent(d, event)
-		}, backoffObject)
-
+		err := sc.handleEvent(d, event)
 		sc.eventCompleted()
 		if err != nil {
 			return err
@@ -395,16 +395,23 @@ func (sc *Syncer) eventLoop(d Do) error {
 }
 
 func (sc *Syncer) handleEvent(d Do, event Event) error {
-	res, err := d(event)
-	if err != nil {
-		return errors.Wrapf(err, "while processing event")
-	}
-	if res == nil {
-		return errors.New("result of event is nil")
-	}
-	_, err = sc.postProcess.Do(event.Kind, event.Op, res)
-	if err != nil {
-		return errors.Wrap(err, "while post processing event")
-	}
-	return nil
+	err := backoff.Retry(func() error {
+		res, err := d(event)
+		if err != nil {
+			// Only this type of error is retried
+			return errors.Wrapf(err, "while processing event")
+		}
+		if res == nil {
+			// Do not retry empty responses
+			return backoff.Permanent(errors.New("result of event is nil"))
+		}
+		_, err = sc.postProcess.Do(event.Kind, event.Op, res)
+		if err != nil {
+			// Do not retry program errors
+			return backoff.Permanent(errors.Wrap(err, "while post processing event"))
+		}
+		return nil
+	}, backoffObject)
+
+	return err
 }
