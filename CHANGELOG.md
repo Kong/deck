@@ -1,6 +1,7 @@
 # Table of Contents
 
-- [v1.2.3](#v122---20201118)
+- [v1.2.4](#v124---20210106)
+- [v1.2.3](#v123---20201118)
 - [v1.2.2](#v122---20201019)
 - [v1.2.1](#v121---20200804)
 - [v1.2.0](#v120---20200804)
@@ -22,6 +23,16 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.2.4] - 2021/01/06
+
+### Fixed
+
+- Fixed a bug that disabled verbose output.
+  [#243](https://github.com/Kong/deck/pull/243)
+- decK no longer considers tag order significant. This avoids unnecessary
+  resource updates for Cassandra-backed clusters.
+  [#240](https://github.com/Kong/deck/pull/240)
 
 ## [v1.2.3] - 2020/11/18
 
@@ -520,6 +531,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.2.4]: https://github.com/kong/deck/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/kong/deck/compare/v1.2.2...v1.2.3
 [v1.2.2]: https://github.com/kong/deck/compare/v1.2.1...v1.2.2
 [v1.2.1]: https://github.com/hbagdi/deck/compare/v1.2.0...v1.2.1
