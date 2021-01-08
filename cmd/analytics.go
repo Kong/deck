@@ -4,13 +4,11 @@ import (
 	"context"
 	"net/http"
 	"os"
-	"time"
 )
 
-func sendAnalytics() {
+func sendAnalytics(ctx context.Context) {
 	const (
-		minOSArgs        = 2
-		analyticsTimeout = 3 * time.Second
+		minOSArgs = 2
 	)
 
 	if os.Getenv("DECK_ANALYTICS") == "off" {
@@ -31,9 +29,6 @@ func sendAnalytics() {
 	// HTTP to avoid latency due to handshake
 	URL := "http://d.yolo42.com/" + cmd
 
-	ctx, cancel := context.WithDeadline(context.Background(),
-		time.Now().Add(analyticsTimeout))
-	defer cancel()
 	req, _ := http.NewRequestWithContext(ctx, "GET", URL, nil)
 	req.Header["deck-version"] = []string{VERSION}
 

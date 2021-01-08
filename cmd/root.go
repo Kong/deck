@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -46,13 +47,16 @@ func Execute() {
 	const threads = 2
 	wg.Add(threads)
 
+	ctx, cancel := context.WithCancel(context.Background())
+
 	go func() {
-		sendAnalytics()
+		sendAnalytics(ctx)
 		wg.Done()
 	}()
 
 	go func() {
 		err = rootCmd.Execute()
+		cancel()
 		wg.Done()
 	}()
 
