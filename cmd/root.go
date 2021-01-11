@@ -50,14 +50,14 @@ func Execute() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
+		defer wg.Done()
 		sendAnalytics(ctx)
-		wg.Done()
 	}()
 
 	go func() {
+		defer wg.Done()
+		defer cancel()
 		err = rootCmd.Execute()
-		cancel()
-		wg.Done()
 	}()
 
 	wg.Wait()
