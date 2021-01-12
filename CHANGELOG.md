@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.14.0](#v0140---20210112)
 - [v0.13.0](#v0130---20200804)
 - [v0.12.0](#v0120---20200730)
 - [v0.11.0](#v0110---20200117)
@@ -17,6 +18,20 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.14.0] - 2021/01/12
+
+### Breaking changes
+
+- HTTP error format changed to feature HTTP codes
+
+### Added
+
+- RBACUser support
+- Support for auto-expiring key-auth key TTL
+- Support for RBAC roles
+- Support for RBAC permissions
+- DeepCopy annotations for enterprise entities
 
 ## [v0.13.0] - 2020/08/04
 
@@ -262,20 +277,21 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
-[v0.13.0]: https://github.com/hbagdi/go-kong/compare/v0.12.0...v0.13.0
-[v0.12.0]: https://github.com/hbagdi/go-kong/compare/v0.11.0...v0.12.0
-[v0.11.0]: https://github.com/hbagdi/go-kong/compare/v0.10.0...v0.11.0
-[v0.10.0]: https://github.com/hbagdi/go-kong/compare/v0.9.0...v0.10.0
-[v0.9.0]: https://github.com/hbagdi/go-kong/compare/v0.8.0...v0.9.0
-[v0.8.0]: https://github.com/hbagdi/go-kong/compare/v0.7.0...v0.8.0
-[v0.7.0]: https://github.com/hbagdi/go-kong/compare/v0.6.2...v0.7.0
-[v0.6.2]: https://github.com/hbagdi/go-kong/compare/v0.6.1...v0.6.2
-[v0.6.1]: https://github.com/hbagdi/go-kong/compare/v0.6.0...v0.6.1
-[v0.6.0]: https://github.com/hbagdi/go-kong/compare/v0.5.1...v0.6.0
-[v0.5.1]: https://github.com/hbagdi/go-kong/compare/v0.5.0...v0.5.1
-[v0.5.0]: https://github.com/hbagdi/go-kong/compare/v0.4.1...v0.5.0
-[v0.4.1]: https://github.com/hbagdi/go-kong/compare/v0.4.0...v0.4.1
-[v0.4.0]: https://github.com/hbagdi/go-kong/compare/0.3.0...v0.4.0
-[0.3.0]: https://github.com/hbagdi/go-kong/compare/0.2.0...0.3.0
-[0.2.0]: https://github.com/hbagdi/go-kong/compare/0.1.0...0.2.0
-[0.1.0]: https://github.com/hbagdi/go-kong/compare/87666c7fe73477d1874d35d690301241cd23059f...0.1.0
+[v0.14.0]: https://github.com/Kong/go-kong/compare/v0.13.0...v0.14.0
+[v0.13.0]: https://github.com/Kong/go-kong/compare/v0.12.0...v0.13.0
+[v0.12.0]: https://github.com/Kong/go-kong/compare/v0.11.0...v0.12.0
+[v0.11.0]: https://github.com/Kong/go-kong/compare/v0.10.0...v0.11.0
+[v0.10.0]: https://github.com/Kong/go-kong/compare/v0.9.0...v0.10.0
+[v0.9.0]: https://github.com/Kong/go-kong/compare/v0.8.0...v0.9.0
+[v0.8.0]: https://github.com/Kong/go-kong/compare/v0.7.0...v0.8.0
+[v0.7.0]: https://github.com/Kong/go-kong/compare/v0.6.2...v0.7.0
+[v0.6.2]: https://github.com/Kong/go-kong/compare/v0.6.1...v0.6.2
+[v0.6.1]: https://github.com/Kong/go-kong/compare/v0.6.0...v0.6.1
+[v0.6.0]: https://github.com/Kong/go-kong/compare/v0.5.1...v0.6.0
+[v0.5.1]: https://github.com/Kong/go-kong/compare/v0.5.0...v0.5.1
+[v0.5.0]: https://github.com/Kong/go-kong/compare/v0.4.1...v0.5.0
+[v0.4.1]: https://github.com/Kong/go-kong/compare/v0.4.0...v0.4.1
+[v0.4.0]: https://github.com/Kong/go-kong/compare/0.3.0...v0.4.0
+[0.3.0]: https://github.com/Kong/go-kong/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/Kong/go-kong/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/Kong/go-kong/compare/87666c7fe73477d1874d35d690301241cd23059f...0.1.0
