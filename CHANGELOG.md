@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.3.0](#v130---20210115)
 - [v1.2.4](#v124---20210106)
 - [v1.2.3](#v123---20201118)
 - [v1.2.2](#v122---20201019)
@@ -23,6 +24,21 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.3.0] - 2021/01/15
+
+### Added
+
+- decK will now retry sync operations that encounter a 500 error several times
+  before failing completely.
+  [#226](https://github.com/Kong/deck/pull/226)
+
+### Fixed
+
+- Fixed regression that broke workspace creation.
+  [#252](https://github.com/Kong/deck/pull/252)
+- Analytics failures no longer delay execution.
+  [#254](https://github.com/Kong/deck/pull/254)
 
 ## [v1.2.4] - 2021/01/06
 
@@ -531,6 +547,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.3.0]: https://github.com/kong/deck/compare/v1.2.4...v1.3.0
 [v1.2.4]: https://github.com/kong/deck/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/kong/deck/compare/v1.2.2...v1.2.3
 [v1.2.2]: https://github.com/kong/deck/compare/v1.2.1...v1.2.2
