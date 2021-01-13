@@ -911,6 +911,9 @@ const contentSchema = `{
             "type": "string"
           },
           "type": "array"
+        },
+        "ttl": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,
