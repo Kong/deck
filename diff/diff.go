@@ -15,10 +15,9 @@ import (
 
 var (
 	errEnqueueFailed = errors.New("failed to queue event")
-	backoffObject    backoff.BackOff
 )
 
-func init() {
+func defaultBackOff() backoff.BackOff {
 	// For various reasons, Kong can temporarily fail to process
 	// a valid request (e.g. when the database is under heavy load).
 	// We retry each request up to 3 times on failure, after around
@@ -26,7 +25,7 @@ func init() {
 	exponentialBackoff := backoff.NewExponentialBackOff()
 	exponentialBackoff.InitialInterval = 1 * time.Second
 	exponentialBackoff.Multiplier = 3
-	backoffObject = backoff.WithMaxRetries(exponentialBackoff, 4)
+	return backoff.WithMaxRetries(exponentialBackoff, 4)
 }
 
 // TODO get rid of the syncer struct and simply have a func for it
@@ -405,7 +404,6 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 			var kongAPIError *kong.APIError
 			if errors.As(err, &kongAPIError) &&
 				kongAPIError.Code() == http.StatusInternalServerError {
-
 				// Only retry if the request to Kong returned a 500 status code
 				return err
 			}
@@ -423,7 +421,7 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 			return backoff.Permanent(errors.Wrap(err, "while post processing event"))
 		}
 		return nil
-	}, backoffObject)
+	}, defaultBackOff())
 
 	return err
 }
