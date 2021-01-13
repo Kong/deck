@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"net/http"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
+	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -398,8 +400,18 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
-			// Only this type of error is retried
-			return errors.Wrapf(err, "while processing event")
+			err = errors.Wrapf(err, "while processing event")
+
+			var kongAPIError *kong.APIError
+			if errors.As(err, &kongAPIError) &&
+				kongAPIError.Code() == http.StatusInternalServerError {
+
+				// Only retry if the request to Kong returned a 500 status code
+				return err
+			}
+
+			// Do not retry on other status codes
+			return backoff.Permanent(err)
 		}
 		if res == nil {
 			// Do not retry empty responses

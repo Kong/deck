@@ -1,9 +1,6 @@
 package solver
 
 import (
-	"strings"
-
-	"github.com/cenkalti/backoff/v4"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/print"
@@ -62,12 +59,6 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 			// fire the request to Kong
 			result, err = r.Do(e.Kind, e.Op, e)
 			if err != nil {
-				// Make only 500 errors retryable - this is what Kong returns when e.g. the
-				// database is temporarily overloaded.
-				// TODO: Replace with better check when/if go-kong exposes status code
-				if !strings.HasPrefix(err.Error(), "500") {
-					err = backoff.Permanent(err)
-				}
 				return nil, errors.Wrapf(err, "%v %v %v failed", e.Op, e.Kind, c.Console())
 			}
 		} else {

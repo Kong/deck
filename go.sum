@@ -85,8 +85,8 @@ github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 h1:uC1QfSlInpQ
 github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88/go.mod h1:3w7q1U84EfirKl04SVQ/s7nPm1ZPhiXd34z40TNz36k=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/kong/go-kong v0.13.0 h1:r1eTq3lc6fjHAiWWv4Dv1b8e35hER+g6vlNLMFkfcRQ=
-github.com/kong/go-kong v0.13.0/go.mod h1:oF4kdI9l/a8ndDW2ayJA0yhDBpO8Qt2aLiJEv10hqnQ=
+github.com/kong/go-kong v0.14.0 h1:5XD98DcnfajmG18HypztAGvNGp8ga6gtefomM3oMTU0=
+github.com/kong/go-kong v0.14.0/go.mod h1:oF4kdI9l/a8ndDW2ayJA0yhDBpO8Qt2aLiJEv10hqnQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
