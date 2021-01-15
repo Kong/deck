@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strings"
 
 	ghodssyaml "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
@@ -111,7 +111,6 @@ func yamlUnmarshal(bytes []byte, v interface{}) error {
 // returns all the files with a case-insensitive extension of `yml` or `yaml`.
 func configFilesInDir(dir string) ([]string, error) {
 	var res []string
-	exts := regexp.MustCompile("[Yy]([Aa])?[Mm][Ll]|[Jj][Ss][Oo][Nn]")
 	err := filepath.Walk(
 		dir,
 		func(path string, info os.FileInfo, err error) error {
@@ -121,7 +120,8 @@ func configFilesInDir(dir string) ([]string, error) {
 			if info.IsDir() {
 				return nil
 			}
-			if exts.MatchString(path) {
+			switch strings.ToLower(filepath.Ext(path)) {
+			case ".yaml", ".yml", ".json":
 				res = append(res, path)
 			}
 			return nil
