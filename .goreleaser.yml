@@ -26,7 +26,7 @@ nfpms:
   - deb
   - rpm
 brews:
-- github:
+- tap:
     owner: kong
     name: homebrew-deck
   commit_author:
