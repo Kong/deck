@@ -59,6 +59,20 @@ type Route struct {
 	Tags          []*string           `json:"tags,omitempty" yaml:"tags,omitempty"`
 
 	HTTPSRedirectStatusCode *int `json:"https_redirect_status_code,omitempty" yaml:"https_redirect_status_code,omitempty"`
+
+	// Kong buffers requests and responses by default. Buffering is not always
+	// desired, for instance if large payloads are being proxied using HTTP 1.1
+	// chunked encoding.
+	//
+	// The request and response route buffering options are enabled by default
+	// and allow the user to disable buffering if desired for their use case.
+	//
+	// SEE ALSO:
+	// - https://github.com/Kong/kong/pull/6057
+	// - https://docs.konghq.com/2.2.x/admin-api/#route-object
+	//
+	RequestBuffering  *bool `json:"request_buffering,omitempty" yaml:"request_buffering,omitempty"`
+	ResponseBuffering *bool `json:"response_buffering,omitempty" yaml:"response_buffering,omitempty"`
 }
 
 // Consumer represents a Consumer in Kong.

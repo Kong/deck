@@ -1229,6 +1229,16 @@ func (in *Route) DeepCopyInto(out *Route) {
 		*out = new(int)
 		**out = **in
 	}
+	if in.RequestBuffering != nil {
+		in, out := &in.RequestBuffering, &out.RequestBuffering
+		*out = new(bool)
+		**out = **in
+	}
+	if in.ResponseBuffering != nil {
+		in, out := &in.ResponseBuffering, &out.ResponseBuffering
+		*out = new(bool)
+		**out = **in
+	}
 	return
 }
 
