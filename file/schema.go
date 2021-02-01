@@ -541,6 +541,12 @@ const contentSchema = `{
         "regex_priority": {
           "type": "integer"
         },
+        "request_buffering": {
+          "type": "boolean"
+        },
+        "response_buffering": {
+          "type": "boolean"
+        },
         "service": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Service"
@@ -1071,6 +1077,12 @@ const contentSchema = `{
         },
         "regex_priority": {
           "type": "integer"
+        },
+        "request_buffering": {
+          "type": "boolean"
+        },
+        "response_buffering": {
+          "type": "boolean"
         },
         "service": {
           "$ref": "#/definitions/Service"

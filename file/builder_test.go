@@ -1767,6 +1767,27 @@ func Test_stateBuilder(t *testing.T) {
 								},
 							},
 						},
+						{
+							Service: kong.Service{
+								Name: kong.String("large-payload-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:              kong.String("dont-buffer-these"),
+										RequestBuffering:  kong.Bool(false),
+										ResponseBuffering: kong.Bool(false),
+									},
+								},
+								{
+									Route: kong.Route{
+										Name:              kong.String("buffer-these"),
+										RequestBuffering:  kong.Bool(true),
+										ResponseBuffering: kong.Bool(true),
+									},
+								},
+							},
+						},
 					},
 					Upstreams: []FUpstream{
 						{
@@ -1794,6 +1815,16 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
 						Name:           kong.String("bar-service"),
+						Port:           kong.Int(80),
+						Protocol:       kong.String("http"),
+						ConnectTimeout: kong.Int(60000),
+						WriteTimeout:   kong.Int(60000),
+						ReadTimeout:    kong.Int(60000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+					{
+						ID:             kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						Name:           kong.String("large-payload-service"),
 						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
@@ -1851,10 +1882,38 @@ func Test_stateBuilder(t *testing.T) {
 						},
 						Tags: kong.StringSlice("tag1"),
 					},
+					{
+						ID:            kong.String("ba843ee8-d63e-4c4f-be1c-ebea546d8fac"),
+						Name:          kong.String("dont-buffer-these"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						},
+						Tags:              kong.StringSlice("tag1"),
+						RequestBuffering:  kong.Bool(false),
+						ResponseBuffering: kong.Bool(false),
+					},
+					{
+						ID:            kong.String("13dd1aac-04ce-4ea2-877c-5579cfa2c78e"),
+						Name:          kong.String("buffer-these"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						Service: &kong.Service{
+							ID: kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						},
+						Tags:              kong.StringSlice("tag1"),
+						RequestBuffering:  kong.Bool(true),
+						ResponseBuffering: kong.Bool(true),
+					},
 				},
 				Upstreams: []*kong.Upstream{
 					{
-						ID:    kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						ID:    kong.String("1b0bafae-881b-42a7-9110-8a42ed3c903c"),
 						Name:  kong.String("foo"),
 						Slots: kong.Int(42),
 						Healthchecks: &kong.Healthcheck{
