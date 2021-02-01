@@ -37,7 +37,7 @@
 
 - Updated brew syntax
   [#252](https://github.com/Kong/deck/pull/252)
-- Fixed configFilesInDir extension match
+- Fixed YAML/JSON file detection logic
   [#255](https://github.com/Kong/deck/pull/255)
 
 ## [v1.3.0] - 2021/01/15
