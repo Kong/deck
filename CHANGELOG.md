@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.4.0](#v140---20210201)
 - [v1.3.0](#v130---20210115)
 - [v1.2.4](#v124---20210106)
 - [v1.2.3](#v123---20201118)
@@ -24,6 +25,20 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.4.0] - 2021/02/01
+
+### Added
+
+- deck now handles the `request_buffering` and `response_buffering` options for `Route`
+  [#261](https://github.com/Kong/deck/pull/261)
+
+### Fixes
+
+- Updated brew syntax
+  [#252](https://github.com/Kong/deck/pull/252)
+- Fixed YAML/JSON file detection logic
+  [#255](https://github.com/Kong/deck/pull/255)
 
 ## [v1.3.0] - 2021/01/15
 
@@ -547,6 +562,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.4.0]: https://github.com/kong/deck/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/kong/deck/compare/v1.2.4...v1.3.0
 [v1.2.4]: https://github.com/kong/deck/compare/v1.2.3...v1.2.4
 [v1.2.3]: https://github.com/kong/deck/compare/v1.2.2...v1.2.3
