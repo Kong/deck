@@ -40,6 +40,7 @@ type Client struct {
 	Plugins                 *PluginService
 	SNIs                    *SNIService
 	Upstreams               *UpstreamService
+	UpstreamNodeHealth      *UpstreamNodeHealthService
 	Targets                 *TargetService
 	Workspaces              *WorkspaceService
 	Admins                  *AdminService
@@ -109,6 +110,7 @@ func NewClient(baseURL *string, client *http.Client) (*Client, error) {
 	kong.CACertificates = (*CACertificateService)(&kong.common)
 	kong.SNIs = (*SNIService)(&kong.common)
 	kong.Upstreams = (*UpstreamService)(&kong.common)
+	kong.UpstreamNodeHealth = (*UpstreamNodeHealthService)(&kong.common)
 	kong.Targets = (*TargetService)(&kong.common)
 	kong.Workspaces = (*WorkspaceService)(&kong.common)
 	kong.Admins = (*AdminService)(&kong.common)

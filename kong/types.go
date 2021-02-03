@@ -160,6 +160,47 @@ type Healthcheck struct {
 	Threshold *float64            `json:"threshold,omitempty" yaml:"threshold,omitempty"`
 }
 
+// HealthDataAddress represents the health data address of a target
+// +k8s:deepcopy-gen=true
+type HealthDataAddress struct {
+	Port   *int    `json:"port,omitempty" yaml:"port,omitempty"`
+	IP     *string `json:"ip,omitempty" yaml:"ip,omitempty"`
+	Health *string `json:"health,omitempty" yaml:"data,omitempty"`
+	Weight *int    `json:"weight,omitempty" yaml:"weight,omitempty"`
+}
+
+// HealthDataWeight represents the health data weight of a target
+// +k8s:deepcopy-gen=true
+type HealthDataWeight struct {
+	Total       *int `json:"total,omitempty" yaml:"total,omitempty"`
+	Available   *int `json:"available,omitempty" yaml:"available,omitempty"`
+	Unavailable *int `json:"unavailable,omitempty" yaml:"unavailable,omitempty"`
+}
+
+// HealthData represents the health data of a target
+// +k8s:deepcopy-gen=true
+type HealthData struct {
+	Host       *string              `json:"host,omitempty" yaml:"host,omitempty"`
+	Port       *int                 `json:"port,omitempty" yaml:"port,omitempty"`
+	NodeWeight *int                 `json:"nodeWeight,omitempty" yaml:"nodeWeight,omitempty"`
+	Weight     *HealthDataWeight    `json:"weight,omitempty" yaml:"weight,omitempty"`
+	Addresses  []*HealthDataAddress `json:"addresses,omitempty" yaml:"addresses,omitempty"`
+	DNS        *string              `json:"dns,omitempty" yaml:"dns,omitempty"`
+}
+
+// UpstreamNodeHealth represents the node health of a upstream
+// +k8s:deepcopy-gen=true
+type UpstreamNodeHealth struct {
+	ID        *string     `json:"id,omitempty" yaml:"id,omitempty"`
+	CreatedAt *float64    `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	Data      *HealthData `json:"data,omitempty" yaml:"data,omitempty"`
+	Health    *string     `json:"health,omitempty" yaml:"data,omitempty"`
+	Target    *string     `json:"target,omitempty" yaml:"target,omitempty"`
+	Upstream  *Upstream   `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+	Weight    *int        `json:"weight,omitempty" yaml:"weight,omitempty"`
+	Tags      []*string   `json:"tags,omitempty" yaml:"tags,omitempty"`
+}
+
 // Upstream represents an Upstream in Kong.
 // +k8s:deepcopy-gen=true
 type Upstream struct {
