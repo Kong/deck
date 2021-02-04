@@ -435,7 +435,7 @@ func (b *stateBuilder) services() {
 				_, err := b.currentState.Certificates.Get(*s.ClientCertificate.ID)
 				if err == state.ErrNotFound {
 					b.err = errors.Errorf("client certificate not found: %v",
-					*s.ClientCertificate.ID)
+						*s.ClientCertificate.ID)
 					return
 				} else if err != nil {
 					b.err = err
