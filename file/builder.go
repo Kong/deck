@@ -432,9 +432,9 @@ func (b *stateBuilder) services() {
 
 		if s.ClientCertificate != nil && !utils.Empty(s.ClientCertificate.ID) {
 			if _, ok := b.certIDs[*s.ClientCertificate.ID]; !ok {
-				_, err := b.currentState.Certificates.Get(*s.ClientCertificate.ID)
+				_, err := b.currentState.AllAvailableCertificates.Get(*s.ClientCertificate.ID)
 				if err == state.ErrNotFound {
-					b.err = errors.Errorf("client certificate not found: %v",
+					b.err = errors.Errorf("client certificate not found in all available certs list: %v",
 						*s.ClientCertificate.ID)
 					return
 				} else if err != nil {

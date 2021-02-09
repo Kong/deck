@@ -135,6 +135,19 @@ func existingUpstreamState() *state.KongState {
 	return s
 }
 
+func existingAllAvailableCertificateState() *state.KongState {
+	s, _ := state.NewKongState()
+	s.AllAvailableCertificates.Add(state.Certificate{
+		Certificate: kong.Certificate{
+			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Cert: kong.String("foo"),
+			Key:  kong.String("bar"),
+		},
+	})
+	return s
+}
+
+
 func existingCertificateState() *state.KongState {
 	s, _ := state.NewKongState()
 	s.Certificates.Add(state.Certificate{
@@ -363,7 +376,7 @@ func Test_stateBuilder_services(t *testing.T) {
 						},
 					},
 				},
-				currentState: existingCertificateState(),
+				currentState: existingAllAvailableCertificateState(),
 			},
 			wantErr: false,
 			want: &utils.KongRawState{
@@ -401,7 +414,7 @@ func Test_stateBuilder_services(t *testing.T) {
 				currentState: emptyState(),
 			},
 			wantErr: true,
-			err:     "client certificate not found: 00000000-c962-4817-83e5-9433cf20b663",
+			err:     "client certificate not found in all available certs list: 00000000-c962-4817-83e5-9433cf20b663",
 		},
 	}
 	for _, tt := range tests {

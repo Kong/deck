@@ -28,6 +28,7 @@ type KongRawState struct {
 	Targets   []*kong.Target
 
 	Certificates   []*kong.Certificate
+	AllAvailableCertificates   []*kong.Certificate
 	SNIs           []*kong.SNI
 	CACertificates []*kong.CACertificate
 
