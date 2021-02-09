@@ -31,7 +31,6 @@ var allAvailableCertificateTableSchema = &memdb.TableSchema{
 	},
 }
 
-
 // CertificatesCollection stores and indexes Kong Certificates.
 type AllAvailableCertificatesCollection collection
 

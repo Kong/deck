@@ -147,7 +147,6 @@ func existingAllAvailableCertificateState() *state.KongState {
 	return s
 }
 
-
 func existingCertificateState() *state.KongState {
 	s, _ := state.NewKongState()
 	s.Certificates.Add(state.Certificate{

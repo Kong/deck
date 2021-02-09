@@ -12,17 +12,17 @@ type collection struct {
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
-	common         collection
-	Services       *ServicesCollection
-	Routes         *RoutesCollection
-	Upstreams      *UpstreamsCollection
-	Targets        *TargetsCollection
-	Certificates   *CertificatesCollection
+	common                   collection
+	Services                 *ServicesCollection
+	Routes                   *RoutesCollection
+	Upstreams                *UpstreamsCollection
+	Targets                  *TargetsCollection
+	Certificates             *CertificatesCollection
 	AllAvailableCertificates *AllAvailableCertificatesCollection
-	SNIs           *SNIsCollection
-	CACertificates *CACertificatesCollection
-	Plugins        *PluginsCollection
-	Consumers      *ConsumersCollection
+	SNIs                     *SNIsCollection
+	CACertificates           *CACertificatesCollection
+	Plugins                  *PluginsCollection
+	Consumers                *ConsumersCollection
 
 	KeyAuths    *KeyAuthsCollection
 	HMACAuths   *HMACAuthsCollection
@@ -46,16 +46,16 @@ func NewKongState() (*KongState, error) {
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
-			serviceTableName:     serviceTableSchema,
-			routeTableName:       routeTableSchema,
-			upstreamTableName:    upstreamTableSchema,
-			targetTableName:      targetTableSchema,
-			certificateTableName: certificateTableSchema,
+			serviceTableName:                 serviceTableSchema,
+			routeTableName:                   routeTableSchema,
+			upstreamTableName:                upstreamTableSchema,
+			targetTableName:                  targetTableSchema,
+			certificateTableName:             certificateTableSchema,
 			allAvailableCertificateTableName: allAvailableCertificateTableSchema,
-			sniTableName:         sniTableSchema,
-			caCertTableName:      caCertTableSchema,
-			pluginTableName:      pluginTableSchema,
-			consumerTableName:    consumerTableSchema,
+			sniTableName:                     sniTableSchema,
+			caCertTableName:                  caCertTableSchema,
+			pluginTableName:                  pluginTableSchema,
+			consumerTableName:                consumerTableSchema,
 
 			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
 			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
