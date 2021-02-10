@@ -281,11 +281,9 @@ func Test_stateBuilder_services(t *testing.T) {
 		currentState  *state.KongState
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-		err     string
-		want    *utils.KongRawState
+		name   string
+		fields fields
+		want   *utils.KongRawState
 	}{
 		{
 			name: "matches ID of an existing service",
