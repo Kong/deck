@@ -430,20 +430,6 @@ func (b *stateBuilder) services() {
 		utils.MustMergeTags(&s.Service, b.selectTags)
 		b.defaulter.MustSet(&s.Service)
 
-		if s.ClientCertificate != nil && !utils.Empty(s.ClientCertificate.ID) {
-			if _, ok := b.certIDs[*s.ClientCertificate.ID]; !ok {
-				_, err := b.currentState.AllAvailableCertificates.Get(*s.ClientCertificate.ID)
-				if err == state.ErrNotFound {
-					b.err = errors.Errorf("client certificate not found in all available certs list: %v",
-						*s.ClientCertificate.ID)
-					return
-				} else if err != nil {
-					b.err = err
-					return
-				}
-			}
-		}
-
 		b.rawState.Services = append(b.rawState.Services, &s.Service)
 		err := b.intermediate.Services.Add(state.Service{Service: s.Service})
 		if err != nil {

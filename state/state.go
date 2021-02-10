@@ -12,17 +12,16 @@ type collection struct {
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
-	common                   collection
-	Services                 *ServicesCollection
-	Routes                   *RoutesCollection
-	Upstreams                *UpstreamsCollection
-	Targets                  *TargetsCollection
-	Certificates             *CertificatesCollection
-	AllAvailableCertificates *AllAvailableCertificatesCollection
-	SNIs                     *SNIsCollection
-	CACertificates           *CACertificatesCollection
-	Plugins                  *PluginsCollection
-	Consumers                *ConsumersCollection
+	common         collection
+	Services       *ServicesCollection
+	Routes         *RoutesCollection
+	Upstreams      *UpstreamsCollection
+	Targets        *TargetsCollection
+	Certificates   *CertificatesCollection
+	SNIs           *SNIsCollection
+	CACertificates *CACertificatesCollection
+	Plugins        *PluginsCollection
+	Consumers      *ConsumersCollection
 
 	KeyAuths    *KeyAuthsCollection
 	HMACAuths   *HMACAuthsCollection
@@ -46,16 +45,15 @@ func NewKongState() (*KongState, error) {
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
-			serviceTableName:                 serviceTableSchema,
-			routeTableName:                   routeTableSchema,
-			upstreamTableName:                upstreamTableSchema,
-			targetTableName:                  targetTableSchema,
-			certificateTableName:             certificateTableSchema,
-			allAvailableCertificateTableName: allAvailableCertificateTableSchema,
-			sniTableName:                     sniTableSchema,
-			caCertTableName:                  caCertTableSchema,
-			pluginTableName:                  pluginTableSchema,
-			consumerTableName:                consumerTableSchema,
+			serviceTableName:     serviceTableSchema,
+			routeTableName:       routeTableSchema,
+			upstreamTableName:    upstreamTableSchema,
+			targetTableName:      targetTableSchema,
+			certificateTableName: certificateTableSchema,
+			sniTableName:         sniTableSchema,
+			caCertTableName:      caCertTableSchema,
+			pluginTableName:      pluginTableSchema,
+			consumerTableName:    consumerTableSchema,
 
 			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
 			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
@@ -82,7 +80,6 @@ func NewKongState() (*KongState, error) {
 	state.Upstreams = (*UpstreamsCollection)(&state.common)
 	state.Targets = (*TargetsCollection)(&state.common)
 	state.Certificates = (*CertificatesCollection)(&state.common)
-	state.AllAvailableCertificates = (*AllAvailableCertificatesCollection)(&state.common)
 	state.SNIs = (*SNIsCollection)(&state.common)
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)

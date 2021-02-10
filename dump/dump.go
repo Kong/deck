@@ -91,15 +91,6 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 	})
 
 	group.Go(func() error {
-		certificates, err := GetAllCertificates(ctx, client, nil)
-		if err != nil {
-			return errors.Wrap(err, "allAvailableCertificates")
-		}
-		state.AllAvailableCertificates = certificates
-		return nil
-	})
-
-	group.Go(func() error {
 		caCerts, err := GetAllCACertificates(ctx, client, config.SelectorTags)
 		if err != nil {
 			return errors.Wrap(err, "ca-certificates")

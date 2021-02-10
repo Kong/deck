@@ -2,7 +2,6 @@ package file
 
 import (
 	"encoding/hex"
-	"fmt"
 	"math/rand"
 	"os"
 	"reflect"
@@ -130,18 +129,6 @@ func existingUpstreamState() *state.KongState {
 		Upstream: kong.Upstream{
 			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 			Name: kong.String("foo"),
-		},
-	})
-	return s
-}
-
-func existingAllAvailableCertificateState() *state.KongState {
-	s, _ := state.NewKongState()
-	s.AllAvailableCertificates.Add(state.Certificate{
-		Certificate: kong.Certificate{
-			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
-			Cert: kong.String("foo"),
-			Key:  kong.String("bar"),
 		},
 	})
 	return s
@@ -360,61 +347,6 @@ func Test_stateBuilder_services(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "process an existing client certificate for service",
-			fields: fields{
-				targetContent: &Content{
-					Services: []FService{
-						{
-							Service: kong.Service{
-								Name: kong.String("foo"),
-								ClientCertificate: &kong.Certificate{
-									ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
-								},
-							},
-						},
-					},
-				},
-				currentState: existingAllAvailableCertificateState(),
-			},
-			wantErr: false,
-			want: &utils.KongRawState{
-				Services: []*kong.Service{
-					{
-						ClientCertificate: &kong.Certificate{
-							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
-						},
-						ID:             kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
-						Name:           kong.String("foo"),
-						Port:           kong.Int(80),
-						Protocol:       kong.String("http"),
-						ConnectTimeout: kong.Int(60000),
-						WriteTimeout:   kong.Int(60000),
-						ReadTimeout:    kong.Int(60000),
-					},
-				},
-			},
-		},
-		{
-			name: "process a non-existent client certificate for service",
-			fields: fields{
-				targetContent: &Content{
-					Services: []FService{
-						{
-							Service: kong.Service{
-								Name: kong.String("foo"),
-								ClientCertificate: &kong.Certificate{
-									ID: kong.String("00000000-c962-4817-83e5-9433cf20b663"),
-								},
-							},
-						},
-					},
-				},
-				currentState: emptyState(),
-			},
-			wantErr: true,
-			err:     "client certificate not found in all available certs list: 00000000-c962-4817-83e5-9433cf20b663",
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -425,13 +357,7 @@ func Test_stateBuilder_services(t *testing.T) {
 			d, _ := utils.GetKongDefaulter()
 			b.defaulter = d
 			b.build()
-
-			if (b.err != nil) && tt.wantErr {
-				assert.Equal(tt.err, fmt.Sprintf("%v", b.err))
-			} else {
-				assert.Equal(tt.want, b.rawState)
-			}
-
+			assert.Equal(tt.want, b.rawState)
 		})
 	}
 }

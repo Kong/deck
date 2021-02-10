@@ -152,13 +152,6 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 		}
 	}
 
-	for _, c := range raw.AllAvailableCertificates {
-		err := kongState.AllAvailableCertificates.Add(Certificate{Certificate: *c})
-		if err != nil {
-			return nil, errors.Wrap(err, "inserting all available certificate into state")
-		}
-	}
-
 	for _, s := range raw.SNIs {
 		err := kongState.SNIs.Add(SNI{SNI: *s})
 		if err != nil {
