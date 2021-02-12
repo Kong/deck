@@ -17,7 +17,6 @@ type stateBuilder struct {
 
 	selectTags   []string
 	intermediate *state.KongState
-	certIDs      map[string]bool
 
 	err error
 }
@@ -45,7 +44,6 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	if err != nil {
 		return nil, err
 	}
-	b.certIDs = map[string]bool{}
 
 	// build
 	b.certificates()
@@ -105,8 +103,6 @@ func (b *stateBuilder) certificates() {
 			b.err = err
 			return
 		}
-
-		b.certIDs[*c.ID] = true
 	}
 }
 
