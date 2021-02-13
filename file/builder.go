@@ -17,7 +17,6 @@ type stateBuilder struct {
 
 	selectTags   []string
 	intermediate *state.KongState
-	certIDs      map[string]bool
 
 	err error
 }
@@ -45,7 +44,6 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	if err != nil {
 		return nil, err
 	}
-	b.certIDs = map[string]bool{}
 
 	// build
 	b.certificates()
@@ -105,8 +103,6 @@ func (b *stateBuilder) certificates() {
 			b.err = err
 			return
 		}
-
-		b.certIDs[*c.ID] = true
 	}
 }
 
@@ -429,14 +425,6 @@ func (b *stateBuilder) services() {
 		}
 		utils.MustMergeTags(&s.Service, b.selectTags)
 		b.defaulter.MustSet(&s.Service)
-
-		if s.ClientCertificate != nil && !utils.Empty(s.ClientCertificate.ID) {
-			if _, ok := b.certIDs[*s.ClientCertificate.ID]; !ok {
-				b.err = errors.Errorf("client certificate not found: %v",
-					*s.ClientCertificate.ID)
-				return
-			}
-		}
 
 		b.rawState.Services = append(b.rawState.Services, &s.Service)
 		err := b.intermediate.Services.Add(state.Service{Service: s.Service})
