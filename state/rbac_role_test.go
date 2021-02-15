@@ -250,38 +250,6 @@ func TestRBACRolesCollection_Update(t *testing.T) {
 	}
 }
 
-// Regression test
-// to ensure that the memory reference of the pointer returned by Get()
-// is different from the one stored in MemDB.
-// func TestRBACRoleGetMemoryReference(t *testing.T) {
-// 	assert := assert.New(t)
-// 	collection := rbacRolesCollection()
-
-// 	var rbacRole RBACRole
-// 	rbacRole.Name = kong.String("my-rbacRole")
-// 	rbacRole.ID = kong.String("first")
-// 	rbacRole.Hosts = kong.StringSlice("example.com", "demo.example.com")
-// 	rbacRole.Service = &kong.Service{
-// 		ID: kong.String("service1-id"),
-// 	}
-// 	assert.NotNil(rbacRole.Service)
-// 	err := collection.Add(rbacRole)
-// 	assert.NotNil(rbacRole.Service)
-// 	assert.Nil(err)
-
-// 	re, err := collection.Get("first")
-// 	assert.Nil(err)
-// 	assert.NotNil(re)
-// 	assert.Equal("my-rbacRole", *re.Name)
-
-// 	re.SNIs = kong.StringSlice("example.com", "demo.example.com")
-
-// 	re, err = collection.Get("my-rbacRole")
-// 	assert.Nil(err)
-// 	assert.NotNil(re)
-// 	assert.Nil(re.SNIs)
-// }
-
 func TestRBACRoleDelete(t *testing.T) {
 	assert := assert.New(t)
 	collection := rbacRolesCollection()
@@ -327,57 +295,3 @@ func TestRBACRoleGetAll(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(2, len(rbacRoles))
 }
-
-// func TestRBACRoleGetAllByServiceID(t *testing.T) {
-// 	assert := assert.New(t)
-// 	collection := rbacRolesCollection()
-
-// 	rbacRoles := []*RBACRole{
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID: kong.String("rbacRole0-id"),
-// 			},
-// 		},
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID:   kong.String("rbacRole1-id"),
-// 				Name: kong.String("rbacRole1-name"),
-// 			},
-// 		},
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID: kong.String("rbacRole2-id"),
-// 			},
-// 		},
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID:   kong.String("rbacRole3-id"),
-// 				Name: kong.String("rbacRole3-name"),
-// 			},
-// 		},
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID:   kong.String("rbacRole4-id"),
-// 				Name: kong.String("rbacRole4-name"),
-// 			},
-// 		},
-// 		{
-// 			RBACRole: kong.RBACRole{
-// 				ID: kong.String("rbacRole5-id"),
-// 			},
-// 		},
-// 	}
-
-// 	for _, rbacRole := range rbacRoles {
-// 		err := collection.Add(*rbacRole)
-// 		assert.Nil(err)
-// 	}
-
-// 	rbacRoles, err := collection.GetAllByServiceID("service1-id")
-// 	assert.Nil(err)
-// 	assert.Equal(2, len(rbacRoles))
-
-// 	rbacRoles, err = collection.GetAllByServiceID("service2-id")
-// 	assert.Nil(err)
-// 	assert.Equal(3, len(rbacRoles))
-// }
