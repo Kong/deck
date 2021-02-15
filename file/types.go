@@ -479,6 +479,16 @@ func (c FConsumer) id() string {
 	return ""
 }
 
+// FRBACRole represents an RBACRole in Kong
+type FRBACRole struct {
+	kong.RBACRole       `yaml:",inline,omitempty"`
+	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"`
+}
+
+type FRBACEndpointPermission struct {
+	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
+}
+
 // Info contains meta-data of the file.
 type Info struct {
 	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
@@ -499,6 +509,8 @@ type Content struct {
 	Upstreams      []FUpstream      `json:"upstreams,omitempty" yaml:",omitempty"`
 	Certificates   []FCertificate   `json:"certificates,omitempty" yaml:",omitempty"`
 	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
+
+	RBACRoles []FRBACRole `json:"rbac_roles,omitempty" yaml:"rbac_roles,omitempty"`
 
 	PluginConfigs map[string]kong.Configuration `json:"_plugin_configs,omitempty" yaml:"_plugin_configs,omitempty"`
 }

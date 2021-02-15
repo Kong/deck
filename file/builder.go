@@ -53,6 +53,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	b.upstreams()
 	b.consumers()
 	b.plugins()
+	b.rbacRoles()
 
 	// result
 	if b.err != nil {
@@ -467,6 +468,35 @@ func (b *stateBuilder) routes() {
 			b.err = err
 			return
 		}
+	}
+}
+
+func (b *stateBuilder) rbacRoles() {
+	if b.err != nil {
+		return
+	}
+
+	for _, r := range b.targetContent.RBACRoles {
+		r := r
+		if utils.Empty(r.ID) {
+			role, err := b.currentState.RBACRoles.Get(*r.Name)
+			if err == state.ErrNotFound {
+				r.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				r.ID = kong.String(*role.ID)
+			}
+		}
+		b.rawState.RBACRoles = append(b.rawState.RBACRoles, &r.RBACRole)
+		// rbac endpoint permissions for the role
+		for _, ep := range r.EndpointPermissions {
+			ep := ep
+			ep.Role = &kong.RBACRole{ID: kong.String(*r.ID)}
+			b.rawState.RBACEndpointPermissions = append(b.rawState.RBACEndpointPermissions, &ep.RBACEndpointPermission)
+		}
+		// TODO entity permissions
 	}
 }
 

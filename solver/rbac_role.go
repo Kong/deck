@@ -22,13 +22,13 @@ func rbacRoleFromStuct(arg diff.Event) *state.RBACRole {
 }
 
 // Create creates a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the route to be created,
+// The arg should be of type diff.Event, containing the role to be created,
 // else the function will panic.
 // It returns a the created *state.RBACRole.
 func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	role := routeFromStuct(event)
-	createdRBACRole, err := s.client.RBACRoles.Create(nil, role)
+	role := rbacRoleFromStuct(event)
+	createdRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
 	if err != nil {
 		return nil, err
 	}
@@ -36,28 +36,28 @@ func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 }
 
 // Delete deletes a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the route to be deleted,
+// The arg should be of type diff.Event, containing the role to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.RBACRole.
 func (s *rbacRoleCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	route := routeFromStuct(event)
-	err := s.client.RBACRoles.Delete(nil, route.ID)
+	role := rbacRoleFromStuct(event)
+	err := s.client.RBACRoles.Delete(nil, role.ID)
 	if err != nil {
 		return nil, err
 	}
-	return route, nil
+	return role, nil
 }
 
 // Update updates a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the route to be updated,
+// The arg should be of type diff.Event, containing the role to be updated,
 // else the function will panic.
 // It returns a the updated *state.RBACRole.
 func (s *rbacRoleCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	route := routeFromStuct(event)
+	role := rbacRoleFromStuct(event)
 
-	updatedRBACRole, err := s.client.RBACRoles.Create(nil, &route.RBACRole)
+	updatedRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
 	if err != nil {
 		return nil, err
 	}

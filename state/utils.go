@@ -53,3 +53,5 @@ func multiIndexLookupUsingTxn(txn *memdb.Txn, tableName string,
 	}
 	return nil, ErrNotFound
 }
+
+// TODO: Add version check - apply to cert pull and EE entities

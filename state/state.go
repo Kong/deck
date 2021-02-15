@@ -23,13 +23,15 @@ type KongState struct {
 	Plugins        *PluginsCollection
 	Consumers      *ConsumersCollection
 
-	KeyAuths    *KeyAuthsCollection
-	HMACAuths   *HMACAuthsCollection
-	JWTAuths    *JWTAuthsCollection
-	BasicAuths  *BasicAuthsCollection
-	ACLGroups   *ACLGroupsCollection
-	Oauth2Creds *Oauth2CredsCollection
-	MTLSAuths   *MTLSAuthsCollection
+	KeyAuths                *KeyAuthsCollection
+	HMACAuths               *HMACAuthsCollection
+	JWTAuths                *JWTAuthsCollection
+	BasicAuths              *BasicAuthsCollection
+	ACLGroups               *ACLGroupsCollection
+	Oauth2Creds             *Oauth2CredsCollection
+	MTLSAuths               *MTLSAuthsCollection
+	RBACRoles               *RBACRolesCollection
+	RBACEndpointPermissions *RBACEndpointPermissionsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -45,15 +47,17 @@ func NewKongState() (*KongState, error) {
 
 	var schema = &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
-			serviceTableName:     serviceTableSchema,
-			routeTableName:       routeTableSchema,
-			upstreamTableName:    upstreamTableSchema,
-			targetTableName:      targetTableSchema,
-			certificateTableName: certificateTableSchema,
-			sniTableName:         sniTableSchema,
-			caCertTableName:      caCertTableSchema,
-			pluginTableName:      pluginTableSchema,
-			consumerTableName:    consumerTableSchema,
+			serviceTableName:                serviceTableSchema,
+			routeTableName:                  routeTableSchema,
+			upstreamTableName:               upstreamTableSchema,
+			targetTableName:                 targetTableSchema,
+			certificateTableName:            certificateTableSchema,
+			sniTableName:                    sniTableSchema,
+			caCertTableName:                 caCertTableSchema,
+			pluginTableName:                 pluginTableSchema,
+			consumerTableName:               consumerTableSchema,
+			rbacRoleTableName:               rbacRoleTableSchema,
+			rbacEndpointPermissionTableName: rbacEndpointPermissionTableSchema,
 
 			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
 			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
@@ -84,6 +88,8 @@ func NewKongState() (*KongState, error) {
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
+	state.RBACRoles = (*RBACRolesCollection)(&state.common)
+	state.RBACEndpointPermissions = (*RBACEndpointPermissionsCollection)(&state.common)
 
 	state.KeyAuths = newKeyAuthsCollection(state.common)
 	state.HMACAuths = newHMACAuthsCollection(state.common)

@@ -4,13 +4,11 @@ import (
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
-	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
 )
 
 const (
-	rbacRoleTableName    = "rbacRole"
-	rbacRolesByServiceID = "rbacRolesByServiceID"
+	rbacRoleTableName = "rbac-role"
 )
 
 var rbacRoleTableSchema = &memdb.TableSchema{
@@ -28,19 +26,6 @@ var rbacRoleTableSchema = &memdb.TableSchema{
 			AllowMissing: true,
 		},
 		all: allIndex,
-		// foreign
-		rbacRolesByServiceID: {
-			Name: rbacRolesByServiceID,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Service",
-						Sub:    "ID",
-					},
-				},
-			},
-			AllowMissing: true,
-		},
 	},
 }
 
@@ -187,25 +172,5 @@ func (k *RBACRolesCollection) GetAll() ([]*RBACRole, error) {
 		res = append(res, &RBACRole{RBACRole: *r.DeepCopy()})
 	}
 	txn.Commit()
-	return res, nil
-}
-
-// GetAllByServiceID returns all rbacRoles referencing a service
-// by its id.
-func (k *RBACRolesCollection) GetAllByServiceID(id string) ([]*RBACRole,
-	error) {
-	txn := k.db.Txn(false)
-	iter, err := txn.Get(rbacRoleTableName, rbacRolesByServiceID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*RBACRole
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*RBACRole)
-		if !ok {
-			panic(unexpectedType)
-		}
-		res = append(res, &RBACRole{RBACRole: *r.DeepCopy()})
-	}
 	return res, nil
 }
