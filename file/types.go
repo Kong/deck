@@ -482,7 +482,7 @@ func (c FConsumer) id() string {
 // FRBACRole represents an RBACRole in Kong
 type FRBACRole struct {
 	kong.RBACRole       `yaml:",inline,omitempty"`
-	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"`
+	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"` //nolint
 }
 
 type FRBACEndpointPermission struct {
