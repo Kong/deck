@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/kong/deck/konnect"
 	"net/http"
 	"net/url"
 	"os"
@@ -80,6 +81,12 @@ type KongClientConfig struct {
 	SkipWorkspaceCrud bool
 
 	Headers []string
+}
+
+type KonnectConfig struct {
+	Email    string
+	Password string
+	Debug    bool
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
@@ -163,6 +170,18 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		kongClient.SetLogger(os.Stderr)
 	}
 	return kongClient, nil
+}
+
+func GetKonnectClient(debug bool) (*konnect.Client, error) {
+	client, err := konnect.NewClient(nil)
+	if err != nil {
+		return nil, err
+	}
+	if debug {
+		client.SetDebugMode(true)
+		client.SetLogger(os.Stderr)
+	}
+	return client, nil
 }
 
 // CleanAddress removes trailling / from a URL.
