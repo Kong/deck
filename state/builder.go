@@ -174,5 +174,17 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 			return nil, errors.Wrap(err, "inserting plugins into state")
 		}
 	}
+	for _, r := range raw.RBACRoles {
+		err := kongState.RBACRoles.Add(RBACRole{RBACRole: *r})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting rbac roles into state")
+		}
+	}
+	for _, r := range raw.RBACEndpointPermissions {
+		err := kongState.RBACEndpointPermissions.Add(RBACEndpointPermission{RBACEndpointPermission: *r})
+		if err != nil {
+			return nil, errors.Wrap(err, "inserting rbac endpoint permissions into state")
+		}
+	}
 	return kongState, nil
 }

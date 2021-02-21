@@ -1,6 +1,8 @@
 package crud
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 // Kind represents Kind of an entity or object.
 type Kind string

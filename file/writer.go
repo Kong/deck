@@ -33,7 +33,6 @@ func compareID(obj1, obj2 id) bool {
 func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	// TODO break-down this giant function
 	var file Content
-
 	file.Workspace = config.Workspace
 	// hardcoded as only one version exists currently
 	file.FormatVersion = "1.1"
@@ -372,6 +371,25 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		zeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.Consumer, selectTags)
 		file.Consumers = append(file.Consumers, c)
+	}
+	rbacRoles, err := kongState.RBACRoles.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, r := range rbacRoles {
+		r := FRBACRole{RBACRole: r.RBACRole}
+		eps, err := kongState.RBACEndpointPermissions.GetAllByRoleID(*r.ID)
+		if err != nil {
+			return err
+		}
+		for _, ep := range eps {
+			ep.Role = nil
+			zeroOutTimestamps(ep)
+			r.EndpointPermissions = append(
+				r.EndpointPermissions, &FRBACEndpointPermission{RBACEndpointPermission: ep.RBACEndpointPermission})
+		}
+		zeroOutTimestamps(&r)
+		file.RBACRoles = append(file.RBACRoles, r)
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
 		return compareID(file.Consumers[i], file.Consumers[j])

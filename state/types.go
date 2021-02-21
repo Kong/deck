@@ -1,6 +1,7 @@
 package state
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 
@@ -1028,6 +1029,101 @@ func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
 		b2Copy.Consumer = nil
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
+}
+
+// RBACRole represents an RBAC Role in Kong.
+// It adds some helper methods along with Meta to the original RBACRole object.
+type RBACRole struct {
+	kong.RBACRole `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (r1 *RBACRole) Identifier() string {
+	if r1.Name != nil {
+		return *r1.Name
+	}
+	return *r1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (r1 *RBACRole) Console() string {
+	return r1.Identifier()
+}
+
+// Equal returns true if r1 and r2 are equal.
+// TODO add compare array without position
+func (r1 *RBACRole) Equal(r2 *RBACRole) bool {
+	return r1.EqualWithOpts(r2, false, false, false)
+}
+
+// EqualWithOpts returns true if r1 and r2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (r1 *RBACRole) EqualWithOpts(r2 *RBACRole, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	r1Copy := r1.RBACRole.DeepCopy()
+	r2Copy := r2.RBACRole.DeepCopy()
+
+	if ignoreID {
+		r1Copy.ID = nil
+		r2Copy.ID = nil
+	}
+	if ignoreTS {
+		r1Copy.CreatedAt = nil
+		r2Copy.CreatedAt = nil
+	}
+
+	return reflect.DeepEqual(r1Copy, r2Copy)
+}
+
+// RBACEndpointPermission represents an RBAC Role in Kong.
+// It adds some helper methods along with Meta to the original RBACEndpointPermission object.
+type RBACEndpointPermission struct {
+	ID                          string
+	kong.RBACEndpointPermission `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns a composite ID base on Role ID, workspace, and endpoint
+func (r1 *RBACEndpointPermission) Identifier() string {
+	if r1.Endpoint != nil {
+		return fmt.Sprintf("%s-%s-%s", *r1.Role.ID, *r1.Workspace, *r1.Endpoint)
+	}
+	return *r1.Endpoint
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (r1 *RBACEndpointPermission) Console() string {
+	return r1.Identifier()
+}
+
+// Equal returns true if r1 and r2 are equal.
+// TODO add compare array without position
+func (r1 *RBACEndpointPermission) Equal(r2 *RBACEndpointPermission) bool {
+	return r1.EqualWithOpts(r2, false, false, false)
+}
+
+// EqualWithOpts returns true if r1 and r2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (r1 *RBACEndpointPermission) EqualWithOpts(r2 *RBACEndpointPermission, ignoreID,
+	ignoreTS, ignoreForeign bool) bool {
+	r1Copy := r1.RBACEndpointPermission.DeepCopy()
+	r2Copy := r2.RBACEndpointPermission.DeepCopy()
+
+	if ignoreID {
+		r1Copy.Endpoint = nil
+		r2Copy.Endpoint = nil
+	}
+	if ignoreTS {
+		r1Copy.CreatedAt = nil
+		r2Copy.CreatedAt = nil
+	}
+
+	return reflect.DeepEqual(r1Copy, r2Copy)
 }
 
 // GetID returns ID.

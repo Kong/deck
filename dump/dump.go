@@ -122,6 +122,24 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil
 	})
 
+	group.Go(func() error {
+		roles, err := GetAllRBACRoles(ctx, client)
+		if err != nil {
+			return errors.Wrap(err, "roles")
+		}
+		state.RBACRoles = roles
+		return nil
+	})
+
+	group.Go(func() error {
+		eps, err := GetAllRBACREndpointPermissions(ctx, client)
+		if err != nil {
+			return errors.Wrap(err, "eps")
+		}
+		state.RBACEndpointPermissions = eps
+		return nil
+	})
+
 	if !config.SkipConsumers {
 		group.Go(func() error {
 			consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
@@ -630,6 +648,47 @@ func GetAllMTLSAuths(ctx context.Context,
 		opt = nextopt
 	}
 	return mtlsAuths, nil
+}
+
+// GetAllRBACRoles queries Kong for all the RBACRoles using client.
+func GetAllRBACRoles(ctx context.Context,
+	client *kong.Client) ([]*kong.RBACRole, error) {
+
+	roles, err := client.RBACRoles.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	return roles, nil
+}
+
+func GetAllRBACREndpointPermissions(ctx context.Context,
+	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
+
+	var eps = []*kong.RBACEndpointPermission{}
+	roles, err := client.RBACRoles.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	// retrieve all permissions for the role
+	for _, r := range roles {
+		reps, err := client.RBACEndpointPermissions.ListAllForRole(ctx, r.ID)
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		eps = append(eps, reps...)
+	}
+
+	return eps, nil
 }
 
 // excludeConsumersPlugins filter out consumer plugins

@@ -71,6 +71,8 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("acl-group", &aclGroupPostAction{current})
 	s.postProcess.MustRegister("oauth2-cred", &oauth2CredPostAction{current})
 	s.postProcess.MustRegister("mtls-auth", &mtlsAuthPostAction{current})
+	s.postProcess.MustRegister("rbac-role", &rbacRolePostAction{current})
+	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
 	return s, nil
 }
 
@@ -179,6 +181,16 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 
+	err = sc.deleteRBACEndpointPermissions()
+	if err != nil {
+		return err
+	}
+
+	err = sc.deleteRBACRoles()
+	if err != nil {
+		return err
+	}
+
 	// finish delete before returning
 	sc.wait()
 
@@ -268,6 +280,16 @@ func (sc *Syncer) createUpdate() error {
 	sc.wait()
 
 	err = sc.createUpdatePlugins()
+	if err != nil {
+		return err
+	}
+
+	err = sc.createUpdateRBACRoles()
+	if err != nil {
+		return err
+	}
+
+	err = sc.createUpdateRBACEndpointPermissions()
 	if err != nil {
 		return err
 	}

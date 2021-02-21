@@ -41,6 +41,9 @@ type KongRawState struct {
 	ACLGroups   []*kong.ACLGroup
 	Oauth2Creds []*kong.Oauth2Credential
 	MTLSAuths   []*kong.MTLSAuth
+
+	RBACRoles               []*kong.RBACRole
+	RBACEndpointPermissions []*kong.RBACEndpointPermission
 }
 
 // ErrArray holds an array of errors.
