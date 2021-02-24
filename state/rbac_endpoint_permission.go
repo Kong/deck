@@ -89,7 +89,6 @@ func getRBACEndpointPermission(txn *memdb.Txn, IDs ...string) (*RBACEndpointPerm
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, rbacEndpointPermissionTableName,
 			[]string{"id"}, id)
-		fmt.Println(res)
 		if err == ErrNotFound {
 			continue
 		}

@@ -57,7 +57,7 @@ func (s *rbacEndpointPermissionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStuct(event)
 
-	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Create(nil, &ep.RBACEndpointPermission)
+	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Update(nil, &ep.RBACEndpointPermission)
 	if err != nil {
 		return nil, err
 	}

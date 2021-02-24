@@ -186,6 +186,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 
+	// barrier for foreign relations
+	// RBAC endpoint permissions must be deleted before RBAC roles
+	sc.wait()
+
 	err = sc.deleteRBACRoles()
 	if err != nil {
 		return err
@@ -288,6 +292,10 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
+
+	// barrier for foreign relations
+	// RBAC roles must be created before endpoint permissions
+	sc.wait()
 
 	err = sc.createUpdateRBACEndpointPermissions()
 	if err != nil {

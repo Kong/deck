@@ -388,6 +388,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 			r.EndpointPermissions = append(
 				r.EndpointPermissions, &FRBACEndpointPermission{RBACEndpointPermission: ep.RBACEndpointPermission})
 		}
+		zeroOutID(&r, r.Name, config.WithID)
 		zeroOutTimestamps(&r)
 		file.RBACRoles = append(file.RBACRoles, r)
 	}

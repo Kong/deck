@@ -20,10 +20,9 @@ var rbacRoleTableSchema = &memdb.TableSchema{
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
 		"name": {
-			Name:         "name",
-			Unique:       true,
-			Indexer:      &memdb.StringFieldIndex{Field: "Name"},
-			AllowMissing: true,
+			Name:    "name",
+			Unique:  true,
+			Indexer: &memdb.StringFieldIndex{Field: "Name"},
 		},
 		all: allIndex,
 	},

@@ -53,7 +53,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	b.upstreams()
 	b.consumers()
 	b.plugins()
-	b.rbacRoles()
+	b.enterprise()
 
 	// result
 	if b.err != nil {
@@ -469,6 +469,10 @@ func (b *stateBuilder) routes() {
 			return
 		}
 	}
+}
+
+func (b *stateBuilder) enterprise() {
+	b.rbacRoles()
 }
 
 func (b *stateBuilder) rbacRoles() {

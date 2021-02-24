@@ -2,7 +2,6 @@ package file
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -223,7 +222,6 @@ func Test_unwrapURL(t *testing.T) {
 			if err := unwrapURL(tt.args.urlString, &in); (err != nil) != tt.wantErr {
 				t.Errorf("unwrapURL() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			fmt.Printf("\n\n%+v", in)
 			if !reflect.DeepEqual(tt.args.fService, &in) {
 				t.Errorf("unwrapURL() got = %v, want = %v", &in, tt.args.fService)
 			}

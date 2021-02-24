@@ -33,7 +33,7 @@ func TestRBACRolesCollection_Add(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "inserts without a name",
+			name: "errors without a name",
 			args: args{
 				rbacRole: RBACRole{
 					RBACRole: kong.RBACRole{
@@ -41,7 +41,7 @@ func TestRBACRolesCollection_Add(t *testing.T) {
 					},
 				},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name: "inserts with a name and ID",
@@ -175,7 +175,8 @@ func TestRBACRolesCollection_Get(t *testing.T) {
 func TestRBACRolesCollection_Update(t *testing.T) {
 	rbacRole1 := RBACRole{
 		RBACRole: kong.RBACRole{
-			ID: kong.String("foo-id"),
+			ID:   kong.String("foo-id"),
+			Name: kong.String("foo-name"),
 		},
 	}
 	rbacRole2 := RBACRole{
@@ -187,7 +188,7 @@ func TestRBACRolesCollection_Update(t *testing.T) {
 	rbacRole3 := RBACRole{
 		RBACRole: kong.RBACRole{
 			ID:   kong.String("foo-id"),
-			Name: kong.String("name"),
+			Name: kong.String("foo-new-name"),
 		},
 	}
 	type args struct {

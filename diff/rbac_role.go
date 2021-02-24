@@ -9,7 +9,7 @@ import (
 func (sc *Syncer) deleteRBACRoles() error {
 	currentRBACRoles, err := sc.currentState.RBACRoles.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching roles from state")
+		return errors.Wrap(err, "error fetching rbac roles from state")
 	}
 
 	for _, role := range currentRBACRoles {
@@ -39,7 +39,7 @@ func (sc *Syncer) deleteRBACRole(role *state.RBACRole) (*Event, error) {
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "looking up rbac role '%v'",
-			role.ID)
+			role.Identifier())
 	}
 	return nil, nil
 }
@@ -78,7 +78,7 @@ func (sc *Syncer) createUpdateRBACRole(role *state.RBACRole) (*Event, error) {
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "error looking up rbac role %v",
-			*role.ID)
+			role.Identifier())
 	}
 
 	// found, check if update needed
