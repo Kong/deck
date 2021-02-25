@@ -135,4 +135,6 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are deleted.\n"+
 			"Multiple tags are ANDed together.")
+	resetCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
+		false, "sync only the RBAC resources (Kong Enterprise only)")
 }
