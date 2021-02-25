@@ -48,6 +48,18 @@ func TestRBACEndpointPermissionsCollection_Add(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "errors when workspace is nil",
+			args: args{
+				rbacEndpointPermission: RBACEndpointPermission{
+					RBACEndpointPermission: kong.RBACEndpointPermission{
+						Actions:  kong.StringSlice("read"),
+						Endpoint: kong.String("/foo"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "inserts without a workspace, endpoint, and role",
 			args: args{
 				rbacEndpointPermission: RBACEndpointPermission{
