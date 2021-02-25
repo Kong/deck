@@ -98,6 +98,10 @@ func main() {
 		"client_id", "redirect_uris", "client_secret"}
 	schema.Definitions["MTLSAuth"].Required = []string{"id", "subject_name"}
 
+	// RBAC resources
+	schema.Definitions["FRBACRole"].Required = []string{"name"}
+	schema.Definitions["FRBACEndpointPermission"].Required = []string{"workspace", "endpoint"}
+
 	// Foreign references
 	stringType := &jsonschema.Type{Type: "string"}
 	schema.Definitions["FPlugin"].Properties["consumer"] = stringType

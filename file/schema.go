@@ -478,6 +478,10 @@ const contentSchema = `{
       "type": "object"
     },
     "FRBACEndpointPermission": {
+      "required": [
+        "workspace",
+        "endpoint"
+      ],
       "properties": {
         "actions": {
           "items": {
@@ -509,6 +513,9 @@ const contentSchema = `{
       "type": "object"
     },
     "FRBACRole": {
+      "required": [
+        "name"
+      ],
       "properties": {
         "comment": {
           "type": "string"
