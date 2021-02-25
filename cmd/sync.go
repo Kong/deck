@@ -51,6 +51,8 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
 			"Multiple tags are ANDed together.")
+	syncCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
+		false, "diff only the RBAC resources (Kong Enterprise only)")
 	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
 		0, "aritificial delay in seconds that is injected between insert operations \n"+
 			"for related entities (usually for cassandra deployments).\n"+
