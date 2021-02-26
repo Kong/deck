@@ -22,19 +22,6 @@ func TestRBACEndpointPermissionsCollection_Add(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "errors when endpoint is nil",
-			args: args{
-				rbacEndpointPermission: RBACEndpointPermission{
-					RBACEndpointPermission: kong.RBACEndpointPermission{
-						Workspace: kong.String("*"),
-						Actions:   kong.StringSlice("read"),
-						Role:      &kong.RBACRole{ID: kong.String("1234")},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
 			name: "errors when role is nil",
 			args: args{
 				rbacEndpointPermission: RBACEndpointPermission{
@@ -42,18 +29,6 @@ func TestRBACEndpointPermissionsCollection_Add(t *testing.T) {
 						Workspace: kong.String("*"),
 						Actions:   kong.StringSlice("read"),
 						Endpoint:  kong.String("/foo"),
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "errors when workspace is nil",
-			args: args{
-				rbacEndpointPermission: RBACEndpointPermission{
-					RBACEndpointPermission: kong.RBACEndpointPermission{
-						Actions:  kong.StringSlice("read"),
-						Endpoint: kong.String("/foo"),
 					},
 				},
 			},
@@ -208,19 +183,6 @@ func TestRBACEndpointPermissionsCollection_Update(t *testing.T) {
 		wantErr                       bool
 		updatedRBACEndpointPermission *RBACEndpointPermission
 	}{
-		{
-			name: "update errors if rbacEndpointPermission.Endpoint is nil",
-			args: args{
-				rbacEndpointPermission: RBACEndpointPermission{
-					RBACEndpointPermission: kong.RBACEndpointPermission{
-						Workspace: kong.String("*"),
-						Actions:   kong.StringSlice("read"),
-						Role:      &kong.RBACRole{ID: kong.String("1234")},
-					},
-				},
-			},
-			wantErr: true,
-		},
 		{
 			name: "update errors if rbacEndpointPermission does not exist",
 			args: args{

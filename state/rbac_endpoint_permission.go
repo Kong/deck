@@ -15,8 +15,6 @@ const (
 )
 
 var errInvalidRole = errors.New("role.ID is required in rbacEndpointPermission")
-var errEndpointRequired = errors.New("endpoint is required in rbacEndpointPermission")
-var errWorkspaceRequired = errors.New("workspace is required in rbacEndpointPermission")
 var rbacEndpointPermissionTableSchema = &memdb.TableSchema{
 	Name: rbacEndpointPermissionTableName,
 	Indexes: map[string]*memdb.IndexSchema{
@@ -56,15 +54,6 @@ type RBACEndpointPermissionsCollection collection
 // Add adds a rbacEndpointPermission into RBACEndpointPermissionsCollection
 // rbacEndpointPermission.Endpoint should not be nil else an error is thrown.
 func (k *RBACEndpointPermissionsCollection) Add(rbacEndpointPermission RBACEndpointPermission) error {
-	// TODO abstract this check in the go-memdb library itself
-	if utils.Empty(rbacEndpointPermission.Endpoint) {
-		return errEndpointRequired
-	}
-
-	if utils.Empty(rbacEndpointPermission.Workspace) {
-		return errWorkspaceRequired
-	}
-
 	if err := validateRoleForRBACEndpointPermission(&rbacEndpointPermission); err != nil {
 		return err
 	}
@@ -126,12 +115,6 @@ func (k *RBACEndpointPermissionsCollection) Get(nameOrID string) (*RBACEndpointP
 
 // Update updates a rbacEndpointPermission
 func (k *RBACEndpointPermissionsCollection) Update(rbacEndpointPermission RBACEndpointPermission) error {
-	if utils.Empty(rbacEndpointPermission.Endpoint) {
-		return errEndpointRequired
-	}
-	if utils.Empty(rbacEndpointPermission.Workspace) {
-		return errWorkspaceRequired
-	}
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
