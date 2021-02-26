@@ -3,6 +3,8 @@ package konnect
 import (
 	"context"
 	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 )
 
 type AuthResponse struct {
@@ -26,13 +28,17 @@ func (s *AuthService) Login(ctx context.Context, email,
 		return AuthResponse{}, err
 	}
 	var authResponse AuthResponse
-	_, err = s.client.Do(ctx, req, &authResponse)
+	resp, err := s.client.Do(ctx, req, &authResponse)
+	if err != nil {
+		return AuthResponse{}, err
+	}
+	url, _ := url.Parse(BaseURL())
+	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return AuthResponse{}, err
 	}
 
-	if err != nil {
-		return AuthResponse{}, nil
-	}
+	jar.SetCookies(url, resp.Cookies())
+	s.client.client.Jar = jar
 	return authResponse, nil
 }
