@@ -15,7 +15,7 @@ var konnectPingCmd = &cobra.Command{
 can connect to Konnect's API endpoint. It also validates the supplied
 credentials.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := utils.GetKonnectClient(konnectConfig.Debug)
+		client, err := utils.GetKonnectClient(nil, konnectConfig.Debug)
 		if err != nil {
 			return err
 		}

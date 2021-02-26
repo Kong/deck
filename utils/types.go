@@ -81,6 +81,8 @@ type KongClientConfig struct {
 	SkipWorkspaceCrud bool
 
 	Headers []string
+
+	HTTPClient *http.Client
 }
 
 type KonnectConfig struct {
@@ -141,7 +143,10 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		tlsConfig.RootCAs = certPool
 	}
 
-	c := &http.Client{}
+	c := opt.HTTPClient
+	if c == nil {
+		c = &http.Client{}
+	}
 	defaultTransport := http.DefaultTransport.(*http.Transport)
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
@@ -172,8 +177,9 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	return kongClient, nil
 }
 
-func GetKonnectClient(debug bool) (*konnect.Client, error) {
-	client, err := konnect.NewClient(nil)
+func GetKonnectClient(httpClient *http.Client, debug bool) (*konnect.Client,
+	error) {
+	client, err := konnect.NewClient(httpClient)
 	if err != nil {
 		return nil, err
 	}
