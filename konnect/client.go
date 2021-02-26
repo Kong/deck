@@ -21,12 +21,16 @@ type service struct {
 
 // Client talks to the Konnect API.
 type Client struct {
-	client  *http.Client
-	baseURL string
-	common  service
-	Auth    *AuthService
-	logger  io.Writer
-	debug   bool
+	client                *http.Client
+	baseURL               string
+	common                service
+	Auth                  *AuthService
+	ServicePackages       *ServicePackageService
+	ServiceVersions       *ServiceVersionService
+	ControlPlanes         *ControlPlaneService
+	ControlPlaneRelations *ControlPlaneRelationsService
+	logger                io.Writer
+	debug                 bool
 }
 
 // NewClient returns a Client which talks to Konnect's API.
@@ -36,7 +40,7 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	}
 	client := new(Client)
 	client.client = httpClient
-	url, err := url.ParseRequestURI(baseURL)
+	url, err := url.ParseRequestURI(BaseURL())
 	if err != nil {
 		return nil, errors.Wrap(err, "parsing URL")
 	}
@@ -44,6 +48,10 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 
 	client.common.client = client
 	client.Auth = (*AuthService)(&client.common)
+	client.ServicePackages = (*ServicePackageService)(&client.common)
+	client.ServiceVersions = (*ServiceVersionService)(&client.common)
+	client.ControlPlanes = (*ControlPlaneService)(&client.common)
+	client.ControlPlaneRelations = (*ControlPlaneRelationsService)(&client.common)
 	client.logger = os.Stderr
 	return client, nil
 }

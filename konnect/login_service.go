@@ -7,13 +7,6 @@ import (
 	"net/url"
 )
 
-type AuthResponse struct {
-	Organization   string `json:"org_name"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
-	OrganizationID string `json:"org_id"`
-}
-
 type AuthService service
 
 func (s *AuthService) Login(ctx context.Context, email,
