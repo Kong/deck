@@ -12,7 +12,7 @@ type rbacEndpointPermissionCRUD struct {
 	client *kong.Client
 }
 
-func rbacEndpointPermissionFromStuct(arg diff.Event) *state.RBACEndpointPermission {
+func rbacEndpointPermissionFromStruct(arg diff.Event) *state.RBACEndpointPermission {
 	ep, ok := arg.Obj.(*state.RBACEndpointPermission)
 	if !ok {
 		panic("unexpected type, expected *state.RBACEndpointPermission")
@@ -27,7 +27,7 @@ func rbacEndpointPermissionFromStuct(arg diff.Event) *state.RBACEndpointPermissi
 // It returns a the created *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	ep := rbacEndpointPermissionFromStuct(event)
+	ep := rbacEndpointPermissionFromStruct(event)
 	createdRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Create(nil, &ep.RBACEndpointPermission)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *rbacEndpointPermissionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	ep := rbacEndpointPermissionFromStuct(event)
+	ep := rbacEndpointPermissionFromStruct(event)
 	err := s.client.RBACEndpointPermissions.Delete(nil, ep.Role.ID, ep.Workspace, ep.Endpoint)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	ep := rbacEndpointPermissionFromStuct(event)
+	ep := rbacEndpointPermissionFromStruct(event)
 
 	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Update(nil, &ep.RBACEndpointPermission)
 	if err != nil {
