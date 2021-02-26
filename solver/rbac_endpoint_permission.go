@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"strings"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -42,7 +44,15 @@ func (s *rbacEndpointPermissionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
-	err := s.client.RBACEndpointPermissions.Delete(nil, ep.Role.ID, ep.Workspace, ep.Endpoint)
+
+	// for DELETE calls, the endpoint is passed in the URL only
+	// including the leading slash results in a URL like
+	// /rbac/roles/ROLEID/endpoints/workspace//foo/
+	// Kong expects a URL like
+	// /rbac/roles/ROLEID/endpoints/workspace/foo/
+	// so we strip this before passing it to go-kong
+	trimmed := strings.TrimLeft(*ep.Endpoint, "/")
+	err := s.client.RBACEndpointPermissions.Delete(nil, ep.Role.ID, ep.Workspace, &trimmed)
 	if err != nil {
 		return nil, err
 	}
