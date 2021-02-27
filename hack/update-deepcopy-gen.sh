@@ -1,16 +1,13 @@
 #!/bin/bash -e
-VERSION="kubernetes-1.18.2"
 
-if [[ ! -d /tmp/code-generator ]];
-then
-  git clone https://github.com/kubernetes/code-generator.git  /tmp/code-generator
-  pushd /tmp/code-generator
-  git checkout $VERSION
-  popd
-fi
-/tmp/code-generator/generate-groups.sh \
-deepcopy \
-github.com/kong/go-kong/kong \
-github.com/kong \
-go-kong:kong \
---go-header-file hack/header-template.go.tmpl
+go install k8s.io/code-generator/cmd/deepcopy-gen
+TMP_DIR=$(mktemp -d)
+trap "rm -rf $TMP_DIR" EXIT
+
+deepcopy-gen --input-dirs github.com/kong/go-kong/kong \
+  -O zz_generated.deepcopy \
+  --go-header-file hack/header-template.go.tmpl \
+  --output-base $TMP_DIR
+
+cp $TMP_DIR/github.com/kong/go-kong/kong/zz_generated.deepcopy.go \
+  kong/zz_generated.deepcopy.go
