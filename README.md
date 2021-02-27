@@ -28,15 +28,6 @@ After making a change to an API type you can run the generators with:
 ./hack/update-deepcopy-gen.sh
 ```
 
-Note that the files generated will be placed in
-`$GOPATH/src/github.com/kong/go-kong/` and if you were in another directory
-when you ran the script you'll need to copy generated code from there, e.g.:
-
-```shell
-cp $(go env GOPATH)/src/github.com/kong/go-kong/kong/zz_generated.deepcopy.go \
-    $(pwd)/kong/zz_generated.deepcopy.go
-```
-
 ## License
 
 go-kong is licensed with Apache License Version 2.0.
