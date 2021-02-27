@@ -9,7 +9,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.14'
+          go-version: '^1.16'
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup golangci-lint
@@ -21,7 +21,7 @@ jobs:
   test:
     strategy:
       matrix:
-        kong_version: [ '1.0.3', '1.1.2', '1.2.0', '1.3.0', '1.4.0', '2.0.4', '2.1.0']
+        kong_version: [ '1.0.3', '1.1.2', '1.2.0', '1.3.0', '1.4.0', '2.0.4', '2.1.0', '2.2.0', '2.3.0']
     env:
       KONG_VERSION: ${{ matrix.kong_version }}
       KONG_ENTERPRISE_REPO_USERNAME: ${{ secrets.KONG_ENTERPRISE_REPO_USERNAME }}
@@ -40,7 +40,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.14'
+          go-version: '^1.16'
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Postgres
@@ -75,7 +75,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v2
         with:
-          go-version: '^1.14'
+          go-version: '^1.16'
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Postgres
