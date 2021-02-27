@@ -47,6 +47,11 @@ type KongRawState struct {
 	RBACEndpointPermissions []*kong.RBACEndpointPermission
 }
 
+// KonnectRawState contains all of Konnect resources.
+type KonnectRawState struct {
+	ServicePackages []*konnect.ServicePackage
+}
+
 // ErrArray holds an array of errors.
 type ErrArray struct {
 	Errors []error
