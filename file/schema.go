@@ -63,6 +63,13 @@ const contentSchema = `{
       },
       "type": "array"
     },
+    "service_packages": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FServicePackage"
+      },
+      "type": "array"
+    },
     "services": {
       "items": {
         "$schema": "http://json-schema.org/draft-04/schema#",
@@ -756,6 +763,50 @@ const contentSchema = `{
         }
       ]
     },
+    "FServicePackage": {
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "versions": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/FServiceVersion"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FServiceVersion": {
+      "required": [
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "implementation": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Implementation"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "FTarget": {
       "required": [
         "target"
@@ -918,6 +969,23 @@ const contentSchema = `{
       "additionalProperties": false,
       "type": "object"
     },
+    "Implementation": {
+      "required": [
+        "type",
+        "kong"
+      ],
+      "properties": {
+        "kong": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Kong"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Info": {
       "properties": {
         "select_tags": {
@@ -993,6 +1061,15 @@ const contentSchema = `{
         },
         "ttl": {
           "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Kong": {
+      "properties": {
+        "service": {
+          "$ref": "#/definitions/FService"
         }
       },
       "additionalProperties": false,
