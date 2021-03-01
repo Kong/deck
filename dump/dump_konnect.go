@@ -2,9 +2,13 @@ package dump
 
 import (
 	"context"
+	"fmt"
+	"sync"
 
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
+	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 )
 
 type KonnectConfig struct {
@@ -15,25 +19,79 @@ type KonnectConfig struct {
 func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 	config KonnectConfig) (*utils.KonnectRawState, error) {
 	var res utils.KonnectRawState
-	servicePackages, err := konnectClient.ServicePackages.ListAll(ctx)
-	if err != nil {
-		return nil, err
-	}
+	var servicePackages []*konnect.ServicePackage
+	var relations []*konnect.ControlPlaneServiceRelation
 
-	for _, sp := range servicePackages {
-		versions, err := konnectClient.ServiceVersions.ListForPackage(ctx, sp.ID)
+	group, ctx := errgroup.WithContext(context.Background())
+	// group1 fetches service packages and their versions
+	group.Go(func() error {
+		var err error
+		// fetch service packages
+		servicePackages, err = konnectClient.ServicePackages.ListAll(ctx)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		sp.Versions = versions
-	}
 
-	relations, err := konnectClient.ControlPlaneRelations.ListAll(ctx)
+		// versions of service packages are fetched concurrently
+		errChan := make(chan error)
+		var err2 error
+
+		m := &sync.Mutex{}
+		m.Lock()
+		go func() {
+			defer m.Unlock()
+			// only the last error matters
+			for err := range errChan {
+				err2 = err
+			}
+		}()
+
+		semaphore := semaphore.NewWeighted(10)
+		for i := 0; i < len(servicePackages); i++ {
+			// control the number of outstanding go routines, also controlling
+			// the number of parallel requests
+			err := semaphore.Acquire(ctx, 1)
+			if err != nil {
+				return fmt.Errorf("acquire semaphore: %v", err)
+			}
+			go func(i int) {
+				defer semaphore.Release(1)
+				versions, err := konnectClient.ServiceVersions.ListForPackage(ctx, servicePackages[i].ID)
+				if err != nil {
+					errChan <- err
+					return
+				}
+				servicePackages[i].Versions = versions
+			}(i)
+		}
+		err = semaphore.Acquire(ctx, 10)
+		if err != nil {
+			return fmt.Errorf("acquire semaphore: %v", err)
+		}
+		close(errChan)
+		semaphore.Release(10)
+		m.Lock()
+		defer m.Unlock()
+		if err2 != nil {
+			return err2
+		}
+		return nil
+	})
+
+	// group2 fetches CP-service relations
+	group.Go(func() error {
+		var err error
+		relations, err = konnectClient.ControlPlaneRelations.ListAll(ctx)
+		return err
+	})
+
+	err := group.Wait()
 	if err != nil {
 		return nil, err
 	}
 
-	res.ServicePackages = filterNonKongPackages(config.ControlPlaneID, servicePackages, relations)
+	res.ServicePackages = filterNonKongPackages(config.ControlPlaneID,
+		servicePackages, relations)
 	return &res, nil
 }
 
