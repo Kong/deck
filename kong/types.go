@@ -21,6 +21,7 @@ type Service struct {
 	ReadTimeout       *int         `json:"read_timeout,omitempty" yaml:"read_timeout,omitempty"`
 	Retries           *int         `json:"retries,omitempty" yaml:"retries,omitempty"`
 	UpdatedAt         *int         `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
+	URL               *string      `json:"url,omitempty" yaml:"url,omitempty"`
 	WriteTimeout      *int         `json:"write_timeout,omitempty" yaml:"write_timeout,omitempty"`
 	Tags              []*string    `json:"tags,omitempty" yaml:"tags,omitempty"`
 	TLSVerify         *bool        `json:"tls_verify,omitempty" yaml:"tls_verify,omitempty"`

@@ -1481,6 +1481,11 @@ func (in *Service) DeepCopyInto(out *Service) {
 		*out = new(int)
 		**out = **in
 	}
+	if in.URL != nil {
+		in, out := &in.URL, &out.URL
+		*out = new(string)
+		**out = **in
+	}
 	if in.WriteTimeout != nil {
 		in, out := &in.WriteTimeout, &out.WriteTimeout
 		*out = new(int)
