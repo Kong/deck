@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v0.15.0](#v0150---20210122)
 - [v0.14.0](#v0140---20210112)
 - [v0.13.0](#v0130---20200804)
 - [v0.12.0](#v0120---20200730)
@@ -18,6 +19,18 @@
 - [0.3.0](#030---20181219)
 - [0.2.0](#020---20181219)
 - [0.1.0](#010---20181201)
+
+## [v0.16.0] - 2021/03/03
+
+### Added
+
+- `Service` now includes `URL`.
+
+## [v0.15.0] - 2021/01/22
+
+### Added
+
+- `Route` now includes `RequestBuffering` and `ResponseBuffering`.
 
 ## [v0.14.0] - 2021/01/12
 
@@ -277,6 +290,8 @@ authentication credentials in Kong.
   releases of Kong since every release of Kong is introducing breaking changes
   to the Admin API.
 
+[v0.16.0]: https://github.com/Kong/go-kong/compare/v0.15.0...v0.16.0
+[v0.15.0]: https://github.com/Kong/go-kong/compare/v0.14.0...v0.15.0
 [v0.14.0]: https://github.com/Kong/go-kong/compare/v0.13.0...v0.14.0
 [v0.13.0]: https://github.com/Kong/go-kong/compare/v0.12.0...v0.13.0
 [v0.12.0]: https://github.com/Kong/go-kong/compare/v0.11.0...v0.12.0
