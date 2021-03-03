@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	validateCmdKongStateFile []string
+	validateCmdKongStateFile     []string
+	validateCmdRBACResourcesOnly bool
 )
 
 // validateCmd represents the diff command
@@ -43,6 +44,9 @@ this command.
 		if err != nil {
 			return err
 		}
+		if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
+			return err
+		}
 		// this catches foreign relation errors
 		_, err = state.Get(rawState)
 		if err != nil {
@@ -62,6 +66,8 @@ this command.
 
 func init() {
 	rootCmd.AddCommand(validateCmd)
+	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
+		false, "indicate that the state file(s) contain RBAC resources only (Kong Enterprise only)")
 	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+

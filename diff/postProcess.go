@@ -262,3 +262,35 @@ func (crud *mtlsAuthPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
 func (crud *mtlsAuthPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.MTLSAuths.Update(*args[0].(*state.MTLSAuth))
 }
+
+type rbacRolePostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *rbacRolePostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACRoles.Add(*args[0].(*state.RBACRole))
+}
+
+func (crud *rbacRolePostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACRoles.Delete(*((args[0].(*state.RBACRole)).ID))
+}
+
+func (crud *rbacRolePostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACRoles.Update(*args[0].(*state.RBACRole))
+}
+
+type rbacEndpointPermissionPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *rbacEndpointPermissionPostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACEndpointPermissions.Add(*args[0].(*state.RBACEndpointPermission))
+}
+
+func (crud *rbacEndpointPermissionPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACEndpointPermissions.Delete(args[0].(*state.RBACEndpointPermission).Identifier())
+}
+
+func (crud *rbacEndpointPermissionPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.RBACEndpointPermissions.Update(*args[0].(*state.RBACEndpointPermission))
+}

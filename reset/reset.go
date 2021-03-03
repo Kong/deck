@@ -96,6 +96,14 @@ func Reset(state *utils.KongRawState, client *kong.Client) error {
 		}
 	}
 
+	// Deleting RBAC roles also deletes their associated permissions
+	for _, r := range state.RBACRoles {
+		err := client.RBACRoles.Delete(nil, r.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	// TODO handle custom entities
 	return nil
 }

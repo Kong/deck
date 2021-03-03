@@ -168,5 +168,6 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are exported.\n"+
 			"Multiple tags are ANDed together.")
-
+	dumpCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
+		false, "export only the RBAC resources (Kong Enterprise only)")
 }

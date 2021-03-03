@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -145,6 +146,9 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	if err != nil {
 		return err
 	}
+	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
+		return err
+	}
 	targetState, err := state.Get(rawState)
 	if err != nil {
 		return err
@@ -215,4 +219,35 @@ func validateNoArgs(cmd *cobra.Command, args []string) error {
 			"Run 'deck --help' for usage.")
 	}
 	return nil
+}
+
+func checkForRBACResources(content utils.KongRawState,
+	rbacResourcesOnly bool) error {
+	proxyConfig := containsProxyConfiguration(content)
+	rbacConfig := containsRBACConfiguration(content)
+	if proxyConfig && rbacConfig {
+		common := "At a time, state file(s) must entirely consist of either proxy " +
+			"configuration or RBAC configuration."
+		if rbacResourcesOnly {
+			return fmt.Errorf("When --rbac-resources-only is used, state file(s) " +
+				"cannot contain any resources other than RBAC resources. " + common)
+		}
+		return fmt.Errorf("State file(s) contains RBAC resources. " +
+			"Please use --rbac-resources-only flag to manage these resources. " + common)
+	}
+	return nil
+}
+
+func containsProxyConfiguration(content utils.KongRawState) bool {
+	return len(content.Services) != 0 ||
+		len(content.Routes) != 0 ||
+		len(content.Plugins) != 0 ||
+		len(content.Upstreams) != 0 ||
+		len(content.Certificates) != 0 ||
+		len(content.CACertificates) != 0 ||
+		len(content.Consumers) != 0
+}
+
+func containsRBACConfiguration(content utils.KongRawState) bool {
+	return len(content.RBACRoles) != 0
 }

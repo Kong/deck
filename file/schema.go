@@ -50,6 +50,13 @@ const contentSchema = `{
       },
       "type": "array"
     },
+    "rbac_roles": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FRBACRole"
+      },
+      "type": "array"
+    },
     "routes": {
       "items": {
         "$ref": "#/definitions/FRoute"
@@ -465,6 +472,72 @@ const contentSchema = `{
             "type": "string"
           },
           "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FRBACEndpointPermission": {
+      "required": [
+        "workspace",
+        "endpoint"
+      ],
+      "properties": {
+        "actions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "negative": {
+          "type": "boolean"
+        },
+        "role": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/RBACRole"
+        },
+        "workspace": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FRBACRole": {
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "endpoint_permissions": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/FRBACEndpointPermission"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_default": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
@@ -1009,6 +1082,27 @@ const contentSchema = `{
         },
         "unhealthy": {
           "$ref": "#/definitions/Unhealthy"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RBACRole": {
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "is_default": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

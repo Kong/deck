@@ -54,6 +54,8 @@ func init() {
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are diffed.\n"+
 			"Multiple tags are ANDed together.")
+	diffCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
+		false, "sync only the RBAC resources (Kong Enterprise only)")
 	diffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+

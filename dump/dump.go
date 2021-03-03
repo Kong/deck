@@ -2,6 +2,7 @@ package dump
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -11,6 +12,10 @@ import (
 
 // Config can be used to skip exporting certain entities
 type Config struct {
+	// If true, only RBAC resources are exported.
+	// SkipConsumers and SelectorTags should be falsy when this is set.
+	RBACResourcesOnly bool
+
 	// If true, consumers and any plugins associated with it
 	// are not exported.
 	SkipConsumers bool
@@ -42,14 +47,95 @@ func newOpt(tags []string) *kong.ListOpt {
 	return opt
 }
 
-// Get queries all the entities using client and returns
-// all the entities in KongRawState.
-func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
+func validateConfig(config Config) error {
+	if config.RBACResourcesOnly {
+		if config.SkipConsumers {
+			return fmt.Errorf("dump: config: SkipConsumer cannot be set when RBACResourcesOnly is set")
+		}
+		if len(config.SelectorTags) != 0 {
+			return fmt.Errorf("dump: config: SelectorTags cannot be set when RBACResourcesOnly is set")
+		}
+	}
+	return nil
+}
 
-	var state utils.KongRawState
+func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
+	client *kong.Client, config Config, state *utils.KongRawState) {
+	group.Go(func() error {
+		consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "consumers")
+		}
+		state.Consumers = consumers
+		return nil
+	})
 
-	group, ctx := errgroup.WithContext(context.Background())
+	group.Go(func() error {
+		keyAuths, err := GetAllKeyAuths(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "key-auths")
+		}
+		state.KeyAuths = keyAuths
+		return nil
+	})
 
+	group.Go(func() error {
+		hmacAuths, err := GetAllHMACAuths(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "hmac-auths")
+		}
+		state.HMACAuths = hmacAuths
+		return nil
+	})
+
+	group.Go(func() error {
+		jwtAuths, err := GetAllJWTAuths(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "jwts")
+		}
+		state.JWTAuths = jwtAuths
+		return nil
+	})
+
+	group.Go(func() error {
+		basicAuths, err := GetAllBasicAuths(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "basic-auths")
+		}
+		state.BasicAuths = basicAuths
+		return nil
+	})
+
+	group.Go(func() error {
+		oauth2Creds, err := GetAllOauth2Creds(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "oauth2")
+		}
+		state.Oauth2Creds = oauth2Creds
+		return nil
+	})
+
+	group.Go(func() error {
+		aclGroups, err := GetAllACLGroups(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "acls")
+		}
+		state.ACLGroups = aclGroups
+		return nil
+	})
+
+	group.Go(func() error {
+		mtlsAuths, err := GetAllMTLSAuths(ctx, client, config.SelectorTags)
+		if err != nil {
+			return errors.Wrap(err, "mtls-auths")
+		}
+		state.MTLSAuths = mtlsAuths
+		return nil
+	})
+}
+
+func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
+	client *kong.Client, config Config, state *utils.KongRawState) {
 	group.Go(func() error {
 		services, err := GetAllServices(ctx, client, config.SelectorTags)
 		if err != nil {
@@ -121,81 +207,52 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		state.Targets = targets
 		return nil
 	})
+}
 
-	if !config.SkipConsumers {
-		group.Go(func() error {
-			consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "consumers")
-			}
-			state.Consumers = consumers
-			return nil
-		})
+func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
+	client *kong.Client, state *utils.KongRawState) {
+	group.Go(func() error {
+		roles, err := GetAllRBACRoles(ctx, client)
+		if err != nil {
+			return errors.Wrap(err, "roles")
+		}
+		state.RBACRoles = roles
+		return nil
+	})
 
-		group.Go(func() error {
-			keyAuths, err := GetAllKeyAuths(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "key-auths")
-			}
-			state.KeyAuths = keyAuths
-			return nil
-		})
+	group.Go(func() error {
+		eps, err := GetAllRBACREndpointPermissions(ctx, client)
+		if err != nil {
+			return errors.Wrap(err, "eps")
+		}
+		state.RBACEndpointPermissions = eps
+		return nil
+	})
+}
 
-		group.Go(func() error {
-			hmacAuths, err := GetAllHMACAuths(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "hmac-auths")
-			}
-			state.HMACAuths = hmacAuths
-			return nil
-		})
+// Get queries all the entities using client and returns
+// all the entities in KongRawState.
+func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 
-		group.Go(func() error {
-			jwtAuths, err := GetAllJWTAuths(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "jwts")
-			}
-			state.JWTAuths = jwtAuths
-			return nil
-		})
+	var state utils.KongRawState
 
-		group.Go(func() error {
-			basicAuths, err := GetAllBasicAuths(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "basic-auths")
-			}
-			state.BasicAuths = basicAuths
-			return nil
-		})
-
-		group.Go(func() error {
-			oauth2Creds, err := GetAllOauth2Creds(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "oauth2")
-			}
-			state.Oauth2Creds = oauth2Creds
-			return nil
-		})
-
-		group.Go(func() error {
-			aclGroups, err := GetAllACLGroups(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "acls")
-			}
-			state.ACLGroups = aclGroups
-			return nil
-		})
-
-		group.Go(func() error {
-			mtlsAuths, err := GetAllMTLSAuths(ctx, client, config.SelectorTags)
-			if err != nil {
-				return errors.Wrap(err, "mtls-auths")
-			}
-			state.MTLSAuths = mtlsAuths
-			return nil
-		})
-
+	if err := validateConfig(config); err != nil {
+		return nil, err
 	}
+
+	group, ctx := errgroup.WithContext(context.Background())
+
+	// dump only rbac resources
+	if config.RBACResourcesOnly {
+		getEnterpriseRBACConfiguration(ctx, group, client, &state)
+	} else {
+		// regular case
+		getProxyConfiguration(ctx, group, client, config, &state)
+		if !config.SkipConsumers {
+			getConsumerConfiguration(ctx, group, client, config, &state)
+		}
+	}
+
 	err := group.Wait()
 	if err != nil {
 		return nil, err
@@ -630,6 +687,47 @@ func GetAllMTLSAuths(ctx context.Context,
 		opt = nextopt
 	}
 	return mtlsAuths, nil
+}
+
+// GetAllRBACRoles queries Kong for all the RBACRoles using client.
+func GetAllRBACRoles(ctx context.Context,
+	client *kong.Client) ([]*kong.RBACRole, error) {
+
+	roles, err := client.RBACRoles.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	return roles, nil
+}
+
+func GetAllRBACREndpointPermissions(ctx context.Context,
+	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
+
+	var eps = []*kong.RBACEndpointPermission{}
+	roles, err := client.RBACRoles.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	// retrieve all permissions for the role
+	for _, r := range roles {
+		reps, err := client.RBACEndpointPermissions.ListAllForRole(ctx, r.ID)
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		eps = append(eps, reps...)
+	}
+
+	return eps, nil
 }
 
 // excludeConsumersPlugins filter out consumer plugins
