@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.5.0](#v150---20210306)
 - [v1.4.0](#v140---20210201)
 - [v1.3.0](#v130---20210115)
 - [v1.2.4](#v124---20210106)
@@ -25,6 +26,24 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.5.0] - 2021/03/06
+
+### Added
+
+- decK now supports Kong Konnect. Configuration for Kong Konnect can be exported,
+  diffed and synced using decK. A new command `konnect` has been introduced for
+  this purpose, which has 4 sub-commands: `ping`, `dump`, `diff`, and  `sync`.
+  This feature in decK is currently in `alpha` state, which means there can be
+  breaking changes to these commands in future releases.
+- decK now supports two new Kong Enterprise resources: RBAC role and RBAC
+  endpoint-permission. Special thanks to [@tjrivera](https://github.com/tjrivera)
+  for this contribution. A new flag `--rbac-resources-only` has been introduced
+  to manage RBAC-only configuration via decK.
+  [#276](https://github.com/Kong/deck/pull/276)
+- Certificates and Kong Services can now be managed separately. A check for
+  existence of Certificate has been relaxed to make this possible.
+  [#269](https://github.com/Kong/deck/pull/269)
 
 ## [v1.4.0] - 2021/02/01
 
@@ -562,6 +581,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.5.0]: https://github.com/kong/deck/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/kong/deck/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/kong/deck/compare/v1.2.4...v1.3.0
 [v1.2.4]: https://github.com/kong/deck/compare/v1.2.3...v1.2.4
