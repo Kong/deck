@@ -126,12 +126,16 @@ func TestServiceVersionCollection_Add(t *testing.T) {
 
 func TestServiceVersionCollection_Get(t *testing.T) {
 	type args struct {
-		nameOrID string
+		nameOrID  string
+		packageID string
 	}
 	sv1 := ServiceVersion{
 		ServiceVersion: konnect.ServiceVersion{
 			ID:      kong.String("foo-id"),
 			Version: kong.String("foo-name"),
+			ServicePackage: &konnect.ServicePackage{
+				ID: kong.String("id1"),
+			},
 		},
 	}
 	sv2 := ServiceVersion{
@@ -151,25 +155,27 @@ func TestServiceVersionCollection_Get(t *testing.T) {
 	}{
 
 		{
-			name: "gets a serviceVersion by ID",
+			name: "gets a serviceVersion by package and version ID",
 			args: args{
-				nameOrID: "foo-id",
+				nameOrID:  "foo-id",
+				packageID: "id1",
 			},
 			want:    &sv1,
 			wantErr: false,
 		},
 		{
-			name: "gets a serviceVersion by Version",
+			name: "returns an error when only version is specified",
 			args: args{
 				nameOrID: "bar-name",
 			},
-			want:    &sv2,
-			wantErr: false,
+			want:    nil,
+			wantErr: true,
 		},
 		{
 			name: "returns an ErrNotFound when no serviceVersion found",
 			args: args{
-				nameOrID: "baz-id",
+				nameOrID:  "baz-id",
+				packageID: "id1",
 			},
 			want:    nil,
 			wantErr: true,
@@ -188,8 +194,7 @@ func TestServiceVersionCollection_Get(t *testing.T) {
 	k.Add(sv2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			got, err := k.Get(tt.args.nameOrID)
+			got, err := k.Get(tt.args.packageID, tt.args.nameOrID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ServiceVersionCollection.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -233,10 +238,10 @@ func TestServiceVersionCollection_Update(t *testing.T) {
 		serviceVersion ServiceVersion
 	}
 	tests := []struct {
-		name         string
-		args         args
-		wantErr      bool
-		updatedRoute *ServiceVersion
+		name           string
+		args           args
+		wantErr        bool
+		updatedVersion *ServiceVersion
 	}{
 		{
 			name: "update errors if serviceVersion.ID is nil",
@@ -268,8 +273,8 @@ func TestServiceVersionCollection_Update(t *testing.T) {
 			args: args{
 				serviceVersion: sv3,
 			},
-			wantErr:      false,
-			updatedRoute: &sv3,
+			wantErr:        false,
+			updatedVersion: &sv3,
 		},
 	}
 	k := serviceVersionCollection()
@@ -282,10 +287,10 @@ func TestServiceVersionCollection_Update(t *testing.T) {
 				t.Errorf("ServiceVersionCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				got, _ := k.Get(*tt.updatedRoute.ID)
+				got, _ := k.Get(*tt.updatedVersion.ServicePackage.ID, *tt.updatedVersion.ID)
 
-				if !reflect.DeepEqual(got, tt.updatedRoute) {
-					t.Errorf("update serviceVersion, got = %#v, want %#v", got, tt.updatedRoute)
+				if !reflect.DeepEqual(got, tt.updatedVersion) {
+					t.Errorf("update serviceVersion, got = %#v, want %#v", got, tt.updatedVersion)
 				}
 			}
 		})
@@ -300,19 +305,19 @@ func TestServiceVersionDelete(t *testing.T) {
 	serviceVersion.Version = kong.String("my-serviceVersion")
 	serviceVersion.ID = kong.String("first")
 	serviceVersion.ServicePackage = &konnect.ServicePackage{
-		ID: kong.String("id1"),
+		ID: kong.String("package-id1"),
 	}
 	err := collection.Add(serviceVersion)
 	assert.Nil(err)
 
-	re, err := collection.Get("my-serviceVersion")
+	re, err := collection.Get("package-id1", "my-serviceVersion")
 	assert.Nil(err)
 	assert.NotNil(re)
 
-	err = collection.Delete(*re.ID)
+	err = collection.Delete("package-id1", *re.ID)
 	assert.Nil(err)
 
-	err = collection.Delete(*re.ID)
+	err = collection.Delete("package-id1", *re.ID)
 	assert.NotNil(err)
 }
 

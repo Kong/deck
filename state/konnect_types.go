@@ -70,20 +70,26 @@ func (s1 *ServiceVersion) Console() string {
 
 // Equal returns true if s1 and s2 are equal.
 func (s1 *ServiceVersion) Equal(s2 *ServiceVersion) bool {
-	return s1.EqualWithOpts(s2, false, false)
+	return s1.EqualWithOpts(s2, false, false,false)
 }
 
 // EqualWithOpts returns true if s1 and s2 are equal.
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (s1 *ServiceVersion) EqualWithOpts(s2 *ServiceVersion,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID, ignoreTS, ignoreForeign bool) bool {
 	s1Copy := s1.ServiceVersion.DeepCopy()
 	s2Copy := s2.ServiceVersion.DeepCopy()
 
 	if ignoreID {
 		s1Copy.ID = nil
 		s2Copy.ID = nil
+	}
+	if ignoreForeign {
+		s1Copy.ServicePackage = nil
+		s1Copy.ControlPlaneServiceRelation = nil
+		s2Copy.ServicePackage = nil
+		s2Copy.ControlPlaneServiceRelation = nil
 	}
 	return reflect.DeepEqual(s1Copy, s2Copy)
 }

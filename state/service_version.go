@@ -2,15 +2,19 @@ package state
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
+	"github.com/pkg/errors"
 )
 
 const (
 	serviceVersionTableName    = "service-version"
 	versionsByServicePackageID = "serviceVersionsByServicePackageID"
 )
+
+var errInvalidPackage = errors.New("servicePackage.ID is required in ServiceVersion")
 
 var serviceVersionTableSchema = &memdb.TableSchema{
 	Name: serviceVersionTableName,
@@ -19,11 +23,6 @@ var serviceVersionTableSchema = &memdb.TableSchema{
 			Name:    "id",
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
-		},
-		"version": {
-			Name:    "version",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "Version"},
 		},
 		all: allIndex,
 		// foreign
@@ -41,6 +40,14 @@ var serviceVersionTableSchema = &memdb.TableSchema{
 	},
 }
 
+func validatePackage(version ServiceVersion) error {
+	if version.ServicePackage == nil ||
+		utils.Empty(version.ServicePackage.ID) {
+		return errInvalidPackage
+	}
+	return nil
+}
+
 // ServiceVersionsCollection stores and indexes Service Versions.
 type ServiceVersionsCollection collection
 
@@ -52,6 +59,10 @@ func (k *ServiceVersionsCollection) Add(serviceVersion ServiceVersion) error {
 		return errIDRequired
 	}
 
+	if err := validatePackage(serviceVersion); err != nil {
+		return err
+	}
+
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
@@ -60,7 +71,7 @@ func (k *ServiceVersionsCollection) Add(serviceVersion ServiceVersion) error {
 	if !utils.Empty(serviceVersion.Version) {
 		searchBy = append(searchBy, *serviceVersion.Version)
 	}
-	_, err := getServiceVersion(txn, searchBy...)
+	_, err := getServiceVersion(txn, *serviceVersion.ServicePackage.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting serviceVersion %v: %w", serviceVersion.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
@@ -75,35 +86,34 @@ func (k *ServiceVersionsCollection) Add(serviceVersion ServiceVersion) error {
 	return nil
 }
 
-func getServiceVersion(txn *memdb.Txn, IDs ...string) (*ServiceVersion, error) {
-	for _, id := range IDs {
-		res, err := multiIndexLookupUsingTxn(txn, serviceVersionTableName,
-			[]string{"version", "id"}, id)
-		if err == ErrNotFound {
-			continue
-		}
-		if err != nil {
-			return nil, err
-		}
+func getServiceVersion(txn *memdb.Txn, packageID string, IDs ...string) (*ServiceVersion, error) {
+	if packageID == "" {
+		return nil, errors.New("packageID is required")
+	}
+	versions, err := getAllByPackageID(txn, packageID)
+	if err != nil {
+		return nil, err
+	}
 
-		serviceVersion, ok := res.(*ServiceVersion)
-		if !ok {
-			panic(unexpectedType)
+	for _, id := range IDs {
+		for _, version := range versions {
+			if id == *version.ID || id == *version.Version {
+				return &ServiceVersion{ServiceVersion: *version.DeepCopy()}, nil
+			}
 		}
-		return &ServiceVersion{ServiceVersion: *serviceVersion.DeepCopy()}, nil
 	}
 	return nil, ErrNotFound
 }
 
 // Get gets a Service Version by name or ID.
-func (k *ServiceVersionsCollection) Get(nameOrID string) (*ServiceVersion, error) {
+func (k *ServiceVersionsCollection) Get(packageID, nameOrID string) (*ServiceVersion, error) {
 	if nameOrID == "" {
 		return nil, errIDRequired
 	}
 
 	txn := k.db.Txn(false)
 	defer txn.Abort()
-	serviceVersion, err := getServiceVersion(txn, nameOrID)
+	serviceVersion, err := getServiceVersion(txn, packageID, nameOrID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,11 +126,14 @@ func (k *ServiceVersionsCollection) Update(serviceVersion ServiceVersion) error 
 	if utils.Empty(serviceVersion.ID) {
 		return errIDRequired
 	}
+	if err := validatePackage(serviceVersion); err != nil {
+		return err
+	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteServiceVersion(txn, *serviceVersion.ID)
+	err := deleteServiceVersion(txn, *serviceVersion.ServicePackage.ID, *serviceVersion.ID)
 	if err != nil {
 		return err
 	}
@@ -134,8 +147,8 @@ func (k *ServiceVersionsCollection) Update(serviceVersion ServiceVersion) error 
 	return nil
 }
 
-func deleteServiceVersion(txn *memdb.Txn, nameOrID string) error {
-	serviceVersion, err := getServiceVersion(txn, nameOrID)
+func deleteServiceVersion(txn *memdb.Txn, packageID, nameOrID string) error {
+	serviceVersion, err := getServiceVersion(txn, packageID, nameOrID)
 	if err != nil {
 		return err
 	}
@@ -148,7 +161,7 @@ func deleteServiceVersion(txn *memdb.Txn, nameOrID string) error {
 }
 
 // Delete deletes a serviceVersion by name or ID.
-func (k *ServiceVersionsCollection) Delete(nameOrID string) error {
+func (k *ServiceVersionsCollection) Delete(packageID, nameOrID string) error {
 	if nameOrID == "" {
 		return errIDRequired
 	}
@@ -156,7 +169,7 @@ func (k *ServiceVersionsCollection) Delete(nameOrID string) error {
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteServiceVersion(txn, nameOrID)
+	err := deleteServiceVersion(txn, packageID, nameOrID)
 	if err != nil {
 		return err
 	}
@@ -187,21 +200,26 @@ func (k *ServiceVersionsCollection) GetAll() ([]*ServiceVersion, error) {
 	return res, nil
 }
 
+func getAllByPackageID(txn *memdb.Txn, packageID string) ([]*ServiceVersion, error) {
+	iter, err := txn.Get(serviceVersionTableName, versionsByServicePackageID, packageID)
+	if err != nil {
+		return nil, err
+	}
+
+	var versions []*ServiceVersion
+	for el := iter.Next(); el != nil; el = iter.Next() {
+		v, ok := el.(*ServiceVersion)
+		if !ok {
+			panic(unexpectedType)
+		}
+		versions = append(versions, &ServiceVersion{ServiceVersion: *v.DeepCopy()})
+	}
+	return versions, nil
+}
+
 // GetAllByServicePackageID returns all serviceVersions for a servicePackage id.
 func (k *ServiceVersionsCollection) GetAllByServicePackageID(id string) ([]*ServiceVersion,
 	error) {
 	txn := k.db.Txn(false)
-	iter, err := txn.Get(serviceVersionTableName, versionsByServicePackageID, id)
-	if err != nil {
-		return nil, err
-	}
-	var res []*ServiceVersion
-	for el := iter.Next(); el != nil; el = iter.Next() {
-		r, ok := el.(*ServiceVersion)
-		if !ok {
-			panic(unexpectedType)
-		}
-		res = append(res, &ServiceVersion{ServiceVersion: *r.DeepCopy()})
-	}
-	return res, nil
+	return getAllByPackageID(txn, id)
 }
