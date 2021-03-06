@@ -32,6 +32,26 @@ func GetContentFromFiles(filenames []string) (*Content, error) {
 	return getContent(filenames)
 }
 
+func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState, *utils.KonnectRawState, error) {
+	var builder stateBuilder
+	// setup
+	builder.targetContent = fileContent
+	builder.currentState = opt.CurrentState
+	builder.kongVersion = opt.KongVersion
+
+	d, err := utils.GetKongDefaulter()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "creating defaulter")
+	}
+	builder.defaulter = d
+
+	kongState, konnectState, err := builder.build()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "building state")
+	}
+	return kongState, konnectState, nil
+}
+
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
 func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
@@ -47,7 +67,7 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	}
 	builder.defaulter = d
 
-	state, err := builder.build()
+	state, _, err := builder.build()
 	if err != nil {
 		return nil, errors.Wrap(err, "building state")
 	}

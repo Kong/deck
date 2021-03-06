@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -17,8 +18,9 @@ import (
 )
 
 var (
-	cfgFile    string
-	rootConfig utils.KongClientConfig
+	cfgFile       string
+	rootConfig    utils.KongClientConfig
+	konnectConfig utils.KonnectConfig
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -125,6 +127,23 @@ func init() {
 		"Skip API calls related to Workspaces (Kong Enterprise only)")
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
+
+	// konnect-specific flags
+	rootCmd.PersistentFlags().String("konnect-email", "",
+		"Email address associated with your Konnect account")
+	viper.BindPFlag("konnect-email",
+		rootCmd.PersistentFlags().Lookup("konnect-email"))
+
+	rootCmd.PersistentFlags().String("konnect-password", "",
+		"Password associated with your Konnect account, "+
+			"this takes precedence over --konnect-password-file flag")
+	viper.BindPFlag("konnect-password",
+		rootCmd.PersistentFlags().Lookup("konnect-password"))
+
+	rootCmd.PersistentFlags().String("konnect-password-file", "",
+		"File containing password to your Konnect account")
+	viper.BindPFlag("konnect-password-file",
+		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -151,6 +170,7 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 
@@ -163,4 +183,32 @@ func initConfig() {
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
+
+	if err := initKonnectConfig(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+func initKonnectConfig() error {
+	password := viper.GetString("konnect-password")
+	passwordFile := viper.GetString("konnect-password-file")
+	// read from password file only if password is not supplied using an
+	//environment variable or flag
+	if password == "" && passwordFile != "" {
+		fileContent, err := ioutil.ReadFile(passwordFile)
+		if err != nil {
+			return errors.Errorf("read file '%s': %v", passwordFile, err)
+		}
+		if len(fileContent) == 0 {
+			return errors.Errorf("file '%s': empty", passwordFile)
+		}
+		password = string(fileContent)
+		password = strings.TrimRight(password, "\n")
+	}
+
+	konnectConfig.Email = viper.GetString("konnect-email")
+	konnectConfig.Password = password
+	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
+	return nil
 }

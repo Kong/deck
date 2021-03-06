@@ -18,5 +18,7 @@ jobs:
         run: golangci-lint run ./...
       - name: Verify Codegen
         run: ./scripts/verify-codegen.sh
+      - name: Verify deepcopy-gen
+        run: ./scripts/verify-deepcopy-gen.sh
       - name: Run tests
         run: go test ./...

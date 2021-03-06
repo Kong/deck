@@ -3,6 +3,7 @@ package solver
 import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
@@ -18,9 +19,10 @@ type Stats struct {
 
 // Solve generates a diff and walks the graph.
 func Solve(doneCh chan struct{}, syncer *diff.Syncer,
-	client *kong.Client, parallelism int, dry bool) (Stats, []error) {
+	client *kong.Client, konnectClient *konnect.Client,
+	parallelism int, dry bool) (Stats, []error) {
 
-	r := buildRegistry(client)
+	r := buildRegistry(client, konnectClient)
 
 	var stats Stats
 	recordOp := func(op crud.Op) {
@@ -74,7 +76,7 @@ func Solve(doneCh chan struct{}, syncer *diff.Syncer,
 	return stats, errs
 }
 
-func buildRegistry(client *kong.Client) *crud.Registry {
+func buildRegistry(client *kong.Client, konnectClient *konnect.Client) *crud.Registry {
 	var r crud.Registry
 	r.MustRegister("service", &serviceCRUD{client: client})
 	r.MustRegister("route", &routeCRUD{client: client})
@@ -94,5 +96,8 @@ func buildRegistry(client *kong.Client) *crud.Registry {
 	r.MustRegister("mtls-auth", &mtlsAuthCRUD{client: client})
 	r.MustRegister("rbac-role", &rbacRoleCRUD{client: client})
 	r.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionCRUD{client: client})
+
+	r.MustRegister("service-package", &servicePackageCRUD{client: konnectClient})
+	r.MustRegister("service-version", &serviceVersionCRUD{client: konnectClient})
 	return &r
 }

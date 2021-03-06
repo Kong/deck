@@ -2,7 +2,6 @@ linters:
   enable:
   - megacheck
   - govet
-  - bodyclose
   - unparam
   - unconvert
   - misspell

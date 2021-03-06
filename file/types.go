@@ -494,6 +494,39 @@ type Info struct {
 	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
 }
 
+type Kong struct {
+	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
+}
+
+type Implementation struct {
+	Type string `json:"type,omitempty" yaml:"type,omitempty"`
+	Kong *Kong  `json:"kong,omitempty" yaml:"kong,omitempty"`
+}
+
+type FServiceVersion struct {
+	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
+	Version        *string         `json:"version,omitempty" yaml:"version,omitempty"`
+	Implementation *Implementation `json:"implementation,omitempty" yaml:"implementation,omitempty"`
+}
+
+type FServicePackage struct {
+	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`
+	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
+	Description *string           `json:"description,omitempty" yaml:"description,omitempty"`
+	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
+}
+
+// id is used for sorting.
+func (s FServicePackage) id() string {
+	if s.ID != nil {
+		return *s.ID
+	}
+	if s.Name != nil {
+		return *s.Name
+	}
+	return ""
+}
+
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
@@ -513,4 +546,6 @@ type Content struct {
 	RBACRoles []FRBACRole `json:"rbac_roles,omitempty" yaml:"rbac_roles,omitempty"`
 
 	PluginConfigs map[string]kong.Configuration `json:"_plugin_configs,omitempty" yaml:"_plugin_configs,omitempty"`
+
+	ServicePackages []FServicePackage `json:"service_packages,omitempty" yaml:"service_packages,omitempty"`
 }

@@ -110,6 +110,11 @@ func main() {
 
 	schema.Definitions["FService"].Properties["client_certificate"] = stringType
 
+	// konnect resources
+	schema.Definitions["FServicePackage"].Required = []string{"name"}
+	schema.Definitions["FServiceVersion"].Required = []string{"version"}
+	schema.Definitions["Implementation"].Required = []string{"type", "kong"}
+
 	jsonSchema, err := json.MarshalIndent(schema, "", "  ")
 	if err != nil {
 		log.Fatalln(err)

@@ -32,6 +32,10 @@ type KongState struct {
 	MTLSAuths               *MTLSAuthsCollection
 	RBACRoles               *RBACRolesCollection
 	RBACEndpointPermissions *RBACEndpointPermissionsCollection
+
+	// konnect-specific entities
+	ServicePackages *ServicePackagesCollection
+	ServiceVersions *ServiceVersionsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -67,6 +71,10 @@ func NewKongState() (*KongState, error) {
 			mtlsAuthTemp.TableName():    mtlsAuthTemp.Schema(),
 
 			aclGroupTableName: aclGroupTableSchema,
+
+			// konnect-specific entities
+			servicePackageTableName: servicePackageTableSchema,
+			serviceVersionTableName: serviceVersionTableSchema,
 		},
 	}
 
@@ -99,5 +107,10 @@ func NewKongState() (*KongState, error) {
 	state.MTLSAuths = newMTLSAuthsCollection(state.common)
 
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
+
+	// konnect-specific entities
+	state.ServicePackages = (*ServicePackagesCollection)(&state.common)
+	state.ServiceVersions = (*ServiceVersionsCollection)(&state.common)
+
 	return &state, nil
 }

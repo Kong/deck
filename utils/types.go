@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/kong/deck/konnect"
 	"net/http"
 	"net/url"
 	"os"
@@ -46,6 +47,11 @@ type KongRawState struct {
 	RBACEndpointPermissions []*kong.RBACEndpointPermission
 }
 
+// KonnectRawState contains all of Konnect resources.
+type KonnectRawState struct {
+	ServicePackages []*konnect.ServicePackage
+}
+
 // ErrArray holds an array of errors.
 type ErrArray struct {
 	Errors []error
@@ -80,6 +86,14 @@ type KongClientConfig struct {
 	SkipWorkspaceCrud bool
 
 	Headers []string
+
+	HTTPClient *http.Client
+}
+
+type KonnectConfig struct {
+	Email    string
+	Password string
+	Debug    bool
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
@@ -134,7 +148,10 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		tlsConfig.RootCAs = certPool
 	}
 
-	c := &http.Client{}
+	c := opt.HTTPClient
+	if c == nil {
+		c = &http.Client{}
+	}
 	defaultTransport := http.DefaultTransport.(*http.Transport)
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
@@ -163,6 +180,19 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		kongClient.SetLogger(os.Stderr)
 	}
 	return kongClient, nil
+}
+
+func GetKonnectClient(httpClient *http.Client, debug bool) (*konnect.Client,
+	error) {
+	client, err := konnect.NewClient(httpClient)
+	if err != nil {
+		return nil, err
+	}
+	if debug {
+		client.SetDebugMode(true)
+		client.SetLogger(os.Stderr)
+	}
+	return client, nil
 }
 
 // CleanAddress removes trailling / from a URL.

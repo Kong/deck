@@ -15,7 +15,7 @@ var (
 // diffCmd represents the diff command
 var diffCmd = &cobra.Command{
 	Use:   "diff",
-	Short: "Diff the current entities in Kong with the on on disks",
+	Short: "Diff the current entities in Kong with the one on disks",
 	Long: `Diff is like a dry run of 'decK sync' command.
 
 It will load entities form Kong and then perform a diff on those with
