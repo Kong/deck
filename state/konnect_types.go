@@ -70,7 +70,7 @@ func (s1 *ServiceVersion) Console() string {
 
 // Equal returns true if s1 and s2 are equal.
 func (s1 *ServiceVersion) Equal(s2 *ServiceVersion) bool {
-	return s1.EqualWithOpts(s2, false, false,false)
+	return s1.EqualWithOpts(s2, false, false, false)
 }
 
 // EqualWithOpts returns true if s1 and s2 are equal.
