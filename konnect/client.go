@@ -16,7 +16,8 @@ var (
 )
 
 type service struct {
-	client *Client
+	client         *Client
+	controlPlaneID string
 }
 
 // Client talks to the Konnect API.
@@ -54,6 +55,12 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	client.ControlPlaneRelations = (*ControlPlaneRelationsService)(&client.common)
 	client.logger = os.Stderr
 	return client, nil
+}
+
+// SetControlPlaneID sets the kong control-plane ID in the client.
+// This is used to inject the control-plane ID in requests as needed.
+func (c *Client) SetControlPlaneID(cpID string) {
+	c.common.controlPlaneID = cpID
 }
 
 // Do executes a HTTP request and returns a response
