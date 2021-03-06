@@ -20,10 +20,11 @@ var (
 // konnectDumpCmd represents the dump2 command
 var konnectDumpCmd = &cobra.Command{
 	Use:   "dump",
-	Short: "Export configuration from Konnect",
+	Short: "Export configuration from Konnect (in alpha)",
 	Long: `Dump command reads all entities present in Konnect and exports them to
 a file on disk. The file can then be read using the Sync o Diff command to again
-configure Konnect.`,
+configure Konnect.` + konnectAlphaState,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := http.DefaultClient
 
@@ -77,7 +78,7 @@ configure Konnect.`,
 func init() {
 	konnectCmd.AddCommand(konnectDumpCmd)
 	konnectDumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
-		"kong", "file to which to write Kong's configuration."+
+		"konnect", "file to which to write Kong's configuration."+
 			"Use '-' to write to stdout.")
 	konnectDumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml")

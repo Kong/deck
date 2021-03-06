@@ -10,10 +10,11 @@ import (
 // konnectPingCmd represents the ping2 command
 var konnectPingCmd = &cobra.Command{
 	Use:   "ping",
-	Short: "Verify connectivity with Konnect",
+	Short: "Verify connectivity with Konnect (in alpha)",
 	Long: `Ping command can be used to verify if decK
 can connect to Konnect's API endpoint. It also validates the supplied
-credentials.`,
+credentials.` + konnectAlphaState,
+	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetKonnectClient(nil, konnectConfig.Debug)
 		if err != nil {

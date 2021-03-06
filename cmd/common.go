@@ -156,7 +156,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
-	stats, errs := solver.Solve(stopChannel, s, wsClient, parallelism, dry)
+	stats, errs := solver.Solve(stopChannel, s, wsClient, nil, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)
