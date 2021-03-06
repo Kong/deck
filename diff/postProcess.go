@@ -294,3 +294,36 @@ func (crud *rbacEndpointPermissionPostAction) Delete(args ...crud.Arg) (crud.Arg
 func (crud *rbacEndpointPermissionPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.RBACEndpointPermissions.Update(*args[0].(*state.RBACEndpointPermission))
 }
+
+type servicePackagePostAction struct {
+	currentState *state.KongState
+}
+
+func (crud servicePackagePostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ServicePackages.Add(*args[0].(*state.ServicePackage))
+}
+
+func (crud servicePackagePostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ServicePackages.Delete(*((args[0].(*state.ServicePackage)).ID))
+}
+
+func (crud servicePackagePostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ServicePackages.Update(*args[0].(*state.ServicePackage))
+}
+
+type serviceVersionPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud serviceVersionPostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ServiceVersions.Add(*args[0].(*state.ServiceVersion))
+}
+
+func (crud serviceVersionPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	sv := args[0].(*state.ServiceVersion)
+	return nil, crud.currentState.ServiceVersions.Delete(*sv.ServicePackage.ID, *sv.ID)
+}
+
+func (crud serviceVersionPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ServiceVersions.Update(*args[0].(*state.ServiceVersion))
+}

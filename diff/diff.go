@@ -73,6 +73,9 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("mtls-auth", &mtlsAuthPostAction{current})
 	s.postProcess.MustRegister("rbac-role", &rbacRolePostAction{current})
 	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
+	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
+	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
+
 	return s, nil
 }
 
@@ -195,6 +198,20 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 
+	err = sc.deleteServiceVersions()
+	if err != nil {
+		return err
+	}
+
+	// barrier for foreign relations
+	// ServiceVersions must be deleted before ServicePackages
+	sc.wait()
+
+	err = sc.deleteServicePackages()
+	if err != nil {
+		return err
+	}
+
 	// finish delete before returning
 	sc.wait()
 
@@ -298,6 +315,19 @@ func (sc *Syncer) createUpdate() error {
 	sc.wait()
 
 	err = sc.createUpdateRBACEndpointPermissions()
+	if err != nil {
+		return err
+	}
+
+	err = sc.createUpdateServicePackages()
+	if err != nil {
+		return err
+	}
+	// barrier for foreign relations
+	// services, routes and consumers must be created before plugins
+	sc.wait()
+
+	err = sc.createUpdateServiceVersions()
 	if err != nil {
 		return err
 	}
