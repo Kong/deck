@@ -44,7 +44,7 @@ func (c *Client) list(ctx context.Context,
 
 	// convenient for end user to use this opt till it's nil
 	var next *ListOpt
-	if list.Page != list.PageCount {
+	if len(list.Data) > 0 && list.Page != list.PageCount {
 		next = &ListOpt{
 			Page: list.Page + 1,
 			Size: opt.Size,
