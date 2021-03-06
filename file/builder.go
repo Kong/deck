@@ -2,6 +2,7 @@ package file
 
 import (
 	"github.com/blang/semver"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -9,11 +10,12 @@ import (
 )
 
 type stateBuilder struct {
-	targetContent *Content
-	rawState      *utils.KongRawState
-	currentState  *state.KongState
-	defaulter     *utils.Defaulter
-	kongVersion   semver.Version
+	targetContent   *Content
+	rawState        *utils.KongRawState
+	konnectRawState *utils.KonnectRawState
+	currentState    *state.KongState
+	defaulter       *utils.Defaulter
+	kongVersion     semver.Version
 
 	selectTags   []string
 	intermediate *state.KongState
@@ -32,17 +34,18 @@ var uuid = func() *string {
 	return kong.String(utils.UUID())
 }
 
-func (b *stateBuilder) build() (*utils.KongRawState, error) {
+func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, error) {
 	// setup
 	var err error
 	b.rawState = &utils.KongRawState{}
+	b.konnectRawState = &utils.KonnectRawState{}
 
 	if b.targetContent.Info != nil {
 		b.selectTags = b.targetContent.Info.SelectorTags
 	}
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// build
@@ -55,11 +58,14 @@ func (b *stateBuilder) build() (*utils.KongRawState, error) {
 	b.plugins()
 	b.enterprise()
 
+	// konnect
+	b.konnect()
+
 	// result
 	if b.err != nil {
-		return nil, b.err
+		return nil, nil, b.err
 	}
-	return b.rawState, nil
+	return b.rawState, b.konnectRawState, nil
 }
 
 func (b *stateBuilder) certificates() {
@@ -406,6 +412,74 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
 	}
 }
 
+func (b *stateBuilder) konnect() {
+	if b.err != nil {
+		return
+	}
+
+	for i := range b.targetContent.ServicePackages {
+		targetSP := b.targetContent.ServicePackages[i]
+		if utils.Empty(targetSP.ID) {
+			currentSP, err := b.currentState.ServicePackages.Get(*targetSP.Name)
+			if err == state.ErrNotFound {
+				targetSP.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				targetSP.ID = kong.String(*currentSP.ID)
+			}
+		}
+
+		targetKonnectSP := konnect.ServicePackage{
+			ID:          targetSP.ID,
+			Name:        targetSP.Name,
+			Description: targetSP.Description,
+		}
+
+		// versions associated with the package
+		for _, targetSV := range targetSP.Versions {
+			targetKonnectSV := konnect.ServiceVersion{
+				ID:      targetSV.ID,
+				Version: targetSV.Version,
+			}
+			targetRelationID := ""
+			if utils.Empty(targetKonnectSV.ID) {
+				currentSV, err := b.currentState.ServiceVersions.Get(*targetKonnectSP.ID, *targetKonnectSV.Version)
+				if err == state.ErrNotFound {
+					targetKonnectSV.ID = uuid()
+				} else if err != nil {
+					b.err = err
+					return
+				} else {
+					targetKonnectSV.ID = kong.String(*currentSV.ID)
+					if currentSV.ControlPlaneServiceRelation != nil {
+						targetRelationID = *currentSV.ControlPlaneServiceRelation.ID
+					}
+				}
+			}
+			if targetSV.Implementation != nil &&
+				targetSV.Implementation.Kong != nil {
+				err := b.ingestService(targetSV.Implementation.Kong.Service)
+				if err != nil {
+					b.err = err
+					return
+				}
+				targetKonnectSV.ControlPlaneServiceRelation = &konnect.ControlPlaneServiceRelation{
+					ControlPlaneEntityID: targetSV.Implementation.Kong.Service.ID,
+				}
+				if targetRelationID != "" {
+					targetKonnectSV.ControlPlaneServiceRelation.ID = &targetRelationID
+				}
+			}
+			targetKonnectSP.Versions = append(targetKonnectSP.Versions, targetKonnectSV)
+		}
+
+		b.konnectRawState.ServicePackages = append(b.konnectRawState.ServicePackages,
+			&targetKonnectSP)
+	}
+}
+
 func (b *stateBuilder) services() {
 	if b.err != nil {
 		return
@@ -413,48 +487,53 @@ func (b *stateBuilder) services() {
 
 	for _, s := range b.targetContent.Services {
 		s := s
-		if utils.Empty(s.ID) {
-			svc, err := b.currentState.Services.Get(*s.Name)
-			if err == state.ErrNotFound {
-				s.ID = uuid()
-			} else if err != nil {
-				b.err = err
-				return
-			} else {
-				s.ID = kong.String(*svc.ID)
-			}
-		}
-		utils.MustMergeTags(&s.Service, b.selectTags)
-		b.defaulter.MustSet(&s.Service)
-
-		b.rawState.Services = append(b.rawState.Services, &s.Service)
-		err := b.intermediate.Services.Add(state.Service{Service: s.Service})
+		err := b.ingestService(&s)
 		if err != nil {
 			b.err = err
 			return
 		}
+	}
+}
 
-		// plugins for the service
-		var plugins []FPlugin
-		for _, p := range s.Plugins {
-			p.Service = &kong.Service{ID: kong.String(*s.ID)}
-			plugins = append(plugins, *p)
-		}
-		if err := b.ingestPlugins(plugins); err != nil {
-			b.err = err
-			return
-		}
-
-		// routes for the service
-		for _, r := range s.Routes {
-			r := r
-			r.Service = &kong.Service{ID: kong.String(*s.ID)}
-			if err := b.ingestRoute(*r); err != nil {
-				b.err = err
-				return
-			}
+func (b *stateBuilder) ingestService(s *FService) error {
+	if utils.Empty(s.ID) {
+		svc, err := b.currentState.Services.Get(*s.Name)
+		if err == state.ErrNotFound {
+			s.ID = uuid()
+		} else if err != nil {
+			return err
+		} else {
+			s.ID = kong.String(*svc.ID)
 		}
 	}
+	utils.MustMergeTags(&s.Service, b.selectTags)
+	b.defaulter.MustSet(&s.Service)
+
+	b.rawState.Services = append(b.rawState.Services, &s.Service)
+	err := b.intermediate.Services.Add(state.Service{Service: s.Service})
+	if err != nil {
+		return err
+	}
+
+	// plugins for the service
+	var plugins []FPlugin
+	for _, p := range s.Plugins {
+		p.Service = &kong.Service{ID: kong.String(*s.ID)}
+		plugins = append(plugins, *p)
+	}
+	if err := b.ingestPlugins(plugins); err != nil {
+		return err
+	}
+
+	// routes for the service
+	for _, r := range s.Routes {
+		r := r
+		r.Service = &kong.Service{ID: kong.String(*s.ID)}
+		if err := b.ingestRoute(*r); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (b *stateBuilder) routes() {

@@ -156,7 +156,7 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 					return err
 				}
 				fVersion.Implementation = &Implementation{
-					Type: "kong-gateway",
+					Type: "kong",
 					Kong: &Kong{
 						Service: s,
 					},
