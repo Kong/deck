@@ -8,8 +8,8 @@ builds:
   - freebsd
   goarch:
   - amd64
-  asmflags:
-  - all=-trimpath={{.Env.GOPATH}}
+  flags:
+  - -trimpath
   ldflags:
   - -s -w -X github.com/kong/deck/cmd.VERSION={{ .Tag }} -X github.com/kong/deck/cmd.COMMIT={{ .ShortCommit }}
 checksum:
