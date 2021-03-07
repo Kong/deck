@@ -122,14 +122,6 @@ func TestTargetsInvalidType(t *testing.T) {
 
 	collection := targetsCollection()
 
-	var upstream Upstream
-	upstream.Name = kong.String("my-upstream")
-	upstream.ID = kong.String("first")
-	txn := collection.db.Txn(true)
-	err := txn.Insert(targetTableName, &upstream)
-	assert.NotNil(err)
-	txn.Abort()
-
 	type badTarget struct {
 		kong.Target
 		Meta
@@ -145,8 +137,8 @@ func TestTargetsInvalidType(t *testing.T) {
 		},
 	}
 
-	txn = collection.db.Txn(true)
-	err = txn.Insert(targetTableName, &target)
+	txn := collection.db.Txn(true)
+	err := txn.Insert(targetTableName, &target)
 	assert.Nil(err)
 	txn.Commit()
 

@@ -24,17 +24,6 @@ var targetTableSchema = &memdb.TableSchema{
 			Unique:  true,
 			Indexer: &memdb.StringFieldIndex{Field: "ID"},
 		},
-		"target": {
-			Name: "target",
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Target",
-						Sub:    "Target",
-					},
-				},
-			},
-		},
 		all: allIndex,
 		// foreign
 		targetsByUpstreamID: {
