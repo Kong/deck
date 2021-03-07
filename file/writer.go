@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
-	"reflect"
 	"sort"
 	"strings"
 
@@ -162,10 +161,10 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 					},
 				}
 			}
-			zeroOutID(&fVersion, fVersion.Version, config.WithID)
+			utils.ZeroOutID(&fVersion, fVersion.Version, config.WithID)
 			p.Versions = append(p.Versions, fVersion)
 		}
-		zeroOutID(&p, p.Name, config.WithID)
+		utils.ZeroOutID(&p, p.Name, config.WithID)
 		file.ServicePackages = append(file.ServicePackages, p)
 	}
 	sort.SliceStable(file.ServicePackages, func(i, j int) bool {
@@ -212,8 +211,8 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 			continue
 		}
 		p.Service = nil
-		zeroOutID(p, p.Name, config.WithID)
-		zeroOutTimestamps(p)
+		utils.ZeroOutID(p, p.Name, config.WithID)
+		utils.ZeroOutTimestamps(p)
 		utils.MustRemoveTags(&p.Plugin, config.SelectTags)
 		s.Plugins = append(s.Plugins, &FPlugin{Plugin: p.Plugin})
 	}
@@ -226,8 +225,8 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 			return nil, err
 		}
 		r.Service = nil
-		zeroOutID(r, r.Name, config.WithID)
-		zeroOutTimestamps(r)
+		utils.ZeroOutID(r, r.Name, config.WithID)
+		utils.ZeroOutTimestamps(r)
 		utils.MustRemoveTags(&r.Route, config.SelectTags)
 		route := &FRoute{Route: r.Route}
 		for _, p := range plugins {
@@ -235,8 +234,8 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 				continue
 			}
 			p.Route = nil
-			zeroOutID(p, p.Name, config.WithID)
-			zeroOutTimestamps(p)
+			utils.ZeroOutID(p, p.Name, config.WithID)
+			utils.ZeroOutTimestamps(p)
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
 			route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
@@ -248,8 +247,8 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 	sort.SliceStable(s.Routes, func(i, j int) bool {
 		return compareID(s.Routes[i], s.Routes[j])
 	})
-	zeroOutID(&s, s.Name, config.WithID)
-	zeroOutTimestamps(&s)
+	utils.ZeroOutID(&s, s.Name, config.WithID)
+	utils.ZeroOutTimestamps(&s)
 	return &s, nil
 }
 
@@ -267,8 +266,8 @@ func populateServicelessRoutes(kongState *state.KongState, file *Content,
 		if err != nil {
 			return err
 		}
-		zeroOutID(r, r.Name, config.WithID)
-		zeroOutTimestamps(r)
+		utils.ZeroOutID(r, r.Name, config.WithID)
+		utils.ZeroOutTimestamps(r)
 		utils.MustRemoveTags(&r.Route, config.SelectTags)
 		route := &FRoute{Route: r.Route}
 		for _, p := range plugins {
@@ -276,8 +275,8 @@ func populateServicelessRoutes(kongState *state.KongState, file *Content,
 				continue
 			}
 			p.Route = nil
-			zeroOutID(p, p.Name, config.WithID)
-			zeroOutTimestamps(p)
+			utils.ZeroOutID(p, p.Name, config.WithID)
+			utils.ZeroOutTimestamps(p)
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
 			route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
@@ -337,8 +336,8 @@ func populatePlugins(kongState *state.KongState, file *Content,
 			p.Route.ID = &rID
 		}
 		if associations == 0 || associations > 1 {
-			zeroOutID(p, p.Name, config.WithID)
-			zeroOutTimestamps(p)
+			utils.ZeroOutID(p, p.Name, config.WithID)
+			utils.ZeroOutTimestamps(p)
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
 			p := FPlugin{Plugin: p.Plugin}
 			file.Plugins = append(file.Plugins, p)
@@ -364,16 +363,16 @@ func populateUpstreams(kongState *state.KongState, file *Content,
 		}
 		for _, t := range targets {
 			t.Upstream = nil
-			zeroOutID(t, t.Target.Target, config.WithID)
-			zeroOutTimestamps(t)
+			utils.ZeroOutID(t, t.Target.Target, config.WithID)
+			utils.ZeroOutTimestamps(t)
 			utils.MustRemoveTags(&t.Target, config.SelectTags)
 			u.Targets = append(u.Targets, &FTarget{Target: t.Target})
 		}
 		sort.SliceStable(u.Targets, func(i, j int) bool {
 			return compareID(u.Targets[i], u.Targets[j])
 		})
-		zeroOutID(&u, u.Name, config.WithID)
-		zeroOutTimestamps(&u)
+		utils.ZeroOutID(&u, u.Name, config.WithID)
+		utils.ZeroOutTimestamps(&u)
 		utils.MustRemoveTags(&u.Upstream, config.SelectTags)
 		file.Upstreams = append(file.Upstreams, u)
 	}
@@ -402,15 +401,15 @@ func populateCertificates(kongState *state.KongState, file *Content,
 		}
 		for _, s := range snis {
 			s.Certificate = nil
-			zeroOutID(s, s.Name, config.WithID)
-			zeroOutTimestamps(s)
+			utils.ZeroOutID(s, s.Name, config.WithID)
+			utils.ZeroOutTimestamps(s)
 			utils.MustRemoveTags(&s.SNI, config.SelectTags)
 			c.SNIs = append(c.SNIs, s.SNI)
 		}
 		sort.SliceStable(c.SNIs, func(i, j int) bool {
 			return strings.Compare(*c.SNIs[i].Name, *c.SNIs[j].Name) < 0
 		})
-		zeroOutTimestamps(&c)
+		utils.ZeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c, config.SelectTags)
 		file.Certificates = append(file.Certificates, c)
 	}
@@ -428,7 +427,7 @@ func populateCACertificates(kongState *state.KongState, file *Content,
 	}
 	for _, c := range caCertificates {
 		c := FCACertificate{CACertificate: c.CACertificate}
-		zeroOutTimestamps(&c)
+		utils.ZeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.CACertificate, config.SelectTags)
 		file.CACertificates = append(file.CACertificates, c)
 	}
@@ -454,8 +453,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			if p.Service != nil || p.Route != nil {
 				continue
 			}
-			zeroOutID(p, p.Name, config.WithID)
-			zeroOutTimestamps(p)
+			utils.ZeroOutID(p, p.Name, config.WithID)
+			utils.ZeroOutTimestamps(p)
 			p.Consumer = nil
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
 			c.Plugins = append(c.Plugins, &FPlugin{Plugin: p.Plugin})
@@ -469,8 +468,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			return err
 		}
 		for _, k := range keyAuths {
-			zeroOutID(k, k.Key, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.Key, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			k.Consumer = nil
 			c.KeyAuths = append(c.KeyAuths, &k.KeyAuth)
 		}
@@ -480,8 +479,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range hmacAuth {
 			k.Consumer = nil
-			zeroOutID(k, k.Username, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.Username, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			c.HMACAuths = append(c.HMACAuths, &k.HMACAuth)
 		}
 		jwtSecrets, err := kongState.JWTAuths.GetAllByConsumerID(*c.ID)
@@ -490,8 +489,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range jwtSecrets {
 			k.Consumer = nil
-			zeroOutID(k, k.Key, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.Key, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			c.JWTAuths = append(c.JWTAuths, &k.JWTAuth)
 		}
 		basicAuths, err := kongState.BasicAuths.GetAllByConsumerID(*c.ID)
@@ -500,8 +499,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range basicAuths {
 			k.Consumer = nil
-			zeroOutID(k, k.Username, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.Username, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
 		}
 		oauth2Creds, err := kongState.Oauth2Creds.GetAllByConsumerID(*c.ID)
@@ -510,8 +509,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range oauth2Creds {
 			k.Consumer = nil
-			zeroOutID(k, k.ClientID, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.ClientID, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			c.Oauth2Creds = append(c.Oauth2Creds, &k.Oauth2Credential)
 		}
 		aclGroups, err := kongState.ACLGroups.GetAllByConsumerID(*c.ID)
@@ -520,8 +519,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range aclGroups {
 			k.Consumer = nil
-			zeroOutID(k, k.Group, config.WithID)
-			zeroOutTimestamps(k)
+			utils.ZeroOutID(k, k.Group, config.WithID)
+			utils.ZeroOutTimestamps(k)
 			c.ACLGroups = append(c.ACLGroups, &k.ACLGroup)
 		}
 		mtlsAuths, err := kongState.MTLSAuths.GetAllByConsumerID(*c.ID)
@@ -529,12 +528,12 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			return err
 		}
 		for _, k := range mtlsAuths {
-			zeroOutTimestamps(k)
+			utils.ZeroOutTimestamps(k)
 			k.Consumer = nil
 			c.MTLSAuths = append(c.MTLSAuths, &k.MTLSAuth)
 		}
-		zeroOutID(&c, c.Username, config.WithID)
-		zeroOutTimestamps(&c)
+		utils.ZeroOutID(&c, c.Username, config.WithID)
+		utils.ZeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.Consumer, config.SelectTags)
 		file.Consumers = append(file.Consumers, c)
 	}
@@ -550,12 +549,12 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, ep := range eps {
 			ep.Role = nil
-			zeroOutTimestamps(ep)
+			utils.ZeroOutTimestamps(ep)
 			r.EndpointPermissions = append(
 				r.EndpointPermissions, &FRBACEndpointPermission{RBACEndpointPermission: ep.RBACEndpointPermission})
 		}
-		zeroOutID(&r, r.Name, config.WithID)
-		zeroOutTimestamps(&r)
+		utils.ZeroOutID(&r, r.Name, config.WithID)
+		utils.ZeroOutTimestamps(&r)
 		file.RBACRoles = append(file.RBACRoles, r)
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
@@ -599,37 +598,4 @@ func addExtToFilename(filename, format string) string {
 		filename = filename + "." + strings.ToLower(format)
 	}
 	return filename
-}
-
-func zeroOutTimestamps(obj interface{}) {
-	zeroOutField(obj, "CreatedAt")
-	zeroOutField(obj, "UpdatedAt")
-}
-
-var zero reflect.Value
-
-func zeroOutField(obj interface{}, field string) {
-	ptr := reflect.ValueOf(obj)
-	if ptr.Kind() != reflect.Ptr {
-		return
-	}
-	v := reflect.Indirect(ptr)
-	ts := v.FieldByName(field)
-	if ts == zero {
-		return
-	}
-	ts.Set(reflect.Zero(ts.Type()))
-}
-
-func zeroOutID(obj interface{}, altName *string, withID bool) {
-	// withID is set, export the ID
-	if withID {
-		return
-	}
-	// altName is not set, export the ID
-	if utils.Empty(altName) {
-		return
-	}
-	// zero the ID field
-	zeroOutField(obj, "ID")
 }
