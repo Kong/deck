@@ -5,6 +5,7 @@ import (
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
+	"github.com/kong/deck/utils"
 	"github.com/yudai/gojsondiff"
 	"github.com/yudai/gojsondiff/formatter"
 )
@@ -14,6 +15,8 @@ var (
 )
 
 func getDiff(a, b interface{}) (string, error) {
+	utils.ZeroOutTimestamps(a)
+	utils.ZeroOutTimestamps(b)
 	aJSON, err := json.Marshal(a)
 	if err != nil {
 		return "", err
