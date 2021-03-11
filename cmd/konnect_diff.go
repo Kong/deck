@@ -4,6 +4,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	konnectDiffCmdKongStateFile   []string
+	konnectDiffCmdParallelism     int
+	konnectDiffCmdNonZeroExitCode bool
+)
+
 // konnectDiffCmd represents the 'deck konnect diff' command.
 var konnectDiffCmd = &cobra.Command{
 	Use:   "diff",
@@ -15,23 +21,23 @@ the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncKonnect(cmd.Context(), diffCmdKongStateFile, true,
-			diffCmdParallelism)
+		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
+			konnectDiffCmdParallelism)
 	},
 }
 
 func init() {
 	konnectCmd.AddCommand(konnectDiffCmd)
-	konnectDiffCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
+	konnectDiffCmd.Flags().StringSliceVarP(&konnectDiffCmdKongStateFile,
 		"state", "s", []string{"konnect.yaml"}, "file(s) containing Konnect's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	konnectDiffCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
 			"with consumers")
-	konnectDiffCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
+	konnectDiffCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations")
-	konnectDiffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",
+	konnectDiffCmd.Flags().BoolVar(&konnectDiffCmdNonZeroExitCode, "non-zero-exit-code",
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")

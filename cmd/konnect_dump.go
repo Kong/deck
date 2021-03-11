@@ -15,6 +15,9 @@ import (
 
 var (
 	konnectDumpIncludeConsumers bool
+	konnectDumpCmdKongStateFile string
+	konnectDumpCmdStateFormat   string
+	konnectDumpWithID           bool
 )
 
 // konnectDumpCmd represents the dump2 command
@@ -65,8 +68,8 @@ configure Konnect.` + konnectAlphaState,
 		}
 
 		if err := file.KonnectStateToFile(ks, file.WriteConfig{
-			Filename:   dumpCmdKongStateFile,
-			FileFormat: file.Format(strings.ToUpper(dumpCmdStateFormat)),
+			Filename:   konnectDumpCmdKongStateFile,
+			FileFormat: file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 			WithID:     dumpWithID,
 		}); err != nil {
 			return err
@@ -77,12 +80,12 @@ configure Konnect.` + konnectAlphaState,
 
 func init() {
 	konnectCmd.AddCommand(konnectDumpCmd)
-	konnectDumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
+	konnectDumpCmd.Flags().StringVarP(&konnectDumpCmdKongStateFile, "output-file", "o",
 		"konnect", "file to which to write Kong's configuration."+
 			"Use '-' to write to stdout.")
-	konnectDumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
+	konnectDumpCmd.Flags().StringVar(&konnectDumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml")
-	konnectDumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
+	konnectDumpCmd.Flags().BoolVar(&konnectDumpWithID, "with-id",
 		false, "write ID of all entities in the output")
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+

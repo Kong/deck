@@ -13,20 +13,20 @@ var konnectSyncCmd = &cobra.Command{
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncKonnect(cmd.Context(), diffCmdKongStateFile, false,
-			diffCmdParallelism)
+		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
+			konnectDiffCmdParallelism)
 	},
 }
 
 func init() {
 	konnectCmd.AddCommand(konnectSyncCmd)
-	konnectSyncCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
+	konnectSyncCmd.Flags().StringSliceVarP(&konnectDiffCmdKongStateFile,
 		"state", "s", []string{"konnect.yaml"}, "file(s) containing Konnect's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	konnectSyncCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
 			"with consumers")
-	konnectSyncCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
+	konnectSyncCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations")
 }
