@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.5.1](#v151---20210323)
 - [v1.5.0](#v150---20210306)
 - [v1.4.0](#v140---20210201)
 - [v1.3.0](#v130---20210115)
@@ -26,6 +27,22 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.5.0] - 2021/03/23
+
+### Fixed
+
+- Targets with identical IP and port values no longer conflict when created for
+  different upstreams.
+  [#280](https://github.com/Kong/deck/pull/280)
+- Fixed issue where Konnect flag defaults overwrote non-Konnect flag defaults,
+  which broke the `--all-workspaces` flag.
+  [#290](https://github.com/Kong/deck/pull/290)
+- Diff output no longer prints resource timestamp information.
+  [#283](https://github.com/Kong/deck/pull/283)
+- Tracebacks no longer include unwanted information specific to the build
+  environment.
+  [#284](https://github.com/Kong/deck/pull/284)
 
 ## [v1.5.0] - 2021/03/06
 
@@ -581,6 +598,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.5.1]: https://github.com/kong/deck/compare/v1.5.1...v1.5.1
 [v1.5.0]: https://github.com/kong/deck/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/kong/deck/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/kong/deck/compare/v1.2.4...v1.3.0
