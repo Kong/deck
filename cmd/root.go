@@ -1,13 +1,11 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
@@ -43,29 +41,8 @@ It can be used to export, import or sync entities to Kong.`,
 // Execute adds all child commands to the root command and sets
 // sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	var wg sync.WaitGroup
-	var err error
-	const threads = 2
-	wg.Add(threads)
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go func() {
-		defer wg.Done()
-		sendAnalytics(ctx)
-	}()
-
-	go func() {
-		defer wg.Done()
-		defer cancel()
-		err = rootCmd.Execute()
-	}()
-
-	wg.Wait()
-	if err != nil {
-		os.Exit(1)
-	}
+func Execute() error {
+	return rootCmd.Execute()
 }
 
 //nolint:errcheck
