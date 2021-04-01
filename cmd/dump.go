@@ -107,6 +107,12 @@ configure Kong.`,
 			return nil
 		}
 
+		if yes, err := confirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+			return err
+		} else if !yes {
+			return nil
+		}
+
 		// Kong OSS
 		// or Kong Enterprise single workspace
 		if dumpWorkspace != "" {
@@ -170,4 +176,6 @@ func init() {
 			"Multiple tags are ANDed together.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "export only the RBAC resources (Kong Enterprise only)")
+	dumpCmd.Flags().BoolVar(&assumeYes, "yes",
+		false, "Assume 'yes' to prompts and run non-interactively")
 }

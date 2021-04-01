@@ -178,37 +178,3 @@ services:
 }`
 	assert.Equal(expected, output)
 }
-
-func Test_addExtToFilename(t *testing.T) {
-	type args struct {
-		filename string
-		format   string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			args: args{
-				filename: "foo",
-				format:   "yolo",
-			},
-			want: "foo.yolo",
-		},
-		{
-			args: args{
-				filename: "foo.json",
-				format:   "yolo",
-			},
-			want: "foo.json",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := addExtToFilename(tt.args.filename, tt.args.format); got != tt.want {
-				t.Errorf("addExtToFilename() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}

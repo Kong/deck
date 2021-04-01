@@ -31,6 +31,12 @@ configure Konnect.` + konnectAlphaState,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := http.DefaultClient
 
+		if yes, err := confirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+			return err
+		} else if !yes {
+			return nil
+		}
+
 		// get Konnect client
 		konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
 		if err != nil {
@@ -90,4 +96,6 @@ func init() {
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
 			"with consumers")
+	konnectDumpCmd.Flags().BoolVar(&assumeYes, "yes",
+		false, "Assume 'yes' to prompts and run non-interactively")
 }

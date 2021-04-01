@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"path/filepath"
 	"regexp"
 )
 
@@ -57,4 +58,11 @@ func CleanKongVersion(version string) (string, error) {
 		return "", fmt.Errorf("unknown Kong version")
 	}
 	return matches[0], nil
+}
+
+func AddExtToFilename(filename, ext string) string {
+	if filepath.Ext(filename) == "" {
+		filename = filename + "." + ext
+	}
+	return filename
 }

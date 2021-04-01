@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -584,18 +583,11 @@ func writeFile(content *Content, filename string, format Format) error {
 	if filename == "-" {
 		_, err = fmt.Print(string(c))
 	} else {
-		filename = addExtToFilename(filename, string(format))
+		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))
 		err = ioutil.WriteFile(filename, c, 0600)
 	}
 	if err != nil {
 		return errors.Wrap(err, "writing file")
 	}
 	return nil
-}
-
-func addExtToFilename(filename, format string) string {
-	if filepath.Ext(filename) == "" {
-		filename = filename + "." + strings.ToLower(format)
-	}
-	return filename
 }
