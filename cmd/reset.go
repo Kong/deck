@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/reset"
 	"github.com/kong/deck/utils"
@@ -30,7 +27,8 @@ By default, this command will ask for a confirmation prompt.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !resetCmdForce {
-			ok, err := confirm()
+			ok, err := confirm("This will delete all configuration from Kong's database." +
+				"\n> Are you sure? ")
 			if err != nil {
 				return err
 			}
@@ -96,27 +94,6 @@ By default, this command will ask for a confirmation prompt.`,
 		}
 		return nil
 	},
-}
-
-// confirm prompts a user for a confirmation
-// and returns true with no error if input is "yes" or "y" (case-insensitive),
-// otherwise false.
-func confirm() (bool, error) {
-	fmt.Println("This will delete all configuration from Kong's database.")
-	fmt.Print("> Are you sure? ")
-	yes := []string{"yes", "y"}
-	var input string
-	_, err := fmt.Scanln(&input)
-	if err != nil {
-		return false, err
-	}
-	input = strings.ToLower(input)
-	for _, valid := range yes {
-		if input == valid {
-			return true, nil
-		}
-	}
-	return false, nil
 }
 
 func init() {

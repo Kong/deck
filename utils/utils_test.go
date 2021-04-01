@@ -113,3 +113,37 @@ func Test_cleanKongVersion(t *testing.T) {
 		})
 	}
 }
+
+func Test_AddExtToFilename(t *testing.T) {
+	type args struct {
+		filename string
+		ext      string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			args: args{
+				filename: "foo",
+				ext:      "yolo",
+			},
+			want: "foo.yolo",
+		},
+		{
+			args: args{
+				filename: "foo.json",
+				ext:      "yolo",
+			},
+			want: "foo.json",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AddExtToFilename(tt.args.filename, tt.args.ext); got != tt.want {
+				t.Errorf("AddExtToFilename() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

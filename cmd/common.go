@@ -27,6 +27,7 @@ const (
 var (
 	stopChannel chan struct{}
 	dumpConfig  dump.Config
+	assumeYes   bool
 )
 
 // SetStopCh sets the stop channel for long running commands.
