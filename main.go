@@ -26,11 +26,7 @@ func registerSignalHandler() {
 
 func main() {
 	registerSignalHandler()
-	err := cmd.Execute()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	cmd.Execute()
 }
 
 func init() {
