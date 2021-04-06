@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"

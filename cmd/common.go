@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/blang/semver"
+	"github.com/blang/semver/v4"
 	"github.com/fatih/color"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
