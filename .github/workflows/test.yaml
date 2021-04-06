@@ -21,6 +21,6 @@ jobs:
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
-        run: make upload-coverage
+        run: "bash <(curl -s https://codecov.io/bash)"
       - name: Build
         run: make build

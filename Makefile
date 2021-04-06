@@ -31,7 +31,3 @@ coverage:
 	# ignoring generated code for coverage
 	grep -E -v 'generated.deepcopy.go' coverage.out.tmp > coverage.out
 	rm -f coverage.out.tmp
-
-.PHONY: upload-coverage
-upload-coverage:
-	bash <(curl -s https://codecov.io/bash) 
