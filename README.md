@@ -4,6 +4,7 @@ decK provides declarative configuration and drift detection for Kong.
 
 [![Build Status](https://github.com/kong/deck/workflows/CI%20Test/badge.svg)](https://github.com/kong/deck/actions?query=branch%3Amain+event%3Apush)
 [![codecov](https://codecov.io/gh/Kong/deck/branch/main/graph/badge.svg?token=S1aqcXiGEo)](https://codecov.io/gh/Kong/deck)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kong/deck)](https://goreportcard.com/report/github.com/kong/deck)
 
 [![asciicast](https://asciinema.org/a/238318.svg)](https://asciinema.org/a/238318)
 
