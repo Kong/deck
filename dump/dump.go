@@ -693,7 +693,7 @@ func GetAllMTLSAuths(ctx context.Context,
 func GetAllRBACRoles(ctx context.Context,
 	client *kong.Client) ([]*kong.RBACRole, error) {
 
-	roles, err := client.RBACRoles.List(ctx)
+	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -708,7 +708,7 @@ func GetAllRBACREndpointPermissions(ctx context.Context,
 	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
 
 	var eps = []*kong.RBACEndpointPermission{}
-	roles, err := client.RBACRoles.List(ctx)
+	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {
 		return nil, err
 	}

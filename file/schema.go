@@ -1378,6 +1378,9 @@ const contentSchema = `{
         "updated_at": {
           "type": "integer"
         },
+        "url": {
+          "type": "string"
+        },
         "write_timeout": {
           "type": "integer"
         }
