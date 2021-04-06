@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
+	yaml "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // WriteConfig holds settings to use to write the state file.

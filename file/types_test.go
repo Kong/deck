@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	yaml "github.com/ghodss/yaml"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
-	yaml "gopkg.in/yaml.v2"
 )
 
 var (

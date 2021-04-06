@@ -34,7 +34,6 @@ require (
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/ini.v1 v1.55.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/code-generator v0.20.4
 )
 
