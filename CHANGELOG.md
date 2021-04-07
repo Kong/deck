@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.6.0](#v160---20210408)
 - [v1.5.1](#v151---20210323)
 - [v1.5.0](#v150---20210306)
 - [v1.4.0](#v140---20210201)
@@ -27,6 +28,27 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.6.0] - 2021/04/08
+
+### Added
+
+- decK now prompts by default before overwriting existing state files when
+  dumping config. Including `--yes` in args assumes yes and overwrites state
+  files without prompting.
+  [#285](https://github.com/Kong/deck/pull/285)
+
+### Misc
+
+- Removed analytics.
+  [#301](https://github.com/Kong/deck/pull/301)
+
+### Breaking changes
+
+- Changed `github.com/blang/semver` module to `github.com/blang/semver/v4`. If
+  you use decK's `file` package in other applications, you will also need to
+  update the semver module used in your application.
+  [#303](https://github.com/Kong/deck/pull/303)
 
 ## [v1.5.1] - 2021/03/23
 
@@ -598,7 +620,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[v1.5.1]: https://github.com/kong/deck/compare/v1.5.1...v1.5.1
+[v1.6.0]: https://github.com/kong/deck/compare/v1.5.1...v1.6.0
+[v1.5.1]: https://github.com/kong/deck/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/kong/deck/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/kong/deck/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/kong/deck/compare/v1.2.4...v1.3.0
