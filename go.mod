@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.3.0 // indirect
 	github.com/hashicorp/go-memdb v1.1.2
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
-	github.com/imdario/mergo v0.3.9
+	github.com/imdario/mergo v0.3.12
 	github.com/kong/go-kong v0.17.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
@@ -35,6 +35,6 @@ require (
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	gopkg.in/ini.v1 v1.55.0 // indirect
-	gopkg.in/yaml.v2 v2.2.8
+	gopkg.in/yaml.v2 v2.3.0
 	k8s.io/code-generator v0.20.5
 )
