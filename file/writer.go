@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	yaml "github.com/ghodss/yaml"
+	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
@@ -567,7 +567,7 @@ func writeFile(content *Content, filename string, format Format) error {
 	var err error
 	switch format {
 	case YAML:
-		c, err = yaml.Marshal(content)
+		c, err = ghodss.Marshal(content)
 		if err != nil {
 			return err
 		}

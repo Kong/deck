@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ghodssyaml "github.com/ghodss/yaml"
+	ghodss "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 )
@@ -104,7 +104,7 @@ func readContent(reader io.Reader) (*Content, error) {
 // If it is present, then it leads to a silent error. See Github Issue #144.
 // The verification for this is done using a test.
 func yamlUnmarshal(bytes []byte, v interface{}) error {
-	return ghodssyaml.Unmarshal(bytes, v)
+	return ghodss.Unmarshal(bytes, v)
 }
 
 // configFilesInDir traverses the directory rooted at dir and

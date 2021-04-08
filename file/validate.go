@@ -1,7 +1,7 @@
 package file
 
 import (
-	yaml "github.com/ghodss/yaml"
+	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 	"github.com/xeipuuv/gojsonschema"
@@ -9,7 +9,7 @@ import (
 
 func validate(content []byte) error {
 	var c map[string]interface{}
-	err := yaml.Unmarshal(content, &c)
+	err := ghodss.Unmarshal(content, &c)
 	if err != nil {
 		return errors.Wrap(err, "unmarshaling file content")
 	}
