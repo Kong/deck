@@ -41,8 +41,12 @@ It can be used to export, import or sync entities to Kong.`,
 // Execute adds all child commands to the root command and sets
 // sflags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() error {
-	return rootCmd.Execute()
+func Execute() {
+	err := rootCmd.Execute()
+	if err != nil {
+		// do not print error because cobra already prints it
+		os.Exit(1)
+	}
 }
 
 //nolint:errcheck
