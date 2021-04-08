@@ -24,3 +24,10 @@ verify-codegen:
 update-codegen:
 	go generate ./...
 	./scripts/update-deepcopy-gen.sh
+
+.PHONY: coverage
+coverage:
+	go test -race -v -count=1 -coverprofile=coverage.out.tmp ./...
+	# ignoring generated code for coverage
+	grep -E -v 'generated.deepcopy.go' coverage.out.tmp > coverage.out
+	rm -f coverage.out.tmp
