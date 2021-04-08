@@ -6,6 +6,7 @@ updates:
   schedule:
     interval: daily
 - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
+  directory: /
+  target-branch: main
+  schedule:
+    interval: daily
