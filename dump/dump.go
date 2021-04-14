@@ -497,9 +497,7 @@ func GetAllTargets(ctx context.Context, client *kong.Client,
 func GetAllKeyAuths(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
 	var keyAuths []*kong.KeyAuth
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.KeyAuths.List(ctx, opt)
@@ -525,9 +523,7 @@ func GetAllKeyAuths(ctx context.Context,
 func GetAllHMACAuths(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
 	var hmacAuths []*kong.HMACAuth
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.HMACAuths.List(ctx, opt)
@@ -553,9 +549,7 @@ func GetAllHMACAuths(ctx context.Context,
 func GetAllJWTAuths(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
 	var jwtAuths []*kong.JWTAuth
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.JWTAuths.List(ctx, opt)
@@ -581,9 +575,7 @@ func GetAllJWTAuths(ctx context.Context,
 func GetAllBasicAuths(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
 	var basicAuths []*kong.BasicAuth
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.BasicAuths.List(ctx, opt)
@@ -609,9 +601,7 @@ func GetAllBasicAuths(ctx context.Context,
 func GetAllOauth2Creds(ctx context.Context, client *kong.Client,
 	tags []string) ([]*kong.Oauth2Credential, error) {
 	var oauth2Creds []*kong.Oauth2Credential
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.Oauth2Credentials.List(ctx, opt)
@@ -637,9 +627,7 @@ func GetAllOauth2Creds(ctx context.Context, client *kong.Client,
 func GetAllACLGroups(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
 	var aclGroups []*kong.ACLGroup
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.ACLs.List(ctx, opt)
@@ -665,9 +653,7 @@ func GetAllACLGroups(ctx context.Context,
 func GetAllMTLSAuths(ctx context.Context,
 	client *kong.Client, tags []string) ([]*kong.MTLSAuth, error) {
 	var mtlsAuths []*kong.MTLSAuth
-	// tags are not supported on credentials
-	// opt := newOpt(tags)
-	opt := newOpt(nil)
+	opt := newOpt(tags)
 
 	for {
 		s, nextopt, err := client.MTLSAuths.List(ctx, opt)
