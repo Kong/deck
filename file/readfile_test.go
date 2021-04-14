@@ -131,6 +131,7 @@ func Test_getContent(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
+		envVars map[string]string
 		want    *Content
 		wantErr bool
 	}{
@@ -167,12 +168,16 @@ func Test_getContent(t *testing.T) {
 		{
 			name: "single file",
 			args: args{[]string{"testdata/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_SVC2_HOST": "2.example.com",
+			},
 			want: &Content{
 				Services: []FService{
 					{
 						Service: kong.Service{
 							Name: kong.String("svc2"),
 							Host: kong.String("2.example.com"),
+							Tags: kong.StringSlice("<"),
 						},
 						Routes: []*FRoute{
 							{
@@ -195,14 +200,28 @@ func Test_getContent(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "environment variable present in file but not set",
+			args:    args{[]string{"testdata/file.yaml"}},
+			wantErr: true,
+		},
+		{
+			name:    "file with bad environment variable",
+			args:    args{[]string{"testdata/bad-env-var/file.yaml"}},
+			wantErr: true,
+		},
+		{
 			name: "multiple files",
 			args: args{[]string{"testdata/file.yaml", "testdata/file.json"}},
+			envVars: map[string]string{
+				"DECK_SVC2_HOST": "2.example.com",
+			},
 			want: &Content{
 				Services: []FService{
 					{
 						Service: kong.Service{
 							Name: kong.String("svc2"),
 							Host: kong.String("2.example.com"),
+							Tags: kong.StringSlice("<"),
 						},
 						Routes: []*FRoute{
 							{
@@ -304,6 +323,12 @@ func Test_getContent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
+				defer func(k string) {
+					os.Unsetenv(k)
+				}(k)
+			}
 			got, err := getContent(tt.args.filenames)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)

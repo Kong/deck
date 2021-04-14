@@ -1,11 +1,9 @@
 services:
 - name: svc2
-  host: ${{ env "DECK_SVC2_HOST" }}
+  host: ${{ env "SVC2_HOST" }}
   routes:
   - name: r2
     paths:
     - /r2
-  tags:
-    - '<'
 plugins:
 - name: prometheus
