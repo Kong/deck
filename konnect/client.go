@@ -28,6 +28,7 @@ type Client struct {
 	Auth                  *AuthService
 	ServicePackages       *ServicePackageService
 	ServiceVersions       *ServiceVersionService
+	Documents             *DocumentService
 	ControlPlanes         *ControlPlaneService
 	ControlPlaneRelations *ControlPlaneRelationsService
 	logger                io.Writer
