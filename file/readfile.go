@@ -2,11 +2,14 @@ package file
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	ghodss "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
@@ -80,22 +83,26 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 // readContent reads all the byes until io.EOF and unmarshals the read
 // bytes into Content.
 func readContent(reader io.Reader) (*Content, error) {
-	var content Content
-	var bytes []byte
 	var err error
-	bytes, err = ioutil.ReadAll(reader)
+	contentBytes, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
-	err = validate(bytes)
+	renderedContent, err := renderTemplate(string(contentBytes))
+	if err != nil {
+		return nil, fmt.Errorf("parsing file: %w", err)
+	}
+	renderedContentBytes := []byte(renderedContent)
+	err = validate(renderedContentBytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "validating file content")
 	}
-	err = yamlUnmarshal(bytes, &content)
+	var result Content
+	err = yamlUnmarshal(renderedContentBytes, &result)
 	if err != nil {
 		return nil, err
 	}
-	return &content, nil
+	return &result, nil
 }
 
 // yamlUnmarshal is a wrapper around yaml.Unmarshal to ensure that the right
@@ -131,4 +138,33 @@ func configFilesInDir(dir string) ([]string, error) {
 		return nil, errors.Wrap(err, "reading state directory")
 	}
 	return res, nil
+}
+
+func getPrefixedEnvVar(key string) (string, error) {
+	const envVarPrefix = "DECK_"
+	if !strings.HasPrefix(key, envVarPrefix) {
+		return "", fmt.Errorf("environment variables in the state file must "+
+			"be prefixed with 'DECK_', found: '%s'", key)
+	}
+	value, exists := os.LookupEnv(key)
+	if !exists {
+		return "", fmt.Errorf("environment variable '%s' present in state file but not set", key)
+	}
+	return value, nil
+}
+
+func renderTemplate(content string) (string, error) {
+	t := template.New("state").Funcs(template.FuncMap{
+		"env": getPrefixedEnvVar,
+	}).Delims("${{", "}}")
+	t, err := t.Parse(content)
+	if err != nil {
+		return "", err
+	}
+	var buffer bytes.Buffer
+	err = t.Execute(&buffer, nil)
+	if err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
 }

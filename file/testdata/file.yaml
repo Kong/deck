@@ -1,9 +1,11 @@
 services:
 - name: svc2
-  host: 2.example.com
+  host: ${{ env "DECK_SVC2_HOST" }}
   routes:
   - name: r2
     paths:
     - /r2
+  tags:
+    - '<' # verifies that the templating engine does not perform character escaping
 plugins:
 - name: prometheus
