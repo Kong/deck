@@ -6,6 +6,6 @@ services:
     paths:
     - /r2
   tags:
-    - '<'
+    - '<' # verifies that the templating engine does not perform character escaping
 plugins:
 - name: prometheus
