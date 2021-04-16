@@ -177,33 +177,27 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 
 	var version string
 
-	workspace := config.Workspace
-
-	// remove workspace to be able to call top-level / endpoint
-	config.Workspace = ""
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return semver.Version{}, err
 	}
-	root, err := client.Root(nil)
-	if err != nil {
-		if workspace == "" {
-			return semver.Version{}, err
-		}
-		// try with workspace path
-		req, err := http.NewRequest("GET",
-			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
-			nil)
+
+	if len(config.Workspace) > 0 {
+		req, err := http.NewRequest("GET", "/kong", nil)
 		if err != nil {
 			return semver.Version{}, err
 		}
 		var resp map[string]interface{}
-		_, err = client.Do(nil, req, &resp)
+		_, err = client.Do(context.TODO(), req, &resp)
 		if err != nil {
 			return semver.Version{}, err
 		}
 		version = resp["version"].(string)
 	} else {
+		root, err := client.Root(context.TODO())
+		if err != nil {
+			return semver.Version{}, err
+		}
 		version = root["version"].(string)
 	}
 
