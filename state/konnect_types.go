@@ -5,6 +5,18 @@ import (
 	"reflect"
 )
 
+// Document represents a document in Konnect.
+// It adds some helper methods along with Meta to the original Document object.
+type Document struct {
+	konnect.Document `yaml:",inline"`
+	Meta
+}
+
+// Console returns an entity's identity in a human-readable string.
+func (d *Document) Console() string {
+	return *d.Path
+}
+
 // ServicePackage represents a service package in Konnect.
 // It adds some helper methods along with Meta to the original ServicePackage object.
 type ServicePackage struct {
