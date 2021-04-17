@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/blang/semver/v4"
@@ -183,7 +182,7 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	}
 
 	if len(config.Workspace) > 0 {
-		req, err := http.NewRequest("GET", "/kong", nil)
+		req, err := client.NewRequest("GET", "/kong", nil, nil)
 		if err != nil {
 			return semver.Version{}, err
 		}
