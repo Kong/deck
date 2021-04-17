@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	documentTableName           = "service-package"
+	documentTableName           = "document"
 	documentsByServicePackageID = "documentsByServicePackageID"
 	documentsByServiceVersionID = "documentsByServiceVersionID"
 )
@@ -36,7 +36,8 @@ var documentTableSchema = &memdb.TableSchema{
 		all: allIndex,
 		// foreign
 		documentsByServicePackageID: {
-			Name: documentsByServicePackageID,
+			Name:         documentsByServicePackageID,
+			AllowMissing: true,
 			Indexer: &indexers.SubFieldIndexer{
 				Fields: []indexers.Field{
 					{
@@ -48,7 +49,8 @@ var documentTableSchema = &memdb.TableSchema{
 		},
 		// foreign
 		documentsByServiceVersionID: {
-			Name: documentsByServiceVersionID,
+			Name:         documentsByServiceVersionID,
+			AllowMissing: true,
 			Indexer: &indexers.SubFieldIndexer{
 				Fields: []indexers.Field{
 					{

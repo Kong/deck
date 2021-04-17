@@ -36,6 +36,7 @@ type KongState struct {
 	// konnect-specific entities
 	ServicePackages *ServicePackagesCollection
 	ServiceVersions *ServiceVersionsCollection
+	Documents       *DocumentsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
@@ -75,6 +76,7 @@ func NewKongState() (*KongState, error) {
 			// konnect-specific entities
 			servicePackageTableName: servicePackageTableSchema,
 			serviceVersionTableName: serviceVersionTableSchema,
+			documentTableName:       documentTableSchema,
 		},
 	}
 
@@ -111,6 +113,7 @@ func NewKongState() (*KongState, error) {
 	// konnect-specific entities
 	state.ServicePackages = (*ServicePackagesCollection)(&state.common)
 	state.ServiceVersions = (*ServiceVersionsCollection)(&state.common)
+	state.Documents = (*DocumentsCollection)(&state.common)
 
 	return &state, nil
 }

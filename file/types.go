@@ -523,6 +523,7 @@ type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
 	Version        *string         `json:"version,omitempty" yaml:"version,omitempty"`
 	Implementation *Implementation `json:"implementation,omitempty" yaml:"implementation,omitempty"`
+	Documents      []FDocument     `json:"documents,omitempty" yaml:"documents,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -531,6 +532,14 @@ type FServicePackage struct {
 	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
 	Description *string           `json:"description,omitempty" yaml:"description,omitempty"`
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
+	Documents   []FDocument       `json:"documents,omitempty" yaml:"documents,omitempty"`
+}
+
+type FDocument struct {
+	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Path      *string `json:"path,omitempty" yaml:"path,omitempty"`
+	LocalPath *string `json:"local_path,omitempty" yaml:"local_path,omitempty"`
+	Published *bool   `json:"published,omitempty" yaml:"published,omitempty"`
 }
 
 // id is used for sorting.

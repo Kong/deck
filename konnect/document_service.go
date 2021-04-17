@@ -171,7 +171,7 @@ func (d *DocumentService) ListAllForServicePackage(ctx context.Context, sp *Serv
 	if sp == nil {
 		return nil, fmt.Errorf("ServicePackage cannot be nil")
 	}
-	docs, err := d.listAllByPath(ctx, "/service_packages/"+*sp.ID+"/documents")
+	docs, err := d.listAllByPath(ctx, "/api/service_packages/"+*sp.ID+"/documents")
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (d *DocumentService) ListAllForServiceVersion(ctx context.Context, sv *Serv
 	if sv == nil {
 		return nil, fmt.Errorf("ServiceVersion cannot be nil")
 	}
-	docs, err := d.listAllByPath(ctx, "/service_versions/"+*sv.ID+"/documents")
+	docs, err := d.listAllByPath(ctx, "/api/service_versions/"+*sv.ID+"/documents")
 	if err != nil {
 		return nil, err
 	}

@@ -139,6 +139,22 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		if err != nil {
 			return err
 		}
+		documents, err := kongState.Documents.GetAllByServicePackageID(*p.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, d := range documents {
+			fDocument := FDocument{
+				ID:        d.ID,
+				Path:      d.Path,
+				Published: d.Published,
+				// TODO use a scheme that can't collide local paths
+				LocalPath: d.Path,
+			}
+			utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
+			p.Documents = append(p.Documents, fDocument)
+		}
 
 		for _, v := range versions {
 			fVersion := FServiceVersion{
@@ -159,6 +175,22 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 						Service: s,
 					},
 				}
+			}
+			documents, err := kongState.Documents.GetAllByServiceVersionID(*v.ID)
+			if err != nil {
+				return err
+			}
+
+			for _, d := range documents {
+				fDocument := FDocument{
+					ID:        d.ID,
+					Path:      d.Path,
+					Published: d.Published,
+					// TODO use a scheme that can't collide local paths
+					LocalPath: d.Path,
+				}
+				utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
+				fVersion.Documents = append(fVersion.Documents, fDocument)
 			}
 			utils.ZeroOutID(&fVersion, fVersion.Version, config.WithID)
 			p.Versions = append(p.Versions, fVersion)

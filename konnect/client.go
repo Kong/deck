@@ -52,6 +52,7 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	client.Auth = (*AuthService)(&client.common)
 	client.ServicePackages = (*ServicePackageService)(&client.common)
 	client.ServiceVersions = (*ServiceVersionService)(&client.common)
+	client.Documents = (*DocumentService)(&client.common)
 	client.ControlPlanes = (*ControlPlaneService)(&client.common)
 	client.ControlPlaneRelations = (*ControlPlaneRelationsService)(&client.common)
 	client.logger = os.Stderr
