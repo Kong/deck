@@ -437,9 +437,6 @@ const contentSchema = `{
         "id": {
           "type": "string"
         },
-        "local_path": {
-          "type": "string"
-        },
         "path": {
           "type": "string"
         },

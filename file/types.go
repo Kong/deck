@@ -535,11 +535,12 @@ type FServicePackage struct {
 	Documents   []FDocument       `json:"documents,omitempty" yaml:"documents,omitempty"`
 }
 
+// +k8s:deepcopy-gen=true
 type FDocument struct {
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
 	Path      *string `json:"path,omitempty" yaml:"path,omitempty"`
-	LocalPath *string `json:"local_path,omitempty" yaml:"local_path,omitempty"`
 	Published *bool   `json:"published,omitempty" yaml:"published,omitempty"`
+	Content   *string `json:"-" yaml:"-"`
 }
 
 // id is used for sorting.

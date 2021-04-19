@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -149,8 +151,9 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 				ID:        d.ID,
 				Path:      d.Path,
 				Published: d.Published,
+				Content:   d.Content,
 				// TODO use a scheme that can't collide local paths
-				LocalPath: d.Path,
+				//LocalPath: d.Path,
 			}
 			utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
 			p.Documents = append(p.Documents, fDocument)
@@ -186,8 +189,9 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 					ID:        d.ID,
 					Path:      d.Path,
 					Published: d.Published,
+					Content:   d.Content,
 					// TODO use a scheme that can't collide local paths
-					LocalPath: d.Path,
+					//LocalPath: d.Path,
 				}
 				utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
 				fVersion.Documents = append(fVersion.Documents, fDocument)
@@ -613,13 +617,36 @@ func writeFile(content *Content, filename string, format Format) error {
 	}
 
 	if filename == "-" {
-		_, err = fmt.Print(string(c))
+		// TODO how should we write document files when output is stdout?
+		if _, err := fmt.Print(string(c)); err != nil {
+			return errors.Wrap(err, "writing file")
+		}
 	} else {
 		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))
-		err = ioutil.WriteFile(filename, c, 0600)
-	}
-	if err != nil {
-		return errors.Wrap(err, "writing file")
+		prefix, _ := filepath.Split(filename)
+		if err := ioutil.WriteFile(filename, c, 0600); err != nil {
+			return errors.Wrap(err, "writing file")
+		}
+		for _, sp := range content.ServicePackages {
+			for _, d := range sp.Documents {
+				if err := os.MkdirAll(prefix+*sp.Name, 0700); err != nil {
+					return errors.Wrap(err, "creating document directory")
+				}
+				if err := os.WriteFile(prefix+*sp.Name+*d.Path, []byte(*d.Content), 0600); err != nil {
+					return errors.Wrap(err, "writing document file")
+				}
+			}
+			for _, v := range sp.Versions {
+				for _, d := range v.Documents {
+					if err := os.MkdirAll(prefix+*sp.Name+"/"+*v.Version, 0700); err != nil {
+						return errors.Wrap(err, "creating document directory")
+					}
+					if err := os.WriteFile(prefix+*sp.Name+"/"+*v.Version+*d.Path, []byte(*d.Content), 0600); err != nil {
+						return errors.Wrap(err, "writing document file")
+					}
+				}
+			}
+		}
 	}
 	return nil
 }
