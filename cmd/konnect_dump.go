@@ -25,13 +25,13 @@ var konnectDumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export configuration from Konnect (in alpha)",
 	Long: `Dump command reads all entities present in Konnect and exports them to
-a file on disk. The file can then be read using the Sync o Diff command to again
+a file on disk. The file can then be read using the Sync or Diff command to again
 configure Konnect.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := http.DefaultClient
 
-		if yes, err := confirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+		if yes, err := confirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
 		} else if !yes {
 			return nil
