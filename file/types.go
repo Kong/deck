@@ -26,6 +26,7 @@ const (
 )
 
 // FService represents a Kong Service and it's associated routes and plugins.
+// +k8s:deepcopy-gen=true
 type FService struct {
 	kong.Service
 	Routes  []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
@@ -46,6 +47,7 @@ func (s FService) id() string {
 	return ""
 }
 
+// +k8s:deepcopy-gen=true
 type service struct {
 	ClientCertificate *string    `json:"client_certificate,omitempty" yaml:"client_certificate,omitempty"`
 	ConnectTimeout    *int       `json:"connect_timeout,omitempty" yaml:"connect_timeout,omitempty"`
@@ -208,6 +210,7 @@ func (s *FService) UnmarshalJSON(b []byte) error {
 }
 
 // FRoute represents a Kong Route and it's associated plugins.
+// +k8s:deepcopy-gen=true
 type FRoute struct {
 	kong.Route `yaml:",inline,omitempty"`
 	Plugins    []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
@@ -225,6 +228,7 @@ func (r FRoute) id() string {
 }
 
 // FUpstream represents a Kong Upstream and it's associated targets.
+// +k8s:deepcopy-gen=true
 type FUpstream struct {
 	kong.Upstream `yaml:",inline,omitempty"`
 	Targets       []*FTarget `json:"targets,omitempty" yaml:",omitempty"`
@@ -242,6 +246,7 @@ func (u FUpstream) id() string {
 }
 
 // FTarget represents a Kong Target.
+// +k8s:deepcopy-gen=true
 type FTarget struct {
 	kong.Target `yaml:",inline,omitempty"`
 }
@@ -258,6 +263,7 @@ func (t FTarget) id() string {
 }
 
 // FCertificate represents a Kong Certificate.
+// +k8s:deepcopy-gen=true
 type FCertificate struct {
 	ID        *string    `json:"id,omitempty" yaml:"id,omitempty"`
 	Cert      *string    `json:"cert,omitempty" yaml:"cert,omitempty"`
@@ -279,6 +285,7 @@ func (c FCertificate) id() string {
 }
 
 // FCACertificate represents a Kong CACertificate.
+// +k8s:deepcopy-gen=true
 type FCACertificate struct {
 	kong.CACertificate `yaml:",inline,omitempty"`
 }
@@ -295,6 +302,7 @@ func (c FCACertificate) id() string {
 }
 
 // FPlugin represents a plugin in Kong.
+// +k8s:deepcopy-gen=true
 type FPlugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
 
@@ -303,6 +311,7 @@ type FPlugin struct {
 
 // foo is a shadow type of Plugin.
 // It is used for custom marshalling of plugin.
+// +k8s:deepcopy-gen=true
 type foo struct {
 	CreatedAt *int               `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string            `json:"id,omitempty" yaml:"id,omitempty"`
@@ -456,6 +465,7 @@ func (p FPlugin) id() string {
 }
 
 // FConsumer represents a consumer in Kong.
+// +k8s:deepcopy-gen=true
 type FConsumer struct {
 	kong.Consumer `yaml:",inline,omitempty"`
 	Plugins       []*FPlugin               `json:"plugins,omitempty" yaml:",omitempty"`
@@ -480,35 +490,42 @@ func (c FConsumer) id() string {
 }
 
 // FRBACRole represents an RBACRole in Kong
+// +k8s:deepcopy-gen=true
 type FRBACRole struct {
 	kong.RBACRole       `yaml:",inline,omitempty"`
 	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"` //nolint
 }
 
+// +k8s:deepcopy-gen=true
 type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
 }
 
 // Info contains meta-data of the file.
+// +k8s:deepcopy-gen=true
 type Info struct {
 	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
 }
 
+// +k8s:deepcopy-gen=true
 type Kong struct {
 	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
 }
 
+// +k8s:deepcopy-gen=true
 type Implementation struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 	Kong *Kong  `json:"kong,omitempty" yaml:"kong,omitempty"`
 }
 
+// +k8s:deepcopy-gen=true
 type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
 	Version        *string         `json:"version,omitempty" yaml:"version,omitempty"`
 	Implementation *Implementation `json:"implementation,omitempty" yaml:"implementation,omitempty"`
 }
 
+// +k8s:deepcopy-gen=true
 type FServicePackage struct {
 	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`
 	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
@@ -530,6 +547,7 @@ func (s FServicePackage) id() string {
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
+// +k8s:deepcopy-gen=true
 type Content struct {
 	FormatVersion string `json:"_format_version,omitempty" yaml:"_format_version,omitempty"`
 	Info          *Info  `json:"_info,omitempty" yaml:"_info,omitempty"`
