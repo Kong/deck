@@ -64,7 +64,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 	}
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error { 
+func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
