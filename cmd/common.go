@@ -64,7 +64,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 	}
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
+func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error { 
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -88,7 +88,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	}
 
 	// load Kong version after workspace
-	kongVersion, err := kongVersion(wsConfig)
+	kongVersion, err := kongVersion(context.Background(), wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
@@ -172,7 +172,8 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	return nil
 }
 
-func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
+func kongVersion(ctx context.Context,
+	config utils.KongClientConfig) (semver.Version, error) {
 
 	var version string
 
@@ -187,13 +188,13 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 			return semver.Version{}, err
 		}
 		var resp map[string]interface{}
-		_, err = client.Do(context.TODO(), req, &resp)
+		_, err = client.Do(ctx, req, &resp)
 		if err != nil {
 			return semver.Version{}, err
 		}
 		version = resp["version"].(string)
 	} else {
-		root, err := client.Root(context.TODO())
+		root, err := client.Root(ctx)
 		if err != nil {
 			return semver.Version{}, err
 		}
