@@ -37,7 +37,7 @@ func SetStopCh(stopCh chan struct{}) {
 }
 
 // workspaceExists checks if workspace exists in Kong.
-func workspaceExists(config utils.KongClientConfig) (bool, error) {
+func workspaceExists(ctx context.Context, config utils.KongClientConfig) (bool, error) {
 	if config.Workspace == "" {
 		// default workspace always exists
 		return true, nil
@@ -53,7 +53,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 		return false, err
 	}
 
-	_, _, err = wsClient.Routes.List(context.TODO(), nil)
+	_, _, err = wsClient.Routes.List(ctx, nil)
 	switch {
 	case kong.IsNotFoundErr(err):
 		return false, nil
@@ -64,7 +64,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 	}
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
+func syncMain(ctx context.Context, filenames []string, dry bool, parallelism, delay int, workspace string) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -88,12 +88,12 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	}
 
 	// load Kong version after workspace
-	kongVersion, err := kongVersion(context.Background(), wsConfig)
+	kongVersion, err := kongVersion(ctx, wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
 
-	workspaceExists, err := workspaceExists(wsConfig)
+	workspaceExists, err := workspaceExists(ctx, wsConfig)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 		}
 
 		if !dry {
-			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &wsConfig.Workspace})
+			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
 				return err
 			}

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
@@ -21,7 +22,7 @@ var (
 	dumpWithID           bool
 )
 
-func listWorkspaces(client *kong.Client, baseURL string) ([]string, error) {
+func listWorkspaces(ctx context.Context, client *kong.Client, baseURL string) ([]string, error) {
 	type Workspace struct {
 		Name string
 	}
@@ -35,7 +36,7 @@ func listWorkspaces(client *kong.Client, baseURL string) ([]string, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "building request for fetching workspaces")
 	}
-	_, err = client.Do(nil, req, &response)
+	_, err = client.Do(ctx, req, &response)
 	if err != nil {
 		return nil, errors.Wrap(err, "fetching workspaces from Kong")
 	}
@@ -58,7 +59,7 @@ The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
+		var ctx = context.Background()
 		wsClient, err := utils.GetKongClient(rootConfig)
 		if err != nil {
 			return err
@@ -74,7 +75,7 @@ configure Kong.`,
 			if dumpCmdKongStateFile != "kong" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
-			workspaces, err := listWorkspaces(wsClient, rootConfig.Address)
+			workspaces, err := listWorkspaces(ctx, wsClient, rootConfig.Address)
 			if err != nil {
 				return err
 			}
@@ -118,7 +119,7 @@ configure Kong.`,
 		if dumpWorkspace != "" {
 			wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
 
-			exists, err := workspaceExists(wsConfig)
+			exists, err := workspaceExists(ctx, wsConfig)
 			if err != nil {
 				return err
 			}
