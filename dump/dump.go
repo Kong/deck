@@ -660,18 +660,18 @@ func GetAllMTLSAuths(ctx context.Context,
 		if kong.IsNotFoundErr(err) {
 			return mtlsAuths, nil
 		}
-		// TODO figure out a better way to handle unauthorized endpoints
-		// per https://github.com/Kong/deck/issues/274 we can't dump these resources
-		// from an Enterprise instance running in free mode, and the 403 results in a
-		// fatal error when running "deck dump". We don't want to just treat 403s the
-		// same as 404s because Kong also uses them to indicate missing RBAC permissions,
-		// but this is currently necessary for compatibility. We need a better approach
-		// before adding other Enterprise resources that decK handles by default (versus,
-		// for example, RBAC roles, which require the --rbac-resources-only flag).
-		if err.(*kong.APIError).Code() == 403 {
-			return mtlsAuths, nil
-		}
 		if err != nil {
+			// TODO figure out a better way to handle unauthorized endpoints
+			// per https://github.com/Kong/deck/issues/274 we can't dump these resources
+			// from an Enterprise instance running in free mode, and the 403 results in a
+			// fatal error when running "deck dump". We don't want to just treat 403s the
+			// same as 404s because Kong also uses them to indicate missing RBAC permissions,
+			// but this is currently necessary for compatibility. We need a better approach
+			// before adding other Enterprise resources that decK handles by default (versus,
+			// for example, RBAC roles, which require the --rbac-resources-only flag).
+			if err.(*kong.APIError).Code() == 403 {
+				return mtlsAuths, nil
+			}
 			return nil, err
 		}
 		if err := ctx.Err(); err != nil {
