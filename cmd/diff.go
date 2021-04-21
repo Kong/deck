@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"context"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -26,7 +24,7 @@ that will be created or updated or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(context.Background(), diffCmdKongStateFile, true, diffCmdParallelism, 0, diffWorkspace)
+		return syncMain(cmd.Context(), diffCmdKongStateFile, true, diffCmdParallelism, 0, diffWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {

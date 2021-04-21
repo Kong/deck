@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/reset"
 	"github.com/kong/deck/utils"
@@ -58,7 +57,7 @@ By default, this command will ask for a confirmation prompt.`,
 		if resetAllWorkspaces && resetWorkspace != "" {
 			return errors.New("workspace cannot be specified with --all-workspace flag")
 		}
-		var ctx = context.Background()
+		var ctx = cmd.Context()
 		// Kong Enterprise
 		var workspaces []string
 		if resetAllWorkspaces {

@@ -59,7 +59,7 @@ The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var ctx = context.Background()
+		var ctx = cmd.Context()
 		wsClient, err := utils.GetKongClient(rootConfig)
 		if err != nil {
 			return err
