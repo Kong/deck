@@ -65,7 +65,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 			}(i)
 			go func(i int) {
 				defer semaphore.Release(1)
-				documents, err := konnectClient.Documents.ListAllForServicePackage(ctx, servicePackages[i])
+				documents, err := konnectClient.Documents.ListAllForParent(ctx, servicePackages[i])
 				if err != nil {
 					errChan <- err
 					return
@@ -81,7 +81,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 				}
 				go func(i int, j int) {
 					defer semaphore.Release(1)
-					documents, err := konnectClient.Documents.ListAllForServiceVersion(ctx,
+					documents, err := konnectClient.Documents.ListAllForParent(ctx,
 						&servicePackages[i].Versions[j])
 					if err != nil {
 						errChan <- err

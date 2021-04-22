@@ -1,8 +1,18 @@
 package konnect
 
+import (
+	"fmt"
+)
+
 const (
 	authEndpoint = "/api/auth"
 )
+
+type ParentInfoer interface {
+	URL() string
+	Key() string
+	DeepCopyParentInfoer() ParentInfoer
+}
 
 func BaseURL() string {
 	const baseURL = "https://konnect.konghq.com"
@@ -11,6 +21,7 @@ func BaseURL() string {
 }
 
 // +k8s:deepcopy-gen=true
+// +k8s:deepcopy-gen:interfaces=github.com/kong/deck/konnect.ParentInfoer
 type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
 	Name        *string `json:"name,omitempty"`
@@ -19,7 +30,16 @@ type ServicePackage struct {
 	Versions []ServiceVersion `json:"versions,omitempty"`
 }
 
+func (p *ServicePackage) URL() string {
+	return fmt.Sprintf("/api/service_packages/%s", *p.ID)
+}
+
+func (p *ServicePackage) Key() string {
+	return "ServicePackage" + ":" + *p.ID
+}
+
 // +k8s:deepcopy-gen=true
+// +k8s:deepcopy-gen:interfaces=github.com/kong/deck/konnect.ParentInfoer
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
 	Version *string `json:"version,omitempty"`
@@ -27,6 +47,28 @@ type ServiceVersion struct {
 	ServicePackage *ServicePackage `json:"service_package,omitempty"`
 
 	ControlPlaneServiceRelation *ControlPlaneServiceRelation `json:"control_plane_service_relation,omitempty"`
+}
+
+func (v *ServiceVersion) URL() string {
+	return fmt.Sprintf("/api/service_versions/%s", *v.ID)
+}
+
+func (v *ServiceVersion) Key() string {
+	return "ServiceVersion" + ":" + *v.ID
+}
+
+// +k8s:deepcopy-gen=true
+// +k8s:deepcopy-gen:interfaces
+type Document struct {
+	ID        *string      `json:"id,omitempty"`
+	Path      *string      `json:"path,omitempty"`
+	Content   *string      `json:"content,omitempty"`
+	Published *bool        `json:"published,omitempty"`
+	Parent    ParentInfoer `json:"-"`
+}
+
+func (d *Document) ParentKey() string {
+	return d.Parent.Key()
 }
 
 // +k8s:deepcopy-gen=true

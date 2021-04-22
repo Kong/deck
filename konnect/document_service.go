@@ -8,36 +8,6 @@ import (
 
 type DocumentService service
 
-// TODO move this to types.go. It lives here for now to avoid accidentally
-// committing the base URL change for the test env
-
-// +k8s:deepcopy-gen=true
-type Document struct {
-	ID             *string         `json:"id,omitempty"`
-	Path           *string         `json:"path,omitempty"`
-	Content        *string         `json:"content,omitempty"`
-	Published      *bool           `json:"published,omitempty"`
-	ServicePackage *ServicePackage `json:"-"`
-	ServiceVersion *ServiceVersion `json:"-"`
-}
-
-// TODO move to types.go
-
-// ParentEndpoint returns the path of the Service Package or Service Version a Document is attached to.
-// It returns an error if the Document has neither or both set
-func (d *Document) ParentEndpoint() (string, error) {
-	if d.ServicePackage != nil && d.ServiceVersion != nil {
-		return "", fmt.Errorf("Document cannot be attached to both a ServicePackage and ServiceVersion")
-	}
-	if d.ServiceVersion != nil {
-		return "service_versions/" + *d.ServiceVersion.ID, nil
-	}
-	if d.ServicePackage != nil {
-		return "service_packages/" + *d.ServiceVersion.ID, nil
-	}
-	return "", fmt.Errorf("Document must be attached to either a ServicePackage and ServiceVersion")
-}
-
 // Create creates a Document in Konnect.
 func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document, error) {
 
@@ -45,12 +15,11 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 		return nil, fmt.Errorf("cannot create a nil document")
 	}
 
-	parent, err := doc.ParentEndpoint()
-	if err != nil {
-		return nil, err
+	if doc.Parent == nil {
+		return nil, fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := "/api/" + parent + "/documents"
+	endpoint := doc.Parent.URL() + "/documents"
 	method := "POST"
 	if doc.ID != nil {
 		method = "PUT"
@@ -66,8 +35,7 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 	if err != nil {
 		return nil, err
 	}
-	createdDoc.ServicePackage = doc.ServicePackage
-	createdDoc.ServiceVersion = doc.ServiceVersion
+	createdDoc.Parent = doc.Parent
 	return &createdDoc, nil
 }
 
@@ -78,12 +46,11 @@ func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}
 
-	parent, err := doc.ParentEndpoint()
-	if err != nil {
-		return err
+	if doc.Parent == nil {
+		return fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := fmt.Sprintf("/api/"+parent+"/documents/%v", *doc.ID)
+	endpoint := doc.Parent.URL() + "/" + *doc.ID
 	req, err := d.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -95,7 +62,6 @@ func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
 
 // Update updates a Document in Konnect.
 func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document, error) {
-
 	if doc == nil {
 		return nil, fmt.Errorf("cannot update a nil document")
 	}
@@ -104,12 +70,11 @@ func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document,
 		return nil, fmt.Errorf("ID cannot be nil for Update operation")
 	}
 
-	parent, err := doc.ParentEndpoint()
-	if err != nil {
-		return nil, err
+	if doc.Parent == nil {
+		return nil, fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := fmt.Sprintf("/api/"+parent+"/documents/%v", *doc.ID)
+	endpoint := doc.Parent.URL() + "/" + *doc.ID
 	req, err := d.client.NewRequest("PATCH", endpoint, nil, doc)
 	if err != nil {
 		return nil, err
@@ -120,8 +85,7 @@ func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document,
 	if err != nil {
 		return nil, err
 	}
-	updatedDoc.ServicePackage = doc.ServicePackage
-	updatedDoc.ServiceVersion = doc.ServiceVersion
+	updatedDoc.Parent = doc.Parent
 	return &updatedDoc, nil
 }
 
@@ -166,32 +130,19 @@ func (d *DocumentService) listAllByPath(ctx context.Context, path string) ([]*Do
 	return docs, nil
 }
 
-// ListAllForServicePackage fetches all Documents in Kong enabled for a Service Package.
-func (d *DocumentService) ListAllForServicePackage(ctx context.Context, sp *ServicePackage) ([]*Document, error) {
-	if sp == nil {
-		return nil, fmt.Errorf("ServicePackage cannot be nil")
+// ListAllForParent fetches all Documents in Konnect for a parent entity.
+func (d *DocumentService) ListAllForParent(ctx context.Context, parent ParentInfoer) ([]*Document, error) {
+	if parent == nil {
+		return nil, fmt.Errorf("Parent cannot be nil")
 	}
-	docs, err := d.listAllByPath(ctx, "/api/service_packages/"+*sp.ID+"/documents")
+	var docs []*Document
+	var err error
+	docs, err = d.listAllByPath(ctx, parent.URL()+"/documents")
 	if err != nil {
 		return nil, err
 	}
 	for _, doc := range docs {
-		doc.ServicePackage = sp
-	}
-	return docs, nil
-}
-
-// ListAllForServiceVersion fetches all Documents in Kong enabled for a Service Version.
-func (d *DocumentService) ListAllForServiceVersion(ctx context.Context, sv *ServiceVersion) ([]*Document, error) {
-	if sv == nil {
-		return nil, fmt.Errorf("ServiceVersion cannot be nil")
-	}
-	docs, err := d.listAllByPath(ctx, "/api/service_versions/"+*sv.ID+"/documents")
-	if err != nil {
-		return nil, err
-	}
-	for _, doc := range docs {
-		doc.ServiceVersion = sv
+		doc.Parent = parent
 	}
 	return docs, nil
 }
