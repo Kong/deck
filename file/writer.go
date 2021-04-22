@@ -22,8 +22,8 @@ type WriteConfig struct {
 	WithID     bool
 }
 
-func compareID(obj1, obj2 id) bool {
-	return strings.Compare(obj1.id(), obj2.id()) < 0
+func compareOrder(obj1, obj2 sortable) bool {
+	return strings.Compare(obj1.sortKey(), obj2.sortKey()) < 0
 }
 
 // KongStateToFile writes a state object to file with filename.
@@ -167,7 +167,7 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		file.ServicePackages = append(file.ServicePackages, p)
 	}
 	sort.SliceStable(file.ServicePackages, func(i, j int) bool {
-		return compareID(file.ServicePackages[i], file.ServicePackages[j])
+		return compareOrder(file.ServicePackages[i], file.ServicePackages[j])
 	})
 	return nil
 }
@@ -186,7 +186,7 @@ func populateServices(kongState *state.KongState, file *Content,
 		file.Services = append(file.Services, *s)
 	}
 	sort.SliceStable(file.Services, func(i, j int) bool {
-		return compareID(file.Services[i], file.Services[j])
+		return compareOrder(file.Services[i], file.Services[j])
 	})
 	return nil
 }
@@ -216,7 +216,7 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 		s.Plugins = append(s.Plugins, &FPlugin{Plugin: p.Plugin})
 	}
 	sort.SliceStable(s.Plugins, func(i, j int) bool {
-		return compareID(s.Plugins[i], s.Plugins[j])
+		return compareOrder(s.Plugins[i], s.Plugins[j])
 	})
 	for _, r := range routes {
 		plugins, err := kongState.Plugins.GetAllByRouteID(*r.ID)
@@ -239,12 +239,12 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 			route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(route.Plugins, func(i, j int) bool {
-			return compareID(route.Plugins[i], route.Plugins[j])
+			return compareOrder(route.Plugins[i], route.Plugins[j])
 		})
 		s.Routes = append(s.Routes, route)
 	}
 	sort.SliceStable(s.Routes, func(i, j int) bool {
-		return compareID(s.Routes[i], s.Routes[j])
+		return compareOrder(s.Routes[i], s.Routes[j])
 	})
 	utils.ZeroOutID(&s, s.Name, config.WithID)
 	utils.ZeroOutTimestamps(&s)
@@ -280,12 +280,12 @@ func populateServicelessRoutes(kongState *state.KongState, file *Content,
 			route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(route.Plugins, func(i, j int) bool {
-			return compareID(route.Plugins[i], route.Plugins[j])
+			return compareOrder(route.Plugins[i], route.Plugins[j])
 		})
 		file.Routes = append(file.Routes, *route)
 	}
 	sort.SliceStable(file.Routes, func(i, j int) bool {
-		return compareID(file.Routes[i], file.Routes[j])
+		return compareOrder(file.Routes[i], file.Routes[j])
 	})
 	return nil
 }
@@ -343,7 +343,7 @@ func populatePlugins(kongState *state.KongState, file *Content,
 		}
 	}
 	sort.SliceStable(file.Plugins, func(i, j int) bool {
-		return compareID(file.Plugins[i], file.Plugins[j])
+		return compareOrder(file.Plugins[i], file.Plugins[j])
 	})
 	return nil
 }
@@ -368,7 +368,7 @@ func populateUpstreams(kongState *state.KongState, file *Content,
 			u.Targets = append(u.Targets, &FTarget{Target: t.Target})
 		}
 		sort.SliceStable(u.Targets, func(i, j int) bool {
-			return compareID(u.Targets[i], u.Targets[j])
+			return compareOrder(u.Targets[i], u.Targets[j])
 		})
 		utils.ZeroOutID(&u, u.Name, config.WithID)
 		utils.ZeroOutTimestamps(&u)
@@ -376,7 +376,7 @@ func populateUpstreams(kongState *state.KongState, file *Content,
 		file.Upstreams = append(file.Upstreams, u)
 	}
 	sort.SliceStable(file.Upstreams, func(i, j int) bool {
-		return compareID(file.Upstreams[i], file.Upstreams[j])
+		return compareOrder(file.Upstreams[i], file.Upstreams[j])
 	})
 	return nil
 }
@@ -413,7 +413,7 @@ func populateCertificates(kongState *state.KongState, file *Content,
 		file.Certificates = append(file.Certificates, c)
 	}
 	sort.SliceStable(file.Certificates, func(i, j int) bool {
-		return compareID(file.Certificates[i], file.Certificates[j])
+		return compareOrder(file.Certificates[i], file.Certificates[j])
 	})
 	return nil
 }
@@ -431,7 +431,7 @@ func populateCACertificates(kongState *state.KongState, file *Content,
 		file.CACertificates = append(file.CACertificates, c)
 	}
 	sort.SliceStable(file.CACertificates, func(i, j int) bool {
-		return compareID(file.CACertificates[i], file.CACertificates[j])
+		return compareOrder(file.CACertificates[i], file.CACertificates[j])
 	})
 	return nil
 }
@@ -459,7 +459,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			c.Plugins = append(c.Plugins, &FPlugin{Plugin: p.Plugin})
 		}
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
-			return compareID(c.Plugins[i], c.Plugins[j])
+			return compareOrder(c.Plugins[i], c.Plugins[j])
 		})
 		// custom-entities associated with Consumer
 		keyAuths, err := kongState.KeyAuths.GetAllByConsumerID(*c.ID)
@@ -557,7 +557,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		file.RBACRoles = append(file.RBACRoles, r)
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
-		return compareID(file.Consumers[i], file.Consumers[j])
+		return compareOrder(file.Consumers[i], file.Consumers[j])
 	})
 	return nil
 }

@@ -14,8 +14,8 @@ import (
 // Format is a file format for Kong's configuration.
 type Format string
 
-type id interface {
-	id() string
+type sortable interface {
+	sortKey() string
 }
 
 const (
@@ -36,8 +36,8 @@ type FService struct {
 	URL *string `json:"url,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (s FService) id() string {
+// sortKey is used for sorting.
+func (s FService) sortKey() string {
 	if s.Name != nil {
 		return *s.Name
 	}
@@ -216,8 +216,8 @@ type FRoute struct {
 	Plugins    []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (r FRoute) id() string {
+// sortKey is used for sorting.
+func (r FRoute) sortKey() string {
 	if r.Name != nil {
 		return *r.Name
 	}
@@ -234,8 +234,8 @@ type FUpstream struct {
 	Targets       []*FTarget `json:"targets,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (u FUpstream) id() string {
+// sortKey is used for sorting.
+func (u FUpstream) sortKey() string {
 	if u.Name != nil {
 		return *u.Name
 	}
@@ -251,8 +251,8 @@ type FTarget struct {
 	kong.Target `yaml:",inline,omitempty"`
 }
 
-// id is used for sorting.
-func (t FTarget) id() string {
+// sortKey is used for sorting.
+func (t FTarget) sortKey() string {
 	if t.Target.Target != nil {
 		return *t.Target.Target
 	}
@@ -273,8 +273,8 @@ type FCertificate struct {
 	SNIs      []kong.SNI `json:"snis,omitempty" yaml:"snis,omitempty"`
 }
 
-// id is used for sorting.
-func (c FCertificate) id() string {
+// sortKey is used for sorting.
+func (c FCertificate) sortKey() string {
 	if c.Cert != nil {
 		return *c.Cert
 	}
@@ -290,8 +290,8 @@ type FCACertificate struct {
 	kong.CACertificate `yaml:",inline,omitempty"`
 }
 
-// id is used for sorting.
-func (c FCACertificate) id() string {
+// sortKey is used for sorting.
+func (c FCACertificate) sortKey() string {
 	if c.Cert != nil {
 		return *c.Cert
 	}
@@ -444,8 +444,8 @@ func (p *FPlugin) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// id is used for sorting.
-func (p FPlugin) id() string {
+// sortKey is used for sorting.
+func (p FPlugin) sortKey() string {
 	// concat plugin name and foreign relations
 	if p.Name != nil {
 		key := ""
@@ -481,8 +481,8 @@ type FConsumer struct {
 	MTLSAuths     []*kong.MTLSAuth         `json:"mtls_auth_credentials,omitempty" yaml:"mtls_auth_credentials,omitempty"`
 }
 
-// id is used for sorting.
-func (c FConsumer) id() string {
+// sortKey is used for sorting.
+func (c FConsumer) sortKey() string {
 	if c.Username != nil {
 		return *c.Username
 	}
