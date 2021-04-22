@@ -21,8 +21,6 @@ var errDocumentPathRequired = errors.New("Document must have a Path")
 // DocumentsCollection stores and indexes key-auth credentials.
 type DocumentsCollection collection
 
-type documentindex func(*memdb.Txn, string) ([]*Document, error)
-
 var documentTableSchema = &memdb.TableSchema{
 	Name: documentTableName,
 	Indexes: map[string]*memdb.IndexSchema{
