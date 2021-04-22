@@ -669,8 +669,10 @@ func GetAllMTLSAuths(ctx context.Context,
 			// but this is currently necessary for compatibility. We need a better approach
 			// before adding other Enterprise resources that decK handles by default (versus,
 			// for example, RBAC roles, which require the --rbac-resources-only flag).
-			if err.(*kong.APIError).Code() == 403 {
-				return mtlsAuths, nil
+			if kongErr, ok := err.(*kong.APIError); ok {
+				if kongErr.Code() == 403 {
+					return mtlsAuths, nil
+				}
 			}
 			return nil, err
 		}
