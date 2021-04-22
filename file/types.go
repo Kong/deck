@@ -38,11 +38,11 @@ type FService struct {
 
 // id is used for sorting.
 func (s FService) id() string {
-	if s.ID != nil {
-		return *s.ID
-	}
 	if s.Name != nil {
 		return *s.Name
+	}
+	if s.ID != nil {
+		return *s.ID
 	}
 	return ""
 }
@@ -218,11 +218,11 @@ type FRoute struct {
 
 // id is used for sorting.
 func (r FRoute) id() string {
-	if r.ID != nil {
-		return *r.ID
-	}
 	if r.Name != nil {
 		return *r.Name
+	}
+	if r.ID != nil {
+		return *r.ID
 	}
 	return ""
 }
@@ -236,11 +236,11 @@ type FUpstream struct {
 
 // id is used for sorting.
 func (u FUpstream) id() string {
-	if u.ID != nil {
-		return *u.ID
-	}
 	if u.Name != nil {
 		return *u.Name
+	}
+	if u.ID != nil {
+		return *u.ID
 	}
 	return ""
 }
@@ -253,11 +253,11 @@ type FTarget struct {
 
 // id is used for sorting.
 func (t FTarget) id() string {
-	if t.ID != nil {
-		return *t.ID
-	}
 	if t.Target.Target != nil {
 		return *t.Target.Target
+	}
+	if t.ID != nil {
+		return *t.ID
 	}
 	return ""
 }
@@ -275,11 +275,11 @@ type FCertificate struct {
 
 // id is used for sorting.
 func (c FCertificate) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
 	if c.Cert != nil {
 		return *c.Cert
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -292,11 +292,11 @@ type FCACertificate struct {
 
 // id is used for sorting.
 func (c FCACertificate) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
 	if c.Cert != nil {
 		return *c.Cert
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -446,22 +446,25 @@ func (p *FPlugin) UnmarshalJSON(b []byte) error {
 
 // id is used for sorting.
 func (p FPlugin) id() string {
+	// concat plugin name and foreign relations
+	if p.Name != nil {
+		key := ""
+		key = *p.Name
+		if p.Consumer != nil {
+			key += *p.Consumer.ID
+		}
+		if p.Route != nil {
+			key += *p.Route.ID
+		}
+		if p.Service != nil {
+			key += *p.Service.ID
+		}
+		return key
+	}
 	if p.ID != nil {
 		return *p.ID
 	}
-	// concat plugin name and foreign relations
-	key := ""
-	key = *p.Name
-	if p.Consumer != nil {
-		key += *p.Consumer.ID
-	}
-	if p.Route != nil {
-		key += *p.Route.ID
-	}
-	if p.Service != nil {
-		key += *p.Service.ID
-	}
-	return key
+	return ""
 }
 
 // FConsumer represents a consumer in Kong.
@@ -480,11 +483,11 @@ type FConsumer struct {
 
 // id is used for sorting.
 func (c FConsumer) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
 	if c.Username != nil {
 		return *c.Username
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -535,11 +538,11 @@ type FServicePackage struct {
 
 // id is used for sorting.
 func (s FServicePackage) id() string {
-	if s.ID != nil {
-		return *s.ID
-	}
 	if s.Name != nil {
 		return *s.Name
+	}
+	if s.ID != nil {
+		return *s.ID
 	}
 	return ""
 }
