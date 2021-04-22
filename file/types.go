@@ -536,8 +536,8 @@ type FServicePackage struct {
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
 }
 
-// id is used for sorting.
-func (s FServicePackage) id() string {
+// sortKey is used for sorting.
+func (s FServicePackage) sortKey() string {
 	if s.Name != nil {
 		return *s.Name
 	}
