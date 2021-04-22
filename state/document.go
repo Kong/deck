@@ -154,6 +154,24 @@ func deleteDocument(txn *memdb.Txn, key string, index string, pathOrID string) e
 	return nil
 }
 
+// DeleteByParent deletes a Document by parent and path or ID.
+func (k *DocumentsCollection) DeleteByParent(parent konnect.ParentInfoer, pathOrID string) error {
+	if pathOrID == "" {
+		return errIDRequired
+	}
+
+	txn := k.db.Txn(true)
+	defer txn.Abort()
+
+	err := deleteDocument(txn, parent.Key(), documentsByParent, pathOrID)
+	if err != nil {
+		return err
+	}
+
+	txn.Commit()
+	return nil
+}
+
 // GetAll gets all Documents.
 func (k *DocumentsCollection) GetAll() ([]*Document, error) {
 	txn := k.db.Txn(false)
@@ -178,6 +196,22 @@ func (k *DocumentsCollection) GetAll() ([]*Document, error) {
 
 // GetAllByParent returns all documents for a Parent
 func (k *DocumentsCollection) GetAllByParent(parent konnect.ParentInfoer) ([]*Document, error) {
+	if parent == nil {
+		return make([]*Document, 0), errDocumentMissingParent
+	}
 	txn := k.db.Txn(false)
 	return getAllDocsByParentKey(txn, parent.Key())
+}
+
+// GetByParent returns a document attached to a Parent with a given path or ID
+func (k *DocumentsCollection) GetByParent(parent konnect.ParentInfoer, pathOrID string) (*Document, error) {
+	if parent == nil {
+		return nil, errDocumentMissingParent
+	}
+	txn := k.db.Txn(false)
+	document, err := getDocument(txn, parent.Key(), documentsByParent, pathOrID)
+	if err != nil {
+		return nil, err
+	}
+	return document, nil
 }
