@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -65,6 +67,71 @@ func Test_cleanAddress(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := CleanAddress(tt.args.address); got != tt.want {
 				t.Errorf("cleanAddress() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseHeaders(t *testing.T) {
+	type args struct {
+		headers []string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    http.Header
+		wantErr bool
+	}{
+		{
+			name: "nil headers returns without an error",
+			args: args{
+				headers: nil,
+			},
+			want:    http.Header{},
+			wantErr: false,
+		},
+		{
+			name: "empty headers returns without an error",
+			args: args{
+				headers: []string{},
+			},
+			want:    http.Header{},
+			wantErr: false,
+		},
+		{
+			name: "headers returns without an error",
+			args: args{
+				headers: []string{
+					"foo:bar",
+					"baz:fubar",
+				},
+			},
+			want: http.Header{
+				"Foo": []string{"bar"},
+				"Baz": []string{"fubar"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid headers value returns an error",
+			args: args{
+				headers: []string{
+					"fubar",
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseHeaders(tt.args.headers)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseHeaders() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseHeaders() = %v, want %v", got, tt.want)
 			}
 		})
 	}
