@@ -47,7 +47,6 @@ func (s FService) id() string {
 	return ""
 }
 
-// +k8s:deepcopy-gen=true
 type service struct {
 	ClientCertificate *string    `json:"client_certificate,omitempty" yaml:"client_certificate,omitempty"`
 	ConnectTimeout    *int       `json:"connect_timeout,omitempty" yaml:"connect_timeout,omitempty"`
@@ -311,7 +310,6 @@ type FPlugin struct {
 
 // foo is a shadow type of Plugin.
 // It is used for custom marshalling of plugin.
-// +k8s:deepcopy-gen=true
 type foo struct {
 	CreatedAt *int               `json:"created_at,omitempty" yaml:"created_at,omitempty"`
 	ID        *string            `json:"id,omitempty" yaml:"id,omitempty"`
