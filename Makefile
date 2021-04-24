@@ -33,7 +33,7 @@ test-coverage:
 	rm -f coverage.out.tmp 
 
 .PHONY: integration-test-coverage
-test-coverage:
+integration-test-coverage:
 	go test -tags=integration -race -v -count=1 -coverprofile=coverage.out.tmp ./...
 	# ignoring generated code for coverage
 	grep -E -v 'generated.deepcopy.go' coverage.out.tmp > coverage.out
