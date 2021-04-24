@@ -1,3 +1,4 @@
+// +build integration
 package cmd
 
 import (
@@ -15,7 +16,8 @@ func Test_kongVersion(T *testing.T) {
 	assert := assert.New(T)
 	assert.Nil(err)
 	assert.NotNil(version)
-	assert.Equal(version, expectedVersion, "The two version should be identical")
+	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
+	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
 }
 
 func NewTestClientConfig() utils.KongClientConfig {
