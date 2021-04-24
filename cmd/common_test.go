@@ -34,12 +34,11 @@ func Test_kongVersion(T *testing.T) {
 	client.Workspaces.Create(defaultCtx, ws)
 	config = NewTestClientConfig(*ws.Name)
 	version, err := kongVersion(defaultCtx, config)
-	assert2 := assert.New(T)
-	assert2.Nil(err)
-	assert2.NotNil(version)
-	assert2.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
-	assert2.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
-	client.Workspaces.Delete(defaultCtx, *ws.Name)
+	assert.Nil(err)
+	assert.NotNil(version)
+	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
+	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
+	client.Workspaces.Delete(defaultCtx, ws.Name)
 }
 
 func NewTestClientConfig(workspace string) utils.KongClientConfig {
