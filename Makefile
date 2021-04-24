@@ -25,9 +25,13 @@ update-codegen:
 	go generate ./...
 	./scripts/update-deepcopy-gen.sh
 
-.PHONY: coverage
-coverage:
+.PHONY: test-coverage
+test-coverage:
 	go test -race -v -count=1 -coverprofile=coverage.out.tmp ./...
 	# ignoring generated code for coverage
 	grep -E -v 'generated.deepcopy.go' coverage.out.tmp > coverage.out
-	rm -f coverage.out.tmp
+	rm -f coverage.out.tmp 
+
+.PHONY: setup-kong
+setup-kong:
+	bash .ci/setup_kong.sh
