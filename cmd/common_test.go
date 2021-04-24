@@ -1,16 +1,16 @@
 package cmd
 
 import (
+	"github.com/blang/semver/v4"
 	"github.com/kong/deck/utils"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"github.com/blang/semver/v4"
 )
 
 func Test_kongVersion(T *testing.T) {
-	kongVersion, _ := os.LookupEnv("KONG_VERSION")
-	expectedVersion = semver.MustParse(kongVersion)
+	kongVersionEnv, _ := os.LookupEnv("KONG_VERSION")
+	var expectedVersion = semver.MustParse(kongVersionEnv)
 	version, err := kongVersion(nil, NewTestClientConfig())
 	assert := assert.New(T)
 	assert.Nil(err)
