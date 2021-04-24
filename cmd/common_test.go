@@ -10,21 +10,41 @@ import (
 	"testing"
 )
 
+var (
+	defaultCtx = context.Background()
+)
+
 func Test_kongVersion(T *testing.T) {
 	kongVersionEnv, _ := os.LookupEnv("KONG_VERSION")
 	var expectedVersion = semver.MustParse(kongVersionEnv)
-	version, err := kongVersion(nil, NewTestClientConfig())
+	var config = NewTestClientConfig("")
+	version, err := kongVersion(defaultCtx, config)
 	assert := assert.New(T)
 	assert.Nil(err)
 	assert.NotNil(version)
 	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
 	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
+
+	client, err := utils.GetKongClient(config)
+	ws := &kong.Workspace{
+		Name: kong.String("test"),
+	}
+	client.Workspaces.Create(defaultCtx, ws)
+	config = NewTestClientConfig(*ws.Name)
+	version, err := kongVersion(defaultCtx, config)
+	assert := assert.New(T)
+	assert.Nil(err)
+	assert.NotNil(version)
+	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
+	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
+	client.Workspaces.Delete(defaultCtx, *ws.Name)
 }
 
-func NewTestClientConfig() utils.KongClientConfig {
+func NewTestClientConfig(workspace string) utils.KongClientConfig {
 	kongAdminToken, _ := os.LookupEnv("KONG_ADMIN_TOKEN")
 	return utils.KongClientConfig{
-		Address: "http://localhost:8001",
-		Headers: []string{"kong-admin-token:" + kongAdminToken},
+		Address:   "http://localhost:8001",
+		Workspace: workspace,
+		Headers:   []string{"kong-admin-token:" + kongAdminToken},
 	}
 }
