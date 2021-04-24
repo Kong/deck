@@ -9,6 +9,7 @@ import (
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -28,7 +29,7 @@ func Test_kongVersion(T *testing.T) {
 	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
 
 	if strings.Contains(kongVersionEnv, "enterprise") {
-		t.Log("Enterprise test Kong")
+		T.Log("Enterprise test Kong")
 		client, err := utils.GetKongClient(config)
 		ws := &kong.Workspace{
 			Name: kong.String("test"),
