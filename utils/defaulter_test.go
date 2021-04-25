@@ -157,9 +157,11 @@ func TestRouteSetTest(t *testing.T) {
 			desc: "preserve host is not overridden",
 			arg: &kong.Route{
 				PreserveHost: kong.Bool(true),
+				PathHandling: kong.String("v1"),
 			},
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(true),
+				PathHandling:  kong.String("v1"),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "https"),
@@ -172,6 +174,7 @@ func TestRouteSetTest(t *testing.T) {
 			},
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(false),
+				PathHandling:  kong.String("v1"),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "tls"),
@@ -190,6 +193,7 @@ func TestRouteSetTest(t *testing.T) {
 				Hosts:         kong.StringSlice("1.example.com", "2.example.com"),
 				Methods:       kong.StringSlice("GET", "POST"),
 				PreserveHost:  kong.Bool(false),
+				PathHandling:  kong.String("v1"),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "https"),
@@ -202,6 +206,7 @@ func TestRouteSetTest(t *testing.T) {
 			},
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(false),
+				PathHandling:  kong.String("v1"),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(false),
 				Protocols:     kong.StringSlice("http", "https"),
@@ -214,6 +219,7 @@ func TestRouteSetTest(t *testing.T) {
 			},
 			want: &kong.Route{
 				PreserveHost:  kong.Bool(false),
+				PathHandling:  kong.String("v1"),
 				RegexPriority: kong.Int(0),
 				StripPath:     kong.Bool(true),
 				Protocols:     kong.StringSlice("http", "https"),
@@ -250,6 +256,7 @@ func TestUpstreamSetTest(t *testing.T) {
 			arg: &kong.Upstream{
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
+						HTTPSVerifyCertificate: kong.Bool(true),
 						Healthy: &kong.Healthy{
 							HTTPStatuses: []int{200},
 						},
@@ -260,7 +267,8 @@ func TestUpstreamSetTest(t *testing.T) {
 				Slots: kong.Int(10000),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
-						Concurrency: kong.Int(10),
+						HTTPSVerifyCertificate: kong.Bool(true),
+						Concurrency:            kong.Int(10),
 						Healthy: &kong.Healthy{
 							HTTPStatuses: []int{200},
 							Interval:     kong.Int(0),
@@ -303,6 +311,7 @@ func TestUpstreamSetTest(t *testing.T) {
 				Name: kong.String("foo"),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
+						HTTPSVerifyCertificate: kong.Bool(true),
 						Healthy: &kong.Healthy{
 							Interval: kong.Int(1),
 						},
@@ -314,7 +323,8 @@ func TestUpstreamSetTest(t *testing.T) {
 				Slots: kong.Int(10000),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
-						Concurrency: kong.Int(10),
+						HTTPSVerifyCertificate: kong.Bool(true),
+						Concurrency:            kong.Int(10),
 						Healthy: &kong.Healthy{
 							HTTPStatuses: []int{200, 302},
 							Interval:     kong.Int(1),
@@ -357,10 +367,10 @@ func TestUpstreamSetTest(t *testing.T) {
 				Name: kong.String("foo"),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
+						HTTPSVerifyCertificate: kong.Bool(true),
 						Healthy: &kong.Healthy{
 							Interval: kong.Int(1),
 						},
-						HTTPSVerifyCertificate: kong.Bool(false),
 					},
 				},
 			},
@@ -369,16 +379,16 @@ func TestUpstreamSetTest(t *testing.T) {
 				Slots: kong.Int(10000),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
-						Concurrency: kong.Int(10),
+						HTTPSVerifyCertificate: kong.Bool(true),
+						Concurrency:            kong.Int(10),
 						Healthy: &kong.Healthy{
 							HTTPStatuses: []int{200, 302},
 							Interval:     kong.Int(1),
 							Successes:    kong.Int(0),
 						},
-						HTTPPath:               kong.String("/"),
-						HTTPSVerifyCertificate: kong.Bool(false),
-						Type:                   kong.String("http"),
-						Timeout:                kong.Int(1),
+						HTTPPath: kong.String("/"),
+						Type:     kong.String("http"),
+						Timeout:  kong.Int(1),
 						Unhealthy: &kong.Unhealthy{
 							HTTPFailures: kong.Int(0),
 							TCPFailures:  kong.Int(0),
@@ -413,10 +423,10 @@ func TestUpstreamSetTest(t *testing.T) {
 				Name: kong.String("foo"),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
+						HTTPSVerifyCertificate: kong.Bool(true),
 						Healthy: &kong.Healthy{
 							Interval: kong.Int(1),
 						},
-						HTTPSVerifyCertificate: kong.Bool(true),
 					},
 				},
 			},
@@ -425,16 +435,16 @@ func TestUpstreamSetTest(t *testing.T) {
 				Slots: kong.Int(10000),
 				Healthchecks: &kong.Healthcheck{
 					Active: &kong.ActiveHealthcheck{
-						Concurrency: kong.Int(10),
+						HTTPSVerifyCertificate: kong.Bool(true),
+						Concurrency:            kong.Int(10),
 						Healthy: &kong.Healthy{
 							HTTPStatuses: []int{200, 302},
 							Interval:     kong.Int(1),
 							Successes:    kong.Int(0),
 						},
-						HTTPPath:               kong.String("/"),
-						HTTPSVerifyCertificate: kong.Bool(true),
-						Type:                   kong.String("http"),
-						Timeout:                kong.Int(1),
+						HTTPPath: kong.String("/"),
+						Type:     kong.String("http"),
+						Timeout:  kong.Int(1),
 						Unhealthy: &kong.Unhealthy{
 							HTTPFailures: kong.Int(0),
 							TCPFailures:  kong.Int(0),
