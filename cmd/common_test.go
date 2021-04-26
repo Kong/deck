@@ -17,8 +17,27 @@ var (
 	defaultCtx = context.Background()
 )
 
-func Test_kongVersion(T *testing.T) {
+func Test_kongVersion_Community(T *testing.T) {
 	kongVersionEnv, _ := os.LookupEnv("KONG_VERSION")
+	if strings.Contains(kongVersionEnv, "enterprise") {
+		T.Skip()
+	}
+	var expectedVersion = semver.MustParse(kongVersionEnv)
+	var config = NewTestClientConfig("")
+	version, err := kongVersion(defaultCtx, config)
+	assert := assert.New(T)
+	assert.Nil(err)
+	assert.NotNil(version)
+	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
+	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
+}
+
+func Test_kongVersion_Enterprise(T *testing.T) {
+	kongVersionEnv, _ := os.LookupEnv("KONG_VERSION")
+	if !strings.Contains(kongVersionEnv, "enterprise") {
+		T.Skip()
+	}
+	kongVersionEnv = strings.Replace(kongVersionEnv, "enterprise-", "", 1)
 	var expectedVersion = semver.MustParse(kongVersionEnv)
 	var config = NewTestClientConfig("")
 	version, err := kongVersion(defaultCtx, config)
@@ -28,20 +47,18 @@ func Test_kongVersion(T *testing.T) {
 	assert.Equal(version.Major, expectedVersion.Major, "The two version should have the same major")
 	assert.Equal(version.Minor, expectedVersion.Minor, "The two version should have the same minor")
 
-	if strings.Contains(kongVersionEnv, "enterprise") {
-		T.Log("Enterprise test Kong")
-		client, err := utils.GetKongClient(config)
-		ws := &kong.Workspace{
-			Name: kong.String("test"),
-		}
-		client.Workspaces.Create(defaultCtx, ws)
-		config = NewTestClientConfig(*ws.Name)
-		workspaceversion, err := kongVersion(defaultCtx, config)
-		assert.Nil(err)
-		assert.NotNil(workspaceversion)
-		assert.Equal(workspaceversion.Major, expectedVersion.Major, "The two version should have the same major")
-		assert.Equal(workspaceversion.Minor, expectedVersion.Minor, "The two version should have the same minor")
+	client, err := utils.GetKongClient(config)
+	ws := &kong.Workspace{
+		Name: kong.String("test"),
 	}
+	client.Workspaces.Create(defaultCtx, ws)
+	config = NewTestClientConfig(*ws.Name)
+	workspaceversion, err := kongVersion(defaultCtx, config)
+	assert.Nil(err)
+	assert.NotNil(workspaceversion)
+	assert.Equal(workspaceversion.Major, expectedVersion.Major, "The two version should have the same major")
+	assert.Equal(workspaceversion.Minor, expectedVersion.Minor, "The two version should have the same minor")
+
 }
 
 func NewTestClientConfig(workspace string) utils.KongClientConfig {
