@@ -4,8 +4,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -65,4 +69,42 @@ func AddExtToFilename(filename, ext string) string {
 		filename = filename + "." + ext
 	}
 	return filename
+}
+
+// confirm prompts a user for a confirmation with message
+// and returns true with no error if input is "yes" or "y" (case-insensitive),
+// otherwise false.
+func Confirm(message string) (bool, error) {
+	fmt.Print(message)
+	yes := []string{"yes", "y"}
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return false, err
+	}
+	input = strings.ToLower(input)
+	for _, valid := range yes {
+		if input == valid {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func ConfirmFileOverwrite(filename string, ext string, assumeYes bool) (bool, error) {
+	if assumeYes {
+		return true, nil
+	}
+
+	filename = AddExtToFilename(filename, ext)
+	_, err := os.Stat(filename)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return true, nil
+		}
+		return false, err
+	}
+
+	// file exists, prompt user
+	return Confirm("File '" + filename + "' already exists. Do you want to overwrite it? ")
 }

@@ -27,7 +27,7 @@ By default, this command will ask for a confirmation prompt.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if !resetCmdForce {
-			ok, err := confirm("This will delete all configuration from Kong's database." +
+			ok, err := utils.Confirm("This will delete all configuration from Kong's database." +
 				"\n> Are you sure? ")
 			if err != nil {
 				return err

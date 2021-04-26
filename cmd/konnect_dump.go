@@ -31,7 +31,7 @@ configure Konnect.` + konnectAlphaState,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := http.DefaultClient
 
-		if yes, err := confirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+		if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
 		} else if !yes {
 			return nil
