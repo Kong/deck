@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"github.com/fatih/color"
@@ -19,7 +20,7 @@ import (
 
 func syncKonnect(ctx context.Context,
 	filenames []string, dry bool, parallelism int) error {
-	httpClient := utils.HTTPClient()
+	httpClient := http.DefaultClient
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)

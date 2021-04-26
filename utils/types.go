@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"net"
+	"github.com/kong/deck/konnect"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,16 +12,10 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
 	"github.com/pkg/errors"
-)
-
-const (
-	defaultClientTimeout = 10 * time.Second
 )
 
 // KongRawState contains all of Kong Data
@@ -156,7 +150,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 	c := opt.HTTPClient
 	if c == nil {
-		c = HTTPClient()
+		c = &http.Client{}
 	}
 	defaultTransport := http.DefaultTransport.(*http.Transport)
 	defaultTransport.TLSClientConfig = &tlsConfig
@@ -205,18 +199,4 @@ func GetKonnectClient(httpClient *http.Client, debug bool) (*konnect.Client,
 func CleanAddress(address string) string {
 	re := regexp.MustCompile("[/]+$")
 	return re.ReplaceAllString(address, "")
-}
-
-// HTTPClient returns a new Go stdlib's net/http.Client with
-// sane default timeouts.
-func HTTPClient() *http.Client {
-	return &http.Client{
-		Timeout: defaultClientTimeout,
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout: defaultClientTimeout,
-			}).DialContext,
-			TLSHandshakeTimeout: defaultClientTimeout,
-		},
-	}
 }

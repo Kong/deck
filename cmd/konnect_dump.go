@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/kong/deck/konnect"
@@ -28,7 +29,7 @@ a file on disk. The file can then be read using the Sync or Diff command to agai
 configure Konnect.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		httpClient := utils.HTTPClient()
+		httpClient := http.DefaultClient
 
 		if yes, err := confirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
