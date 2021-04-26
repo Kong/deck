@@ -36,17 +36,17 @@ Assuming you are on the TAG commit, you need to perform the following:
 ```
 export TAG=$(git describe --abbrev=0 --tags)
 export COMMIT=$(git rev-parse --short $TAG)
-docker build --build-arg TAG=$TAG --build-arg COMMIT=$COMMIT -t hbagdi/deck:$TAG .
-docker push hbagdi/deck:$TAG
+docker build --build-arg TAG=$TAG --build-arg COMMIT=$COMMIT -t kong/deck:$TAG .
+docker push kong/deck:$TAG
 
-docker tag hbagdi/deck:$TAG kong/deck:$TAG
+docker tag kong/deck:$TAG kong/deck:$TAG
 docker push kong/deck:$TAG
 
 
 # if also the latest release (not for a back-ported patch release):
-docker tag hbagdi/deck:$TAG hbagdi/deck:latest
-docker push hbagdi/deck:latest
+docker tag kong/deck:$TAG kong/deck:latest
+docker push kong/deck:latest
 
-docker tag hbagdi/deck:latest kong/deck:latest
+docker tag kong/deck:latest kong/deck:latest
 docker push kong/deck:latest
 ```
