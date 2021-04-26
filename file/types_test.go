@@ -39,6 +39,237 @@ protocols:
 `
 )
 
+func Test_sortKey(t *testing.T) {
+	tests := []struct {
+		name        string
+		sortable    sortable
+		expectedKey string
+	}{
+		{
+			sortable: &FService{
+				Service: kong.Service{
+					Name: kong.String("my-service"),
+					ID:   kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-service",
+		},
+		{
+			sortable: &FService{
+				Service: kong.Service{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FService{},
+			expectedKey: "",
+		}, {
+			sortable: &FRoute{
+				Route: kong.Route{
+					Name: kong.String("my-route"),
+					ID:   kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-route",
+		},
+		{
+			sortable: FRoute{
+				Route: kong.Route{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FRoute{},
+			expectedKey: "",
+		}, {
+			sortable: FUpstream{
+				Upstream: kong.Upstream{
+					Name: kong.String("my-upstream"),
+					ID:   kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-upstream",
+		},
+		{
+			sortable: FUpstream{
+				Upstream: kong.Upstream{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FUpstream{},
+			expectedKey: "",
+		}, {
+			sortable: FTarget{
+				Target: kong.Target{
+					Target: kong.String("my-target"),
+					ID:     kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-target",
+		},
+		{
+			sortable: FTarget{
+				Target: kong.Target{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FTarget{},
+			expectedKey: "",
+		}, {
+			sortable: FCertificate{
+				Cert: kong.String("my-certificate"),
+				ID:   kong.String("my-id"),
+			},
+			expectedKey: "my-certificate",
+		},
+		{
+			sortable: FCertificate{
+				ID: kong.String("my-id"),
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FCertificate{},
+			expectedKey: "",
+		}, {
+			sortable: FCACertificate{
+				CACertificate: kong.CACertificate{
+					Cert: kong.String("my-ca-certificate"),
+					ID:   kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-ca-certificate",
+		},
+		{
+			sortable: FCACertificate{
+				CACertificate: kong.CACertificate{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FCACertificate{},
+			expectedKey: "",
+		},
+		{
+			sortable: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin"),
+					ID:   kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-plugin",
+		},
+		{
+			sortable: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin"),
+					ID:   kong.String("my-id"),
+					Consumer: &kong.Consumer{
+						ID: kong.String("my-consumer-id"),
+					},
+				},
+			},
+			expectedKey: "my-pluginmy-consumer-id",
+		},
+		{
+			sortable: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin"),
+					ID:   kong.String("my-id"),
+					Route: &kong.Route{
+						ID: kong.String("my-route-id"),
+					},
+				},
+			},
+			expectedKey: "my-pluginmy-route-id",
+		},
+		{
+			sortable: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin"),
+					ID:   kong.String("my-id"),
+					Service: &kong.Service{
+						ID: kong.String("my-service-id"),
+					},
+				},
+			},
+			expectedKey: "my-pluginmy-service-id",
+		},
+
+		{
+			sortable: FPlugin{
+				Plugin: kong.Plugin{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FPlugin{},
+			expectedKey: "",
+		},
+		{
+			sortable: &FConsumer{
+				Consumer: kong.Consumer{
+					Username: kong.String("my-consumer"),
+					ID:       kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-consumer",
+		},
+		{
+			sortable: &FConsumer{
+				Consumer: kong.Consumer{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FConsumer{},
+			expectedKey: "",
+		},
+		{
+			sortable: &FServicePackage{
+				Name: kong.String("my-service-package"),
+				ID:   kong.String("my-id"),
+			},
+			expectedKey: "my-service-package",
+		},
+		{
+			sortable: &FServicePackage{
+				ID: kong.String("my-id"),
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FServicePackage{},
+			expectedKey: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			key := tt.sortable.sortKey()
+			if key != tt.expectedKey {
+				t.Errorf("Expected %v, but is %v", tt.expectedKey, key)
+			}
+		})
+	}
+
+}
+
 func TestPluginUnmarshalYAML(t *testing.T) {
 	var p FPlugin
 	assert := assert.New(t)

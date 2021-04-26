@@ -42,6 +42,158 @@ func captureOutput(f func()) string {
 	return <-out
 }
 
+func Test_compareOrder(t *testing.T) {
+	tests := []struct {
+		name      string
+		sortable1 sortable
+		sortable2 sortable
+		expected  bool
+	}{
+		{
+			sortable1: &FService{
+				Service: kong.Service{
+					Name: kong.String("my-service-1"),
+					ID:   kong.String("my-id-1"),
+				},
+			},
+			sortable2: &FService{
+				Service: kong.Service{
+					Name: kong.String("my-service-2"),
+					ID:   kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: &FRoute{
+				Route: kong.Route{
+					Name: kong.String("my-route-1"),
+					ID:   kong.String("my-id-1"),
+				},
+			},
+			sortable2: &FRoute{
+				Route: kong.Route{
+					Name: kong.String("my-route-2"),
+					ID:   kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: FUpstream{
+				Upstream: kong.Upstream{
+					Name: kong.String("my-upstream-1"),
+					ID:   kong.String("my-id-1"),
+				},
+			},
+			sortable2: FUpstream{
+				Upstream: kong.Upstream{
+					Name: kong.String("my-upstream-2"),
+					ID:   kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: FTarget{
+				Target: kong.Target{
+					Target: kong.String("my-target-1"),
+					ID:     kong.String("my-id-1"),
+				},
+			},
+			sortable2: FTarget{
+				Target: kong.Target{
+					Target: kong.String("my-target-2"),
+					ID:     kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: FCertificate{
+				Cert: kong.String("my-certificate-1"),
+				ID:   kong.String("my-id-1"),
+			},
+			sortable2: FCertificate{
+				Cert: kong.String("my-certificate-2"),
+				ID:   kong.String("my-id-2"),
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: FCACertificate{
+				CACertificate: kong.CACertificate{
+					Cert: kong.String("my-ca-certificate-1"),
+					ID:   kong.String("my-id-1"),
+				},
+			},
+			sortable2: FCACertificate{
+				CACertificate: kong.CACertificate{
+					Cert: kong.String("my-ca-certificate-2"),
+					ID:   kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin-1"),
+					ID:   kong.String("my-id-1"),
+				},
+			},
+			sortable2: FPlugin{
+				Plugin: kong.Plugin{
+					Name: kong.String("my-plugin-2"),
+					ID:   kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: &FConsumer{
+				Consumer: kong.Consumer{
+					Username: kong.String("my-consumer-1"),
+					ID:       kong.String("my-id-2"),
+				},
+			},
+			sortable2: &FConsumer{
+				Consumer: kong.Consumer{
+					Username: kong.String("my-consumer-2"),
+					ID:       kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+
+		{
+			sortable1: &FServicePackage{
+				Name: kong.String("my-service-package-1"),
+				ID:   kong.String("my-id-1"),
+			},
+			sortable2: &FServicePackage{
+				Name: kong.String("my-service-package-2"),
+				ID:   kong.String("my-id-2"),
+			},
+			expected: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if compareOrder(tt.sortable1, tt.sortable2) != tt.expected {
+				t.Errorf("Expected %v, but isn't", tt.expected)
+			}
+		})
+	}
+}
+
 func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	var ks, _ = state.NewKongState()
 	var filename = "-"

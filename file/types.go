@@ -14,8 +14,8 @@ import (
 // Format is a file format for Kong's configuration.
 type Format string
 
-type id interface {
-	id() string
+type sortable interface {
+	sortKey() string
 }
 
 const (
@@ -36,13 +36,13 @@ type FService struct {
 	URL *string `json:"url,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (s FService) id() string {
-	if s.ID != nil {
-		return *s.ID
-	}
+// sortKey is used for sorting.
+func (s FService) sortKey() string {
 	if s.Name != nil {
 		return *s.Name
+	}
+	if s.ID != nil {
+		return *s.ID
 	}
 	return ""
 }
@@ -215,13 +215,13 @@ type FRoute struct {
 	Plugins    []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (r FRoute) id() string {
-	if r.ID != nil {
-		return *r.ID
-	}
+// sortKey is used for sorting.
+func (r FRoute) sortKey() string {
 	if r.Name != nil {
 		return *r.Name
+	}
+	if r.ID != nil {
+		return *r.ID
 	}
 	return ""
 }
@@ -233,13 +233,13 @@ type FUpstream struct {
 	Targets       []*FTarget `json:"targets,omitempty" yaml:",omitempty"`
 }
 
-// id is used for sorting.
-func (u FUpstream) id() string {
-	if u.ID != nil {
-		return *u.ID
-	}
+// sortKey is used for sorting.
+func (u FUpstream) sortKey() string {
 	if u.Name != nil {
 		return *u.Name
+	}
+	if u.ID != nil {
+		return *u.ID
 	}
 	return ""
 }
@@ -250,13 +250,13 @@ type FTarget struct {
 	kong.Target `yaml:",inline,omitempty"`
 }
 
-// id is used for sorting.
-func (t FTarget) id() string {
-	if t.ID != nil {
-		return *t.ID
-	}
+// sortKey is used for sorting.
+func (t FTarget) sortKey() string {
 	if t.Target.Target != nil {
 		return *t.Target.Target
+	}
+	if t.ID != nil {
+		return *t.ID
 	}
 	return ""
 }
@@ -272,13 +272,13 @@ type FCertificate struct {
 	SNIs      []kong.SNI `json:"snis,omitempty" yaml:"snis,omitempty"`
 }
 
-// id is used for sorting.
-func (c FCertificate) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
+// sortKey is used for sorting.
+func (c FCertificate) sortKey() string {
 	if c.Cert != nil {
 		return *c.Cert
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -289,13 +289,13 @@ type FCACertificate struct {
 	kong.CACertificate `yaml:",inline,omitempty"`
 }
 
-// id is used for sorting.
-func (c FCACertificate) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
+// sortKey is used for sorting.
+func (c FCACertificate) sortKey() string {
 	if c.Cert != nil {
 		return *c.Cert
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -442,24 +442,27 @@ func (p *FPlugin) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// id is used for sorting.
-func (p FPlugin) id() string {
+// sortKey is used for sorting.
+func (p FPlugin) sortKey() string {
+	// concat plugin name and foreign relations
+	if p.Name != nil {
+		key := ""
+		key = *p.Name
+		if p.Consumer != nil {
+			key += *p.Consumer.ID
+		}
+		if p.Route != nil {
+			key += *p.Route.ID
+		}
+		if p.Service != nil {
+			key += *p.Service.ID
+		}
+		return key
+	}
 	if p.ID != nil {
 		return *p.ID
 	}
-	// concat plugin name and foreign relations
-	key := ""
-	key = *p.Name
-	if p.Consumer != nil {
-		key += *p.Consumer.ID
-	}
-	if p.Route != nil {
-		key += *p.Route.ID
-	}
-	if p.Service != nil {
-		key += *p.Service.ID
-	}
-	return key
+	return ""
 }
 
 // FConsumer represents a consumer in Kong.
@@ -476,13 +479,13 @@ type FConsumer struct {
 	MTLSAuths     []*kong.MTLSAuth         `json:"mtls_auth_credentials,omitempty" yaml:"mtls_auth_credentials,omitempty"`
 }
 
-// id is used for sorting.
-func (c FConsumer) id() string {
-	if c.ID != nil {
-		return *c.ID
-	}
+// sortKey is used for sorting.
+func (c FConsumer) sortKey() string {
 	if c.Username != nil {
 		return *c.Username
+	}
+	if c.ID != nil {
+		return *c.ID
 	}
 	return ""
 }
@@ -531,13 +534,13 @@ type FServicePackage struct {
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
 }
 
-// id is used for sorting.
-func (s FServicePackage) id() string {
-	if s.ID != nil {
-		return *s.ID
-	}
+// sortKey is used for sorting.
+func (s FServicePackage) sortKey() string {
 	if s.Name != nil {
 		return *s.Name
+	}
+	if s.ID != nil {
+		return *s.ID
 	}
 	return ""
 }
