@@ -107,7 +107,7 @@ configure Kong.`,
 			return nil
 		}
 
-		if yes, err := confirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+		if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
 		} else if !yes {
 			return nil
