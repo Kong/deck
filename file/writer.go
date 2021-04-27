@@ -78,7 +78,7 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
-	return writeFile(file, config.Filename, config.FileFormat)
+	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
 func KonnectStateToFile(kongState *state.KongState, config WriteConfig) error {
@@ -119,7 +119,7 @@ func KonnectStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
-	return writeFile(file, config.Filename, config.FileFormat)
+	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
 func populateServicePackages(kongState *state.KongState, file *Content,
@@ -154,7 +154,7 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 					return err
 				}
 				fVersion.Implementation = &Implementation{
-					Type: "kong",
+					Type: utils.ImplementationTypeKongGateway,
 					Kong: &Kong{
 						Service: s,
 					},
@@ -562,7 +562,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	return nil
 }
 
-func writeFile(content *Content, filename string, format Format) error {
+func WriteContentToFile(content *Content, filename string, format Format) error {
 	var c []byte
 	var err error
 	switch format {

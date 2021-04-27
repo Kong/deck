@@ -68,3 +68,7 @@ var (
 		HashOnCookiePath: kong.String("/"),
 	}
 )
+
+const (
+	ImplementationTypeKongGateway = "kong-gateway"
+)
