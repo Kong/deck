@@ -535,6 +535,17 @@ type FServicePackage struct {
 }
 
 // sortKey is used for sorting.
+func (s FServiceVersion) sortKey() string {
+	if s.Version != nil {
+		return *s.Version
+	}
+	if s.ID != nil {
+		return *s.ID
+	}
+	return ""
+}
+
+// sortKey is used for sorting.
 func (s FServicePackage) sortKey() string {
 	if s.Name != nil {
 		return *s.Name

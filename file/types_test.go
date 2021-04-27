@@ -258,6 +258,23 @@ func Test_sortKey(t *testing.T) {
 			sortable:    FServicePackage{},
 			expectedKey: "",
 		},
+		{
+			sortable: &FServiceVersion{
+				Version: kong.String("my-service-version"),
+				ID:      kong.String("my-id"),
+			},
+			expectedKey: "my-service-version",
+		},
+		{
+			sortable: &FServiceVersion{
+				ID: kong.String("my-id"),
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FServiceVersion{},
+			expectedKey: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

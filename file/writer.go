@@ -163,6 +163,9 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 			utils.ZeroOutID(&fVersion, fVersion.Version, config.WithID)
 			p.Versions = append(p.Versions, fVersion)
 		}
+		sort.SliceStable(p.Versions, func(i, j int) bool {
+			return compareOrder(p.Versions[i], p.Versions[j])
+		})
 		utils.ZeroOutID(&p, p.Name, config.WithID)
 		file.ServicePackages = append(file.ServicePackages, p)
 	}
