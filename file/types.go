@@ -545,7 +545,6 @@ func (s FServiceVersion) sortKey() string {
 	return ""
 }
 
-
 // sortKey is used for sorting.
 func (s FServicePackage) sortKey() string {
 	if s.Name != nil {

@@ -187,11 +187,11 @@ func Test_compareOrder(t *testing.T) {
 		{
 			sortable1: &FServiceVersion{
 				Version: kong.String("my-service-version-1"),
-				ID:   kong.String("my-id-1"),
+				ID:      kong.String("my-id-1"),
 			},
 			sortable2: &FServiceVersion{
 				Version: kong.String("my-service-version-2"),
-				ID:   kong.String("my-id-2"),
+				ID:      kong.String("my-id-2"),
 			},
 			expected: true,
 		},
