@@ -79,7 +79,7 @@ func syncKonnect(ctx context.Context,
 	}
 
 	s, _ := diff.NewSyncer(currentState, targetState)
-	stats, errs := solver.Solve(stopChannel, s, kongClient, konnectClient, parallelism, dry)
+	stats, errs := solver.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)
@@ -142,7 +142,7 @@ func getKonnectState(ctx context.Context,
 	group.Go(func() error {
 		var err error
 		// get export of Kong resources
-		kongState, err = dump.Get(kongClient, dump.Config{
+		kongState, err = dump.Get(ctx, kongClient, dump.Config{
 			SkipConsumers: skipConsumers,
 		})
 		if err != nil {

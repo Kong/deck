@@ -22,7 +22,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 	var servicePackages []*konnect.ServicePackage
 	var relations []*konnect.ControlPlaneServiceRelation
 
-	group, ctx := errgroup.WithContext(context.Background())
+	group, ctx := errgroup.WithContext(ctx)
 	// group1 fetches service packages and their versions
 	group.Go(func() error {
 		var err error

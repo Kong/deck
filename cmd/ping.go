@@ -19,9 +19,10 @@ var pingCmd = &cobra.Command{
 can connect to Kong's Admin API or not.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
 
 		wsConfig := rootConfig.ForWorkspace(pingWorkspace)
-		version, err := kongVersion(wsConfig)
+		version, err := kongVersion(ctx, wsConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading Kong version")
 		}

@@ -232,7 +232,7 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
-func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
+func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRawState, error) {
 
 	var state utils.KongRawState
 
@@ -240,7 +240,7 @@ func Get(client *kong.Client, config Config) (*utils.KongRawState, error) {
 		return nil, err
 	}
 
-	group, ctx := errgroup.WithContext(context.Background())
+	group, ctx := errgroup.WithContext(ctx)
 
 	// dump only rbac resources
 	if config.RBACResourcesOnly {

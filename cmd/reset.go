@@ -26,6 +26,8 @@ Use this command with extreme care as it is equivalent to running
 By default, this command will ask for a confirmation prompt.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+
 		if !resetCmdForce {
 			ok, err := utils.Confirm("This will delete all configuration from Kong's database." +
 				"\n> Are you sure? ")
@@ -43,11 +45,11 @@ By default, this command will ask for a confirmation prompt.`,
 		}
 		// Kong OSS or default workspace
 		if !resetAllWorkspaces && resetWorkspace == "" {
-			state, err := dump.Get(rootClient, dumpConfig)
+			state, err := dump.Get(ctx, rootClient, dumpConfig)
 			if err != nil {
 				return err
 			}
-			err = reset.Reset(state, rootClient)
+			err = reset.Reset(ctx, state, rootClient)
 			if err != nil {
 				return err
 			}
@@ -61,13 +63,13 @@ By default, this command will ask for a confirmation prompt.`,
 		// Kong Enterprise
 		var workspaces []string
 		if resetAllWorkspaces {
-			workspaces, err = listWorkspaces(cmd.Context(), rootClient)
+			workspaces, err = listWorkspaces(ctx, rootClient)
 			if err != nil {
 				return err
 			}
 		}
 		if resetWorkspace != "" {
-			exists, err := workspaceExists(rootConfig.ForWorkspace(resetWorkspace))
+			exists, err := workspaceExists(ctx, rootConfig.ForWorkspace(resetWorkspace))
 			if err != nil {
 				return err
 			}
@@ -83,11 +85,11 @@ By default, this command will ask for a confirmation prompt.`,
 			if err != nil {
 				return err
 			}
-			state, err := dump.Get(wsClient, dumpConfig)
+			state, err := dump.Get(ctx, wsClient, dumpConfig)
 			if err != nil {
 				return err
 			}
-			err = reset.Reset(state, wsClient)
+			err = reset.Reset(ctx, state, wsClient)
 			if err != nil {
 				return err
 			}

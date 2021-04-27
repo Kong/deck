@@ -25,20 +25,12 @@ const (
 )
 
 var (
-	stopChannel chan struct{}
-	dumpConfig  dump.Config
-	assumeYes   bool
+	dumpConfig dump.Config
+	assumeYes  bool
 )
 
-// SetStopCh sets the stop channel for long running commands.
-// This is useful for cases when a process needs to be cancelled gracefully
-// before it can complete to finish. Example: SIGINT
-func SetStopCh(stopCh chan struct{}) {
-	stopChannel = stopCh
-}
-
 // workspaceExists checks if workspace exists in Kong.
-func workspaceExists(config utils.KongClientConfig) (bool, error) {
+func workspaceExists(ctx context.Context, config utils.KongClientConfig) (bool, error) {
 	if config.Workspace == "" {
 		// default workspace always exists
 		return true, nil
@@ -54,7 +46,7 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 		return false, err
 	}
 
-	_, _, err = wsClient.Routes.List(context.TODO(), nil)
+	_, _, err = wsClient.Routes.List(ctx, nil)
 	switch {
 	case kong.IsNotFoundErr(err):
 		return false, nil
@@ -65,7 +57,8 @@ func workspaceExists(config utils.KongClientConfig) (bool, error) {
 	}
 }
 
-func syncMain(filenames []string, dry bool, parallelism, delay int, workspace string) error {
+func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
+	delay int, workspace string) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -89,12 +82,12 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	}
 
 	// load Kong version after workspace
-	kongVersion, err := kongVersion(wsConfig)
+	kongVersion, err := kongVersion(ctx, wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
 
-	workspaceExists, err := workspaceExists(wsConfig)
+	workspaceExists, err := workspaceExists(ctx, wsConfig)
 	if err != nil {
 		return err
 	}
@@ -111,7 +104,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
-		rawState, err := dump.Get(wsClient, dumpConfig)
+		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -157,7 +150,7 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
-	stats, errs := solver.Solve(stopChannel, s, wsClient, nil, parallelism, dry)
+	stats, errs := solver.Solve(ctx, s, wsClient, nil, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
 	printFn("  Created: %v\n", stats.CreateOps)
@@ -173,7 +166,8 @@ func syncMain(filenames []string, dry bool, parallelism, delay int, workspace st
 	return nil
 }
 
-func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
+func kongVersion(ctx context.Context,
+	config utils.KongClientConfig) (semver.Version, error) {
 
 	var version string
 
@@ -185,7 +179,7 @@ func kongVersion(config utils.KongClientConfig) (semver.Version, error) {
 	if err != nil {
 		return semver.Version{}, err
 	}
-	root, err := client.Root(nil)
+	root, err := client.Root(ctx)
 	if err != nil {
 		if workspace == "" {
 			return semver.Version{}, err

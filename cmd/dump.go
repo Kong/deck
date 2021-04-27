@@ -45,6 +45,7 @@ The file can then be read using the Sync o Diff command to again
 configure Kong.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
 
 		wsClient, err := utils.GetKongClient(rootConfig)
 		if err != nil {
@@ -61,7 +62,7 @@ configure Kong.`,
 			if dumpCmdKongStateFile != "kong" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
-			workspaces, err := listWorkspaces(cmd.Context(), wsClient)
+			workspaces, err := listWorkspaces(ctx, wsClient)
 			if err != nil {
 				return err
 			}
@@ -72,7 +73,7 @@ configure Kong.`,
 					return err
 				}
 
-				rawState, err := dump.Get(wsClient, dumpConfig)
+				rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 				if err != nil {
 					return errors.Wrap(err, "reading configuration from Kong")
 				}
@@ -105,7 +106,7 @@ configure Kong.`,
 		if dumpWorkspace != "" {
 			wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
 
-			exists, err := workspaceExists(wsConfig)
+			exists, err := workspaceExists(ctx, wsConfig)
 			if err != nil {
 				return err
 			}
@@ -119,7 +120,7 @@ configure Kong.`,
 			}
 		}
 
-		rawState, err := dump.Get(wsClient, dumpConfig)
+		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading configuration from Kong")
 		}
