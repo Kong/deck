@@ -613,7 +613,6 @@ func writeFile(content *Content, filename string, format Format) error {
 	}
 
 	if filename == "-" {
-		// TODO how should we write document files when output is stdout?
 		if _, err := fmt.Print(string(c)); err != nil {
 			return errors.Wrap(err, "writing file")
 		}

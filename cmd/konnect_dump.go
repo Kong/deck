@@ -31,6 +31,10 @@ configure Konnect.` + konnectAlphaState,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := http.DefaultClient
 
+		if konnectDumpCmdKongStateFile == "-" {
+			return errors.New("writing to stdout is not supported in Konnect mode")
+		}
+
 		if yes, err := confirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
 		} else if !yes {
@@ -87,8 +91,7 @@ configure Konnect.` + konnectAlphaState,
 func init() {
 	konnectCmd.AddCommand(konnectDumpCmd)
 	konnectDumpCmd.Flags().StringVarP(&konnectDumpCmdKongStateFile, "output-file", "o",
-		"konnect", "file to which to write Kong's configuration."+
-			"Use '-' to write to stdout.")
+		"konnect", "file to which to write Kong's configuration.")
 	konnectDumpCmd.Flags().StringVar(&konnectDumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml")
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpWithID, "with-id",
