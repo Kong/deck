@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"net/url"
+	"os"
 	"regexp"
 	"testing"
 
@@ -143,6 +145,39 @@ func Test_AddExtToFilename(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := AddExtToFilename(tt.args.filename, tt.args.ext); got != tt.want {
 				t.Errorf("AddExtToFilename() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_NameToFilename(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "leading separator",
+			args: args{
+				name: string(os.PathSeparator) + "foo.md",
+			},
+			want: "foo.md",
+		},
+		{
+			name: "inner separator",
+			args: args{
+				name: "bar" + string(os.PathSeparator) + "foo.md",
+			},
+			want: "bar" + url.PathEscape(string(os.PathSeparator)) + "foo.md",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NameToFilename(tt.args.name); got != tt.want {
+				t.Errorf("NameToFilename() = %v, want %v", got, tt.want)
 			}
 		})
 	}

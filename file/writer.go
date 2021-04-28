@@ -624,21 +624,31 @@ func writeFile(content *Content, filename string, format Format) error {
 			return errors.Wrap(err, "writing file")
 		}
 		for _, sp := range content.ServicePackages {
-			for _, d := range sp.Documents {
-				if err := os.MkdirAll(prefix+*sp.Name, 0700); err != nil {
+			safePackageName := utils.NameToFilename(*sp.Name)
+			if len(sp.Documents) > 0 {
+				if err := os.MkdirAll(filepath.Join(prefix, safePackageName), 0700); err != nil {
 					return errors.Wrap(err, "creating document directory")
 				}
-				if err := os.WriteFile(prefix+*sp.Name+*d.Path, []byte(*d.Content), 0600); err != nil {
-					return errors.Wrap(err, "writing document file")
+				for _, d := range sp.Documents {
+					safeDocPath := utils.NameToFilename(*d.Path)
+					if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeDocPath),
+						[]byte(*d.Content), 0600); err != nil {
+						return errors.Wrap(err, "writing document file")
+					}
 				}
 			}
 			for _, v := range sp.Versions {
-				for _, d := range v.Documents {
-					if err := os.MkdirAll(prefix+*sp.Name+"/"+*v.Version, 0700); err != nil {
+				if len(v.Documents) > 0 {
+					safeVersionName := utils.NameToFilename(*v.Version)
+					if err := os.MkdirAll(filepath.Join(prefix, safePackageName, safeVersionName), 0700); err != nil {
 						return errors.Wrap(err, "creating document directory")
 					}
-					if err := os.WriteFile(prefix+*sp.Name+"/"+*v.Version+*d.Path, []byte(*d.Content), 0600); err != nil {
-						return errors.Wrap(err, "writing document file")
+					for _, d := range v.Documents {
+						safeDocPath := utils.NameToFilename(*d.Path)
+						if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeVersionName, safeDocPath),
+							[]byte(*d.Content), 0600); err != nil {
+							return errors.Wrap(err, "writing document file")
+						}
 					}
 				}
 			}

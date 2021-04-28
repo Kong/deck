@@ -4,8 +4,11 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"net/url"
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 var (
@@ -65,4 +68,14 @@ func AddExtToFilename(filename, ext string) string {
 		filename = filename + "." + ext
 	}
 	return filename
+}
+
+// NameToFilename clears path separators from strings. Some entity names in Kong and Konnect
+// allow path directory separators. Some decK operations write files using entity names,
+// which is not compatible with names that contain path separators. NameToFilename strips leading
+// separator characters and replaces other instances of the separator with its URL-encoded representation.
+func NameToFilename(name string) string {
+	s := strings.TrimPrefix(name, string(os.PathSeparator))
+	s = strings.ReplaceAll(s, string(os.PathSeparator), url.PathEscape(string(os.PathSeparator)))
+	return s
 }
