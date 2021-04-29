@@ -12,9 +12,41 @@ type Document struct {
 	Meta
 }
 
+// Identifier returns the endpoint key name or ID.
+func (d *Document) Identifier() string {
+	if d.Path != nil {
+		return *d.Path
+	}
+	return *d.ID
+}
+
 // Console returns an entity's identity in a human-readable string.
 func (d *Document) Console() string {
 	return *d.Path
+}
+
+// Equal returns true if s1 and s2 are equal.
+func (d1 *Document) Equal(d2 *Document) bool {
+	return d1.EqualWithOpts(d2, false, false, false)
+}
+
+// EqualWithOpts returns true if d1 and d2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (d1 *Document) EqualWithOpts(d2 *Document,
+	ignoreID, ignoreTS, ignoreForeign bool) bool {
+	d1Copy := d1.Document.DeepCopy()
+	d2Copy := d2.Document.DeepCopy()
+
+	if ignoreID {
+		d1Copy.ID = nil
+		d2Copy.ID = nil
+	}
+	if ignoreForeign {
+		d1Copy.Parent = nil
+		d2Copy.Parent = nil
+	}
+	return reflect.DeepEqual(d1Copy, d2Copy)
 }
 
 // ServicePackage represents a service package in Konnect.

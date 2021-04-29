@@ -332,6 +332,11 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 
+	err = sc.createUpdateDocuments()
+	if err != nil {
+		return err
+	}
+
 	// finish createUpdate before returning
 	sc.wait()
 
