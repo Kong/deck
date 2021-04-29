@@ -28,6 +28,11 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
+	err = targetContent.PopulateDocumentContent(filenames)
+	if err != nil {
+		return err
+	}
+
 	// get Konnect client
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
 	if err != nil {
