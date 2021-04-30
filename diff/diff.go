@@ -75,6 +75,7 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
 	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
 	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
+	s.postProcess.MustRegister("document", &documentPostAction{current})
 
 	return s, nil
 }

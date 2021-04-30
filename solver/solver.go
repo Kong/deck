@@ -99,5 +99,6 @@ func buildRegistry(client *kong.Client, konnectClient *konnect.Client) *crud.Reg
 
 	r.MustRegister("service-package", &servicePackageCRUD{client: konnectClient})
 	r.MustRegister("service-version", &serviceVersionCRUD{client: konnectClient})
+	r.MustRegister("document", &documentCRUD{client: konnectClient})
 	return &r
 }

@@ -82,7 +82,10 @@ func (sc *Syncer) createUpdateDocument(d *state.Document) (*Event, error) {
 	}
 
 	// found, check if update needed
-	if !currentd.EqualWithOpts(dCopy, false, true, false) {
+	// Service Package-attached Documents fail equality checks if ignoreForeign
+	// is disabled. This appears to be related to an invalid diff detection for
+	// Service Versions attached to the package.
+	if !currentd.EqualWithOpts(dCopy, false, true, true) {
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "document",
