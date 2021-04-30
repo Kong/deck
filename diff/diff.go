@@ -199,6 +199,11 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 
+	err = sc.deleteDocuments()
+	if err != nil {
+		return err
+	}
+
 	err = sc.deleteServiceVersions()
 	if err != nil {
 		return err
