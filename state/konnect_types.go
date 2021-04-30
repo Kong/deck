@@ -13,16 +13,16 @@ type Document struct {
 }
 
 // Identifier returns the endpoint key name or ID.
-func (d *Document) Identifier() string {
-	if d.Path != nil {
-		return *d.Path
+func (d1 *Document) Identifier() string {
+	if d1.Path != nil {
+		return *d1.Path
 	}
-	return *d.ID
+	return *d1.ID
 }
 
 // Console returns an entity's identity in a human-readable string.
-func (d *Document) Console() string {
-	return *d.Path
+func (d1 *Document) Console() string {
+	return *d1.Path
 }
 
 // Equal returns true if s1 and s2 are equal.
