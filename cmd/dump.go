@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"net/http"
+	"context"
 	"strings"
 
 	"github.com/kong/deck/dump"
@@ -21,27 +21,14 @@ var (
 	dumpWithID           bool
 )
 
-func listWorkspaces(client *kong.Client, baseURL string) ([]string, error) {
-	type Workspace struct {
-		Name string
-	}
-	type Response struct {
-		Data []Workspace
-	}
-
-	var response Response
-	// TODO handle pagination
-	req, err := http.NewRequest("GET", baseURL+"/workspaces?size=1000", nil)
-	if err != nil {
-		return nil, errors.Wrap(err, "building request for fetching workspaces")
-	}
-	_, err = client.Do(nil, req, &response)
+func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) {
+	workspaces, err := client.Workspaces.ListAll(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "fetching workspaces from Kong")
 	}
 	var res []string
-	for _, workspace := range response.Data {
-		res = append(res, workspace.Name)
+	for _, workspace := range workspaces {
+		res = append(res, *workspace.Name)
 	}
 
 	return res, nil
@@ -74,7 +61,7 @@ configure Kong.`,
 			if dumpCmdKongStateFile != "kong" {
 				return errors.New("output-file cannot be specified with --all-workspace flag")
 			}
-			workspaces, err := listWorkspaces(wsClient, rootConfig.Address)
+			workspaces, err := listWorkspaces(cmd.Context(), wsClient)
 			if err != nil {
 				return err
 			}

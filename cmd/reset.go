@@ -61,7 +61,7 @@ By default, this command will ask for a confirmation prompt.`,
 		// Kong Enterprise
 		var workspaces []string
 		if resetAllWorkspaces {
-			workspaces, err = listWorkspaces(rootClient, rootConfig.Address)
+			workspaces, err = listWorkspaces(cmd.Context(), rootClient)
 			if err != nil {
 				return err
 			}
