@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -26,7 +27,7 @@ can connect to Kong's Admin API or not.`,
 			return errors.Wrap(err, "reading Kong version")
 		}
 		fmt.Println("Successfully connected to Kong!")
-		fmt.Println("Kong version: ", version)
+		fmt.Fprintf(os.Stdout, "Kong version: %v.%v\n", version.Major, version.Minor)
 		return nil
 	},
 }
