@@ -1,0 +1,8 @@
+services:
+- id: 1404df16-48c4-42e6-beab-b7f8792587dc
+  host: mockbin.org
+  routes:
+  - name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
