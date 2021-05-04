@@ -24,7 +24,8 @@ that will be created or updated or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(diffCmdKongStateFile, true, diffCmdParallelism, 0, diffWorkspace)
+		return syncMain(cmd.Context(), diffCmdKongStateFile, true,
+			diffCmdParallelism, 0, diffWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {

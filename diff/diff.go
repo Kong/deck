@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"context"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -366,7 +367,7 @@ func (sc *Syncer) wait() {
 }
 
 // Run starts a diff and invokes d for every diff.
-func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
+func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	if parallelism < 1 {
 		return append([]error{}, errors.New("parallelism can not be negative"))
 	}
@@ -410,7 +411,7 @@ func (sc *Syncer) Run(done <-chan struct{}, parallelism int, d Do) []error {
 
 	var errs []error
 	select {
-	case <-done:
+	case <-ctx.Done():
 	case err, ok := <-sc.errChan:
 		if ok && err != nil {
 			if err != errEnqueueFailed {

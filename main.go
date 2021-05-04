@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -11,22 +12,22 @@ import (
 	"github.com/kong/deck/cmd"
 )
 
-func registerSignalHandler() {
+func registerSignalHandler() context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
 	sigs := make(chan os.Signal, 1)
-	done := make(chan struct{})
-	cmd.SetStopCh(done)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		sig := <-sigs
 		fmt.Println("received", sig, ", terminating...")
-		close(done)
+		cancel()
 	}()
+	return ctx
 }
 
 func main() {
-	registerSignalHandler()
-	cmd.Execute()
+	ctx := registerSignalHandler()
+	cmd.Execute(ctx)
 }
 
 func init() {

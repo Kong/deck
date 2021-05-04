@@ -10,12 +10,12 @@ import (
 )
 
 // Reset deletes all entities in Kong.
-func Reset(state *utils.KongRawState, client *kong.Client) error {
+func Reset(ctx context.Context, state *utils.KongRawState, client *kong.Client) error {
 	if state == nil {
 		return errors.New("state cannot be empty")
 	}
 
-	group, ctx := errgroup.WithContext(context.Background())
+	group, ctx := errgroup.WithContext(ctx)
 
 	group.Go(func() error {
 		// Delete routes before services
