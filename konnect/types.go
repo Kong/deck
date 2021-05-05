@@ -66,42 +66,41 @@ func (d *Document) ParentKey() string {
 	return d.Parent.Key()
 }
 
-// ShallowCopyInto is a shallowcopy function, copying the receiver, writing into out. in must be non-nil.
-func (in *Document) ShallowCopyInto(out *Document) {
-	*out = *in
-	if in.ID != nil {
-		in, out := &in.ID, &out.ID
+// ShallowCopyInto is a shallowcopy function, copying the receiver, writing into out. d must be non-nil.
+func (d *Document) ShallowCopyInto(out *Document) {
+	*out = *d
+	if d.ID != nil {
+		d, out := &d.ID, &out.ID
 		*out = new(string)
-		**out = **in
+		**out = **d
 	}
-	if in.Path != nil {
-		in, out := &in.Path, &out.Path
+	if d.Path != nil {
+		d, out := &d.Path, &out.Path
 		*out = new(string)
-		**out = **in
+		**out = **d
 	}
-	if in.Content != nil {
-		in, out := &in.Content, &out.Content
+	if d.Content != nil {
+		d, out := &d.Content, &out.Content
 		*out = new(string)
-		**out = **in
+		**out = **d
 	}
-	if in.Published != nil {
-		in, out := &in.Published, &out.Published
+	if d.Published != nil {
+		d, out := &d.Published, &out.Published
 		*out = new(bool)
-		**out = **in
+		**out = **d
 	}
-	if in.Parent != nil {
-		out.Parent = in.Parent
+	if d.Parent != nil {
+		out.Parent = d.Parent
 	}
-	return
 }
 
 // ShallowCopy is a shallowcopy function, copying the receiver, creating a new Document.
-func (in *Document) ShallowCopy() *Document {
-	if in == nil {
+func (d *Document) ShallowCopy() *Document {
+	if d == nil {
 		return nil
 	}
 	out := new(Document)
-	in.ShallowCopyInto(out)
+	d.ShallowCopyInto(out)
 	return out
 }
 
