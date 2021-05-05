@@ -50,7 +50,7 @@ func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
 		return fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := doc.Parent.URL() + "/documents" + *doc.ID
+	endpoint := doc.Parent.URL() + "/documents/" + *doc.ID
 	req, err := d.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
