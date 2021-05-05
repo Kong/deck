@@ -35,8 +35,8 @@ func (d1 *Document) Equal(d2 *Document) bool {
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (d1 *Document) EqualWithOpts(d2 *Document,
 	ignoreID, ignoreTS, ignoreForeign bool) bool {
-	d1Copy := d1.Document.DeepCopy()
-	d2Copy := d2.Document.DeepCopy()
+	d1Copy := d1.Document.ShallowCopy()
+	d2Copy := d2.Document.ShallowCopy()
 
 	if ignoreID {
 		d1Copy.ID = nil

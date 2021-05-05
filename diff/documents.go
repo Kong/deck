@@ -66,7 +66,7 @@ func (sc *Syncer) createUpdateDocuments() error {
 }
 
 func (sc *Syncer) createUpdateDocument(d *state.Document) (*Event, error) {
-	dCopy := &state.Document{Document: *d.DeepCopy()}
+	dCopy := &state.Document{Document: *d.ShallowCopy()}
 	currentd, err := sc.currentState.Documents.GetByParent(d.Parent, *d.ID)
 
 	if err == state.ErrNotFound {

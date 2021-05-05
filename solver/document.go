@@ -71,7 +71,7 @@ func (s *documentCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 
 	// if there is a change in document entity, make a PATCH
 	if !document.EqualWithOpts(oldDocument, false, true, true) {
-		documentCopy := &state.Document{Document: *document.DeepCopy()}
+		documentCopy := &state.Document{Document: *document.ShallowCopy()}
 		updatedDoc, err = s.client.Documents.Update(nil, &documentCopy.Document)
 		if err != nil {
 			return nil, err

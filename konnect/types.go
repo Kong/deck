@@ -11,7 +11,6 @@ const (
 type ParentInfoer interface {
 	URL() string
 	Key() string
-	DeepCopyParentInfoer() ParentInfoer
 }
 
 func BaseURL() string {
@@ -21,7 +20,6 @@ func BaseURL() string {
 }
 
 // +k8s:deepcopy-gen=true
-// +k8s:deepcopy-gen:interfaces=github.com/kong/deck/konnect.ParentInfoer
 type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
 	Name        *string `json:"name,omitempty"`
@@ -39,7 +37,6 @@ func (p *ServicePackage) Key() string {
 }
 
 // +k8s:deepcopy-gen=true
-// +k8s:deepcopy-gen:interfaces=github.com/kong/deck/konnect.ParentInfoer
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
 	Version *string `json:"version,omitempty"`
@@ -57,8 +54,6 @@ func (v *ServiceVersion) Key() string {
 	return "ServiceVersion" + ":" + *v.ID
 }
 
-// +k8s:deepcopy-gen=true
-// +k8s:deepcopy-gen:interfaces
 type Document struct {
 	ID        *string      `json:"id,omitempty"`
 	Path      *string      `json:"path,omitempty"`
@@ -69,6 +64,45 @@ type Document struct {
 
 func (d *Document) ParentKey() string {
 	return d.Parent.Key()
+}
+
+// ShallowCopyInto is a shallowcopy function, copying the receiver, writing into out. in must be non-nil.
+func (in *Document) ShallowCopyInto(out *Document) {
+	*out = *in
+	if in.ID != nil {
+		in, out := &in.ID, &out.ID
+		*out = new(string)
+		**out = **in
+	}
+	if in.Path != nil {
+		in, out := &in.Path, &out.Path
+		*out = new(string)
+		**out = **in
+	}
+	if in.Content != nil {
+		in, out := &in.Content, &out.Content
+		*out = new(string)
+		**out = **in
+	}
+	if in.Published != nil {
+		in, out := &in.Published, &out.Published
+		*out = new(bool)
+		**out = **in
+	}
+	if in.Parent != nil {
+		out.Parent = in.Parent
+	}
+	return
+}
+
+// ShallowCopy is a shallowcopy function, copying the receiver, creating a new Document.
+func (in *Document) ShallowCopy() *Document {
+	if in == nil {
+		return nil
+	}
+	out := new(Document)
+	in.ShallowCopyInto(out)
+	return out
 }
 
 // +k8s:deepcopy-gen=true

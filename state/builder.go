@@ -220,7 +220,7 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 		}
 	}
 	for _, d := range raw.Documents {
-		document := d.DeepCopy()
+		document := d.ShallowCopy()
 		err := kongState.Documents.Add(Document{
 			Document: *document,
 		})

@@ -89,7 +89,7 @@ func getDocument(txn *memdb.Txn, parentKey string, IDs ...string) (*Document, er
 	for _, id := range IDs {
 		for _, document := range documents {
 			if id == *document.ID || id == *document.Path {
-				return &Document{Document: *document.DeepCopy()}, nil
+				return &Document{Document: *document.ShallowCopy()}, nil
 			}
 		}
 	}
@@ -104,11 +104,11 @@ func getAllDocsByParentKey(txn *memdb.Txn, parentKey string) ([]*Document, error
 
 	var documents []*Document
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		v, ok := el.(*Document)
+		d, ok := el.(*Document)
 		if !ok {
 			panic(unexpectedType)
 		}
-		documents = append(documents, &Document{Document: *v.DeepCopy()})
+		documents = append(documents, &Document{Document: *d.ShallowCopy()})
 	}
 	return documents, nil
 }
@@ -184,11 +184,11 @@ func (k *DocumentsCollection) GetAll() ([]*Document, error) {
 
 	var res []*Document
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		s, ok := el.(*Document)
+		d, ok := el.(*Document)
 		if !ok {
 			panic(unexpectedType)
 		}
-		res = append(res, &Document{Document: *s.DeepCopy()})
+		res = append(res, &Document{Document: *d.ShallowCopy()})
 	}
 	txn.Commit()
 	return res, nil
