@@ -19,11 +19,11 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 		return nil, fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := doc.Parent.URL() + "/documents"
+	endpoint := doc.Parent.URL() + "/documents/"
 	method := "POST"
 	if doc.ID != nil {
 		method = "PUT"
-		endpoint = endpoint + "/" + *doc.ID
+		endpoint = endpoint + *doc.ID
 	}
 	req, err := d.client.NewRequest(method, endpoint, nil, doc)
 	if err != nil {
@@ -50,7 +50,7 @@ func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
 		return fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := doc.Parent.URL() + "/documents/" + *doc.ID
+	endpoint := fmt.Sprintf("%s/documents/%s", doc.Parent.URL(), *doc.ID)
 	req, err := d.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -77,7 +77,7 @@ func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document,
 	// Document PATCHes run through POST validation logic. Attempting to PATCH a Published: true
 	// document without toggling Published results in a 400, as if you'd tried to POST another
 	// Published: true document under the same resource.
-	endpoint := doc.Parent.URL() + "/documents/" + *doc.ID
+	endpoint := fmt.Sprintf("%s/documents/%s", doc.Parent.URL(), *doc.ID)
 	delReq, err := d.client.NewRequest("DELETE", endpoint, nil, doc)
 	if err != nil {
 		return nil, err
