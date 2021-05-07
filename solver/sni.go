@@ -12,7 +12,7 @@ type sniCRUD struct {
 	client *kong.Client
 }
 
-func sniFromStuct(arg diff.Event) *state.SNI {
+func sniFromStruct(arg diff.Event) *state.SNI {
 	sni, ok := arg.Obj.(*state.SNI)
 	if !ok {
 		panic("unexpected type, expected *state.SNI")
@@ -27,7 +27,7 @@ func sniFromStuct(arg diff.Event) *state.SNI {
 // It returns a the created *state.SNI.
 func (s *sniCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sni := sniFromStuct(event)
+	sni := sniFromStruct(event)
 	createdSNI, err := s.client.SNIs.Create(nil, &sni.SNI)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *sniCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.SNI.
 func (s *sniCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sni := sniFromStuct(event)
+	sni := sniFromStruct(event)
 	err := s.client.SNIs.Delete(nil, sni.ID)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *sniCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.SNI.
 func (s *sniCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sni := sniFromStuct(event)
+	sni := sniFromStruct(event)
 
 	updatedSNI, err := s.client.SNIs.Create(nil, &sni.SNI)
 	if err != nil {

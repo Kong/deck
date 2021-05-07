@@ -12,7 +12,7 @@ type consumerCRUD struct {
 	client *kong.Client
 }
 
-func consumerFromStuct(arg diff.Event) *state.Consumer {
+func consumerFromStruct(arg diff.Event) *state.Consumer {
 	consumer, ok := arg.Obj.(*state.Consumer)
 	if !ok {
 		panic("unexpected type, expected *state.consumer")
@@ -26,7 +26,7 @@ func consumerFromStuct(arg diff.Event) *state.Consumer {
 // It returns a the created *state.Consumer.
 func (s *consumerCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	consumer := consumerFromStuct(event)
+	consumer := consumerFromStruct(event)
 	createdConsumer, err := s.client.Consumers.Create(nil, &consumer.Consumer)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *consumerCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Consumer.
 func (s *consumerCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	consumer := consumerFromStuct(event)
+	consumer := consumerFromStruct(event)
 	err := s.client.Consumers.Delete(nil, consumer.ID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *consumerCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Consumer.
 func (s *consumerCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	consumer := consumerFromStuct(event)
+	consumer := consumerFromStruct(event)
 
 	updatedConsumer, err := s.client.Consumers.Create(nil, &consumer.Consumer)
 	if err != nil {

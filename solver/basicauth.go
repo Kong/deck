@@ -13,7 +13,7 @@ type basicAuthCRUD struct {
 	client *kong.Client
 }
 
-func basicAuthFromStuct(arg diff.Event) *state.BasicAuth {
+func basicAuthFromStruct(arg diff.Event) *state.BasicAuth {
 	basicAuth, ok := arg.Obj.(*state.BasicAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func basicAuthFromStuct(arg diff.Event) *state.BasicAuth {
 // It returns a the created *state.Route.
 func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	basicAuth := basicAuthFromStuct(event)
+	basicAuth := basicAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(basicAuth.Consumer.Username) {
 		cid = *basicAuth.Consumer.Username
@@ -50,7 +50,7 @@ func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	basicAuth := basicAuthFromStuct(event)
+	basicAuth := basicAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(basicAuth.Consumer.Username) {
 		cid = *basicAuth.Consumer.Username
@@ -71,7 +71,7 @@ func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *basicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	basicAuth := basicAuthFromStuct(event)
+	basicAuth := basicAuthFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(basicAuth.Consumer.Username) {

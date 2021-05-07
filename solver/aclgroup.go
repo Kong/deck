@@ -13,7 +13,7 @@ type aclGroupCRUD struct {
 	client *kong.Client
 }
 
-func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
+func aclGroupFromStruct(arg diff.Event) *state.ACLGroup {
 	aclGroup, ok := arg.Obj.(*state.ACLGroup)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
 // It returns a the created *state.Route.
 func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
 		cid = *aclGroup.Consumer.Username
@@ -50,7 +50,7 @@ func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
 		cid = *aclGroup.Consumer.Username
@@ -71,7 +71,7 @@ func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *aclGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {

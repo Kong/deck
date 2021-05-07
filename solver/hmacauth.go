@@ -13,7 +13,7 @@ type hmacAuthCRUD struct {
 	client *kong.Client
 }
 
-func hmacAuthFromStuct(arg diff.Event) *state.HMACAuth {
+func hmacAuthFromStruct(arg diff.Event) *state.HMACAuth {
 	hmacAuth, ok := arg.Obj.(*state.HMACAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func hmacAuthFromStuct(arg diff.Event) *state.HMACAuth {
 // It returns a the created *state.Route.
 func (s *hmacAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	hmacAuth := hmacAuthFromStuct(event)
+	hmacAuth := hmacAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(hmacAuth.Consumer.Username) {
 		cid = *hmacAuth.Consumer.Username
@@ -50,7 +50,7 @@ func (s *hmacAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *hmacAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	hmacAuth := hmacAuthFromStuct(event)
+	hmacAuth := hmacAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(hmacAuth.Consumer.Username) {
 		cid = *hmacAuth.Consumer.Username
@@ -71,7 +71,7 @@ func (s *hmacAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *hmacAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	hmacAuth := hmacAuthFromStuct(event)
+	hmacAuth := hmacAuthFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(hmacAuth.Consumer.Username) {

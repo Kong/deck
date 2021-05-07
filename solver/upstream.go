@@ -12,7 +12,7 @@ type upstreamCRUD struct {
 	client *kong.Client
 }
 
-func upstreamFromStuct(arg diff.Event) *state.Upstream {
+func upstreamFromStruct(arg diff.Event) *state.Upstream {
 	upstream, ok := arg.Obj.(*state.Upstream)
 	if !ok {
 		panic("unexpected type, expected *state.upstream")
@@ -26,7 +26,7 @@ func upstreamFromStuct(arg diff.Event) *state.Upstream {
 // It returns a the created *state.Upstream.
 func (s *upstreamCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	upstream := upstreamFromStuct(event)
+	upstream := upstreamFromStruct(event)
 	createdUpstream, err := s.client.Upstreams.Create(nil, &upstream.Upstream)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *upstreamCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Upstream.
 func (s *upstreamCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	upstream := upstreamFromStuct(event)
+	upstream := upstreamFromStruct(event)
 	err := s.client.Upstreams.Delete(nil, upstream.ID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *upstreamCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Upstream.
 func (s *upstreamCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	upstream := upstreamFromStuct(event)
+	upstream := upstreamFromStruct(event)
 
 	updatedUpstream, err := s.client.Upstreams.Create(nil, &upstream.Upstream)
 	if err != nil {

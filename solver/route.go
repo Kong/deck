@@ -12,7 +12,7 @@ type routeCRUD struct {
 	client *kong.Client
 }
 
-func routeFromStuct(arg diff.Event) *state.Route {
+func routeFromStruct(arg diff.Event) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -27,7 +27,7 @@ func routeFromStuct(arg diff.Event) *state.Route {
 // It returns a the created *state.Route.
 func (s *routeCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	route := routeFromStuct(event)
+	route := routeFromStruct(event)
 	createdRoute, err := s.client.Routes.Create(nil, &route.Route)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *routeCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *routeCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	route := routeFromStuct(event)
+	route := routeFromStruct(event)
 	err := s.client.Routes.Delete(nil, route.ID)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *routeCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *routeCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	route := routeFromStuct(event)
+	route := routeFromStruct(event)
 
 	updatedRoute, err := s.client.Routes.Create(nil, &route.Route)
 	if err != nil {

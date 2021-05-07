@@ -12,7 +12,7 @@ type caCertificateCRUD struct {
 	client *kong.Client
 }
 
-func caCertFromStuct(arg diff.Event) *state.CACertificate {
+func caCertFromStruct(arg diff.Event) *state.CACertificate {
 	caCert, ok := arg.Obj.(*state.CACertificate)
 	if !ok {
 		panic("unexpected type, expected *state.CACertificate")
@@ -26,7 +26,7 @@ func caCertFromStuct(arg diff.Event) *state.CACertificate {
 // It returns a the created *state.CACertificate.
 func (s *caCertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := caCertFromStuct(event)
+	certificate := caCertFromStruct(event)
 	createdCertificate, err := s.client.CACertificates.Create(nil,
 		&certificate.CACertificate)
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *caCertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.CACertificate.
 func (s *caCertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := caCertFromStuct(event)
+	certificate := caCertFromStruct(event)
 	err := s.client.CACertificates.Delete(nil, certificate.ID)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *caCertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.CACertificate.
 func (s *caCertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := caCertFromStuct(event)
+	certificate := caCertFromStruct(event)
 	updatedCertificate, err := s.client.CACertificates.Create(nil,
 		&certificate.CACertificate)
 	if err != nil {

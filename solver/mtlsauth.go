@@ -13,7 +13,7 @@ type mtlsAuthCRUD struct {
 	client *kong.Client
 }
 
-func mtlsAuthFromStuct(arg diff.Event) *state.MTLSAuth {
+func mtlsAuthFromStruct(arg diff.Event) *state.MTLSAuth {
 	mtlsAuth, ok := arg.Obj.(*state.MTLSAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func mtlsAuthFromStuct(arg diff.Event) *state.MTLSAuth {
 // It returns a the created *state.Route.
 func (s *mtlsAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	mtlsAuth := mtlsAuthFromStuct(event)
+	mtlsAuth := mtlsAuthFromStruct(event)
 	createdMTLSAuth, err := s.client.MTLSAuths.Create(nil, mtlsAuth.Consumer.ID,
 		&mtlsAuth.MTLSAuth)
 	if err != nil {
@@ -43,7 +43,7 @@ func (s *mtlsAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *mtlsAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	mtlsAuth := mtlsAuthFromStuct(event)
+	mtlsAuth := mtlsAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(mtlsAuth.Consumer.Username) {
 		cid = *mtlsAuth.Consumer.Username
@@ -64,7 +64,7 @@ func (s *mtlsAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *mtlsAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	mtlsAuth := mtlsAuthFromStuct(event)
+	mtlsAuth := mtlsAuthFromStruct(event)
 
 	updatedMTLSAuth, err := s.client.MTLSAuths.Create(nil, mtlsAuth.Consumer.ID,
 		&mtlsAuth.MTLSAuth)

@@ -13,7 +13,7 @@ type oauth2CredCRUD struct {
 	client *kong.Client
 }
 
-func oauth2CredFromStuct(arg diff.Event) *state.Oauth2Credential {
+func oauth2CredFromStruct(arg diff.Event) *state.Oauth2Credential {
 	oauth2Cred, ok := arg.Obj.(*state.Oauth2Credential)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func oauth2CredFromStuct(arg diff.Event) *state.Oauth2Credential {
 // It returns a the created *state.Route.
 func (s *oauth2CredCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	oauth2Cred := oauth2CredFromStuct(event)
+	oauth2Cred := oauth2CredFromStruct(event)
 	cid := ""
 	if !utils.Empty(oauth2Cred.Consumer.Username) {
 		cid = *oauth2Cred.Consumer.Username
@@ -50,7 +50,7 @@ func (s *oauth2CredCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *oauth2CredCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	oauth2Cred := oauth2CredFromStuct(event)
+	oauth2Cred := oauth2CredFromStruct(event)
 	cid := ""
 	if !utils.Empty(oauth2Cred.Consumer.Username) {
 		cid = *oauth2Cred.Consumer.Username
@@ -71,7 +71,7 @@ func (s *oauth2CredCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *oauth2CredCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	oauth2Cred := oauth2CredFromStuct(event)
+	oauth2Cred := oauth2CredFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(oauth2Cred.Consumer.Username) {

@@ -13,7 +13,7 @@ type jwtAuthCRUD struct {
 	client *kong.Client
 }
 
-func jwtAuthFromStuct(arg diff.Event) *state.JWTAuth {
+func jwtAuthFromStruct(arg diff.Event) *state.JWTAuth {
 	jwtAuth, ok := arg.Obj.(*state.JWTAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -28,7 +28,7 @@ func jwtAuthFromStuct(arg diff.Event) *state.JWTAuth {
 // It returns a the created *state.Route.
 func (s *jwtAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
 		cid = *jwtAuth.Consumer.Username
@@ -50,7 +50,7 @@ func (s *jwtAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Route.
 func (s *jwtAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
 		cid = *jwtAuth.Consumer.Username
@@ -71,7 +71,7 @@ func (s *jwtAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Route.
 func (s *jwtAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
