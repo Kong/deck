@@ -491,12 +491,10 @@ func (in *FServicePackage) DeepCopyInto(out *FServicePackage) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	if in.Documents != nil {
-		in, out := &in.Documents, &out.Documents
-		*out = make([]FDocument, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+	if in.Document != nil {
+		in, out := &in.Document, &out.Document
+		*out = new(FDocument)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -529,12 +527,10 @@ func (in *FServiceVersion) DeepCopyInto(out *FServiceVersion) {
 		*out = new(Implementation)
 		(*in).DeepCopyInto(*out)
 	}
-	if in.Documents != nil {
-		in, out := &in.Documents, &out.Documents
-		*out = make([]FDocument, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+	if in.Document != nil {
+		in, out := &in.Document, &out.Document
+		*out = new(FDocument)
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }

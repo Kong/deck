@@ -1753,12 +1753,10 @@ func Test_stateBuilder_documents(t *testing.T) {
 					ServicePackages: []FServicePackage{
 						{
 							Name: kong.String("foo"),
-							Documents: []FDocument{
-								{
-									Path:      kong.String("/foo.md"),
-									Published: kong.Bool(true),
-									Content:   kong.String("foo"),
-								},
+							Document: &FDocument{
+								Path:      kong.String("/foo.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("foo"),
 							},
 						},
 					},
@@ -1793,12 +1791,10 @@ func Test_stateBuilder_documents(t *testing.T) {
 					ServicePackages: []FServicePackage{
 						{
 							Name: kong.String("bar"),
-							Documents: []FDocument{
-								{
-									Path:      kong.String("/bar.md"),
-									Published: kong.Bool(true),
-									Content:   kong.String("bar"),
-								},
+							Document: &FDocument{
+								Path:      kong.String("/bar.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("bar"),
 							},
 						},
 					},

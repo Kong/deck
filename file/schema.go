@@ -786,11 +786,8 @@ const contentSchema = `{
         "description": {
           "type": "string"
         },
-        "documents": {
-          "items": {
-            "$ref": "#/definitions/FDocument"
-          },
-          "type": "array"
+        "document": {
+          "$ref": "#/definitions/FDocument"
         },
         "id": {
           "type": "string"
@@ -814,12 +811,9 @@ const contentSchema = `{
         "version"
       ],
       "properties": {
-        "documents": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/FDocument"
-          },
-          "type": "array"
+        "document": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/FDocument"
         },
         "id": {
           "type": "string"

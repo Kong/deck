@@ -21,24 +21,20 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 	root := filepath.Dir(filenames[0])
 	for _, sp := range c.ServicePackages {
 		spPath := utils.NameToFilename(*sp.Name)
-		for i, d := range sp.Documents {
-			path := filepath.Join(root, spPath, utils.NameToFilename(*d.Path))
+		path := filepath.Join(root, spPath, utils.NameToFilename(*sp.Document.Path))
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return errors.Wrap(err, "error reading document file")
+		}
+		sp.Document.Content = kong.String(string(content))
+		for _, sv := range sp.Versions {
+			path := filepath.Join(root, spPath, utils.NameToFilename(*sv.Version),
+				utils.NameToFilename(*sv.Document.Path))
 			content, err := os.ReadFile(path)
 			if err != nil {
 				return errors.Wrap(err, "error reading document file")
 			}
-			sp.Documents[i].Content = kong.String(string(content))
-		}
-		for _, sv := range sp.Versions {
-			for i, d := range sv.Documents {
-				path := filepath.Join(root, spPath, utils.NameToFilename(*sv.Version),
-					utils.NameToFilename(*d.Path))
-				content, err := os.ReadFile(path)
-				if err != nil {
-					return errors.Wrap(err, "error reading document file")
-				}
-				sv.Documents[i].Content = kong.String(string(content))
-			}
+			sv.Document.Content = kong.String(string(content))
 		}
 	}
 	return nil

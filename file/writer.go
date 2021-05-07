@@ -154,7 +154,10 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 				Content:   d.Content,
 			}
 			utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
-			p.Documents = append(p.Documents, fDocument)
+			p.Document = &fDocument
+			// Although the documents API returns a list of documents and does support multiple documents,
+			// we pretend there's only one because that's all the web UI allows.
+			break
 		}
 
 		for _, v := range versions {
@@ -190,7 +193,8 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 					Content:   d.Content,
 				}
 				utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
-				fVersion.Documents = append(fVersion.Documents, fDocument)
+				fVersion.Document = &fDocument
+				break
 			}
 			utils.ZeroOutID(&fVersion, fVersion.Version, config.WithID)
 			p.Versions = append(p.Versions, fVersion)
@@ -624,30 +628,26 @@ func writeFile(content *Content, filename string, format Format) error {
 		}
 		for _, sp := range content.ServicePackages {
 			safePackageName := utils.NameToFilename(*sp.Name)
-			if len(sp.Documents) > 0 {
+			if sp.Document != nil {
 				if err := os.MkdirAll(filepath.Join(prefix, safePackageName), 0700); err != nil {
 					return errors.Wrap(err, "creating document directory")
 				}
-				for _, d := range sp.Documents {
-					safeDocPath := utils.NameToFilename(*d.Path)
-					if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeDocPath),
-						[]byte(*d.Content), 0600); err != nil {
-						return errors.Wrap(err, "writing document file")
-					}
+				safeDocPath := utils.NameToFilename(*sp.Document.Path)
+				if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeDocPath),
+					[]byte(*sp.Document.Content), 0600); err != nil {
+					return errors.Wrap(err, "writing document file")
 				}
 			}
 			for _, v := range sp.Versions {
-				if len(v.Documents) > 0 {
+				if v.Document != nil {
 					safeVersionName := utils.NameToFilename(*v.Version)
 					if err := os.MkdirAll(filepath.Join(prefix, safePackageName, safeVersionName), 0700); err != nil {
 						return errors.Wrap(err, "creating document directory")
 					}
-					for _, d := range v.Documents {
-						safeDocPath := utils.NameToFilename(*d.Path)
-						if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeVersionName, safeDocPath),
-							[]byte(*d.Content), 0600); err != nil {
-							return errors.Wrap(err, "writing document file")
-						}
+					safeDocPath := utils.NameToFilename(*v.Document.Path)
+					if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeVersionName, safeDocPath),
+						[]byte(*v.Document.Content), 0600); err != nil {
+						return errors.Wrap(err, "writing document file")
 					}
 				}
 			}
