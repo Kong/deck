@@ -12,7 +12,7 @@ type servicePackageCRUD struct {
 	client *konnect.Client
 }
 
-func servicePackageFromStuct(arg diff.Event) *state.ServicePackage {
+func servicePackageFromStruct(arg diff.Event) *state.ServicePackage {
 	sp, ok := arg.Obj.(*state.ServicePackage)
 	if !ok {
 		panic("unexpected type, expected *state.ServicePackage")
@@ -26,7 +26,7 @@ func servicePackageFromStuct(arg diff.Event) *state.ServicePackage {
 // It returns a the created *state.ServicePackage.
 func (s *servicePackageCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
+	sp := servicePackageFromStruct(event)
 	createdSP, err := s.client.ServicePackages.Create(nil, &sp.ServicePackage)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *servicePackageCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.ServicePackage.
 func (s *servicePackageCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
+	sp := servicePackageFromStruct(event)
 	err := s.client.ServicePackages.Delete(nil, sp.ID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *servicePackageCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.ServicePackage.
 func (s *servicePackageCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
+	sp := servicePackageFromStruct(event)
 
 	updatedSP, err := s.client.ServicePackages.Update(nil, &sp.ServicePackage)
 	if err != nil {

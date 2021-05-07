@@ -12,7 +12,7 @@ type pluginCRUD struct {
 	client *kong.Client
 }
 
-func pluginFromStuct(arg diff.Event) *state.Plugin {
+func pluginFromStruct(arg diff.Event) *state.Plugin {
 	plugin, ok := arg.Obj.(*state.Plugin)
 	if !ok {
 		panic("unexpected type, expected *state.Plugin")
@@ -27,7 +27,7 @@ func pluginFromStuct(arg diff.Event) *state.Plugin {
 // It returns a the created *state.Plugin.
 func (s *pluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
+	plugin := pluginFromStruct(event)
 
 	createdPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *pluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Plugin.
 func (s *pluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
+	plugin := pluginFromStruct(event)
 	err := s.client.Plugins.Delete(nil, plugin.ID)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *pluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Plugin.
 func (s *pluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
+	plugin := pluginFromStruct(event)
 
 	updatedPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
 	if err != nil {

@@ -12,7 +12,7 @@ type certificateCRUD struct {
 	client *kong.Client
 }
 
-func certificateFromStuct(arg diff.Event) *state.Certificate {
+func certificateFromStruct(arg diff.Event) *state.Certificate {
 	certificate, ok := arg.Obj.(*state.Certificate)
 	if !ok {
 		panic("unexpected type, expected *state.certificate")
@@ -26,7 +26,7 @@ func certificateFromStuct(arg diff.Event) *state.Certificate {
 // It returns a the created *state.Certificate.
 func (s *certificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := certificateFromStuct(event)
+	certificate := certificateFromStruct(event)
 	createdCertificate, err := s.client.Certificates.Create(nil, &certificate.Certificate)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *certificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Certificate.
 func (s *certificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := certificateFromStuct(event)
+	certificate := certificateFromStruct(event)
 	err := s.client.Certificates.Delete(nil, certificate.ID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *certificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Certificate.
 func (s *certificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	certificate := certificateFromStuct(event)
+	certificate := certificateFromStruct(event)
 
 	updatedCertificate, err := s.client.Certificates.Create(nil, &certificate.Certificate)
 	if err != nil {

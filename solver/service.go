@@ -12,7 +12,7 @@ type serviceCRUD struct {
 	client *kong.Client
 }
 
-func serviceFromStuct(arg diff.Event) *state.Service {
+func serviceFromStruct(arg diff.Event) *state.Service {
 	service, ok := arg.Obj.(*state.Service)
 	if !ok {
 		panic("unexpected type, expected *state.service")
@@ -26,7 +26,7 @@ func serviceFromStuct(arg diff.Event) *state.Service {
 // It returns a the created *state.Service.
 func (s *serviceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	service := serviceFromStuct(event)
+	service := serviceFromStruct(event)
 	createdService, err := s.client.Services.Create(nil, &service.Service)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *serviceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.Service.
 func (s *serviceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	service := serviceFromStuct(event)
+	service := serviceFromStruct(event)
 	err := s.client.Services.Delete(nil, service.ID)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (s *serviceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.Service.
 func (s *serviceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	service := serviceFromStuct(event)
+	service := serviceFromStruct(event)
 
 	updatedService, err := s.client.Services.Create(nil, &service.Service)
 	if err != nil {

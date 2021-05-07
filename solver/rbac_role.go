@@ -12,7 +12,7 @@ type rbacRoleCRUD struct {
 	client *kong.Client
 }
 
-func rbacRoleFromStuct(arg diff.Event) *state.RBACRole {
+func rbacRoleFromStruct(arg diff.Event) *state.RBACRole {
 	role, ok := arg.Obj.(*state.RBACRole)
 	if !ok {
 		panic("unexpected type, expected *state.RBACRole")
@@ -27,7 +27,7 @@ func rbacRoleFromStuct(arg diff.Event) *state.RBACRole {
 // It returns a the created *state.RBACRole.
 func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	role := rbacRoleFromStuct(event)
+	role := rbacRoleFromStruct(event)
 	createdRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the deleted *state.RBACRole.
 func (s *rbacRoleCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	role := rbacRoleFromStuct(event)
+	role := rbacRoleFromStruct(event)
 	err := s.client.RBACRoles.Delete(nil, role.ID)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *rbacRoleCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // It returns a the updated *state.RBACRole.
 func (s *rbacRoleCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	role := rbacRoleFromStuct(event)
+	role := rbacRoleFromStruct(event)
 
 	updatedRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
 	if err != nil {
