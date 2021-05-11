@@ -33,6 +33,8 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
+	targetContent.StripLocalDocumentPath()
+
 	// get Konnect client
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
 )
 
@@ -132,6 +133,7 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 	}
 
 	for _, sp := range packages {
+		safePackageName := utils.NameToFilename(*sp.Name)
 		p := FServicePackage{
 			ID:          sp.ID,
 			Name:        sp.Name,
@@ -147,9 +149,10 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		}
 
 		for _, d := range documents {
+			safeDocPath := utils.NameToFilename(*d.Path)
 			fDocument := FDocument{
 				ID:        d.ID,
-				Path:      d.Path,
+				Path:      kong.String(filepath.Join(safePackageName, safeDocPath)),
 				Published: d.Published,
 				Content:   d.Content,
 			}
@@ -161,6 +164,7 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		}
 
 		for _, v := range versions {
+			safeVersionName := utils.NameToFilename(*v.Version)
 			fVersion := FServiceVersion{
 				ID:      v.ID,
 				Version: v.Version,
@@ -186,9 +190,10 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 			}
 
 			for _, d := range documents {
+				safeDocPath := utils.NameToFilename(*d.Path)
 				fDocument := FDocument{
 					ID:        d.ID,
-					Path:      d.Path,
+					Path:      kong.String(filepath.Join(safePackageName, safeVersionName, safeDocPath)),
 					Published: d.Published,
 					Content:   d.Content,
 				}
@@ -627,25 +632,21 @@ func writeFile(content *Content, filename string, format Format) error {
 			return errors.Wrap(err, "writing file")
 		}
 		for _, sp := range content.ServicePackages {
-			safePackageName := utils.NameToFilename(*sp.Name)
 			if sp.Document != nil {
-				if err := os.MkdirAll(filepath.Join(prefix, safePackageName), 0700); err != nil {
+				if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*sp.Document.Path)), 0700); err != nil {
 					return errors.Wrap(err, "creating document directory")
 				}
-				safeDocPath := utils.NameToFilename(*sp.Document.Path)
-				if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeDocPath),
+				if err := os.WriteFile(filepath.Join(prefix, *sp.Document.Path),
 					[]byte(*sp.Document.Content), 0600); err != nil {
 					return errors.Wrap(err, "writing document file")
 				}
 			}
 			for _, v := range sp.Versions {
 				if v.Document != nil {
-					safeVersionName := utils.NameToFilename(*v.Version)
-					if err := os.MkdirAll(filepath.Join(prefix, safePackageName, safeVersionName), 0700); err != nil {
+					if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*v.Document.Path)), 0700); err != nil {
 						return errors.Wrap(err, "creating document directory")
 					}
-					safeDocPath := utils.NameToFilename(*v.Document.Path)
-					if err := os.WriteFile(filepath.Join(prefix, safePackageName, safeVersionName, safeDocPath),
+					if err := os.WriteFile(filepath.Join(prefix, *v.Document.Path),
 						[]byte(*v.Document.Content), 0600); err != nil {
 						return errors.Wrap(err, "writing document file")
 					}

@@ -17,12 +17,13 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 		return errors.New("cannot populate documents without a location")
 	}
 	// TODO decK actually allows you to use _multiple_ state files
-	// How should we choose which to use as the search path for documents?
+	// We currently choose the first arbitrarily and assume document content is under its directory
+	// Future plans are to rework the multiple state file functionality to require all state files
+	// be in the same directory.
 	root := filepath.Dir(filenames[0])
 	for _, sp := range c.ServicePackages {
-		spPath := utils.NameToFilename(*sp.Name)
 		if sp.Document != nil {
-			path := filepath.Join(root, spPath, utils.NameToFilename(*sp.Document.Path))
+			path := filepath.Join(root, utils.FilenameToName(*sp.Document.Path))
 			content, err := os.ReadFile(path)
 			if err != nil {
 				return errors.Wrap(err, "error reading document file")
@@ -31,8 +32,7 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 		}
 		for _, sv := range sp.Versions {
 			if sv.Document != nil {
-				path := filepath.Join(root, spPath, utils.NameToFilename(*sv.Version),
-					utils.NameToFilename(*sv.Document.Path))
+				path := filepath.Join(root, utils.FilenameToName(*sv.Document.Path))
 				content, err := os.ReadFile(path)
 				if err != nil {
 					return errors.Wrap(err, "error reading document file")
@@ -42,4 +42,20 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 		}
 	}
 	return nil
+}
+
+// StripLocalDocum
+func (c Content) StripLocalDocumentPath() {
+	for _, sp := range c.ServicePackages {
+		if sp.Document != nil {
+			trunc := "/" + filepath.Base(utils.FilenameToName(*sp.Document.Path))
+			sp.Document.Path = &trunc
+		}
+		for _, sv := range sp.Versions {
+			if sv.Document != nil {
+				trunc := "/" + filepath.Base(utils.FilenameToName(*sv.Document.Path))
+				sv.Document.Path = &trunc
+			}
+		}
+	}
 }

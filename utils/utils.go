@@ -79,3 +79,10 @@ func NameToFilename(name string) string {
 	s = strings.ReplaceAll(s, string(os.PathSeparator), url.PathEscape(string(os.PathSeparator)))
 	return s
 }
+
+// FilenameToName (partially) reverses NameToFilename, replacing all URL-encoded path separator characters
+// with the path separator character. It does not re-add a leading separator, because there is no way to know
+// if that separator was included originally, and only some names (document paths) typically include one.
+func FilenameToName(filename string) string {
+	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
+}
