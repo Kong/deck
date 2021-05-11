@@ -44,7 +44,9 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 	return nil
 }
 
-// StripLocalDocum
+// StripLocalDocumentPath removes local path information from a target state document, returning the base path with a
+// prepended slash. These path values match typical path values for documents created in the Konnect GUI, whereas path
+// values in decK state files are local relative paths with service package and service version directories.
 func (c Content) StripLocalDocumentPath() {
 	for _, sp := range c.ServicePackages {
 		if sp.Document != nil {
