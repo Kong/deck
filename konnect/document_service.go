@@ -76,22 +76,14 @@ func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document,
 
 	// Document PATCHes run through POST validation logic. Attempting to PATCH a Published: true
 	// document without toggling Published results in a 400, as if you'd tried to POST another
-	// Published: true document under the same resource.
+	// Published: true document under the same resource. As such, this PUTs instead.
 	endpoint := fmt.Sprintf("%s/documents/%s", doc.Parent.URL(), *doc.ID)
-	delReq, err := d.client.NewRequest("DELETE", endpoint, nil, doc)
-	if err != nil {
-		return nil, err
-	}
 	putReq, err := d.client.NewRequest("PUT", endpoint, nil, doc)
 	if err != nil {
 		return nil, err
 	}
 
 	var updatedDoc Document
-	_, err = d.client.Do(ctx, delReq, nil)
-	if err != nil {
-		return nil, err
-	}
 	_, err = d.client.Do(ctx, putReq, &updatedDoc)
 	if err != nil {
 		return nil, err
