@@ -437,26 +437,27 @@ func (b *stateBuilder) konnect() {
 			Description: targetSP.Description,
 		}
 
-		// documents associated with the package
-		targetKonnectDoc := konnect.Document{
-			ID:        targetSP.Document.ID,
-			Path:      targetSP.Document.Path,
-			Published: targetSP.Document.Published,
-			Content:   targetSP.Document.Content,
-			Parent:    &targetKonnectSP,
-		}
-		if utils.Empty(targetKonnectDoc.ID) {
-			currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSP, *targetKonnectDoc.Path)
-			if err == state.ErrNotFound {
-				targetKonnectDoc.ID = uuid()
-			} else if err != nil {
-				b.err = err
-				return
-			} else {
-				targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+		if targetSP.Document != nil {
+			targetKonnectDoc := konnect.Document{
+				ID:        targetSP.Document.ID,
+				Path:      targetSP.Document.Path,
+				Published: targetSP.Document.Published,
+				Content:   targetSP.Document.Content,
+				Parent:    &targetKonnectSP,
 			}
+			if utils.Empty(targetKonnectDoc.ID) {
+				currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSP, *targetKonnectDoc.Path)
+				if err == state.ErrNotFound {
+					targetKonnectDoc.ID = uuid()
+				} else if err != nil {
+					b.err = err
+					return
+				} else {
+					targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+				}
+			}
+			b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
 		}
-		b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
 
 		// versions associated with the package
 		for _, targetSV := range targetSP.Versions {
@@ -493,25 +494,27 @@ func (b *stateBuilder) konnect() {
 					targetKonnectSV.ControlPlaneServiceRelation.ID = &targetRelationID
 				}
 			}
-			targetKonnectDoc := konnect.Document{
-				ID:        targetSV.Document.ID,
-				Path:      targetSV.Document.Path,
-				Published: targetSV.Document.Published,
-				Content:   targetSV.Document.Content,
-				Parent:    &targetKonnectSV,
-			}
-			if utils.Empty(targetKonnectDoc.ID) {
-				currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSV, *targetKonnectDoc.Path)
-				if err == state.ErrNotFound {
-					targetKonnectDoc.ID = uuid()
-				} else if err != nil {
-					b.err = err
-					return
-				} else {
-					targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+			if targetSV.Document != nil {
+				targetKonnectDoc := konnect.Document{
+					ID:        targetSV.Document.ID,
+					Path:      targetSV.Document.Path,
+					Published: targetSV.Document.Published,
+					Content:   targetSV.Document.Content,
+					Parent:    &targetKonnectSV,
 				}
+				if utils.Empty(targetKonnectDoc.ID) {
+					currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSV, *targetKonnectDoc.Path)
+					if err == state.ErrNotFound {
+						targetKonnectDoc.ID = uuid()
+					} else if err != nil {
+						b.err = err
+						return
+					} else {
+						targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+					}
+				}
+				b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
 			}
-			b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
 			targetKonnectSP.Versions = append(targetKonnectSP.Versions, targetKonnectSV)
 		}
 
