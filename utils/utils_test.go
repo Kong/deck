@@ -182,3 +182,29 @@ func Test_NameToFilename(t *testing.T) {
 		})
 	}
 }
+
+func Test_FilenameToName(t *testing.T) {
+	type args struct {
+		filename string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "inner separator",
+			args: args{
+				filename: "bar" + url.PathEscape(string(os.PathSeparator)) + "foo.md",
+			},
+			want: "bar" + string(os.PathSeparator) + "foo.md",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FilenameToName(tt.args.filename); got != tt.want {
+				t.Errorf("FilenameToName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
