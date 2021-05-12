@@ -34,3 +34,7 @@ issues:
     - gosec
     text:  "Expect WriteFile permissions to be 0600 or less"
     path: file/codegen/main.go
+  - linters:
+    - lll
+    text: "long line in test string"
+    path: solver/utils_test.go
