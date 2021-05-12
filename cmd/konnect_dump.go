@@ -29,6 +29,7 @@ configure Konnect.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := utils.HTTPClient()
+		_ = sendAnalytics("konnect-dump", "")
 
 		if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err

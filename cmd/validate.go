@@ -26,6 +26,7 @@ this command.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		_ = sendAnalytics("validate", "")
 		// read target file
 		// this does json schema validation as well
 		targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
