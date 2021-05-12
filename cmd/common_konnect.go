@@ -30,7 +30,7 @@ func syncKonnect(ctx context.Context,
 
 	err = targetContent.PopulateDocumentContent(filenames)
 	if err != nil {
-		return err
+		return fmt.Errorf("reading documents: %w", err)
 	}
 
 	targetContent.StripLocalDocumentPath()
