@@ -33,7 +33,13 @@ func getDocumentDiff(a, b *state.Document) (string, error) {
 	var contentDiff string
 	if json.Valid([]byte(aContent)) && json.Valid([]byte(bContent)) {
 		aContent, err = pprintJSONString(aContent)
+		if err != nil {
+			return "", err
+		}
 		bContent, err = pprintJSONString(bContent)
+		if err != nil {
+			return "", err
+		}
 	}
 	edits := myers.ComputeEdits(span.URIFromPath("old"), aContent, bContent)
 	contentDiff = fmt.Sprint(gotextdiff.ToUnified("old", "new", aContent, edits))
