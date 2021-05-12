@@ -31,31 +31,28 @@ func getDocumentDiff(a, b *state.Document) (string, error) {
 		return "", err
 	}
 	var contentDiff string
-	if json.Valid([]byte(aContent)) {
-		var aObj, bObj interface{}
-		err = json.Unmarshal([]byte(aContent), &aObj)
-		if err != nil {
-			return "", err
-		}
-		err = json.Unmarshal([]byte(bContent), &bObj)
-		if err != nil {
-			return "", err
-		}
-		aBytes, err := json.MarshalIndent(aObj, "", "\t")
-		if err != nil {
-			return "", err
-		}
-		bBytes, err := json.MarshalIndent(bObj, "", "\t")
-		if err != nil {
-			return "", err
-		}
-		aContent = string(aBytes)
-		bContent = string(bBytes)
+	if json.Valid([]byte(aContent)) && json.Valid([]byte(bContent)) {
+		aContent, err = pprintJSONString(aContent)
+		bContent, err = pprintJSONString(bContent)
 	}
 	edits := myers.ComputeEdits(span.URIFromPath("old"), aContent, bContent)
 	contentDiff = fmt.Sprint(gotextdiff.ToUnified("old", "new", aContent, edits))
 
 	return objDiff + contentDiff, nil
+}
+
+func pprintJSONString(JSONString string) (string, error) {
+	jBlob := []byte(JSONString)
+	var obj interface{}
+	err := json.Unmarshal(jBlob, &obj)
+	if err != nil {
+		return "", err
+	}
+	bytes, err := json.MarshalIndent(obj, "", "\t")
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
 
 func getDiff(a, b interface{}) (string, error) {
