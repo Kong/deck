@@ -36,5 +36,5 @@ issues:
     path: file/codegen/main.go
   - linters:
     - lll
-    text: "long line in test string"
+    text: "line is 180 characters"
     path: solver/utils_test.go
