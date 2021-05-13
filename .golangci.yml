@@ -10,7 +10,6 @@ linters:
   - golint
   - gosec
   - nakedret
-  - maligned
   - dogsled
   - depguard
 issues:
