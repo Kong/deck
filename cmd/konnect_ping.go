@@ -16,6 +16,7 @@ can connect to Konnect's API endpoint. It also validates the supplied
 credentials.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		_ = utils.SendAnalytics("konnect-ping", VERSION, "")
 		client, err := utils.GetKonnectClient(nil, konnectConfig.Debug)
 		if err != nil {
 			return err

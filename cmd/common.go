@@ -82,10 +82,23 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	// load Kong version after workspace
-	kongVersion, err := kongVersion(ctx, wsConfig)
+	kongVersion, err := fetchKongVersion(ctx, wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
+	parsedKongVersion, err := parseKongVersion(kongVersion)
+	if err != nil {
+		return errors.Wrap(err, "parsing Kong version")
+	}
+
+	// TODO: instead of guessing the cobra command here, move the sendAnalytics
+	// call to the RunE function. That is not trivial because it requires the
+	// workspace name and kong client to be present on that level.
+	cmd := "sync"
+	if dry {
+		cmd = "diff"
+	}
+	_ = sendAnalytics(cmd, kongVersion)
 
 	workspaceExists, err := workspaceExists(ctx, wsConfig)
 	if err != nil {
@@ -135,7 +148,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the target state
 	rawState, err := file.Get(targetContent, file.RenderConfig{
 		CurrentState: currentState,
-		KongVersion:  kongVersion,
+		KongVersion:  parsedKongVersion,
 	})
 	if err != nil {
 		return err
@@ -166,8 +179,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
-func kongVersion(ctx context.Context,
-	config utils.KongClientConfig) (semver.Version, error) {
+func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
 
 	var version string
 
@@ -177,30 +189,33 @@ func kongVersion(ctx context.Context,
 	config.Workspace = ""
 	client, err := utils.GetKongClient(config)
 	if err != nil {
-		return semver.Version{}, err
+		return "", err
 	}
 	root, err := client.Root(ctx)
 	if err != nil {
 		if workspace == "" {
-			return semver.Version{}, err
+			return "", err
 		}
 		// try with workspace path
 		req, err := http.NewRequest("GET",
 			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
 			nil)
 		if err != nil {
-			return semver.Version{}, err
+			return "", err
 		}
 		var resp map[string]interface{}
-		_, err = client.Do(nil, req, &resp)
+		_, err = client.Do(ctx, req, &resp)
 		if err != nil {
-			return semver.Version{}, err
+			return "", err
 		}
 		version = resp["version"].(string)
 	} else {
 		version = root["version"].(string)
 	}
+	return version, nil
+}
 
+func parseKongVersion(version string) (semver.Version, error) {
 	v, err := utils.CleanKongVersion(version)
 	if err != nil {
 		return semver.Version{}, err
@@ -245,4 +260,11 @@ func containsProxyConfiguration(content utils.KongRawState) bool {
 
 func containsRBACConfiguration(content utils.KongRawState) bool {
 	return len(content.RBACRoles) != 0
+}
+
+func sendAnalytics(cmd, kongVersion string) error {
+	if disableAnalytics {
+		return nil
+	}
+	return utils.SendAnalytics(cmd, VERSION, kongVersion)
 }

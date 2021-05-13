@@ -21,6 +21,7 @@ the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		_ = sendAnalytics("konnect-diff", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 			konnectDiffCmdParallelism)
 	},

@@ -43,6 +43,13 @@ By default, this command will ask for a confirmation prompt.`,
 		if err != nil {
 			return err
 		}
+
+		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
+		if err != nil {
+			return errors.Wrap(err, "reading Kong version")
+		}
+		_ = sendAnalytics("reset", kongVersion)
+
 		// Kong OSS or default workspace
 		if !resetAllWorkspaces && resetWorkspace == "" {
 			state, err := dump.Get(ctx, rootClient, dumpConfig)

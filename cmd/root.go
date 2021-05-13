@@ -20,6 +20,8 @@ var (
 	cfgFile       string
 	rootConfig    utils.KongClientConfig
 	konnectConfig utils.KonnectConfig
+
+	disableAnalytics bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -126,6 +128,11 @@ func init() {
 		"File containing password to your Konnect account")
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
+
+	rootCmd.PersistentFlags().Bool("analytics", true,
+		"share anonymized data to help improve decK")
+	viper.BindPFlag("analytics",
+		rootCmd.PersistentFlags().Lookup("analytics"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -189,6 +196,7 @@ func initKonnectConfig() error {
 		password = strings.TrimRight(password, "\n")
 	}
 
+	disableAnalytics = !viper.GetBool("analytics")
 	konnectConfig.Email = viper.GetString("konnect-email")
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)

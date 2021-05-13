@@ -13,6 +13,7 @@ var konnectSyncCmd = &cobra.Command{
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		_ = sendAnalytics("konnect-sync", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 			konnectDiffCmdParallelism)
 	},

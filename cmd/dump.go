@@ -54,6 +54,12 @@ configure Kong.`,
 
 		format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 
+		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
+		if err != nil {
+			return errors.Wrap(err, "reading Kong version")
+		}
+		_ = sendAnalytics("dump", kongVersion)
+
 		// Kong Enterprise dump all workspace
 		if dumpAllWorkspaces {
 			if dumpWorkspace != "" {

@@ -22,10 +22,11 @@ can connect to Kong's Admin API or not.`,
 		ctx := cmd.Context()
 
 		wsConfig := rootConfig.ForWorkspace(pingWorkspace)
-		version, err := kongVersion(ctx, wsConfig)
+		version, err := fetchKongVersion(ctx, wsConfig)
 		if err != nil {
 			return errors.Wrap(err, "reading Kong version")
 		}
+		_ = sendAnalytics("ping", version)
 		fmt.Println("Successfully connected to Kong!")
 		fmt.Println("Kong version: ", version)
 		return nil
