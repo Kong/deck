@@ -12,7 +12,7 @@ require (
 	github.com/google/go-querystring v1.1.0
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.17.0
+	github.com/kong/go-kong v0.18.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect

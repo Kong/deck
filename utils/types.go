@@ -142,7 +142,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "parsing headers")
 	}
-	*c = kong.HTTPClientWithHeaders(c, headers)
+	c = kong.HTTPClientWithHeaders(c, headers)
 
 	url, err := url.ParseRequestURI(address)
 	if err != nil {
