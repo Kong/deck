@@ -8,7 +8,7 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
-func Test_PprintJSONString(t *testing.T) {
+func Test_PrettyPrintJSONString(t *testing.T) {
 	type args struct {
 		jstring string
 	}
@@ -37,13 +37,13 @@ func Test_PprintJSONString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := pprintJSONString(tt.args.jstring)
+			got, err := prettyPrintJSONString(tt.args.jstring)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("pprintJSONString() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("prettyPrintJSONString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("pprintJSONString() = %v\nwant %v", got, tt.want)
+				t.Errorf("prettyPrintJSONString() = %v\nwant %v", got, tt.want)
 			}
 		})
 	}

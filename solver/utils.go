@@ -32,11 +32,11 @@ func getDocumentDiff(a, b *state.Document) (string, error) {
 	}
 	var contentDiff string
 	if json.Valid([]byte(aContent)) && json.Valid([]byte(bContent)) {
-		aContent, err = pprintJSONString(aContent)
+		aContent, err = prettyPrintJSONString(aContent)
 		if err != nil {
 			return "", err
 		}
-		bContent, err = pprintJSONString(bContent)
+		bContent, err = prettyPrintJSONString(bContent)
 		if err != nil {
 			return "", err
 		}
@@ -47,7 +47,7 @@ func getDocumentDiff(a, b *state.Document) (string, error) {
 	return objDiff + contentDiff, nil
 }
 
-func pprintJSONString(JSONString string) (string, error) {
+func prettyPrintJSONString(JSONString string) (string, error) {
 	jBlob := []byte(JSONString)
 	var obj interface{}
 	err := json.Unmarshal(jBlob, &obj)
