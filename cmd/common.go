@@ -80,7 +80,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
-	kongVersion, err := fetchKongVersion(ctx, rootConfig)
+	kongVersion, err := fetchKongVersion(ctx, wsConfig)
 	if err != nil {
 		return errors.Wrap(err, "reading Kong version")
 	}
