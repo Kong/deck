@@ -21,9 +21,15 @@ func Test_PrettyPrintJSONString(t *testing.T) {
 		{
 			name: "basic JSON string",
 			args: args{
-				jstring: "{\"foo\":\"foo\",\"bar\":{\"a\": 1, \"b\": 2}}",
+				jstring: `{"foo":"foo","bar":{"a": 1, "b": 2}}`,
 			},
-			want:    "{\n\t\"bar\": {\n\t\t\"a\": 1,\n\t\t\"b\": 2\n\t},\n\t\"foo\": \"foo\"\n}",
+			want: `{
+	"bar": {
+		"a": 1,
+		"b": 2
+	},
+	"foo": "foo"
+}`,
 			wantErr: false,
 		},
 		{
@@ -68,7 +74,7 @@ func Test_GetDocumentDiff(t *testing.T) {
 						Parent: &konnect.ServiceVersion{
 							ID: kong.String("abc"),
 						},
-						Content: kong.String("{\"foo\":\"foo\",\"bar\":\"bar\"}"),
+						Content: kong.String(`{"foo":"foo","bar":"bar"}`),
 					},
 				},
 				docB: &state.Document{
@@ -77,11 +83,23 @@ func Test_GetDocumentDiff(t *testing.T) {
 						Parent: &konnect.ServiceVersion{
 							ID: kong.String("abc"),
 						},
-						Content: kong.String("{\"foo\":\"foo\",\"bar\":\"bar\",\"baz\":\"baz\"}"),
+						Content: kong.String(`{"foo":"foo","bar":"bar","baz":"baz"}`),
 					},
 				},
 			},
-			want: " {\n   \"path\": \"foo\"\n }\n--- old\n+++ new\n@@ -1,4 +1,5 @@\n {\n \t\"bar\": \"bar\",\n+\t\"baz\": \"baz\",\n \t\"foo\": \"foo\"\n }\n\\ No newline at end of file\n",
+			want: ` {
+   "path": "foo"
+ }
+--- old
++++ new
+@@ -1,4 +1,5 @@
+ {
+ 	"bar": "bar",
++	"baz": "baz",
+ 	"foo": "foo"
+ }
+\ No newline at end of file
+`,
 		},
 		{
 			name: "not JSON",
@@ -92,7 +110,8 @@ func Test_GetDocumentDiff(t *testing.T) {
 						Parent: &konnect.ServiceVersion{
 							ID: kong.String("abc"),
 						},
-						Content: kong.String("foo\n"),
+						Content: kong.String(`foo
+`),
 					},
 				},
 				docB: &state.Document{
@@ -101,11 +120,21 @@ func Test_GetDocumentDiff(t *testing.T) {
 						Parent: &konnect.ServiceVersion{
 							ID: kong.String("abc"),
 						},
-						Content: kong.String("foo\nbar\n"),
+						Content: kong.String(`foo
+bar
+`),
 					},
 				},
 			},
-			want: " {\n   \"path\": \"foo\"\n }\n--- old\n+++ new\n@@ -1 +1,2 @@\n foo\n+bar\n",
+			want: ` {
+   "path": "foo"
+ }
+--- old
++++ new
+@@ -1 +1,2 @@
+ foo
++bar
+`,
 		},
 	}
 	for _, tt := range tests {
