@@ -153,9 +153,18 @@ func getPrefixedEnvVar(key string) (string, error) {
 	return value, nil
 }
 
+func getFileContent(path string) (string, error) {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("reading file: %v", err)
+	}
+	return string(content), nil
+}
+
 func renderTemplate(content string) (string, error) {
 	t := template.New("state").Funcs(template.FuncMap{
-		"env": getPrefixedEnvVar,
+		"env":  getPrefixedEnvVar,
+		"file": getFileContent,
 	}).Delims("${{", "}}")
 	t, err := t.Parse(content)
 	if err != nil {
