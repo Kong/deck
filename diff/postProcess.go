@@ -327,3 +327,20 @@ func (crud serviceVersionPostAction) Delete(args ...crud.Arg) (crud.Arg, error) 
 func (crud serviceVersionPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.ServiceVersions.Update(*args[0].(*state.ServiceVersion))
 }
+
+type documentPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud documentPostAction) Create(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Documents.Add(*args[0].(*state.Document))
+}
+
+func (crud documentPostAction) Delete(args ...crud.Arg) (crud.Arg, error) {
+	d := args[0].(*state.Document)
+	return nil, crud.currentState.Documents.DeleteByParent(d.Parent, *d.ID)
+}
+
+func (crud documentPostAction) Update(args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Documents.Update(*args[0].(*state.Document))
+}

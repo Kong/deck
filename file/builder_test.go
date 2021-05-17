@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -237,6 +238,27 @@ func existingTargetsState() *state.KongState {
 			Upstream: &kong.Upstream{
 				ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
 			},
+		},
+	})
+	return s
+}
+
+func existingDocumentState() *state.KongState {
+	s, _ := state.NewKongState()
+	s.ServicePackages.Add(state.ServicePackage{
+		ServicePackage: konnect.ServicePackage{
+			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Name: kong.String("foo"),
+		},
+	})
+	parent, _ := s.ServicePackages.Get("4bfcb11f-c962-4817-83e5-9433cf20b663")
+	s.Documents.Add(state.Document{
+		Document: konnect.Document{
+			ID:        kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Path:      kong.String("/foo.md"),
+			Published: kong.Bool(true),
+			Content:   kong.String("foo"),
+			Parent:    parent,
 		},
 	})
 	return s
@@ -1708,6 +1730,109 @@ func Test_stateBuilder_upstream(t *testing.T) {
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
+		})
+	}
+}
+
+func Test_stateBuilder_documents(t *testing.T) {
+	assert := assert.New(t)
+	rand.Seed(42)
+	type fields struct {
+		targetContent *Content
+		currentState  *state.KongState
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *utils.KonnectRawState
+	}{
+		{
+			name: "matches ID of an existing document",
+			fields: fields{
+				targetContent: &Content{
+					ServicePackages: []FServicePackage{
+						{
+							Name: kong.String("foo"),
+							Document: &FDocument{
+								Path:      kong.String("/foo.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("foo"),
+							},
+						},
+					},
+				},
+				currentState: existingDocumentState(),
+			},
+			want: &utils.KonnectRawState{
+				Documents: []*konnect.Document{
+					{
+						ID:        kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Path:      kong.String("/foo.md"),
+						Published: kong.Bool(true),
+						Content:   kong.String("foo"),
+						Parent: &konnect.ServicePackage{
+							ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+							Name: kong.String("foo"),
+						},
+					},
+				},
+				ServicePackages: []*konnect.ServicePackage{
+					{
+						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Name: kong.String("foo"),
+					},
+				},
+			},
+		},
+		{
+			name: "process a non-existent document",
+			fields: fields{
+				targetContent: &Content{
+					ServicePackages: []FServicePackage{
+						{
+							Name: kong.String("bar"),
+							Document: &FDocument{
+								Path:      kong.String("/bar.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("bar"),
+							},
+						},
+					},
+				},
+				currentState: existingDocumentState(),
+			},
+			want: &utils.KonnectRawState{
+				Documents: []*konnect.Document{
+					{
+						ID:        kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Path:      kong.String("/bar.md"),
+						Published: kong.Bool(true),
+						Content:   kong.String("bar"),
+						Parent: &konnect.ServicePackage{
+							ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+							Name: kong.String("bar"),
+						},
+					},
+				},
+				ServicePackages: []*konnect.ServicePackage{
+					{
+						ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &stateBuilder{
+				targetContent: tt.fields.targetContent,
+				currentState:  tt.fields.currentState,
+			}
+			d, _ := utils.GetKongDefaulter()
+			b.defaulter = d
+			b.build()
+			assert.Equal(tt.want, b.konnectRawState)
 		})
 	}
 }

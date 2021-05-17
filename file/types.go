@@ -524,6 +524,7 @@ type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
 	Version        *string         `json:"version,omitempty" yaml:"version,omitempty"`
 	Implementation *Implementation `json:"implementation,omitempty" yaml:"implementation,omitempty"`
+	Document       *FDocument      `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -532,6 +533,15 @@ type FServicePackage struct {
 	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
 	Description *string           `json:"description,omitempty" yaml:"description,omitempty"`
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
+	Document    *FDocument        `json:"document,omitempty" yaml:"document,omitempty"`
+}
+
+// +k8s:deepcopy-gen=true
+type FDocument struct {
+	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Path      *string `json:"path,omitempty" yaml:"path,omitempty"`
+	Published *bool   `json:"published,omitempty" yaml:"published,omitempty"`
+	Content   *string `json:"-" yaml:"-"`
 }
 
 // sortKey is used for sorting.

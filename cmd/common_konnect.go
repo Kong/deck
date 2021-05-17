@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/fatih/color"
@@ -26,6 +27,13 @@ func syncKonnect(ctx context.Context,
 	if err != nil {
 		return err
 	}
+
+	err = targetContent.PopulateDocumentContent(filenames)
+	if err != nil {
+		return fmt.Errorf("reading documents: %w", err)
+	}
+
+	targetContent.StripLocalDocumentPath()
 
 	// get Konnect client
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)

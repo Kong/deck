@@ -432,6 +432,21 @@ const contentSchema = `{
         }
       ]
     },
+    "FDocument": {
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "published": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "FPlugin": {
       "required": [
         "name"
@@ -771,6 +786,9 @@ const contentSchema = `{
         "description": {
           "type": "string"
         },
+        "document": {
+          "$ref": "#/definitions/FDocument"
+        },
         "id": {
           "type": "string"
         },
@@ -793,6 +811,10 @@ const contentSchema = `{
         "version"
       ],
       "properties": {
+        "document": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/FDocument"
+        },
         "id": {
           "type": "string"
         },
