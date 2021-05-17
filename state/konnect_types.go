@@ -5,6 +5,50 @@ import (
 	"reflect"
 )
 
+// Document represents a document in Konnect.
+// It adds some helper methods along with Meta to the original Document object.
+type Document struct {
+	konnect.Document `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (d1 *Document) Identifier() string {
+	if d1.Path != nil {
+		return *d1.Path
+	}
+	return *d1.ID
+}
+
+// Console returns an entity's identity in a human-readable string.
+func (d1 *Document) Console() string {
+	return *d1.Path
+}
+
+// Equal returns true if s1 and s2 are equal.
+func (d1 *Document) Equal(d2 *Document) bool {
+	return d1.EqualWithOpts(d2, false, false, false)
+}
+
+// EqualWithOpts returns true if d1 and d2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (d1 *Document) EqualWithOpts(d2 *Document,
+	ignoreID, ignoreTS, ignoreForeign bool) bool {
+	d1Copy := d1.Document.ShallowCopy()
+	d2Copy := d2.Document.ShallowCopy()
+
+	if ignoreID {
+		d1Copy.ID = nil
+		d2Copy.ID = nil
+	}
+	if ignoreForeign {
+		d1Copy.Parent = nil
+		d2Copy.Parent = nil
+	}
+	return reflect.DeepEqual(d1Copy, d2Copy)
+}
+
 // ServicePackage represents a service package in Konnect.
 // It adds some helper methods along with Meta to the original ServicePackage object.
 type ServicePackage struct {

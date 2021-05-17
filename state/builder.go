@@ -219,6 +219,15 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 			}
 		}
 	}
+	for _, d := range raw.Documents {
+		document := d.ShallowCopy()
+		err := kongState.Documents.Add(Document{
+			Document: *document,
+		})
+		if err != nil {
+			return errors.Wrap(err, "inserting document into state")
+		}
+	}
 	return nil
 }
 

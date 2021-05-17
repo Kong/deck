@@ -56,6 +56,7 @@ type KongRawState struct {
 // KonnectRawState contains all of Konnect resources.
 type KonnectRawState struct {
 	ServicePackages []*konnect.ServicePackage
+	Documents       []*konnect.Document
 }
 
 // ErrArray holds an array of errors.

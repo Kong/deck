@@ -76,6 +76,7 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
 	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
 	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
+	s.postProcess.MustRegister("document", &documentPostAction{current})
 
 	return s, nil
 }
@@ -195,6 +196,11 @@ func (sc *Syncer) delete() error {
 	sc.wait()
 
 	err = sc.deleteRBACRoles()
+	if err != nil {
+		return err
+	}
+
+	err = sc.deleteDocuments()
 	if err != nil {
 		return err
 	}
@@ -329,6 +335,11 @@ func (sc *Syncer) createUpdate() error {
 	sc.wait()
 
 	err = sc.createUpdateServiceVersions()
+	if err != nil {
+		return err
+	}
+
+	err = sc.createUpdateDocuments()
 	if err != nil {
 		return err
 	}

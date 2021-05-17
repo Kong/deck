@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +22,9 @@ the entities present in files locally. This allows you to see the entities
 that will be created or updated or deleted.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if konnectDumpCmdKongStateFile == "-" {
+			return errors.New("writing to stdout is not supported in Konnect mode")
+		}
 		_ = sendAnalytics("konnect-diff", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 			konnectDiffCmdParallelism)
@@ -31,8 +35,7 @@ func init() {
 	konnectCmd.AddCommand(konnectDiffCmd)
 	konnectDiffCmd.Flags().StringSliceVarP(&konnectDiffCmdKongStateFile,
 		"state", "s", []string{"konnect.yaml"}, "file(s) containing Konnect's configuration.\n"+
-			"This flag can be specified multiple times for multiple files.\n"+
-			"Use '-' to read from stdin.")
+			"This flag can be specified multiple times for multiple files.")
 	konnectDiffCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
 			"with consumers")
