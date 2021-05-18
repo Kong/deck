@@ -36,7 +36,7 @@ func syncKonnect(ctx context.Context,
 	targetContent.StripLocalDocumentPath()
 
 	// get Konnect client
-	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
+	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func syncKonnect(ctx context.Context,
 
 	// initialize kong client
 	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-		Address:    konnect.BaseURL() + "/api/control_planes/" + kongCPID,
+		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 	})
