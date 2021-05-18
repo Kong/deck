@@ -35,14 +35,19 @@ type Client struct {
 	debug                 bool
 }
 
+// ClientOpts contains configuration options for a new Client.
+type ClientOpts struct {
+	BaseURL string
+}
+
 // NewClient returns a Client which talks to Konnect's API.
-func NewClient(httpClient *http.Client) (*Client, error) {
+func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 	client := new(Client)
 	client.client = httpClient
-	url, err := url.ParseRequestURI(BaseURL())
+	url, err := url.ParseRequestURI(opts.BaseURL)
 	if err != nil {
 		return nil, errors.Wrap(err, "parsing URL")
 	}

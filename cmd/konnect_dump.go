@@ -3,8 +3,6 @@ package cmd
 import (
 	"strings"
 
-	"github.com/kong/deck/konnect"
-
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
@@ -42,7 +40,7 @@ configure Konnect.` + konnectAlphaState,
 		}
 
 		// get Konnect client
-		konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
+		konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 		if err != nil {
 			return err
 		}
@@ -63,7 +61,7 @@ configure Konnect.` + konnectAlphaState,
 
 		// initialize kong client
 		kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-			Address:    konnect.BaseURL() + "/api/control_planes/" + kongCPID,
+			Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 			HTTPClient: httpClient,
 			Debug:      konnectConfig.Debug,
 		})

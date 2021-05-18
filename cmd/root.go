@@ -132,6 +132,11 @@ func init() {
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 
+	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
+		"address of the Konnect endpoint")
+	viper.BindPFlag("konnect-addr",
+		rootCmd.PersistentFlags().Lookup("konnect-addr"))
+
 	rootCmd.PersistentFlags().Bool("analytics", true,
 		"share anonymized data to help improve decK")
 	viper.BindPFlag("analytics",
@@ -203,5 +208,6 @@ func initKonnectConfig() error {
 	konnectConfig.Email = viper.GetString("konnect-email")
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
+	konnectConfig.Address = viper.GetString("konnect-addr")
 	return nil
 }
