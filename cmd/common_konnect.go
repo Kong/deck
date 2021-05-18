@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
@@ -88,11 +87,8 @@ func syncKonnect(ctx context.Context,
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	stats, errs := solver.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
-	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
-	printFn("Summary:\n")
-	printFn("  Created: %v\n", stats.CreateOps.Count())
-	printFn("  Updated: %v\n", stats.UpdateOps.Count())
-	printFn("  Deleted: %v\n", stats.DeleteOps.Count())
+	// print stats before error to report completed operations
+	printStats(stats)
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
 	}
