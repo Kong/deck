@@ -85,6 +85,26 @@ func (sc *Syncer) createUpdateCertificate(
 
 	// found, check if update needed
 	if !currentCertificate.EqualWithOpts(certificateCopy, false, true) {
+		// Certificate and SNI objects have a special relationship. A PUT request
+		// (which we use for updates) with a certificate that contains no SNI
+		// children will in fact delete any existing SNI objects associated with
+		// that certificate, rather than leaving them as-is.
+
+		// To work around this issues, we set SNIs on certificates here using the
+		// current certificate's SNI list. If there are changes to the SNIs,
+		// subsequent actions on the SNI objects will handle those.
+		currentSNIs, err := sc.currentState.SNIs.GetAllByCertID(*currentCertificate.ID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error looking up current certificate SNIs %v",
+				certificate.Identifier())
+		}
+		sniNames := make([]*string, 0)
+		for _, s := range currentSNIs {
+			sniNames = append(sniNames, s.Name)
+		}
+
+		certificateCopy.SNIs = sniNames
+		currentCertificate.SNIs = sniNames
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "certificate",
