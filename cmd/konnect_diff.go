@@ -29,6 +29,9 @@ that will be created or updated or deleted.` + konnectAlphaState,
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 			konnectDiffCmdParallelism)
 	},
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return preRunSilenceEventsFlag()
+	},
 }
 
 func init() {
@@ -45,4 +48,5 @@ func init() {
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
+	addSilenceEventsFlag(konnectDiffCmd.Flags())
 }

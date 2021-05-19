@@ -29,7 +29,7 @@ to get Kong's state in sync with the input state.`,
 			return errors.New("A state file with Kong's configuration " +
 				"must be specified using -s/--state flag.")
 		}
-		return nil
+		return preRunSilenceEventsFlag()
 	},
 }
 
@@ -58,4 +58,5 @@ func init() {
 		0, "aritificial delay in seconds that is injected between insert operations \n"+
 			"for related entities (usually for cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
+	addSilenceEventsFlag(syncCmd.Flags())
 }
