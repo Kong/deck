@@ -21,6 +21,9 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 			konnectDiffCmdParallelism)
 	},
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return preRunSilenceEventsFlag()
+	},
 }
 
 func init() {
@@ -33,4 +36,5 @@ func init() {
 			"with consumers")
 	konnectSyncCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations")
+	addSilenceEventsFlag(konnectSyncCmd.Flags())
 }
