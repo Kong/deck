@@ -10,7 +10,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
-	"reflect"
 )
 
 // Stats holds the stats related to a Solve.
@@ -49,7 +48,7 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 			print.CreatePrintln("creating", e.Kind, c.Console())
 		case crud.Update:
 			var diffString string
-			if reflect.TypeOf(e.OldObj).ConvertibleTo(reflect.TypeOf(&state.Document{})) {
+			if isDocument(e.OldObj) {
 				diffString, err = getDocumentDiff(e.OldObj.(*state.Document), e.Obj.(*state.Document))
 			} else {
 				diffString, err = getDiff(e.OldObj, e.Obj)

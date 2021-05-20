@@ -145,3 +145,36 @@ bar
 		})
 	}
 }
+
+func Test_IsDocument(t *testing.T) {
+	type args struct {
+		obj interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "document",
+			args: args{
+				obj: &state.Document{},
+			},
+			want: true,
+		},
+		{
+			name: "not document",
+			args: args{
+				obj: &state.Service{},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isDocument(tt.args.obj); got != tt.want {
+				t.Errorf("isDocument() = %v\nwant %v", got, tt.want)
+			}
+		})
+	}
+}
