@@ -3,6 +3,7 @@ package solver
 import (
 	"testing"
 
+	"github.com/kong/deck/file"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
@@ -166,6 +167,13 @@ func Test_IsDocument(t *testing.T) {
 			name: "not document",
 			args: args{
 				obj: &state.Service{},
+			},
+			want: false,
+		},
+		{
+			name: "the wrong sort of document",
+			args: args{
+				obj: &file.FDocument{},
 			},
 			want: false,
 		},
