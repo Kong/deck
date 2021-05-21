@@ -48,8 +48,8 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 			print.CreatePrintln("creating", e.Kind, c.Console())
 		case crud.Update:
 			var diffString string
-			if isDocument(e.OldObj) {
-				diffString, err = getDocumentDiff(e.OldObj.(*state.Document), e.Obj.(*state.Document))
+			if oldObj, ok := e.OldObj.(*state.Document); ok {
+				diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
 			} else {
 				diffString, err = getDiff(e.OldObj, e.Obj)
 			}

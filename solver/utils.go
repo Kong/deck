@@ -95,8 +95,3 @@ func eventFromArg(arg crud.Arg) diff.Event {
 	}
 	return event
 }
-
-func isDocument(obj interface{}) bool {
-	_, ok := obj.(*state.Document)
-	return ok
-}
