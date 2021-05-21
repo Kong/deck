@@ -18,6 +18,8 @@ linters:
   - gosec
   - nakedret
   - dogsled
+  - exportloopref
+  - asciicheck
   - depguard
 issues:
   exclude-rules:
