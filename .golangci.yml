@@ -1,5 +1,6 @@
 linters:
   enable:
+  - wastedassign
   - megacheck
   - govet
   - unparam

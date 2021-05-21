@@ -446,8 +446,7 @@ func (p *FPlugin) UnmarshalJSON(b []byte) error {
 func (p FPlugin) sortKey() string {
 	// concat plugin name and foreign relations
 	if p.Name != nil {
-		key := ""
-		key = *p.Name
+		key := *p.Name
 		if p.Consumer != nil {
 			key += *p.Consumer.ID
 		}
