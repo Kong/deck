@@ -234,7 +234,6 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
 func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRawState, error) {
-
 	var state utils.KongRawState
 
 	if err := validateConfig(config); err != nil {
@@ -707,7 +706,7 @@ func GetAllRBACRoles(ctx context.Context,
 func GetAllRBACREndpointPermissions(ctx context.Context,
 	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
 
-	var eps = []*kong.RBACEndpointPermission{}
+	eps := []*kong.RBACEndpointPermission{}
 	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {
 		return nil, err

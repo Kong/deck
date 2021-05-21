@@ -10,7 +10,6 @@ type DocumentService service
 
 // Create creates a Document in Konnect.
 func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document, error) {
-
 	if doc == nil {
 		return nil, fmt.Errorf("cannot create a nil document")
 	}
@@ -41,7 +40,6 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 
 // Delete deletes a Document in Konnect.
 func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
-
 	if emptyString(doc.ID) {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}

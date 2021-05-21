@@ -211,7 +211,7 @@ func TestRBACEndpointPermissionsCollection_Update(t *testing.T) {
 	k.Add(rbacEndpointPermission2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.rbacEndpointPermission); (err != nil) != tt.wantErr {
 				t.Errorf("RBACEndpointPermissionsCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -45,7 +45,6 @@ func (s *ServiceVersionService) Create(ctx context.Context,
 
 // Delete deletes a ServiceVersion in Konnect.
 func (s *ServiceVersionService) Delete(ctx context.Context, id *string) error {
-
 	if emptyString(id) {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}

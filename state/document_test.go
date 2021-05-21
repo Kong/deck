@@ -305,7 +305,7 @@ func TestDocumentCollection_Update(t *testing.T) {
 	k.Add(d2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.document); (err != nil) != tt.wantErr {
 				t.Errorf("DocumentCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

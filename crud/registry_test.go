@@ -31,9 +31,11 @@ func (t testActionFixture) invoke(op string, inputs ...Arg) (Arg, error) {
 func (t testActionFixture) Create(input ...Arg) (Arg, error) {
 	return t.invoke("create", input...)
 }
+
 func (t testActionFixture) Delete(input ...Arg) (Arg, error) {
 	return t.invoke("delete", input...)
 }
+
 func (t testActionFixture) Update(input ...Arg) (Arg, error) {
 	return t.invoke("update", input...)
 }

@@ -82,7 +82,6 @@ func (sc *Syncer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 	// found, check if update needed
 
 	if !currentKeyAuth.EqualWithOpts(keyAuth, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "key-auth",

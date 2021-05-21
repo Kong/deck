@@ -247,7 +247,7 @@ func TestServicesCollection_Update(t *testing.T) {
 	k.Add(svc2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.service); (err != nil) != tt.wantErr {
 				t.Errorf("ServicesCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -423,5 +423,4 @@ func TestServiceGetAllMemoryReference(t *testing.T) {
 	assert.Nil(err)
 	assert.NotNil(service)
 	assert.Equal("example.com", *service.Host)
-
 }

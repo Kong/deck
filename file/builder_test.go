@@ -15,9 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	kong130Version = semver.MustParse("1.3.0")
-)
+var kong130Version = semver.MustParse("1.3.0")
 
 func emptyState() *state.KongState {
 	s, _ := state.NewKongState()
@@ -1529,9 +1527,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1591,9 +1591,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1657,9 +1659,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1699,9 +1703,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -2062,9 +2068,11 @@ func Test_stateBuilder(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{

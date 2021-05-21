@@ -23,9 +23,7 @@ type stateBuilder struct {
 	err error
 }
 
-var (
-	kong140Version = semver.MustParse("1.4.0")
-)
+var kong140Version = semver.MustParse("1.4.0")
 
 // uuid generates a UUID string and returns a pointer to it.
 // It is a variable for testing purpose, to override and supply

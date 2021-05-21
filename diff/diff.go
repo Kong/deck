@@ -14,9 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	errEnqueueFailed = errors.New("failed to queue event")
-)
+var errEnqueueFailed = errors.New("failed to queue event")
 
 func defaultBackOff() backoff.BackOff {
 	// For various reasons, Kong can temporarily fail to process
@@ -437,7 +435,6 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	// collect errors
 	for err := range sc.errChan {
 		if err != errEnqueueFailed {
-
 			errs = append(errs, err)
 		}
 	}

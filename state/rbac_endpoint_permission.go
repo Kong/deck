@@ -14,31 +14,33 @@ const (
 	rbacEndpointPermissionsByRoleID = "rbacEndpointPermissionsByRoleID"
 )
 
-var errInvalidRole = errors.New("role.ID is required in rbacEndpointPermission")
-var rbacEndpointPermissionTableSchema = &memdb.TableSchema{
-	Name: rbacEndpointPermissionTableName,
-	Indexes: map[string]*memdb.IndexSchema{
-		// ID in the case of an RBACEndpointPermission is a composite key of role ID, workspace, and endpoint
-		"id": {
-			Name:    "id",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "ID"},
-		},
-		all: allIndex,
-		// foreign
-		rbacEndpointPermissionsByRoleID: {
-			Name: rbacEndpointPermissionsByRoleID,
-			Indexer: &indexers.SubFieldIndexer{
-				Fields: []indexers.Field{
-					{
-						Struct: "Role",
-						Sub:    "ID",
+var (
+	errInvalidRole                    = errors.New("role.ID is required in rbacEndpointPermission")
+	rbacEndpointPermissionTableSchema = &memdb.TableSchema{
+		Name: rbacEndpointPermissionTableName,
+		Indexes: map[string]*memdb.IndexSchema{
+			// ID in the case of an RBACEndpointPermission is a composite key of role ID, workspace, and endpoint
+			"id": {
+				Name:    "id",
+				Unique:  true,
+				Indexer: &memdb.StringFieldIndex{Field: "ID"},
+			},
+			all: allIndex,
+			// foreign
+			rbacEndpointPermissionsByRoleID: {
+				Name: rbacEndpointPermissionsByRoleID,
+				Indexer: &indexers.SubFieldIndexer{
+					Fields: []indexers.Field{
+						{
+							Struct: "Role",
+							Sub:    "ID",
+						},
 					},
 				},
 			},
 		},
-	},
-}
+	}
+)
 
 func validateRoleForRBACEndpointPermission(rbacEndpointPermission *RBACEndpointPermission) error {
 	if rbacEndpointPermission.Role == nil ||

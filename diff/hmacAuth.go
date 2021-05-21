@@ -83,7 +83,6 @@ func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error)
 	// found, check if update needed
 
 	if !currentHMACAuth.EqualWithOpts(hmacAuth, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "hmac-auth",

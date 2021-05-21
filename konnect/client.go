@@ -12,9 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	defaultCtx = context.Background()
-)
+var defaultCtx = context.Background()
 
 type service struct {
 	client         *Client
@@ -89,7 +87,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 		return nil, err
 	}
 
-	//Make the request
+	// Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, errors.Wrap(err, "making HTTP request")

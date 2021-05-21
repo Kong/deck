@@ -33,7 +33,6 @@ func (s *ServicePackageService) Create(ctx context.Context,
 
 // Delete deletes a ServicePackage in Konnect.
 func (s *ServicePackageService) Delete(ctx context.Context, id *string) error {
-
 	if emptyString(id) {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}

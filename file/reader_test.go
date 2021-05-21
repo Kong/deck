@@ -40,7 +40,7 @@ func Test_ensureJSON(t *testing.T) {
 }
 
 func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
-	var filenames = []string{"-"}
+	filenames := []string{"-"}
 	assert := assert.New(t)
 	assert.Equal("-", filenames[0])
 
@@ -72,7 +72,7 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 }
 
 func TestReadKongStateFromStdin(t *testing.T) {
-	var filenames = []string{"-"}
+	filenames := []string{"-"}
 	assert := assert.New(t)
 	assert.Equal("-", filenames[0])
 

@@ -19,7 +19,7 @@ func (c *Client) NewRequest(method, endpoint string, qs interface{},
 	if endpoint == "" {
 		return nil, errors.New("endpoint can't be nil")
 	}
-	//body to be sent in JSON
+	// body to be sent in JSON
 	var buf []byte
 	if body != nil {
 		var err error
@@ -29,7 +29,7 @@ func (c *Client) NewRequest(method, endpoint string, qs interface{},
 		}
 	}
 
-	//Create a new request
+	// Create a new request
 	req, err := http.NewRequest(method, c.baseURL+endpoint,
 		bytes.NewBuffer(buf))
 	if err != nil {

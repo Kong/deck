@@ -7,9 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	pingWorkspace string
-)
+var pingWorkspace string
 
 // pingCmd represents the ping command
 var pingCmd = &cobra.Command{

@@ -13,9 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
-)
+var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
 
 // Empty checks if a string referenced by s or s itself is empty.
 func Empty(s *string) bool {

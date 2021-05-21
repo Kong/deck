@@ -322,7 +322,7 @@ func TestSNIsCollection_Update(t *testing.T) {
 	k.Add(sni2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.sni); (err != nil) != tt.wantErr {
 				t.Errorf("SNIsCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

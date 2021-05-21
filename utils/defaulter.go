@@ -58,8 +58,7 @@ func (d *Defaulter) Register(def interface{}) error {
 	return nil
 }
 
-type kongTransformer struct {
-}
+type kongTransformer struct{}
 
 func (t kongTransformer) Transformer(typ reflect.Type) func(dst, src reflect.Value) error {
 	var a *int

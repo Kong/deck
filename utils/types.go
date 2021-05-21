@@ -114,7 +114,6 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 
 // GetKongClient returns a Kong client
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
-
 	var tlsConfig tls.Config
 	if opt.TLSSkipVerify {
 		tlsConfig.InsecureSkipVerify = true

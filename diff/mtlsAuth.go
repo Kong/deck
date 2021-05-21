@@ -82,7 +82,6 @@ func (sc *Syncer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error)
 	// found, check if update needed
 
 	if !currentMTLSAuth.EqualWithOpts(mtlsAuth, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "mtls-auth",

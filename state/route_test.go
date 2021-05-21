@@ -266,7 +266,7 @@ func TestRoutesCollection_Update(t *testing.T) {
 	k.Add(route2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.route); (err != nil) != tt.wantErr {
 				t.Errorf("RoutesCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

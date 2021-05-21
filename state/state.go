@@ -41,7 +41,6 @@ type KongState struct {
 
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
-
 	// TODO FIXME clean up the mess
 	keyAuthTemp := newKeyAuthsCollection(collection{})
 	hmacAuthTemp := newHMACAuthsCollection(collection{})
@@ -50,7 +49,7 @@ func NewKongState() (*KongState, error) {
 	oauth2CredsTemp := newOauth2CredsCollection(collection{})
 	mtlsAuthTemp := newMTLSAuthsCollection(collection{})
 
-	var schema = &memdb.DBSchema{
+	schema := &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
 			serviceTableName:                serviceTableSchema,
 			routeTableName:                  routeTableSchema,

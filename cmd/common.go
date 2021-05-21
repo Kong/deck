@@ -180,7 +180,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 }
 
 func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
-
 	var version string
 
 	workspace := config.Workspace

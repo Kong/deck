@@ -84,7 +84,6 @@ func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*E
 	// found, check if update needed
 
 	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "oauth2-cred",
