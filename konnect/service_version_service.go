@@ -35,10 +35,11 @@ func (s *ServiceVersionService) Create(ctx context.Context,
 	}
 
 	var createdSV ServiceVersion
-	_, err = s.client.Do(ctx, req, &createdSV)
+	resp, err := s.client.Do(ctx, req, &createdSV)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	return &createdSV, nil
 }
 
@@ -55,7 +56,11 @@ func (s *ServiceVersionService) Delete(ctx context.Context, id *string) error {
 		return err
 	}
 
-	_, err = s.client.Do(ctx, req, nil)
+	resp, err := s.client.Do(ctx, req, nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 	return err
 }
 
@@ -78,10 +83,11 @@ func (s *ServiceVersionService) Update(ctx context.Context,
 	}
 
 	var updatedSV ServiceVersion
-	_, err = s.client.Do(ctx, req, &updatedSV)
+	resp, err := s.client.Do(ctx, req, &updatedSV)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	return &updatedSV, nil
 }
 
@@ -96,9 +102,10 @@ func (s *ServiceVersionService) ListForPackage(ctx context.Context,
 	// Note: This endpoint doesn't follow the structure of paginated endpoints
 	// and instead returns an array with all service versions.
 	var response []ServiceVersion
-	_, err = s.client.Do(ctx, req, &response)
+	resp, err := s.client.Do(ctx, req, &response)
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	return response, nil
 }

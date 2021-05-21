@@ -13,6 +13,7 @@ linters:
   - lll
   - durationcheck
   - gofmt
+  - bodyclose
   - golint
   - gosec
   - nakedret
