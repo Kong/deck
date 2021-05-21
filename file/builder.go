@@ -622,7 +622,6 @@ func (b *stateBuilder) rbacRoles() {
 			ep.Role = &kong.RBACRole{ID: kong.String(*r.ID)}
 			b.rawState.RBACEndpointPermissions = append(b.rawState.RBACEndpointPermissions, &ep.RBACEndpointPermission)
 		}
-		// TODO entity permissions
 	}
 }
 

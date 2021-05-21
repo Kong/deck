@@ -104,6 +104,5 @@ func Reset(ctx context.Context, state *utils.KongRawState, client *kong.Client) 
 		}
 	}
 
-	// TODO handle custom entities
 	return nil
 }

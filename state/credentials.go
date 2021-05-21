@@ -37,8 +37,7 @@ func (k *credentialsCollection) Schema() *memdb.TableSchema {
 				},
 			},
 			"id2": {
-				Name: "id2",
-				// TODO configurable
+				Name:   "id2",
 				Unique: true,
 				Indexer: &indexers.MethodIndexer{
 					Method: "GetID2",

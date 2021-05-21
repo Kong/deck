@@ -16,8 +16,6 @@ type Defaulter struct {
 // GetKongDefaulter returns a defaulter which can set default values
 // for Kong entities.
 func GetKongDefaulter() (*Defaulter, error) {
-	// TODO make defaults configurable
-	// TODO add support for file based defaults
 	var d Defaulter
 	err := d.Register(&serviceDefaults)
 	if err != nil {

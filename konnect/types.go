@@ -15,7 +15,6 @@ type ParentInfoer interface {
 
 func BaseURL() string {
 	const baseURL = "https://konnect.konghq.com"
-	// TODO override the baseURL using configuration
 	return baseURL
 }
 
