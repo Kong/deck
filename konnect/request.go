@@ -3,9 +3,10 @@ package konnect
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+
 	"github.com/google/go-querystring/query"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 // NewRequest creates a request based on the inputs.

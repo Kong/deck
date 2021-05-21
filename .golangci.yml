@@ -21,6 +21,7 @@ linters:
   - exportloopref
   - asciicheck
   - stylecheck
+  - goimports
   - depguard
 issues:
   exclude-rules:

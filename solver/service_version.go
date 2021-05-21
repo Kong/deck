@@ -1,11 +1,12 @@
 package solver
 
 import (
+	"reflect"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
-	"reflect"
 )
 
 // serviceVersionCRUD implements crud.Actions interface.

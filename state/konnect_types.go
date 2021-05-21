@@ -1,8 +1,9 @@
 package state
 
 import (
-	"github.com/kong/deck/konnect"
 	"reflect"
+
+	"github.com/kong/deck/konnect"
 )
 
 // Document represents a document in Konnect.

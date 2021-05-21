@@ -3,12 +3,13 @@ package konnect
 import (
 	"context"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 var (
