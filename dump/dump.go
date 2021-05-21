@@ -3,6 +3,7 @@ package dump
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -670,7 +671,7 @@ func GetAllMTLSAuths(ctx context.Context,
 			// before adding other Enterprise resources that decK handles by default (versus,
 			// for example, RBAC roles, which require the --rbac-resources-only flag).
 			if kongErr, ok := err.(*kong.APIError); ok {
-				if kongErr.Code() == 403 {
+				if kongErr.Code() == http.StatusForbidden {
 					return mtlsAuths, nil
 				}
 			}

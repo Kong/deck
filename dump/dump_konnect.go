@@ -46,7 +46,9 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 			}
 		}()
 
-		semaphore := semaphore.NewWeighted(10)
+		const concurrency = 10
+
+		semaphore := semaphore.NewWeighted(concurrency)
 		for i := 0; i < len(servicePackages); i++ {
 			// control the number of outstanding go routines, also controlling
 			// the number of parallel requests
@@ -90,12 +92,12 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 				}(version)
 			}
 		}
-		err = semaphore.Acquire(ctx, 10)
+		err = semaphore.Acquire(ctx, concurrency)
 		if err != nil {
 			return fmt.Errorf("acquire semaphore: %v", err)
 		}
 		close(errChan)
-		semaphore.Release(10)
+		semaphore.Release(concurrency)
 		m.Lock()
 		defer m.Unlock()
 		if err2 != nil {

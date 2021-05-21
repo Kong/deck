@@ -23,6 +23,7 @@ func Empty(s *string) bool {
 }
 
 // UUID will generate a random v14 unique identifier based upon random numbers
+// nolint:gomnd
 func UUID() string {
 	version := byte(4)
 	uuid := make([]byte, 16)

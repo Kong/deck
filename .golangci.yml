@@ -5,6 +5,7 @@ linters:
   - gci
   - govet
   - nolintlint
+  - gomnd
   - unparam
   - nilerr
   - unconvert

@@ -25,6 +25,11 @@ const (
 	YAML = "YAML"
 )
 
+const (
+	httpPort  = 80
+	httpsPort = 443
+)
+
 // FService represents a Kong Service and it's associated routes and plugins.
 // +k8s:deepcopy-gen=true
 type FService struct {
@@ -111,9 +116,9 @@ func unwrapURL(urlString string, fService *FService) error {
 
 	fService.Protocol = kong.String(parsed.Scheme)
 
-	fService.Port = kong.Int(80)
+	fService.Port = kong.Int(httpPort)
 	if parsed.Scheme == "https" {
-		fService.Port = kong.Int(443)
+		fService.Port = kong.Int(httpsPort)
 	}
 
 	if parsed.Host != "" {

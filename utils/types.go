@@ -168,9 +168,10 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 func parseHeaders(headers []string) (http.Header, error) {
 	res := http.Header{}
+	const splitLen = 2
 	for _, keyValue := range headers {
 		split := strings.SplitN(keyValue, ":", 2)
-		if len(split) >= 2 {
+		if len(split) >= splitLen {
 			res.Add(split[0], split[1])
 		} else {
 			return nil, fmt.Errorf("splitting header key-value '%s'", keyValue)
