@@ -3,7 +3,6 @@ package solver
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
@@ -98,7 +97,6 @@ func eventFromArg(arg crud.Arg) diff.Event {
 }
 
 func isDocument(obj interface{}) bool {
-	a := reflect.TypeOf(obj)
-	b := reflect.TypeOf(&state.Document{})
-	return a == b
+	_, ok := obj.(*state.Document)
+	return ok
 }
