@@ -43,6 +43,7 @@
   similarly-configured instances that do not share object IDs.
   [#327](https://github.com/Kong/deck/pull/327)
 - Added a default timeout to HTTP requests.
+  [37eeec8](https://github.com/Kong/deck/commit/37eeec8606583d2ecfacb3265f7ff15921f0ab8d)
 - Implemented `convert` command for converting state files between Kong Gateway
   and Konnect configuration formats. This is aimed to solving migration problem between
   on-premise Kong clusters and Konnect SaaS.
