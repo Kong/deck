@@ -166,14 +166,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	stats, errs := solver.Solve(ctx, s, wsClient, nil, parallelism, dry)
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
-	printFn("  Created: %v\n", stats.CreateOps)
-	printFn("  Updated: %v\n", stats.UpdateOps)
-	printFn("  Deleted: %v\n", stats.DeleteOps)
+	printFn("  Created: %v\n", stats.CreateOps.Count())
+	printFn("  Updated: %v\n", stats.UpdateOps.Count())
+	printFn("  Deleted: %v\n", stats.DeleteOps.Count())
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
 	}
 	if diffCmdNonZeroExitCode &&
-		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
+		stats.CreateOps.Count()+stats.UpdateOps.Count()+stats.DeleteOps.Count() != 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
 	return nil

@@ -2,6 +2,7 @@ package solver
 
 import (
 	"context"
+	"sync"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
@@ -14,9 +15,26 @@ import (
 
 // Stats holds the stats related to a Solve.
 type Stats struct {
-	CreateOps int
-	UpdateOps int
-	DeleteOps int
+	CreateOps *AtomicInt32Counter
+	UpdateOps *AtomicInt32Counter
+	DeleteOps *AtomicInt32Counter
+}
+
+type AtomicInt32Counter struct {
+	counter int32
+	lock    sync.RWMutex
+}
+
+func (a *AtomicInt32Counter) Increment(delta int32) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+	a.counter += delta
+}
+
+func (a *AtomicInt32Counter) Count() int32 {
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+	return a.counter
 }
 
 // Solve generates a diff and walks the graph.
@@ -26,15 +44,19 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 
 	r := buildRegistry(client, konnectClient)
 
-	var stats Stats
+	stats := Stats{
+		CreateOps: &AtomicInt32Counter{},
+		UpdateOps: &AtomicInt32Counter{},
+		DeleteOps: &AtomicInt32Counter{},
+	}
 	recordOp := func(op crud.Op) {
 		switch op {
 		case crud.Create:
-			stats.CreateOps = stats.CreateOps + 1
+			stats.CreateOps.Increment(1)
 		case crud.Update:
-			stats.UpdateOps = stats.UpdateOps + 1
+			stats.UpdateOps.Increment(1)
 		case crud.Delete:
-			stats.DeleteOps = stats.DeleteOps + 1
+			stats.DeleteOps.Increment(1)
 		}
 	}
 
