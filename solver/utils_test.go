@@ -3,7 +3,6 @@ package solver
 import (
 	"testing"
 
-	"github.com/kong/deck/file"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
