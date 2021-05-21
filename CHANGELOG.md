@@ -44,9 +44,11 @@
   [#327](https://github.com/Kong/deck/pull/327)
 - Added a default timeout to HTTP requests.
 - Implemented `convert` command for converting state files between Kong Gateway
-  and Konnect configuration formats.
+  and Konnect configuration formats. This is aimed to solving migration problem between
+  on-premise Kong clusters and Konnect SaaS.
   [#330](https://github.com/Kong/deck/pull/330)
-- Add `--konnect-addr` flag to set Konnect address.
+- Add `--konnect-addr` flag to set Konnect address. This can be used to target Konnect
+data-centers in geographical regions other than the US.
   [#374](https://github.com/Kong/deck/pull/374)
 
 ### Fixed
