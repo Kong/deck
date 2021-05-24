@@ -29,9 +29,6 @@ linters:
 issues:
   exclude-rules:
   - linters:
-    - staticcheck
-    text: "SA1012" # do not pass a nil Context
-  - linters:
     - gosec
     text:  "weak cryptographic primitive"
     path: "state/indexers/md5Indexer.*"

@@ -88,7 +88,7 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 		if !dry {
 			// sync mode
 			// fire the request to Kong
-			result, err = r.Do(e.Kind, e.Op, e)
+			result, err = r.Do(ctx, e.Kind, e.Op, e)
 			if err != nil {
 				return nil, fmt.Errorf("%v %v %v failed: %w", e.Op, e.Kind, c.Console(), err)
 			}

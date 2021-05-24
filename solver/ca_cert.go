@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -24,10 +26,10 @@ func caCertFromStruct(arg diff.Event) *state.CACertificate {
 // The arg should be of type diff.Event, containing the certificate to be created,
 // else the function will panic.
 // It returns a the created *state.CACertificate.
-func (s *caCertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStruct(event)
-	createdCertificate, err := s.client.CACertificates.Create(nil,
+	createdCertificate, err := s.client.CACertificates.Create(ctx,
 		&certificate.CACertificate)
 	if err != nil {
 		return nil, err
@@ -39,10 +41,10 @@ func (s *caCertificateCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.CACertificate.
-func (s *caCertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStruct(event)
-	err := s.client.CACertificates.Delete(nil, certificate.ID)
+	err := s.client.CACertificates.Delete(ctx, certificate.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +55,10 @@ func (s *caCertificateCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the certificate to be updated,
 // else the function will panic.
 // It returns a the updated *state.CACertificate.
-func (s *caCertificateCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *caCertificateCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	certificate := caCertFromStruct(event)
-	updatedCertificate, err := s.client.CACertificates.Create(nil,
+	updatedCertificate, err := s.client.CACertificates.Create(ctx,
 		&certificate.CACertificate)
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -28,15 +29,15 @@ func (t testActionFixture) invoke(op string, inputs ...Arg) (Arg, error) {
 	return res, nil
 }
 
-func (t testActionFixture) Create(input ...Arg) (Arg, error) {
+func (t testActionFixture) Create(ctx context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("create", input...)
 }
 
-func (t testActionFixture) Delete(input ...Arg) (Arg, error) {
+func (t testActionFixture) Delete(ctx context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("delete", input...)
 }
 
-func (t testActionFixture) Update(input ...Arg) (Arg, error) {
+func (t testActionFixture) Update(ctx context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("update", input...)
 }
 
@@ -102,7 +103,7 @@ func TestRegistryCreate(t *testing.T) {
 	err := r.Register("foo", a)
 	assert.Nil(err)
 
-	res, err := r.Create("foo", "yolo")
+	res, err := r.Create(context.Background(), "foo", "yolo")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok := res.(string)
@@ -110,18 +111,18 @@ func TestRegistryCreate(t *testing.T) {
 	assert.Equal("foo create yolo", result)
 
 	// make sure it takes multiple arguments
-	res, err = r.Create("foo", "yolo", "always")
+	res, err = r.Create(context.Background(), "foo", "yolo", "always")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok = res.(string)
 	assert.True(ok)
 	assert.Equal("foo create yolo always", result)
 
-	res, err = r.Create("foo", 42)
+	res, err = r.Create(context.Background(), "foo", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = r.Create("bar", 42)
+	res, err = r.Create(context.Background(), "bar", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 }
@@ -134,7 +135,7 @@ func TestRegistryUpdate(t *testing.T) {
 	err := r.Register("foo", a)
 	assert.Nil(err)
 
-	res, err := r.Update("foo", "yolo")
+	res, err := r.Update(context.Background(), "foo", "yolo")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok := res.(string)
@@ -142,18 +143,18 @@ func TestRegistryUpdate(t *testing.T) {
 	assert.Equal("foo update yolo", result)
 
 	// make sure it takes multiple arguments
-	res, err = r.Update("foo", "yolo", "always")
+	res, err = r.Update(context.Background(), "foo", "yolo", "always")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok = res.(string)
 	assert.True(ok)
 	assert.Equal("foo update yolo always", result)
 
-	res, err = r.Update("foo", 42)
+	res, err = r.Update(context.Background(), "foo", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = r.Update("bar", 42)
+	res, err = r.Update(context.Background(), "bar", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 }
@@ -166,7 +167,7 @@ func TestRegistryDelete(t *testing.T) {
 	err := r.Register("foo", a)
 	assert.Nil(err)
 
-	res, err := r.Delete("foo", "yolo")
+	res, err := r.Delete(context.Background(), "foo", "yolo")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok := res.(string)
@@ -174,18 +175,18 @@ func TestRegistryDelete(t *testing.T) {
 	assert.Equal("foo delete yolo", result)
 
 	// make sure it takes multiple arguments
-	res, err = r.Delete("foo", "yolo", "always")
+	res, err = r.Delete(context.Background(), "foo", "yolo", "always")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok = res.(string)
 	assert.True(ok)
 	assert.Equal("foo delete yolo always", result)
 
-	res, err = r.Delete("foo", 42)
+	res, err = r.Delete(context.Background(), "foo", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = r.Delete("bar", 42)
+	res, err = r.Delete(context.Background(), "bar", 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 }
@@ -198,7 +199,7 @@ func TestRegistryDo(t *testing.T) {
 	err := r.Register("foo", a)
 	assert.Nil(err)
 
-	res, err := r.Do("foo", Create, "yolo")
+	res, err := r.Do(context.Background(), "foo", Create, "yolo")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok := res.(string)
@@ -206,22 +207,22 @@ func TestRegistryDo(t *testing.T) {
 	assert.Equal("foo create yolo", result)
 
 	// make sure it takes multiple arguments
-	res, err = r.Do("foo", Update, "yolo", "always")
+	res, err = r.Do(context.Background(), "foo", Update, "yolo", "always")
 	assert.Nil(err)
 	assert.NotNil(res)
 	result, ok = res.(string)
 	assert.True(ok)
 	assert.Equal("foo update yolo always", result)
 
-	res, err = r.Do("foo", Delete, 42)
+	res, err = r.Do(context.Background(), "foo", Delete, 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = r.Do("foo", Op{"unknown-op"}, 42)
+	res, err = r.Do(context.Background(), "foo", Op{"unknown-op"}, 42)
 	assert.NotNil(err)
 	assert.Nil(res)
 
-	res, err = r.Do("bar", Create, "yolo")
+	res, err = r.Do(context.Background(), "bar", Create, "yolo")
 	assert.NotNil(err)
 	assert.Nil(res)
 }

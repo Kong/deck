@@ -392,7 +392,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
 		go func() {
-			err := sc.eventLoop(d)
+			err := sc.eventLoop(ctx, d)
 			if err != nil {
 				sc.errChan <- err
 			}
@@ -444,7 +444,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 // Do is the worker function to sync the diff
 type Do func(a Event) (crud.Arg, error)
 
-func (sc *Syncer) eventLoop(d Do) error {
+func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	for event := range sc.eventChan {
 		// Stop if program is terminated
 		select {
@@ -453,7 +453,7 @@ func (sc *Syncer) eventLoop(d Do) error {
 		default:
 		}
 
-		err := sc.handleEvent(d, event)
+		err := sc.handleEvent(ctx, d, event)
 		sc.eventCompleted()
 		if err != nil {
 			return err
@@ -462,7 +462,7 @@ func (sc *Syncer) eventLoop(d Do) error {
 	return nil
 }
 
-func (sc *Syncer) handleEvent(d Do, event Event) error {
+func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
@@ -482,7 +482,7 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 			// Do not retry empty responses
 			return backoff.Permanent(fmt.Errorf("result of event is nil"))
 		}
-		_, err = sc.postProcess.Do(event.Kind, event.Op, res)
+		_, err = sc.postProcess.Do(ctx, event.Kind, event.Op, res)
 		if err != nil {
 			// Do not retry program errors
 			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))

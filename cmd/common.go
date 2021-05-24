@@ -135,7 +135,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 
 		if !dry {
-			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &wsConfig.Workspace})
+			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
 				return err
 			}

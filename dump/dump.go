@@ -364,7 +364,7 @@ func GetAllCACertificates(ctx context.Context,
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.CACertificates.List(nil, opt)
+		s, nextopt, err := client.CACertificates.List(ctx, opt)
 		// Compatibility for Kong < 1.3
 		// This core entitiy was not present in the past
 		// and the Admin API request will error with 404 Not Found
