@@ -134,7 +134,7 @@ func (d *DocumentService) listAllByPath(ctx context.Context, path string) ([]*Do
 // ListAllForParent fetches all Documents in Konnect for a parent entity.
 func (d *DocumentService) ListAllForParent(ctx context.Context, parent ParentInfoer) ([]*Document, error) {
 	if parent == nil {
-		return nil, fmt.Errorf("rarent cannot be nil")
+		return nil, fmt.Errorf("parent cannot be nil")
 	}
 	var docs []*Document
 	var err error
