@@ -27,8 +27,6 @@ func defaultBackOff() backoff.BackOff {
 	return backoff.WithMaxRetries(exponentialBackoff, 4)
 }
 
-// TODO get rid of the syncer struct and simply have a func for it
-
 // Syncer takes in a current and target state of Kong,
 // diffs them, generating a Graph to get Kong from current
 // to target state.
@@ -443,7 +441,6 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 }
 
 // Do is the worker function to sync the diff
-// TODO remove crud.Arg
 type Do func(a Event) (crud.Arg, error)
 
 func (sc *Syncer) eventLoop(d Do) error {
