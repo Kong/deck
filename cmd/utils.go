@@ -17,9 +17,7 @@ func printStats(stats solver.Stats) {
 	printFn("  Deleted: %v\n", stats.DeleteOps)
 }
 
-var (
-	silenceEvents bool
-)
+var silenceEvents bool
 
 func preRunSilenceEventsFlag() error {
 	printPkg.DisableOutput = true
