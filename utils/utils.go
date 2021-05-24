@@ -13,9 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
-)
+var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
 
 // Empty checks if a string referenced by s or s itself is empty.
 func Empty(s *string) bool {
@@ -23,6 +21,7 @@ func Empty(s *string) bool {
 }
 
 // UUID will generate a random v14 unique identifier based upon random numbers
+// nolint:gomnd
 func UUID() string {
 	version := byte(4)
 	uuid := make([]byte, 16)

@@ -100,7 +100,6 @@ func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, err
 	// found, check if update needed
 
 	if !currentBasicAuth.EqualWithOpts(basicAuth, false, true, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "basic-auth",

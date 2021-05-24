@@ -82,7 +82,6 @@ func (sc *Syncer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
 	// found, check if update needed
 
 	if !currentJWTAuth.EqualWithOpts(jwtAuth, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "jwt-auth",

@@ -1,8 +1,9 @@
 package state
 
 import (
-	"github.com/kong/deck/konnect"
 	"reflect"
+
+	"github.com/kong/deck/konnect"
 )
 
 // Document represents a document in Konnect.
@@ -92,7 +93,7 @@ func (s1 *ServicePackage) EqualWithOpts(s2 *ServicePackage,
 
 // ServiceVersion represents a service version in Konnect.
 // It adds some helper methods along with Meta to the original ServiceVersion
-//object.
+// object.
 type ServiceVersion struct {
 	konnect.ServiceVersion `yaml:",inline"`
 	Meta

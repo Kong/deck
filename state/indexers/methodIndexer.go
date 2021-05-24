@@ -18,14 +18,12 @@ type MethodIndexer struct {
 func (s *MethodIndexer) FromObject(obj interface{}) (bool, []byte, error) {
 	v := reflect.ValueOf(obj)
 
-	key := ""
-
 	method := v.MethodByName(s.Method)
 	resp := method.Call(nil)
 	if len(resp) != 1 {
 		return false, nil, fmt.Errorf("function call returned unexpected result")
 	}
-	key = resp[0].String()
+	key := resp[0].String()
 
 	if key == "" {
 		return false, nil, nil

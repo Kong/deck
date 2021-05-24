@@ -191,7 +191,7 @@ func initKonnectConfig() error {
 	password := viper.GetString("konnect-password")
 	passwordFile := viper.GetString("konnect-password-file")
 	// read from password file only if password is not supplied using an
-	//environment variable or flag
+	// environment variable or flag
 	if password == "" && passwordFile != "" {
 		fileContent, err := ioutil.ReadFile(passwordFile)
 		if err != nil {

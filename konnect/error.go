@@ -51,7 +51,7 @@ func (e *APIError) Code() int {
 func IsNotFoundErr(e error) bool {
 	switch e := e.(type) {
 	case *APIError:
-		return e.httpCode == 404
+		return e.httpCode == http.StatusNotFound
 	default:
 		return false
 	}

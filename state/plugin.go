@@ -9,9 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-var (
-	errPluginNameRequired = errors.New("name of plugin required")
-)
+var errPluginNameRequired = errors.New("name of plugin required")
 
 const (
 	pluginTableName     = "plugin"

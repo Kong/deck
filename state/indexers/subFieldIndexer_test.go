@@ -97,5 +97,4 @@ func TestSubFieldIndexerPointer(t *testing.T) {
 	val, err = in.FromArgs("yolo")
 	assert.Nil(err)
 	assert.Equal("yolo\x00", string(val))
-
 }

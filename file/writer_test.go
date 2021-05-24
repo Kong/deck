@@ -206,8 +206,8 @@ func Test_compareOrder(t *testing.T) {
 }
 
 func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
-	var ks, _ = state.NewKongState()
-	var filename = "-"
+	ks, _ := state.NewKongState()
+	filename := "-"
 	assert := assert.New(t)
 	assert.Equal("-", filename)
 	assert.NotEmpty(t, ks)
@@ -236,8 +236,8 @@ func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 }
 
 func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
-	var ks, _ = state.NewKongState()
-	var filename = "-"
+	ks, _ := state.NewKongState()
+	filename := "-"
 	assert := assert.New(t)
 	var service state.Service
 	service.ID = kong.String("first")
@@ -275,8 +275,8 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 }
 
 func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
-	var ks, _ = state.NewKongState()
-	var filename = "-"
+	ks, _ := state.NewKongState()
+	filename := "-"
 	assert := assert.New(t)
 	var service state.Service
 	service.ID = kong.String("first")

@@ -15,8 +15,10 @@ const (
 	documentsByParent = "documentsByParent"
 )
 
-var errDocumentMissingParent = errors.New("Document has no Parent")
-var errDocumentPathRequired = errors.New("Document must have a Path")
+var (
+	errDocumentMissingParent = errors.New("Document has no Parent")
+	errDocumentPathRequired  = errors.New("Document must have a Path")
+)
 
 // DocumentsCollection stores and indexes key-auth credentials.
 type DocumentsCollection collection

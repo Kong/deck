@@ -1,11 +1,12 @@
 package file
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/pkg/errors"
-	"os"
-	"path/filepath"
 )
 
 // PopulateDocumentContent updates the Documents contained within a Content with the

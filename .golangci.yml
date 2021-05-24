@@ -1,16 +1,30 @@
 linters:
   enable:
+  - wastedassign
   - megacheck
+  - gci
   - govet
+  - nolintlint
+  - gomnd
+  - gofumpt
   - unparam
+  - nilerr
   - unconvert
   - misspell
+  - importas
+  - exhaustive
   - lll
+  - durationcheck
   - gofmt
+  - bodyclose
   - golint
   - gosec
   - nakedret
   - dogsled
+  - exportloopref
+  - asciicheck
+  - stylecheck
+  - goimports
   - depguard
 issues:
   exclude-rules:

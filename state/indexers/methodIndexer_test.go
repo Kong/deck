@@ -68,5 +68,4 @@ func TestMethodIndexer(t *testing.T) {
 	assert.False(ok)
 	assert.NotNil(err)
 	assert.Empty(val)
-
 }

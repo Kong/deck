@@ -101,6 +101,7 @@ func TestUpstreamGetMemoryReference(t *testing.T) {
 	assert.NotNil(se)
 	assert.Nil(se.Slots)
 }
+
 func TestUpstreamsInvalidType(t *testing.T) {
 	assert := assert.New(t)
 

@@ -15,9 +15,7 @@ import (
 	"github.com/yudai/gojsondiff/formatter"
 )
 
-var (
-	differ = gojsondiff.New()
-)
+var differ = gojsondiff.New()
 
 func getDocumentDiff(a, b *state.Document) (string, error) {
 	aCopy := a.ShallowCopy()
