@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteCertificates() error {
 	currentCertificates, err := sc.currentState.Certificates.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching certificates from state")
+		return fmt.Errorf("error fetching certificates from state: %w", err)
 	}
 
 	for _, certificate := range currentCertificates {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteCertificate(
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up certificate '%v'",
-			certificate.Identifier())
+		return nil, fmt.Errorf("looking up certificate %q': %w",
+			certificate.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteCertificate(
 func (sc *Syncer) createUpdateCertificates() error {
 	targetCertificates, err := sc.targetState.Certificates.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching certificates from state")
+		return fmt.Errorf("error fetching certificates from state: %w", err)
 	}
 
 	for _, certificate := range targetCertificates {
@@ -79,8 +80,8 @@ func (sc *Syncer) createUpdateCertificate(
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up certificate %v",
-			certificate.Identifier())
+		return nil, fmt.Errorf("error looking up certificate %q: %w",
+			certificate.Identifier(), err)
 	}
 
 	// found, check if update needed
@@ -95,8 +96,8 @@ func (sc *Syncer) createUpdateCertificate(
 		// subsequent actions on the SNI objects will handle those.
 		currentSNIs, err := sc.currentState.SNIs.GetAllByCertID(*currentCertificate.ID)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error looking up current certificate SNIs %v",
-				certificate.Identifier())
+			return nil, fmt.Errorf("error looking up current certificate SNIs %q: %w",
+				certificate.Identifier(), err)
 		}
 		sniNames := make([]*string, 0)
 		for _, s := range currentSNIs {

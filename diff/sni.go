@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteSNIs() error {
 	currentSNIs, err := sc.currentState.SNIs.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching snis from state")
+		return fmt.Errorf("error fetching snis from state: %w", err)
 	}
 
 	for _, sni := range currentSNIs {
@@ -37,7 +38,7 @@ func (sc *Syncer) deleteSNI(sni *state.SNI) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up sni '%v'", *sni.Name)
+		return nil, fmt.Errorf("looking up sni %q: %w", *sni.Name, err)
 	}
 	return nil, nil
 }
@@ -45,7 +46,7 @@ func (sc *Syncer) deleteSNI(sni *state.SNI) (*Event, error) {
 func (sc *Syncer) createUpdateSNIs() error {
 	sniSNIs, err := sc.targetState.SNIs.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching snis from state")
+		return fmt.Errorf("error fetching snis from state: %w", err)
 	}
 
 	for _, sni := range sniSNIs {
@@ -76,7 +77,7 @@ func (sc *Syncer) createUpdateSNI(sni *state.SNI) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up sni %v", *sni.Name)
+		return nil, fmt.Errorf("error looking up sni %q: %w", *sni.Name, err)
 	}
 	// found, check if update needed
 

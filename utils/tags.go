@@ -1,9 +1,8 @@
 package utils
 
 import (
+	"fmt"
 	"reflect"
-
-	"github.com/pkg/errors"
 )
 
 // MustMergeTags is same as MergeTags but panics if there is an error.
@@ -21,7 +20,7 @@ func MergeTags(obj interface{}, tags []string) error {
 	}
 	ptr := reflect.ValueOf(obj)
 	if ptr.Kind() != reflect.Ptr {
-		return errors.New("obj is not a pointer")
+		return fmt.Errorf("obj is not a pointer")
 	}
 	v := reflect.Indirect(ptr)
 	structTags := v.FieldByName("Tags")
@@ -64,7 +63,7 @@ func RemoveTags(obj interface{}, tags []string) error {
 
 	ptr := reflect.ValueOf(obj)
 	if ptr.Kind() != reflect.Ptr {
-		return errors.New("obj is not a pointer")
+		return fmt.Errorf("obj is not a pointer")
 	}
 	v := reflect.Indirect(ptr)
 	structTags := v.FieldByName("Tags")

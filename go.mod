@@ -17,7 +17,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
-	github.com/pkg/errors v0.9.1
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.4
 	github.com/spf13/afero v1.2.2 // indirect

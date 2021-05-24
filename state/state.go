@@ -1,8 +1,9 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
-	"github.com/pkg/errors"
 )
 
 type collection struct {
@@ -81,7 +82,7 @@ func NewKongState() (*KongState, error) {
 
 	memDB, err := memdb.NewMemDB(schema)
 	if err != nil {
-		return nil, errors.Wrap(err, "creating new ServiceCollection")
+		return nil, fmt.Errorf("creating new ServiceCollection: %w", err)
 	}
 	var state KongState
 	state.common = collection{

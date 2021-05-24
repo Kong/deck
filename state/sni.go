@@ -6,7 +6,6 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -14,7 +13,7 @@ const (
 	snisByCertID = "snisByCertID"
 )
 
-var errInvalidCert = errors.New("certificate.ID is required in sni")
+var errInvalidCert = fmt.Errorf("certificate.ID is required in sni")
 
 var sniTableSchema = &memdb.TableSchema{
 	Name: sniTableName,

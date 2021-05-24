@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteRBACEndpointPermissions() error {
 	currentRBACEndpointPermissions, err := sc.currentState.RBACEndpointPermissions.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching eps from state")
+		return fmt.Errorf("error fetching eps from state: %w", err)
 	}
 
 	for _, ep := range currentRBACEndpointPermissions {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteRBACEndpointPermission(ep *state.RBACEndpointPermission)
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up rbac ep '%v'",
-			ep.ID)
+		return nil, fmt.Errorf("looking up rbac ep %q: %w",
+			ep.ID, err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteRBACEndpointPermission(ep *state.RBACEndpointPermission)
 func (sc *Syncer) createUpdateRBACEndpointPermissions() error {
 	targetRBACEndpointPermissions, err := sc.targetState.RBACEndpointPermissions.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching rbac eps from state")
+		return fmt.Errorf("error fetching rbac eps from state: %w", err)
 	}
 
 	for _, ep := range targetRBACEndpointPermissions {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateRBACEndpointPermission(ep *state.RBACEndpointPermi
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up rbac endpoint permission %v",
-			ep.Identifier())
+		return nil, fmt.Errorf("error looking up rbac endpoint permission %q: %w",
+			ep.Identifier(), err)
 	}
 
 	// found, check if update needed

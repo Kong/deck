@@ -13,7 +13,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -45,7 +44,7 @@ func syncKonnect(ctx context.Context,
 		konnectConfig.Email,
 		konnectConfig.Password)
 	if err != nil {
-		return errors.Wrap(err, "authenticating with Konnect")
+		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 
 	// get kong control plane ID
@@ -104,7 +103,7 @@ func fetchKongControlPlaneID(ctx context.Context,
 	client *konnect.Client) (string, error) {
 	controlPlanes, _, err := client.ControlPlanes.List(ctx, nil)
 	if err != nil {
-		return "", errors.Wrap(err, "fetching control planes")
+		return "", fmt.Errorf("fetching control planes: %w", err)
 	}
 
 	return singleOutKongCP(controlPlanes)
@@ -123,11 +122,11 @@ func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
 		}
 	}
 	if kongCPCount == 0 {
-		return "", errors.New("found no Kong EE control-planes")
+		return "", fmt.Errorf("found no Kong EE control-planes")
 	}
 	if kongCPCount > 1 {
-		return "", errors.New("found multiple Kong EE control-planes. " +
-			"decK expected a single control-plane.")
+		return "", fmt.Errorf("found multiple Kong EE control-planes, " +
+			"decK expected a single control-plane")
 	}
 	return kongCPID, nil
 }
@@ -150,7 +149,7 @@ func getKonnectState(ctx context.Context,
 			SkipConsumers: skipConsumers,
 		})
 		if err != nil {
-			return errors.Wrap(err, "reading configuration from Kong")
+			return fmt.Errorf("reading configuration from Kong: %w", err)
 		}
 		return nil
 	})
@@ -173,7 +172,7 @@ func getKonnectState(ctx context.Context,
 
 	ks, err := state.GetKonnectState(kongState, konnectState)
 	if err != nil {
-		return nil, errors.Wrap(err, "building state")
+		return nil, fmt.Errorf("building state: %w", err)
 	}
 	return ks, nil
 }

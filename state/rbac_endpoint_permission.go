@@ -6,7 +6,6 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -15,7 +14,7 @@ const (
 )
 
 var (
-	errInvalidRole                    = errors.New("role.ID is required in rbacEndpointPermission")
+	errInvalidRole                    = fmt.Errorf("role.ID is required in rbacEndpointPermission")
 	rbacEndpointPermissionTableSchema = &memdb.TableSchema{
 		Name: rbacEndpointPermissionTableName,
 		Indexes: map[string]*memdb.IndexSchema{

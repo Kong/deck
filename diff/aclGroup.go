@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteACLGroups() error {
 	currentACLGroups, err := sc.currentState.ACLGroups.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching acls from state")
+		return fmt.Errorf("error fetching acls from state: %w", err)
 	}
 
 	for _, aclGroup := range currentACLGroups {
@@ -38,7 +39,7 @@ func (sc *Syncer) deleteACLGroup(aclGroup *state.ACLGroup) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up acl '%v'", *aclGroup.Group)
+		return nil, fmt.Errorf("looking up acl %q: %w", *aclGroup.Group, err)
 	}
 	return nil, nil
 }
@@ -46,7 +47,7 @@ func (sc *Syncer) deleteACLGroup(aclGroup *state.ACLGroup) (*Event, error) {
 func (sc *Syncer) createUpdateACLGroups() error {
 	targetACLGroups, err := sc.targetState.ACLGroups.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching acls from state")
+		return fmt.Errorf("error fetching acls from state: %w", err)
 	}
 
 	for _, aclGroup := range targetACLGroups {
@@ -78,8 +79,8 @@ func (sc *Syncer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*Event, error)
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up acl %v",
-			*aclGroup.Group)
+		return nil, fmt.Errorf("error looking up acl %q: %w",
+			*aclGroup.Group, err)
 	}
 	// found, check if update needed
 

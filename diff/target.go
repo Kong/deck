@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteTargets() error {
 	currentTargets, err := sc.currentState.Targets.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching targets from state")
+		return fmt.Errorf("error fetching targets from state: %w", err)
 	}
 
 	for _, target := range currentTargets {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteTarget(target *state.Target) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up target '%v'",
-			*target.Target.Target)
+		return nil, fmt.Errorf("looking up target %q: %w",
+			*target.Target.Target, err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteTarget(target *state.Target) (*Event, error) {
 func (sc *Syncer) createUpdateTargets() error {
 	targetTargets, err := sc.targetState.Targets.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching targets from state")
+		return fmt.Errorf("error fetching targets from state: %w", err)
 	}
 
 	for _, target := range targetTargets {
@@ -79,8 +80,8 @@ func (sc *Syncer) createUpdateTarget(target *state.Target) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up target %v",
-			*target.Target.Target)
+		return nil, fmt.Errorf("error looking up target %q: %w",
+			*target.Target.Target, err)
 	}
 	// found, check if update needed
 

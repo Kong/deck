@@ -13,7 +13,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // WriteConfig holds settings to use to write the state file.
@@ -621,37 +620,37 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 			return err
 		}
 	default:
-		return errors.New("unknown file format: " + string(format))
+		return fmt.Errorf("unknown file format: " + string(format))
 	}
 
 	if filename == "-" {
 		if _, err := fmt.Print(string(c)); err != nil {
-			return errors.Wrap(err, "writing file")
+			return fmt.Errorf("writing file: %w", err)
 		}
 	} else {
 		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))
 		prefix, _ := filepath.Split(filename)
 		if err := ioutil.WriteFile(filename, c, 0o600); err != nil {
-			return errors.Wrap(err, "writing file")
+			return fmt.Errorf("writing file: %w", err)
 		}
 		for _, sp := range content.ServicePackages {
 			if sp.Document != nil {
 				if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*sp.Document.Path)), 0o700); err != nil {
-					return errors.Wrap(err, "creating document directory")
+					return fmt.Errorf("creating document directory: %w", err)
 				}
 				if err := os.WriteFile(filepath.Join(prefix, *sp.Document.Path),
 					[]byte(*sp.Document.Content), 0o600); err != nil {
-					return errors.Wrap(err, "writing document file")
+					return fmt.Errorf("writing document file: %w", err)
 				}
 			}
 			for _, v := range sp.Versions {
 				if v.Document != nil {
 					if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*v.Document.Path)), 0o700); err != nil {
-						return errors.Wrap(err, "creating document directory")
+						return fmt.Errorf("creating document directory: %w", err)
 					}
 					if err := os.WriteFile(filepath.Join(prefix, *v.Document.Path),
 						[]byte(*v.Document.Content), 0o600); err != nil {
-						return errors.Wrap(err, "writing document file")
+						return fmt.Errorf("writing document file: %w", err)
 					}
 				}
 			}

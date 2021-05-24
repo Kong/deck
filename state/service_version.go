@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -14,7 +13,7 @@ const (
 	versionsByServicePackageID = "serviceVersionsByServicePackageID"
 )
 
-var errInvalidPackage = errors.New("servicePackage.ID is required in ServiceVersion")
+var errInvalidPackage = fmt.Errorf("servicePackage.ID is required in ServiceVersion")
 
 var serviceVersionTableSchema = &memdb.TableSchema{
 	Name: serviceVersionTableName,
@@ -88,7 +87,7 @@ func (k *ServiceVersionsCollection) Add(serviceVersion ServiceVersion) error {
 
 func getServiceVersion(txn *memdb.Txn, packageID string, IDs ...string) (*ServiceVersion, error) {
 	if packageID == "" {
-		return nil, errors.New("packageID is required")
+		return nil, fmt.Errorf("packageID is required")
 	}
 	versions, err := getAllByPackageID(txn, packageID)
 	if err != nil {

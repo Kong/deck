@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteCACertificates() error {
 	currentCACertificates, err := sc.currentState.CACertificates.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching caCertificates from state")
+		return fmt.Errorf("error fetching caCertificates from state: %w", err)
 	}
 
 	for _, certificate := range currentCACertificates {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteCACertificate(
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up caCertificate '%v'",
-			caCert.Identifier())
+		return nil, fmt.Errorf("looking up caCertificate %q: %w",
+			caCert.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteCACertificate(
 func (sc *Syncer) createUpdateCACertificates() error {
 	targetCACertificates, err := sc.targetState.CACertificates.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching caCertificates from state")
+		return fmt.Errorf("error fetching caCertificates from state: %w", err)
 	}
 
 	for _, caCert := range targetCACertificates {
@@ -79,8 +80,8 @@ func (sc *Syncer) createUpdateCACertificate(
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up caCertificate %v",
-			caCert.Identifier())
+		return nil, fmt.Errorf("error looking up caCertificate %q: %w",
+			caCert.Identifier(), err)
 	}
 
 	// found, check if update needed

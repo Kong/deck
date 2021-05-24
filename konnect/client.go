@@ -3,13 +3,12 @@ package konnect
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-
-	"github.com/pkg/errors"
 )
 
 var defaultCtx = context.Background()
@@ -48,7 +47,7 @@ func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	client.client = httpClient
 	url, err := url.ParseRequestURI(opts.BaseURL)
 	if err != nil {
-		return nil, errors.Wrap(err, "parsing URL")
+		return nil, fmt.Errorf("parsing URL: %w", err)
 	}
 	client.baseURL = url.String()
 
@@ -74,7 +73,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	v interface{}) (*http.Response, error) {
 	var err error
 	if req == nil {
-		return nil, errors.New("request cannot be nil")
+		return nil, fmt.Errorf("request cannot be nil")
 	}
 	if ctx == nil {
 		ctx = defaultCtx
@@ -90,7 +89,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	// Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "making HTTP request")
+		return nil, fmt.Errorf("making HTTP request: %w", err)
 	}
 
 	// log the response

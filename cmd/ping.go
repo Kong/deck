@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +21,7 @@ can connect to Kong's Admin API or not.`,
 		wsConfig := rootConfig.ForWorkspace(pingWorkspace)
 		version, err := fetchKongVersion(ctx, wsConfig)
 		if err != nil {
-			return errors.Wrap(err, "reading Kong version")
+			return fmt.Errorf("reading Kong version: %w", err)
 		}
 		_ = sendAnalytics("ping", version)
 		fmt.Println("Successfully connected to Kong!")

@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteRBACRoles() error {
 	currentRBACRoles, err := sc.currentState.RBACRoles.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching rbac roles from state")
+		return fmt.Errorf("error fetching rbac roles from state: %w", err)
 	}
 
 	for _, role := range currentRBACRoles {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteRBACRole(role *state.RBACRole) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up rbac role '%v'",
-			role.Identifier())
+		return nil, fmt.Errorf("looking up rbac role %q: %w",
+			role.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteRBACRole(role *state.RBACRole) (*Event, error) {
 func (sc *Syncer) createUpdateRBACRoles() error {
 	targetRBACRoles, err := sc.targetState.RBACRoles.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching rbac roles from state")
+		return fmt.Errorf("error fetching rbac roles from state: %w", err)
 	}
 
 	for _, role := range targetRBACRoles {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateRBACRole(role *state.RBACRole) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up rbac role %v",
-			role.Identifier())
+		return nil, fmt.Errorf("error looking up rbac role %q: %w",
+			role.Identifier(), err)
 	}
 
 	// found, check if update needed

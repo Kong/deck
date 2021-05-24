@@ -13,7 +13,6 @@ import (
 
 	ghodss "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
-	"github.com/pkg/errors"
 )
 
 // getContent reads all the YAML and JSON files in the directory or the
@@ -32,11 +31,11 @@ func getContent(filenames []string) (*Content, error) {
 	for _, r := range allReaders {
 		content, err := readContent(r)
 		if err != nil {
-			return nil, errors.Wrap(err, "reading file")
+			return nil, fmt.Errorf("reading file: %w", err)
 		}
 		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
 		if err != nil {
-			return nil, errors.Wrap(err, "merging file contents")
+			return nil, fmt.Errorf("merging file contents: %w", err)
 		}
 	}
 	return &res, nil
@@ -55,15 +54,14 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 
 	finfo, err := os.Stat(fileOrDir)
 	if err != nil {
-		return nil, errors.Wrap(err, "reading state file")
+		return nil, fmt.Errorf("reading state file: %w", err)
 	}
 
 	var files []string
 	if finfo.IsDir() {
 		files, err = configFilesInDir(fileOrDir)
 		if err != nil {
-			return nil,
-				errors.Wrap(err, "getting files from directory")
+			return nil, fmt.Errorf("getting files from directory: %w", err)
 		}
 	} else {
 		files = append(files, fileOrDir)
@@ -73,7 +71,7 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 	for _, file := range files {
 		f, err := os.Open(file)
 		if err != nil {
-			return nil, errors.Wrap(err, "opening file")
+			return nil, fmt.Errorf("opening file: %w", err)
 		}
 		res = append(res, bufio.NewReader(f))
 	}
@@ -95,7 +93,7 @@ func readContent(reader io.Reader) (*Content, error) {
 	renderedContentBytes := []byte(renderedContent)
 	err = validate(renderedContentBytes)
 	if err != nil {
-		return nil, errors.Wrap(err, "validating file content")
+		return nil, fmt.Errorf("validating file content: %w", err)
 	}
 	var result Content
 	err = yamlUnmarshal(renderedContentBytes, &result)
@@ -135,7 +133,7 @@ func configFilesInDir(dir string) ([]string, error) {
 		},
 	)
 	if err != nil {
-		return nil, errors.Wrap(err, "reading state directory")
+		return nil, fmt.Errorf("reading state directory: %w", err)
 	}
 	return res, nil
 }

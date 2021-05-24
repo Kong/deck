@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteUpstreams() error {
 	currentUpstreams, err := sc.currentState.Upstreams.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching upstreams from state")
+		return fmt.Errorf("error fetching upstreams from state: %w", err)
 	}
 
 	for _, upstream := range currentUpstreams {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteUpstream(upstream *state.Upstream) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up upstream '%v'",
-			*upstream.Name)
+		return nil, fmt.Errorf("looking up upstream %q: %w",
+			*upstream.Name, err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteUpstream(upstream *state.Upstream) (*Event, error) {
 func (sc *Syncer) createUpdateUpstreams() error {
 	targetUpstreams, err := sc.targetState.Upstreams.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching upstreams from state")
+		return fmt.Errorf("error fetching upstreams from state: %w", err)
 	}
 
 	for _, upstream := range targetUpstreams {
@@ -78,8 +79,8 @@ func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*Event,
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up upstream %v",
-			*upstream.Name)
+		return nil, fmt.Errorf("error looking up upstream %v: %w",
+			*upstream.Name, err)
 	}
 
 	// found, check if update needed

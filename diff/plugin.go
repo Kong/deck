@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deletePlugins() error {
 	currentPlugins, err := sc.currentState.Plugins.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching plugins from state")
+		return fmt.Errorf("error fetching plugins from state: %w", err)
 	}
 
 	for _, plugin := range currentPlugins {
@@ -41,7 +42,7 @@ func (sc *Syncer) deletePlugin(plugin *state.Plugin) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up plugin '%v'", *plugin.ID)
+		return nil, fmt.Errorf("looking up plugin %q: %w", *plugin.ID, err)
 	}
 	return nil, nil
 }
@@ -49,7 +50,7 @@ func (sc *Syncer) deletePlugin(plugin *state.Plugin) (*Event, error) {
 func (sc *Syncer) createUpdatePlugins() error {
 	targetPlugins, err := sc.targetState.Plugins.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching plugins from state")
+		return fmt.Errorf("error fetching plugins from state: %w", err)
 	}
 
 	for _, plugin := range targetPlugins {
@@ -83,8 +84,8 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up plugin %v",
-			*plugin.Name)
+		return nil, fmt.Errorf("error looking up plugin %q: %w",
+			*plugin.Name, err)
 	}
 	currentPlugin = &state.Plugin{Plugin: *currentPlugin.DeepCopy()}
 	// found, check if update needed
