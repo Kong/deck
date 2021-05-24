@@ -1,31 +1,31 @@
 linters:
   enable:
-  - wastedassign
-  - megacheck
-  - gci
-  - govet
-  - nolintlint
-  - gomnd
-  - gofumpt
-  - unparam
-  - nilerr
-  - unconvert
-  - misspell
-  - importas
-  - exhaustive
-  - lll
-  - durationcheck
-  - gofmt
-  - bodyclose
-  - golint
-  - gosec
-  - nakedret
-  - dogsled
-  - exportloopref
   - asciicheck
-  - stylecheck
-  - goimports
+  - bodyclose
   - depguard
+  - dogsled
+  - durationcheck
+  - exhaustive
+  - exportloopref
+  - gci
+  - gofmt
+  - gofumpt
+  - goimports
+  - golint
+  - gomnd
+  - gosec
+  - govet
+  - importas
+  - lll
+  - megacheck
+  - misspell
+  - nakedret
+  - nilerr
+  - nolintlint
+  - stylecheck
+  - unconvert
+  - unparam
+  - wastedassign
 issues:
   exclude-rules:
   - linters:
