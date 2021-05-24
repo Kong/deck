@@ -1,17 +1,18 @@
 linters:
   enable:
   - asciicheck
-  - bodyclose
   - depguard
   - dogsled
   - durationcheck
   - exhaustive
   - exportloopref
   - gci
+  - goconst
   - gofmt
   - gofumpt
   - goimports
   - gomnd
+  - gomodguard
   - gosec
   - govet
   - importas

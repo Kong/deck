@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type ControlPlaneRelationsService service
@@ -29,7 +30,7 @@ func (s *ControlPlaneRelationsService) Create(ctx context.Context,
 	relation.ControlPlane = s.controlPlaneID
 
 	endpoint := "/api/control_plane_service_relations"
-	method := "POST"
+	method := http.MethodPost
 
 	req, err := s.client.NewRequest(method, endpoint, nil, relation)
 	if err != nil {
