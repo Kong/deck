@@ -1,6 +1,8 @@
 package dump
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_validateConfig(t *testing.T) {
 	type args struct {

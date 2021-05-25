@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +16,7 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if konnectDumpCmdKongStateFile == "-" {
-			return errors.New("writing to stdout is not supported in Konnect mode")
+			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 		}
 		_ = sendAnalytics("konnect-sync", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,

@@ -6,12 +6,11 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 var (
-	errGroupRequired    = errors.New("name of ACL group required")
-	errConsumerRequired = errors.New("consumer required")
+	errGroupRequired    = fmt.Errorf("name of ACL group required")
+	errConsumerRequired = fmt.Errorf("consumer required")
 )
 
 const (

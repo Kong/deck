@@ -2,6 +2,8 @@ package diff
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -11,7 +13,6 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 var errEnqueueFailed = errors.New("failed to queue event")
@@ -376,7 +377,7 @@ func (sc *Syncer) wait() {
 // Run starts a diff and invokes d for every diff.
 func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	if parallelism < 1 {
-		return append([]error{}, errors.New("parallelism can not be negative"))
+		return append([]error{}, fmt.Errorf("parallelism can not be negative"))
 	}
 
 	var wg sync.WaitGroup
@@ -465,7 +466,7 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
-			err = errors.Wrapf(err, "while processing event")
+			err = fmt.Errorf("while processing event: %w", err)
 
 			var kongAPIError *kong.APIError
 			if errors.As(err, &kongAPIError) &&
@@ -479,12 +480,12 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 		}
 		if res == nil {
 			// Do not retry empty responses
-			return backoff.Permanent(errors.New("result of event is nil"))
+			return backoff.Permanent(fmt.Errorf("result of event is nil"))
 		}
 		_, err = sc.postProcess.Do(event.Kind, event.Op, res)
 		if err != nil {
 			// Do not retry program errors
-			return backoff.Permanent(errors.Wrap(err, "while post processing event"))
+			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))
 		}
 		return nil
 	}, defaultBackOff())

@@ -11,7 +11,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,7 +34,7 @@ It can be used to export, import or sync entities to Kong.`,
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
-			return errors.WithStack(errors.Wrap(err, "invalid URL"))
+			return fmt.Errorf("invalid URL: %w", err)
 		}
 		return nil
 	},
@@ -195,10 +194,10 @@ func initKonnectConfig() error {
 	if password == "" && passwordFile != "" {
 		fileContent, err := ioutil.ReadFile(passwordFile)
 		if err != nil {
-			return errors.Errorf("read file '%s': %v", passwordFile, err)
+			return fmt.Errorf("read file %q: %w", passwordFile, err)
 		}
 		if len(fileContent) == 0 {
-			return errors.Errorf("file '%s': empty", passwordFile)
+			return fmt.Errorf("file %q: empty", passwordFile)
 		}
 		password = string(fileContent)
 		password = strings.TrimRight(password, "\n")

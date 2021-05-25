@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +30,8 @@ that will be created or updated or deleted.
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {
-			return errors.New("A state file with Kong's configuration " +
-				"must be specified using -s/--state flag.")
+			return fmt.Errorf("a state file with Kong's configuration " +
+				"must be specified using -s/--state flag")
 		}
 		return preRunSilenceEventsFlag()
 	},

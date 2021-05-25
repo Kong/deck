@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteDocuments() error {
 	currentDocuments, err := sc.currentState.Documents.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching documents from state")
+		return fmt.Errorf("error fetching documents from state: %w", err)
 	}
 
 	for _, d := range currentDocuments {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteDocument(d *state.Document) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up document '%v'",
-			d.Identifier())
+		return nil, fmt.Errorf("looking up document %q: %w",
+			d.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteDocument(d *state.Document) (*Event, error) {
 func (sc *Syncer) createUpdateDocuments() error {
 	targetDocuments, err := sc.targetState.Documents.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching documents from state")
+		return fmt.Errorf("error fetching documents from state: %w", err)
 	}
 
 	for _, d := range targetDocuments {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateDocument(d *state.Document) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up document %v",
-			d.Identifier())
+		return nil, fmt.Errorf("error looking up document %q: %w",
+			d.Identifier(), err)
 	}
 
 	// found, check if update needed

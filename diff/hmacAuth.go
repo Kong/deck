@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteHMACAuths() error {
 	currentHMACAuths, err := sc.currentState.HMACAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching hmac-auths from state")
+		return fmt.Errorf("error fetching hmac-auths from state: %w", err)
 	}
 
 	for _, hmacAuth := range currentHMACAuths {
@@ -37,8 +38,8 @@ func (sc *Syncer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up hmac-auth '%v'",
-			*hmacAuth.Username)
+		return nil, fmt.Errorf("looking up hmac-auth %q: %w",
+			*hmacAuth.Username, err)
 	}
 	return nil, nil
 }
@@ -46,7 +47,7 @@ func (sc *Syncer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
 func (sc *Syncer) createUpdateHMACAuths() error {
 	targetHMACAuths, err := sc.targetState.HMACAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching hmac-auths from state")
+		return fmt.Errorf("error fetching hmac-auths from state: %w", err)
 	}
 
 	for _, hmacAuth := range targetHMACAuths {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error)
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up hmac-auth %v",
-			*hmacAuth.Username)
+		return nil, fmt.Errorf("error looking up hmac-auth %q: %w",
+			*hmacAuth.Username, err)
 	}
 	// found, check if update needed
 

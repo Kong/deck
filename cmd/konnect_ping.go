@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +24,7 @@ credentials.` + konnectAlphaState,
 		res, err := client.Auth.Login(cmd.Context(), konnectConfig.Email,
 			konnectConfig.Password)
 		if err != nil {
-			return errors.Wrap(err, "authenticating with Konnect")
+			return fmt.Errorf("authenticating with Konnect: %w", err)
 		}
 		fmt.Printf("Successfully Konnected as %s %s (%s)!\n",
 			res.FirstName, res.LastName, res.Organization)

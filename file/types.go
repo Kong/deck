@@ -2,13 +2,13 @@ package file
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // Format is a file format for Kong's configuration.
@@ -108,10 +108,10 @@ func copyToService(fService FService) service {
 func unwrapURL(urlString string, fService *FService) error {
 	parsed, err := url.Parse(urlString)
 	if err != nil {
-		return errors.New("invaid url: " + urlString)
+		return fmt.Errorf("invalid url: " + urlString)
 	}
 	if parsed.Scheme == "" {
-		return errors.New("invalid url:" + urlString)
+		return fmt.Errorf("invalid url:" + urlString)
 	}
 
 	fService.Protocol = kong.String(parsed.Scheme)

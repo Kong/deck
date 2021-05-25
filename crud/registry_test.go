@@ -1,9 +1,9 @@
 package crud
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func (t testActionFixture) invoke(op string, inputs ...Arg) (Arg, error) {
 	for _, input := range inputs {
 		iString, ok := input.(string)
 		if !ok {
-			return nil, errors.New("input is not a string")
+			return nil, fmt.Errorf("input is not a string")
 		}
 		res += " " + iString
 	}

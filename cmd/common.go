@@ -15,7 +15,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -52,7 +51,7 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig) (bool, 
 	case err == nil:
 		return true, nil
 	default:
-		return false, errors.Wrap(err, "checking if workspace exists")
+		return false, fmt.Errorf("checking if workspace exists: %w", err)
 	}
 }
 
@@ -83,11 +82,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// load Kong version after workspace
 	kongVersion, err := fetchKongVersion(ctx, wsConfig)
 	if err != nil {
-		return errors.Wrap(err, "reading Kong version")
+		return fmt.Errorf("reading Kong version: %w", err)
 	}
 	parsedKongVersion, err := parseKongVersion(kongVersion)
 	if err != nil {
-		return errors.Wrap(err, "parsing Kong version")
+		return fmt.Errorf("parsing Kong version: %w", err)
 	}
 
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
@@ -220,8 +219,8 @@ func parseKongVersion(version string) (semver.Version, error) {
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
-		return errors.New("positional arguments are not valid for this command, please use flags instead\n" +
-			"Run 'deck --help' for usage.")
+		return fmt.Errorf("positional arguments are not valid for this command, " +
+			"please use flags instead")
 	}
 	return nil
 }

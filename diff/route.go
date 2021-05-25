@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteRoutes() error {
 	currentRoutes, err := sc.currentState.Routes.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching routes from state")
+		return fmt.Errorf("error fetching routes from state: %w", err)
 	}
 
 	for _, route := range currentRoutes {
@@ -37,8 +38,8 @@ func (sc *Syncer) deleteRoute(route *state.Route) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up route '%v'",
-			route.Identifier())
+		return nil, fmt.Errorf("looking up route %q: %w",
+			route.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -46,7 +47,7 @@ func (sc *Syncer) deleteRoute(route *state.Route) (*Event, error) {
 func (sc *Syncer) createUpdateRoutes() error {
 	targetRoutes, err := sc.targetState.Routes.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching routes from state")
+		return fmt.Errorf("error fetching routes from state: %w", err)
 	}
 
 	for _, route := range targetRoutes {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up route %v",
-			route.Identifier())
+		return nil, fmt.Errorf("error looking up route %q: %w",
+			route.Identifier(), err)
 	}
 	// found, check if update needed
 

@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +24,7 @@ that will be created or updated or deleted.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if konnectDumpCmdKongStateFile == "-" {
-			return errors.New("writing to stdout is not supported in Konnect mode")
+			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 		}
 		_ = sendAnalytics("konnect-diff", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,

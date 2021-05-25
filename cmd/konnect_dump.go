@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +29,7 @@ configure Konnect.` + konnectAlphaState,
 		_ = sendAnalytics("konnect-dump", "")
 
 		if konnectDumpCmdKongStateFile == "-" {
-			return errors.New("writing to stdout is not supported in Konnect mode")
+			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 		}
 
 		if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
@@ -49,7 +49,7 @@ configure Konnect.` + konnectAlphaState,
 			konnectConfig.Email,
 			konnectConfig.Password)
 		if err != nil {
-			return errors.Wrap(err, "authenticating with Konnect")
+			return fmt.Errorf("authenticating with Konnect: %w", err)
 		}
 
 		// get kong control plane ID

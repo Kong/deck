@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -58,8 +59,8 @@ this command.
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(validateCmdKongStateFile) == 0 {
-			return errors.New("A state file with Kong's configuration " +
-				"must be specified using -s/--state flag.")
+			return fmt.Errorf("a state file with Kong's configuration " +
+				"must be specified using -s/--state flag")
 		}
 		return nil
 	},

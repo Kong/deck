@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteKeyAuths() error {
 	currentKeyAuths, err := sc.currentState.KeyAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching key-auths from state")
+		return fmt.Errorf("error fetching key-auths from state: %w", err)
 	}
 
 	for _, keyAuth := range currentKeyAuths {
@@ -37,7 +38,7 @@ func (sc *Syncer) deleteKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up key-auth '%v'", *keyAuth.ID)
+		return nil, fmt.Errorf("looking up key-auth %q: %w", *keyAuth.ID, err)
 	}
 	return nil, nil
 }
@@ -45,7 +46,7 @@ func (sc *Syncer) deleteKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 func (sc *Syncer) createUpdateKeyAuths() error {
 	targetKeyAuths, err := sc.targetState.KeyAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching key-auths from state")
+		return fmt.Errorf("error fetching key-auths from state: %w", err)
 	}
 
 	for _, keyAuth := range targetKeyAuths {
@@ -76,8 +77,8 @@ func (sc *Syncer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up key-auth %v",
-			*keyAuth.ID)
+		return nil, fmt.Errorf("error looking up key-auth %q: %w",
+			*keyAuth.ID, err)
 	}
 	// found, check if update needed
 

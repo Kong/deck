@@ -7,7 +7,6 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -16,8 +15,8 @@ const (
 )
 
 var (
-	errDocumentMissingParent = errors.New("Document has no Parent")
-	errDocumentPathRequired  = errors.New("Document must have a Path")
+	errDocumentMissingParent = fmt.Errorf("Document has no Parent")
+	errDocumentPathRequired  = fmt.Errorf("Document must have a Path")
 )
 
 // DocumentsCollection stores and indexes key-auth credentials.
@@ -81,7 +80,7 @@ func (k *DocumentsCollection) Add(document Document) error {
 
 func getDocument(txn *memdb.Txn, parentKey string, IDs ...string) (*Document, error) {
 	if parentKey == "" {
-		return nil, errors.New("parentKey is required")
+		return nil, fmt.Errorf("parentKey is required")
 	}
 	documents, err := getAllDocsByParentKey(txn, parentKey)
 	if err != nil {

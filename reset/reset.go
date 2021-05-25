@@ -2,17 +2,17 @@ package reset
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
 // Reset deletes all entities in Kong.
 func Reset(ctx context.Context, state *utils.KongRawState, client *kong.Client) error {
 	if state == nil {
-		return errors.New("state cannot be empty")
+		return fmt.Errorf("state cannot be empty")
 	}
 
 	group, ctx := errgroup.WithContext(ctx)

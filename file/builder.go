@@ -1,12 +1,13 @@
 package file
 
 import (
+	"fmt"
+
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 type stateBuilder struct {
@@ -690,8 +691,9 @@ func (b *stateBuilder) plugins() {
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "consumer %v for plugin %v",
-					*p.Consumer.ID, *p.Name)
+				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
+					*p.Consumer.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -702,8 +704,9 @@ func (b *stateBuilder) plugins() {
 		if p.Service != nil && !utils.Empty(p.Service.ID) {
 			s, err := b.intermediate.Services.Get(*p.Service.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "service %v for plugin %v",
-					*p.Service.ID, *p.Name)
+				b.err = fmt.Errorf("service %v for plugin %v: %w",
+					*p.Service.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -714,8 +717,9 @@ func (b *stateBuilder) plugins() {
 		if p.Route != nil && !utils.Empty(p.Route.ID) {
 			s, err := b.intermediate.Routes.Get(*p.Route.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "route %v for plugin %v",
-					*p.Route.ID, *p.Name)
+				b.err = fmt.Errorf("route %v for plugin %v: %w",
+					*p.Route.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -795,12 +799,12 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 
 func (b *stateBuilder) fillPluginConfig(plugin *FPlugin) error {
 	if plugin == nil {
-		return errors.New("plugin is nil")
+		return fmt.Errorf("plugin is nil")
 	}
 	if !utils.Empty(plugin.ConfigSource) {
 		conf, ok := b.targetContent.PluginConfigs[*plugin.ConfigSource]
 		if !ok {
-			return errors.Errorf("_plugin_config '%v' not found",
+			return fmt.Errorf("_plugin_config %q not found",
 				*plugin.ConfigSource)
 		}
 		for k, v := range conf {

@@ -1,12 +1,12 @@
 package file
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // PopulateDocumentContent updates the Documents contained within a Content with the
@@ -15,7 +15,7 @@ import (
 // where <root> is the directory containing the first state file.
 func (c Content) PopulateDocumentContent(filenames []string) error {
 	if len(filenames) == 0 {
-		return errors.New("cannot populate documents without a location")
+		return fmt.Errorf("cannot populate documents without a location")
 	}
 	// TODO decK actually allows you to use _multiple_ state files
 	// We currently choose the first arbitrarily and assume document content is under its directory
@@ -27,7 +27,7 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 			path := filepath.Join(root, utils.FilenameToName(*sp.Document.Path))
 			content, err := os.ReadFile(path)
 			if err != nil {
-				return errors.Wrap(err, "error reading document file")
+				return fmt.Errorf("error reading document file: %w", err)
 			}
 			sp.Document.Content = kong.String(string(content))
 		}
@@ -36,7 +36,7 @@ func (c Content) PopulateDocumentContent(filenames []string) error {
 				path := filepath.Join(root, utils.FilenameToName(*sv.Document.Path))
 				content, err := os.ReadFile(path)
 				if err != nil {
-					return errors.Wrap(err, "error reading document file")
+					return fmt.Errorf("error reading document file: %w", err)
 				}
 				sv.Document.Content = kong.String(string(content))
 			}

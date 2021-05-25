@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteConsumers() error {
 	currentConsumers, err := sc.currentState.Consumers.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching consumers from state")
+		return fmt.Errorf("error fetching consumers from state: %w", err)
 	}
 
 	for _, consumer := range currentConsumers {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up consumer '%v'",
-			consumer.Identifier())
+		return nil, fmt.Errorf("looking up consumer %q: %w",
+			consumer.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*Event, error) {
 func (sc *Syncer) createUpdateConsumers() error {
 	targetConsumers, err := sc.targetState.Consumers.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching consumers from state")
+		return fmt.Errorf("error fetching consumers from state: %w", err)
 	}
 
 	for _, consumer := range targetConsumers {
@@ -78,8 +79,8 @@ func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*Event, error)
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up consumer %v",
-			consumer.Identifier())
+		return nil, fmt.Errorf("error looking up consumer %q: %w",
+			consumer.Identifier(), err)
 	}
 
 	// found, check if update needed

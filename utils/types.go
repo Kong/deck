@@ -17,7 +17,6 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -126,7 +125,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		certPool := x509.NewCertPool()
 		ok := certPool.AppendCertsFromPEM([]byte(opt.TLSCACert))
 		if !ok {
-			return nil, errors.New("failed to load TLSCACert")
+			return nil, fmt.Errorf("failed to load TLSCACert")
 		}
 		tlsConfig.RootCAs = certPool
 	}
@@ -142,13 +141,13 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 	headers, err := parseHeaders(opt.Headers)
 	if err != nil {
-		return nil, errors.Wrap(err, "parsing headers")
+		return nil, fmt.Errorf("parsing headers: %w", err)
 	}
 	c = kong.HTTPClientWithHeaders(c, headers)
 
 	url, err := url.ParseRequestURI(address)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse kong address")
+		return nil, fmt.Errorf("failed to parse kong address: %w", err)
 	}
 	if opt.Workspace != "" {
 		url.Path = path.Join(url.Path, opt.Workspace)
@@ -156,7 +155,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
-		return nil, errors.Wrap(err, "creating client for Kong's Admin API")
+		return nil, fmt.Errorf("creating client for Kong's Admin API: %w", err)
 	}
 	if opt.Debug {
 		kongClient.SetDebugMode(true)

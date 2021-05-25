@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteJWTAuths() error {
 	currentJWTAuths, err := sc.currentState.JWTAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching jwt-auths from state")
+		return fmt.Errorf("error fetching jwt-auths from state: %w", err)
 	}
 
 	for _, jwtAuth := range currentJWTAuths {
@@ -37,7 +38,7 @@ func (sc *Syncer) deleteJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up jwt-auth '%v'", *jwtAuth.Key)
+		return nil, fmt.Errorf("looking up jwt-auth %q: %w", *jwtAuth.Key, err)
 	}
 	return nil, nil
 }
@@ -45,7 +46,7 @@ func (sc *Syncer) deleteJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
 func (sc *Syncer) createUpdateJWTAuths() error {
 	targetJWTAuths, err := sc.targetState.JWTAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching jwt-auths from state")
+		return fmt.Errorf("error fetching jwt-auths from state: %w", err)
 	}
 
 	for _, jwtAuth := range targetJWTAuths {
@@ -76,8 +77,8 @@ func (sc *Syncer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up jwt-auth %v",
-			*jwtAuth.Key)
+		return nil, fmt.Errorf("error looking up jwt-auth %q: %w",
+			*jwtAuth.Key, err)
 	}
 	// found, check if update needed
 

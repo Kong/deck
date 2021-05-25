@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/reset"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +47,7 @@ By default, this command will ask for a confirmation prompt.`,
 
 		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
 		if err != nil {
-			return errors.Wrap(err, "reading Kong version")
+			return fmt.Errorf("reading Kong version: %w", err)
 		}
 		_ = sendAnalytics("reset", kongVersion)
 
@@ -64,7 +65,7 @@ By default, this command will ask for a confirmation prompt.`,
 		}
 
 		if resetAllWorkspaces && resetWorkspace != "" {
-			return errors.New("workspace cannot be specified with --all-workspace flag")
+			return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
 		}
 
 		// Kong Enterprise
@@ -81,7 +82,7 @@ By default, this command will ask for a confirmation prompt.`,
 				return err
 			}
 			if !exists {
-				return errors.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
+				return fmt.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
 			}
 
 			workspaces = append(workspaces, resetWorkspace)
