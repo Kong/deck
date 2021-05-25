@@ -12,9 +12,9 @@ func printStats(stats solver.Stats) {
 	// is used only for events logs
 	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
 	printFn("Summary:\n")
-	printFn("  Created: %v\n", stats.CreateOps)
-	printFn("  Updated: %v\n", stats.UpdateOps)
-	printFn("  Deleted: %v\n", stats.DeleteOps)
+	printFn("  Created: %d\n", stats.CreateOps.Count())
+	printFn("  Updated: %d\n", stats.UpdateOps.Count())
+	printFn("  Deleted: %d\n", stats.DeleteOps.Count())
 }
 
 var silenceEvents bool
