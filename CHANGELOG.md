@@ -51,7 +51,7 @@
 - Add `--konnect-addr` flag to set Konnect address. This can be used to target Konnect
   data-centers in geographical regions other than the US.
   [#374](https://github.com/Kong/deck/pull/374)
-- Added support for Konnect document objects.
+- Added support for document objects for Service Packages and Versions in Konnect.
   [#388](https://github.com/Kong/deck/pull/388)
 
 ### Fixed
