@@ -3,8 +3,8 @@ package diff
 import (
 	"fmt"
 
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 )
 
@@ -18,7 +18,7 @@ func (sc *Syncer) warnBasicAuth() {
 		if sc.SilenceWarnings {
 			return
 		}
-		print.UpdatePrintln(basicAuthPasswordWarning)
+		cprint.UpdatePrintln(basicAuthPasswordWarning)
 	})
 }
 

@@ -7,10 +7,10 @@ import (
 	"os"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/solver"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -72,7 +72,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var wsConfig utils.KongClientConfig
 	// prepare to read the current state from Kong
 	if workspace != targetContent.Workspace && workspace != "" {
-		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
 			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
 		wsConfig = rootConfig.ForWorkspace(workspace)
 	} else {
@@ -126,7 +126,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	} else {
 
-		print.CreatePrintln("creating workspace", wsConfig.Workspace)
+		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
 
 		// inject empty state
 		currentState, err = state.NewKongState()
