@@ -115,32 +115,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
-		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
-		if err != nil {
-			return err
-		}
-
-		currentState, err = state.Get(rawState)
+		currentState, err = fetchCurrentState(ctx, wsClient, dumpConfig)
 		if err != nil {
 			return err
 		}
 	} else {
-
-		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
-
 		// inject empty state
 		currentState, err = state.NewKongState()
 		if err != nil {
 			return err
 		}
 
+		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
 		if !dry {
 			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
 				return err
 			}
 		}
-
 	}
 
 	// read the target state
@@ -159,19 +151,42 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	s, _ := diff.NewSyncer(currentState, targetState)
-	s.StageDelaySec = delay
-	stats, errs := solver.Solve(ctx, s, wsClient, nil, parallelism, dry)
-	// print stats before error to report completed operations
-	printStats(stats)
-	if errs != nil {
-		return utils.ErrArray{Errors: errs}
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient)
+	if err != nil {
+		return err
 	}
-	if diffCmdNonZeroExitCode &&
-		stats.CreateOps.Count()+stats.UpdateOps.Count()+stats.DeleteOps.Count() != 0 {
+
+	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
 	return nil
+}
+
+func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump.Config) (*state.KongState, error) {
+	rawState, err := dump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	currentState, err := state.Get(rawState)
+	if err != nil {
+		return nil, err
+	}
+	return currentState, nil
+}
+
+func performDiff(ctx context.Context, currentState, targetState *state.KongState,
+	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
+	s, _ := diff.NewSyncer(currentState, targetState)
+	s.StageDelaySec = delay
+	stats, errs := solver.Solve(ctx, s, client, nil, parallelism, dry)
+	// print stats before error to report completed operations
+	printStats(stats)
+	if errs != nil {
+		return 0, utils.ErrArray{Errors: errs}
+	}
+	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
+	return int(totalOps), nil
 }
 
 func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
