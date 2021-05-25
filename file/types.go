@@ -108,7 +108,7 @@ func copyToService(fService FService) service {
 func unwrapURL(urlString string, fService *FService) error {
 	parsed, err := url.Parse(urlString)
 	if err != nil {
-		return fmt.Errorf("invaid url: " + urlString)
+		return fmt.Errorf("invalid url: " + urlString)
 	}
 	if parsed.Scheme == "" {
 		return fmt.Errorf("invalid url:" + urlString)
