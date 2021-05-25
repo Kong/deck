@@ -95,7 +95,6 @@ certificates:
 plugins:
 - name: prometheus
   enabled: true
-  run_on: first
   protocols:
   - http
   - https
@@ -137,7 +136,6 @@ consumers:
       second: null
       year: null
     enabled: true
-    run_on: first
     protocols:
     - http
     - https
