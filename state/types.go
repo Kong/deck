@@ -240,12 +240,7 @@ func (t1 *Target) Identifier() string {
 func (t1 *Target) Console() string {
 	res := t1.Identifier()
 	if t1.Upstream != nil {
-		if t1.Upstream.ID != nil {
-			res = res + " for upstream " + *t1.Upstream.ID
-		}
-		if t1.Upstream.Name != nil {
-			res = res + " for upstream " + *t1.Upstream.Name
-		}
+		res = res + " for upstream " + (&Upstream{*t1.Upstream, *new(Meta)}).Identifier()
 	}
 	return res
 }
@@ -402,20 +397,20 @@ func (p1 *Plugin) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (p1 *Plugin) Console() string {
-	res := *p1.Name + " "
+	res := p1.Identifier() + " "
 
 	if p1.Service == nil && p1.Route == nil && p1.Consumer == nil {
 		return res + "(global)"
 	}
 	associations := []string{}
 	if p1.Service != nil {
-		associations = append(associations, "service "+*p1.Service.ID)
+		associations = append(associations, "service "+(&Service{*p1.Service, *new(Meta)}).Identifier())
 	}
 	if p1.Route != nil {
-		associations = append(associations, "route "+*p1.Route.ID)
+		associations = append(associations, "route "+(&Route{*p1.Route, *new(Meta)}).Identifier())
 	}
 	if p1.Consumer != nil {
-		associations = append(associations, "consumer "+*p1.Consumer.ID)
+		associations = append(associations, "consumer "+(&Consumer{*p1.Consumer, *new(Meta)}).Identifier())
 	}
 	if len(associations) > 0 {
 		res += "for "
@@ -515,12 +510,7 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 
 func forConsumerString(c *kong.Consumer) string {
 	if c != nil {
-		if c.Username != nil {
-			return " for consumer " + *c.Username
-		}
-		if c.ID != nil {
-			return " for consumer " + *c.ID
-		}
+		return " for consumer " + (&Consumer{*c, *new(Meta)}).Identifier()
 	}
 	return ""
 }
