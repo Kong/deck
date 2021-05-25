@@ -20,7 +20,9 @@ func printStats(stats solver.Stats) {
 var silenceEvents bool
 
 func preRunSilenceEventsFlag() error {
-	cprint.DisableOutput = true
+	if silenceEvents {
+		cprint.DisableOutput = true
+	}
 	return nil
 }
 
