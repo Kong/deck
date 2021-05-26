@@ -1,4 +1,4 @@
-package print
+package cprint
 
 import (
 	"sync"

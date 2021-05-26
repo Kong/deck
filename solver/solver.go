@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -67,7 +67,7 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			print.CreatePrintln("creating", e.Kind, c.Console())
+			cprint.CreatePrintln("creating", e.Kind, c.Console())
 		case crud.Update:
 			var diffString string
 			if oldObj, ok := e.OldObj.(*state.Document); ok {
@@ -78,9 +78,9 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 			if err != nil {
 				return nil, err
 			}
-			print.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			print.DeletePrintln("deleting", e.Kind, c.Console())
+			cprint.DeletePrintln("deleting", e.Kind, c.Console())
 		default:
 			panic("unknown operation " + e.Op.String())
 		}

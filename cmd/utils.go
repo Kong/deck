@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/fatih/color"
-	printPkg "github.com/kong/deck/print"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/solver"
 	"github.com/spf13/pflag"
 )
@@ -20,7 +20,7 @@ func printStats(stats solver.Stats) {
 var silenceEvents bool
 
 func preRunSilenceEventsFlag() error {
-	printPkg.DisableOutput = true
+	cprint.DisableOutput = true
 	return nil
 }
 
