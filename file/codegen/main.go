@@ -47,16 +47,13 @@ func main() {
 		return nil
 	}
 	schema := reflector.Reflect(file.Content{})
-	schema.Definitions["Service"].AnyOf = anyOfNameOrID
+
 	schema.Definitions["FService"].AnyOf = anyOfNameOrID
 
-	schema.Definitions["Route"].AnyOf = anyOfNameOrID
 	schema.Definitions["FRoute"].AnyOf = anyOfNameOrID
 
-	schema.Definitions["Consumer"].AnyOf = anyOfUsernameOrID
 	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrID
 
-	schema.Definitions["Upstream"].Required = []string{"name"}
 	schema.Definitions["FUpstream"].Required = []string{"name"}
 
 	schema.Definitions["FTarget"].Required = []string{"target"}

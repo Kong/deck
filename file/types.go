@@ -506,10 +506,21 @@ type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
 }
 
+// KongDefaults represents default values that are filled in
+// for entities with corresponding missing properties.
+// +k8s:deepcopy-gen=true
+type KongDefaults struct {
+	Service  *kong.Service  `json:"service,omitempty" yaml:"service,omitempty"`
+	Route    *kong.Route    `json:"route,omitempty" yaml:"route,omitempty"`
+	Upstream *kong.Upstream `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+	Target   *kong.Target   `json:"target,omitempty" yaml:"target,omitempty"`
+}
+
 // Info contains meta-data of the file.
 // +k8s:deepcopy-gen=true
 type Info struct {
-	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	SelectorTags []string     `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
