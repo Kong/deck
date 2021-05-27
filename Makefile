@@ -23,8 +23,8 @@ verify-codegen:
 
 .PHONY: update-codegen
 update-codegen:
-	go generate ./...
 	./scripts/update-deepcopy-gen.sh
+	go generate ./...
 
 .PHONY: coverage
 coverage:
