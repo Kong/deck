@@ -6,7 +6,6 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -34,10 +33,10 @@ var certificateTableSchema = &memdb.TableSchema{
 
 func validateCert(certificate Certificate) error {
 	if utils.Empty(certificate.Key) {
-		return errors.New("certificate's Key cannot be empty")
+		return fmt.Errorf("certificate's Key cannot be empty")
 	}
 	if utils.Empty(certificate.Cert) {
-		return errors.New("certificate's Cert cannot be empty")
+		return fmt.Errorf("certificate's Cert cannot be empty")
 	}
 	return nil
 }
@@ -122,7 +121,7 @@ func getCertificateByCertKey(txn *memdb.Txn, cert, key string) (*Certificate, er
 func (k *CertificatesCollection) GetByCertKey(cert,
 	key string) (*Certificate, error) {
 	if cert == "" || key == "" {
-		return nil, errors.New("cert/key cannot be empty string")
+		return nil, fmt.Errorf("cert/key cannot be empty string")
 	}
 
 	txn := k.db.Txn(false)
@@ -192,7 +191,7 @@ func (k *CertificatesCollection) Delete(id string) error {
 // DeleteByCertKey deletes a certificate by looking up it's cert and key.
 func (k *CertificatesCollection) DeleteByCertKey(cert, key string) error {
 	if cert == "" || key == "" {
-		return errors.New("cert/key cannot be empty string")
+		return fmt.Errorf("cert/key cannot be empty string")
 	}
 
 	txn := k.db.Txn(true)

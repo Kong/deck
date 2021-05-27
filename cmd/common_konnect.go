@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
-	"github.com/fatih/color"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
@@ -13,7 +13,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -27,8 +26,15 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
+	err = targetContent.PopulateDocumentContent(filenames)
+	if err != nil {
+		return fmt.Errorf("reading documents: %w", err)
+	}
+
+	targetContent.StripLocalDocumentPath()
+
 	// get Konnect client
-	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
+	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 	if err != nil {
 		return err
 	}
@@ -38,7 +44,7 @@ func syncKonnect(ctx context.Context,
 		konnectConfig.Email,
 		konnectConfig.Password)
 	if err != nil {
-		return errors.Wrap(err, "authenticating with Konnect")
+		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 
 	// get kong control plane ID
@@ -52,7 +58,7 @@ func syncKonnect(ctx context.Context,
 
 	// initialize kong client
 	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-		Address:    konnect.BaseURL() + "/api/control_planes/" + kongCPID,
+		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 	})
@@ -80,16 +86,13 @@ func syncKonnect(ctx context.Context,
 
 	s, _ := diff.NewSyncer(currentState, targetState)
 	stats, errs := solver.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
-	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
-	printFn("Summary:\n")
-	printFn("  Created: %v\n", stats.CreateOps)
-	printFn("  Updated: %v\n", stats.UpdateOps)
-	printFn("  Deleted: %v\n", stats.DeleteOps)
+	// print stats before error to report completed operations
+	printStats(stats)
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
 	}
 	if diffCmdNonZeroExitCode &&
-		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
+		stats.CreateOps.Count()+stats.UpdateOps.Count()+stats.DeleteOps.Count() != 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
 
@@ -100,7 +103,7 @@ func fetchKongControlPlaneID(ctx context.Context,
 	client *konnect.Client) (string, error) {
 	controlPlanes, _, err := client.ControlPlanes.List(ctx, nil)
 	if err != nil {
-		return "", errors.Wrap(err, "fetching control planes")
+		return "", fmt.Errorf("fetching control planes: %w", err)
 	}
 
 	return singleOutKongCP(controlPlanes)
@@ -119,11 +122,11 @@ func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
 		}
 	}
 	if kongCPCount == 0 {
-		return "", errors.New("found no Kong EE control-planes")
+		return "", fmt.Errorf("found no Kong EE control-planes")
 	}
 	if kongCPCount > 1 {
-		return "", errors.New("found multiple Kong EE control-planes. " +
-			"decK expected a single control-plane.")
+		return "", fmt.Errorf("found multiple Kong EE control-planes, " +
+			"decK expected a single control-plane")
 	}
 	return kongCPID, nil
 }
@@ -146,7 +149,7 @@ func getKonnectState(ctx context.Context,
 			SkipConsumers: skipConsumers,
 		})
 		if err != nil {
-			return errors.Wrap(err, "reading configuration from Kong")
+			return fmt.Errorf("reading configuration from Kong: %w", err)
 		}
 		return nil
 	})
@@ -169,7 +172,7 @@ func getKonnectState(ctx context.Context,
 
 	ks, err := state.GetKonnectState(kongState, konnectState)
 	if err != nil {
-		return nil, errors.Wrap(err, "building state")
+		return nil, fmt.Errorf("building state: %w", err)
 	}
 	return ks, nil
 }

@@ -1,8 +1,9 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -11,13 +12,13 @@ const (
 
 // ErrNotFound is an error type that is
 // returned when an entity is not found in the state.
-var ErrNotFound = errors.New("entity not found")
+var ErrNotFound = fmt.Errorf("entity not found")
 
 // ErrAlreadyExists represents an entity is already present in the state.
-var ErrAlreadyExists = errors.New("entity already exists")
+var ErrAlreadyExists = fmt.Errorf("entity already exists")
 
 // internal errors
-var errIDRequired = errors.New("ID is required")
+var errIDRequired = fmt.Errorf("ID is required")
 
 // error annotation messages
 const (

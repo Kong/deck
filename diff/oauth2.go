@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteOauth2Creds() error {
 	currentOauth2Creds, err := sc.currentState.Oauth2Creds.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching oauth2-cred from state")
+		return fmt.Errorf("error fetching oauth2-cred from state: %w", err)
 	}
 
 	for _, oauth2Cred := range currentOauth2Creds {
@@ -38,7 +39,7 @@ func (sc *Syncer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up oauth2-cred '%v'", *oauth2Cred.Name)
+		return nil, fmt.Errorf("looking up oauth2-cred %q: %w", *oauth2Cred.Name, err)
 	}
 	return nil, nil
 }
@@ -46,7 +47,7 @@ func (sc *Syncer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
 func (sc *Syncer) createUpdateOauth2Creds() error {
 	targetOauth2Creds, err := sc.targetState.Oauth2Creds.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching oauth2-creds from state")
+		return fmt.Errorf("error fetching oauth2-creds from state: %w", err)
 	}
 
 	for _, oauth2Cred := range targetOauth2Creds {
@@ -77,14 +78,13 @@ func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*E
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up oauth2-cred %v",
-			*oauth2Cred.Name)
+		return nil, fmt.Errorf("error looking up oauth2-cred %q: %w",
+			*oauth2Cred.Name, err)
 	}
 	currentOauth2Cred = &state.Oauth2Credential{Oauth2Credential: *currentOauth2Cred.DeepCopy()}
 	// found, check if update needed
 
 	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "oauth2-cred",

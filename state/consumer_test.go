@@ -22,7 +22,7 @@ func TestConsumerInsert(t *testing.T) {
 	consumer.ID = kong.String("first")
 	assert.Nil(collection.Add(consumer))
 
-	//re-insert
+	// re-insert
 	consumer.Username = kong.String("my-name")
 	assert.NotNil(collection.Add(consumer))
 }

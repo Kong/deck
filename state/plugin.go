@@ -6,12 +6,9 @@ import (
 	memdb "github.com/hashicorp/go-memdb"
 	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
-var (
-	errPluginNameRequired = errors.New("name of plugin required")
-)
+var errPluginNameRequired = fmt.Errorf("name of plugin required")
 
 const (
 	pluginTableName     = "plugin"

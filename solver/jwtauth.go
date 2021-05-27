@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -13,7 +15,7 @@ type jwtAuthCRUD struct {
 	client *kong.Client
 }
 
-func jwtAuthFromStuct(arg diff.Event) *state.JWTAuth {
+func jwtAuthFromStruct(arg diff.Event) *state.JWTAuth {
 	jwtAuth, ok := arg.Obj.(*state.JWTAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -26,9 +28,9 @@ func jwtAuthFromStuct(arg diff.Event) *state.JWTAuth {
 // The arg should be of type diff.Event, containing the jwtAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *jwtAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *jwtAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
 		cid = *jwtAuth.Consumer.Username
@@ -36,7 +38,7 @@ func (s *jwtAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(jwtAuth.Consumer.ID) {
 		cid = *jwtAuth.Consumer.ID
 	}
-	createdJWTAuth, err := s.client.JWTAuths.Create(nil, &cid,
+	createdJWTAuth, err := s.client.JWTAuths.Create(ctx, &cid,
 		&jwtAuth.JWTAuth)
 	if err != nil {
 		return nil, err
@@ -48,9 +50,9 @@ func (s *jwtAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the jwtAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *jwtAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *jwtAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
 		cid = *jwtAuth.Consumer.Username
@@ -58,7 +60,7 @@ func (s *jwtAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(jwtAuth.Consumer.ID) {
 		cid = *jwtAuth.Consumer.ID
 	}
-	err := s.client.JWTAuths.Delete(nil, &cid, jwtAuth.ID)
+	err := s.client.JWTAuths.Delete(ctx, &cid, jwtAuth.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +71,9 @@ func (s *jwtAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the jwtAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *jwtAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *jwtAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	jwtAuth := jwtAuthFromStuct(event)
+	jwtAuth := jwtAuthFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
@@ -80,7 +82,7 @@ func (s *jwtAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(jwtAuth.Consumer.ID) {
 		cid = *jwtAuth.Consumer.ID
 	}
-	updatedJWTAuth, err := s.client.JWTAuths.Create(nil, &cid, &jwtAuth.JWTAuth)
+	updatedJWTAuth, err := s.client.JWTAuths.Create(ctx, &cid, &jwtAuth.JWTAuth)
 	if err != nil {
 		return nil, err
 	}

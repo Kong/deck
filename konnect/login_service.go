@@ -25,7 +25,8 @@ func (s *AuthService) Login(ctx context.Context, email,
 	if err != nil {
 		return AuthResponse{}, err
 	}
-	url, _ := url.Parse(BaseURL())
+	defer resp.Body.Close()
+	url, _ := url.Parse(s.client.baseURL)
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return AuthResponse{}, err

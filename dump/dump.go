@@ -3,10 +3,10 @@ package dump
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -64,7 +64,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "consumers")
+			return fmt.Errorf("consumers: %w", err)
 		}
 		state.Consumers = consumers
 		return nil
@@ -73,7 +73,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		keyAuths, err := GetAllKeyAuths(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "key-auths")
+			return fmt.Errorf("key-auths: %w", err)
 		}
 		state.KeyAuths = keyAuths
 		return nil
@@ -82,7 +82,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		hmacAuths, err := GetAllHMACAuths(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "hmac-auths")
+			return fmt.Errorf("hmac-auths: %w", err)
 		}
 		state.HMACAuths = hmacAuths
 		return nil
@@ -91,7 +91,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		jwtAuths, err := GetAllJWTAuths(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "jwts")
+			return fmt.Errorf("jwts: %w", err)
 		}
 		state.JWTAuths = jwtAuths
 		return nil
@@ -100,7 +100,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		basicAuths, err := GetAllBasicAuths(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "basic-auths")
+			return fmt.Errorf("basic-auths: %w", err)
 		}
 		state.BasicAuths = basicAuths
 		return nil
@@ -109,7 +109,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		oauth2Creds, err := GetAllOauth2Creds(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "oauth2")
+			return fmt.Errorf("oauth2: %w", err)
 		}
 		state.Oauth2Creds = oauth2Creds
 		return nil
@@ -118,7 +118,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		aclGroups, err := GetAllACLGroups(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "acls")
+			return fmt.Errorf("acls: %w", err)
 		}
 		state.ACLGroups = aclGroups
 		return nil
@@ -127,7 +127,7 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		mtlsAuths, err := GetAllMTLSAuths(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "mtls-auths")
+			return fmt.Errorf("mtls-auths: %w", err)
 		}
 		state.MTLSAuths = mtlsAuths
 		return nil
@@ -139,7 +139,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		services, err := GetAllServices(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "services")
+			return fmt.Errorf("services: %w", err)
 		}
 		state.Services = services
 		return nil
@@ -148,7 +148,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		routes, err := GetAllRoutes(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "routes")
+			return fmt.Errorf("routes: %w", err)
 		}
 		state.Routes = routes
 		return nil
@@ -157,7 +157,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		plugins, err := GetAllPlugins(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "plugins")
+			return fmt.Errorf("plugins: %w", err)
 		}
 		if config.SkipConsumers {
 			state.Plugins = excludeConsumersPlugins(plugins)
@@ -170,7 +170,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		certificates, err := GetAllCertificates(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "certificates")
+			return fmt.Errorf("certificates: %w", err)
 		}
 		state.Certificates = certificates
 		return nil
@@ -179,7 +179,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		caCerts, err := GetAllCACertificates(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "ca-certificates")
+			return fmt.Errorf("ca-certificates: %w", err)
 		}
 		state.CACertificates = caCerts
 		return nil
@@ -188,7 +188,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		snis, err := GetAllSNIs(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "snis")
+			return fmt.Errorf("snis: %w", err)
 		}
 		state.SNIs = snis
 		return nil
@@ -197,12 +197,12 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		upstreams, err := GetAllUpstreams(ctx, client, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "upstreams")
+			return fmt.Errorf("upstreams: %w", err)
 		}
 		state.Upstreams = upstreams
 		targets, err := GetAllTargets(ctx, client, upstreams, config.SelectorTags)
 		if err != nil {
-			return errors.Wrap(err, "targets")
+			return fmt.Errorf("targets: %w", err)
 		}
 		state.Targets = targets
 		return nil
@@ -214,7 +214,7 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		roles, err := GetAllRBACRoles(ctx, client)
 		if err != nil {
-			return errors.Wrap(err, "roles")
+			return fmt.Errorf("roles: %w", err)
 		}
 		state.RBACRoles = roles
 		return nil
@@ -223,7 +223,7 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 	group.Go(func() error {
 		eps, err := GetAllRBACREndpointPermissions(ctx, client)
 		if err != nil {
-			return errors.Wrap(err, "eps")
+			return fmt.Errorf("eps: %w", err)
 		}
 		state.RBACEndpointPermissions = eps
 		return nil
@@ -233,7 +233,6 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
 func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRawState, error) {
-
 	var state utils.KongRawState
 
 	if err := validateConfig(config); err != nil {
@@ -365,7 +364,7 @@ func GetAllCACertificates(ctx context.Context,
 	opt := newOpt(tags)
 
 	for {
-		s, nextopt, err := client.CACertificates.List(nil, opt)
+		s, nextopt, err := client.CACertificates.List(ctx, opt)
 		// Compatibility for Kong < 1.3
 		// This core entitiy was not present in the past
 		// and the Admin API request will error with 404 Not Found
@@ -670,7 +669,7 @@ func GetAllMTLSAuths(ctx context.Context,
 			// before adding other Enterprise resources that decK handles by default (versus,
 			// for example, RBAC roles, which require the --rbac-resources-only flag).
 			if kongErr, ok := err.(*kong.APIError); ok {
-				if kongErr.Code() == 403 {
+				if kongErr.Code() == http.StatusForbidden {
 					return mtlsAuths, nil
 				}
 			}
@@ -706,7 +705,7 @@ func GetAllRBACRoles(ctx context.Context,
 func GetAllRBACREndpointPermissions(ctx context.Context,
 	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
 
-	var eps = []*kong.RBACEndpointPermission{}
+	eps := []*kong.RBACEndpointPermission{}
 	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {
 		return nil, err

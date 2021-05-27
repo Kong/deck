@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/kong/deck/dump"
-	"github.com/kong/deck/reset"
+	"fmt"
+
+	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +28,10 @@ By default, this command will ask for a confirmation prompt.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 
+		if resetAllWorkspaces && resetWorkspace != "" {
+			return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
+		}
+
 		if !resetCmdForce {
 			ok, err := utils.Confirm("This will delete all configuration from Kong's database." +
 				"\n> Are you sure? ")
@@ -46,29 +50,17 @@ By default, this command will ask for a confirmation prompt.`,
 
 		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
 		if err != nil {
-			return errors.Wrap(err, "reading Kong version")
+			return fmt.Errorf("reading Kong version: %w", err)
 		}
 		_ = sendAnalytics("reset", kongVersion)
 
+		var workspaces []string
 		// Kong OSS or default workspace
 		if !resetAllWorkspaces && resetWorkspace == "" {
-			state, err := dump.Get(ctx, rootClient, dumpConfig)
-			if err != nil {
-				return err
-			}
-			err = reset.Reset(ctx, state, rootClient)
-			if err != nil {
-				return err
-			}
-			return nil
-		}
-
-		if resetAllWorkspaces && resetWorkspace != "" {
-			return errors.New("workspace cannot be specified with --all-workspace flag")
+			workspaces = append(workspaces, "")
 		}
 
 		// Kong Enterprise
-		var workspaces []string
 		if resetAllWorkspaces {
 			workspaces, err = listWorkspaces(ctx, rootClient)
 			if err != nil {
@@ -81,7 +73,7 @@ By default, this command will ask for a confirmation prompt.`,
 				return err
 			}
 			if !exists {
-				return errors.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
+				return fmt.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
 			}
 
 			workspaces = append(workspaces, resetWorkspace)
@@ -92,11 +84,15 @@ By default, this command will ask for a confirmation prompt.`,
 			if err != nil {
 				return err
 			}
-			state, err := dump.Get(ctx, wsClient, dumpConfig)
+			currentState, err := fetchCurrentState(ctx, wsClient, dumpConfig)
 			if err != nil {
 				return err
 			}
-			err = reset.Reset(ctx, state, wsClient)
+			targetState, err := state.NewKongState()
+			if err != nil {
+				return err
+			}
+			_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient)
 			if err != nil {
 				return err
 			}

@@ -1,4 +1,4 @@
-package print
+package cprint
 
 import (
 	"sync"
@@ -9,47 +9,64 @@ import (
 var (
 	// mu is used to synchronize writes from multiple goroutines.
 	mu sync.Mutex
+	// DisableOutput disables all output.
+	DisableOutput bool
+)
 
+func conditionalPrintf(fn func(string, ...interface{}), format string, a ...interface{}) {
+	if DisableOutput {
+		return
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	fn(format, a...)
+}
+
+func conditionalPrintln(fn func(...interface{}), a ...interface{}) {
+	if DisableOutput {
+		return
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	fn(a...)
+}
+
+var (
 	createPrintf = color.New(color.FgGreen).PrintfFunc()
+	deletePrintf = color.New(color.FgRed).PrintfFunc()
+	updatePrintf = color.New(color.FgYellow).PrintfFunc()
+
 	// CreatePrintf is fmt.Printf with red as foreground color.
 	CreatePrintf = func(format string, a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		createPrintf(format, a...)
+		conditionalPrintf(createPrintf, format, a...)
 	}
-	deletePrintf = color.New(color.FgRed).PrintfFunc()
+
 	// DeletePrintf is fmt.Printf with green as foreground color.
 	DeletePrintf = func(format string, a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		deletePrintf(format, a...)
+		conditionalPrintf(deletePrintf, format, a...)
 	}
-	updatePrintf = color.New(color.FgYellow).PrintfFunc()
+
 	// UpdatePrintf is fmt.Printf with yellow as foreground color.
 	UpdatePrintf = func(format string, a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		updatePrintf(format, a...)
+		conditionalPrintf(updatePrintf, format, a...)
 	}
+
 	createPrintln = color.New(color.FgGreen).PrintlnFunc()
+	deletePrintln = color.New(color.FgRed).PrintlnFunc()
+	updatePrintln = color.New(color.FgYellow).PrintlnFunc()
+
 	// CreatePrintln is fmt.Println with red as foreground color.
 	CreatePrintln = func(a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		createPrintln(a...)
+		conditionalPrintln(createPrintln, a...)
 	}
-	deletePrintln = color.New(color.FgRed).PrintlnFunc()
+
 	// DeletePrintln is fmt.Println with green as foreground color.
 	DeletePrintln = func(a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		deletePrintln(a...)
+		conditionalPrintln(deletePrintln, a...)
 	}
-	updatePrintln = color.New(color.FgYellow).PrintlnFunc()
+
 	// UpdatePrintln is fmt.Println with yellow as foreground color.
 	UpdatePrintln = func(a ...interface{}) {
-		mu.Lock()
-		defer mu.Unlock()
-		updatePrintln(a...)
+		conditionalPrintln(updatePrintln, a...)
 	}
 )

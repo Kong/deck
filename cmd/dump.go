@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/kong/deck/dump"
@@ -9,7 +10,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +24,7 @@ var (
 func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) {
 	workspaces, err := client.Workspaces.ListAll(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "fetching workspaces from Kong")
+		return nil, fmt.Errorf("fetching workspaces from Kong: %w", err)
 	}
 	var res []string
 	for _, workspace := range workspaces {
@@ -56,17 +56,17 @@ configure Kong.`,
 
 		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
 		if err != nil {
-			return errors.Wrap(err, "reading Kong version")
+			return fmt.Errorf("reading Kong version: %w", err)
 		}
 		_ = sendAnalytics("dump", kongVersion)
 
 		// Kong Enterprise dump all workspace
 		if dumpAllWorkspaces {
 			if dumpWorkspace != "" {
-				return errors.New("workspace cannot be specified with --all-workspace flag")
+				return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
 			}
 			if dumpCmdKongStateFile != "kong" {
-				return errors.New("output-file cannot be specified with --all-workspace flag")
+				return fmt.Errorf("output-file cannot be specified with --all-workspace flag")
 			}
 			workspaces, err := listWorkspaces(ctx, wsClient)
 			if err != nil {
@@ -81,11 +81,11 @@ configure Kong.`,
 
 				rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 				if err != nil {
-					return errors.Wrap(err, "reading configuration from Kong")
+					return fmt.Errorf("reading configuration from Kong: %w", err)
 				}
 				ks, err := state.Get(rawState)
 				if err != nil {
-					return errors.Wrap(err, "building state")
+					return fmt.Errorf("building state: %w", err)
 				}
 
 				if err := file.KongStateToFile(ks, file.WriteConfig{
@@ -116,7 +116,7 @@ configure Kong.`,
 				return err
 			}
 			if !exists {
-				return errors.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
+				return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
 			}
 			wsClient, err = utils.GetKongClient(wsConfig)
 			if err != nil {
@@ -126,11 +126,11 @@ configure Kong.`,
 
 		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 		if err != nil {
-			return errors.Wrap(err, "reading configuration from Kong")
+			return fmt.Errorf("reading configuration from Kong: %w", err)
 		}
 		ks, err := state.Get(rawState)
 		if err != nil {
-			return errors.Wrap(err, "building state")
+			return fmt.Errorf("building state: %w", err)
 		}
 		if err := file.KongStateToFile(ks, file.WriteConfig{
 			SelectTags: dumpConfig.SelectorTags,

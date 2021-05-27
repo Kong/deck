@@ -3,18 +3,16 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
-var (
-	kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
-)
+var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
 
 // Empty checks if a string referenced by s or s itself is empty.
 func Empty(s *string) bool {
@@ -22,6 +20,7 @@ func Empty(s *string) bool {
 }
 
 // UUID will generate a random v14 unique identifier based upon random numbers
+// nolint:gomnd
 func UUID() string {
 	version := byte(4)
 	uuid := make([]byte, 16)
@@ -69,6 +68,23 @@ func AddExtToFilename(filename, ext string) string {
 		filename = filename + "." + ext
 	}
 	return filename
+}
+
+// NameToFilename clears path separators from strings. Some entity names in Kong and Konnect
+// allow path directory separators. Some decK operations write files using entity names,
+// which is not compatible with names that contain path separators. NameToFilename strips leading
+// separator characters and replaces other instances of the separator with its URL-encoded representation.
+func NameToFilename(name string) string {
+	s := strings.TrimPrefix(name, string(os.PathSeparator))
+	s = strings.ReplaceAll(s, string(os.PathSeparator), url.PathEscape(string(os.PathSeparator)))
+	return s
+}
+
+// FilenameToName (partially) reverses NameToFilename, replacing all URL-encoded path separator characters
+// with the path separator character. It does not re-add a leading separator, because there is no way to know
+// if that separator was included originally, and only some names (document paths) typically include one.
+func FilenameToName(filename string) string {
+	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
 }
 
 // confirm prompts a user for a confirmation with message

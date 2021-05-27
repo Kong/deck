@@ -2,13 +2,13 @@ package file
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // Format is a file format for Kong's configuration.
@@ -23,6 +23,11 @@ const (
 	JSON = "JSON"
 	// YAML if YAML file format.
 	YAML = "YAML"
+)
+
+const (
+	httpPort  = 80
+	httpsPort = 443
 )
 
 // FService represents a Kong Service and it's associated routes and plugins.
@@ -103,17 +108,17 @@ func copyToService(fService FService) service {
 func unwrapURL(urlString string, fService *FService) error {
 	parsed, err := url.Parse(urlString)
 	if err != nil {
-		return errors.New("invaid url: " + urlString)
+		return fmt.Errorf("invalid url: " + urlString)
 	}
 	if parsed.Scheme == "" {
-		return errors.New("invalid url:" + urlString)
+		return fmt.Errorf("invalid url:" + urlString)
 	}
 
 	fService.Protocol = kong.String(parsed.Scheme)
 
-	fService.Port = kong.Int(80)
+	fService.Port = kong.Int(httpPort)
 	if parsed.Scheme == "https" {
-		fService.Port = kong.Int(443)
+		fService.Port = kong.Int(httpsPort)
 	}
 
 	if parsed.Host != "" {
@@ -446,8 +451,7 @@ func (p *FPlugin) UnmarshalJSON(b []byte) error {
 func (p FPlugin) sortKey() string {
 	// concat plugin name and foreign relations
 	if p.Name != nil {
-		key := ""
-		key = *p.Name
+		key := *p.Name
 		if p.Consumer != nil {
 			key += *p.Consumer.ID
 		}
@@ -502,10 +506,21 @@ type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
 }
 
+// KongDefaults represents default values that are filled in
+// for entities with corresponding missing properties.
+// +k8s:deepcopy-gen=true
+type KongDefaults struct {
+	Service  *kong.Service  `json:"service,omitempty" yaml:"service,omitempty"`
+	Route    *kong.Route    `json:"route,omitempty" yaml:"route,omitempty"`
+	Upstream *kong.Upstream `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+	Target   *kong.Target   `json:"target,omitempty" yaml:"target,omitempty"`
+}
+
 // Info contains meta-data of the file.
 // +k8s:deepcopy-gen=true
 type Info struct {
-	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	SelectorTags []string     `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -524,6 +539,7 @@ type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
 	Version        *string         `json:"version,omitempty" yaml:"version,omitempty"`
 	Implementation *Implementation `json:"implementation,omitempty" yaml:"implementation,omitempty"`
+	Document       *FDocument      `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -532,6 +548,15 @@ type FServicePackage struct {
 	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
 	Description *string           `json:"description,omitempty" yaml:"description,omitempty"`
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
+	Document    *FDocument        `json:"document,omitempty" yaml:"document,omitempty"`
+}
+
+// +k8s:deepcopy-gen=true
+type FDocument struct {
+	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
+	Path      *string `json:"path,omitempty" yaml:"path,omitempty"`
+	Published *bool   `json:"published,omitempty" yaml:"published,omitempty"`
+	Content   *string `json:"-" yaml:"-"`
 }
 
 // sortKey is used for sorting.

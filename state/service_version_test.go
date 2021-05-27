@@ -282,7 +282,7 @@ func TestServiceVersionCollection_Update(t *testing.T) {
 	k.Add(sv2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.serviceVersion); (err != nil) != tt.wantErr {
 				t.Errorf("ServiceVersionCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

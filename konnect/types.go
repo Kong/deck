@@ -1,12 +1,20 @@
 package konnect
 
+import (
+	"fmt"
+)
+
 const (
 	authEndpoint = "/api/auth"
 )
 
+type ParentInfoer interface {
+	URL() string
+	Key() string
+}
+
 func BaseURL() string {
 	const baseURL = "https://konnect.konghq.com"
-	// TODO override the baseURL using configuration
 	return baseURL
 }
 
@@ -19,6 +27,14 @@ type ServicePackage struct {
 	Versions []ServiceVersion `json:"versions,omitempty"`
 }
 
+func (p *ServicePackage) URL() string {
+	return fmt.Sprintf("/api/service_packages/%s", *p.ID)
+}
+
+func (p *ServicePackage) Key() string {
+	return "ServicePackage" + ":" + *p.ID
+}
+
 // +k8s:deepcopy-gen=true
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
@@ -27,6 +43,64 @@ type ServiceVersion struct {
 	ServicePackage *ServicePackage `json:"service_package,omitempty"`
 
 	ControlPlaneServiceRelation *ControlPlaneServiceRelation `json:"control_plane_service_relation,omitempty"`
+}
+
+func (v *ServiceVersion) URL() string {
+	return fmt.Sprintf("/api/service_versions/%s", *v.ID)
+}
+
+func (v *ServiceVersion) Key() string {
+	return "ServiceVersion" + ":" + *v.ID
+}
+
+type Document struct {
+	ID        *string      `json:"id,omitempty"`
+	Path      *string      `json:"path,omitempty"`
+	Content   *string      `json:"content,omitempty"`
+	Published *bool        `json:"published,omitempty"`
+	Parent    ParentInfoer `json:"-"`
+}
+
+func (d *Document) ParentKey() string {
+	return d.Parent.Key()
+}
+
+// ShallowCopyInto is a shallowcopy function, copying the receiver, writing into out. d must be non-nil.
+func (d *Document) ShallowCopyInto(out *Document) {
+	*out = *d
+	if d.ID != nil {
+		d, out := &d.ID, &out.ID
+		*out = new(string)
+		**out = **d
+	}
+	if d.Path != nil {
+		d, out := &d.Path, &out.Path
+		*out = new(string)
+		**out = **d
+	}
+	if d.Content != nil {
+		d, out := &d.Content, &out.Content
+		*out = new(string)
+		**out = **d
+	}
+	if d.Published != nil {
+		d, out := &d.Published, &out.Published
+		*out = new(bool)
+		**out = **d
+	}
+	if d.Parent != nil {
+		out.Parent = d.Parent
+	}
+}
+
+// ShallowCopy is a shallowcopy function, copying the receiver, creating a new Document.
+func (d *Document) ShallowCopy() *Document {
+	if d == nil {
+		return nil
+	}
+	out := new(Document)
+	d.ShallowCopyInto(out)
+	return out
 }
 
 // +k8s:deepcopy-gen=true

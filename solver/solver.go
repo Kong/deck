@@ -2,21 +2,39 @@ package solver
 
 import (
 	"context"
+	"fmt"
+	"sync"
 
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 // Stats holds the stats related to a Solve.
 type Stats struct {
-	CreateOps int
-	UpdateOps int
-	DeleteOps int
+	CreateOps *AtomicInt32Counter
+	UpdateOps *AtomicInt32Counter
+	DeleteOps *AtomicInt32Counter
+}
+
+type AtomicInt32Counter struct {
+	counter int32
+	lock    sync.RWMutex
+}
+
+func (a *AtomicInt32Counter) Increment(delta int32) {
+	a.lock.Lock()
+	defer a.lock.Unlock()
+	a.counter += delta
+}
+
+func (a *AtomicInt32Counter) Count() int32 {
+	a.lock.RLock()
+	defer a.lock.RUnlock()
+	return a.counter
 }
 
 // Solve generates a diff and walks the graph.
@@ -26,15 +44,19 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 
 	r := buildRegistry(client, konnectClient)
 
-	var stats Stats
+	stats := Stats{
+		CreateOps: &AtomicInt32Counter{},
+		UpdateOps: &AtomicInt32Counter{},
+		DeleteOps: &AtomicInt32Counter{},
+	}
 	recordOp := func(op crud.Op) {
 		switch op {
 		case crud.Create:
-			stats.CreateOps = stats.CreateOps + 1
+			stats.CreateOps.Increment(1)
 		case crud.Update:
-			stats.UpdateOps = stats.UpdateOps + 1
+			stats.UpdateOps.Increment(1)
 		case crud.Delete:
-			stats.DeleteOps = stats.DeleteOps + 1
+			stats.DeleteOps.Increment(1)
 		}
 	}
 
@@ -45,15 +67,20 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			print.CreatePrintln("creating", e.Kind, c.Console())
+			cprint.CreatePrintln("creating", e.Kind, c.Console())
 		case crud.Update:
-			diffString, err := getDiff(e.OldObj, e.Obj)
+			var diffString string
+			if oldObj, ok := e.OldObj.(*state.Document); ok {
+				diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
+			} else {
+				diffString, err = getDiff(e.OldObj, e.Obj)
+			}
 			if err != nil {
 				return nil, err
 			}
-			print.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			print.DeletePrintln("deleting", e.Kind, c.Console())
+			cprint.DeletePrintln("deleting", e.Kind, c.Console())
 		default:
 			panic("unknown operation " + e.Op.String())
 		}
@@ -61,9 +88,9 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 		if !dry {
 			// sync mode
 			// fire the request to Kong
-			result, err = r.Do(e.Kind, e.Op, e)
+			result, err = r.Do(ctx, e.Kind, e.Op, e)
 			if err != nil {
-				return nil, errors.Wrapf(err, "%v %v %v failed", e.Op, e.Kind, c.Console())
+				return nil, fmt.Errorf("%v %v %v failed: %w", e.Op, e.Kind, c.Console(), err)
 			}
 		} else {
 			// diff mode
@@ -101,5 +128,6 @@ func buildRegistry(client *kong.Client, konnectClient *konnect.Client) *crud.Reg
 
 	r.MustRegister("service-package", &servicePackageCRUD{client: konnectClient})
 	r.MustRegister("service-version", &serviceVersionCRUD{client: konnectClient})
+	r.MustRegister("document", &documentCRUD{client: konnectClient})
 	return &r
 }

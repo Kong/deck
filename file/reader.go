@@ -6,7 +6,6 @@ import (
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 // RenderConfig contains necessary information to render a correct
@@ -26,7 +25,7 @@ type RenderConfig struct {
 // or if there is any error during processing.
 func GetContentFromFiles(filenames []string) (*Content, error) {
 	if len(filenames) == 0 {
-		return nil, errors.New("filename cannot be empty")
+		return nil, fmt.Errorf("filename cannot be empty")
 	}
 
 	return getContent(filenames)
@@ -37,17 +36,10 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
-
-	d, err := utils.GetKongDefaulter()
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "creating defaulter")
-	}
-	builder.defaulter = d
 
 	kongState, konnectState, err := builder.build()
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "building state")
+		return nil, nil, fmt.Errorf("building state: %w", err)
 	}
 	return kongState, konnectState, nil
 }
@@ -59,17 +51,10 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
-
-	d, err := utils.GetKongDefaulter()
-	if err != nil {
-		return nil, errors.Wrap(err, "creating defaulter")
-	}
-	builder.defaulter = d
 
 	state, _, err := builder.build()
 	if err != nil {
-		return nil, errors.Wrap(err, "building state")
+		return nil, fmt.Errorf("building state: %w", err)
 	}
 	return state, nil
 }

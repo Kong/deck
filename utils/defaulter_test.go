@@ -279,9 +279,11 @@ func TestUpstreamSetTest(t *testing.T) {
 					},
 					Passive: &kong.PassiveHealthcheck{
 						Healthy: &kong.Healthy{
-							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+							HTTPStatuses: []int{
+								200, 201, 202, 203, 204, 205,
 								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-								306, 307, 308},
+								306, 307, 308,
+							},
 							Successes: kong.Int(0),
 						},
 						Unhealthy: &kong.Unhealthy{
@@ -333,9 +335,11 @@ func TestUpstreamSetTest(t *testing.T) {
 					},
 					Passive: &kong.PassiveHealthcheck{
 						Healthy: &kong.Healthy{
-							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+							HTTPStatuses: []int{
+								200, 201, 202, 203, 204, 205,
 								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-								306, 307, 308},
+								306, 307, 308,
+							},
 							Successes: kong.Int(0),
 						},
 						Unhealthy: &kong.Unhealthy{
@@ -389,9 +393,11 @@ func TestUpstreamSetTest(t *testing.T) {
 					},
 					Passive: &kong.PassiveHealthcheck{
 						Healthy: &kong.Healthy{
-							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+							HTTPStatuses: []int{
+								200, 201, 202, 203, 204, 205,
 								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-								306, 307, 308},
+								306, 307, 308,
+							},
 							Successes: kong.Int(0),
 						},
 						Unhealthy: &kong.Unhealthy{
@@ -445,9 +451,11 @@ func TestUpstreamSetTest(t *testing.T) {
 					},
 					Passive: &kong.PassiveHealthcheck{
 						Healthy: &kong.Healthy{
-							HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+							HTTPStatuses: []int{
+								200, 201, 202, 203, 204, 205,
 								206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-								306, 307, 308},
+								306, 307, 308,
+							},
 							Successes: kong.Int(0),
 						},
 						Unhealthy: &kong.Unhealthy{

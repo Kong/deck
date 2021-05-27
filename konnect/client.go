@@ -3,7 +3,7 @@ package konnect
 import (
 	"context"
 	"encoding/json"
-	"github.com/pkg/errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -11,9 +11,7 @@ import (
 	"os"
 )
 
-var (
-	defaultCtx = context.Background()
-)
+var defaultCtx = context.Background()
 
 type service struct {
 	client         *Client
@@ -28,22 +26,28 @@ type Client struct {
 	Auth                  *AuthService
 	ServicePackages       *ServicePackageService
 	ServiceVersions       *ServiceVersionService
+	Documents             *DocumentService
 	ControlPlanes         *ControlPlaneService
 	ControlPlaneRelations *ControlPlaneRelationsService
 	logger                io.Writer
 	debug                 bool
 }
 
+// ClientOpts contains configuration options for a new Client.
+type ClientOpts struct {
+	BaseURL string
+}
+
 // NewClient returns a Client which talks to Konnect's API.
-func NewClient(httpClient *http.Client) (*Client, error) {
+func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 	client := new(Client)
 	client.client = httpClient
-	url, err := url.ParseRequestURI(BaseURL())
+	url, err := url.ParseRequestURI(opts.BaseURL)
 	if err != nil {
-		return nil, errors.Wrap(err, "parsing URL")
+		return nil, fmt.Errorf("parsing URL: %w", err)
 	}
 	client.baseURL = url.String()
 
@@ -51,6 +55,7 @@ func NewClient(httpClient *http.Client) (*Client, error) {
 	client.Auth = (*AuthService)(&client.common)
 	client.ServicePackages = (*ServicePackageService)(&client.common)
 	client.ServiceVersions = (*ServiceVersionService)(&client.common)
+	client.Documents = (*DocumentService)(&client.common)
 	client.ControlPlanes = (*ControlPlaneService)(&client.common)
 	client.ControlPlaneRelations = (*ControlPlaneRelationsService)(&client.common)
 	client.logger = os.Stderr
@@ -68,7 +73,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 	v interface{}) (*http.Response, error) {
 	var err error
 	if req == nil {
-		return nil, errors.New("request cannot be nil")
+		return nil, fmt.Errorf("request cannot be nil")
 	}
 	if ctx == nil {
 		ctx = defaultCtx
@@ -81,10 +86,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request,
 		return nil, err
 	}
 
-	//Make the request
+	// Make the request
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "making HTTP request")
+		return nil, fmt.Errorf("making HTTP request: %w", err)
 	}
 
 	// log the response

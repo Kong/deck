@@ -1,11 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,11 +14,11 @@ func TestErrArrayString(t *testing.T) {
 	var err ErrArray
 	assert.Equal("nil", err.Error())
 
-	err.Errors = append(err.Errors, errors.New("foo failed"))
+	err.Errors = append(err.Errors, fmt.Errorf("foo failed"))
 
 	assert.Equal(err.Error(), "1 errors occurred:\n\tfoo failed\n")
 
-	err.Errors = append(err.Errors, errors.New("bar failed"))
+	err.Errors = append(err.Errors, fmt.Errorf("bar failed"))
 
 	assert.Equal(err.Error(), "2 errors occurred:\n\tfoo failed\n\tbar failed\n")
 }

@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -29,10 +30,10 @@ that will be created or updated or deleted.
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(diffCmdKongStateFile) == 0 {
-			return errors.New("A state file with Kong's configuration " +
-				"must be specified using -s/--state flag.")
+			return fmt.Errorf("a state file with Kong's configuration " +
+				"must be specified using -s/--state flag")
 		}
-		return nil
+		return preRunSilenceEventsFlag()
 	},
 }
 
@@ -61,4 +62,5 @@ func init() {
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
+	addSilenceEventsFlag(diffCmd.Flags())
 }

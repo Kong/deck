@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteServices() error {
 	currentServices, err := sc.currentState.Services.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching services from state")
+		return fmt.Errorf("error fetching services from state: %w", err)
 	}
 
 	for _, service := range currentServices {
@@ -38,8 +39,8 @@ func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up service '%v'",
-			service.Identifier())
+		return nil, fmt.Errorf("looking up service %q: %w",
+			service.Identifier(), err)
 	}
 	return nil, nil
 }
@@ -47,7 +48,7 @@ func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
 func (sc *Syncer) createUpdateServices() error {
 	targetServices, err := sc.targetState.Services.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching services from state")
+		return fmt.Errorf("error fetching services from state: %w", err)
 	}
 
 	for _, service := range targetServices {
@@ -77,8 +78,8 @@ func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up service %v",
-			*service.Name)
+		return nil, fmt.Errorf("error looking up service %q: %w",
+			*service.Name, err)
 	}
 
 	// found, check if update needed

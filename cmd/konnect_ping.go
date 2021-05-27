@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -17,14 +17,14 @@ credentials.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		_ = utils.SendAnalytics("konnect-ping", VERSION, "")
-		client, err := utils.GetKonnectClient(nil, konnectConfig.Debug)
+		client, err := utils.GetKonnectClient(nil, konnectConfig)
 		if err != nil {
 			return err
 		}
 		res, err := client.Auth.Login(cmd.Context(), konnectConfig.Email,
 			konnectConfig.Password)
 		if err != nil {
-			return errors.Wrap(err, "authenticating with Konnect")
+			return fmt.Errorf("authenticating with Konnect: %w", err)
 		}
 		fmt.Printf("Successfully Konnected as %s %s (%s)!\n",
 			res.FirstName, res.LastName, res.Organization)

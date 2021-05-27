@@ -1,12 +1,13 @@
 package file
 
 import (
+	"fmt"
+
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
 type stateBuilder struct {
@@ -23,9 +24,7 @@ type stateBuilder struct {
 	err error
 }
 
-var (
-	kong140Version = semver.MustParse("1.4.0")
-)
+var kong140Version = semver.MustParse("1.4.0")
 
 // uuid generates a UUID string and returns a pointer to it.
 // It is a variable for testing purpose, to override and supply
@@ -46,6 +45,16 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// defaulter
+	var kongDefaults KongDefaults
+	if b.targetContent.Info != nil {
+		kongDefaults = b.targetContent.Info.Defaults
+	}
+	b.defaulter, err = defaulter(kongDefaults)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating defaulter: %w", err)
 	}
 
 	// build
@@ -437,6 +446,28 @@ func (b *stateBuilder) konnect() {
 			Description: targetSP.Description,
 		}
 
+		if targetSP.Document != nil {
+			targetKonnectDoc := konnect.Document{
+				ID:        targetSP.Document.ID,
+				Path:      targetSP.Document.Path,
+				Published: targetSP.Document.Published,
+				Content:   targetSP.Document.Content,
+				Parent:    &targetKonnectSP,
+			}
+			if utils.Empty(targetKonnectDoc.ID) {
+				currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSP, *targetKonnectDoc.Path)
+				if err == state.ErrNotFound {
+					targetKonnectDoc.ID = uuid()
+				} else if err != nil {
+					b.err = err
+					return
+				} else {
+					targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+				}
+			}
+			b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
+		}
+
 		// versions associated with the package
 		for _, targetSV := range targetSP.Versions {
 			targetKonnectSV := konnect.ServiceVersion{
@@ -471,6 +502,27 @@ func (b *stateBuilder) konnect() {
 				if targetRelationID != "" {
 					targetKonnectSV.ControlPlaneServiceRelation.ID = &targetRelationID
 				}
+			}
+			if targetSV.Document != nil {
+				targetKonnectDoc := konnect.Document{
+					ID:        targetSV.Document.ID,
+					Path:      targetSV.Document.Path,
+					Published: targetSV.Document.Published,
+					Content:   targetSV.Document.Content,
+					Parent:    &targetKonnectSV,
+				}
+				if utils.Empty(targetKonnectDoc.ID) {
+					currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSV, *targetKonnectDoc.Path)
+					if err == state.ErrNotFound {
+						targetKonnectDoc.ID = uuid()
+					} else if err != nil {
+						b.err = err
+						return
+					} else {
+						targetKonnectDoc.ID = kong.String(*currentDoc.ID)
+					}
+				}
+				b.konnectRawState.Documents = append(b.konnectRawState.Documents, &targetKonnectDoc)
 			}
 			targetKonnectSP.Versions = append(targetKonnectSP.Versions, targetKonnectSV)
 		}
@@ -579,7 +631,6 @@ func (b *stateBuilder) rbacRoles() {
 			ep.Role = &kong.RBACRole{ID: kong.String(*r.ID)}
 			b.rawState.RBACEndpointPermissions = append(b.rawState.RBACEndpointPermissions, &ep.RBACEndpointPermission)
 		}
-		// TODO entity permissions
 	}
 }
 
@@ -650,8 +701,9 @@ func (b *stateBuilder) plugins() {
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "consumer %v for plugin %v",
-					*p.Consumer.ID, *p.Name)
+				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
+					*p.Consumer.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -662,8 +714,9 @@ func (b *stateBuilder) plugins() {
 		if p.Service != nil && !utils.Empty(p.Service.ID) {
 			s, err := b.intermediate.Services.Get(*p.Service.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "service %v for plugin %v",
-					*p.Service.ID, *p.Name)
+				b.err = fmt.Errorf("service %v for plugin %v: %w",
+					*p.Service.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -674,8 +727,9 @@ func (b *stateBuilder) plugins() {
 		if p.Route != nil && !utils.Empty(p.Route.ID) {
 			s, err := b.intermediate.Routes.Get(*p.Route.ID)
 			if err == state.ErrNotFound {
-				b.err = errors.Wrapf(err, "route %v for plugin %v",
-					*p.Route.ID, *p.Name)
+				b.err = fmt.Errorf("route %v for plugin %v: %w",
+					*p.Route.ID, *p.Name, err)
+
 				return
 			} else if err != nil {
 				b.err = err
@@ -755,12 +809,12 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 
 func (b *stateBuilder) fillPluginConfig(plugin *FPlugin) error {
 	if plugin == nil {
-		return errors.New("plugin is nil")
+		return fmt.Errorf("plugin is nil")
 	}
 	if !utils.Empty(plugin.ConfigSource) {
 		conf, ok := b.targetContent.PluginConfigs[*plugin.ConfigSource]
 		if !ok {
-			return errors.Errorf("_plugin_config '%v' not found",
+			return fmt.Errorf("_plugin_config %q not found",
 				*plugin.ConfigSource)
 		}
 		for k, v := range conf {
@@ -783,4 +837,32 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 		sID = *plugin.Service.ID
 	}
 	return
+}
+
+func defaulter(defaults KongDefaults) (*utils.Defaulter, error) {
+	d, err := utils.GetKongDefaulter()
+	if err != nil {
+		return nil, err
+	}
+	if defaults.Route != nil {
+		if err = d.Register(defaults.Route); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Service != nil {
+		if err = d.Register(defaults.Service); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Upstream != nil {
+		if err = d.Register(defaults.Upstream); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Target != nil {
+		if err = d.Register(defaults.Target); err != nil {
+			return nil, err
+		}
+	}
+	return d, nil
 }

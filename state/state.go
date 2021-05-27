@@ -1,8 +1,9 @@
 package state
 
 import (
+	"fmt"
+
 	memdb "github.com/hashicorp/go-memdb"
-	"github.com/pkg/errors"
 )
 
 type collection struct {
@@ -36,11 +37,11 @@ type KongState struct {
 	// konnect-specific entities
 	ServicePackages *ServicePackagesCollection
 	ServiceVersions *ServiceVersionsCollection
+	Documents       *DocumentsCollection
 }
 
 // NewKongState creates a new in-memory KongState.
 func NewKongState() (*KongState, error) {
-
 	// TODO FIXME clean up the mess
 	keyAuthTemp := newKeyAuthsCollection(collection{})
 	hmacAuthTemp := newHMACAuthsCollection(collection{})
@@ -49,7 +50,7 @@ func NewKongState() (*KongState, error) {
 	oauth2CredsTemp := newOauth2CredsCollection(collection{})
 	mtlsAuthTemp := newMTLSAuthsCollection(collection{})
 
-	var schema = &memdb.DBSchema{
+	schema := &memdb.DBSchema{
 		Tables: map[string]*memdb.TableSchema{
 			serviceTableName:                serviceTableSchema,
 			routeTableName:                  routeTableSchema,
@@ -75,12 +76,13 @@ func NewKongState() (*KongState, error) {
 			// konnect-specific entities
 			servicePackageTableName: servicePackageTableSchema,
 			serviceVersionTableName: serviceVersionTableSchema,
+			documentTableName:       documentTableSchema,
 		},
 	}
 
 	memDB, err := memdb.NewMemDB(schema)
 	if err != nil {
-		return nil, errors.Wrap(err, "creating new ServiceCollection")
+		return nil, fmt.Errorf("creating new ServiceCollection: %w", err)
 	}
 	var state KongState
 	state.common = collection{
@@ -111,6 +113,7 @@ func NewKongState() (*KongState, error) {
 	// konnect-specific entities
 	state.ServicePackages = (*ServicePackagesCollection)(&state.common)
 	state.ServiceVersions = (*ServiceVersionsCollection)(&state.common)
+	state.Documents = (*DocumentsCollection)(&state.common)
 
 	return &state, nil
 }

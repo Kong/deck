@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := test-all
 
+CLI_DOCS_PATH=docs/cli-docs/
 .PHONY: test-all
 test-all: lint test
 
@@ -22,8 +23,8 @@ verify-codegen:
 
 .PHONY: update-codegen
 update-codegen:
-	go generate ./...
 	./scripts/update-deepcopy-gen.sh
+	go generate ./...
 
 .PHONY: coverage
 coverage:
@@ -31,3 +32,7 @@ coverage:
 	# ignoring generated code for coverage
 	grep -E -v 'generated.deepcopy.go' coverage.out.tmp > coverage.out
 	rm -f coverage.out.tmp
+
+generate-cli-docs:
+	mkdir -p $(CLI_DOCS_PATH)
+	go run docs/generate-docs.go -output-path $(CLI_DOCS_PATH)

@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
 	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
+	"github.com/kong/go-kong/kong"
 )
 
 // WriteConfig holds settings to use to write the state file.
@@ -129,18 +131,39 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		return err
 	}
 
-	for _, p := range packages {
+	for _, sp := range packages {
+		safePackageName := utils.NameToFilename(*sp.Name)
 		p := FServicePackage{
-			ID:          p.ID,
-			Name:        p.Name,
-			Description: p.Description,
+			ID:          sp.ID,
+			Name:        sp.Name,
+			Description: sp.Description,
 		}
 		versions, err := kongState.ServiceVersions.GetAllByServicePackageID(*p.ID)
 		if err != nil {
 			return err
 		}
+		documents, err := kongState.Documents.GetAllByParent(sp)
+		if err != nil {
+			return err
+		}
+
+		for _, d := range documents {
+			safeDocPath := utils.NameToFilename(*d.Path)
+			fDocument := FDocument{
+				ID:        d.ID,
+				Path:      kong.String(filepath.Join(safePackageName, safeDocPath)),
+				Published: d.Published,
+				Content:   d.Content,
+			}
+			utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
+			p.Document = &fDocument
+			// Although the documents API returns a list of documents and does support multiple documents,
+			// we pretend there's only one because that's all the web UI allows.
+			break
+		}
 
 		for _, v := range versions {
+			safeVersionName := utils.NameToFilename(*v.Version)
 			fVersion := FServiceVersion{
 				ID:      v.ID,
 				Version: v.Version,
@@ -159,6 +182,23 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 						Service: s,
 					},
 				}
+			}
+			documents, err := kongState.Documents.GetAllByParent(v)
+			if err != nil {
+				return err
+			}
+
+			for _, d := range documents {
+				safeDocPath := utils.NameToFilename(*d.Path)
+				fDocument := FDocument{
+					ID:        d.ID,
+					Path:      kong.String(filepath.Join(safePackageName, safeVersionName, safeDocPath)),
+					Published: d.Published,
+					Content:   d.Content,
+				}
+				utils.ZeroOutID(&fDocument, fDocument.Path, config.WithID)
+				fVersion.Document = &fDocument
+				break
 			}
 			utils.ZeroOutID(&fVersion, fVersion.Version, config.WithID)
 			p.Versions = append(p.Versions, fVersion)
@@ -580,17 +620,41 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 			return err
 		}
 	default:
-		return errors.New("unknown file format: " + string(format))
+		return fmt.Errorf("unknown file format: " + string(format))
 	}
 
 	if filename == "-" {
-		_, err = fmt.Print(string(c))
+		if _, err := fmt.Print(string(c)); err != nil {
+			return fmt.Errorf("writing file: %w", err)
+		}
 	} else {
 		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))
-		err = ioutil.WriteFile(filename, c, 0600)
-	}
-	if err != nil {
-		return errors.Wrap(err, "writing file")
+		prefix, _ := filepath.Split(filename)
+		if err := ioutil.WriteFile(filename, c, 0o600); err != nil {
+			return fmt.Errorf("writing file: %w", err)
+		}
+		for _, sp := range content.ServicePackages {
+			if sp.Document != nil {
+				if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*sp.Document.Path)), 0o700); err != nil {
+					return fmt.Errorf("creating document directory: %w", err)
+				}
+				if err := os.WriteFile(filepath.Join(prefix, *sp.Document.Path),
+					[]byte(*sp.Document.Content), 0o600); err != nil {
+					return fmt.Errorf("writing document file: %w", err)
+				}
+			}
+			for _, v := range sp.Versions {
+				if v.Document != nil {
+					if err := os.MkdirAll(filepath.Join(prefix, filepath.Dir(*v.Document.Path)), 0o700); err != nil {
+						return fmt.Errorf("creating document directory: %w", err)
+					}
+					if err := os.WriteFile(filepath.Join(prefix, *v.Document.Path),
+						[]byte(*v.Document.Content), 0o600); err != nil {
+						return fmt.Errorf("writing document file: %w", err)
+					}
+				}
+			}
+		}
 	}
 	return nil
 }

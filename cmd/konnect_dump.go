@@ -1,14 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
-
-	"github.com/kong/deck/konnect"
 
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
-
 	"github.com/spf13/cobra"
 )
 
@@ -31,6 +28,10 @@ configure Konnect.` + konnectAlphaState,
 		httpClient := utils.HTTPClient()
 		_ = sendAnalytics("konnect-dump", "")
 
+		if konnectDumpCmdKongStateFile == "-" {
+			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
+		}
+
 		if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 			return err
 		} else if !yes {
@@ -38,7 +39,7 @@ configure Konnect.` + konnectAlphaState,
 		}
 
 		// get Konnect client
-		konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig.Debug)
+		konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 		if err != nil {
 			return err
 		}
@@ -48,7 +49,7 @@ configure Konnect.` + konnectAlphaState,
 			konnectConfig.Email,
 			konnectConfig.Password)
 		if err != nil {
-			return errors.Wrap(err, "authenticating with Konnect")
+			return fmt.Errorf("authenticating with Konnect: %w", err)
 		}
 
 		// get kong control plane ID
@@ -59,7 +60,7 @@ configure Konnect.` + konnectAlphaState,
 
 		// initialize kong client
 		kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-			Address:    konnect.BaseURL() + "/api/control_planes/" + kongCPID,
+			Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 			HTTPClient: httpClient,
 			Debug:      konnectConfig.Debug,
 		})
@@ -87,8 +88,7 @@ configure Konnect.` + konnectAlphaState,
 func init() {
 	konnectCmd.AddCommand(konnectDumpCmd)
 	konnectDumpCmd.Flags().StringVarP(&konnectDumpCmdKongStateFile, "output-file", "o",
-		"konnect", "file to which to write Kong's configuration."+
-			"Use '-' to write to stdout.")
+		"konnect", "file to which to write Kong's configuration.")
 	konnectDumpCmd.Flags().StringVar(&konnectDumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml")
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpWithID, "with-id",

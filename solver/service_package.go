@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
@@ -12,7 +14,7 @@ type servicePackageCRUD struct {
 	client *konnect.Client
 }
 
-func servicePackageFromStuct(arg diff.Event) *state.ServicePackage {
+func servicePackageFromStruct(arg diff.Event) *state.ServicePackage {
 	sp, ok := arg.Obj.(*state.ServicePackage)
 	if !ok {
 		panic("unexpected type, expected *state.ServicePackage")
@@ -24,10 +26,10 @@ func servicePackageFromStuct(arg diff.Event) *state.ServicePackage {
 // The arg should be of type diff.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.ServicePackage.
-func (s *servicePackageCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *servicePackageCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
-	createdSP, err := s.client.ServicePackages.Create(nil, &sp.ServicePackage)
+	sp := servicePackageFromStruct(event)
+	createdSP, err := s.client.ServicePackages.Create(ctx, &sp.ServicePackage)
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +40,10 @@ func (s *servicePackageCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.ServicePackage.
-func (s *servicePackageCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *servicePackageCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
-	err := s.client.ServicePackages.Delete(nil, sp.ID)
+	sp := servicePackageFromStruct(event)
+	err := s.client.ServicePackages.Delete(ctx, sp.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +54,11 @@ func (s *servicePackageCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.ServicePackage.
-func (s *servicePackageCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *servicePackageCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	sp := servicePackageFromStuct(event)
+	sp := servicePackageFromStruct(event)
 
-	updatedSP, err := s.client.ServicePackages.Update(nil, &sp.ServicePackage)
+	updatedSP, err := s.client.ServicePackages.Update(ctx, &sp.ServicePackage)
 	if err != nil {
 		return nil, err
 	}

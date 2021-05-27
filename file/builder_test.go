@@ -8,15 +8,14 @@ import (
 	"testing"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	kong130Version = semver.MustParse("1.3.0")
-)
+var kong130Version = semver.MustParse("1.3.0")
 
 func emptyState() *state.KongState {
 	s, _ := state.NewKongState()
@@ -242,6 +241,27 @@ func existingTargetsState() *state.KongState {
 	return s
 }
 
+func existingDocumentState() *state.KongState {
+	s, _ := state.NewKongState()
+	s.ServicePackages.Add(state.ServicePackage{
+		ServicePackage: konnect.ServicePackage{
+			ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Name: kong.String("foo"),
+		},
+	})
+	parent, _ := s.ServicePackages.Get("4bfcb11f-c962-4817-83e5-9433cf20b663")
+	s.Documents.Add(state.Document{
+		Document: konnect.Document{
+			ID:        kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Path:      kong.String("/foo.md"),
+			Published: kong.Bool(true),
+			Content:   kong.String("foo"),
+			Parent:    parent,
+		},
+	})
+	return s
+}
+
 var deterministicUUID = func() *string {
 	version := byte(4)
 	uuid := make([]byte, 16)
@@ -352,8 +372,6 @@ func Test_stateBuilder_services(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
-			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
 		})
@@ -1507,9 +1525,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1569,9 +1589,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1635,9 +1657,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1677,9 +1701,11 @@ func Test_stateBuilder_upstream(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1712,9 +1738,111 @@ func Test_stateBuilder_upstream(t *testing.T) {
 	}
 }
 
-func Test_stateBuilder(t *testing.T) {
+func Test_stateBuilder_documents(t *testing.T) {
 	assert := assert.New(t)
 	rand.Seed(42)
+	type fields struct {
+		targetContent *Content
+		currentState  *state.KongState
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *utils.KonnectRawState
+	}{
+		{
+			name: "matches ID of an existing document",
+			fields: fields{
+				targetContent: &Content{
+					ServicePackages: []FServicePackage{
+						{
+							Name: kong.String("foo"),
+							Document: &FDocument{
+								Path:      kong.String("/foo.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("foo"),
+							},
+						},
+					},
+				},
+				currentState: existingDocumentState(),
+			},
+			want: &utils.KonnectRawState{
+				Documents: []*konnect.Document{
+					{
+						ID:        kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Path:      kong.String("/foo.md"),
+						Published: kong.Bool(true),
+						Content:   kong.String("foo"),
+						Parent: &konnect.ServicePackage{
+							ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+							Name: kong.String("foo"),
+						},
+					},
+				},
+				ServicePackages: []*konnect.ServicePackage{
+					{
+						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Name: kong.String("foo"),
+					},
+				},
+			},
+		},
+		{
+			name: "process a non-existent document",
+			fields: fields{
+				targetContent: &Content{
+					ServicePackages: []FServicePackage{
+						{
+							Name: kong.String("bar"),
+							Document: &FDocument{
+								Path:      kong.String("/bar.md"),
+								Published: kong.Bool(true),
+								Content:   kong.String("bar"),
+							},
+						},
+					},
+				},
+				currentState: existingDocumentState(),
+			},
+			want: &utils.KonnectRawState{
+				Documents: []*konnect.Document{
+					{
+						ID:        kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Path:      kong.String("/bar.md"),
+						Published: kong.Bool(true),
+						Content:   kong.String("bar"),
+						Parent: &konnect.ServicePackage{
+							ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+							Name: kong.String("bar"),
+						},
+					},
+				},
+				ServicePackages: []*konnect.ServicePackage{
+					{
+						ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &stateBuilder{
+				targetContent: tt.fields.targetContent,
+				currentState:  tt.fields.currentState,
+			}
+			d, _ := utils.GetKongDefaulter()
+			b.defaulter = d
+			b.build()
+			assert.Equal(tt.want, b.konnectRawState)
+		})
+	}
+}
+
+func Test_stateBuilder(t *testing.T) {
+	assert := assert.New(t)
 	type fields struct {
 		targetContent *Content
 		currentState  *state.KongState
@@ -1937,9 +2065,316 @@ func Test_stateBuilder(t *testing.T) {
 							},
 							Passive: &kong.PassiveHealthcheck{
 								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 201, 202, 203, 204, 205,
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308},
+										306, 307, 308,
+									},
+									Successes: kong.Int(0),
+								},
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									HTTPStatuses: []int{429, 500, 503},
+								},
+							},
+						},
+						HashOn:           kong.String("none"),
+						HashFallback:     kong.String("none"),
+						HashOnCookiePath: kong.String("/"),
+						Tags:             kong.StringSlice("tag1"),
+					},
+				},
+			},
+		},
+		{
+			name: "entities with configurable defaults",
+			fields: fields{
+				targetContent: &Content{
+					Info: &Info{
+						SelectorTags: []string{"tag1"},
+						Defaults: KongDefaults{
+							Route: &kong.Route{
+								PathHandling:     kong.String("v0"),
+								PreserveHost:     kong.Bool(false),
+								RegexPriority:    kong.Int(0),
+								StripPath:        kong.Bool(false),
+								Protocols:        kong.StringSlice("http", "https"),
+								RequestBuffering: kong.Bool(false),
+							},
+							Service: &kong.Service{
+								Port:           kong.Int(443),
+								Protocol:       kong.String("https"),
+								ConnectTimeout: kong.Int(5000),
+								WriteTimeout:   kong.Int(5000),
+								ReadTimeout:    kong.Int(5000),
+							},
+							Upstream: &kong.Upstream{
+								Slots: kong.Int(100),
+								Healthchecks: &kong.Healthcheck{
+									Active: &kong.ActiveHealthcheck{
+										Concurrency: kong.Int(5),
+										Healthy: &kong.Healthy{
+											HTTPStatuses: []int{200, 302},
+											Interval:     kong.Int(0),
+											Successes:    kong.Int(0),
+										},
+										HTTPPath: kong.String("/"),
+										Type:     kong.String("http"),
+										Timeout:  kong.Int(1),
+										Unhealthy: &kong.Unhealthy{
+											HTTPFailures: kong.Int(0),
+											TCPFailures:  kong.Int(0),
+											Timeouts:     kong.Int(0),
+											Interval:     kong.Int(0),
+											HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+										},
+									},
+									Passive: &kong.PassiveHealthcheck{
+										Healthy: &kong.Healthy{
+											HTTPStatuses: []int{
+												200, 201, 202, 203, 204, 205,
+												206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+												306, 307, 308,
+											},
+											Successes: kong.Int(0),
+										},
+										Unhealthy: &kong.Unhealthy{
+											HTTPFailures: kong.Int(0),
+											TCPFailures:  kong.Int(0),
+											Timeouts:     kong.Int(0),
+											HTTPStatuses: []int{429, 500, 503},
+										},
+									},
+								},
+								HashOn:           kong.String("none"),
+								HashFallback:     kong.String("none"),
+								HashOnCookiePath: kong.String("/"),
+							},
+						},
+					},
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("foo-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name: kong.String("foo-route1"),
+									},
+								},
+								{
+									Route: kong.Route{
+										ID:   kong.String("d125e79a-297c-414b-bc00-ad3a87be6c2b"),
+										Name: kong.String("foo-route2"),
+									},
+								},
+							},
+						},
+						{
+							Service: kong.Service{
+								Name: kong.String("bar-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name: kong.String("bar-route1"),
+									},
+								},
+								{
+									Route: kong.Route{
+										Name: kong.String("bar-route2"),
+									},
+								},
+							},
+						},
+						{
+							Service: kong.Service{
+								Name: kong.String("large-payload-service"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:              kong.String("dont-buffer-these"),
+										RequestBuffering:  kong.Bool(false),
+										ResponseBuffering: kong.Bool(false),
+									},
+								},
+								{
+									Route: kong.Route{
+										Name:              kong.String("buffer-these"),
+										RequestBuffering:  kong.Bool(true),
+										ResponseBuffering: kong.Bool(true),
+									},
+								},
+							},
+						},
+					},
+					Upstreams: []FUpstream{
+						{
+							Upstream: kong.Upstream{
+								Name:  kong.String("foo"),
+								Slots: kong.Int(42),
+							},
+						},
+					},
+				},
+				currentState: existingServiceState(),
+			},
+			want: &utils.KongRawState{
+				Services: []*kong.Service{
+					{
+						ID:             kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Name:           kong.String("foo-service"),
+						Port:           kong.Int(443),
+						Protocol:       kong.String("https"),
+						ConnectTimeout: kong.Int(5000),
+						WriteTimeout:   kong.Int(5000),
+						ReadTimeout:    kong.Int(5000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+					{
+						ID:             kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						Name:           kong.String("bar-service"),
+						Port:           kong.Int(443),
+						Protocol:       kong.String("https"),
+						ConnectTimeout: kong.Int(5000),
+						WriteTimeout:   kong.Int(5000),
+						ReadTimeout:    kong.Int(5000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+					{
+						ID:             kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						Name:           kong.String("large-payload-service"),
+						Port:           kong.Int(443),
+						Protocol:       kong.String("https"),
+						ConnectTimeout: kong.Int(5000),
+						WriteTimeout:   kong.Int(5000),
+						ReadTimeout:    kong.Int(5000),
+						Tags:           kong.StringSlice("tag1"),
+					},
+				},
+				Routes: []*kong.Route{
+					{
+						ID:               kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Name:             kong.String("foo-route1"),
+						PreserveHost:     kong.Bool(false),
+						RegexPriority:    kong.Int(0),
+						StripPath:        kong.Bool(false),
+						Protocols:        kong.StringSlice("http", "https"),
+						RequestBuffering: kong.Bool(false),
+						PathHandling:     kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:               kong.String("d125e79a-297c-414b-bc00-ad3a87be6c2b"),
+						Name:             kong.String("foo-route2"),
+						PreserveHost:     kong.Bool(false),
+						RegexPriority:    kong.Int(0),
+						StripPath:        kong.Bool(false),
+						Protocols:        kong.StringSlice("http", "https"),
+						RequestBuffering: kong.Bool(false),
+						PathHandling:     kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:               kong.String("0cc0d614-4c88-4535-841a-cbe0709b0758"),
+						Name:             kong.String("bar-route1"),
+						PreserveHost:     kong.Bool(false),
+						RegexPriority:    kong.Int(0),
+						StripPath:        kong.Bool(false),
+						Protocols:        kong.StringSlice("http", "https"),
+						RequestBuffering: kong.Bool(false),
+						PathHandling:     kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:               kong.String("083f61d3-75bc-42b4-9df4-f91929e18fda"),
+						Name:             kong.String("bar-route2"),
+						PreserveHost:     kong.Bool(false),
+						RegexPriority:    kong.Int(0),
+						StripPath:        kong.Bool(false),
+						Protocols:        kong.StringSlice("http", "https"),
+						RequestBuffering: kong.Bool(false),
+						PathHandling:     kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
+						},
+						Tags: kong.StringSlice("tag1"),
+					},
+					{
+						ID:            kong.String("ba843ee8-d63e-4c4f-be1c-ebea546d8fac"),
+						Name:          kong.String("dont-buffer-these"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						PathHandling:  kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						},
+						Tags:              kong.StringSlice("tag1"),
+						RequestBuffering:  kong.Bool(false),
+						ResponseBuffering: kong.Bool(false),
+					},
+					{
+						ID:            kong.String("13dd1aac-04ce-4ea2-877c-5579cfa2c78e"),
+						Name:          kong.String("buffer-these"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("http", "https"),
+						PathHandling:  kong.String("v0"),
+						Service: &kong.Service{
+							ID: kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
+						},
+						Tags:              kong.StringSlice("tag1"),
+						RequestBuffering:  kong.Bool(true),
+						ResponseBuffering: kong.Bool(true),
+					},
+				},
+				Upstreams: []*kong.Upstream{
+					{
+						ID:    kong.String("1b0bafae-881b-42a7-9110-8a42ed3c903c"),
+						Name:  kong.String("foo"),
+						Slots: kong.Int(42),
+						Healthchecks: &kong.Healthcheck{
+							Active: &kong.ActiveHealthcheck{
+								Concurrency: kong.Int(5),
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{200, 302},
+									Interval:     kong.Int(0),
+									Successes:    kong.Int(0),
+								},
+								HTTPPath: kong.String("/"),
+								Type:     kong.String("http"),
+								Timeout:  kong.Int(1),
+								Unhealthy: &kong.Unhealthy{
+									HTTPFailures: kong.Int(0),
+									TCPFailures:  kong.Int(0),
+									Timeouts:     kong.Int(0),
+									Interval:     kong.Int(0),
+									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+								},
+							},
+							Passive: &kong.PassiveHealthcheck{
+								Healthy: &kong.Healthy{
+									HTTPStatuses: []int{
+										200, 201, 202, 203, 204, 205,
+										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+										306, 307, 308,
+									},
 									Successes: kong.Int(0),
 								},
 								Unhealthy: &kong.Unhealthy{
@@ -1961,6 +2396,7 @@ func Test_stateBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			rand.Seed(42)
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,

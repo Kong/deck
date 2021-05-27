@@ -65,7 +65,8 @@ func Test_sortKey(t *testing.T) {
 		{
 			sortable:    FService{},
 			expectedKey: "",
-		}, {
+		},
+		{
 			sortable: &FRoute{
 				Route: kong.Route{
 					Name: kong.String("my-route"),
@@ -85,7 +86,8 @@ func Test_sortKey(t *testing.T) {
 		{
 			sortable:    FRoute{},
 			expectedKey: "",
-		}, {
+		},
+		{
 			sortable: FUpstream{
 				Upstream: kong.Upstream{
 					Name: kong.String("my-upstream"),
@@ -105,7 +107,8 @@ func Test_sortKey(t *testing.T) {
 		{
 			sortable:    FUpstream{},
 			expectedKey: "",
-		}, {
+		},
+		{
 			sortable: FTarget{
 				Target: kong.Target{
 					Target: kong.String("my-target"),
@@ -125,7 +128,8 @@ func Test_sortKey(t *testing.T) {
 		{
 			sortable:    FTarget{},
 			expectedKey: "",
-		}, {
+		},
+		{
 			sortable: FCertificate{
 				Cert: kong.String("my-certificate"),
 				ID:   kong.String("my-id"),
@@ -141,7 +145,8 @@ func Test_sortKey(t *testing.T) {
 		{
 			sortable:    FCertificate{},
 			expectedKey: "",
-		}, {
+		},
+		{
 			sortable: FCACertificate{
 				CACertificate: kong.CACertificate{
 					Cert: kong.String("my-ca-certificate"),
@@ -284,7 +289,6 @@ func Test_sortKey(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestPluginUnmarshalYAML(t *testing.T) {

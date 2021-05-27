@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -12,7 +14,7 @@ type pluginCRUD struct {
 	client *kong.Client
 }
 
-func pluginFromStuct(arg diff.Event) *state.Plugin {
+func pluginFromStruct(arg diff.Event) *state.Plugin {
 	plugin, ok := arg.Obj.(*state.Plugin)
 	if !ok {
 		panic("unexpected type, expected *state.Plugin")
@@ -25,11 +27,11 @@ func pluginFromStuct(arg diff.Event) *state.Plugin {
 // The arg should be of type diff.Event, containing the plugin to be created,
 // else the function will panic.
 // It returns a the created *state.Plugin.
-func (s *pluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
+	plugin := pluginFromStruct(event)
 
-	createdPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
+	createdPlugin, err := s.client.Plugins.Create(ctx, &plugin.Plugin)
 	if err != nil {
 		return nil, err
 	}
@@ -40,10 +42,10 @@ func (s *pluginCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the plugin to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Plugin.
-func (s *pluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
-	err := s.client.Plugins.Delete(nil, plugin.ID)
+	plugin := pluginFromStruct(event)
+	err := s.client.Plugins.Delete(ctx, plugin.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,11 +56,11 @@ func (s *pluginCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the plugin to be updated,
 // else the function will panic.
 // It returns a the updated *state.Plugin.
-func (s *pluginCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *pluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	plugin := pluginFromStuct(event)
+	plugin := pluginFromStruct(event)
 
-	updatedPlugin, err := s.client.Plugins.Create(nil, &plugin.Plugin)
+	updatedPlugin, err := s.client.Plugins.Create(ctx, &plugin.Plugin)
 	if err != nil {
 		return nil, err
 	}

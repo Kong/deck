@@ -1,15 +1,16 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/utils"
-	"github.com/pkg/errors"
 )
 
 // Get builds a KongState from a raw representation of Kong.
 func Get(raw *utils.KongRawState) (*KongState, error) {
 	kongState, err := NewKongState()
 	if err != nil {
-		return nil, errors.Wrap(err, "creating new in-memory state of Kong")
+		return nil, fmt.Errorf("creating new in-memory state of Kong: %w", err)
 	}
 	err = buildKong(kongState, raw)
 	if err != nil {
@@ -22,19 +23,19 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 	for _, s := range raw.Services {
 		err := kongState.Services.Add(Service{Service: *s})
 		if err != nil {
-			return errors.Wrap(err, "inserting service into state")
+			return fmt.Errorf("inserting service into state: %w", err)
 		}
 	}
 	for _, r := range raw.Routes {
 		err := kongState.Routes.Add(Route{Route: *r})
 		if err != nil {
-			return errors.Wrap(err, "inserting route into state")
+			return fmt.Errorf("inserting route into state: %w", err)
 		}
 	}
 	for _, c := range raw.Consumers {
 		err := kongState.Consumers.Add(Consumer{Consumer: *c})
 		if err != nil {
-			return errors.Wrap(err, "inserting consumer into state")
+			return fmt.Errorf("inserting consumer into state: %w", err)
 		}
 	}
 	ensureConsumer := func(consumerID string) (bool, error) {
@@ -43,8 +44,8 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			if err == ErrNotFound {
 				return false, nil
 			}
-			return false, errors.Wrapf(err,
-				"looking up consumer '%v'", consumerID)
+			return false, fmt.Errorf("looking up consumer %q: %w", consumerID, err)
+
 		}
 		return true, nil
 	}
@@ -58,7 +59,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.KeyAuths.Add(KeyAuth{KeyAuth: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting key-auth into state")
+			return fmt.Errorf("inserting key-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.HMACAuths {
@@ -71,7 +72,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.HMACAuths.Add(HMACAuth{HMACAuth: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting hmac-auth into state")
+			return fmt.Errorf("inserting hmac-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.JWTAuths {
@@ -84,7 +85,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.JWTAuths.Add(JWTAuth{JWTAuth: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting jwt into state")
+			return fmt.Errorf("inserting jwt into state: %w", err)
 		}
 	}
 	for _, cred := range raw.BasicAuths {
@@ -97,7 +98,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.BasicAuths.Add(BasicAuth{BasicAuth: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting basic-auth into state")
+			return fmt.Errorf("inserting basic-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.Oauth2Creds {
@@ -110,7 +111,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.Oauth2Creds.Add(Oauth2Credential{Oauth2Credential: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting oauth2-cred into state")
+			return fmt.Errorf("inserting oauth2-cred into state: %w", err)
 		}
 	}
 	for _, cred := range raw.ACLGroups {
@@ -123,7 +124,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.ACLGroups.Add(ACLGroup{ACLGroup: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting basic-auth into state")
+			return fmt.Errorf("inserting basic-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.MTLSAuths {
@@ -136,33 +137,33 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 		err = kongState.MTLSAuths.Add(MTLSAuth{MTLSAuth: *cred})
 		if err != nil {
-			return errors.Wrap(err, "inserting mtls-auth into state")
+			return fmt.Errorf("inserting mtls-auth into state: %w", err)
 		}
 	}
 	for _, u := range raw.Upstreams {
 		err := kongState.Upstreams.Add(Upstream{Upstream: *u})
 		if err != nil {
-			return errors.Wrap(err, "inserting upstream into state")
+			return fmt.Errorf("inserting upstream into state: %w", err)
 		}
 	}
 	for _, t := range raw.Targets {
 		err := kongState.Targets.Add(Target{Target: *t})
 		if err != nil {
-			return errors.Wrap(err, "inserting target into state")
+			return fmt.Errorf("inserting target into state: %w", err)
 		}
 	}
 
 	for _, c := range raw.Certificates {
 		err := kongState.Certificates.Add(Certificate{Certificate: *c})
 		if err != nil {
-			return errors.Wrap(err, "inserting certificate into state")
+			return fmt.Errorf("inserting certificate into state: %w", err)
 		}
 	}
 
 	for _, s := range raw.SNIs {
 		err := kongState.SNIs.Add(SNI{SNI: *s})
 		if err != nil {
-			return errors.Wrap(err, "inserting sni into state")
+			return fmt.Errorf("inserting sni into state: %w", err)
 		}
 	}
 
@@ -171,27 +172,27 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			CACertificate: *c,
 		})
 		if err != nil {
-			return errors.Wrap(err, "inserting ca_certificate into state")
+			return fmt.Errorf("inserting ca_certificate into state: %w", err)
 		}
 	}
 
 	for _, p := range raw.Plugins {
 		err := kongState.Plugins.Add(Plugin{Plugin: *p})
 		if err != nil {
-			return errors.Wrap(err, "inserting plugins into state")
+			return fmt.Errorf("inserting plugins into state: %w", err)
 		}
 	}
 
 	for _, r := range raw.RBACRoles {
 		err := kongState.RBACRoles.Add(RBACRole{RBACRole: *r})
 		if err != nil {
-			return errors.Wrap(err, "inserting rbac roles into state")
+			return fmt.Errorf("inserting rbac roles into state: %w", err)
 		}
 	}
 	for _, r := range raw.RBACEndpointPermissions {
 		err := kongState.RBACEndpointPermissions.Add(RBACEndpointPermission{RBACEndpointPermission: *r})
 		if err != nil {
-			return errors.Wrap(err, "inserting rbac endpoint permissions into state")
+			return fmt.Errorf("inserting rbac endpoint permissions into state: %w", err)
 		}
 	}
 	return nil
@@ -205,7 +206,7 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 			ServicePackage: *servicePackage,
 		})
 		if err != nil {
-			return errors.Wrap(err, "inserting service-package into state")
+			return fmt.Errorf("inserting service-package into state: %w", err)
 		}
 
 		for _, v := range s.Versions {
@@ -215,8 +216,17 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 				ServiceVersion: v,
 			})
 			if err != nil {
-				return errors.Wrap(err, "inserting service-version into state")
+				return fmt.Errorf("inserting service-version into state: %w", err)
 			}
+		}
+	}
+	for _, d := range raw.Documents {
+		document := d.ShallowCopy()
+		err := kongState.Documents.Add(Document{
+			Document: *document,
+		})
+		if err != nil {
+			return fmt.Errorf("inserting document into state: %w", err)
 		}
 	}
 	return nil
@@ -226,7 +236,7 @@ func GetKonnectState(rawKong *utils.KongRawState,
 	rawKonnect *utils.KonnectRawState) (*KongState, error) {
 	kongState, err := NewKongState()
 	if err != nil {
-		return nil, errors.Wrap(err, "creating new in-memory state of Kong")
+		return nil, fmt.Errorf("creating new in-memory state of Kong: %w", err)
 	}
 
 	err = buildKong(kongState, rawKong)

@@ -17,7 +17,6 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -56,6 +55,7 @@ type KongRawState struct {
 // KonnectRawState contains all of Konnect resources.
 type KonnectRawState struct {
 	ServicePackages []*konnect.ServicePackage
+	Documents       []*konnect.Document
 }
 
 // ErrArray holds an array of errors.
@@ -100,6 +100,8 @@ type KonnectConfig struct {
 	Email    string
 	Password string
 	Debug    bool
+
+	Address string
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
@@ -111,7 +113,6 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 
 // GetKongClient returns a Kong client
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
-
 	var tlsConfig tls.Config
 	if opt.TLSSkipVerify {
 		tlsConfig.InsecureSkipVerify = true
@@ -124,7 +125,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		certPool := x509.NewCertPool()
 		ok := certPool.AppendCertsFromPEM([]byte(opt.TLSCACert))
 		if !ok {
-			return nil, errors.New("failed to load TLSCACert")
+			return nil, fmt.Errorf("failed to load TLSCACert")
 		}
 		tlsConfig.RootCAs = certPool
 	}
@@ -140,13 +141,13 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 	headers, err := parseHeaders(opt.Headers)
 	if err != nil {
-		return nil, errors.Wrap(err, "parsing headers")
+		return nil, fmt.Errorf("parsing headers: %w", err)
 	}
 	c = kong.HTTPClientWithHeaders(c, headers)
 
 	url, err := url.ParseRequestURI(address)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse kong address")
+		return nil, fmt.Errorf("failed to parse kong address: %w", err)
 	}
 	if opt.Workspace != "" {
 		url.Path = path.Join(url.Path, opt.Workspace)
@@ -154,7 +155,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
-		return nil, errors.Wrap(err, "creating client for Kong's Admin API")
+		return nil, fmt.Errorf("creating client for Kong's Admin API: %w", err)
 	}
 	if opt.Debug {
 		kongClient.SetDebugMode(true)
@@ -165,9 +166,10 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 
 func parseHeaders(headers []string) (http.Header, error) {
 	res := http.Header{}
+	const splitLen = 2
 	for _, keyValue := range headers {
 		split := strings.SplitN(keyValue, ":", 2)
-		if len(split) >= 2 {
+		if len(split) >= splitLen {
 			res.Add(split[0], split[1])
 		} else {
 			return nil, fmt.Errorf("splitting header key-value '%s'", keyValue)
@@ -176,13 +178,16 @@ func parseHeaders(headers []string) (http.Header, error) {
 	return res, nil
 }
 
-func GetKonnectClient(httpClient *http.Client, debug bool) (*konnect.Client,
+func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.Client,
 	error) {
-	client, err := konnect.NewClient(httpClient)
+	address := CleanAddress(config.Address)
+	client, err := konnect.NewClient(httpClient, konnect.ClientOpts{
+		BaseURL: address,
+	})
 	if err != nil {
 		return nil, err
 	}
-	if debug {
+	if config.Debug {
 		client.SetDebugMode(true)
 		client.SetLogger(os.Stderr)
 	}

@@ -7,16 +7,14 @@ import (
 	"os"
 
 	"github.com/blang/semver/v4"
-	"github.com/fatih/color"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/solver"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
@@ -48,7 +46,7 @@ func workspaceExists(ctx context.Context, rootConfig utils.KongClientConfig, wor
 
 	exists, err := rootClient.Workspaces.Exists(ctx, &workspaceName)
 	if err != nil {
-		return false, errors.Wrap(err, "checking if workspace exists")
+		return false, fmt.Errorf("checking if workspace exists: %w", err)
 	}
 	return exists, nil
 }
@@ -71,7 +69,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var workspaceName string
 	// prepare to read the current state from Kong
 	if workspace != targetContent.Workspace && workspace != "" {
-		print.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
 			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
 		workspaceName = workspace
 	} else {
@@ -82,11 +80,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// load Kong version after workspace
 	kongVersion, err := fetchKongVersion(ctx, wsConfig)
 	if err != nil {
-		return errors.Wrap(err, "reading Kong version")
+		return fmt.Errorf("reading Kong version: %w", err)
 	}
 	parsedKongVersion, err := parseKongVersion(kongVersion)
 	if err != nil {
-		return errors.Wrap(err, "parsing Kong version")
+		return fmt.Errorf("parsing Kong version: %w", err)
 	}
 
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
@@ -115,32 +113,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
-		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
-		if err != nil {
-			return err
-		}
-
-		currentState, err = state.Get(rawState)
+		currentState, err = fetchCurrentState(ctx, wsClient, dumpConfig)
 		if err != nil {
 			return err
 		}
 	} else {
-
-		print.CreatePrintln("creating workspace", wsConfig.Workspace)
-
 		// inject empty state
 		currentState, err = state.NewKongState()
 		if err != nil {
 			return err
 		}
 
+		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
 		if !dry {
-			_, err = rootClient.Workspaces.Create(nil, &kong.Workspace{Name: &wsConfig.Workspace})
+			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
 				return err
 			}
 		}
-
 	}
 
 	// read the target state
@@ -159,26 +149,45 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	s, _ := diff.NewSyncer(currentState, targetState)
-	s.StageDelaySec = delay
-	stats, errs := solver.Solve(ctx, s, wsClient, nil, parallelism, dry)
-	printFn := color.New(color.FgGreen, color.Bold).PrintfFunc()
-	printFn("Summary:\n")
-	printFn("  Created: %v\n", stats.CreateOps)
-	printFn("  Updated: %v\n", stats.UpdateOps)
-	printFn("  Deleted: %v\n", stats.DeleteOps)
-	if errs != nil {
-		return utils.ErrArray{Errors: errs}
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient)
+	if err != nil {
+		return err
 	}
-	if diffCmdNonZeroExitCode &&
-		stats.CreateOps+stats.UpdateOps+stats.DeleteOps != 0 {
+
+	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
 	return nil
 }
 
-func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
+func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump.Config) (*state.KongState, error) {
+	rawState, err := dump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return nil, err
+	}
 
+	currentState, err := state.Get(rawState)
+	if err != nil {
+		return nil, err
+	}
+	return currentState, nil
+}
+
+func performDiff(ctx context.Context, currentState, targetState *state.KongState,
+	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
+	s, _ := diff.NewSyncer(currentState, targetState)
+	s.StageDelaySec = delay
+	stats, errs := solver.Solve(ctx, s, client, nil, parallelism, dry)
+	// print stats before error to report completed operations
+	printStats(stats)
+	if errs != nil {
+		return 0, utils.ErrArray{Errors: errs}
+	}
+	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
+	return int(totalOps), nil
+}
+
+func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
 	var version string
 
 	workspace := config.Workspace
@@ -223,8 +232,8 @@ func parseKongVersion(version string) (semver.Version, error) {
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
-		return errors.New("positional arguments are not valid for this command, please use flags instead\n" +
-			"Run 'deck --help' for usage.")
+		return fmt.Errorf("positional arguments are not valid for this command, " +
+			"please use flags instead")
 	}
 	return nil
 }

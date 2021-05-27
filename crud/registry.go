@@ -1,7 +1,8 @@
 package crud
 
 import (
-	"github.com/pkg/errors"
+	"context"
+	"fmt"
 )
 
 // Kind represents Kind of an entity or object.
@@ -23,11 +24,11 @@ func (r *Registry) typesMap() map[Kind]Actions {
 // An error will be returned if kind was previously registered.
 func (r *Registry) Register(kind Kind, a Actions) error {
 	if kind == "" {
-		return errors.New("kind cannot be empty")
+		return fmt.Errorf("kind cannot be empty")
 	}
 	m := r.typesMap()
 	if _, ok := m[kind]; ok {
-		return errors.New("kind '" + string(kind) + "' already registered")
+		return fmt.Errorf("kind %q already registered", kind)
 	}
 	m[kind] = a
 	return nil
@@ -45,79 +46,79 @@ func (r *Registry) MustRegister(kind Kind, a Actions) {
 // An error will be returned if kind was never registered.
 func (r *Registry) Get(kind Kind) (Actions, error) {
 	if kind == "" {
-		return nil, errors.New("kind cannot be empty")
+		return nil, fmt.Errorf("kind cannot be empty")
 	}
 	m := r.typesMap()
 	a, ok := m[kind]
 	if !ok {
-		return nil, errors.New("kind '" + string(kind) + "' is not registered")
+		return nil, fmt.Errorf("kind %q is not registered", kind)
 	}
 	return a, nil
 }
 
 // Create calls the registered create action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Create(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Create(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
-		return nil, errors.Wrap(err, "create failed")
+		return nil, fmt.Errorf("create failed: %w", err)
 	}
 
-	res, err := a.Create(args...)
+	res, err := a.Create(ctx, args...)
 	if err != nil {
-		return nil, errors.Wrap(err, "create failed")
+		return nil, fmt.Errorf("create failed: %w", err)
 	}
 	return res, nil
 }
 
 // Update calls the registered update action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Update(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Update(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
-		return nil, errors.Wrap(err, "update failed")
+		return nil, fmt.Errorf("update failed: %w", err)
 	}
 
-	res, err := a.Update(args...)
+	res, err := a.Update(ctx, args...)
 	if err != nil {
-		return nil, errors.Wrap(err, "update failed")
+		return nil, fmt.Errorf("update failed: %w", err)
 	}
 	return res, nil
 }
 
 // Delete calls the registered delete action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Delete(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Delete(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
-		return nil, errors.Wrap(err, "delete failed")
+		return nil, fmt.Errorf("delete failed: %w", err)
 	}
 
-	res, err := a.Delete(args...)
+	res, err := a.Delete(ctx, args...)
 	if err != nil {
-		return nil, errors.Wrap(err, "delete failed")
+		return nil, fmt.Errorf("delete failed: %w", err)
 	}
 	return res, nil
 }
 
 // Do calls an aciton based on op with args and returns the result and error.
-func (r *Registry) Do(kind Kind, op Op, args ...Arg) (Arg, error) {
+func (r *Registry) Do(ctx context.Context, kind Kind, op Op, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
-		return nil, errors.Wrapf(err, "%v failed", op)
+		return nil, fmt.Errorf("%v failed: %w", op, err)
 	}
 
 	var res Arg
 
 	switch op.name {
 	case Create.name:
-		res, err = a.Create(args...)
+		res, err = a.Create(ctx, args...)
 	case Update.name:
-		res, err = a.Update(args...)
+		res, err = a.Update(ctx, args...)
 	case Delete.name:
-		res, err = a.Delete(args...)
+		res, err = a.Delete(ctx, args...)
 	default:
-		return nil, errors.New("unknown operation: " + op.name)
+		return nil, fmt.Errorf("unknown operation: %s", op.name)
 	}
 
 	if err != nil {

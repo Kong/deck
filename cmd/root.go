@@ -11,7 +11,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,11 +34,14 @@ It can be used to export, import or sync entities to Kong.`,
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
-			return errors.WithStack(errors.Wrap(err, "invalid URL"))
+			return fmt.Errorf("invalid URL: %w", err)
 		}
 		return nil
 	},
 }
+
+// RootCmdOnlyForDocs is used to generate makrdown documentation.
+var RootCmdOnlyForDocs = rootCmd
 
 // Execute adds all child commands to the root command and sets
 // flags appropriately.
@@ -129,6 +131,11 @@ func init() {
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 
+	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
+		"address of the Konnect endpoint")
+	viper.BindPFlag("konnect-addr",
+		rootCmd.PersistentFlags().Lookup("konnect-addr"))
+
 	rootCmd.PersistentFlags().Bool("analytics", true,
 		"share anonymized data to help improve decK")
 	viper.BindPFlag("analytics",
@@ -183,14 +190,14 @@ func initKonnectConfig() error {
 	password := viper.GetString("konnect-password")
 	passwordFile := viper.GetString("konnect-password-file")
 	// read from password file only if password is not supplied using an
-	//environment variable or flag
+	// environment variable or flag
 	if password == "" && passwordFile != "" {
 		fileContent, err := ioutil.ReadFile(passwordFile)
 		if err != nil {
-			return errors.Errorf("read file '%s': %v", passwordFile, err)
+			return fmt.Errorf("read file %q: %w", passwordFile, err)
 		}
 		if len(fileContent) == 0 {
-			return errors.Errorf("file '%s': empty", passwordFile)
+			return fmt.Errorf("file %q: empty", passwordFile)
 		}
 		password = string(fileContent)
 		password = strings.TrimRight(password, "\n")
@@ -200,5 +207,6 @@ func initKonnectConfig() error {
 	konnectConfig.Email = viper.GetString("konnect-email")
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
+	konnectConfig.Address = viper.GetString("konnect-addr")
 	return nil
 }

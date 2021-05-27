@@ -1,11 +1,13 @@
 package solver
 
 import (
+	"context"
+	"reflect"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
-	"reflect"
 )
 
 // serviceVersionCRUD implements crud.Actions interface.
@@ -33,15 +35,15 @@ func oldServiceVersionFromStruct(arg diff.Event) *state.ServiceVersion {
 // The arg should be of type diff.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.ServiceVersion.
-func (s *serviceVersionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceVersionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	sv := serviceVersionFromStruct(event)
-	createdSV, err := s.client.ServiceVersions.Create(nil, &sv.ServiceVersion)
+	createdSV, err := s.client.ServiceVersions.Create(ctx, &sv.ServiceVersion)
 	if err != nil {
 		return nil, err
 	}
 	if sv.ControlPlaneServiceRelation != nil {
-		_, err := s.client.ControlPlaneRelations.Create(nil, &konnect.ControlPlaneServiceRelationCreateRequest{
+		_, err := s.client.ControlPlaneRelations.Create(ctx, &konnect.ControlPlaneServiceRelationCreateRequest{
 			ServiceVersionID:     *createdSV.ID,
 			ControlPlaneEntityID: *sv.ControlPlaneServiceRelation.ControlPlaneEntityID,
 		})
@@ -56,10 +58,10 @@ func (s *serviceVersionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.ServiceVersion.
-func (s *serviceVersionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceVersionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	sv := serviceVersionFromStruct(event)
-	err := s.client.ServiceVersions.Delete(nil, sv.ID)
+	err := s.client.ServiceVersions.Delete(ctx, sv.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +72,7 @@ func (s *serviceVersionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.ServiceVersion.
-func (s *serviceVersionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceVersionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	var (
 		err       error
 		updatedSV *konnect.ServiceVersion
@@ -84,7 +86,7 @@ func (s *serviceVersionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 		versionCopy := &state.ServiceVersion{ServiceVersion: *version.DeepCopy()}
 		versionCopy.ControlPlaneServiceRelation = nil
 		versionCopy.ServicePackage = nil
-		updatedSV, err = s.client.ServiceVersions.Update(nil, &versionCopy.ServiceVersion)
+		updatedSV, err = s.client.ServiceVersions.Update(ctx, &versionCopy.ServiceVersion)
 		if err != nil {
 			return nil, err
 		}
@@ -95,7 +97,7 @@ func (s *serviceVersionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// When a service versions update is detected, it could be due to changes in
 	// control-plane-entity and service-version relations
 	// This is possible only during update events
-	err = s.relationCRUD(&version.ServiceVersion, &oldVersion.ServiceVersion)
+	err = s.relationCRUD(ctx, &version.ServiceVersion, &oldVersion.ServiceVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -103,26 +105,26 @@ func (s *serviceVersionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	return &state.ServiceVersion{ServiceVersion: *updatedSV}, nil
 }
 
-func (s *serviceVersionCRUD) relationCRUD(version,
+func (s *serviceVersionCRUD) relationCRUD(ctx context.Context, version,
 	oldVersion *konnect.ServiceVersion) error {
 	var err error
 
 	if version.ControlPlaneServiceRelation != nil &&
 		oldVersion.ControlPlaneServiceRelation == nil {
 		// no version existed before, create a new relation
-		_, err = s.client.ControlPlaneRelations.Create(nil, &konnect.ControlPlaneServiceRelationCreateRequest{
+		_, err = s.client.ControlPlaneRelations.Create(ctx, &konnect.ControlPlaneServiceRelationCreateRequest{
 			ServiceVersionID:     *version.ID,
 			ControlPlaneEntityID: *version.ControlPlaneServiceRelation.ControlPlaneEntityID,
 		})
 	} else if version.ControlPlaneServiceRelation == nil && oldVersion.
 		ControlPlaneServiceRelation != nil {
 		// version doesn't need to exist anymore, delete it
-		err = s.client.ControlPlaneRelations.Delete(nil,
+		err = s.client.ControlPlaneRelations.Delete(ctx,
 			oldVersion.ControlPlaneServiceRelation.ID)
 	} else if !reflect.DeepEqual(version.ControlPlaneServiceRelation,
 		oldVersion.ControlPlaneServiceRelation) {
 		// relations are different, update it
-		_, err = s.client.ControlPlaneRelations.Update(nil,
+		_, err = s.client.ControlPlaneRelations.Update(ctx,
 			&konnect.ControlPlaneServiceRelationUpdateRequest{
 				ID: *oldVersion.ControlPlaneServiceRelation.ID,
 				ControlPlaneServiceRelationCreateRequest: konnect.ControlPlaneServiceRelationCreateRequest{

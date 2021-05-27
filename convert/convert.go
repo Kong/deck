@@ -16,9 +16,7 @@ const (
 	FormatKonnect     Format = "konnect"
 )
 
-var (
-	AllFormats = []Format{FormatKongGateway, FormatKonnect}
-)
+var AllFormats = []Format{FormatKongGateway, FormatKonnect}
 
 func ParseFormat(key string) (Format, error) {
 	format := Format(strings.ToLower(key))

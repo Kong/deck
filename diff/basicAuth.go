@@ -1,10 +1,11 @@
 package diff
 
 import (
+	"fmt"
+
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/print"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -17,14 +18,14 @@ func (sc *Syncer) warnBasicAuth() {
 		if sc.SilenceWarnings {
 			return
 		}
-		print.UpdatePrintln(basicAuthPasswordWarning)
+		cprint.UpdatePrintln(basicAuthPasswordWarning)
 	})
 }
 
 func (sc *Syncer) deleteBasicAuths() error {
 	currentBasicAuths, err := sc.currentState.BasicAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching basic-auths from state")
+		return fmt.Errorf("error fetching basic-auths from state: %w", err)
 	}
 
 	for _, basicAuth := range currentBasicAuths {
@@ -53,8 +54,8 @@ func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up basic-auth '%v'",
-			*basicAuth.Username)
+		return nil, fmt.Errorf("looking up basic-auth %q: %w",
+			*basicAuth.Username, err)
 	}
 	return nil, nil
 }
@@ -62,7 +63,7 @@ func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
 func (sc *Syncer) createUpdateBasicAuths() error {
 	targetBasicAuths, err := sc.targetState.BasicAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching basic-auths from state")
+		return fmt.Errorf("error fetching basic-auths from state: %w", err)
 	}
 
 	for _, basicAuth := range targetBasicAuths {
@@ -94,13 +95,12 @@ func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, err
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up basic-auth %v",
-			*basicAuth.Username)
+		return nil, fmt.Errorf("error looking up basic-auth %q: %w",
+			*basicAuth.Username, err)
 	}
 	// found, check if update needed
 
 	if !currentBasicAuth.EqualWithOpts(basicAuth, false, true, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "basic-auth",

@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.7.0](#v170---20210520)
 - [v1.6.0](#v160---20210408)
 - [v1.5.1](#v151---20210323)
 - [v1.5.0](#v150---20210306)
@@ -28,6 +29,52 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.7.0] - 2021/05/20
+
+### Added
+
+- State files now support environment variable-based templating. decK can
+  substitute the value of an environment variable into an object in the state
+  file. This is useful for avoiding persistent cleartext storage of sensitive
+  values and populating values that vary between similar configurations.
+  [#286](https://github.com/Kong/deck/pull/286)
+- Sort state file objects by name, to ease comparing state files from
+  similarly-configured instances that do not share object IDs.
+  [#327](https://github.com/Kong/deck/pull/327)
+- Added a default timeout to HTTP requests.
+  [37eeec8](https://github.com/Kong/deck/commit/37eeec8606583d2ecfacb3265f7ff15921f0ab8d)
+- Implemented `convert` command for converting state files between Kong Gateway
+  and Konnect configuration formats. This is aimed to solving migration problem between
+  on-premise Kong clusters and Konnect SaaS.
+  [#330](https://github.com/Kong/deck/pull/330)
+- Add `--konnect-addr` flag to set Konnect address. This can be used to target Konnect
+  data-centers in geographical regions other than the US.
+  [#374](https://github.com/Kong/deck/pull/374)
+- Added support for document objects for Service Packages and Versions in Konnect.
+  [#388](https://github.com/Kong/deck/pull/388)
+
+### Fixed
+
+- Fixed duplicate error message prints.
+  [#317](https://github.com/Kong/deck/pull/317)
+- Handle mtls-auth credential API behavior when Kong Enterprise is running in
+  free mode. decK no longer treats the free mode mtls-auth behavior as a fatal
+  error.
+  [#321](https://github.com/Kong/deck/pull/321)
+- `--select-tag` tags are now applied to credentials.
+  [#282](https://github.com/Kong/deck/pull/282)
+- Fix empty Service Package descriptions not syncing correctly.
+  [#347](https://github.com/Kong/deck/pull/347)
+- Updating certificate fields no longer deletes SNI associations. 
+  [#386](https://github.com/Kong/deck/pull/386)
+
+### Misc
+
+- Refactored utility functionality to take advantage of new features in
+  go-kong.
+- Added reworked usage analytics.
+  [#379](https://github.com/Kong/deck/pull/379)
 
 ## [v1.6.0] - 2021/04/08
 
@@ -620,6 +667,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/kong/deck/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/kong/deck/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/kong/deck/compare/v1.4.0...v1.5.0

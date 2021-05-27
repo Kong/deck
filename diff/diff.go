@@ -2,6 +2,8 @@ package diff
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -11,12 +13,9 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
-	"github.com/pkg/errors"
 )
 
-var (
-	errEnqueueFailed = errors.New("failed to queue event")
-)
+var errEnqueueFailed = errors.New("failed to queue event")
 
 func defaultBackOff() backoff.BackOff {
 	// For various reasons, Kong can temporarily fail to process
@@ -28,8 +27,6 @@ func defaultBackOff() backoff.BackOff {
 	exponentialBackoff.Multiplier = 3
 	return backoff.WithMaxRetries(exponentialBackoff, 4)
 }
-
-// TODO get rid of the syncer struct and simply have a func for it
 
 // Syncer takes in a current and target state of Kong,
 // diffs them, generating a Graph to get Kong from current
@@ -76,6 +73,7 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
 	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
 	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
+	s.postProcess.MustRegister("document", &documentPostAction{current})
 
 	return s, nil
 }
@@ -195,6 +193,11 @@ func (sc *Syncer) delete() error {
 	sc.wait()
 
 	err = sc.deleteRBACRoles()
+	if err != nil {
+		return err
+	}
+
+	err = sc.deleteDocuments()
 	if err != nil {
 		return err
 	}
@@ -333,6 +336,11 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 
+	err = sc.createUpdateDocuments()
+	if err != nil {
+		return err
+	}
+
 	// finish createUpdate before returning
 	sc.wait()
 
@@ -369,7 +377,7 @@ func (sc *Syncer) wait() {
 // Run starts a diff and invokes d for every diff.
 func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	if parallelism < 1 {
-		return append([]error{}, errors.New("parallelism can not be negative"))
+		return append([]error{}, fmt.Errorf("parallelism can not be negative"))
 	}
 
 	var wg sync.WaitGroup
@@ -384,7 +392,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
 		go func() {
-			err := sc.eventLoop(d)
+			err := sc.eventLoop(ctx, d)
 			if err != nil {
 				sc.errChan <- err
 			}
@@ -426,7 +434,6 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	// collect errors
 	for err := range sc.errChan {
 		if err != errEnqueueFailed {
-
 			errs = append(errs, err)
 		}
 	}
@@ -435,10 +442,9 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 }
 
 // Do is the worker function to sync the diff
-// TODO remove crud.Arg
 type Do func(a Event) (crud.Arg, error)
 
-func (sc *Syncer) eventLoop(d Do) error {
+func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	for event := range sc.eventChan {
 		// Stop if program is terminated
 		select {
@@ -447,7 +453,7 @@ func (sc *Syncer) eventLoop(d Do) error {
 		default:
 		}
 
-		err := sc.handleEvent(d, event)
+		err := sc.handleEvent(ctx, d, event)
 		sc.eventCompleted()
 		if err != nil {
 			return err
@@ -456,11 +462,11 @@ func (sc *Syncer) eventLoop(d Do) error {
 	return nil
 }
 
-func (sc *Syncer) handleEvent(d Do, event Event) error {
+func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
-			err = errors.Wrapf(err, "while processing event")
+			err = fmt.Errorf("while processing event: %w", err)
 
 			var kongAPIError *kong.APIError
 			if errors.As(err, &kongAPIError) &&
@@ -474,12 +480,12 @@ func (sc *Syncer) handleEvent(d Do, event Event) error {
 		}
 		if res == nil {
 			// Do not retry empty responses
-			return backoff.Permanent(errors.New("result of event is nil"))
+			return backoff.Permanent(fmt.Errorf("result of event is nil"))
 		}
-		_, err = sc.postProcess.Do(event.Kind, event.Op, res)
+		_, err = sc.postProcess.Do(ctx, event.Kind, event.Op, res)
 		if err != nil {
 			// Do not retry program errors
-			return backoff.Permanent(errors.Wrap(err, "while post processing event"))
+			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))
 		}
 		return nil
 	}, defaultBackOff())

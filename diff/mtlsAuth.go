@@ -1,15 +1,16 @@
 package diff
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
-	"github.com/pkg/errors"
 )
 
 func (sc *Syncer) deleteMTLSAuths() error {
 	currentMTLSAuths, err := sc.currentState.MTLSAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching mtls-auths from state")
+		return fmt.Errorf("error fetching mtls-auths from state: %w", err)
 	}
 
 	for _, mtlsAuth := range currentMTLSAuths {
@@ -37,7 +38,7 @@ func (sc *Syncer) deleteMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error) {
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "looking up mtls-auth '%v'", *mtlsAuth.ID)
+		return nil, fmt.Errorf("looking up mtls-auth %q: %w", *mtlsAuth.ID, err)
 	}
 	return nil, nil
 }
@@ -45,7 +46,7 @@ func (sc *Syncer) deleteMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error) {
 func (sc *Syncer) createUpdateMTLSAuths() error {
 	targetMTLSAuths, err := sc.targetState.MTLSAuths.GetAll()
 	if err != nil {
-		return errors.Wrap(err, "error fetching mtls-auths from state")
+		return fmt.Errorf("error fetching mtls-auths from state: %w", err)
 	}
 
 	for _, mtlsAuth := range targetMTLSAuths {
@@ -76,13 +77,12 @@ func (sc *Syncer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error)
 		}, nil
 	}
 	if err != nil {
-		return nil, errors.Wrapf(err, "error looking up mtls-auth %v",
-			*mtlsAuth.ID)
+		return nil, fmt.Errorf("error looking up mtls-auth %q: %w",
+			*mtlsAuth.ID, err)
 	}
 	// found, check if update needed
 
 	if !currentMTLSAuth.EqualWithOpts(mtlsAuth, false, true, false) {
-
 		return &Event{
 			Op:     crud.Update,
 			Kind:   "mtls-auth",

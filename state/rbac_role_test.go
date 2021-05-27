@@ -236,7 +236,7 @@ func TestRBACRolesCollection_Update(t *testing.T) {
 	k.Add(rbacRole2)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			// t.Parallel()
 			if err := k.Update(tt.args.rbacRole); (err != nil) != tt.wantErr {
 				t.Errorf("RBACRolesCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

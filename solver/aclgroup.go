@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -13,7 +15,7 @@ type aclGroupCRUD struct {
 	client *kong.Client
 }
 
-func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
+func aclGroupFromStruct(arg diff.Event) *state.ACLGroup {
 	aclGroup, ok := arg.Obj.(*state.ACLGroup)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -26,9 +28,9 @@ func aclGroupFromStuct(arg diff.Event) *state.ACLGroup {
 // The arg should be of type diff.Event, containing the aclGroup to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
 		cid = *aclGroup.Consumer.Username
@@ -36,7 +38,7 @@ func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(aclGroup.Consumer.ID) {
 		cid = *aclGroup.Consumer.ID
 	}
-	createdACLGroup, err := s.client.ACLs.Create(nil, &cid,
+	createdACLGroup, err := s.client.ACLs.Create(ctx, &cid,
 		&aclGroup.ACLGroup)
 	if err != nil {
 		return nil, err
@@ -48,9 +50,9 @@ func (s *aclGroupCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the aclGroup to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
 		cid = *aclGroup.Consumer.Username
@@ -58,7 +60,7 @@ func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(aclGroup.Consumer.ID) {
 		cid = *aclGroup.Consumer.ID
 	}
-	err := s.client.ACLs.Delete(nil, &cid, aclGroup.ID)
+	err := s.client.ACLs.Delete(ctx, &cid, aclGroup.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +71,9 @@ func (s *aclGroupCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the aclGroup to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *aclGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *aclGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
-	aclGroup := aclGroupFromStuct(event)
+	aclGroup := aclGroupFromStruct(event)
 
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
@@ -80,7 +82,7 @@ func (s *aclGroupCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(aclGroup.Consumer.ID) {
 		cid = *aclGroup.Consumer.ID
 	}
-	updatedACLGroup, err := s.client.ACLs.Create(nil, &cid, &aclGroup.ACLGroup)
+	updatedACLGroup, err := s.client.ACLs.Create(ctx, &cid, &aclGroup.ACLGroup)
 	if err != nil {
 		return nil, err
 	}

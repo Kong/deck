@@ -46,11 +46,13 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 			}
 		}()
 
-		semaphore := semaphore.NewWeighted(10)
+		const concurrency = 10
+
+		semaphore := semaphore.NewWeighted(concurrency)
 		for i := 0; i < len(servicePackages); i++ {
 			// control the number of outstanding go routines, also controlling
 			// the number of parallel requests
-			err := semaphore.Acquire(ctx, 1)
+			err := semaphore.Acquire(ctx, 2)
 			if err != nil {
 				return fmt.Errorf("acquire semaphore: %v", err)
 			}
@@ -63,13 +65,39 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 				}
 				servicePackages[i].Versions = versions
 			}(i)
+			go func(i int) {
+				defer semaphore.Release(1)
+				documents, err := konnectClient.Documents.ListAllForParent(ctx, servicePackages[i])
+				if err != nil {
+					errChan <- err
+					return
+				}
+				res.Documents = append(res.Documents, documents...)
+			}(i)
 		}
-		err = semaphore.Acquire(ctx, 10)
+		for i := 0; i < len(servicePackages); i++ {
+			for _, version := range servicePackages[i].Versions {
+				err := semaphore.Acquire(ctx, 1)
+				if err != nil {
+					return fmt.Errorf("acquire semaphore: %v", err)
+				}
+				go func(version konnect.ServiceVersion) {
+					defer semaphore.Release(1)
+					documents, err := konnectClient.Documents.ListAllForParent(ctx, &version)
+					if err != nil {
+						errChan <- err
+						return
+					}
+					res.Documents = append(res.Documents, documents...)
+				}(version)
+			}
+		}
+		err = semaphore.Acquire(ctx, concurrency)
 		if err != nil {
 			return fmt.Errorf("acquire semaphore: %v", err)
 		}
 		close(errChan)
-		semaphore.Release(10)
+		semaphore.Release(concurrency)
 		m.Lock()
 		defer m.Unlock()
 		if err2 != nil {
