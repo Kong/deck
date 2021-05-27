@@ -47,6 +47,16 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 
+	// defaulter
+	var kongDefaults KongDefaults
+	if b.targetContent.Info != nil {
+		kongDefaults = b.targetContent.Info.Defaults
+	}
+	b.defaulter, err = defaulter(kongDefaults)
+	if err != nil {
+		return nil, nil, fmt.Errorf("creating defaulter: %w", err)
+	}
+
 	// build
 	b.certificates()
 	b.caCertificates()
@@ -827,4 +837,32 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 		sID = *plugin.Service.ID
 	}
 	return
+}
+
+func defaulter(defaults KongDefaults) (*utils.Defaulter, error) {
+	d, err := utils.GetKongDefaulter()
+	if err != nil {
+		return nil, err
+	}
+	if defaults.Route != nil {
+		if err = d.Register(defaults.Route); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Service != nil {
+		if err = d.Register(defaults.Service); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Upstream != nil {
+		if err = d.Register(defaults.Upstream); err != nil {
+			return nil, err
+		}
+	}
+	if defaults.Target != nil {
+		if err = d.Register(defaults.Target); err != nil {
+			return nil, err
+		}
+	}
+	return d, nil
 }
