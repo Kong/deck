@@ -101,3 +101,41 @@ func WorkspaceExists(ctx context.Context, client *kong.Client) (bool, error) {
 	}
 	return client.Workspaces.Exists(ctx, &workspace)
 }
+
+// These GetFooReference functions return stripped copies (ID and Name only) of Kong resource
+// structs. We use these within KongRawState structs to indicate entity relationships.
+// While state files indicate relationships by nesting (A collection of services is
+// [{name: "foo", id: "1234", connect_timeout: 600000, routes: [{name: "fooRoute"}]}]),
+// KongRawState is flattened, with all entities listed independently at the top level.
+// To preserve the relationships, these flattened entities include references (the route from
+// earlier becomes {name: "fooRoute", service: {name: "foo", id: "1234"}}).
+
+// GetConsumerReference returns a username+ID only copy of the input consumer,
+// for use in references from other objects
+func GetConsumerReference(c kong.Consumer) *kong.Consumer {
+	consumer := &kong.Consumer{ID: kong.String(*c.ID)}
+	if c.Username != nil {
+		consumer.Username = kong.String(*c.Username)
+	}
+	return consumer
+}
+
+// GetServiceReference returns a name+ID only copy of the input service,
+// for use in references from other objects
+func GetServiceReference(s kong.Service) *kong.Service {
+	service := &kong.Service{ID: kong.String(*s.ID)}
+	if s.Name != nil {
+		service.Name = kong.String(*s.Name)
+	}
+	return service
+}
+
+// GetRouteReference returns a name+ID only copy of the input route,
+// for use in references from other objects
+func GetRouteReference(r kong.Route) *kong.Route {
+	route := &kong.Route{ID: kong.String(*r.ID)}
+	if r.Name != nil {
+		route.Name = kong.String(*r.Name)
+	}
+	return route
+}
