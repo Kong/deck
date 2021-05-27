@@ -15,7 +15,7 @@ func validate(content []byte) error {
 		return fmt.Errorf("unmarshaling file content: %w", err)
 	}
 	c = ensureJSON(c)
-	schemaLoader := gojsonschema.NewStringLoader(contentSchema)
+	schemaLoader := gojsonschema.NewStringLoader(kongJSONSchema)
 	documentLoader := gojsonschema.NewGoLoader(c)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
 	if err != nil {
