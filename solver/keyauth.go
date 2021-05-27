@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -26,10 +28,10 @@ func keyAuthFromStruct(arg diff.Event) *state.KeyAuth {
 // The arg should be of type diff.Event, containing the keyAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *keyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
-	createdKeyAuth, err := s.client.KeyAuths.Create(nil, keyAuth.Consumer.ID,
+	createdKeyAuth, err := s.client.KeyAuths.Create(ctx, keyAuth.Consumer.ID,
 		&keyAuth.KeyAuth)
 	if err != nil {
 		return nil, err
@@ -41,7 +43,7 @@ func (s *keyAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the keyAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *keyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 	cid := ""
@@ -51,7 +53,7 @@ func (s *keyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(keyAuth.Consumer.ID) {
 		cid = *keyAuth.Consumer.ID
 	}
-	err := s.client.KeyAuths.Delete(nil, &cid, keyAuth.ID)
+	err := s.client.KeyAuths.Delete(ctx, &cid, keyAuth.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,11 +64,11 @@ func (s *keyAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the keyAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *keyAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *keyAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 
-	updatedKeyAuth, err := s.client.KeyAuths.Create(nil, keyAuth.Consumer.ID,
+	updatedKeyAuth, err := s.client.KeyAuths.Create(ctx, keyAuth.Consumer.ID,
 		&keyAuth.KeyAuth)
 	if err != nil {
 		return nil, err

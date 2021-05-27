@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -25,10 +27,10 @@ func routeFromStruct(arg diff.Event) *state.Route {
 // The arg should be of type diff.Event, containing the route to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *routeCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *routeCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStruct(event)
-	createdRoute, err := s.client.Routes.Create(nil, &route.Route)
+	createdRoute, err := s.client.Routes.Create(ctx, &route.Route)
 	if err != nil {
 		return nil, err
 	}
@@ -39,10 +41,10 @@ func (s *routeCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the route to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *routeCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *routeCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStruct(event)
-	err := s.client.Routes.Delete(nil, route.ID)
+	err := s.client.Routes.Delete(ctx, route.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +55,11 @@ func (s *routeCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the route to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *routeCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *routeCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	route := routeFromStruct(event)
 
-	updatedRoute, err := s.client.Routes.Create(nil, &route.Route)
+	updatedRoute, err := s.client.Routes.Create(ctx, &route.Route)
 	if err != nil {
 		return nil, err
 	}

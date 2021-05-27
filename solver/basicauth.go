@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -26,7 +28,7 @@ func basicAuthFromStruct(arg diff.Event) *state.BasicAuth {
 // The arg should be of type diff.Event, containing the basicAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
-func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	cid := ""
@@ -36,7 +38,7 @@ func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(basicAuth.Consumer.ID) {
 		cid = *basicAuth.Consumer.ID
 	}
-	createdBasicAuth, err := s.client.BasicAuths.Create(nil, &cid,
+	createdBasicAuth, err := s.client.BasicAuths.Create(ctx, &cid,
 		&basicAuth.BasicAuth)
 	if err != nil {
 		return nil, err
@@ -48,7 +50,7 @@ func (s *basicAuthCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the basicAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
-func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	cid := ""
@@ -58,7 +60,7 @@ func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(basicAuth.Consumer.ID) {
 		cid = *basicAuth.Consumer.ID
 	}
-	err := s.client.BasicAuths.Delete(nil, &cid, basicAuth.ID)
+	err := s.client.BasicAuths.Delete(ctx, &cid, basicAuth.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +71,7 @@ func (s *basicAuthCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the basicAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
-func (s *basicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *basicAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 
@@ -80,7 +82,7 @@ func (s *basicAuthCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	if !utils.Empty(basicAuth.Consumer.ID) {
 		cid = *basicAuth.Consumer.ID
 	}
-	updatedBasicAuth, err := s.client.BasicAuths.Create(nil, &cid, &basicAuth.BasicAuth)
+	updatedBasicAuth, err := s.client.BasicAuths.Create(ctx, &cid, &basicAuth.BasicAuth)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -24,10 +26,10 @@ func serviceFromStruct(arg diff.Event) *state.Service {
 // The arg should be of type diff.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.Service.
-func (s *serviceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStruct(event)
-	createdService, err := s.client.Services.Create(nil, &service.Service)
+	createdService, err := s.client.Services.Create(ctx, &service.Service)
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +40,10 @@ func (s *serviceCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Service.
-func (s *serviceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStruct(event)
-	err := s.client.Services.Delete(nil, service.ID)
+	err := s.client.Services.Delete(ctx, service.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +54,11 @@ func (s *serviceCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.Service.
-func (s *serviceCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	service := serviceFromStruct(event)
 
-	updatedService, err := s.client.Services.Create(nil, &service.Service)
+	updatedService, err := s.client.Services.Create(ctx, &service.Service)
 	if err != nil {
 		return nil, err
 	}

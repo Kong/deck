@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
@@ -25,10 +27,10 @@ func rbacRoleFromStruct(arg diff.Event) *state.RBACRole {
 // The arg should be of type diff.Event, containing the role to be created,
 // else the function will panic.
 // It returns a the created *state.RBACRole.
-func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacRoleCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	role := rbacRoleFromStruct(event)
-	createdRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
+	createdRBACRole, err := s.client.RBACRoles.Create(ctx, &role.RBACRole)
 	if err != nil {
 		return nil, err
 	}
@@ -39,10 +41,10 @@ func (s *rbacRoleCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the role to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.RBACRole.
-func (s *rbacRoleCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacRoleCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	role := rbacRoleFromStruct(event)
-	err := s.client.RBACRoles.Delete(nil, role.ID)
+	err := s.client.RBACRoles.Delete(ctx, role.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +55,11 @@ func (s *rbacRoleCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the role to be updated,
 // else the function will panic.
 // It returns a the updated *state.RBACRole.
-func (s *rbacRoleCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacRoleCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	role := rbacRoleFromStruct(event)
 
-	updatedRBACRole, err := s.client.RBACRoles.Create(nil, &role.RBACRole)
+	updatedRBACRole, err := s.client.RBACRoles.Create(ctx, &role.RBACRole)
 	if err != nil {
 		return nil, err
 	}

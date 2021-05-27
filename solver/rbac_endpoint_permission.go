@@ -1,6 +1,7 @@
 package solver
 
 import (
+	"context"
 	"strings"
 
 	"github.com/kong/deck/crud"
@@ -27,10 +28,10 @@ func rbacEndpointPermissionFromStruct(arg diff.Event) *state.RBACEndpointPermiss
 // The arg should be of type diff.Event, containing the ep to be created,
 // else the function will panic.
 // It returns a the created *state.RBACEndpointPermission.
-func (s *rbacEndpointPermissionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacEndpointPermissionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
-	createdRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Create(nil, &ep.RBACEndpointPermission)
+	createdRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Create(ctx, &ep.RBACEndpointPermission)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +42,7 @@ func (s *rbacEndpointPermissionCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the ep to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.RBACEndpointPermission.
-func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacEndpointPermissionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
 
@@ -52,7 +53,7 @@ func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 	// /rbac/roles/ROLEID/endpoints/workspace/foo/
 	// so we strip this before passing it to go-kong
 	trimmed := strings.TrimLeft(*ep.Endpoint, "/")
-	err := s.client.RBACEndpointPermissions.Delete(nil, ep.Role.ID, ep.Workspace, &trimmed)
+	err := s.client.RBACEndpointPermissions.Delete(ctx, ep.Role.ID, ep.Workspace, &trimmed)
 	if err != nil {
 		return nil, err
 	}
@@ -63,11 +64,11 @@ func (s *rbacEndpointPermissionCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the ep to be updated,
 // else the function will panic.
 // It returns a the updated *state.RBACEndpointPermission.
-func (s *rbacEndpointPermissionCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *rbacEndpointPermissionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
 
-	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Update(nil, &ep.RBACEndpointPermission)
+	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Update(ctx, &ep.RBACEndpointPermission)
 	if err != nil {
 		return nil, err
 	}

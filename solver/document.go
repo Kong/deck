@@ -1,6 +1,8 @@
 package solver
 
 import (
+	"context"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
@@ -32,10 +34,10 @@ func oldDocumentFromStruct(arg diff.Event) *state.Document {
 // The arg should be of type diff.Event, containing the document to be created,
 // else the function will panic.
 // It returns the created *state.Document.
-func (s *documentCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
+func (s *documentCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	d := documentFromStruct(event)
-	createdDoc, err := s.client.Documents.Create(nil, &d.Document)
+	createdDoc, err := s.client.Documents.Create(ctx, &d.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -46,10 +48,10 @@ func (s *documentCRUD) Create(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the document to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Document.
-func (s *documentCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
+func (s *documentCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := eventFromArg(arg[0])
 	d := documentFromStruct(event)
-	err := s.client.Documents.Delete(nil, &d.Document)
+	err := s.client.Documents.Delete(ctx, &d.Document)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +62,7 @@ func (s *documentCRUD) Delete(arg ...crud.Arg) (crud.Arg, error) {
 // The arg should be of type diff.Event, containing the document to be updated,
 // else the function will panic.
 // It returns a the updated *state.Document.
-func (s *documentCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
+func (s *documentCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	var (
 		err        error
 		updatedDoc *konnect.Document
@@ -72,7 +74,7 @@ func (s *documentCRUD) Update(arg ...crud.Arg) (crud.Arg, error) {
 	// if there is a change in document entity, make a PATCH
 	if !document.EqualWithOpts(oldDocument, false, true, true) {
 		documentCopy := &state.Document{Document: *document.ShallowCopy()}
-		updatedDoc, err = s.client.Documents.Update(nil, &documentCopy.Document)
+		updatedDoc, err = s.client.Documents.Update(ctx, &documentCopy.Document)
 		if err != nil {
 			return nil, err
 		}
