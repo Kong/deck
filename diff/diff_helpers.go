@@ -1,4 +1,4 @@
-package solver
+package diff
 
 import (
 	"encoding/json"

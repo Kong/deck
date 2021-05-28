@@ -11,7 +11,6 @@ import (
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
-	"github.com/kong/deck/solver"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -179,7 +178,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
 	s, _ := diff.NewSyncer(currentState, targetState)
 	s.StageDelaySec = delay
-	stats, errs := solver.Solve(ctx, s, client, nil, parallelism, dry)
+	stats, errs := diff.Solve(ctx, s, client, nil, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

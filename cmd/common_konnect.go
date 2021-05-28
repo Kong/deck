@@ -9,7 +9,6 @@ import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/konnect"
-	"github.com/kong/deck/solver"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -85,7 +84,7 @@ func syncKonnect(ctx context.Context,
 	}
 
 	s, _ := diff.NewSyncer(currentState, targetState)
-	stats, errs := solver.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
+	stats, errs := diff.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {
