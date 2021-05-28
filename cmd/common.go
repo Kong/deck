@@ -28,7 +28,8 @@ var (
 )
 
 // workspaceExists checks if workspace exists in Kong.
-func workspaceExists(ctx context.Context, rootConfig utils.KongClientConfig, workspaceName string) (bool, error) {
+func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspaceName string) (bool, error) {
+	rootConfig := config.ForWorkspace("")
 	if workspaceName == "" {
 		// default workspace always exists
 		return true, nil
