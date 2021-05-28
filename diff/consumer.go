@@ -29,10 +29,10 @@ func (sc *Syncer) deleteConsumers() error {
 	return nil
 }
 
-func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*Event, error) {
+func (sc *Syncer) deleteConsumer(consumer *state.Consumer) (*crud.Event, error) {
 	_, err := sc.targetState.Consumers.Get(*consumer.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "consumer",
 			Obj:  consumer,
@@ -66,13 +66,13 @@ func (sc *Syncer) createUpdateConsumers() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*Event, error) {
+func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*crud.Event, error) {
 	consumerCopy := &state.Consumer{Consumer: *consumer.DeepCopy()}
 	currentConsumer, err := sc.currentState.Consumers.Get(*consumer.ID)
 
 	if err == state.ErrNotFound {
 		// consumer not present, create it
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "consumer",
 			Obj:  consumerCopy,
@@ -85,7 +85,7 @@ func (sc *Syncer) createUpdateConsumer(consumer *state.Consumer) (*Event, error)
 
 	// found, check if update needed
 	if !currentConsumer.EqualWithOpts(consumerCopy, false, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "consumer",
 			Obj:    consumerCopy,

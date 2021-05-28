@@ -28,10 +28,10 @@ func (sc *Syncer) deleteKeyAuths() error {
 	return nil
 }
 
-func (sc *Syncer) deleteKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
+func (sc *Syncer) deleteKeyAuth(keyAuth *state.KeyAuth) (*crud.Event, error) {
 	_, err := sc.targetState.KeyAuths.Get(*keyAuth.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "key-auth",
 			Obj:  keyAuth,
@@ -64,13 +64,13 @@ func (sc *Syncer) createUpdateKeyAuths() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
+func (sc *Syncer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*crud.Event, error) {
 	keyAuth = &state.KeyAuth{KeyAuth: *keyAuth.DeepCopy()}
 	currentKeyAuth, err := sc.currentState.KeyAuths.Get(*keyAuth.ID)
 	if err == state.ErrNotFound {
 		// keyAuth not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "key-auth",
 			Obj:  keyAuth,
@@ -83,7 +83,7 @@ func (sc *Syncer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*Event, error) {
 	// found, check if update needed
 
 	if !currentKeyAuth.EqualWithOpts(keyAuth, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "key-auth",
 			Obj:    keyAuth,

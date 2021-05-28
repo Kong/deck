@@ -28,10 +28,10 @@ func (sc *Syncer) deleteMTLSAuths() error {
 	return nil
 }
 
-func (sc *Syncer) deleteMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error) {
+func (sc *Syncer) deleteMTLSAuth(mtlsAuth *state.MTLSAuth) (*crud.Event, error) {
 	_, err := sc.targetState.MTLSAuths.Get(*mtlsAuth.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "mtls-auth",
 			Obj:  mtlsAuth,
@@ -64,13 +64,13 @@ func (sc *Syncer) createUpdateMTLSAuths() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error) {
+func (sc *Syncer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*crud.Event, error) {
 	mtlsAuth = &state.MTLSAuth{MTLSAuth: *mtlsAuth.DeepCopy()}
 	currentMTLSAuth, err := sc.currentState.MTLSAuths.Get(*mtlsAuth.ID)
 	if err == state.ErrNotFound {
 		// mtlsAuth not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "mtls-auth",
 			Obj:  mtlsAuth,
@@ -83,7 +83,7 @@ func (sc *Syncer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*Event, error)
 	// found, check if update needed
 
 	if !currentMTLSAuth.EqualWithOpts(mtlsAuth, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "mtls-auth",
 			Obj:    mtlsAuth,

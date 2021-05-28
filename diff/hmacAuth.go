@@ -28,10 +28,10 @@ func (sc *Syncer) deleteHMACAuths() error {
 	return nil
 }
 
-func (sc *Syncer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
+func (sc *Syncer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*crud.Event, error) {
 	_, err := sc.targetState.HMACAuths.Get(*hmacAuth.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "hmac-auth",
 			Obj:  hmacAuth,
@@ -65,13 +65,13 @@ func (sc *Syncer) createUpdateHMACAuths() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error) {
+func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*crud.Event, error) {
 	hmacAuth = &state.HMACAuth{HMACAuth: *hmacAuth.DeepCopy()}
 	currentHMACAuth, err := sc.currentState.HMACAuths.Get(*hmacAuth.ID)
 	if err == state.ErrNotFound {
 		// hmacAuth not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "hmac-auth",
 			Obj:  hmacAuth,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*Event, error)
 	// found, check if update needed
 
 	if !currentHMACAuth.EqualWithOpts(hmacAuth, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "hmac-auth",
 			Obj:    hmacAuth,

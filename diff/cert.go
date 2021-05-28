@@ -29,10 +29,10 @@ func (sc *Syncer) deleteCertificates() error {
 }
 
 func (sc *Syncer) deleteCertificate(
-	certificate *state.Certificate) (*Event, error) {
+	certificate *state.Certificate) (*crud.Event, error) {
 	_, err := sc.targetState.Certificates.Get(*certificate.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "certificate",
 			Obj:  certificate,
@@ -67,13 +67,13 @@ func (sc *Syncer) createUpdateCertificates() error {
 }
 
 func (sc *Syncer) createUpdateCertificate(
-	certificate *state.Certificate) (*Event, error) {
+	certificate *state.Certificate) (*crud.Event, error) {
 	certificateCopy := &state.Certificate{Certificate: *certificate.DeepCopy()}
 	currentCertificate, err := sc.currentState.Certificates.Get(*certificate.ID)
 
 	if err == state.ErrNotFound {
 		// certificate not present, create it
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "certificate",
 			Obj:  certificateCopy,
@@ -106,7 +106,7 @@ func (sc *Syncer) createUpdateCertificate(
 
 		certificateCopy.SNIs = sniNames
 		currentCertificate.SNIs = sniNames
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "certificate",
 			Obj:    certificateCopy,

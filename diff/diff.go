@@ -37,7 +37,7 @@ type Syncer struct {
 	targetState  *state.KongState
 	postProcess  crud.Registry
 
-	eventChan chan Event
+	eventChan chan crud.Event
 	errChan   chan error
 	stopChan  chan struct{}
 
@@ -362,7 +362,7 @@ func (sc *Syncer) createUpdate() error {
 	return nil
 }
 
-func (sc *Syncer) queueEvent(e Event) error {
+func (sc *Syncer) queueEvent(e crud.Event) error {
 	atomic.AddInt32(&sc.inFlightOps, 1)
 	select {
 	case sc.eventChan <- e:
@@ -398,7 +398,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	var wg sync.WaitGroup
 	const eventBuffer = 10
 
-	sc.eventChan = make(chan Event, eventBuffer)
+	sc.eventChan = make(chan crud.Event, eventBuffer)
 	sc.stopChan = make(chan struct{})
 	sc.errChan = make(chan error)
 
@@ -457,7 +457,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 }
 
 // Do is the worker function to sync the diff
-type Do func(a Event) (crud.Arg, error)
+type Do func(a crud.Event) (crud.Arg, error)
 
 func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	for event := range sc.eventChan {
@@ -477,7 +477,7 @@ func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	return nil
 }
 
-func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
+func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {

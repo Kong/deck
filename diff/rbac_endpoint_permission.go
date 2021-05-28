@@ -29,10 +29,10 @@ func (sc *Syncer) deleteRBACEndpointPermissions() error {
 	return nil
 }
 
-func (sc *Syncer) deleteRBACEndpointPermission(ep *state.RBACEndpointPermission) (*Event, error) {
+func (sc *Syncer) deleteRBACEndpointPermission(ep *state.RBACEndpointPermission) (*crud.Event, error) {
 	_, err := sc.targetState.RBACEndpointPermissions.Get(ep.Identifier())
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "rbac-endpointpermission",
 			Obj:  ep,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateRBACEndpointPermissions() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateRBACEndpointPermission(ep *state.RBACEndpointPermission) (*Event, error) {
+func (sc *Syncer) createUpdateRBACEndpointPermission(ep *state.RBACEndpointPermission) (*crud.Event, error) {
 	epCopy := &state.RBACEndpointPermission{RBACEndpointPermission: *ep.DeepCopy()}
 	currentEp, err := sc.currentState.RBACEndpointPermissions.Get(ep.Identifier())
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "rbac-endpointpermission",
 			Obj:  epCopy,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateRBACEndpointPermission(ep *state.RBACEndpointPermi
 
 	// found, check if update needed
 	if !currentEp.EqualWithOpts(epCopy, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "rbac-endpointpermission",
 			Obj:    epCopy,

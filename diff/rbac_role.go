@@ -29,10 +29,10 @@ func (sc *Syncer) deleteRBACRoles() error {
 	return nil
 }
 
-func (sc *Syncer) deleteRBACRole(role *state.RBACRole) (*Event, error) {
+func (sc *Syncer) deleteRBACRole(role *state.RBACRole) (*crud.Event, error) {
 	_, err := sc.targetState.RBACRoles.Get(*role.Name)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "rbac-role",
 			Obj:  role,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateRBACRoles() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateRBACRole(role *state.RBACRole) (*Event, error) {
+func (sc *Syncer) createUpdateRBACRole(role *state.RBACRole) (*crud.Event, error) {
 	roleCopy := &state.RBACRole{RBACRole: *role.DeepCopy()}
 	currentRole, err := sc.currentState.RBACRoles.Get(*role.Name)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "rbac-role",
 			Obj:  roleCopy,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateRBACRole(role *state.RBACRole) (*Event, error) {
 
 	// found, check if update needed
 	if !currentRole.EqualWithOpts(roleCopy, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "rbac-role",
 			Obj:    roleCopy,

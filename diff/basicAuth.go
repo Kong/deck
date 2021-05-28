@@ -43,11 +43,11 @@ func (sc *Syncer) deleteBasicAuths() error {
 	return nil
 }
 
-func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
+func (sc *Syncer) deleteBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
 	sc.warnBasicAuth()
 	_, err := sc.targetState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "basic-auth",
 			Obj:  basicAuth,
@@ -81,14 +81,14 @@ func (sc *Syncer) createUpdateBasicAuths() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, error) {
+func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
 	sc.warnBasicAuth()
 	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
 	currentBasicAuth, err := sc.currentState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {
 		// basicAuth not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "basic-auth",
 			Obj:  basicAuth,
@@ -101,7 +101,7 @@ func (sc *Syncer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*Event, err
 	// found, check if update needed
 
 	if !currentBasicAuth.EqualWithOpts(basicAuth, false, true, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "basic-auth",
 			Obj:    basicAuth,

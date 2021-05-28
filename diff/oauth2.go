@@ -29,10 +29,10 @@ func (sc *Syncer) deleteOauth2Creds() error {
 }
 
 func (sc *Syncer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
-	*Event, error) {
+	*crud.Event, error) {
 	_, err := sc.targetState.Oauth2Creds.Get(*oauth2Cred.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "oauth2-cred",
 			Obj:  oauth2Cred,
@@ -65,13 +65,13 @@ func (sc *Syncer) createUpdateOauth2Creds() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*Event, error) {
+func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*crud.Event, error) {
 	oauth2Cred = &state.Oauth2Credential{Oauth2Credential: *oauth2Cred.DeepCopy()}
 	currentOauth2Cred, err := sc.currentState.Oauth2Creds.Get(*oauth2Cred.ID)
 	if err == state.ErrNotFound {
 		// oauth2Cred not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "oauth2-cred",
 			Obj:  oauth2Cred,
@@ -85,7 +85,7 @@ func (sc *Syncer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*E
 	// found, check if update needed
 
 	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "oauth2-cred",
 			Obj:    oauth2Cred,

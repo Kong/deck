@@ -29,10 +29,10 @@ func (sc *Syncer) deleteDocuments() error {
 	return nil
 }
 
-func (sc *Syncer) deleteDocument(d *state.Document) (*Event, error) {
+func (sc *Syncer) deleteDocument(d *state.Document) (*crud.Event, error) {
 	_, err := sc.targetState.Documents.GetByParent(d.Parent, *d.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "document",
 			Obj:  d,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateDocuments() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateDocument(d *state.Document) (*Event, error) {
+func (sc *Syncer) createUpdateDocument(d *state.Document) (*crud.Event, error) {
 	dCopy := &state.Document{Document: *d.ShallowCopy()}
 	currentd, err := sc.currentState.Documents.GetByParent(d.Parent, *d.ID)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "document",
 			Obj:  dCopy,
@@ -87,7 +87,7 @@ func (sc *Syncer) createUpdateDocument(d *state.Document) (*Event, error) {
 	// is disabled. This appears to be related to an invalid diff detection for
 	// Service Versions attached to the package.
 	if !currentd.EqualWithOpts(dCopy, false, true, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "document",
 			Obj:    dCopy,

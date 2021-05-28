@@ -29,10 +29,10 @@ func (sc *Syncer) deleteUpstreams() error {
 	return nil
 }
 
-func (sc *Syncer) deleteUpstream(upstream *state.Upstream) (*Event, error) {
+func (sc *Syncer) deleteUpstream(upstream *state.Upstream) (*crud.Event, error) {
 	_, err := sc.targetState.Upstreams.Get(*upstream.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "upstream",
 			Obj:  upstream,
@@ -66,13 +66,13 @@ func (sc *Syncer) createUpdateUpstreams() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*Event,
+func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*crud.Event,
 	error) {
 	upstreamCopy := &state.Upstream{Upstream: *upstream.DeepCopy()}
 	currentUpstream, err := sc.currentState.Upstreams.Get(*upstream.Name)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "upstream",
 			Obj:  upstreamCopy,
@@ -85,7 +85,7 @@ func (sc *Syncer) createUpdateUpstream(upstream *state.Upstream) (*Event,
 
 	// found, check if update needed
 	if !currentUpstream.EqualWithOpts(upstreamCopy, false, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "upstream",
 			Obj:    upstreamCopy,
