@@ -66,6 +66,8 @@ func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 type serviceDiffer struct {
+	kind crud.Kind
+
 	currentState, targetState *state.KongState
 }
 
@@ -96,7 +98,7 @@ func (d *serviceDiffer) deleteService(service *state.Service) (*crud.Event, erro
 	if err == state.ErrNotFound {
 		return &crud.Event{
 			Op:   crud.Delete,
-			Kind: "service",
+			Kind: d.kind,
 			Obj:  service,
 		}, nil
 	}
