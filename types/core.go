@@ -9,16 +9,23 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+type Differ interface {
+	Deletes(func(crud.Event) error) error
+	CreateAndUpdates(func(crud.Event) error) error
+}
+
 type Entity interface {
 	Type() string
 	CRUDActions() crud.Actions
 	PostProcessActions() crud.Actions
+	Differ() Differ
 }
 
 type entityImpl struct {
 	typ                string
 	crudActions        crud.Actions // needs to set client
 	postProcessActions crud.Actions // needs currentstate Set
+	differ             Differ
 }
 
 func (e entityImpl) Type() string {
@@ -31,6 +38,10 @@ func (e entityImpl) CRUDActions() crud.Actions {
 
 func (e entityImpl) PostProcessActions() crud.Actions {
 	return e.postProcessActions
+}
+
+func (e entityImpl) Differ() Differ {
+	return e.differ
 }
 
 type EntityOpts struct {
@@ -119,6 +130,10 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &servicePostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &serviceDiffer{
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case Route:

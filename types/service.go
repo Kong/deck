@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -62,4 +63,95 @@ func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 		return nil, err
 	}
 	return &state.Service{Service: *updatedService}, nil
+}
+
+type serviceDiffer struct {
+	currentState, targetState *state.KongState
+}
+
+func (d *serviceDiffer) Deletes(handler func(crud.Event) error) error {
+	currentServices, err := d.currentState.Services.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, service := range currentServices {
+		n, err := d.deleteService(service)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+	return nil
+}
+
+func (d *serviceDiffer) deleteService(service *state.Service) (*crud.Event, error) {
+	_, err := d.targetState.Services.Get(*service.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: "service",
+			Obj:  service,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up service %q: %w",
+			service.Identifier(), err)
+	}
+	return nil, nil
+}
+
+func (d *serviceDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetServices, err := d.targetState.Services.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching services from state: %w", err)
+	}
+
+	for _, service := range targetServices {
+		n, err := d.createUpdateService(service)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *serviceDiffer) createUpdateService(service *state.Service) (*crud.Event, error) {
+	serviceCopy := &state.Service{Service: *service.DeepCopy()}
+	currentService, err := d.currentState.Services.Get(*service.ID)
+
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: "service",
+			Obj:  serviceCopy,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up service %q: %w",
+			*service.Name, err)
+	}
+
+	// found, check if update needed
+	if !currentService.EqualWithOpts(serviceCopy, false, true) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   "service",
+			Obj:    serviceCopy,
+			OldObj: currentService,
+		}, nil
+	}
+	return nil, nil
 }

@@ -55,6 +55,8 @@ type Syncer struct {
 
 	kongClient    *kong.Client
 	konnectClient *konnect.Client
+
+	entityDiffers map[string]types.Differ
 }
 
 type SyncerOpts struct {
@@ -114,6 +116,7 @@ func (sc *Syncer) init() error {
 
 		types.ServicePackage, types.ServiceVersion, types.Document,
 	}
+	sc.entityDiffers = map[string]types.Differ{}
 	for _, entityType := range entities {
 		entity, err := types.NewEntity(entityType, opts)
 		if err != nil {
@@ -121,6 +124,7 @@ func (sc *Syncer) init() error {
 		}
 		sc.postProcessor.MustRegister(crud.Kind(entityType), entity.PostProcessActions())
 		sc.processor.MustRegister(crud.Kind(entityType), entity.CRUDActions())
+		sc.entityDiffers[entityType] = entity.Differ()
 	}
 	return nil
 }
@@ -210,7 +214,7 @@ func (sc *Syncer) delete() error {
 	// routes must be deleted before services
 	sc.wait()
 
-	err = sc.deleteServices()
+	err = sc.entityDiffers[types.Service].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -305,7 +309,7 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateServices()
+	err = sc.entityDiffers[types.Service].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
