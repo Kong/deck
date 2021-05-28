@@ -111,32 +111,14 @@ func buildRegistry(client *kong.Client, konnectClient *konnect.Client) *crud.Reg
 		KongClient:    client,
 		KonnectClient: konnectClient,
 	}
-	service, err := types.NewEntity(types.Service, opts)
-	if err != nil {
-		panic(err)
-	}
 	var r crud.Registry
-	r.MustRegister("service", service.CRUDActions())
-	r.MustRegister("route", &routeCRUD{client: client})
-	r.MustRegister("upstream", &upstreamCRUD{client: client})
-	r.MustRegister("target", &targetCRUD{client: client})
-	r.MustRegister("certificate", &certificateCRUD{client: client})
-	r.MustRegister("sni", &sniCRUD{client: client})
-	r.MustRegister("ca_certificate", &caCertificateCRUD{client: client})
-	r.MustRegister("plugin", &pluginCRUD{client: client})
-	r.MustRegister("consumer", &consumerCRUD{client: client})
-	r.MustRegister("key-auth", &keyAuthCRUD{client: client})
-	r.MustRegister("hmac-auth", &hmacAuthCRUD{client: client})
-	r.MustRegister("jwt-auth", &jwtAuthCRUD{client: client})
-	r.MustRegister("basic-auth", &basicAuthCRUD{client: client})
-	r.MustRegister("acl-group", &aclGroupCRUD{client: client})
-	r.MustRegister("oauth2-cred", &oauth2CredCRUD{client: client})
-	r.MustRegister("mtls-auth", &mtlsAuthCRUD{client: client})
-	r.MustRegister("rbac-role", &rbacRoleCRUD{client: client})
-	r.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionCRUD{client: client})
 
-	r.MustRegister("service-package", &servicePackageCRUD{client: konnectClient})
-	r.MustRegister("service-version", &serviceVersionCRUD{client: konnectClient})
-	r.MustRegister("document", &documentCRUD{client: konnectClient})
+	for _, entityType := range types.AllTypes {
+		entity, err := types.NewEntity(entityType, opts)
+		if err != nil {
+			panic(err)
+		}
+		r.MustRegister(crud.Kind(entityType), entity.CRUDActions())
+	}
 	return &r
 }

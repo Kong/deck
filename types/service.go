@@ -22,7 +22,7 @@ func serviceFromStruct(arg crud.Event) *state.Service {
 }
 
 // Create creates a Service in Kong.
-// The arg should be of type diff.Event, containing the service to be created,
+// The arg should be of type crud.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.Service.
 func (s *serviceCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -36,7 +36,7 @@ func (s *serviceCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Delete deletes a Service in Kong.
-// The arg should be of type diff.Event, containing the service to be deleted,
+// The arg should be of type crud.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Service.
 func (s *serviceCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -50,7 +50,7 @@ func (s *serviceCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Update updates a Service in Kong.
-// The arg should be of type diff.Event, containing the service to be updated,
+// The arg should be of type crud.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.Service.
 func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -62,21 +62,4 @@ func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 		return nil, err
 	}
 	return &state.Service{Service: *updatedService}, nil
-}
-
-type servicePostAction struct {
-	// TODO switch back to unexported
-	CurrentState *state.KongState
-}
-
-func (crud *servicePostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.CurrentState.Services.Add(*args[0].(*state.Service))
-}
-
-func (crud *servicePostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.CurrentState.Services.Delete(*((args[0].(*state.Service)).ID))
-}
-
-func (crud *servicePostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.CurrentState.Services.Update(*args[0].(*state.Service))
 }

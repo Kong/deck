@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type pluginCRUD struct {
 	client *kong.Client
 }
 
-func pluginFromStruct(arg diff.Event) *state.Plugin {
+func pluginFromStruct(arg crud.Event) *state.Plugin {
 	plugin, ok := arg.Obj.(*state.Plugin)
 	if !ok {
 		panic("unexpected type, expected *state.Plugin")
@@ -24,7 +23,7 @@ func pluginFromStruct(arg diff.Event) *state.Plugin {
 }
 
 // Create creates a Plugin in Kong.
-// The arg should be of type diff.Event, containing the plugin to be created,
+// The arg should be of type crud.Event, containing the plugin to be created,
 // else the function will panic.
 // It returns a the created *state.Plugin.
 func (s *pluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -39,7 +38,7 @@ func (s *pluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 }
 
 // Delete deletes a Plugin in Kong.
-// The arg should be of type diff.Event, containing the plugin to be deleted,
+// The arg should be of type crud.Event, containing the plugin to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Plugin.
 func (s *pluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -53,7 +52,7 @@ func (s *pluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 }
 
 // Update updates a Plugin in Kong.
-// The arg should be of type diff.Event, containing the plugin to be updated,
+// The arg should be of type crud.Event, containing the plugin to be updated,
 // else the function will panic.
 // It returns a the updated *state.Plugin.
 func (s *pluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

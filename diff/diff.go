@@ -54,39 +54,43 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
 
-	opts := types.EntityOpts{
-		CurrentState: current,
-		TargetState:  target,
-		//KongClient:    kongClient,
-		//KonnectClient: konnectClient,
-	}
-	service, err := types.NewEntity(types.Service, opts)
+	err := s.setupPostProcess()
 	if err != nil {
 		return nil, err
 	}
-	s.postProcess.MustRegister("service", service.PostProcessActions())
-	s.postProcess.MustRegister("route", &routePostAction{current})
-	s.postProcess.MustRegister("upstream", &upstreamPostAction{current})
-	s.postProcess.MustRegister("target", &targetPostAction{current})
-	s.postProcess.MustRegister("certificate", &certificatePostAction{current})
-	s.postProcess.MustRegister("sni", &sniPostAction{current})
-	s.postProcess.MustRegister("ca_certificate", &caCertificatePostAction{current})
-	s.postProcess.MustRegister("plugin", &pluginPostAction{current})
-	s.postProcess.MustRegister("consumer", &consumerPostAction{current})
-	s.postProcess.MustRegister("key-auth", &keyAuthPostAction{current})
-	s.postProcess.MustRegister("hmac-auth", &hmacAuthPostAction{current})
-	s.postProcess.MustRegister("jwt-auth", &jwtAuthPostAction{current})
-	s.postProcess.MustRegister("basic-auth", &basicAuthPostAction{current})
-	s.postProcess.MustRegister("acl-group", &aclGroupPostAction{current})
-	s.postProcess.MustRegister("oauth2-cred", &oauth2CredPostAction{current})
-	s.postProcess.MustRegister("mtls-auth", &mtlsAuthPostAction{current})
-	s.postProcess.MustRegister("rbac-role", &rbacRolePostAction{current})
-	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
-	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
-	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
-	s.postProcess.MustRegister("document", &documentPostAction{current})
-
 	return s, nil
+}
+
+func (sc *Syncer) setupPostProcess() error {
+	opts := types.EntityOpts{
+		CurrentState: sc.currentState,
+		TargetState:  sc.targetState,
+	}
+
+	entities := []string{
+		types.Service, types.Route, types.Plugin,
+
+		types.Certificate, types.SNI, types.CACertificate,
+
+		types.Upstream, types.Target,
+
+		types.Consumer,
+		types.ACLGroup, types.BasicAuth, types.KeyAuth,
+		types.HMACAuth, types.JWTAuth, types.OAuth2Cred,
+		types.MTLSAuth,
+
+		types.RBACRole, types.RBACEndpointPermission,
+
+		types.ServicePackage, types.ServiceVersion, types.Document,
+	}
+	for _, entityType := range entities {
+		entity, err := types.NewEntity(entityType, opts)
+		if err != nil {
+			return err
+		}
+		sc.postProcess.MustRegister(crud.Kind(entityType), entity.PostProcessActions())
+	}
+	return nil
 }
 
 func (sc *Syncer) diff() error {

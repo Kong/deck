@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -15,7 +14,7 @@ type keyAuthCRUD struct {
 	client *kong.Client
 }
 
-func keyAuthFromStruct(arg diff.Event) *state.KeyAuth {
+func keyAuthFromStruct(arg crud.Event) *state.KeyAuth {
 	keyAuth, ok := arg.Obj.(*state.KeyAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -25,7 +24,7 @@ func keyAuthFromStruct(arg diff.Event) *state.KeyAuth {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the keyAuth to be created,
+// The arg should be of type crud.Event, containing the keyAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *keyAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -40,7 +39,7 @@ func (s *keyAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the keyAuth to be deleted,
+// The arg should be of type crud.Event, containing the keyAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *keyAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -61,7 +60,7 @@ func (s *keyAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the keyAuth to be updated,
+// The arg should be of type crud.Event, containing the keyAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *keyAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

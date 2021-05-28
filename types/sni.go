@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type sniCRUD struct {
 	client *kong.Client
 }
 
-func sniFromStruct(arg diff.Event) *state.SNI {
+func sniFromStruct(arg crud.Event) *state.SNI {
 	sni, ok := arg.Obj.(*state.SNI)
 	if !ok {
 		panic("unexpected type, expected *state.SNI")
@@ -24,7 +23,7 @@ func sniFromStruct(arg diff.Event) *state.SNI {
 }
 
 // Create creates a SNI in Kong.
-// The arg should be of type diff.Event, containing the sni to be created,
+// The arg should be of type crud.Event, containing the sni to be created,
 // else the function will panic.
 // It returns a the created *state.SNI.
 func (s *sniCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -38,7 +37,7 @@ func (s *sniCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error)
 }
 
 // Delete deletes a SNI in Kong.
-// The arg should be of type diff.Event, containing the sni to be deleted,
+// The arg should be of type crud.Event, containing the sni to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.SNI.
 func (s *sniCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -52,7 +51,7 @@ func (s *sniCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error)
 }
 
 // Update updates a SNI in Kong.
-// The arg should be of type diff.Event, containing the sni to be updated,
+// The arg should be of type crud.Event, containing the sni to be updated,
 // else the function will panic.
 // It returns a the updated *state.SNI.
 func (s *sniCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

@@ -1,4 +1,4 @@
-package diff
+package types
 
 import (
 	"context"
@@ -6,6 +6,22 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 )
+
+type servicePostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *servicePostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Services.Add(*args[0].(*state.Service))
+}
+
+func (crud *servicePostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Services.Delete(*((args[0].(*state.Service)).ID))
+}
+
+func (crud *servicePostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Services.Update(*args[0].(*state.Service))
+}
 
 type routePostAction struct {
 	currentState *state.KongState

@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -15,7 +14,7 @@ type mtlsAuthCRUD struct {
 	client *kong.Client
 }
 
-func mtlsAuthFromStruct(arg diff.Event) *state.MTLSAuth {
+func mtlsAuthFromStruct(arg crud.Event) *state.MTLSAuth {
 	mtlsAuth, ok := arg.Obj.(*state.MTLSAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -25,7 +24,7 @@ func mtlsAuthFromStruct(arg diff.Event) *state.MTLSAuth {
 }
 
 // Create creates an mtls-auth credential in Kong.
-// The arg should be of type diff.Event, containing the mtlsAuth to be created,
+// The arg should be of type crud.Event, containing the mtlsAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *mtlsAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -40,7 +39,7 @@ func (s *mtlsAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Delete deletes an mtls-auth credential in Kong.
-// The arg should be of type diff.Event, containing the mtlsAuth to be deleted,
+// The arg should be of type crud.Event, containing the mtlsAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *mtlsAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -61,7 +60,7 @@ func (s *mtlsAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Update updates an mtls-auth credential in Kong.
-// The arg should be of type diff.Event, containing the mtlsAuth to be updated,
+// The arg should be of type crud.Event, containing the mtlsAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *mtlsAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

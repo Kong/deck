@@ -1,11 +1,10 @@
-package solver
+package types
 
 import (
 	"context"
 	"reflect"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 )
@@ -15,7 +14,7 @@ type serviceVersionCRUD struct {
 	client *konnect.Client
 }
 
-func serviceVersionFromStruct(arg diff.Event) *state.ServiceVersion {
+func serviceVersionFromStruct(arg crud.Event) *state.ServiceVersion {
 	sv, ok := arg.Obj.(*state.ServiceVersion)
 	if !ok {
 		panic("unexpected type, expected *state.ServiceVersion")
@@ -23,7 +22,7 @@ func serviceVersionFromStruct(arg diff.Event) *state.ServiceVersion {
 	return sv
 }
 
-func oldServiceVersionFromStruct(arg diff.Event) *state.ServiceVersion {
+func oldServiceVersionFromStruct(arg crud.Event) *state.ServiceVersion {
 	sv, ok := arg.OldObj.(*state.ServiceVersion)
 	if !ok {
 		panic("unexpected type, expected *state.ServiceVersion")
@@ -32,7 +31,7 @@ func oldServiceVersionFromStruct(arg diff.Event) *state.ServiceVersion {
 }
 
 // Create creates a Service version in Konnect.
-// The arg should be of type diff.Event, containing the service to be created,
+// The arg should be of type crud.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.ServiceVersion.
 func (s *serviceVersionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -55,7 +54,7 @@ func (s *serviceVersionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.
 }
 
 // Delete deletes a Service version in Konnect.
-// The arg should be of type diff.Event, containing the service to be deleted,
+// The arg should be of type crud.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.ServiceVersion.
 func (s *serviceVersionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -69,7 +68,7 @@ func (s *serviceVersionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.
 }
 
 // Update updates a Service version in Konnect.
-// The arg should be of type diff.Event, containing the service to be updated,
+// The arg should be of type crud.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.ServiceVersion.
 func (s *serviceVersionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

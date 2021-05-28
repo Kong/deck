@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -15,7 +14,7 @@ type oauth2CredCRUD struct {
 	client *kong.Client
 }
 
-func oauth2CredFromStruct(arg diff.Event) *state.Oauth2Credential {
+func oauth2CredFromStruct(arg crud.Event) *state.Oauth2Credential {
 	oauth2Cred, ok := arg.Obj.(*state.Oauth2Credential)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -25,7 +24,7 @@ func oauth2CredFromStruct(arg diff.Event) *state.Oauth2Credential {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the oauth2Cred to be created,
+// The arg should be of type crud.Event, containing the oauth2Cred to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *oauth2CredCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -47,7 +46,7 @@ func (s *oauth2CredCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg,
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the oauth2Cred to be deleted,
+// The arg should be of type crud.Event, containing the oauth2Cred to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *oauth2CredCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -68,7 +67,7 @@ func (s *oauth2CredCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg,
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the oauth2Cred to be updated,
+// The arg should be of type crud.Event, containing the oauth2Cred to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *oauth2CredCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
