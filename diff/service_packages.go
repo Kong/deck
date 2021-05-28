@@ -29,10 +29,10 @@ func (sc *Syncer) deleteServicePackages() error {
 	return nil
 }
 
-func (sc *Syncer) deleteServicePackage(sp *state.ServicePackage) (*Event, error) {
+func (sc *Syncer) deleteServicePackage(sp *state.ServicePackage) (*crud.Event, error) {
 	_, err := sc.targetState.ServicePackages.Get(*sp.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "service-package",
 			Obj:  sp,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateServicePackages() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateServicePackage(sp *state.ServicePackage) (*Event, error) {
+func (sc *Syncer) createUpdateServicePackage(sp *state.ServicePackage) (*crud.Event, error) {
 	spCopy := &state.ServicePackage{ServicePackage: *sp.DeepCopy()}
 	currentSP, err := sc.currentState.ServicePackages.Get(*sp.ID)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service-package",
 			Obj:  spCopy,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateServicePackage(sp *state.ServicePackage) (*Event, 
 
 	// found, check if update needed
 	if !currentSP.EqualWithOpts(spCopy, false, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "service-package",
 			Obj:    spCopy,

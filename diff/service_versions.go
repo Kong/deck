@@ -29,10 +29,10 @@ func (sc *Syncer) deleteServiceVersions() error {
 	return nil
 }
 
-func (sc *Syncer) deleteServiceVersion(sv *state.ServiceVersion) (*Event, error) {
+func (sc *Syncer) deleteServiceVersion(sv *state.ServiceVersion) (*crud.Event, error) {
 	_, err := sc.targetState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "service-version",
 			Obj:  sv,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateServiceVersions() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateServiceVersion(sv *state.ServiceVersion) (*Event, error) {
+func (sc *Syncer) createUpdateServiceVersion(sv *state.ServiceVersion) (*crud.Event, error) {
 	svCopy := &state.ServiceVersion{ServiceVersion: *sv.DeepCopy()}
 	currentSV, err := sc.currentState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service-version",
 			Obj:  svCopy,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateServiceVersion(sv *state.ServiceVersion) (*Event, 
 
 	// found, check if update needed
 	if !currentSV.EqualWithOpts(svCopy, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "service-version",
 			Obj:    svCopy,

@@ -28,14 +28,14 @@ func (sc *Syncer) deletePlugins() error {
 	return nil
 }
 
-func (sc *Syncer) deletePlugin(plugin *state.Plugin) (*Event, error) {
+func (sc *Syncer) deletePlugin(plugin *state.Plugin) (*crud.Event, error) {
 	plugin = &state.Plugin{Plugin: *plugin.DeepCopy()}
 	name := *plugin.Name
 	serviceID, routeID, consumerID := foreignNames(plugin)
 	_, err := sc.targetState.Plugins.GetByProp(name, serviceID, routeID,
 		consumerID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "plugin",
 			Obj:  plugin,
@@ -68,7 +68,7 @@ func (sc *Syncer) createUpdatePlugins() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
+func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*crud.Event, error) {
 	plugin = &state.Plugin{Plugin: *plugin.DeepCopy()}
 	name := *plugin.Name
 	serviceID, routeID, consumerID := foreignNames(plugin)
@@ -77,7 +77,7 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 	if err == state.ErrNotFound {
 		// plugin not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "plugin",
 			Obj:  plugin,
@@ -91,7 +91,7 @@ func (sc *Syncer) createUpdatePlugin(plugin *state.Plugin) (*Event, error) {
 	// found, check if update needed
 
 	if !currentPlugin.EqualWithOpts(plugin, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "plugin",
 			Obj:    plugin,

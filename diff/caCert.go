@@ -29,10 +29,10 @@ func (sc *Syncer) deleteCACertificates() error {
 }
 
 func (sc *Syncer) deleteCACertificate(
-	caCert *state.CACertificate) (*Event, error) {
+	caCert *state.CACertificate) (*crud.Event, error) {
 	_, err := sc.targetState.CACertificates.Get(*caCert.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "ca_certificate",
 			Obj:  caCert,
@@ -67,13 +67,13 @@ func (sc *Syncer) createUpdateCACertificates() error {
 }
 
 func (sc *Syncer) createUpdateCACertificate(
-	caCert *state.CACertificate) (*Event, error) {
+	caCert *state.CACertificate) (*crud.Event, error) {
 	caCertCopy := &state.CACertificate{CACertificate: *caCert.DeepCopy()}
 	currentCACert, err := sc.currentState.CACertificates.Get(*caCert.ID)
 
 	if err == state.ErrNotFound {
 		// caCertificate not present, create it
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "ca_certificate",
 			Obj:  caCertCopy,
@@ -86,7 +86,7 @@ func (sc *Syncer) createUpdateCACertificate(
 
 	// found, check if update needed
 	if !currentCACert.EqualWithOpts(caCertCopy, false, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "ca_certificate",
 			Obj:    caCertCopy,

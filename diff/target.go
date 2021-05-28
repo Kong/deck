@@ -28,11 +28,11 @@ func (sc *Syncer) deleteTargets() error {
 	return nil
 }
 
-func (sc *Syncer) deleteTarget(target *state.Target) (*Event, error) {
+func (sc *Syncer) deleteTarget(target *state.Target) (*crud.Event, error) {
 	_, err := sc.targetState.Targets.Get(*target.Upstream.ID,
 		*target.Target.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "target",
 			Obj:  target,
@@ -66,14 +66,14 @@ func (sc *Syncer) createUpdateTargets() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateTarget(target *state.Target) (*Event, error) {
+func (sc *Syncer) createUpdateTarget(target *state.Target) (*crud.Event, error) {
 	target = &state.Target{Target: *target.DeepCopy()}
 	currentTarget, err := sc.currentState.Targets.Get(*target.Upstream.ID,
 		*target.Target.ID)
 	if err == state.ErrNotFound {
 		// target not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "target",
 			Obj:  target,
@@ -86,7 +86,7 @@ func (sc *Syncer) createUpdateTarget(target *state.Target) (*Event, error) {
 	// found, check if update needed
 
 	if !currentTarget.EqualWithOpts(target, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "target",
 			Obj:    target,

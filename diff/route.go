@@ -28,10 +28,10 @@ func (sc *Syncer) deleteRoutes() error {
 	return nil
 }
 
-func (sc *Syncer) deleteRoute(route *state.Route) (*Event, error) {
+func (sc *Syncer) deleteRoute(route *state.Route) (*crud.Event, error) {
 	_, err := sc.targetState.Routes.Get(*route.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "route",
 			Obj:  route,
@@ -65,13 +65,13 @@ func (sc *Syncer) createUpdateRoutes() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateRoute(route *state.Route) (*Event, error) {
+func (sc *Syncer) createUpdateRoute(route *state.Route) (*crud.Event, error) {
 	route = &state.Route{Route: *route.DeepCopy()}
 	currentRoute, err := sc.currentState.Routes.Get(*route.ID)
 	if err == state.ErrNotFound {
 		// route not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "route",
 			Obj:  route,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateRoute(route *state.Route) (*Event, error) {
 	// found, check if update needed
 
 	if !currentRoute.EqualWithOpts(route, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "route",
 			Obj:    route,

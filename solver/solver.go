@@ -61,7 +61,7 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 		}
 	}
 
-	errs := syncer.Run(ctx, parallelism, func(e diff.Event) (crud.Arg, error) {
+	errs := syncer.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
 		var err error
 		var result crud.Arg
 

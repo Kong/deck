@@ -28,10 +28,10 @@ func (sc *Syncer) deleteSNIs() error {
 	return nil
 }
 
-func (sc *Syncer) deleteSNI(sni *state.SNI) (*Event, error) {
+func (sc *Syncer) deleteSNI(sni *state.SNI) (*crud.Event, error) {
 	_, err := sc.targetState.SNIs.Get(*sni.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "sni",
 			Obj:  sni,
@@ -64,13 +64,13 @@ func (sc *Syncer) createUpdateSNIs() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateSNI(sni *state.SNI) (*Event, error) {
+func (sc *Syncer) createUpdateSNI(sni *state.SNI) (*crud.Event, error) {
 	sni = &state.SNI{SNI: *sni.DeepCopy()}
 	currentSNI, err := sc.currentState.SNIs.Get(*sni.ID)
 	if err == state.ErrNotFound {
 		// sni not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "sni",
 			Obj:  sni,
@@ -82,7 +82,7 @@ func (sc *Syncer) createUpdateSNI(sni *state.SNI) (*Event, error) {
 	// found, check if update needed
 
 	if !currentSNI.EqualWithOpts(sni, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "sni",
 			Obj:    sni,

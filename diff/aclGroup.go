@@ -28,11 +28,11 @@ func (sc *Syncer) deleteACLGroups() error {
 	return nil
 }
 
-func (sc *Syncer) deleteACLGroup(aclGroup *state.ACLGroup) (*Event, error) {
+func (sc *Syncer) deleteACLGroup(aclGroup *state.ACLGroup) (*crud.Event, error) {
 	// lookup by consumerID and Group
 	_, err := sc.targetState.ACLGroups.Get(*aclGroup.Consumer.ID, *aclGroup.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "acl-group",
 			Obj:  aclGroup,
@@ -65,14 +65,14 @@ func (sc *Syncer) createUpdateACLGroups() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*Event, error) {
+func (sc *Syncer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*crud.Event, error) {
 	aclGroup = &state.ACLGroup{ACLGroup: *aclGroup.DeepCopy()}
 	currentACLGroup, err := sc.currentState.ACLGroups.Get(
 		*aclGroup.Consumer.ID, *aclGroup.ID)
 	if err == state.ErrNotFound {
 		// aclGroup not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "acl-group",
 			Obj:  aclGroup,
@@ -85,7 +85,7 @@ func (sc *Syncer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*Event, error)
 	// found, check if update needed
 
 	if !currentACLGroup.EqualWithOpts(aclGroup, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "acl-group",
 			Obj:    aclGroup,

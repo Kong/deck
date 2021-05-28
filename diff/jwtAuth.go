@@ -28,10 +28,10 @@ func (sc *Syncer) deleteJWTAuths() error {
 	return nil
 }
 
-func (sc *Syncer) deleteJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
+func (sc *Syncer) deleteJWTAuth(jwtAuth *state.JWTAuth) (*crud.Event, error) {
 	_, err := sc.targetState.JWTAuths.Get(*jwtAuth.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "jwt-auth",
 			Obj:  jwtAuth,
@@ -64,13 +64,13 @@ func (sc *Syncer) createUpdateJWTAuths() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
+func (sc *Syncer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*crud.Event, error) {
 	jwtAuth = &state.JWTAuth{JWTAuth: *jwtAuth.DeepCopy()}
 	currentJWTAuth, err := sc.currentState.JWTAuths.Get(*jwtAuth.ID)
 	if err == state.ErrNotFound {
 		// jwtAuth not present, create it
 
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "jwt-auth",
 			Obj:  jwtAuth,
@@ -83,7 +83,7 @@ func (sc *Syncer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*Event, error) {
 	// found, check if update needed
 
 	if !currentJWTAuth.EqualWithOpts(jwtAuth, false, true, false) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "jwt-auth",
 			Obj:    jwtAuth,

@@ -29,10 +29,10 @@ func (sc *Syncer) deleteServices() error {
 	return nil
 }
 
-func (sc *Syncer) deleteService(service *state.Service) (*Event, error) {
+func (sc *Syncer) deleteService(service *state.Service) (*crud.Event, error) {
 	_, err := sc.targetState.Services.Get(*service.ID)
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "service",
 			Obj:  service,
@@ -66,12 +66,12 @@ func (sc *Syncer) createUpdateServices() error {
 	return nil
 }
 
-func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
+func (sc *Syncer) createUpdateService(service *state.Service) (*crud.Event, error) {
 	serviceCopy := &state.Service{Service: *service.DeepCopy()}
 	currentService, err := sc.currentState.Services.Get(*service.ID)
 
 	if err == state.ErrNotFound {
-		return &Event{
+		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service",
 			Obj:  serviceCopy,
@@ -84,7 +84,7 @@ func (sc *Syncer) createUpdateService(service *state.Service) (*Event, error) {
 
 	// found, check if update needed
 	if !currentService.EqualWithOpts(serviceCopy, false, true) {
-		return &Event{
+		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "service",
 			Obj:    serviceCopy,
