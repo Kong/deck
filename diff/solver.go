@@ -1,54 +1,36 @@
-package solver
+package diff
 
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/types"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
 
 // Stats holds the stats related to a Solve.
 type Stats struct {
-	CreateOps *AtomicInt32Counter
-	UpdateOps *AtomicInt32Counter
-	DeleteOps *AtomicInt32Counter
-}
-
-type AtomicInt32Counter struct {
-	counter int32
-	lock    sync.RWMutex
-}
-
-func (a *AtomicInt32Counter) Increment(delta int32) {
-	a.lock.Lock()
-	defer a.lock.Unlock()
-	a.counter += delta
-}
-
-func (a *AtomicInt32Counter) Count() int32 {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
-	return a.counter
+	CreateOps *utils.AtomicInt32Counter
+	UpdateOps *utils.AtomicInt32Counter
+	DeleteOps *utils.AtomicInt32Counter
 }
 
 // Solve generates a diff and walks the graph.
-func Solve(ctx context.Context, syncer *diff.Syncer,
+func Solve(ctx context.Context, syncer *Syncer,
 	client *kong.Client, konnectClient *konnect.Client,
 	parallelism int, dry bool) (Stats, []error) {
 
 	r := buildRegistry(client, konnectClient)
 
 	stats := Stats{
-		CreateOps: &AtomicInt32Counter{},
-		UpdateOps: &AtomicInt32Counter{},
-		DeleteOps: &AtomicInt32Counter{},
+		CreateOps: &utils.AtomicInt32Counter{},
+		UpdateOps: &utils.AtomicInt32Counter{},
+		DeleteOps: &utils.AtomicInt32Counter{},
 	}
 	recordOp := func(op crud.Op) {
 		switch op {

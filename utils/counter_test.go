@@ -1,4 +1,4 @@
-package solver
+package utils
 
 import (
 	"sync"
