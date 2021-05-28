@@ -10,6 +10,7 @@ import (
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/types"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -106,8 +107,16 @@ func Solve(ctx context.Context, syncer *diff.Syncer,
 }
 
 func buildRegistry(client *kong.Client, konnectClient *konnect.Client) *crud.Registry {
+	opts := types.EntityOpts{
+		KongClient:    client,
+		KonnectClient: konnectClient,
+	}
+	service, err := types.NewEntity(types.Service, opts)
+	if err != nil {
+		panic(err)
+	}
 	var r crud.Registry
-	r.MustRegister("service", &serviceCRUD{client: client})
+	r.MustRegister("service", service.CRUDActions())
 	r.MustRegister("route", &routeCRUD{client: client})
 	r.MustRegister("upstream", &upstreamCRUD{client: client})
 	r.MustRegister("target", &targetCRUD{client: client})

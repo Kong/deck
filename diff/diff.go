@@ -12,6 +12,7 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/types"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -53,7 +54,17 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 	s := &Syncer{}
 	s.currentState, s.targetState = current, target
 
-	s.postProcess.MustRegister("service", &servicePostAction{current})
+	opts := types.EntityOpts{
+		CurrentState: current,
+		TargetState:  target,
+		//KongClient:    kongClient,
+		//KonnectClient: konnectClient,
+	}
+	service, err := types.NewEntity(types.Service, opts)
+	if err != nil {
+		return nil, err
+	}
+	s.postProcess.MustRegister("service", service.PostProcessActions())
 	s.postProcess.MustRegister("route", &routePostAction{current})
 	s.postProcess.MustRegister("upstream", &upstreamPostAction{current})
 	s.postProcess.MustRegister("target", &targetPostAction{current})

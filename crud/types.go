@@ -29,3 +29,13 @@ type Actions interface {
 	Delete(context.Context, ...Arg) (Arg, error)
 	Update(context.Context, ...Arg) (Arg, error)
 }
+
+// Event represents an event to perform
+// an imperative operation
+// that gets Kong closer to the target state.
+type Event struct {
+	Op     Op
+	Kind   Kind
+	Obj    interface{}
+	OldObj interface{}
+}
