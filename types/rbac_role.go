@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type rbacRoleCRUD struct {
 	client *kong.Client
 }
 
-func rbacRoleFromStruct(arg diff.Event) *state.RBACRole {
+func rbacRoleFromStruct(arg crud.Event) *state.RBACRole {
 	role, ok := arg.Obj.(*state.RBACRole)
 	if !ok {
 		panic("unexpected type, expected *state.RBACRole")
@@ -24,7 +23,7 @@ func rbacRoleFromStruct(arg diff.Event) *state.RBACRole {
 }
 
 // Create creates a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the role to be created,
+// The arg should be of type crud.Event, containing the role to be created,
 // else the function will panic.
 // It returns a the created *state.RBACRole.
 func (s *rbacRoleCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -38,7 +37,7 @@ func (s *rbacRoleCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Delete deletes a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the role to be deleted,
+// The arg should be of type crud.Event, containing the role to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.RBACRole.
 func (s *rbacRoleCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -52,7 +51,7 @@ func (s *rbacRoleCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Update updates a RBACRole in Kong.
-// The arg should be of type diff.Event, containing the role to be updated,
+// The arg should be of type crud.Event, containing the role to be updated,
 // else the function will panic.
 // It returns a the updated *state.RBACRole.
 func (s *rbacRoleCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

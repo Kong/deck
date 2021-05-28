@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -15,7 +14,7 @@ type jwtAuthCRUD struct {
 	client *kong.Client
 }
 
-func jwtAuthFromStruct(arg diff.Event) *state.JWTAuth {
+func jwtAuthFromStruct(arg crud.Event) *state.JWTAuth {
 	jwtAuth, ok := arg.Obj.(*state.JWTAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -25,7 +24,7 @@ func jwtAuthFromStruct(arg diff.Event) *state.JWTAuth {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the jwtAuth to be created,
+// The arg should be of type crud.Event, containing the jwtAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *jwtAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -47,7 +46,7 @@ func (s *jwtAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the jwtAuth to be deleted,
+// The arg should be of type crud.Event, containing the jwtAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *jwtAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -68,7 +67,7 @@ func (s *jwtAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the jwtAuth to be updated,
+// The arg should be of type crud.Event, containing the jwtAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *jwtAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

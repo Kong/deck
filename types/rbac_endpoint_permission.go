@@ -1,11 +1,10 @@
-package solver
+package types
 
 import (
 	"context"
 	"strings"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -15,7 +14,7 @@ type rbacEndpointPermissionCRUD struct {
 	client *kong.Client
 }
 
-func rbacEndpointPermissionFromStruct(arg diff.Event) *state.RBACEndpointPermission {
+func rbacEndpointPermissionFromStruct(arg crud.Event) *state.RBACEndpointPermission {
 	ep, ok := arg.Obj.(*state.RBACEndpointPermission)
 	if !ok {
 		panic("unexpected type, expected *state.RBACEndpointPermission")
@@ -25,7 +24,7 @@ func rbacEndpointPermissionFromStruct(arg diff.Event) *state.RBACEndpointPermiss
 }
 
 // Create creates a RBACEndpointPermission in Kong.
-// The arg should be of type diff.Event, containing the ep to be created,
+// The arg should be of type crud.Event, containing the ep to be created,
 // else the function will panic.
 // It returns a the created *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -39,7 +38,7 @@ func (s *rbacEndpointPermissionCRUD) Create(ctx context.Context, arg ...crud.Arg
 }
 
 // Delete deletes a RBACEndpointPermission in Kong.
-// The arg should be of type diff.Event, containing the ep to be deleted,
+// The arg should be of type crud.Event, containing the ep to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -61,7 +60,7 @@ func (s *rbacEndpointPermissionCRUD) Delete(ctx context.Context, arg ...crud.Arg
 }
 
 // Update updates a RBACEndpointPermission in Kong.
-// The arg should be of type diff.Event, containing the ep to be updated,
+// The arg should be of type crud.Event, containing the ep to be updated,
 // else the function will panic.
 // It returns a the updated *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

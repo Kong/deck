@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 )
@@ -14,7 +13,7 @@ type servicePackageCRUD struct {
 	client *konnect.Client
 }
 
-func servicePackageFromStruct(arg diff.Event) *state.ServicePackage {
+func servicePackageFromStruct(arg crud.Event) *state.ServicePackage {
 	sp, ok := arg.Obj.(*state.ServicePackage)
 	if !ok {
 		panic("unexpected type, expected *state.ServicePackage")
@@ -23,7 +22,7 @@ func servicePackageFromStruct(arg diff.Event) *state.ServicePackage {
 }
 
 // Create creates a Service package in Konnect.
-// The arg should be of type diff.Event, containing the service to be created,
+// The arg should be of type crud.Event, containing the service to be created,
 // else the function will panic.
 // It returns a the created *state.ServicePackage.
 func (s *servicePackageCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -37,7 +36,7 @@ func (s *servicePackageCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.
 }
 
 // Delete deletes a Service package in Konnect.
-// The arg should be of type diff.Event, containing the service to be deleted,
+// The arg should be of type crud.Event, containing the service to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.ServicePackage.
 func (s *servicePackageCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -51,7 +50,7 @@ func (s *servicePackageCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.
 }
 
 // Update updates a Service package in Konnect.
-// The arg should be of type diff.Event, containing the service to be updated,
+// The arg should be of type crud.Event, containing the service to be updated,
 // else the function will panic.
 // It returns a the updated *state.ServicePackage.
 func (s *servicePackageCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type upstreamCRUD struct {
 	client *kong.Client
 }
 
-func upstreamFromStruct(arg diff.Event) *state.Upstream {
+func upstreamFromStruct(arg crud.Event) *state.Upstream {
 	upstream, ok := arg.Obj.(*state.Upstream)
 	if !ok {
 		panic("unexpected type, expected *state.upstream")
@@ -23,7 +22,7 @@ func upstreamFromStruct(arg diff.Event) *state.Upstream {
 }
 
 // Create creates a Upstream in Kong.
-// The arg should be of type diff.Event, containing the upstream to be created,
+// The arg should be of type crud.Event, containing the upstream to be created,
 // else the function will panic.
 // It returns a the created *state.Upstream.
 func (s *upstreamCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -37,7 +36,7 @@ func (s *upstreamCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Delete deletes a Upstream in Kong.
-// The arg should be of type diff.Event, containing the upstream to be deleted,
+// The arg should be of type crud.Event, containing the upstream to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Upstream.
 func (s *upstreamCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -51,7 +50,7 @@ func (s *upstreamCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Update updates a Upstream in Kong.
-// The arg should be of type diff.Event, containing the upstream to be updated,
+// The arg should be of type crud.Event, containing the upstream to be updated,
 // else the function will panic.
 // It returns a the updated *state.Upstream.
 func (s *upstreamCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

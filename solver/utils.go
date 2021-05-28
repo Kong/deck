@@ -7,8 +7,6 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
-	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/yudai/gojsondiff"
@@ -84,12 +82,4 @@ func getDiff(a, b interface{}) (string, error) {
 		formatter.AsciiFormatterConfig{})
 	diffString, err := formatter.Format(d)
 	return diffString, err
-}
-
-func eventFromArg(arg crud.Arg) diff.Event {
-	event, ok := arg.(diff.Event)
-	if !ok {
-		panic("unexpected type, expected diff.Event")
-	}
-	return event
 }

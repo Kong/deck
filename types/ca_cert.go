@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type caCertificateCRUD struct {
 	client *kong.Client
 }
 
-func caCertFromStruct(arg diff.Event) *state.CACertificate {
+func caCertFromStruct(arg crud.Event) *state.CACertificate {
 	caCert, ok := arg.Obj.(*state.CACertificate)
 	if !ok {
 		panic("unexpected type, expected *state.CACertificate")
@@ -23,7 +22,7 @@ func caCertFromStruct(arg diff.Event) *state.CACertificate {
 }
 
 // Create creates a CACertificate in Kong.
-// The arg should be of type diff.Event, containing the certificate to be created,
+// The arg should be of type crud.Event, containing the certificate to be created,
 // else the function will panic.
 // It returns a the created *state.CACertificate.
 func (s *caCertificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -38,7 +37,7 @@ func (s *caCertificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.A
 }
 
 // Delete deletes a CACertificate in Kong.
-// The arg should be of type diff.Event, containing the certificate to be deleted,
+// The arg should be of type crud.Event, containing the certificate to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.CACertificate.
 func (s *caCertificateCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -52,7 +51,7 @@ func (s *caCertificateCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.A
 }
 
 // Update updates a CACertificate in Kong.
-// The arg should be of type diff.Event, containing the certificate to be updated,
+// The arg should be of type crud.Event, containing the certificate to be updated,
 // else the function will panic.
 // It returns a the updated *state.CACertificate.
 func (s *caCertificateCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

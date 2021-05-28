@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -15,7 +14,7 @@ type hmacAuthCRUD struct {
 	client *kong.Client
 }
 
-func hmacAuthFromStruct(arg diff.Event) *state.HMACAuth {
+func hmacAuthFromStruct(arg crud.Event) *state.HMACAuth {
 	hmacAuth, ok := arg.Obj.(*state.HMACAuth)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -25,7 +24,7 @@ func hmacAuthFromStruct(arg diff.Event) *state.HMACAuth {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the hmacAuth to be created,
+// The arg should be of type crud.Event, containing the hmacAuth to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *hmacAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -47,7 +46,7 @@ func (s *hmacAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the hmacAuth to be deleted,
+// The arg should be of type crud.Event, containing the hmacAuth to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *hmacAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -68,7 +67,7 @@ func (s *hmacAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the hmacAuth to be updated,
+// The arg should be of type crud.Event, containing the hmacAuth to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *hmacAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

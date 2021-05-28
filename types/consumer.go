@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type consumerCRUD struct {
 	client *kong.Client
 }
 
-func consumerFromStruct(arg diff.Event) *state.Consumer {
+func consumerFromStruct(arg crud.Event) *state.Consumer {
 	consumer, ok := arg.Obj.(*state.Consumer)
 	if !ok {
 		panic("unexpected type, expected *state.consumer")
@@ -23,7 +22,7 @@ func consumerFromStruct(arg diff.Event) *state.Consumer {
 }
 
 // Create creates a Consumer in Kong.
-// The arg should be of type diff.Event, containing the consumer to be created,
+// The arg should be of type crud.Event, containing the consumer to be created,
 // else the function will panic.
 // It returns a the created *state.Consumer.
 func (s *consumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -37,7 +36,7 @@ func (s *consumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Delete deletes a Consumer in Kong.
-// The arg should be of type diff.Event, containing the consumer to be deleted,
+// The arg should be of type crud.Event, containing the consumer to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Consumer.
 func (s *consumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -51,7 +50,7 @@ func (s *consumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 }
 
 // Update updates a Consumer in Kong.
-// The arg should be of type diff.Event, containing the consumer to be updated,
+// The arg should be of type crud.Event, containing the consumer to be updated,
 // else the function will panic.
 // It returns a the updated *state.Consumer.
 func (s *consumerCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {

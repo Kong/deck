@@ -1,10 +1,9 @@
-package solver
+package types
 
 import (
 	"context"
 
 	"github.com/kong/deck/crud"
-	"github.com/kong/deck/diff"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
@@ -14,7 +13,7 @@ type routeCRUD struct {
 	client *kong.Client
 }
 
-func routeFromStruct(arg diff.Event) *state.Route {
+func routeFromStruct(arg crud.Event) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
@@ -24,7 +23,7 @@ func routeFromStruct(arg diff.Event) *state.Route {
 }
 
 // Create creates a Route in Kong.
-// The arg should be of type diff.Event, containing the route to be created,
+// The arg should be of type crud.Event, containing the route to be created,
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *routeCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -38,7 +37,7 @@ func (s *routeCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, erro
 }
 
 // Delete deletes a Route in Kong.
-// The arg should be of type diff.Event, containing the route to be deleted,
+// The arg should be of type crud.Event, containing the route to be deleted,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *routeCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
@@ -52,7 +51,7 @@ func (s *routeCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, erro
 }
 
 // Update updates a Route in Kong.
-// The arg should be of type diff.Event, containing the route to be updated,
+// The arg should be of type crud.Event, containing the route to be updated,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *routeCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
