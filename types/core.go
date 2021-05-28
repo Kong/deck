@@ -124,7 +124,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	switch t {
 	case Service:
 		return entityImpl{
-			typ: "service",
+			typ: Service,
 			crudActions: &serviceCRUD{
 				client: opts.KongClient,
 			},
@@ -132,13 +132,14 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &serviceDiffer{
+				kind:         Service,
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
 		}, nil
 	case Route:
 		return entityImpl{
-			typ: "route",
+			typ: Route,
 			crudActions: &routeCRUD{
 				client: opts.KongClient,
 			},
@@ -153,7 +154,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Upstream:
 		return entityImpl{
-			typ: "upstream",
+			typ: Upstream,
 			crudActions: &upstreamCRUD{
 				client: opts.KongClient,
 			},
@@ -168,7 +169,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Target:
 		return entityImpl{
-			typ: "target",
+			typ: Target,
 			crudActions: &targetCRUD{
 				client: opts.KongClient,
 			},
@@ -183,7 +184,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Plugin:
 		return entityImpl{
-			typ: "plugin",
+			typ: Plugin,
 			crudActions: &pluginCRUD{
 				client: opts.KongClient,
 			},
@@ -198,7 +199,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Consumer:
 		return entityImpl{
-			typ: "consumer",
+			typ: Consumer,
 			crudActions: &consumerCRUD{
 				client: opts.KongClient,
 			},
@@ -213,7 +214,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case ServicePackage:
 		return entityImpl{
-			typ: "service-package",
+			typ: ServicePackage,
 			crudActions: &servicePackageCRUD{
 				client: opts.KonnectClient,
 			},
@@ -228,7 +229,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case ServiceVersion:
 		return entityImpl{
-			typ: "service-version",
+			typ: ServiceVersion,
 			crudActions: &serviceVersionCRUD{
 				client: opts.KonnectClient,
 			},
@@ -243,7 +244,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Document:
 		return entityImpl{
-			typ: "document",
+			typ: Document,
 			crudActions: &documentCRUD{
 				client: opts.KonnectClient,
 			},
@@ -258,7 +259,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case Certificate:
 		return entityImpl{
-			typ: "certificate",
+			typ: Certificate,
 			crudActions: &certificateCRUD{
 				client: opts.KongClient,
 			},
@@ -273,7 +274,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case CACertificate:
 		return entityImpl{
-			typ: "ca-certificate",
+			typ: CACertificate,
 			crudActions: &caCertificateCRUD{
 				client: opts.KongClient,
 			},
@@ -288,7 +289,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case SNI:
 		return entityImpl{
-			typ: "sni",
+			typ: SNI,
 			crudActions: &sniCRUD{
 				client: opts.KongClient,
 			},
@@ -303,7 +304,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case RBACEndpointPermission:
 		return entityImpl{
-			typ: "rbac-endpoint-permission",
+			typ: RBACEndpointPermission,
 			crudActions: &rbacEndpointPermissionCRUD{
 				client: opts.KongClient,
 			},
@@ -318,7 +319,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case RBACRole:
 		return entityImpl{
-			typ: "rbac-role",
+			typ: RBACRole,
 			crudActions: &rbacRoleCRUD{
 				client: opts.KongClient,
 			},
@@ -333,7 +334,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case ACLGroup:
 		return entityImpl{
-			typ: "acl-group",
+			typ: ACLGroup,
 			crudActions: &aclGroupCRUD{
 				client: opts.KongClient,
 			},
@@ -348,7 +349,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case BasicAuth:
 		return entityImpl{
-			typ: "basic-auth",
+			typ: BasicAuth,
 			crudActions: &basicAuthCRUD{
 				client: opts.KongClient,
 			},
@@ -363,7 +364,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case KeyAuth:
 		return entityImpl{
-			typ: "key-auth",
+			typ: KeyAuth,
 			crudActions: &keyAuthCRUD{
 				client: opts.KongClient,
 			},
@@ -378,7 +379,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case HMACAuth:
 		return entityImpl{
-			typ: "hmac-auth",
+			typ: HMACAuth,
 			crudActions: &hmacAuthCRUD{
 				client: opts.KongClient,
 			},
@@ -393,7 +394,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case JWTAuth:
 		return entityImpl{
-			typ: "jwt-auth",
+			typ: JWTAuth,
 			crudActions: &jwtAuthCRUD{
 				client: opts.KongClient,
 			},
@@ -408,7 +409,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case MTLSAuth:
 		return entityImpl{
-			typ: "mtls-auth",
+			typ: MTLSAuth,
 			crudActions: &mtlsAuthCRUD{
 				client: opts.KongClient,
 			},
@@ -423,7 +424,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 		}, nil
 	case OAuth2Cred:
 		return entityImpl{
-			typ: "oauth2-cred",
+			typ: OAuth2Cred,
 			crudActions: &oauth2CredCRUD{
 				client: opts.KongClient,
 			},
