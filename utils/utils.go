@@ -87,7 +87,7 @@ func FilenameToName(filename string) string {
 	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
 }
 
-// confirm prompts a user for a confirmation with message
+// Confirm prompts a user for a confirmation with message
 // and returns true with no error if input is "yes" or "y" (case-insensitive),
 // otherwise false.
 func Confirm(message string) (bool, error) {
