@@ -74,6 +74,6 @@ var (
 )
 
 const (
-	// ImplementationTypeKongGateway
+	// ImplementationTypeKongGateway kong gateway implementation type
 	ImplementationTypeKongGateway = "kong-gateway"
 )
