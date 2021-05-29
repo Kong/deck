@@ -12,10 +12,13 @@ import (
 type Format string
 
 const (
+	// FormatKongGateway : kong gateway format
 	FormatKongGateway Format = "kong-gateway"
-	FormatKonnect     Format = "konnect"
+	// FormatKonnect : konnect format
+	FormatKonnect Format = "konnect"
 )
 
+// AllFormats : all available formats
 var AllFormats = []Format{FormatKongGateway, FormatKonnect}
 
 func ParseFormat(key string) (Format, error) {
