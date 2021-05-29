@@ -501,7 +501,7 @@ type FRBACRole struct {
 	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"` //nolint
 }
 
-// FRBACEndpointPermission 
+// FRBACEndpointPermission
 // +k8s:deepcopy-gen=true
 type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
@@ -524,17 +524,20 @@ type Info struct {
 	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
+// Kong
 // +k8s:deepcopy-gen=true
 type Kong struct {
 	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
 }
 
+// Implementation
 // +k8s:deepcopy-gen=true
 type Implementation struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 	Kong *Kong  `json:"kong,omitempty" yaml:"kong,omitempty"`
 }
 
+// FServiceVersion
 // +k8s:deepcopy-gen=true
 type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
@@ -543,6 +546,7 @@ type FServiceVersion struct {
 	Document       *FDocument      `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
+// FServicePackage
 // +k8s:deepcopy-gen=true
 type FServicePackage struct {
 	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`

@@ -74,14 +74,11 @@ configure Konnect.` + konnectAlphaState,
 			return err
 		}
 
-		if err := file.KonnectStateToFile(ks, file.WriteConfig{
+		return file.KonnectStateToFile(ks, file.WriteConfig{
 			Filename:   konnectDumpCmdKongStateFile,
 			FileFormat: file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 			WithID:     dumpWithID,
-		}); err != nil {
-			return err
-		}
-		return nil
+		})
 	},
 }
 

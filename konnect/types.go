@@ -18,7 +18,7 @@ func BaseURL() string {
 	return baseURL
 }
 
-// ServicePackage 
+// ServicePackage
 // +k8s:deepcopy-gen=true
 type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
@@ -36,7 +36,7 @@ func (p *ServicePackage) Key() string {
 	return "ServicePackage" + ":" + *p.ID
 }
 
-// ServiceVersion 
+// ServiceVersion
 // +k8s:deepcopy-gen=true
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
@@ -105,7 +105,7 @@ func (d *Document) ShallowCopy() *Document {
 	return out
 }
 
-// ControlPlaneServiceRelation 
+// ControlPlaneServiceRelation
 // +k8s:deepcopy-gen=true
 type ControlPlaneServiceRelation struct {
 	ID                   *string       `json:"id,omitempty"`
@@ -113,19 +113,20 @@ type ControlPlaneServiceRelation struct {
 	ControlPlane         *ControlPlane `json:"control_plane,omitempty"`
 }
 
+// ControlPlane
 // +k8s:deepcopy-gen=true
 type ControlPlane struct {
 	ID   *string           `json:"id"`
 	Type *ControlPlaneType `json:"type"`
 }
 
-
-// ControlPlaneType 
+// ControlPlaneType
 // +k8s:deepcopy-gen=true
 type ControlPlaneType struct {
 	Name *string `json:"name"`
 }
 
+// AuthResponse
 type AuthResponse struct {
 	Organization   string `json:"org_name"`
 	FirstName      string `json:"first_name"`
