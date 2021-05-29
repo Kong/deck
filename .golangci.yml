@@ -11,7 +11,6 @@ linters:
   - gofmt
   - gofumpt
   - goimports
-  - golint
   - gomnd
   - gosec
   - govet
@@ -23,6 +22,7 @@ linters:
   - nilerr
   - nolintlint
   - predeclared
+  - revive
   - stylecheck
   - unconvert
   - unparam
