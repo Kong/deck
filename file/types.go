@@ -501,6 +501,7 @@ type FRBACRole struct {
 	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"` //nolint
 }
 
+// FRBACEndpointPermission 
 // +k8s:deepcopy-gen=true
 type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
