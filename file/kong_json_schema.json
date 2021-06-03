@@ -260,19 +260,7 @@
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "anyOf": [
-        {
-          "required": [
-            "username"
-          ]
-        },
-        {
-          "required": [
-            "id"
-          ]
-        }
-      ]
+      "type": "object"
     },
     "FCACertificate": {
       "required": [
@@ -640,7 +628,6 @@
           "type": "boolean"
         },
         "service": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Service"
         },
         "snis": {
@@ -651,7 +638,6 @@
         },
         "sources": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CIDRPort"
           },
           "type": "array"
@@ -847,7 +833,6 @@
           "type": "string"
         },
         "upstream": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Upstream"
         },
         "weight": {
@@ -890,7 +875,6 @@
           "type": "string"
         },
         "healthchecks": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Healthcheck"
         },
         "host_header": {
@@ -1007,6 +991,10 @@
     },
     "Info": {
       "properties": {
+        "defaults": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/KongDefaults"
+        },
         "select_tags": {
           "items": {
             "type": "string"
@@ -1089,6 +1077,28 @@
       "properties": {
         "service": {
           "$ref": "#/definitions/FService"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "KongDefaults": {
+      "properties": {
+        "route": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Route"
+        },
+        "service": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Service"
+        },
+        "target": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Target"
+        },
+        "upstream": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Upstream"
         }
       },
       "additionalProperties": false,
@@ -1285,6 +1295,7 @@
         },
         "sources": {
           "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CIDRPort"
           },
           "type": "array"
@@ -1303,19 +1314,7 @@
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "anyOf": [
-        {
-          "required": [
-            "name"
-          ]
-        },
-        {
-          "required": [
-            "id"
-          ]
-        }
-      ]
+      "type": "object"
     },
     "SNI": {
       "properties": {
@@ -1350,6 +1349,7 @@
           "type": "array"
         },
         "client_certificate": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Certificate"
         },
         "connect_timeout": {
@@ -1405,19 +1405,34 @@
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "anyOf": [
-        {
-          "required": [
-            "name"
-          ]
+      "type": "object"
+    },
+    "Target": {
+      "properties": {
+        "created_at": {
+          "type": "number"
         },
-        {
-          "required": [
-            "id"
-          ]
+        "id": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "target": {
+          "type": "string"
+        },
+        "upstream": {
+          "$ref": "#/definitions/Upstream"
+        },
+        "weight": {
+          "type": "integer"
         }
-      ]
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "Unhealthy": {
       "properties": {
@@ -1444,9 +1459,6 @@
       "type": "object"
     },
     "Upstream": {
-      "required": [
-        "name"
-      ],
       "properties": {
         "algorithm": {
           "type": "string"
@@ -1476,6 +1488,7 @@
           "type": "string"
         },
         "healthchecks": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Healthcheck"
         },
         "host_header": {
