@@ -120,7 +120,7 @@ type ControlPlane struct {
 	Type *ControlPlaneType `json:"type"`
 }
 
-// ControlPlaneType control plane type model
+// ControlPlaneType represents control plane associated information.
 // +k8s:deepcopy-gen=true
 type ControlPlaneType struct {
 	Name *string `json:"name"`
