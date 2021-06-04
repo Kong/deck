@@ -36,7 +36,7 @@ func (p *ServicePackage) Key() string {
 	return "ServicePackage" + ":" + *p.ID
 }
 
-// ServiceVersion service version model
+// ServiceVersion represents a Service Version in Konnect.
 // +k8s:deepcopy-gen=true
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
