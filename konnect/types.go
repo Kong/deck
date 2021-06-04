@@ -113,7 +113,7 @@ type ControlPlaneServiceRelation struct {
 	ControlPlane         *ControlPlane `json:"control_plane,omitempty"`
 }
 
-// ControlPlane control plane model
+// ControlPlane identifies a specific control plane in Konnect.
 // +k8s:deepcopy-gen=true
 type ControlPlane struct {
 	ID   *string           `json:"id"`
