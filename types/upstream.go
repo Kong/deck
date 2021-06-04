@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -62,4 +63,98 @@ func (s *upstreamCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 		return nil, err
 	}
 	return &state.Upstream{Upstream: *updatedUpstream}, nil
+}
+
+type upstreamDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *upstreamDiffer) Deletes(handler func(crud.Event) error) error {
+	currentUpstreams, err := d.currentState.Upstreams.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching upstreams from state: %w", err)
+	}
+
+	for _, upstream := range currentUpstreams {
+		n, err := d.deleteUpstream(upstream)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+	return nil
+}
+
+func (d *upstreamDiffer) deleteUpstream(upstream *state.Upstream) (*crud.Event, error) {
+	_, err := d.targetState.Upstreams.Get(*upstream.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: "upstream",
+			Obj:  upstream,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up upstream %q: %w",
+			*upstream.Name, err)
+	}
+	return nil, nil
+}
+
+func (d *upstreamDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetUpstreams, err := d.targetState.Upstreams.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching upstreams from state: %w", err)
+	}
+
+	for _, upstream := range targetUpstreams {
+		n, err := d.createUpdateUpstream(upstream)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *upstreamDiffer) createUpdateUpstream(upstream *state.Upstream) (*crud.Event,
+	error) {
+	upstreamCopy := &state.Upstream{Upstream: *upstream.DeepCopy()}
+	currentUpstream, err := d.currentState.Upstreams.Get(*upstream.Name)
+
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: "upstream",
+			Obj:  upstreamCopy,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up upstream %v: %w",
+			*upstream.Name, err)
+	}
+
+	// found, check if update needed
+	if !currentUpstream.EqualWithOpts(upstreamCopy, false, true) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   "upstream",
+			Obj:    upstreamCopy,
+			OldObj: currentUpstream,
+		}, nil
+	}
+	return nil, nil
 }

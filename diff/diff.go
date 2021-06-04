@@ -51,8 +51,6 @@ type Syncer struct {
 	silenceWarnings bool
 	stageDelaySec   int
 
-	once sync.Once
-
 	kongClient    *kong.Client
 	konnectClient *konnect.Client
 
@@ -145,43 +143,43 @@ func (sc *Syncer) diff() error {
 func (sc *Syncer) delete() error {
 	var err error
 
-	err = sc.deletePlugins()
+	err = sc.entityDiffers[types.Plugin].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteKeyAuths()
+	err = sc.entityDiffers[types.KeyAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteHMACAuths()
+	err = sc.entityDiffers[types.HMACAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteJWTAuths()
+	err = sc.entityDiffers[types.JWTAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteBasicAuths()
+	err = sc.entityDiffers[types.BasicAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteOauth2Creds()
+	err = sc.entityDiffers[types.OAuth2Cred].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteACLGroups()
+	err = sc.entityDiffers[types.ACLGroup].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteMTLSAuths()
+	err = sc.entityDiffers[types.MTLSAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteTargets()
+	err = sc.entityDiffers[types.Target].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteSNIs()
+	err = sc.entityDiffers[types.SNI].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -197,15 +195,15 @@ func (sc *Syncer) delete() error {
 	// will return a 404
 	sc.wait()
 
-	err = sc.deleteRoutes()
+	err = sc.entityDiffers[types.Route].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteConsumers()
+	err = sc.entityDiffers[types.Consumer].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteUpstreams()
+	err = sc.entityDiffers[types.Upstream].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -223,18 +221,18 @@ func (sc *Syncer) delete() error {
 	// services must be deleted before certificates (client_certificate)
 	sc.wait()
 
-	err = sc.deleteCertificates()
+	err = sc.entityDiffers[types.Certificate].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
 	// services must be deleted before ca_certificates
-	err = sc.deleteCACertificates()
+	err = sc.entityDiffers[types.CACertificate].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteRBACEndpointPermissions()
+	err = sc.entityDiffers[types.RBACEndpointPermission].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -243,17 +241,17 @@ func (sc *Syncer) delete() error {
 	// RBAC endpoint permissions must be deleted before RBAC roles
 	sc.wait()
 
-	err = sc.deleteRBACRoles()
+	err = sc.entityDiffers[types.RBACRole].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteDocuments()
+	err = sc.entityDiffers[types.Document].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteServiceVersions()
+	err = sc.entityDiffers[types.ServiceVersion].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -262,7 +260,7 @@ func (sc *Syncer) delete() error {
 	// ServiceVersions must be deleted before ServicePackages
 	sc.wait()
 
-	err = sc.deleteServicePackages()
+	err = sc.entityDiffers[types.ServicePackage].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -277,19 +275,19 @@ func (sc *Syncer) createUpdate() error {
 	// TODO write an interface and register by types,
 	// then execute in a particular order
 
-	err := sc.createUpdateCertificates()
+	err := sc.entityDiffers[types.Certificate].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateCACertificates()
+	err = sc.entityDiffers[types.CACertificate].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateConsumers()
+	err = sc.entityDiffers[types.Consumer].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateUpstreams()
+	err = sc.entityDiffers[types.Upstream].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -301,11 +299,11 @@ func (sc *Syncer) createUpdate() error {
 	// certificates must be created before services (client_certificate)
 	sc.wait()
 
-	err = sc.createUpdateTargets()
+	err = sc.entityDiffers[types.Target].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateSNIs()
+	err = sc.entityDiffers[types.SNI].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -313,31 +311,31 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateKeyAuths()
+	err = sc.entityDiffers[types.KeyAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateHMACAuths()
+	err = sc.entityDiffers[types.HMACAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateJWTAuths()
+	err = sc.entityDiffers[types.JWTAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateBasicAuths()
+	err = sc.entityDiffers[types.BasicAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateOauth2Creds()
+	err = sc.entityDiffers[types.OAuth2Cred].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateACLGroups()
+	err = sc.entityDiffers[types.ACLGroup].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateMTLSAuths()
+	err = sc.entityDiffers[types.MTLSAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -346,7 +344,7 @@ func (sc *Syncer) createUpdate() error {
 	// services must be created before routes
 	sc.wait()
 
-	err = sc.createUpdateRoutes()
+	err = sc.entityDiffers[types.Route].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -355,12 +353,12 @@ func (sc *Syncer) createUpdate() error {
 	// services, routes and consumers must be created before plugins
 	sc.wait()
 
-	err = sc.createUpdatePlugins()
+	err = sc.entityDiffers[types.Plugin].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateRBACRoles()
+	err = sc.entityDiffers[types.RBACRole].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -369,12 +367,12 @@ func (sc *Syncer) createUpdate() error {
 	// RBAC roles must be created before endpoint permissions
 	sc.wait()
 
-	err = sc.createUpdateRBACEndpointPermissions()
+	err = sc.entityDiffers[types.RBACEndpointPermission].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateServicePackages()
+	err = sc.entityDiffers[types.ServicePackage].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -382,12 +380,12 @@ func (sc *Syncer) createUpdate() error {
 	// services, routes and consumers must be created before plugins
 	sc.wait()
 
-	err = sc.createUpdateServiceVersions()
+	err = sc.entityDiffers[types.ServiceVersion].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateDocuments()
+	err = sc.entityDiffers[types.Document].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}

@@ -145,6 +145,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &routePostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &routeDiffer{
+				kind:         Route,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case Upstream:
 		return entityImpl{
@@ -154,6 +159,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &upstreamPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &upstreamDiffer{
+				kind:         Upstream,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case Target:
@@ -165,6 +175,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &targetPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &targetDiffer{
+				kind:         Target,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case Plugin:
 		return entityImpl{
@@ -174,6 +189,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &pluginPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &pluginDiffer{
+				kind:         Plugin,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case Consumer:
@@ -185,6 +205,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &consumerPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &consumerDiffer{
+				kind:         Consumer,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case ServicePackage:
 		return entityImpl{
@@ -194,6 +219,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &servicePackagePostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &servicePackageDiffer{
+				kind:         ServicePackage,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case ServiceVersion:
@@ -205,6 +235,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &serviceVersionPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &serviceVersionDiffer{
+				kind:         ServiceVersion,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case Document:
 		return entityImpl{
@@ -214,6 +249,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &documentPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &documentDiffer{
+				kind:         Document,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case Certificate:
@@ -225,6 +265,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &certificatePostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &certificateDiffer{
+				kind:         Certificate,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case CACertificate:
 		return entityImpl{
@@ -234,6 +279,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &caCertificatePostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &caCertificateDiffer{
+				kind:         CACertificate,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case SNI:
@@ -245,6 +295,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &sniPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &sniDiffer{
+				kind:         SNI,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case RBACEndpointPermission:
 		return entityImpl{
@@ -254,6 +309,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &rbacEndpointPermissionPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &rbacEndpointPermissionDiffer{
+				kind:         RBACEndpointPermission,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case RBACRole:
@@ -265,6 +325,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &rbacRolePostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &rbacRoleDiffer{
+				kind:         RBACEndpointPermission,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case ACLGroup:
 		return entityImpl{
@@ -274,6 +339,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &aclGroupPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &aclGroupDiffer{
+				kind:         ACLGroup,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case BasicAuth:
@@ -285,6 +355,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &basicAuthPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &basicAuthDiffer{
+				kind:         BasicAuth,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case KeyAuth:
 		return entityImpl{
@@ -294,6 +369,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &keyAuthPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &keyAuthDiffer{
+				kind:         KeyAuth,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case HMACAuth:
@@ -305,6 +385,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &hmacAuthPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &hmacAuthDiffer{
+				kind:         BasicAuth,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case JWTAuth:
 		return entityImpl{
@@ -314,6 +399,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &jwtAuthPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &jwtAuthDiffer{
+				kind:         JWTAuth,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	case MTLSAuth:
@@ -325,6 +415,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			postProcessActions: &mtlsAuthPostAction{
 				currentState: opts.CurrentState,
 			},
+			differ: &mtlsAuthDiffer{
+				kind:         MTLSAuth,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
 		}, nil
 	case OAuth2Cred:
 		return entityImpl{
@@ -334,6 +429,11 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 			},
 			postProcessActions: &oauth2CredPostAction{
 				currentState: opts.CurrentState,
+			},
+			differ: &oauth2CredDiffer{
+				kind:         OAuth2Cred,
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
 			},
 		}, nil
 	default:

@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -87,4 +88,98 @@ func (s *oauth2CredCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg,
 		return nil, err
 	}
 	return &state.Oauth2Credential{Oauth2Credential: *updatedOauth2Cred}, nil
+}
+
+type oauth2CredDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *oauth2CredDiffer) Deletes(handler func(crud.Event) error) error {
+	currentOauth2Creds, err := d.currentState.Oauth2Creds.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching oauth2-cred from state: %w", err)
+	}
+
+	for _, oauth2Cred := range currentOauth2Creds {
+		n, err := d.deleteOauth2Cred(oauth2Cred)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *oauth2CredDiffer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
+	*crud.Event, error) {
+	_, err := d.targetState.Oauth2Creds.Get(*oauth2Cred.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  oauth2Cred,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up oauth2-cred %q: %w", *oauth2Cred.Name, err)
+	}
+	return nil, nil
+}
+
+func (d *oauth2CredDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetOauth2Creds, err := d.targetState.Oauth2Creds.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching oauth2-creds from state: %w", err)
+	}
+
+	for _, oauth2Cred := range targetOauth2Creds {
+		n, err := d.createUpdateOauth2Cred(oauth2Cred)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *oauth2CredDiffer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*crud.Event, error) {
+	oauth2Cred = &state.Oauth2Credential{Oauth2Credential: *oauth2Cred.DeepCopy()}
+	currentOauth2Cred, err := d.currentState.Oauth2Creds.Get(*oauth2Cred.ID)
+	if err == state.ErrNotFound {
+		// oauth2Cred not present, create it
+
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  oauth2Cred,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up oauth2-cred %q: %w",
+			*oauth2Cred.Name, err)
+	}
+	currentOauth2Cred = &state.Oauth2Credential{Oauth2Credential: *currentOauth2Cred.DeepCopy()}
+	// found, check if update needed
+
+	if !currentOauth2Cred.EqualWithOpts(oauth2Cred, false, true, false) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    oauth2Cred,
+			OldObj: currentOauth2Cred,
+		}, nil
+	}
+	return nil, nil
 }

@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -62,4 +63,98 @@ func (s *consumerCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 		return nil, err
 	}
 	return &state.Consumer{Consumer: *updatedConsumer}, nil
+}
+
+type consumerDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *consumerDiffer) Deletes(handler func(crud.Event) error) error {
+	currentConsumers, err := d.currentState.Consumers.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching consumers from state: %w", err)
+	}
+
+	for _, consumer := range currentConsumers {
+		n, err := d.deleteConsumer(consumer)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+	return nil
+}
+
+func (d *consumerDiffer) deleteConsumer(consumer *state.Consumer) (*crud.Event, error) {
+	_, err := d.targetState.Consumers.Get(*consumer.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  consumer,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up consumer %q: %w",
+			consumer.Identifier(), err)
+	}
+	return nil, nil
+}
+
+func (d *consumerDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetConsumers, err := d.targetState.Consumers.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching consumers from state: %w", err)
+	}
+
+	for _, consumer := range targetConsumers {
+		n, err := d.createUpdateConsumer(consumer)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.Event, error) {
+	consumerCopy := &state.Consumer{Consumer: *consumer.DeepCopy()}
+	currentConsumer, err := d.currentState.Consumers.Get(*consumer.ID)
+
+	if err == state.ErrNotFound {
+		// consumer not present, create it
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  consumerCopy,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up consumer %q: %w",
+			consumer.Identifier(), err)
+	}
+
+	// found, check if update needed
+	if !currentConsumer.EqualWithOpts(consumerCopy, false, true) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    consumerCopy,
+			OldObj: currentConsumer,
+		}, nil
+	}
+	return nil, nil
 }

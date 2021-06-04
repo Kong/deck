@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -86,4 +87,113 @@ func (s *basicAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, 
 		return nil, err
 	}
 	return &state.BasicAuth{BasicAuth: *updatedBasicAuth}, nil
+}
+
+type basicAuthDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *basicAuthDiffer) warnBasicAuth() {
+	// TODO figure out a solution for silence warnings
+	// const (
+	// 	basicAuthPasswordWarning = "Warning: import/export of basic-auth" +
+	// 		"credentials using decK doesn't work due to hashing of passwords in Kong."
+	// )
+	// d.once.Do(func() {
+	// 	// if d.silenceWarnings {
+	// 	// 	return
+	// 	// }
+	// 	cprint.UpdatePrintln(basicAuthPasswordWarning)
+	// })
+}
+
+func (d *basicAuthDiffer) Deletes(handler func(crud.Event) error) error {
+	currentBasicAuths, err := d.currentState.BasicAuths.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching basic-auths from state: %w", err)
+	}
+
+	for _, basicAuth := range currentBasicAuths {
+		n, err := d.deleteBasicAuth(basicAuth)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *basicAuthDiffer) deleteBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
+	d.warnBasicAuth()
+	_, err := d.targetState.BasicAuths.Get(*basicAuth.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  basicAuth,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up basic-auth %q: %w",
+			*basicAuth.Username, err)
+	}
+	return nil, nil
+}
+
+func (d *basicAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetBasicAuths, err := d.targetState.BasicAuths.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching basic-auths from state: %w", err)
+	}
+
+	for _, basicAuth := range targetBasicAuths {
+		n, err := d.createUpdateBasicAuth(basicAuth)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *basicAuthDiffer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
+	d.warnBasicAuth()
+	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
+	currentBasicAuth, err := d.currentState.BasicAuths.Get(*basicAuth.ID)
+	if err == state.ErrNotFound {
+		// basicAuth not present, create it
+
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  basicAuth,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up basic-auth %q: %w",
+			*basicAuth.Username, err)
+	}
+	// found, check if update needed
+
+	if !currentBasicAuth.EqualWithOpts(basicAuth, false, true, true, false) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    basicAuth,
+			OldObj: currentBasicAuth,
+		}, nil
+	}
+	return nil, nil
 }
