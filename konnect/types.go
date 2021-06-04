@@ -126,7 +126,7 @@ type ControlPlaneType struct {
 	Name *string `json:"name"`
 }
 
-// AuthResponse authentificaiton response model
+// AuthResponse is authentication response wrapper for login.
 type AuthResponse struct {
 	Organization   string `json:"org_name"`
 	FirstName      string `json:"first_name"`
