@@ -18,7 +18,7 @@ func BaseURL() string {
 	return baseURL
 }
 
-// ServicePackage service package model
+// ServicePackage represents a Service Package in Konnect.
 // +k8s:deepcopy-gen=true
 type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
