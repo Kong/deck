@@ -530,7 +530,7 @@ type Kong struct {
 	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
 }
 
-// Implementation implementation model
+// Implementation represents an implementation of a Service version in Konnect.
 // +k8s:deepcopy-gen=true
 type Implementation struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
