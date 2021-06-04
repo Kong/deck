@@ -557,7 +557,7 @@ type FServicePackage struct {
 	Document    *FDocument        `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
-// FDocument file document model
+// FDocument represents a document in Konnect. The type has been duplicated because the documents are altered before they are exported to the state file for better user experience.
 // +k8s:deepcopy-gen=true
 type FDocument struct {
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`
