@@ -524,7 +524,7 @@ type Info struct {
 	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
-// Kong kong model
+// Kong represents Kong implementation of a Service in Konnect.
 // +k8s:deepcopy-gen=true
 type Kong struct {
 	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
