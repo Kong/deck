@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -63,4 +64,95 @@ func (s *sniCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error)
 		return nil, err
 	}
 	return &state.SNI{SNI: *updatedSNI}, nil
+}
+
+type sniDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *sniDiffer) Deletes(handler func(crud.Event) error) error {
+	currentSNIs, err := d.currentState.SNIs.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching snis from state: %w", err)
+	}
+
+	for _, sni := range currentSNIs {
+		n, err := d.deleteSNI(sni)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *sniDiffer) deleteSNI(sni *state.SNI) (*crud.Event, error) {
+	_, err := d.targetState.SNIs.Get(*sni.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  sni,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up sni %q: %w", *sni.Name, err)
+	}
+	return nil, nil
+}
+
+func (d *sniDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	sniSNIs, err := d.targetState.SNIs.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching snis from state: %w", err)
+	}
+
+	for _, sni := range sniSNIs {
+		n, err := d.createUpdateSNI(sni)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *sniDiffer) createUpdateSNI(sni *state.SNI) (*crud.Event, error) {
+	sni = &state.SNI{SNI: *sni.DeepCopy()}
+	currentSNI, err := d.currentState.SNIs.Get(*sni.ID)
+	if err == state.ErrNotFound {
+		// sni not present, create it
+
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  sni,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up sni %q: %w", *sni.Name, err)
+	}
+	// found, check if update needed
+
+	if !currentSNI.EqualWithOpts(sni, false, true, false) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    sni,
+			OldObj: currentSNI,
+		}, nil
+	}
+	return nil, nil
 }

@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -70,4 +71,99 @@ func (s *targetCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 		return nil, err
 	}
 	return &state.Target{Target: *createdTarget}, nil
+}
+
+type targetDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *targetDiffer) Deletes(handler func(crud.Event) error) error {
+	currentTargets, err := d.currentState.Targets.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching targets from state: %w", err)
+	}
+
+	for _, target := range currentTargets {
+		n, err := d.deleteTarget(target)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *targetDiffer) deleteTarget(target *state.Target) (*crud.Event, error) {
+	_, err := d.targetState.Targets.Get(*target.Upstream.ID,
+		*target.Target.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  target,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up target %q: %w",
+			*target.Target.Target, err)
+	}
+	return nil, nil
+}
+
+func (d *targetDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetTargets, err := d.targetState.Targets.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching targets from state: %w", err)
+	}
+
+	for _, target := range targetTargets {
+		n, err := d.createUpdateTarget(target)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *targetDiffer) createUpdateTarget(target *state.Target) (*crud.Event, error) {
+	target = &state.Target{Target: *target.DeepCopy()}
+	currentTarget, err := d.currentState.Targets.Get(*target.Upstream.ID,
+		*target.Target.ID)
+	if err == state.ErrNotFound {
+		// target not present, create it
+
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  target,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up target %q: %w",
+			*target.Target.Target, err)
+	}
+	// found, check if update needed
+
+	if !currentTarget.EqualWithOpts(target, false, true, false) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    target,
+			OldObj: currentTarget,
+		}, nil
+	}
+	return nil, nil
 }

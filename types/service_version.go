@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/kong/deck/crud"
@@ -133,4 +134,97 @@ func (s *serviceVersionCRUD) relationCRUD(ctx context.Context, version,
 			})
 	}
 	return err
+}
+
+type serviceVersionDiffer struct {
+	kind crud.Kind
+
+	currentState, targetState *state.KongState
+}
+
+func (d *serviceVersionDiffer) Deletes(handler func(crud.Event) error) error {
+	currentServiceVersions, err := d.currentState.ServiceVersions.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching service-versions from state: %w", err)
+	}
+
+	for _, sv := range currentServiceVersions {
+		n, err := d.deleteServiceVersion(sv)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+
+	}
+	return nil
+}
+
+func (d *serviceVersionDiffer) deleteServiceVersion(sv *state.ServiceVersion) (*crud.Event, error) {
+	_, err := d.targetState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: d.kind,
+			Obj:  sv,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("looking up service-version %q': %w",
+			sv.Identifier(), err)
+	}
+	return nil, nil
+}
+
+func (d *serviceVersionDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
+	targetServiceVersions, err := d.targetState.ServiceVersions.GetAll()
+	if err != nil {
+		return fmt.Errorf("error fetching services from state: %w", err)
+	}
+
+	for _, sv := range targetServiceVersions {
+		n, err := d.createUpdateServiceVersion(sv)
+		if err != nil {
+			return err
+		}
+		if n != nil {
+			err = handler(*n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (d *serviceVersionDiffer) createUpdateServiceVersion(sv *state.ServiceVersion) (*crud.Event, error) {
+	svCopy := &state.ServiceVersion{ServiceVersion: *sv.DeepCopy()}
+	currentSV, err := d.currentState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
+
+	if err == state.ErrNotFound {
+		return &crud.Event{
+			Op:   crud.Create,
+			Kind: d.kind,
+			Obj:  svCopy,
+		}, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up service-version %q: %w",
+			sv.Identifier(), err)
+	}
+
+	// found, check if update needed
+	if !currentSV.EqualWithOpts(svCopy, false, true, false) {
+		return &crud.Event{
+			Op:     crud.Update,
+			Kind:   d.kind,
+			Obj:    svCopy,
+			OldObj: currentSV,
+		}, nil
+	}
+	return nil, nil
 }
