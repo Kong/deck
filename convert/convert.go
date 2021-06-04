@@ -14,7 +14,7 @@ type Format string
 const (
 	// FormatKongGateway represents the Kong gateway format.
 	FormatKongGateway Format = "kong-gateway"
-	// FormatKonnect : konnect format
+	// FormatKonnect represents the Konnect format.
 	FormatKonnect Format = "konnect"
 )
 
