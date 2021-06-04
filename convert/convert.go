@@ -18,7 +18,7 @@ const (
 	FormatKonnect Format = "konnect"
 )
 
-// AllFormats : all available formats
+// AllFormats contains all available formats.
 var AllFormats = []Format{FormatKongGateway, FormatKonnect}
 
 func ParseFormat(key string) (Format, error) {
