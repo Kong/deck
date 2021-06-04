@@ -12,7 +12,7 @@ import (
 type Format string
 
 const (
-	// FormatKongGateway : kong gateway format
+	// FormatKongGateway represents the Kong gateway format.
 	FormatKongGateway Format = "kong-gateway"
 	// FormatKonnect : konnect format
 	FormatKonnect Format = "konnect"
