@@ -105,7 +105,7 @@ func (d *Document) ShallowCopy() *Document {
 	return out
 }
 
-// ControlPlaneServiceRelation control plane service relation model
+// ControlPlaneServiceRelation represents relationship between Control plane implementation and a Service version.
 // +k8s:deepcopy-gen=true
 type ControlPlaneServiceRelation struct {
 	ID                   *string       `json:"id,omitempty"`
