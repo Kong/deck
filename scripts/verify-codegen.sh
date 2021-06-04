@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-cp file/schema.go /tmp/schema.go
+FILE="kong_json_schema.json"
+cp file/${FILE} /tmp/${FILE}
 go generate ./...
 
-diff -u /tmp/schema.go file/schema.go
+diff -u /tmp/${FILE} file/${FILE}
