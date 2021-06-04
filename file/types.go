@@ -539,7 +539,7 @@ type Implementation struct {
 
 // FServiceVersion represents a Service version in Konnect.
 // The type is duplicated because only a single document is
-// exported in file while the API allows for multiple documents. 
+// exported in file while the API allows for multiple documents.
 // +k8s:deepcopy-gen=true
 type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
