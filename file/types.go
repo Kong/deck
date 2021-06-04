@@ -547,7 +547,7 @@ type FServiceVersion struct {
 	Document       *FDocument      `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
-// FServicePackage file service package model
+// FServicePackage represents a Service package and its associated entities.
 // +k8s:deepcopy-gen=true
 type FServicePackage struct {
 	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`
