@@ -90,7 +90,7 @@ func (s *ServiceVersionService) Update(ctx context.Context,
 	return &updatedSV, nil
 }
 
-// List fetches a list of Service Versions for a given servicePackageID.
+// ListForPackage fetches a list of Service Versions for a given servicePackageID.
 func (s *ServiceVersionService) ListForPackage(ctx context.Context,
 	servicePackageID *string) ([]ServiceVersion, error) {
 	endpoint := "/api/service_packages/" + *servicePackageID + "/service_versions"

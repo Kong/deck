@@ -772,10 +772,7 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
 		plugins = append(plugins, *p)
 	}
-	if err := b.ingestPlugins(plugins); err != nil {
-		return err
-	}
-	return nil
+	return b.ingestPlugins(plugins)
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {

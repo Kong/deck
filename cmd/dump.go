@@ -134,16 +134,13 @@ configure Kong.`,
 		if err != nil {
 			return fmt.Errorf("building state: %w", err)
 		}
-		if err := file.KongStateToFile(ks, file.WriteConfig{
+		return file.KongStateToFile(ks, file.WriteConfig{
 			SelectTags: dumpConfig.SelectorTags,
 			Workspace:  dumpWorkspace,
 			Filename:   dumpCmdKongStateFile,
 			FileFormat: format,
 			WithID:     dumpWithID,
-		}); err != nil {
-			return err
-		}
-		return nil
+		})
 	},
 }
 
