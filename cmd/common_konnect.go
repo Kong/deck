@@ -83,8 +83,17 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	s, _ := diff.NewSyncer(currentState, targetState)
-	stats, errs := diff.Solve(ctx, s, kongClient, konnectClient, parallelism, dry)
+	s, err := diff.NewSyncer(diff.SyncerOpts{
+		CurrentState:  currentState,
+		TargetState:   targetState,
+		KongClient:    kongClient,
+		KonnectClient: konnectClient,
+	})
+	if err != nil {
+		return err
+	}
+
+	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

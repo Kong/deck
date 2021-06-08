@@ -176,9 +176,17 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
-	s, _ := diff.NewSyncer(currentState, targetState)
-	s.StageDelaySec = delay
-	stats, errs := diff.Solve(ctx, s, client, nil, parallelism, dry)
+	s, err := diff.NewSyncer(diff.SyncerOpts{
+		CurrentState:  currentState,
+		TargetState:   targetState,
+		KongClient:    client,
+		StageDelaySec: delay,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

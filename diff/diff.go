@@ -10,9 +10,12 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/types"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -35,7 +38,9 @@ func defaultBackOff() backoff.BackOff {
 type Syncer struct {
 	currentState *state.KongState
 	targetState  *state.KongState
-	postProcess  crud.Registry
+
+	processor     crud.Registry
+	postProcessor crud.Registry
 
 	eventChan chan crud.Event
 	errChan   chan error
@@ -43,28 +48,54 @@ type Syncer struct {
 
 	inFlightOps int32
 
-	SilenceWarnings bool
-	StageDelaySec   int
+	silenceWarnings bool
+	stageDelaySec   int
 
 	once sync.Once
+
+	kongClient    *kong.Client
+	konnectClient *konnect.Client
+}
+
+type SyncerOpts struct {
+	CurrentState *state.KongState
+	TargetState  *state.KongState
+
+	KongClient    *kong.Client
+	KonnectClient *konnect.Client
+
+	SilenceWarnings bool
+	StageDelaySec   int
 }
 
 // NewSyncer constructs a Syncer.
-func NewSyncer(current, target *state.KongState) (*Syncer, error) {
-	s := &Syncer{}
-	s.currentState, s.targetState = current, target
+func NewSyncer(opts SyncerOpts) (*Syncer, error) {
+	s := &Syncer{
+		currentState: opts.CurrentState,
+		targetState:  opts.TargetState,
 
-	err := s.setupPostProcess()
+		kongClient:    opts.KongClient,
+		konnectClient: opts.KonnectClient,
+
+		silenceWarnings: opts.SilenceWarnings,
+		stageDelaySec:   opts.StageDelaySec,
+	}
+
+	err := s.init()
 	if err != nil {
 		return nil, err
 	}
+
 	return s, nil
 }
 
-func (sc *Syncer) setupPostProcess() error {
+func (sc *Syncer) init() error {
 	opts := types.EntityOpts{
 		CurrentState: sc.currentState,
 		TargetState:  sc.targetState,
+
+		KongClient:    sc.kongClient,
+		KonnectClient: sc.konnectClient,
 	}
 
 	entities := []string{
@@ -88,7 +119,8 @@ func (sc *Syncer) setupPostProcess() error {
 		if err != nil {
 			return err
 		}
-		sc.postProcess.MustRegister(crud.Kind(entityType), entity.PostProcessActions())
+		sc.postProcessor.MustRegister(crud.Kind(entityType), entity.PostProcessActions())
+		sc.processor.MustRegister(crud.Kind(entityType), entity.CRUDActions())
 	}
 	return nil
 }
@@ -378,7 +410,7 @@ func (sc *Syncer) eventCompleted() {
 }
 
 func (sc *Syncer) wait() {
-	time.Sleep(time.Duration(sc.StageDelaySec) * time.Second)
+	time.Sleep(time.Duration(sc.stageDelaySec) * time.Second)
 	for atomic.LoadInt32(&sc.inFlightOps) != 0 {
 		select {
 		case <-sc.stopChan:
@@ -497,7 +529,7 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error
 			// Do not retry empty responses
 			return backoff.Permanent(fmt.Errorf("result of event is nil"))
 		}
-		_, err = sc.postProcess.Do(ctx, event.Kind, event.Op, res)
+		_, err = sc.postProcessor.Do(ctx, event.Kind, event.Op, res)
 		if err != nil {
 			// Do not retry program errors
 			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))
@@ -506,4 +538,74 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error
 	}, defaultBackOff())
 
 	return err
+}
+
+// Stats holds the stats related to a Solve.
+type Stats struct {
+	CreateOps *utils.AtomicInt32Counter
+	UpdateOps *utils.AtomicInt32Counter
+	DeleteOps *utils.AtomicInt32Counter
+}
+
+// Solve generates a diff and walks the graph.
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+	stats := Stats{
+		CreateOps: &utils.AtomicInt32Counter{},
+		UpdateOps: &utils.AtomicInt32Counter{},
+		DeleteOps: &utils.AtomicInt32Counter{},
+	}
+	recordOp := func(op crud.Op) {
+		switch op {
+		case crud.Create:
+			stats.CreateOps.Increment(1)
+		case crud.Update:
+			stats.UpdateOps.Increment(1)
+		case crud.Delete:
+			stats.DeleteOps.Increment(1)
+		}
+	}
+
+	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
+		var err error
+		var result crud.Arg
+
+		c := e.Obj.(state.ConsoleString)
+		switch e.Op {
+		case crud.Create:
+			cprint.CreatePrintln("creating", e.Kind, c.Console())
+		case crud.Update:
+			var diffString string
+			if oldObj, ok := e.OldObj.(*state.Document); ok {
+				diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
+			} else {
+				diffString, err = getDiff(e.OldObj, e.Obj)
+			}
+			if err != nil {
+				return nil, err
+			}
+			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+		case crud.Delete:
+			cprint.DeletePrintln("deleting", e.Kind, c.Console())
+		default:
+			panic("unknown operation " + e.Op.String())
+		}
+
+		if !dry {
+			// sync mode
+			// fire the request to Kong
+			result, err = sc.processor.Do(ctx, e.Kind, e.Op, e)
+			if err != nil {
+				return nil, fmt.Errorf("%v %v %v failed: %w", e.Op, e.Kind, c.Console(), err)
+			}
+		} else {
+			// diff mode
+			// return the new obj as is
+			result = e.Obj
+		}
+		// record operation in both: diff and sync commands
+		recordOp(e.Op)
+
+		return result, nil
+	})
+	return stats, errs
 }
