@@ -15,7 +15,7 @@ const (
 
 func (sc *Syncer) warnBasicAuth() {
 	sc.once.Do(func() {
-		if sc.SilenceWarnings {
+		if sc.silenceWarnings {
 			return
 		}
 		cprint.UpdatePrintln(basicAuthPasswordWarning)
