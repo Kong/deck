@@ -3,7 +3,9 @@ package types
 import (
 	"context"
 	"fmt"
+	"sync"
 
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -91,22 +93,19 @@ func (s *basicAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, 
 
 type basicAuthDiffer struct {
 	kind crud.Kind
+	once sync.Once
 
 	currentState, targetState *state.KongState
 }
 
 func (d *basicAuthDiffer) warnBasicAuth() {
-	// TODO figure out a solution for silence warnings
-	// const (
-	// 	basicAuthPasswordWarning = "Warning: import/export of basic-auth" +
-	// 		"credentials using decK doesn't work due to hashing of passwords in Kong."
-	// )
-	// d.once.Do(func() {
-	// 	// if d.silenceWarnings {
-	// 	// 	return
-	// 	// }
-	// 	cprint.UpdatePrintln(basicAuthPasswordWarning)
-	// })
+	const (
+		basicAuthPasswordWarning = "Warning: import/export of basic-auth" +
+			"credentials using decK doesn't work due to hashing of passwords in Kong."
+	)
+	d.once.Do(func() {
+		cprint.UpdatePrintln(basicAuthPasswordWarning)
+	})
 }
 
 func (d *basicAuthDiffer) Deletes(handler func(crud.Event) error) error {
