@@ -83,12 +83,12 @@ func validate(content []byte) error {
 		errs.Errors = append(errs.Errors, err)
 	}
 
-	var kongdefaults KongDefaults
-	if err := json.Unmarshal(content, &kongdefaults); err != nil {
+	var kongdefaults *KongDefaults
+	if err := json.Unmarshal(content, kongdefaults); err != nil {
 		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
 	}
-	if &kongdefaults != nil {
-		if res := checkDefaults(kongdefaults); !res {
+	if kongdefaults != nil {
+		if res := checkDefaults(*kongdefaults); !res {
 			return fmt.Errorf("fields are not allowed to specify in defaults")
 		}
 	}
