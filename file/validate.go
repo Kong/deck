@@ -30,6 +30,10 @@ func checkDefaults(kd KongDefaults) bool {
 		return false
 	}
 
+	if kd.Service.Port != nil {
+		return false
+	}
+
 	if ret := check("Route.Name", kd.Route.Name); !ret {
 		return false
 	}
@@ -38,11 +42,19 @@ func checkDefaults(kd KongDefaults) bool {
 		return false
 	}
 
-	if ret := check("Upstream.Target", kd.Upstream.Name); !ret {
+	if ret := check("Target.Target", kd.Target.Target); !ret {
 		return false
 	}
 
-	if ret := check("Upstream.Target", kd.Upstream.ID); !ret {
+	if ret := check("Target.ID", kd.Target.ID); !ret {
+		return false
+	}
+
+	if ret := check("Upstream.Name", kd.Upstream.Name); !ret {
+		return false
+	}
+
+	if ret := check("Upstream.ID", kd.Upstream.ID); !ret {
 		return false
 	}
 
