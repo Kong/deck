@@ -28,7 +28,7 @@ func mtlsAuthFromStruct(arg crud.Event) *state.MTLSAuth {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *mtlsAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	mtlsAuth := mtlsAuthFromStruct(event)
 	createdMTLSAuth, err := s.client.MTLSAuths.Create(ctx, mtlsAuth.Consumer.ID,
 		&mtlsAuth.MTLSAuth)
@@ -43,7 +43,7 @@ func (s *mtlsAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *mtlsAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	mtlsAuth := mtlsAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(mtlsAuth.Consumer.Username) {
@@ -64,7 +64,7 @@ func (s *mtlsAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *mtlsAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	mtlsAuth := mtlsAuthFromStruct(event)
 
 	updatedMTLSAuth, err := s.client.MTLSAuths.Create(ctx, mtlsAuth.Consumer.ID,

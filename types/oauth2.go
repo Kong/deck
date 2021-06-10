@@ -28,7 +28,7 @@ func oauth2CredFromStruct(arg crud.Event) *state.Oauth2Credential {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *oauth2CredCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStruct(event)
 	cid := ""
 	if !utils.Empty(oauth2Cred.Consumer.Username) {
@@ -50,7 +50,7 @@ func (s *oauth2CredCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg,
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *oauth2CredCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStruct(event)
 	cid := ""
 	if !utils.Empty(oauth2Cred.Consumer.Username) {
@@ -71,7 +71,7 @@ func (s *oauth2CredCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg,
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *oauth2CredCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	oauth2Cred := oauth2CredFromStruct(event)
 
 	cid := ""

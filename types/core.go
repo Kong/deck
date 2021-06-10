@@ -9,14 +9,6 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
-func eventFromArg(arg crud.Arg) crud.Event {
-	event, ok := arg.(crud.Event)
-	if !ok {
-		panic("unexpected type, expected diff.Event")
-	}
-	return event
-}
-
 type Entity interface {
 	Type() string
 	CRUDActions() crud.Actions
@@ -25,7 +17,7 @@ type Entity interface {
 
 type entityImpl struct {
 	typ                string
-	cRUDActions        crud.Actions // needs to set client
+	crudActions        crud.Actions // needs to set client
 	postProcessActions crud.Actions // needs currentstate Set
 }
 
@@ -34,7 +26,7 @@ func (e entityImpl) Type() string {
 }
 
 func (e entityImpl) CRUDActions() crud.Actions {
-	return e.cRUDActions
+	return e.crudActions
 }
 
 func (e entityImpl) PostProcessActions() crud.Actions {
@@ -122,7 +114,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Service:
 		return entityImpl{
 			typ: "service",
-			cRUDActions: &serviceCRUD{
+			crudActions: &serviceCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &servicePostAction{
@@ -132,7 +124,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Route:
 		return entityImpl{
 			typ: "route",
-			cRUDActions: &routeCRUD{
+			crudActions: &routeCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &routePostAction{
@@ -142,7 +134,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Upstream:
 		return entityImpl{
 			typ: "upstream",
-			cRUDActions: &upstreamCRUD{
+			crudActions: &upstreamCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &upstreamPostAction{
@@ -152,7 +144,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Target:
 		return entityImpl{
 			typ: "target",
-			cRUDActions: &targetCRUD{
+			crudActions: &targetCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &targetPostAction{
@@ -162,7 +154,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Plugin:
 		return entityImpl{
 			typ: "plugin",
-			cRUDActions: &pluginCRUD{
+			crudActions: &pluginCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &pluginPostAction{
@@ -172,7 +164,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Consumer:
 		return entityImpl{
 			typ: "consumer",
-			cRUDActions: &consumerCRUD{
+			crudActions: &consumerCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &consumerPostAction{
@@ -182,7 +174,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case ServicePackage:
 		return entityImpl{
 			typ: "service-package",
-			cRUDActions: &servicePackageCRUD{
+			crudActions: &servicePackageCRUD{
 				client: opts.KonnectClient,
 			},
 			postProcessActions: &servicePackagePostAction{
@@ -192,7 +184,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case ServiceVersion:
 		return entityImpl{
 			typ: "service-version",
-			cRUDActions: &serviceVersionCRUD{
+			crudActions: &serviceVersionCRUD{
 				client: opts.KonnectClient,
 			},
 			postProcessActions: &serviceVersionPostAction{
@@ -202,7 +194,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Document:
 		return entityImpl{
 			typ: "document",
-			cRUDActions: &documentCRUD{
+			crudActions: &documentCRUD{
 				client: opts.KonnectClient,
 			},
 			postProcessActions: &documentPostAction{
@@ -212,7 +204,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case Certificate:
 		return entityImpl{
 			typ: "certificate",
-			cRUDActions: &certificateCRUD{
+			crudActions: &certificateCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &certificatePostAction{
@@ -222,7 +214,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case CACertificate:
 		return entityImpl{
 			typ: "ca-certificate",
-			cRUDActions: &caCertificateCRUD{
+			crudActions: &caCertificateCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &caCertificatePostAction{
@@ -232,7 +224,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case SNI:
 		return entityImpl{
 			typ: "sni",
-			cRUDActions: &sniCRUD{
+			crudActions: &sniCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &sniPostAction{
@@ -242,7 +234,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case RBACEndpointPermission:
 		return entityImpl{
 			typ: "rbac-endpoint-permission",
-			cRUDActions: &rbacEndpointPermissionCRUD{
+			crudActions: &rbacEndpointPermissionCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &rbacEndpointPermissionPostAction{
@@ -252,7 +244,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case RBACRole:
 		return entityImpl{
 			typ: "rbac-role",
-			cRUDActions: &rbacRoleCRUD{
+			crudActions: &rbacRoleCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &rbacRolePostAction{
@@ -262,7 +254,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case ACLGroup:
 		return entityImpl{
 			typ: "acl-group",
-			cRUDActions: &aclGroupCRUD{
+			crudActions: &aclGroupCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &aclGroupPostAction{
@@ -272,7 +264,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case BasicAuth:
 		return entityImpl{
 			typ: "basic-auth",
-			cRUDActions: &basicAuthCRUD{
+			crudActions: &basicAuthCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &basicAuthPostAction{
@@ -282,7 +274,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case KeyAuth:
 		return entityImpl{
 			typ: "key-auth",
-			cRUDActions: &keyAuthCRUD{
+			crudActions: &keyAuthCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &keyAuthPostAction{
@@ -292,7 +284,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case HMACAuth:
 		return entityImpl{
 			typ: "hmac-auth",
-			cRUDActions: &hmacAuthCRUD{
+			crudActions: &hmacAuthCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &hmacAuthPostAction{
@@ -302,7 +294,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case JWTAuth:
 		return entityImpl{
 			typ: "jwt-auth",
-			cRUDActions: &jwtAuthCRUD{
+			crudActions: &jwtAuthCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &jwtAuthPostAction{
@@ -312,7 +304,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case MTLSAuth:
 		return entityImpl{
 			typ: "mtls-auth",
-			cRUDActions: &mtlsAuthCRUD{
+			crudActions: &mtlsAuthCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &mtlsAuthPostAction{
@@ -322,7 +314,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 	case OAuth2Cred:
 		return entityImpl{
 			typ: "oauth2-cred",
-			cRUDActions: &oauth2CredCRUD{
+			crudActions: &oauth2CredCRUD{
 				client: opts.KongClient,
 			},
 			postProcessActions: &oauth2CredPostAction{

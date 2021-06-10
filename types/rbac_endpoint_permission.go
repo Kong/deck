@@ -28,7 +28,7 @@ func rbacEndpointPermissionFromStruct(arg crud.Event) *state.RBACEndpointPermiss
 // else the function will panic.
 // It returns a the created *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
 	createdRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Create(ctx, &ep.RBACEndpointPermission)
 	if err != nil {
@@ -42,7 +42,7 @@ func (s *rbacEndpointPermissionCRUD) Create(ctx context.Context, arg ...crud.Arg
 // else the function will panic.
 // It returns a the deleted *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
 
 	// for DELETE calls, the endpoint is passed in the URL only
@@ -64,7 +64,7 @@ func (s *rbacEndpointPermissionCRUD) Delete(ctx context.Context, arg ...crud.Arg
 // else the function will panic.
 // It returns a the updated *state.RBACEndpointPermission.
 func (s *rbacEndpointPermissionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	ep := rbacEndpointPermissionFromStruct(event)
 
 	updatedRBACEndpointPermission, err := s.client.RBACEndpointPermissions.Update(ctx, &ep.RBACEndpointPermission)

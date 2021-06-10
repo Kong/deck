@@ -27,7 +27,7 @@ func pluginFromStruct(arg crud.Event) *state.Plugin {
 // else the function will panic.
 // It returns a the created *state.Plugin.
 func (s *pluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	plugin := pluginFromStruct(event)
 
 	createdPlugin, err := s.client.Plugins.Create(ctx, &plugin.Plugin)
@@ -42,7 +42,7 @@ func (s *pluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 // else the function will panic.
 // It returns a the deleted *state.Plugin.
 func (s *pluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	plugin := pluginFromStruct(event)
 	err := s.client.Plugins.Delete(ctx, plugin.ID)
 	if err != nil {
@@ -56,7 +56,7 @@ func (s *pluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 // else the function will panic.
 // It returns a the updated *state.Plugin.
 func (s *pluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	plugin := pluginFromStruct(event)
 
 	updatedPlugin, err := s.client.Plugins.Create(ctx, &plugin.Plugin)

@@ -26,7 +26,7 @@ func certificateFromStruct(arg crud.Event) *state.Certificate {
 // else the function will panic.
 // It returns a the created *state.Certificate.
 func (s *certificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	certificate := certificateFromStruct(event)
 	createdCertificate, err := s.client.Certificates.Create(ctx, &certificate.Certificate)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *certificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg
 // else the function will panic.
 // It returns a the deleted *state.Certificate.
 func (s *certificateCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	certificate := certificateFromStruct(event)
 	err := s.client.Certificates.Delete(ctx, certificate.ID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *certificateCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg
 // else the function will panic.
 // It returns a the updated *state.Certificate.
 func (s *certificateCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	certificate := certificateFromStruct(event)
 
 	updatedCertificate, err := s.client.Certificates.Create(ctx, &certificate.Certificate)

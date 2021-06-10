@@ -27,7 +27,7 @@ func sniFromStruct(arg crud.Event) *state.SNI {
 // else the function will panic.
 // It returns a the created *state.SNI.
 func (s *sniCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sni := sniFromStruct(event)
 	createdSNI, err := s.client.SNIs.Create(ctx, &sni.SNI)
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *sniCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error)
 // else the function will panic.
 // It returns a the deleted *state.SNI.
 func (s *sniCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sni := sniFromStruct(event)
 	err := s.client.SNIs.Delete(ctx, sni.ID)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *sniCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error)
 // else the function will panic.
 // It returns a the updated *state.SNI.
 func (s *sniCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sni := sniFromStruct(event)
 
 	updatedSNI, err := s.client.SNIs.Create(ctx, &sni.SNI)

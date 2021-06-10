@@ -27,7 +27,7 @@ func routeFromStruct(arg crud.Event) *state.Route {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *routeCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	route := routeFromStruct(event)
 	createdRoute, err := s.client.Routes.Create(ctx, &route.Route)
 	if err != nil {
@@ -41,7 +41,7 @@ func (s *routeCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, erro
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *routeCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	route := routeFromStruct(event)
 	err := s.client.Routes.Delete(ctx, route.ID)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *routeCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, erro
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *routeCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	route := routeFromStruct(event)
 
 	updatedRoute, err := s.client.Routes.Create(ctx, &route.Route)

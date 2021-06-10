@@ -28,7 +28,7 @@ func aclGroupFromStruct(arg crud.Event) *state.ACLGroup {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *aclGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
@@ -50,7 +50,7 @@ func (s *aclGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *aclGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	aclGroup := aclGroupFromStruct(event)
 	cid := ""
 	if !utils.Empty(aclGroup.Consumer.Username) {
@@ -71,7 +71,7 @@ func (s *aclGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *aclGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	aclGroup := aclGroupFromStruct(event)
 
 	cid := ""

@@ -26,7 +26,7 @@ func consumerFromStruct(arg crud.Event) *state.Consumer {
 // else the function will panic.
 // It returns a the created *state.Consumer.
 func (s *consumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	consumer := consumerFromStruct(event)
 	createdConsumer, err := s.client.Consumers.Create(ctx, &consumer.Consumer)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *consumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Consumer.
 func (s *consumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	consumer := consumerFromStruct(event)
 	err := s.client.Consumers.Delete(ctx, consumer.ID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *consumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the updated *state.Consumer.
 func (s *consumerCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	consumer := consumerFromStruct(event)
 
 	updatedConsumer, err := s.client.Consumers.Create(ctx, &consumer.Consumer)

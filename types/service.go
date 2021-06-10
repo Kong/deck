@@ -26,7 +26,7 @@ func serviceFromStruct(arg crud.Event) *state.Service {
 // else the function will panic.
 // It returns a the created *state.Service.
 func (s *serviceCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	service := serviceFromStruct(event)
 	createdService, err := s.client.Services.Create(ctx, &service.Service)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *serviceCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the deleted *state.Service.
 func (s *serviceCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	service := serviceFromStruct(event)
 	err := s.client.Services.Delete(ctx, service.ID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *serviceCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the updated *state.Service.
 func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	service := serviceFromStruct(event)
 
 	updatedService, err := s.client.Services.Create(ctx, &service.Service)
