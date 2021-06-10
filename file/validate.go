@@ -60,7 +60,7 @@ func validate(content []byte) error {
 	var kongdefaults KongDefaults
 	err = json.Unmarshal(content, &kongdefaults)
 	if err != nil {
-		return fmt.Errorf("unmarshaling file into KongDefaults")
+		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
 	}
 	res := checkDefaults(kongdefaults)
 	if res == false {
