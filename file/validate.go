@@ -19,7 +19,7 @@ func check(item string, t *string) bool {
 
 func checkDefaults(kd KongDefaults) bool {
 	if ret := check("Service.ID", kd.Service.ID); !ret {
-		return ret
+		return false
 	}
 
 	if ret := check("Service.Host", kd.Service.Host); !ret {
@@ -58,12 +58,10 @@ func validate(content []byte) error {
 	c = ensureJSON(c)
 
 	var kongdefaults KongDefaults
-	err = json.Unmarshal(content, &kongdefaults)
-	if err != nil {
+	if err := json.Unmarshal(content, &kongdefaults); err != nil {
 		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
 	}
-	res := checkDefaults(kongdefaults)
-	if res == false {
+	if res := checkDefaults(kongdefaults); !res {
 		return fmt.Errorf("fields are not allowed to specify in defaults")
 	}
 
