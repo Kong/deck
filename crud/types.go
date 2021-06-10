@@ -39,3 +39,13 @@ type Event struct {
 	Obj    interface{}
 	OldObj interface{}
 }
+
+// EventFromArg converts arg into Event.
+// It panics if the type of arg is not Event.
+func EventFromArg(arg Arg) Event {
+	event, ok := arg.(Event)
+	if !ok {
+		panic("unexpected type, expected diff.Event")
+	}
+	return event
+}

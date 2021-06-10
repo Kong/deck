@@ -28,7 +28,7 @@ func keyAuthFromStruct(arg crud.Event) *state.KeyAuth {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *keyAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 	createdKeyAuth, err := s.client.KeyAuths.Create(ctx, keyAuth.Consumer.ID,
 		&keyAuth.KeyAuth)
@@ -43,7 +43,7 @@ func (s *keyAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *keyAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(keyAuth.Consumer.Username) {
@@ -64,7 +64,7 @@ func (s *keyAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *keyAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	keyAuth := keyAuthFromStruct(event)
 
 	updatedKeyAuth, err := s.client.KeyAuths.Create(ctx, keyAuth.Consumer.ID,

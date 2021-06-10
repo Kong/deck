@@ -28,7 +28,7 @@ func basicAuthFromStruct(arg crud.Event) *state.BasicAuth {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *basicAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(basicAuth.Consumer.Username) {
@@ -50,7 +50,7 @@ func (s *basicAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, 
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *basicAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(basicAuth.Consumer.Username) {
@@ -71,7 +71,7 @@ func (s *basicAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, 
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *basicAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	basicAuth := basicAuthFromStruct(event)
 
 	cid := ""

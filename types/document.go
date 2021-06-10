@@ -34,7 +34,7 @@ func oldDocumentFromStruct(arg crud.Event) *state.Document {
 // else the function will panic.
 // It returns the created *state.Document.
 func (s *documentCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	d := documentFromStruct(event)
 	createdDoc, err := s.client.Documents.Create(ctx, &d.Document)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *documentCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Document.
 func (s *documentCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	d := documentFromStruct(event)
 	err := s.client.Documents.Delete(ctx, &d.Document)
 	if err != nil {
@@ -66,7 +66,7 @@ func (s *documentCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 		err        error
 		updatedDoc *konnect.Document
 	)
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	document := documentFromStruct(event)
 	oldDocument := oldDocumentFromStruct(event)
 

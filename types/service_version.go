@@ -35,7 +35,7 @@ func oldServiceVersionFromStruct(arg crud.Event) *state.ServiceVersion {
 // else the function will panic.
 // It returns a the created *state.ServiceVersion.
 func (s *serviceVersionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sv := serviceVersionFromStruct(event)
 	createdSV, err := s.client.ServiceVersions.Create(ctx, &sv.ServiceVersion)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *serviceVersionCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.
 // else the function will panic.
 // It returns a the deleted *state.ServiceVersion.
 func (s *serviceVersionCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sv := serviceVersionFromStruct(event)
 	err := s.client.ServiceVersions.Delete(ctx, sv.ID)
 	if err != nil {
@@ -76,7 +76,7 @@ func (s *serviceVersionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.
 		err       error
 		updatedSV *konnect.ServiceVersion
 	)
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	version := serviceVersionFromStruct(event)
 	oldVersion := oldServiceVersionFromStruct(event)
 

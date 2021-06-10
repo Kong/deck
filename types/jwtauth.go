@@ -28,7 +28,7 @@ func jwtAuthFromStruct(arg crud.Event) *state.JWTAuth {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *jwtAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
@@ -50,7 +50,7 @@ func (s *jwtAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *jwtAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	jwtAuth := jwtAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(jwtAuth.Consumer.Username) {
@@ -71,7 +71,7 @@ func (s *jwtAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *jwtAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	jwtAuth := jwtAuthFromStruct(event)
 
 	cid := ""

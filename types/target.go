@@ -27,7 +27,7 @@ func targetFromStruct(arg crud.Event) *state.Target {
 // else the function will panic.
 // It returns a the created *state.Target.
 func (s *targetCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	target := targetFromStruct(event)
 	createdTarget, err := s.client.Targets.Create(ctx,
 		target.Upstream.ID, &target.Target)
@@ -42,7 +42,7 @@ func (s *targetCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 // else the function will panic.
 // It returns a the deleted *state.Target.
 func (s *targetCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	target := targetFromStruct(event)
 	err := s.client.Targets.Delete(ctx, target.Upstream.ID, target.ID)
 	if err != nil {
@@ -56,7 +56,7 @@ func (s *targetCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 // else the function will panic.
 // It returns a the updated *state.Target.
 func (s *targetCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	target := targetFromStruct(event)
 	// Targets in Kong cannot be updated
 	err := s.client.Targets.Delete(ctx, target.Upstream.ID, target.ID)

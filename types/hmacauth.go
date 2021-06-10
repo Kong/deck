@@ -28,7 +28,7 @@ func hmacAuthFromStruct(arg crud.Event) *state.HMACAuth {
 // else the function will panic.
 // It returns a the created *state.Route.
 func (s *hmacAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(hmacAuth.Consumer.Username) {
@@ -50,7 +50,7 @@ func (s *hmacAuthCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Route.
 func (s *hmacAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStruct(event)
 	cid := ""
 	if !utils.Empty(hmacAuth.Consumer.Username) {
@@ -71,7 +71,7 @@ func (s *hmacAuthCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the updated *state.Route.
 func (s *hmacAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	hmacAuth := hmacAuthFromStruct(event)
 
 	cid := ""

@@ -26,7 +26,7 @@ func upstreamFromStruct(arg crud.Event) *state.Upstream {
 // else the function will panic.
 // It returns a the created *state.Upstream.
 func (s *upstreamCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	upstream := upstreamFromStruct(event)
 	createdUpstream, err := s.client.Upstreams.Create(ctx, &upstream.Upstream)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *upstreamCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the deleted *state.Upstream.
 func (s *upstreamCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	upstream := upstreamFromStruct(event)
 	err := s.client.Upstreams.Delete(ctx, upstream.ID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *upstreamCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, e
 // else the function will panic.
 // It returns a the updated *state.Upstream.
 func (s *upstreamCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	upstream := upstreamFromStruct(event)
 
 	updatedUpstream, err := s.client.Upstreams.Create(ctx, &upstream.Upstream)

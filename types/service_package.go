@@ -26,7 +26,7 @@ func servicePackageFromStruct(arg crud.Event) *state.ServicePackage {
 // else the function will panic.
 // It returns a the created *state.ServicePackage.
 func (s *servicePackageCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sp := servicePackageFromStruct(event)
 	createdSP, err := s.client.ServicePackages.Create(ctx, &sp.ServicePackage)
 	if err != nil {
@@ -40,7 +40,7 @@ func (s *servicePackageCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.
 // else the function will panic.
 // It returns a the deleted *state.ServicePackage.
 func (s *servicePackageCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sp := servicePackageFromStruct(event)
 	err := s.client.ServicePackages.Delete(ctx, sp.ID)
 	if err != nil {
@@ -54,7 +54,7 @@ func (s *servicePackageCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.
 // else the function will panic.
 // It returns a the updated *state.ServicePackage.
 func (s *servicePackageCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
-	event := eventFromArg(arg[0])
+	event := crud.EventFromArg(arg[0])
 	sp := servicePackageFromStruct(event)
 
 	updatedSP, err := s.client.ServicePackages.Update(ctx, &sp.ServicePackage)
