@@ -68,15 +68,6 @@ func validate(content []byte) error {
 		return fmt.Errorf("unmarshaling file content: %w", err)
 	}
 	c = ensureJSON(c)
-
-	var kongdefaults KongDefaults
-	if err := json.Unmarshal(content, &kongdefaults); err != nil {
-		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
-	}
-	if res := checkDefaults(kongdefaults); !res {
-		return fmt.Errorf("fields are not allowed to specify in defaults")
-	}
-
 	schemaLoader := gojsonschema.NewStringLoader(kongJSONSchema)
 	documentLoader := gojsonschema.NewGoLoader(c)
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
@@ -91,5 +82,15 @@ func validate(content []byte) error {
 		err := fmt.Errorf(desc.String())
 		errs.Errors = append(errs.Errors, err)
 	}
+
+	var kongdefaults KongDefaults
+	fmt.Printf("input data %s", content)
+	if err := json.Unmarshal(content, &kongdefaults); err != nil {
+		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
+	}
+	if res := checkDefaults(kongdefaults); !res {
+		return fmt.Errorf("fields are not allowed to specify in defaults")
+	}
+
 	return errs
 }
