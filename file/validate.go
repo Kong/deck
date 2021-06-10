@@ -11,7 +11,7 @@ import (
 
 func check(item string, t *string) bool {
 	if t != nil || len(*t) > 0 {
-		fmt.(item, "[err] is not allowed to be specified.")
+		fmt.Println(item + "[err] is not allowed to be specified.")
 		return false
 	}
 	return true
