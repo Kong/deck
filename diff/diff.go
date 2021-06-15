@@ -251,6 +251,10 @@ func (sc *Syncer) delete() error {
 		return err
 	}
 
+	// barrier for foreign relations
+	// Documents must be deleted before ServiceVersions and Service packages
+	sc.wait()
+
 	err = sc.entityDiffers[types.ServiceVersion].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
@@ -384,6 +388,10 @@ func (sc *Syncer) createUpdate() error {
 	if err != nil {
 		return err
 	}
+
+	// barrier for foreign relations
+	// service versions and packages must be created before documents
+	sc.wait()
 
 	err = sc.entityDiffers[types.Document].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
