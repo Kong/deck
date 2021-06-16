@@ -387,7 +387,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &hmacAuthDiffer{
-				kind:         BasicAuth,
+				kind:         HMACAuth,
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
