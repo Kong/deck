@@ -23,7 +23,7 @@ func TestSubFieldIndexer(t *testing.T) {
 			},
 		},
 	}
-	s := "yolo"
+	s := "fubar"
 	b := Baz{
 		A: &Foo{
 			Bar: &s,
@@ -34,7 +34,7 @@ func TestSubFieldIndexer(t *testing.T) {
 	assert := assert.New(t)
 	assert.True(ok)
 	assert.Nil(err)
-	assert.Equal("yolo\x00", string(val))
+	assert.Equal("fubar\x00", string(val))
 
 	ok, val, err = in.FromObject(Baz{})
 	assert.False(ok)
@@ -51,9 +51,9 @@ func TestSubFieldIndexer(t *testing.T) {
 	assert.Nil(err)
 	assert.Empty(val)
 
-	val, err = in.FromArgs("yolo")
+	val, err = in.FromArgs("fubar")
 	assert.Nil(err)
-	assert.Equal("yolo\x00", string(val))
+	assert.Equal("fubar\x00", string(val))
 
 	val, err = in.FromArgs(2)
 	assert.Nil(val)
@@ -81,7 +81,7 @@ func TestSubFieldIndexerPointer(t *testing.T) {
 			},
 		},
 	}
-	s := "yolo"
+	s := "fubar"
 	b := Baz{
 		A: &Foo{
 			Bar: &s,
@@ -92,9 +92,9 @@ func TestSubFieldIndexerPointer(t *testing.T) {
 	assert := assert.New(t)
 	assert.True(ok)
 	assert.Nil(err)
-	assert.Equal("yolo\x00", string(val))
+	assert.Equal("fubar\x00", string(val))
 
-	val, err = in.FromArgs("yolo")
+	val, err = in.FromArgs("fubar")
 	assert.Nil(err)
-	assert.Equal("yolo\x00", string(val))
+	assert.Equal("fubar\x00", string(val))
 }

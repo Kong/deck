@@ -29,3 +29,23 @@ type Actions interface {
 	Delete(context.Context, ...Arg) (Arg, error)
 	Update(context.Context, ...Arg) (Arg, error)
 }
+
+// Event represents an event to perform
+// an imperative operation
+// that gets Kong closer to the target state.
+type Event struct {
+	Op     Op
+	Kind   Kind
+	Obj    interface{}
+	OldObj interface{}
+}
+
+// EventFromArg converts arg into Event.
+// It panics if the type of arg is not Event.
+func EventFromArg(arg Arg) Event {
+	event, ok := arg.(Event)
+	if !ok {
+		panic("unexpected type, expected diff.Event")
+	}
+	return event
+}

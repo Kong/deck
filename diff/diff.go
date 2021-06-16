@@ -10,8 +10,12 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/types"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -34,48 +38,93 @@ func defaultBackOff() backoff.BackOff {
 type Syncer struct {
 	currentState *state.KongState
 	targetState  *state.KongState
-	postProcess  crud.Registry
 
-	eventChan chan Event
+	processor     crud.Registry
+	postProcessor crud.Registry
+
+	eventChan chan crud.Event
 	errChan   chan error
 	stopChan  chan struct{}
 
 	inFlightOps int32
 
+	silenceWarnings bool
+	stageDelaySec   int
+
+	kongClient    *kong.Client
+	konnectClient *konnect.Client
+
+	entityDiffers map[string]types.Differ
+}
+
+type SyncerOpts struct {
+	CurrentState *state.KongState
+	TargetState  *state.KongState
+
+	KongClient    *kong.Client
+	KonnectClient *konnect.Client
+
 	SilenceWarnings bool
 	StageDelaySec   int
-
-	once sync.Once
 }
 
 // NewSyncer constructs a Syncer.
-func NewSyncer(current, target *state.KongState) (*Syncer, error) {
-	s := &Syncer{}
-	s.currentState, s.targetState = current, target
+func NewSyncer(opts SyncerOpts) (*Syncer, error) {
+	s := &Syncer{
+		currentState: opts.CurrentState,
+		targetState:  opts.TargetState,
 
-	s.postProcess.MustRegister("service", &servicePostAction{current})
-	s.postProcess.MustRegister("route", &routePostAction{current})
-	s.postProcess.MustRegister("upstream", &upstreamPostAction{current})
-	s.postProcess.MustRegister("target", &targetPostAction{current})
-	s.postProcess.MustRegister("certificate", &certificatePostAction{current})
-	s.postProcess.MustRegister("sni", &sniPostAction{current})
-	s.postProcess.MustRegister("ca_certificate", &caCertificatePostAction{current})
-	s.postProcess.MustRegister("plugin", &pluginPostAction{current})
-	s.postProcess.MustRegister("consumer", &consumerPostAction{current})
-	s.postProcess.MustRegister("key-auth", &keyAuthPostAction{current})
-	s.postProcess.MustRegister("hmac-auth", &hmacAuthPostAction{current})
-	s.postProcess.MustRegister("jwt-auth", &jwtAuthPostAction{current})
-	s.postProcess.MustRegister("basic-auth", &basicAuthPostAction{current})
-	s.postProcess.MustRegister("acl-group", &aclGroupPostAction{current})
-	s.postProcess.MustRegister("oauth2-cred", &oauth2CredPostAction{current})
-	s.postProcess.MustRegister("mtls-auth", &mtlsAuthPostAction{current})
-	s.postProcess.MustRegister("rbac-role", &rbacRolePostAction{current})
-	s.postProcess.MustRegister("rbac-endpointpermission", &rbacEndpointPermissionPostAction{current})
-	s.postProcess.MustRegister("service-package", &servicePackagePostAction{current})
-	s.postProcess.MustRegister("service-version", &serviceVersionPostAction{current})
-	s.postProcess.MustRegister("document", &documentPostAction{current})
+		kongClient:    opts.KongClient,
+		konnectClient: opts.KonnectClient,
+
+		silenceWarnings: opts.SilenceWarnings,
+		stageDelaySec:   opts.StageDelaySec,
+	}
+
+	err := s.init()
+	if err != nil {
+		return nil, err
+	}
 
 	return s, nil
+}
+
+func (sc *Syncer) init() error {
+	opts := types.EntityOpts{
+		CurrentState: sc.currentState,
+		TargetState:  sc.targetState,
+
+		KongClient:    sc.kongClient,
+		KonnectClient: sc.konnectClient,
+	}
+
+	entities := []string{
+		types.Service, types.Route, types.Plugin,
+
+		types.Certificate, types.SNI, types.CACertificate,
+
+		types.Upstream, types.Target,
+
+		types.Consumer,
+		types.ACLGroup, types.BasicAuth, types.KeyAuth,
+		types.HMACAuth, types.JWTAuth, types.OAuth2Cred,
+		types.MTLSAuth,
+
+		types.RBACRole, types.RBACEndpointPermission,
+
+		types.ServicePackage, types.ServiceVersion, types.Document,
+	}
+	sc.entityDiffers = map[string]types.Differ{}
+	for _, entityType := range entities {
+		entity, err := types.NewEntity(entityType, opts)
+		if err != nil {
+			return err
+		}
+		sc.postProcessor.MustRegister(crud.Kind(entityType), entity.PostProcessActions())
+		sc.processor.MustRegister(crud.Kind(entityType), entity.CRUDActions())
+		sc.entityDiffers[entityType] = entity.Differ()
+	}
+	return nil
 }
 
 func (sc *Syncer) diff() error {
@@ -94,43 +143,43 @@ func (sc *Syncer) diff() error {
 func (sc *Syncer) delete() error {
 	var err error
 
-	err = sc.deletePlugins()
+	err = sc.entityDiffers[types.Plugin].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteKeyAuths()
+	err = sc.entityDiffers[types.KeyAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteHMACAuths()
+	err = sc.entityDiffers[types.HMACAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteJWTAuths()
+	err = sc.entityDiffers[types.JWTAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteBasicAuths()
+	err = sc.entityDiffers[types.BasicAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteOauth2Creds()
+	err = sc.entityDiffers[types.OAuth2Cred].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteACLGroups()
+	err = sc.entityDiffers[types.ACLGroup].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteMTLSAuths()
+	err = sc.entityDiffers[types.MTLSAuth].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteTargets()
+	err = sc.entityDiffers[types.Target].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteSNIs()
+	err = sc.entityDiffers[types.SNI].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -146,15 +195,15 @@ func (sc *Syncer) delete() error {
 	// will return a 404
 	sc.wait()
 
-	err = sc.deleteRoutes()
+	err = sc.entityDiffers[types.Route].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteConsumers()
+	err = sc.entityDiffers[types.Consumer].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.deleteUpstreams()
+	err = sc.entityDiffers[types.Upstream].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -163,7 +212,7 @@ func (sc *Syncer) delete() error {
 	// routes must be deleted before services
 	sc.wait()
 
-	err = sc.deleteServices()
+	err = sc.entityDiffers[types.Service].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -172,18 +221,18 @@ func (sc *Syncer) delete() error {
 	// services must be deleted before certificates (client_certificate)
 	sc.wait()
 
-	err = sc.deleteCertificates()
+	err = sc.entityDiffers[types.Certificate].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
 	// services must be deleted before ca_certificates
-	err = sc.deleteCACertificates()
+	err = sc.entityDiffers[types.CACertificate].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteRBACEndpointPermissions()
+	err = sc.entityDiffers[types.RBACEndpointPermission].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -192,17 +241,21 @@ func (sc *Syncer) delete() error {
 	// RBAC endpoint permissions must be deleted before RBAC roles
 	sc.wait()
 
-	err = sc.deleteRBACRoles()
+	err = sc.entityDiffers[types.RBACRole].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteDocuments()
+	err = sc.entityDiffers[types.Document].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.deleteServiceVersions()
+	// barrier for foreign relations
+	// Documents must be deleted before ServiceVersions and Service packages
+	sc.wait()
+
+	err = sc.entityDiffers[types.ServiceVersion].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -211,7 +264,7 @@ func (sc *Syncer) delete() error {
 	// ServiceVersions must be deleted before ServicePackages
 	sc.wait()
 
-	err = sc.deleteServicePackages()
+	err = sc.entityDiffers[types.ServicePackage].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -226,19 +279,19 @@ func (sc *Syncer) createUpdate() error {
 	// TODO write an interface and register by types,
 	// then execute in a particular order
 
-	err := sc.createUpdateCertificates()
+	err := sc.entityDiffers[types.Certificate].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateCACertificates()
+	err = sc.entityDiffers[types.CACertificate].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateConsumers()
+	err = sc.entityDiffers[types.Consumer].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateUpstreams()
+	err = sc.entityDiffers[types.Upstream].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -250,43 +303,43 @@ func (sc *Syncer) createUpdate() error {
 	// certificates must be created before services (client_certificate)
 	sc.wait()
 
-	err = sc.createUpdateTargets()
+	err = sc.entityDiffers[types.Target].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateSNIs()
+	err = sc.entityDiffers[types.SNI].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateServices()
+	err = sc.entityDiffers[types.Service].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateKeyAuths()
+	err = sc.entityDiffers[types.KeyAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateHMACAuths()
+	err = sc.entityDiffers[types.HMACAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateJWTAuths()
+	err = sc.entityDiffers[types.JWTAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateBasicAuths()
+	err = sc.entityDiffers[types.BasicAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateOauth2Creds()
+	err = sc.entityDiffers[types.OAuth2Cred].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateACLGroups()
+	err = sc.entityDiffers[types.ACLGroup].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
-	err = sc.createUpdateMTLSAuths()
+	err = sc.entityDiffers[types.MTLSAuth].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -295,7 +348,7 @@ func (sc *Syncer) createUpdate() error {
 	// services must be created before routes
 	sc.wait()
 
-	err = sc.createUpdateRoutes()
+	err = sc.entityDiffers[types.Route].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -304,12 +357,12 @@ func (sc *Syncer) createUpdate() error {
 	// services, routes and consumers must be created before plugins
 	sc.wait()
 
-	err = sc.createUpdatePlugins()
+	err = sc.entityDiffers[types.Plugin].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateRBACRoles()
+	err = sc.entityDiffers[types.RBACRole].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -318,12 +371,12 @@ func (sc *Syncer) createUpdate() error {
 	// RBAC roles must be created before endpoint permissions
 	sc.wait()
 
-	err = sc.createUpdateRBACEndpointPermissions()
+	err = sc.entityDiffers[types.RBACEndpointPermission].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateServicePackages()
+	err = sc.entityDiffers[types.ServicePackage].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -331,12 +384,16 @@ func (sc *Syncer) createUpdate() error {
 	// services, routes and consumers must be created before plugins
 	sc.wait()
 
-	err = sc.createUpdateServiceVersions()
+	err = sc.entityDiffers[types.ServiceVersion].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
 
-	err = sc.createUpdateDocuments()
+	// barrier for foreign relations
+	// service versions and packages must be created before documents
+	sc.wait()
+
+	err = sc.entityDiffers[types.Document].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}
@@ -347,7 +404,7 @@ func (sc *Syncer) createUpdate() error {
 	return nil
 }
 
-func (sc *Syncer) queueEvent(e Event) error {
+func (sc *Syncer) queueEvent(e crud.Event) error {
 	atomic.AddInt32(&sc.inFlightOps, 1)
 	select {
 	case sc.eventChan <- e:
@@ -363,7 +420,7 @@ func (sc *Syncer) eventCompleted() {
 }
 
 func (sc *Syncer) wait() {
-	time.Sleep(time.Duration(sc.StageDelaySec) * time.Second)
+	time.Sleep(time.Duration(sc.stageDelaySec) * time.Second)
 	for atomic.LoadInt32(&sc.inFlightOps) != 0 {
 		select {
 		case <-sc.stopChan:
@@ -383,7 +440,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	var wg sync.WaitGroup
 	const eventBuffer = 10
 
-	sc.eventChan = make(chan Event, eventBuffer)
+	sc.eventChan = make(chan crud.Event, eventBuffer)
 	sc.stopChan = make(chan struct{})
 	sc.errChan = make(chan error)
 
@@ -442,7 +499,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 }
 
 // Do is the worker function to sync the diff
-type Do func(a Event) (crud.Arg, error)
+type Do func(a crud.Event) (crud.Arg, error)
 
 func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	for event := range sc.eventChan {
@@ -462,7 +519,7 @@ func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 	return nil
 }
 
-func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
+func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error {
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
@@ -482,7 +539,7 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
 			// Do not retry empty responses
 			return backoff.Permanent(fmt.Errorf("result of event is nil"))
 		}
-		_, err = sc.postProcess.Do(ctx, event.Kind, event.Op, res)
+		_, err = sc.postProcessor.Do(ctx, event.Kind, event.Op, res)
 		if err != nil {
 			// Do not retry program errors
 			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))
@@ -491,4 +548,74 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event Event) error {
 	}, defaultBackOff())
 
 	return err
+}
+
+// Stats holds the stats related to a Solve.
+type Stats struct {
+	CreateOps *utils.AtomicInt32Counter
+	UpdateOps *utils.AtomicInt32Counter
+	DeleteOps *utils.AtomicInt32Counter
+}
+
+// Solve generates a diff and walks the graph.
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+	stats := Stats{
+		CreateOps: &utils.AtomicInt32Counter{},
+		UpdateOps: &utils.AtomicInt32Counter{},
+		DeleteOps: &utils.AtomicInt32Counter{},
+	}
+	recordOp := func(op crud.Op) {
+		switch op {
+		case crud.Create:
+			stats.CreateOps.Increment(1)
+		case crud.Update:
+			stats.UpdateOps.Increment(1)
+		case crud.Delete:
+			stats.DeleteOps.Increment(1)
+		}
+	}
+
+	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
+		var err error
+		var result crud.Arg
+
+		c := e.Obj.(state.ConsoleString)
+		switch e.Op {
+		case crud.Create:
+			cprint.CreatePrintln("creating", e.Kind, c.Console())
+		case crud.Update:
+			var diffString string
+			if oldObj, ok := e.OldObj.(*state.Document); ok {
+				diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
+			} else {
+				diffString, err = getDiff(e.OldObj, e.Obj)
+			}
+			if err != nil {
+				return nil, err
+			}
+			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+		case crud.Delete:
+			cprint.DeletePrintln("deleting", e.Kind, c.Console())
+		default:
+			panic("unknown operation " + e.Op.String())
+		}
+
+		if !dry {
+			// sync mode
+			// fire the request to Kong
+			result, err = sc.processor.Do(ctx, e.Kind, e.Op, e)
+			if err != nil {
+				return nil, fmt.Errorf("%v %v %v failed: %w", e.Op, e.Kind, c.Console(), err)
+			}
+		} else {
+			// diff mode
+			// return the new obj as is
+			result = e.Obj
+		}
+		// record operation in both: diff and sync commands
+		recordOp(e.Op)
+
+		return result, nil
+	})
+	return stats, errs
 }
