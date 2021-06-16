@@ -20,7 +20,7 @@ type basicAuthCRUD struct {
 func basicAuthFromStruct(arg crud.Event) *state.BasicAuth {
 	basicAuth, ok := arg.Obj.(*state.BasicAuth)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.BasicAuth")
 	}
 
 	return basicAuth

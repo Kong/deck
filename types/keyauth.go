@@ -18,7 +18,7 @@ type keyAuthCRUD struct {
 func keyAuthFromStruct(arg crud.Event) *state.KeyAuth {
 	keyAuth, ok := arg.Obj.(*state.KeyAuth)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.KeyAuth")
 	}
 
 	return keyAuth

@@ -18,7 +18,7 @@ type hmacAuthCRUD struct {
 func hmacAuthFromStruct(arg crud.Event) *state.HMACAuth {
 	hmacAuth, ok := arg.Obj.(*state.HMACAuth)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.HMACAuth")
 	}
 
 	return hmacAuth

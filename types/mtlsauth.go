@@ -18,7 +18,7 @@ type mtlsAuthCRUD struct {
 func mtlsAuthFromStruct(arg crud.Event) *state.MTLSAuth {
 	mtlsAuth, ok := arg.Obj.(*state.MTLSAuth)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.MTLSAuth")
 	}
 
 	return mtlsAuth

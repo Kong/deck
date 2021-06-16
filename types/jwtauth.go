@@ -18,7 +18,7 @@ type jwtAuthCRUD struct {
 func jwtAuthFromStruct(arg crud.Event) *state.JWTAuth {
 	jwtAuth, ok := arg.Obj.(*state.JWTAuth)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.JWTAuth")
 	}
 
 	return jwtAuth
