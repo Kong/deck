@@ -19,7 +19,6 @@ func check(item string, t *string) string {
 }
 
 func checkDefaults(kd KongDefaults) error {
-
 	var invalid []string
 	if ret := check("Service.ID", kd.Service.ID); len(ret) > 0 {
 		invalid = append(invalid, "Service.ID")
