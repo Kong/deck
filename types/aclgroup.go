@@ -18,7 +18,7 @@ type aclGroupCRUD struct {
 func aclGroupFromStruct(arg crud.Event) *state.ACLGroup {
 	aclGroup, ok := arg.Obj.(*state.ACLGroup)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.ACLGroup")
 	}
 
 	return aclGroup

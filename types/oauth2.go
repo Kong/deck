@@ -18,7 +18,7 @@ type oauth2CredCRUD struct {
 func oauth2CredFromStruct(arg crud.Event) *state.Oauth2Credential {
 	oauth2Cred, ok := arg.Obj.(*state.Oauth2Credential)
 	if !ok {
-		panic("unexpected type, expected *state.Route")
+		panic("unexpected type, expected *state.OAuth2")
 	}
 
 	return oauth2Cred
