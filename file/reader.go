@@ -3,7 +3,6 @@ package file
 import (
 	"fmt"
 
-	"github.com/blang/semver/v4"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 )
@@ -12,7 +11,6 @@ import (
 // KongConfig from a file.
 type RenderConfig struct {
 	CurrentState *state.KongState
-	KongVersion  semver.Version
 }
 
 // GetContentFromFiles reads in a file with a slice of filenames and constructs

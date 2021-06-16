@@ -7,15 +7,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
-
-var kong130Version = semver.MustParse("1.3.0")
 
 func emptyState() *state.KongState {
 	s, _ := state.NewKongState()
@@ -751,7 +748,6 @@ func Test_stateBuilder_consumers(t *testing.T) {
 	type fields struct {
 		currentState  *state.KongState
 		targetContent *Content
-		kongVersion   *semver.Version
 	}
 	tests := []struct {
 		name   string
@@ -1130,7 +1126,6 @@ func Test_stateBuilder_consumers(t *testing.T) {
 					},
 				},
 				currentState: existingConsumerCredState(),
-				kongVersion:  &kong130Version,
 			},
 			want: &utils.KongRawState{
 				Consumers: []*kong.Consumer{
@@ -1147,6 +1142,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				BasicAuths: []*kong.BasicAuth{
@@ -1157,6 +1153,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				HMACAuths: []*kong.HMACAuth{
@@ -1167,6 +1164,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				JWTAuths: []*kong.JWTAuth{
@@ -1177,6 +1175,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				Oauth2Creds: []*kong.Oauth2Credential{
@@ -1187,6 +1186,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				ACLGroups: []*kong.ACLGroup{
@@ -1196,6 +1196,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 						Consumer: &kong.Consumer{
 							ID: kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						},
+						Tags: kong.StringSlice("tag1"),
 					},
 				},
 				MTLSAuths: []*kong.MTLSAuth{
@@ -1215,10 +1216,6 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
-				kongVersion:   kong140Version,
-			}
-			if tt.fields.kongVersion != nil {
-				b.kongVersion = *tt.fields.kongVersion
 			}
 			d, _ := utils.GetKongDefaulter()
 			b.defaulter = d

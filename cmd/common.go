@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/blang/semver/v4"
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
@@ -83,10 +82,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err != nil {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
-	parsedKongVersion, err := parseKongVersion(kongVersion)
-	if err != nil {
-		return fmt.Errorf("parsing Kong version: %w", err)
-	}
 
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
 	// call to the RunE function. That is not trivial because it requires the
@@ -137,7 +132,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the target state
 	rawState, err := file.Get(targetContent, file.RenderConfig{
 		CurrentState: currentState,
-		KongVersion:  parsedKongVersion,
 	})
 	if err != nil {
 		return err
@@ -229,14 +223,6 @@ func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (strin
 		version = root["version"].(string)
 	}
 	return version, nil
-}
-
-func parseKongVersion(version string) (semver.Version, error) {
-	v, err := utils.CleanKongVersion(version)
-	if err != nil {
-		return semver.Version{}, err
-	}
-	return semver.ParseTolerant(v)
 }
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
