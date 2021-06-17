@@ -54,7 +54,7 @@ type Syncer struct {
 	kongClient    *kong.Client
 	konnectClient *konnect.Client
 
-	entityDiffers map[string]types.Differ
+	entityDiffers map[types.EntityType]types.Differ
 }
 
 type SyncerOpts struct {
@@ -98,7 +98,7 @@ func (sc *Syncer) init() error {
 		KonnectClient: sc.konnectClient,
 	}
 
-	entities := []string{
+	entities := []types.EntityType{
 		types.Service, types.Route, types.Plugin,
 
 		types.Certificate, types.SNI, types.CACertificate,
@@ -114,7 +114,7 @@ func (sc *Syncer) init() error {
 
 		types.ServicePackage, types.ServiceVersion, types.Document,
 	}
-	sc.entityDiffers = map[string]types.Differ{}
+	sc.entityDiffers = map[types.EntityType]types.Differ{}
 	for _, entityType := range entities {
 		entity, err := types.NewEntity(entityType, opts)
 		if err != nil {

@@ -15,20 +15,20 @@ type Differ interface {
 }
 
 type Entity interface {
-	Type() string
+	Type() EntityType
 	CRUDActions() crud.Actions
 	PostProcessActions() crud.Actions
 	Differ() Differ
 }
 
 type entityImpl struct {
-	typ                string
+	typ                EntityType
 	crudActions        crud.Actions // needs to set client
 	postProcessActions crud.Actions // needs currentstate Set
 	differ             Differ
 }
 
-func (e entityImpl) Type() string {
+func (e entityImpl) Type() EntityType {
 	return e.typ
 }
 
@@ -51,59 +51,62 @@ type EntityOpts struct {
 	KonnectClient *konnect.Client
 }
 
+// EntityType defines a type of entity that is managed by decK.
+type EntityType string
+
 const (
 	// Service identifies a Service in Kong.
-	Service = "service"
+	Service EntityType = "service"
 	// Route identifies a Route in Kong.
-	Route = "route"
+	Route EntityType = "route"
 	// Plugin identifies a Plugin in Kong.
-	Plugin = "plugin"
+	Plugin EntityType = "plugin"
 
 	// Certificate identifies a Certificate in Kong.
-	Certificate = "certificate"
+	Certificate EntityType = "certificate"
 	// SNI identifies a SNI in Kong.
-	SNI = "sni"
+	SNI EntityType = "sni"
 	// CACertificate identifies a CACertificate in Kong.
-	CACertificate = "ca-certificate"
+	CACertificate EntityType = "ca-certificate"
 
 	// Upstream identifies a Upstream in Kong.
-	Upstream = "upstream"
+	Upstream EntityType = "upstream"
 	// Target identifies a Target in Kong.
-	Target = "target"
+	Target EntityType = "target"
 
 	// Consumer identifies a Consumer in Kong.
-	Consumer = "consumer"
+	Consumer EntityType = "consumer"
 	// ACLGroup identifies a ACLGroup in Kong.
-	ACLGroup = "acl-group"
+	ACLGroup EntityType = "acl-group"
 	// BasicAuth identifies a BasicAuth in Kong.
-	BasicAuth = "basic-auth"
+	BasicAuth EntityType = "basic-auth"
 	// HMACAuth identifies a HMACAuth in Kong.
-	HMACAuth = "hmac-auth"
+	HMACAuth EntityType = "hmac-auth"
 	// JWTAuth identifies a JWTAuth in Kong.
-	JWTAuth = "jwt-auth"
+	JWTAuth EntityType = "jwt-auth"
 	// MTLSAuth identifies a MTLSAuth in Kong.
-	MTLSAuth = "mtls-auth"
+	MTLSAuth EntityType = "mtls-auth"
 	// KeyAuth identifies aKeyAuth in Kong.
-	KeyAuth = "key-auth"
+	KeyAuth EntityType = "key-auth"
 	// OAuth2Cred identifies a OAuth2Cred in Kong.
-	OAuth2Cred = "oauth2-cred"
+	OAuth2Cred EntityType = "oauth2-cred"
 
 	// RBACRole identifies a RBACRole in Kong Enterprise.
-	RBACRole = "rbac-role"
+	RBACRole EntityType = "rbac-role"
 	// RBACEndpointPermission identifies a RBACEndpointPermission in Kong Enterprise.
-	RBACEndpointPermission = "rbac-endpoint-permission"
+	RBACEndpointPermission EntityType = "rbac-endpoint-permission"
 
 	// ServicePackage identifies a ServicePackage in Konnect.
-	ServicePackage = "service-package"
+	ServicePackage EntityType = "service-package"
 	// ServiceVersion identifies a ServiceVersion in Konnect.
-	ServiceVersion = "service-version"
+	ServiceVersion EntityType = "service-version"
 	// Document identifies a Document in Konnect.
-	Document = "document"
+	Document EntityType = "document"
 )
 
 // AllTypes represents all types defined in the
 // package.
-var AllTypes = []string{
+var AllTypes = []EntityType{
 	Service, Route, Plugin,
 
 	Certificate, SNI, CACertificate,
@@ -120,7 +123,11 @@ var AllTypes = []string{
 	ServicePackage, ServiceVersion, Document,
 }
 
-func NewEntity(t string, opts EntityOpts) (Entity, error) {
+func entityTypeToKind(t EntityType) crud.Kind {
+	return crud.Kind(t)
+}
+
+func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 	switch t {
 	case Service:
 		return entityImpl{
@@ -132,7 +139,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &serviceDiffer{
-				kind:         Service,
+				kind:         entityTypeToKind(Service),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -147,7 +154,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &routeDiffer{
-				kind:         Route,
+				kind:         entityTypeToKind(Route),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -162,7 +169,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &upstreamDiffer{
-				kind:         Upstream,
+				kind:         entityTypeToKind(Upstream),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -177,7 +184,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &targetDiffer{
-				kind:         Target,
+				kind:         entityTypeToKind(Target),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -192,7 +199,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &pluginDiffer{
-				kind:         Plugin,
+				kind:         entityTypeToKind(Plugin),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -207,7 +214,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &consumerDiffer{
-				kind:         Consumer,
+				kind:         entityTypeToKind(Consumer),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -222,7 +229,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &servicePackageDiffer{
-				kind:         ServicePackage,
+				kind:         entityTypeToKind(ServicePackage),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -237,7 +244,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &serviceVersionDiffer{
-				kind:         ServiceVersion,
+				kind:         entityTypeToKind(ServiceVersion),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -252,7 +259,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &documentDiffer{
-				kind:         Document,
+				kind:         entityTypeToKind(Document),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -267,7 +274,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &certificateDiffer{
-				kind:         Certificate,
+				kind:         entityTypeToKind(Certificate),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -282,7 +289,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &caCertificateDiffer{
-				kind:         CACertificate,
+				kind:         entityTypeToKind(CACertificate),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -297,7 +304,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &sniDiffer{
-				kind:         SNI,
+				kind:         entityTypeToKind(SNI),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -312,7 +319,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &rbacEndpointPermissionDiffer{
-				kind:         RBACEndpointPermission,
+				kind:         entityTypeToKind(RBACEndpointPermission),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -327,7 +334,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &rbacRoleDiffer{
-				kind:         RBACEndpointPermission,
+				kind:         entityTypeToKind(RBACRole),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -342,7 +349,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &aclGroupDiffer{
-				kind:         ACLGroup,
+				kind:         entityTypeToKind(ACLGroup),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -357,7 +364,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &basicAuthDiffer{
-				kind:         BasicAuth,
+				kind:         entityTypeToKind(BasicAuth),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -372,7 +379,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &keyAuthDiffer{
-				kind:         KeyAuth,
+				kind:         entityTypeToKind(KeyAuth),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -387,7 +394,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &hmacAuthDiffer{
-				kind:         HMACAuth,
+				kind:         entityTypeToKind(HMACAuth),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -402,7 +409,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &jwtAuthDiffer{
-				kind:         JWTAuth,
+				kind:         entityTypeToKind(JWTAuth),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -417,7 +424,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &mtlsAuthDiffer{
-				kind:         MTLSAuth,
+				kind:         entityTypeToKind(MTLSAuth),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
@@ -432,7 +439,7 @@ func NewEntity(t string, opts EntityOpts) (Entity, error) {
 				currentState: opts.CurrentState,
 			},
 			differ: &oauth2CredDiffer{
-				kind:         OAuth2Cred,
+				kind:         entityTypeToKind(OAuth2Cred),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
