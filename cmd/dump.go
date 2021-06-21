@@ -111,15 +111,13 @@ configure Kong.`,
 		// or Kong Enterprise single workspace
 		if dumpWorkspace != "" {
 			wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
-
-			exists, err := workspaceExists(ctx, wsConfig)
+			exists, err := workspaceExists(ctx, rootConfig, dumpWorkspace)
 			if err != nil {
 				return err
 			}
 			if !exists {
 				return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
 			}
-
 			wsClient, err = utils.GetKongClient(wsConfig)
 			if err != nil {
 				return err

@@ -68,7 +68,7 @@ By default, this command will ask for a confirmation prompt.`,
 			}
 		}
 		if resetWorkspace != "" {
-			exists, err := workspaceExists(ctx, rootConfig.ForWorkspace(resetWorkspace))
+			exists, err := workspaceExists(ctx, rootConfig, resetWorkspace)
 			if err != nil {
 				return err
 			}

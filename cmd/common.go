@@ -27,31 +27,28 @@ var (
 )
 
 // workspaceExists checks if workspace exists in Kong.
-func workspaceExists(ctx context.Context, config utils.KongClientConfig) (bool, error) {
-	if config.Workspace == "" {
+func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspaceName string) (bool, error) {
+	rootConfig := config.ForWorkspace("")
+	if workspaceName == "" {
 		// default workspace always exists
 		return true, nil
 	}
 
-	if config.SkipWorkspaceCrud {
+	if rootConfig.SkipWorkspaceCrud {
 		// if RBAC user, skip check
 		return true, nil
 	}
 
-	wsClient, err := utils.GetKongClient(config)
+	rootClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
 		return false, err
 	}
 
-	_, _, err = wsClient.Routes.List(ctx, nil)
-	switch {
-	case kong.IsNotFoundErr(err):
-		return false, nil
-	case err == nil:
-		return true, nil
-	default:
+	exists, err := rootClient.Workspaces.Exists(ctx, &workspaceName)
+	if err != nil {
 		return false, fmt.Errorf("checking if workspace exists: %w", err)
 	}
+	return exists, nil
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
@@ -69,14 +66,16 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	var wsConfig utils.KongClientConfig
+	var workspaceName string
 	// prepare to read the current state from Kong
 	if workspace != targetContent.Workspace && workspace != "" {
 		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
 			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
-		wsConfig = rootConfig.ForWorkspace(workspace)
+		workspaceName = workspace
 	} else {
-		wsConfig = rootConfig.ForWorkspace(targetContent.Workspace)
+		workspaceName = targetContent.Workspace
 	}
+	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
 	kongVersion, err := fetchKongVersion(ctx, wsConfig)
@@ -97,7 +96,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	_ = sendAnalytics(cmd, kongVersion)
 
-	workspaceExists, err := workspaceExists(ctx, wsConfig)
+	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 	if err != nil {
 		return err
 	}
