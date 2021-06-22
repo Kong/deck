@@ -12,7 +12,6 @@ import (
 
 func check(item string, t *string) string {
 	if t != nil || len(*t) > 0 {
-		fmt.Println(item + "[err] is not allowed to be specified.")
 		return item
 	}
 	return ""
@@ -94,7 +93,7 @@ func validate(content []byte) error {
 	}
 	if kongdefaults != nil {
 		if err := checkDefaults(*kongdefaults); err != nil {
-			return fmt.Errorf("fields are not allowed to specify in defaults")
+			return fmt.Errorf("default values are not allowed for these fields: %w", err)
 		}
 	}
 
