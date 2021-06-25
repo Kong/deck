@@ -23,6 +23,8 @@ const (
 	defaultClientTimeout = 10 * time.Second
 )
 
+var ClientTimeout  time.Duration
+
 // KongRawState contains all of Kong Data
 type KongRawState struct {
 	Services []*kong.Service
@@ -94,6 +96,8 @@ type KongClientConfig struct {
 	Headers []string
 
 	HTTPClient *http.Client
+
+	Timeout int
 }
 
 type KonnectConfig struct {
@@ -128,6 +132,11 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 			return nil, fmt.Errorf("failed to load TLSCACert")
 		}
 		tlsConfig.RootCAs = certPool
+	}
+	
+	ClientTimeout = defaultClientTimeout
+	if opt.Timeout > 0{
+		ClientTimeout =  time.Duration(opt.Timeout) * time.Second
 	}
 
 	c := opt.HTTPClient
@@ -204,12 +213,12 @@ func CleanAddress(address string) string {
 // sane default timeouts.
 func HTTPClient() *http.Client {
 	return &http.Client{
-		Timeout: defaultClientTimeout,
+		Timeout: ClientTimeout,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
-				Timeout: defaultClientTimeout,
+				Timeout: ClientTimeout,
 			}).DialContext,
-			TLSHandshakeTimeout: defaultClientTimeout,
+			TLSHandshakeTimeout: ClientTimeout,
 		},
 	}
 }
