@@ -213,7 +213,7 @@ func CleanAddress(address string) string {
 // sane default timeouts.
 func HTTPClient() *http.Client {
 	return &http.Client{
-		Timeout: ClientTimeout,
+		Timeout: clientTimeout,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
 				Timeout: ClientTimeout,
