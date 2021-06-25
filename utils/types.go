@@ -19,7 +19,7 @@ import (
 	"github.com/kong/go-kong/kong/custom"
 )
 
-var ClientTimeout time.Duration
+var clientTimeout time.Duration
 
 // KongRawState contains all of Kong Data
 type KongRawState struct {
@@ -130,7 +130,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		tlsConfig.RootCAs = certPool
 	}
 
-	ClientTimeout = time.Duration(opt.Timeout) * time.Second
+	clientTimeout = time.Duration(opt.Timeout) * time.Second
 	c := opt.HTTPClient
 	if c == nil {
 		c = HTTPClient()
@@ -205,12 +205,12 @@ func CleanAddress(address string) string {
 // sane default timeouts.
 func HTTPClient() *http.Client {
 	return &http.Client{
-		Timeout: ClientTimeout,
+		Timeout: clientTimeout,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
-				Timeout: ClientTimeout,
+				Timeout: clientTimeout,
 			}).DialContext,
-			TLSHandshakeTimeout: ClientTimeout,
+			TLSHandshakeTimeout: clientTimeout,
 		},
 	}
 }
