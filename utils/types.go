@@ -134,7 +134,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		tlsConfig.RootCAs = certPool
 	}
 	
-	ClientTimeout = defaultClientTimeout
+	clientTimeout = defaultClientTimeout
 	if opt.Timeout > 0{
 		ClientTimeout =  time.Duration(opt.Timeout) * time.Second
 	}
