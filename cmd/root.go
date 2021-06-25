@@ -141,7 +141,7 @@ func init() {
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
-	rootCmd.PersistentFlags().Int("timeout", 0,
+	rootCmd.PersistentFlags().Int("timeout", 10,
 		"set requests timeout client to connect with kong, value in seconds.")
 	viper.BindPFlag("timeout",
 		rootCmd.PersistentFlags().Lookup("timeout"))
