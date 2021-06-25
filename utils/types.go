@@ -218,7 +218,7 @@ func HTTPClient() *http.Client {
 			DialContext: (&net.Dialer{
 				Timeout: ClientTimeout,
 			}).DialContext,
-			TLSHandshakeTimeout: ClientTimeout,
+			TLSHandshakeTimeout: clientTimeout,
 		},
 	}
 }
