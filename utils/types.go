@@ -23,7 +23,7 @@ const (
 	defaultClientTimeout = 10 * time.Second
 )
 
-var ClientTimeout  time.Duration
+var clientTimeout  time.Duration
 
 // KongRawState contains all of Kong Data
 type KongRawState struct {
