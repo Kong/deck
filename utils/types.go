@@ -136,7 +136,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	
 	clientTimeout = defaultClientTimeout
 	if opt.Timeout > 0{
-		ClientTimeout =  time.Duration(opt.Timeout) * time.Second
+		clientTimeout =  time.Duration(opt.Timeout) * time.Second
 	}
 
 	c := opt.HTTPClient
