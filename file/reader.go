@@ -36,13 +36,6 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
-
-	d, err := utils.GetKongDefaulter()
-	if err != nil {
-		return nil, nil, fmt.Errorf("creating defaulter: %w", err)
-	}
-	builder.defaulter = d
 
 	kongState, konnectState, err := builder.build()
 	if err != nil {
@@ -58,13 +51,6 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
-
-	d, err := utils.GetKongDefaulter()
-	if err != nil {
-		return nil, fmt.Errorf("creating defaulter: %w", err)
-	}
-	builder.defaulter = d
 
 	state, _, err := builder.build()
 	if err != nil {

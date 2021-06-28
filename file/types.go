@@ -501,28 +501,45 @@ type FRBACRole struct {
 	EndpointPermissions []*FRBACEndpointPermission `json:"endpoint_permissions,omitempty" yaml:"endpoint_permissions,omitempty"` //nolint
 }
 
+// FRBACEndpointPermission is a wrapper type for RBACEndpointPermission.
 // +k8s:deepcopy-gen=true
 type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
 }
 
+// KongDefaults represents default values that are filled in
+// for entities with corresponding missing properties.
+// +k8s:deepcopy-gen=true
+type KongDefaults struct {
+	Service  *kong.Service  `json:"service,omitempty" yaml:"service,omitempty"`
+	Route    *kong.Route    `json:"route,omitempty" yaml:"route,omitempty"`
+	Upstream *kong.Upstream `json:"upstream,omitempty" yaml:"upstream,omitempty"`
+	Target   *kong.Target   `json:"target,omitempty" yaml:"target,omitempty"`
+}
+
 // Info contains meta-data of the file.
 // +k8s:deepcopy-gen=true
 type Info struct {
-	SelectorTags []string `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	SelectorTags []string     `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
+// Kong represents Kong implementation of a Service in Konnect.
 // +k8s:deepcopy-gen=true
 type Kong struct {
 	Service *FService `json:"service,omitempty" yaml:"service,omitempty"`
 }
 
+// Implementation represents an implementation of a Service version in Konnect.
 // +k8s:deepcopy-gen=true
 type Implementation struct {
 	Type string `json:"type,omitempty" yaml:"type,omitempty"`
 	Kong *Kong  `json:"kong,omitempty" yaml:"kong,omitempty"`
 }
 
+// FServiceVersion represents a Service version in Konnect.
+// The type is duplicated because only a single document is
+// exported in file while the API allows for multiple documents.
 // +k8s:deepcopy-gen=true
 type FServiceVersion struct {
 	ID             *string         `json:"id,omitempty" yaml:"id,omitempty"`
@@ -531,6 +548,7 @@ type FServiceVersion struct {
 	Document       *FDocument      `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
+// FServicePackage represents a Service package and its associated entities.
 // +k8s:deepcopy-gen=true
 type FServicePackage struct {
 	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`
@@ -540,6 +558,10 @@ type FServicePackage struct {
 	Document    *FDocument        `json:"document,omitempty" yaml:"document,omitempty"`
 }
 
+// FDocument represents a document in Konnect.
+// The type has been duplicated because the documents are altered
+// before they are exported to the state file
+// for better user experience.
 // +k8s:deepcopy-gen=true
 type FDocument struct {
 	ID        *string `json:"id,omitempty" yaml:"id,omitempty"`

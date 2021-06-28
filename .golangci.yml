@@ -1,18 +1,18 @@
 linters:
   enable:
   - asciicheck
-  - bodyclose
   - depguard
   - dogsled
   - durationcheck
   - exhaustive
   - exportloopref
   - gci
+  - goconst
   - gofmt
   - gofumpt
   - goimports
-  - golint
   - gomnd
+  - gomodguard
   - gosec
   - govet
   - importas
@@ -23,15 +23,13 @@ linters:
   - nilerr
   - nolintlint
   - predeclared
+  - revive
   - stylecheck
   - unconvert
   - unparam
   - wastedassign
 issues:
   exclude-rules:
-  - linters:
-    - staticcheck
-    text: "SA1012" # do not pass a nil Context
   - linters:
     - gosec
     text:  "weak cryptographic primitive"

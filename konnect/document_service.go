@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type DocumentService service
@@ -19,7 +20,7 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 	}
 
 	endpoint := doc.Parent.URL() + "/documents/"
-	method := "POST"
+	method := http.MethodPost
 	if doc.ID != nil {
 		method = "PUT"
 		endpoint = endpoint + *doc.ID

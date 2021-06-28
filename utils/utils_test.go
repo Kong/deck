@@ -3,7 +3,6 @@ package utils
 import (
 	"net/url"
 	"os"
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,15 +16,6 @@ func TestEmpty(t *testing.T) {
 	assert.False(Empty(&notEmpty))
 	assert.True(Empty(nilPointer))
 	assert.True(Empty(&emptyString))
-}
-
-func TestUUID(t *testing.T) {
-	assert := assert.New(t)
-	uuid := UUID()
-	assert.NotEmpty(uuid)
-	assert.Regexp(regexp.MustCompile(
-		"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"),
-		uuid)
 }
 
 func Test_cleanKongVersion(t *testing.T) {

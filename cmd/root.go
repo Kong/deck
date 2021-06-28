@@ -140,6 +140,11 @@ func init() {
 		"share anonymized data to help improve decK")
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
+
+	rootCmd.PersistentFlags().Int("timeout", 10,
+		"set requests timeout client to connect with kong, value in seconds.")
+	viper.BindPFlag("timeout",
+		rootCmd.PersistentFlags().Lookup("timeout"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -177,6 +182,7 @@ func initConfig() {
 	rootConfig.Headers = viper.GetStringSlice("headers")
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
+	rootConfig.Timeout = (viper.GetInt("timeout"))
 
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 

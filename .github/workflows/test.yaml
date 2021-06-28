@@ -15,13 +15,13 @@ jobs:
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
         with:
-          version: v1.39.0
+          version: v1.40.1
       - name: Verify Codegen
         run: make verify-codegen
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v1.5.0
+        uses: codecov/codecov-action@v1.5.2
         with:
           name: codecov-deck
           fail_ci_if_error: true

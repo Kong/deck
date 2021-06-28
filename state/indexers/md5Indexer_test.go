@@ -28,10 +28,10 @@ func TestMD5FieldsIndexer(t *testing.T) {
 	ok, val, err := in.FromObject(b)
 	assert.True(ok)
 	assert.Nil(err)
-	sum := md5.Sum([]byte("yolooloy"))
+	sum := md5.Sum([]byte(s1 + s2))
 	assert.Equal(sum[:], val)
 
-	val, err = in.FromArgs("yolo", "oloy")
+	val, err = in.FromArgs(s1, s2)
 	assert.Nil(err)
 	assert.Equal(sum[:], val)
 

@@ -1,6 +1,7 @@
 package crud
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -57,13 +58,13 @@ func (r *Registry) Get(kind Kind) (Actions, error) {
 
 // Create calls the registered create action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Create(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Create(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, fmt.Errorf("create failed: %w", err)
 	}
 
-	res, err := a.Create(args...)
+	res, err := a.Create(ctx, args...)
 	if err != nil {
 		return nil, fmt.Errorf("create failed: %w", err)
 	}
@@ -72,13 +73,13 @@ func (r *Registry) Create(kind Kind, args ...Arg) (Arg, error) {
 
 // Update calls the registered update action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Update(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Update(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, fmt.Errorf("update failed: %w", err)
 	}
 
-	res, err := a.Update(args...)
+	res, err := a.Update(ctx, args...)
 	if err != nil {
 		return nil, fmt.Errorf("update failed: %w", err)
 	}
@@ -87,13 +88,13 @@ func (r *Registry) Update(kind Kind, args ...Arg) (Arg, error) {
 
 // Delete calls the registered delete action of kind with args
 // and returns the result and error (if any).
-func (r *Registry) Delete(kind Kind, args ...Arg) (Arg, error) {
+func (r *Registry) Delete(ctx context.Context, kind Kind, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, fmt.Errorf("delete failed: %w", err)
 	}
 
-	res, err := a.Delete(args...)
+	res, err := a.Delete(ctx, args...)
 	if err != nil {
 		return nil, fmt.Errorf("delete failed: %w", err)
 	}
@@ -101,7 +102,7 @@ func (r *Registry) Delete(kind Kind, args ...Arg) (Arg, error) {
 }
 
 // Do calls an aciton based on op with args and returns the result and error.
-func (r *Registry) Do(kind Kind, op Op, args ...Arg) (Arg, error) {
+func (r *Registry) Do(ctx context.Context, kind Kind, op Op, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {
 		return nil, fmt.Errorf("%v failed: %w", op, err)
@@ -111,11 +112,11 @@ func (r *Registry) Do(kind Kind, op Op, args ...Arg) (Arg, error) {
 
 	switch op.name {
 	case Create.name:
-		res, err = a.Create(args...)
+		res, err = a.Create(ctx, args...)
 	case Update.name:
-		res, err = a.Update(args...)
+		res, err = a.Update(ctx, args...)
 	case Delete.name:
-		res, err = a.Delete(args...)
+		res, err = a.Delete(ctx, args...)
 	default:
 		return nil, fmt.Errorf("unknown operation: %s", op.name)
 	}

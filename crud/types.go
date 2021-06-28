@@ -1,5 +1,7 @@
 package crud
 
+import "context"
+
 // Op represents
 type Op struct {
 	name string
@@ -23,7 +25,27 @@ type Arg interface{}
 
 // Actions is an interface for CRUD operations on any entity
 type Actions interface {
-	Create(...Arg) (Arg, error)
-	Delete(...Arg) (Arg, error)
-	Update(...Arg) (Arg, error)
+	Create(context.Context, ...Arg) (Arg, error)
+	Delete(context.Context, ...Arg) (Arg, error)
+	Update(context.Context, ...Arg) (Arg, error)
+}
+
+// Event represents an event to perform
+// an imperative operation
+// that gets Kong closer to the target state.
+type Event struct {
+	Op     Op
+	Kind   Kind
+	Obj    interface{}
+	OldObj interface{}
+}
+
+// EventFromArg converts arg into Event.
+// It panics if the type of arg is not Event.
+func EventFromArg(arg Arg) Event {
+	event, ok := arg.(Event)
+	if !ok {
+		panic("unexpected type, expected diff.Event")
+	}
+	return event
 }

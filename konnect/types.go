@@ -18,6 +18,7 @@ func BaseURL() string {
 	return baseURL
 }
 
+// ServicePackage represents a Service Package in Konnect.
 // +k8s:deepcopy-gen=true
 type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
@@ -35,6 +36,7 @@ func (p *ServicePackage) Key() string {
 	return "ServicePackage" + ":" + *p.ID
 }
 
+// ServiceVersion represents a Service Version in Konnect.
 // +k8s:deepcopy-gen=true
 type ServiceVersion struct {
 	ID      *string `json:"id,omitempty"`
@@ -103,6 +105,7 @@ func (d *Document) ShallowCopy() *Document {
 	return out
 }
 
+// ControlPlaneServiceRelation represents relationship between Control plane implementation and a Service version.
 // +k8s:deepcopy-gen=true
 type ControlPlaneServiceRelation struct {
 	ID                   *string       `json:"id,omitempty"`
@@ -110,17 +113,20 @@ type ControlPlaneServiceRelation struct {
 	ControlPlane         *ControlPlane `json:"control_plane,omitempty"`
 }
 
+// ControlPlane identifies a specific control plane in Konnect.
 // +k8s:deepcopy-gen=true
 type ControlPlane struct {
 	ID   *string           `json:"id"`
 	Type *ControlPlaneType `json:"type"`
 }
 
+// ControlPlaneType represents control plane associated information.
 // +k8s:deepcopy-gen=true
 type ControlPlaneType struct {
 	Name *string `json:"name"`
 }
 
+// AuthResponse is authentication response wrapper for login.
 type AuthResponse struct {
 	Organization   string `json:"org_name"`
 	FirstName      string `json:"first_name"`
