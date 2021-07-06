@@ -36,6 +36,7 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
+	builder.kongVersion = opt.KongVersion
 
 	kongState, konnectState, err := builder.build()
 	if err != nil {
@@ -51,6 +52,7 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
+	builder.kongVersion = opt.KongVersion
 
 	state, _, err := builder.build()
 	if err != nil {
