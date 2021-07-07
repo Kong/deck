@@ -405,6 +405,7 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 }
 
 func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
+	kong230Version := semver.MustParse("2.3.0")
 	for _, cred := range creds {
 		cred := cred
 		// normally, we'd want to look up existing resources in this case
@@ -412,11 +413,9 @@ func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
 		// so we don't--schema validation requires the ID
 		// there's nothing more to do here
 
-		// TODO: this is stub code, since mtls-auth doesn't actually have tag support yet
-		// They probably should, FTI-1706 tracks that request with the Kong Enterprise team
-		//if b.kongVersion.GTE(kong220Version) {
-		//	utils.MustMergeTags(&cred, b.selectTags)
-		//}
+		if b.kongVersion.GTE(kong230Version) {
+			utils.MustMergeTags(&cred, b.selectTags)
+		}
 		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
 	}
 }
