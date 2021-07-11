@@ -125,7 +125,16 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	})
 
 	group.Go(func() error {
-		mtlsAuths, err := GetAllMTLSAuths(ctx, client, config.SelectorTags)
+		// XXX Select-tags based filtering is not performed for mTLS-auth credentials
+		// because of the following problems:
+		// - We currently do not already tag these credentials, filtering these
+		// credentials with tags will break any existing user
+		// - this is not a big issue since only mTLS-auth credentials for tagged
+		// consumers are exported anyway
+		// This feature would only benefit a user who uses tagged consumers but
+		// then managed mtls-auth credentials out-of-band. We expect such users
+		// to be rare or non-existent.
+		mtlsAuths, err := GetAllMTLSAuths(ctx, client, nil)
 		if err != nil {
 			return fmt.Errorf("mtls-auths: %w", err)
 		}
