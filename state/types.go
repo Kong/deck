@@ -1,7 +1,6 @@
 package state
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 
@@ -70,18 +69,10 @@ type Service struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (s1 *Service) Identifier() string {
-	if s1.Name != nil {
-		return *s1.Name
-	}
-	return *s1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (s1 *Service) Console() string {
-	return s1.Identifier()
+	return s1.FriendlyName()
 }
 
 // Equal returns true if s1 and s2 are equal.
@@ -123,18 +114,10 @@ type Route struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (r1 *Route) Identifier() string {
-	if r1.Name != nil {
-		return *r1.Name
-	}
-	return *r1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *Route) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -179,18 +162,10 @@ type Upstream struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (u1 *Upstream) Identifier() string {
-	if u1.Name != nil {
-		return *u1.Name
-	}
-	return *u1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (u1 *Upstream) Console() string {
-	return u1.Identifier()
+	return u1.FriendlyName()
 }
 
 // Equal returns true if u1 and u2 are equal.
@@ -227,25 +202,12 @@ type Target struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (t1 *Target) Identifier() string {
-	if t1.Target.Target != nil {
-		return *t1.Target.Target
-	}
-	return *t1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (t1 *Target) Console() string {
-	res := t1.Identifier()
+	res := t1.FriendlyName()
 	if t1.Upstream != nil {
-		if t1.Upstream.ID != nil {
-			res = res + " for upstream " + *t1.Upstream.ID
-		}
-		if t1.Upstream.Name != nil {
-			res = res + " for upstream " + *t1.Upstream.Name
-		}
+		res = res + " for upstream " + t1.Upstream.FriendlyName()
 	}
 	return res
 }
@@ -290,18 +252,10 @@ type Certificate struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (c1 *Certificate) Identifier() string {
-	if c1.ID != nil {
-		return *c1.ID
-	}
-	return *c1.Cert
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *Certificate) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -344,18 +298,10 @@ func (s1 *SNI) Equal(s2 *SNI) bool {
 	return s1.EqualWithOpts(s2, false, false, false)
 }
 
-// Identifier returns the endpoint key name or ID.
-func (s1 *SNI) Identifier() string {
-	if s1.Name != nil {
-		return *s1.Name
-	}
-	return *s1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (s1 *SNI) Console() string {
-	return s1.Identifier()
+	return s1.FriendlyName()
 }
 
 // EqualWithOpts returns true if s1 and s2 are equal.
@@ -391,14 +337,6 @@ type Plugin struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (p1 *Plugin) Identifier() string {
-	if p1.Name != nil {
-		return *p1.Name
-	}
-	return *p1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (p1 *Plugin) Console() string {
@@ -409,13 +347,13 @@ func (p1 *Plugin) Console() string {
 	}
 	associations := []string{}
 	if p1.Service != nil {
-		associations = append(associations, "service "+*p1.Service.ID)
+		associations = append(associations, "service "+p1.Service.FriendlyName())
 	}
 	if p1.Route != nil {
-		associations = append(associations, "route "+*p1.Route.ID)
+		associations = append(associations, "route "+p1.Route.FriendlyName())
 	}
 	if p1.Consumer != nil {
-		associations = append(associations, "consumer "+*p1.Consumer.ID)
+		associations = append(associations, "consumer "+p1.Consumer.FriendlyName())
 	}
 	if len(associations) > 0 {
 		res += "for "
@@ -472,18 +410,10 @@ type Consumer struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (c1 *Consumer) Identifier() string {
-	if c1.Username != nil {
-		return *c1.Username
-	}
-	return *c1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *Consumer) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -515,11 +445,9 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 
 func forConsumerString(c *kong.Consumer) string {
 	if c != nil {
-		if c.Username != nil {
-			return " for consumer " + *c.Username
-		}
-		if c.ID != nil {
-			return " for consumer " + *c.ID
+		friendlyName := c.FriendlyName()
+		if friendlyName != "" {
+			return " for consumer " + friendlyName
 		}
 	}
 	return ""
@@ -875,18 +803,10 @@ type CACertificate struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (c1 *CACertificate) Identifier() string {
-	if c1.ID != nil {
-		return *c1.ID
-	}
-	return *c1.Cert
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *CACertificate) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -1038,18 +958,10 @@ type RBACRole struct {
 	Meta
 }
 
-// Identifier returns the endpoint key name or ID.
-func (r1 *RBACRole) Identifier() string {
-	if r1.Name != nil {
-		return *r1.Name
-	}
-	return *r1.ID
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *RBACRole) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -1086,18 +998,10 @@ type RBACEndpointPermission struct {
 	Meta
 }
 
-// Identifier returns a composite ID base on Role ID, workspace, and endpoint
-func (r1 *RBACEndpointPermission) Identifier() string {
-	if r1.Endpoint != nil {
-		return fmt.Sprintf("%s-%s-%s", *r1.Role.ID, *r1.Workspace, *r1.Endpoint)
-	}
-	return *r1.Endpoint
-}
-
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *RBACEndpointPermission) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.
