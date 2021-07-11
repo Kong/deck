@@ -104,7 +104,7 @@ func (d *consumerDiffer) deleteConsumer(consumer *state.Consumer) (*crud.Event, 
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up consumer %q: %w",
-			consumer.Identifier(), err)
+			consumer.FriendlyName(), err)
 	}
 	return nil, nil
 }
@@ -144,7 +144,7 @@ func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.E
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up consumer %q: %w",
-			consumer.Identifier(), err)
+			consumer.FriendlyName(), err)
 	}
 
 	// found, check if update needed
