@@ -106,7 +106,7 @@ type rbacEndpointPermissionDiffer struct {
 func (d *rbacEndpointPermissionDiffer) deleteRBACEndpointPermission(ep *state.RBACEndpointPermission) (
 	*crud.Event, error,
 ) {
-	_, err := d.targetState.RBACEndpointPermissions.Get(ep.Identifier())
+	_, err := d.targetState.RBACEndpointPermissions.Get(ep.FriendlyName())
 	if err == state.ErrNotFound {
 		return &crud.Event{
 			Op:   crud.Delete,
@@ -146,7 +146,7 @@ func (d *rbacEndpointPermissionDiffer) createUpdateRBACEndpointPermission(ep *st
 	*crud.Event, error,
 ) {
 	epCopy := &state.RBACEndpointPermission{RBACEndpointPermission: *ep.DeepCopy()}
-	currentEp, err := d.currentState.RBACEndpointPermissions.Get(ep.Identifier())
+	currentEp, err := d.currentState.RBACEndpointPermissions.Get(ep.FriendlyName())
 
 	if err == state.ErrNotFound {
 		return &crud.Event{
@@ -157,7 +157,7 @@ func (d *rbacEndpointPermissionDiffer) createUpdateRBACEndpointPermission(ep *st
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up rbac endpoint permission %q: %w",
-			ep.Identifier(), err)
+			ep.FriendlyName(), err)
 	}
 
 	// found, check if update needed

@@ -99,7 +99,7 @@ func TestRBACEndpointPermissionsCollection_Get(t *testing.T) {
 		{
 			name: "gets a rbacEndpointPermission by ID",
 			args: args{
-				nameOrID: rbacEndpointPermission1.Identifier(),
+				nameOrID: rbacEndpointPermission1.FriendlyName(),
 			},
 			want:    &rbacEndpointPermission1,
 			wantErr: false,
@@ -107,7 +107,7 @@ func TestRBACEndpointPermissionsCollection_Get(t *testing.T) {
 		{
 			name: "gets a rbacEndpointPermission by Name",
 			args: args{
-				nameOrID: rbacEndpointPermission2.Identifier(),
+				nameOrID: rbacEndpointPermission2.FriendlyName(),
 			},
 			want:    &rbacEndpointPermission2,
 			wantErr: false,
@@ -215,7 +215,7 @@ func TestRBACEndpointPermissionsCollection_Update(t *testing.T) {
 				t.Errorf("RBACEndpointPermissionsCollection.Update() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr {
-				got, _ := k.Get(tt.updatedRBACEndpointPermission.Identifier())
+				got, _ := k.Get(tt.updatedRBACEndpointPermission.FriendlyName())
 
 				if !reflect.DeepEqual(got, tt.updatedRBACEndpointPermission) {
 					t.Errorf("update rbacEndpointPermission, got = %#v, want %#v", got, tt.updatedRBACEndpointPermission)
@@ -239,14 +239,14 @@ func TestRBACEndpointPermissionDelete(t *testing.T) {
 	err := collection.Add(rbacEndpointPermission)
 	assert.Nil(err)
 
-	re, err := collection.Get(rbacEndpointPermission.Identifier())
+	re, err := collection.Get(rbacEndpointPermission.FriendlyName())
 	assert.Nil(err)
 	assert.NotNil(re)
 
-	err = collection.Delete(re.Identifier())
+	err = collection.Delete(re.FriendlyName())
 	assert.Nil(err)
 
-	err = collection.Delete(re.Identifier())
+	err = collection.Delete(re.FriendlyName())
 	assert.NotNil(err)
 }
 

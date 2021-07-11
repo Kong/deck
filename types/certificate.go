@@ -105,7 +105,7 @@ func (d *certificateDiffer) deleteCertificate(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up certificate %q': %w",
-			certificate.Identifier(), err)
+			certificate.FriendlyName(), err)
 	}
 	return nil, nil
 }
@@ -147,7 +147,7 @@ func (d *certificateDiffer) createUpdateCertificate(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up certificate %q: %w",
-			certificate.Identifier(), err)
+			certificate.FriendlyName(), err)
 	}
 
 	// found, check if update needed
@@ -163,7 +163,7 @@ func (d *certificateDiffer) createUpdateCertificate(
 		currentSNIs, err := d.currentState.SNIs.GetAllByCertID(*currentCertificate.ID)
 		if err != nil {
 			return nil, fmt.Errorf("error looking up current certificate SNIs %q: %w",
-				certificate.Identifier(), err)
+				certificate.FriendlyName(), err)
 		}
 		sniNames := make([]*string, 0)
 		for _, s := range currentSNIs {

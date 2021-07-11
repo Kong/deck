@@ -63,7 +63,7 @@ func (k *RBACEndpointPermissionsCollection) Add(rbacEndpointPermission RBACEndpo
 	defer txn.Abort()
 
 	var searchBy []string
-	searchBy = append(searchBy, rbacEndpointPermission.Identifier())
+	searchBy = append(searchBy, rbacEndpointPermission.FriendlyName())
 
 	_, err := getRBACEndpointPermission(txn, searchBy...)
 	if err == nil {
@@ -71,7 +71,7 @@ func (k *RBACEndpointPermissionsCollection) Add(rbacEndpointPermission RBACEndpo
 	} else if err != ErrNotFound {
 		return err
 	}
-	rbacEndpointPermission.ID = rbacEndpointPermission.Identifier()
+	rbacEndpointPermission.ID = rbacEndpointPermission.FriendlyName()
 	err = txn.Insert(rbacEndpointPermissionTableName, &rbacEndpointPermission)
 	if err != nil {
 		return err
@@ -119,12 +119,12 @@ func (k *RBACEndpointPermissionsCollection) Update(rbacEndpointPermission RBACEn
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteRBACEndpointPermission(txn, rbacEndpointPermission.Identifier())
+	err := deleteRBACEndpointPermission(txn, rbacEndpointPermission.FriendlyName())
 	if err != nil {
 		return err
 	}
 
-	rbacEndpointPermission.ID = rbacEndpointPermission.Identifier()
+	rbacEndpointPermission.ID = rbacEndpointPermission.FriendlyName()
 	err = txn.Insert(rbacEndpointPermissionTableName, &rbacEndpointPermission)
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func deleteRBACEndpointPermission(txn *memdb.Txn, nameOrID string) error {
 	if err != nil {
 		return err
 	}
-	rbacEndpointPermission.ID = rbacEndpointPermission.Identifier()
+	rbacEndpointPermission.ID = rbacEndpointPermission.FriendlyName()
 	err = txn.Delete(rbacEndpointPermissionTableName, rbacEndpointPermission)
 	if err != nil {
 		return err
