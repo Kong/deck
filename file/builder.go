@@ -286,18 +286,6 @@ func (r *FRoute) asKongRoute() *kong.Route {
 	return &kong.Route{ID: kong.String(*r.ID), Name: kong.String(*r.Name)}
 }
 
-func asKongConsumer(c *state.Consumer) *kong.Consumer {
-	return &kong.Consumer{ID: kong.String(*c.ID), Username: kong.String(*c.Username)}
-}
-
-func asKongService(s *state.Service) *kong.Service {
-	return &kong.Service{ID: kong.String(*s.ID), Name: kong.String(*s.Name)}
-}
-
-func asKongRoute(s *state.Route) *kong.Route {
-	return &kong.Route{ID: kong.String(*s.ID), Name: kong.String(*s.Name)}
-}
-
 func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 	for _, cred := range creds {
 		cred := cred
@@ -723,40 +711,40 @@ func (b *stateBuilder) plugins() {
 			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
-					*p.Consumer.ID, *p.Name, err)
+					p.Consumer.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Consumer = asKongConsumer(c)
+			p.Consumer = c.AsKongConsumer()
 		}
 		if p.Service != nil && !utils.Empty(p.Service.ID) {
 			s, err := b.intermediate.Services.Get(*p.Service.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("service %v for plugin %v: %w",
-					*p.Service.ID, *p.Name, err)
+					p.Service.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Service = asKongService(s)
+			p.Service = s.AsKongService()
 		}
 		if p.Route != nil && !utils.Empty(p.Route.ID) {
 			r, err := b.intermediate.Routes.Get(*p.Route.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("route %v for plugin %v: %w",
-					*p.Route.ID, *p.Name, err)
+					p.Route.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Route = asKongRoute(r)
+			p.Route = r.AsKongRoute()
 		}
 		plugins = append(plugins, p)
 	}

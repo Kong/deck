@@ -1055,3 +1055,15 @@ func (b1 *MTLSAuth) GetConsumer() string {
 	}
 	return *b1.Consumer.ID
 }
+
+func (c1 *Consumer) AsKongConsumer() *kong.Consumer {
+	return &kong.Consumer{ID: kong.String(*c1.ID), Username: kong.String(*c1.Username)}
+}
+
+func (s1 *Service) AsKongService() *kong.Service {
+	return &kong.Service{ID: kong.String(*s1.ID), Name: kong.String(*s1.Name)}
+}
+
+func (r1 *Route) AsKongRoute() *kong.Route {
+	return &kong.Route{ID: kong.String(*r1.ID), Name: kong.String(*r1.Name)}
+}
