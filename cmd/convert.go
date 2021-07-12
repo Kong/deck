@@ -48,10 +48,12 @@ can be converted into 'konnect' configuration file.`,
 }
 
 func init() {
+	sourceFormats := []convert.Format{convert.FormatKongGateway}
+	destinationFormats := []convert.Format{convert.FormatKonnect}
 	convertCmd.Flags().StringVar(&convertCmdSourceFormat, "from", "",
-		fmt.Sprintf("format of the source file, allowed formats:%v", convert.AllFormats))
+		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
-		fmt.Sprintf("desired format of the output, allowed formats:%v", convert.AllFormats))
+		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
 	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
 		"file containing configuration that needs to be converted. Use '-' to read from stdin.")
 	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "",
