@@ -9,7 +9,7 @@ require (
 	github.com/fatih/color v1.12.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-querystring v1.1.0
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
