@@ -593,6 +593,8 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 			if err != nil {
 				return nil, err
 			}
+
+			diffString = maskEnvVarValue(diffString)
 			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
 			cprint.DeletePrintln("deleting", e.Kind, c.Console())
