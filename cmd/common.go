@@ -52,7 +52,7 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string) error {
+	delay int, workspace string, noMaskValues bool) error {
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -149,7 +149,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient)
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient, noMaskValues)
 	if err != nil {
 		return err
 	}
@@ -174,7 +174,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
-	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
+	dry bool, parallelism int, delay int, client *kong.Client, noMaskValues bool) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
@@ -185,7 +185,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		return 0, err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs := s.Solve(ctx, parallelism, dry, noMaskValues)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

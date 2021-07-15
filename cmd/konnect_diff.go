@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	konnectDiffCmdKongStateFile   []string
-	konnectDiffCmdParallelism     int
-	konnectDiffCmdNonZeroExitCode bool
+	konnectDiffCmdKongStateFile          []string
+	konnectDiffCmdParallelism            int
+	konnectDiffCmdNoMaskDeckEnvVarsValue bool
+	konnectDiffCmdNonZeroExitCode        bool
 )
 
 // konnectDiffCmd represents the 'deck konnect diff' command.
@@ -28,7 +29,7 @@ that will be created or updated or deleted.` + konnectAlphaState,
 		}
 		_ = sendAnalytics("konnect-diff", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
-			konnectDiffCmdParallelism)
+			konnectDiffCmdParallelism, konnectDiffCmdNoMaskDeckEnvVarsValue)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return preRunSilenceEventsFlag()
@@ -45,6 +46,8 @@ func init() {
 			"with consumers")
 	konnectDiffCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations")
+	konnectDiffCmd.Flags().BoolVar(&konnectDiffCmdNoMaskDeckEnvVarsValue, "no-mask-deck-env-vars-value",
+		false, "do not mask DECK_ environment variable values at diff output")
 	konnectDiffCmd.Flags().BoolVar(&konnectDiffCmdNonZeroExitCode, "non-zero-exit-code",
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+

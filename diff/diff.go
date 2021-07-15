@@ -558,7 +558,7 @@ type Stats struct {
 }
 
 // Generete Diff output for 'sync' and 'diff' commands
-func generateDiffString(e crud.Event, isDelete bool) (string, error) {
+func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string, error) {
 	var diffString string
 	var err error
 	if oldObj, ok := e.OldObj.(*state.Document); ok {
@@ -577,12 +577,14 @@ func generateDiffString(e crud.Event, isDelete bool) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	diffString = maskEnvVarValue(diffString)
+	if !noMaskValues {
+		diffString = maskEnvVarValue(diffString)
+	}
 	return diffString, err
 }
 
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, noMaskValues bool) (Stats, []error) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -606,19 +608,19 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			diffString, err := generateDiffString(e, false)
+			diffString, err := generateDiffString(e, false, noMaskValues)
 			if err != nil {
 				return nil, err
 			}
 			cprint.CreatePrintln("creating", e.Kind, c.Console(), diffString)
 		case crud.Update:
-			diffString, err := generateDiffString(e, false)
+			diffString, err := generateDiffString(e, false, noMaskValues)
 			if err != nil {
 				return nil, err
 			}
 			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			diffString, err := generateDiffString(e, true)
+			diffString, err := generateDiffString(e, true, noMaskValues)
 			if err != nil {
 				return nil, err
 			}
