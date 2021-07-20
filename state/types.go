@@ -152,6 +152,13 @@ func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID,
 		r1Copy.Service = nil
 		r2Copy.Service = nil
 	}
+
+	if r1Copy.Service != nil {
+		r1Copy.Service.Name = nil
+	}
+	if r2Copy.Service != nil {
+		r2Copy.Service.Name = nil
+	}
 	return reflect.DeepEqual(r1Copy, r2Copy)
 }
 
@@ -400,6 +407,25 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 		p2Copy.Route = nil
 		p2Copy.Consumer = nil
 	}
+
+	if p1Copy.Service != nil {
+		p1Copy.Service.Name = nil
+	}
+	if p2Copy.Service != nil {
+		p2Copy.Service.Name = nil
+	}
+	if p1Copy.Route != nil {
+		p1Copy.Route.Name = nil
+	}
+	if p2Copy.Route != nil {
+		p2Copy.Route.Name = nil
+	}
+	if p1Copy.Consumer != nil {
+		p1Copy.Consumer.Username = nil
+	}
+	if p2Copy.Consumer != nil {
+		p2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(p1Copy, p2Copy)
 }
 
@@ -504,6 +530,12 @@ func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
 		k1Copy.Consumer = nil
 		k2Copy.Consumer = nil
 	}
+	if k1Copy.Consumer != nil {
+		k1Copy.Consumer.Username = nil
+	}
+	if k2Copy.Consumer != nil {
+		k2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
 
@@ -575,6 +607,12 @@ func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
 		h1Copy.Consumer = nil
 		h2Copy.Consumer = nil
 	}
+	if h1Copy.Consumer != nil {
+		h1Copy.Consumer.Username = nil
+	}
+	if h2Copy.Consumer != nil {
+		h2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(h1Copy, h2Copy)
 }
 
@@ -645,6 +683,12 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 	if ignoreForeign {
 		j1Copy.Consumer = nil
 		j2Copy.Consumer = nil
+	}
+	if j1Copy.Consumer != nil {
+		j1Copy.Consumer.Username = nil
+	}
+	if j2Copy.Consumer != nil {
+		j2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(j1Copy, j2Copy)
 }
@@ -721,6 +765,12 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
 	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
@@ -791,6 +841,12 @@ func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
 	if ignoreForeign {
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
+	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
@@ -877,6 +933,12 @@ func (k1 *Oauth2Credential) EqualWithOpts(k2 *Oauth2Credential, ignoreID,
 		k1Copy.Consumer = nil
 		k2Copy.Consumer = nil
 	}
+	if k1Copy.Consumer != nil {
+		k1Copy.Consumer.Username = nil
+	}
+	if k2Copy.Consumer != nil {
+		k2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
 
@@ -947,6 +1009,12 @@ func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
 	if ignoreForeign {
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
+	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
