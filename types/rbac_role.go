@@ -105,7 +105,7 @@ func (d *rbacRoleDiffer) deleteRBACRole(role *state.RBACRole) (*crud.Event, erro
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up rbac role %q: %w",
-			role.Identifier(), err)
+			role.FriendlyName(), err)
 	}
 	return nil, nil
 }
@@ -144,7 +144,7 @@ func (d *rbacRoleDiffer) createUpdateRBACRole(role *state.RBACRole) (*crud.Event
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up rbac role %q: %w",
-			role.Identifier(), err)
+			role.FriendlyName(), err)
 	}
 
 	// found, check if update needed

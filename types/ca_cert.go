@@ -105,7 +105,7 @@ func (d *caCertificateDiffer) deleteCACertificate(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up caCertificate %q: %w",
-			caCert.Identifier(), err)
+			caCert.FriendlyName(), err)
 	}
 	return nil, nil
 }
@@ -146,7 +146,7 @@ func (d *caCertificateDiffer) createUpdateCACertificate(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up caCertificate %q: %w",
-			caCert.Identifier(), err)
+			caCert.FriendlyName(), err)
 	}
 
 	// found, check if update needed

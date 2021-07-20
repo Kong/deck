@@ -290,7 +290,7 @@ func (crud *rbacEndpointPermissionPostAction) Create(ctx context.Context, args .
 }
 
 func (crud *rbacEndpointPermissionPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.RBACEndpointPermissions.Delete(args[0].(*state.RBACEndpointPermission).Identifier())
+	return nil, crud.currentState.RBACEndpointPermissions.Delete(args[0].(*state.RBACEndpointPermission).FriendlyName())
 }
 
 func (crud *rbacEndpointPermissionPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {

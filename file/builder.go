@@ -196,7 +196,7 @@ func (b *stateBuilder) consumers() {
 		// plugins for the Consumer
 		var plugins []FPlugin
 		for _, p := range c.Plugins {
-			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			p.Consumer = c.asKongConsumer()
 			plugins = append(plugins, *p)
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
@@ -206,7 +206,7 @@ func (b *stateBuilder) consumers() {
 
 		var keyAuths []kong.KeyAuth
 		for _, cred := range c.KeyAuths {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			keyAuths = append(keyAuths, *cred)
 		}
 		if err := b.ingestKeyAuths(keyAuths); err != nil {
@@ -216,7 +216,7 @@ func (b *stateBuilder) consumers() {
 
 		var basicAuths []kong.BasicAuth
 		for _, cred := range c.BasicAuths {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			basicAuths = append(basicAuths, *cred)
 		}
 		if err := b.ingestBasicAuths(basicAuths); err != nil {
@@ -226,7 +226,7 @@ func (b *stateBuilder) consumers() {
 
 		var hmacAuths []kong.HMACAuth
 		for _, cred := range c.HMACAuths {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			hmacAuths = append(hmacAuths, *cred)
 		}
 		if err := b.ingestHMACAuths(hmacAuths); err != nil {
@@ -236,7 +236,7 @@ func (b *stateBuilder) consumers() {
 
 		var jwtAuths []kong.JWTAuth
 		for _, cred := range c.JWTAuths {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			jwtAuths = append(jwtAuths, *cred)
 		}
 		if err := b.ingestJWTAuths(jwtAuths); err != nil {
@@ -246,7 +246,7 @@ func (b *stateBuilder) consumers() {
 
 		var oauth2Creds []kong.Oauth2Credential
 		for _, cred := range c.Oauth2Creds {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			oauth2Creds = append(oauth2Creds, *cred)
 		}
 		if err := b.ingestOauth2Creds(oauth2Creds); err != nil {
@@ -256,7 +256,7 @@ func (b *stateBuilder) consumers() {
 
 		var aclGroups []kong.ACLGroup
 		for _, cred := range c.ACLGroups {
-			cred.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			cred.Consumer = c.asKongConsumer()
 			aclGroups = append(aclGroups, *cred)
 		}
 		if err := b.ingestACLGroups(aclGroups); err != nil {
@@ -266,14 +266,24 @@ func (b *stateBuilder) consumers() {
 
 		var mtlsAuths []kong.MTLSAuth
 		for _, cred := range c.MTLSAuths {
-			cred.Consumer = &kong.Consumer{
-				ID: kong.String(*c.ID),
-			}
+			cred.Consumer = c.asKongConsumer()
 			mtlsAuths = append(mtlsAuths, *cred)
 		}
 
 		b.ingestMTLSAuths(mtlsAuths)
 	}
+}
+
+func (c *FConsumer) asKongConsumer() *kong.Consumer {
+	return &kong.Consumer{ID: kong.String(*c.ID), Username: kong.String(*c.Username)}
+}
+
+func (s *FService) asKongService() *kong.Service {
+	return &kong.Service{ID: kong.String(*s.ID), Name: kong.String(*s.Name)}
+}
+
+func (r *FRoute) asKongRoute() *kong.Route {
+	return &kong.Route{ID: kong.String(*r.ID), Name: kong.String(*r.Name)}
 }
 
 func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
@@ -569,7 +579,7 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	// plugins for the service
 	var plugins []FPlugin
 	for _, p := range s.Plugins {
-		p.Service = &kong.Service{ID: kong.String(*s.ID)}
+		p.Service = s.asKongService()
 		plugins = append(plugins, *p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
@@ -579,7 +589,7 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	// routes for the service
 	for _, r := range s.Routes {
 		r := r
-		r.Service = &kong.Service{ID: kong.String(*s.ID)}
+		r.Service = s.asKongService()
 		if err := b.ingestRoute(*r); err != nil {
 			return err
 		}
@@ -701,40 +711,40 @@ func (b *stateBuilder) plugins() {
 			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
-					*p.Consumer.ID, *p.Name, err)
+					p.Consumer.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			p.Consumer = c.AsKongConsumer()
 		}
 		if p.Service != nil && !utils.Empty(p.Service.ID) {
 			s, err := b.intermediate.Services.Get(*p.Service.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("service %v for plugin %v: %w",
-					*p.Service.ID, *p.Name, err)
+					p.Service.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Service = &kong.Service{ID: kong.String(*s.ID)}
+			p.Service = s.AsKongService()
 		}
 		if p.Route != nil && !utils.Empty(p.Route.ID) {
-			s, err := b.intermediate.Routes.Get(*p.Route.ID)
+			r, err := b.intermediate.Routes.Get(*p.Route.ID)
 			if err == state.ErrNotFound {
 				b.err = fmt.Errorf("route %v for plugin %v: %w",
-					*p.Route.ID, *p.Name, err)
+					p.Route.FriendlyName(), *p.Name, err)
 
 				return
 			} else if err != nil {
 				b.err = err
 				return
 			}
-			p.Route = &kong.Route{ID: kong.String(*s.ID)}
+			p.Route = r.AsKongRoute()
 		}
 		plugins = append(plugins, p)
 	}
@@ -768,7 +778,7 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	// plugins for the route
 	var plugins []FPlugin
 	for _, p := range r.Plugins {
-		p.Route = &kong.Route{ID: kong.String(*r.ID)}
+		p.Route = r.asKongRoute()
 		plugins = append(plugins, *p)
 	}
 	return b.ingestPlugins(plugins)

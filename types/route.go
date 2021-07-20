@@ -104,7 +104,7 @@ func (d *routeDiffer) deleteRoute(route *state.Route) (*crud.Event, error) {
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up route %q: %w",
-			route.Identifier(), err)
+			route.FriendlyName(), err)
 	}
 	return nil, nil
 }
@@ -144,7 +144,7 @@ func (d *routeDiffer) createUpdateRoute(route *state.Route) (*crud.Event, error)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up route %q: %w",
-			route.Identifier(), err)
+			route.FriendlyName(), err)
 	}
 	// found, check if update needed
 
