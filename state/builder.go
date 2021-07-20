@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 )
 
 // Get builds a KongState from a raw representation of Kong.
@@ -19,6 +20,42 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 	return kongState, nil
 }
 
+func ensureService(kongState *KongState, serviceID string) (bool, *kong.Service, error) {
+	s, err := kongState.Services.Get(serviceID)
+	if err != nil {
+		if err == ErrNotFound {
+			return false, nil, nil
+		}
+		return false, nil, fmt.Errorf("looking up service %q: %w", serviceID, err)
+
+	}
+	return true, utils.GetServiceReference(s.Service), nil
+}
+
+func ensureRoute(kongState *KongState, routeID string) (bool, *kong.Route, error) {
+	r, err := kongState.Routes.Get(routeID)
+	if err != nil {
+		if err == ErrNotFound {
+			return false, nil, nil
+		}
+		return false, nil, fmt.Errorf("looking up route %q: %w", routeID, err)
+
+	}
+	return true, utils.GetRouteReference(r.Route), nil
+}
+
+func ensureConsumer(kongState *KongState, consumerID string) (bool, *kong.Consumer, error) {
+	c, err := kongState.Consumers.Get(consumerID)
+	if err != nil {
+		if err == ErrNotFound {
+			return false, nil, nil
+		}
+		return false, nil, fmt.Errorf("looking up consumer %q: %w", consumerID, err)
+
+	}
+	return true, utils.GetConsumerReference(c.Consumer), nil
+}
+
 func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 	for _, s := range raw.Services {
 		err := kongState.Services.Add(Service{Service: *s})
@@ -27,6 +64,15 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 	}
 	for _, r := range raw.Routes {
+		if r.Service != nil && !utils.Empty(r.Service.ID) {
+			ok, s, err := ensureService(kongState, *r.Service.ID)
+			if err != nil {
+				return err
+			}
+			if ok {
+				r.Service = s
+			}
+		}
 		err := kongState.Routes.Add(Route{Route: *r})
 		if err != nil {
 			return fmt.Errorf("inserting route into state: %w", err)
@@ -38,103 +84,99 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting consumer into state: %w", err)
 		}
 	}
-	ensureConsumer := func(consumerID string) (bool, error) {
-		_, err := kongState.Consumers.Get(consumerID)
-		if err != nil {
-			if err == ErrNotFound {
-				return false, nil
-			}
-			return false, fmt.Errorf("looking up consumer %q: %w", consumerID, err)
-
-		}
-		return true, nil
-	}
 	for _, cred := range raw.KeyAuths {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.KeyAuths.Add(KeyAuth{KeyAuth: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting key-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.HMACAuths {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.HMACAuths.Add(HMACAuth{HMACAuth: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting hmac-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.JWTAuths {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.JWTAuths.Add(JWTAuth{JWTAuth: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting jwt into state: %w", err)
 		}
 	}
 	for _, cred := range raw.BasicAuths {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.BasicAuths.Add(BasicAuth{BasicAuth: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting basic-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.Oauth2Creds {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.Oauth2Creds.Add(Oauth2Credential{Oauth2Credential: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting oauth2-cred into state: %w", err)
 		}
 	}
 	for _, cred := range raw.ACLGroups {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.ACLGroups.Add(ACLGroup{ACLGroup: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting basic-auth into state: %w", err)
 		}
 	}
 	for _, cred := range raw.MTLSAuths {
-		ok, err := ensureConsumer(*cred.Consumer.ID)
+		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {
 			return err
 		}
 		if !ok {
 			continue
 		}
+		cred.Consumer = c
 		err = kongState.MTLSAuths.Add(MTLSAuth{MTLSAuth: *cred})
 		if err != nil {
 			return fmt.Errorf("inserting mtls-auth into state: %w", err)
@@ -177,6 +219,33 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 	}
 
 	for _, p := range raw.Plugins {
+		if p.Service != nil && !utils.Empty(p.Service.ID) {
+			ok, s, err := ensureService(kongState, *p.Service.ID)
+			if err != nil {
+				return err
+			}
+			if ok {
+				p.Service = s
+			}
+		}
+		if p.Route != nil && !utils.Empty(p.Route.ID) {
+			ok, r, err := ensureRoute(kongState, *p.Route.ID)
+			if err != nil {
+				return err
+			}
+			if ok {
+				p.Route = r
+			}
+		}
+		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
+			ok, c, err := ensureConsumer(kongState, *p.Consumer.ID)
+			if err != nil {
+				return err
+			}
+			if ok {
+				p.Consumer = c
+			}
+		}
 		err := kongState.Plugins.Add(Plugin{Plugin: *p})
 		if err != nil {
 			return fmt.Errorf("inserting plugins into state: %w", err)
