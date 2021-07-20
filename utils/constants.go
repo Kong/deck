@@ -25,6 +25,7 @@ var (
 		RegexPriority: kong.Int(0),
 		StripPath:     kong.Bool(false),
 		Protocols:     kong.StringSlice("http", "https"),
+		PathHandling:  kong.String("v1"),
 	}
 	targetDefaults = kong.Target{
 		Weight: kong.Int(defaultWeight),
@@ -49,6 +50,7 @@ var (
 					Interval:     kong.Int(0),
 					HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
 				},
+				HTTPSVerifyCertificate: kong.Bool(true),
 			},
 			Passive: &kong.PassiveHealthcheck{
 				Healthy: &kong.Healthy{

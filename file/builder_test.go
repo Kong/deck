@@ -413,6 +413,7 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 						ID:            kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
 						Name:          kong.String("foo"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -439,6 +440,7 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 						ID:            kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						Name:          kong.String("foo"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -1506,7 +1508,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(42),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Concurrency:            kong.Int(10),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1570,7 +1573,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Concurrency:            kong.Int(10),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1638,7 +1642,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Concurrency:            kong.Int(10),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1682,7 +1687,8 @@ func Test_stateBuilder_upstream(t *testing.T) {
 						Slots: kong.Int(10000),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Concurrency:            kong.Int(10),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
@@ -1966,6 +1972,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
 						Name:          kong.String("foo-route1"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -1978,6 +1985,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("d125e79a-297c-414b-bc00-ad3a87be6c2b"),
 						Name:          kong.String("foo-route2"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -1990,6 +1998,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("0cc0d614-4c88-4535-841a-cbe0709b0758"),
 						Name:          kong.String("bar-route1"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -2002,6 +2011,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("083f61d3-75bc-42b4-9df4-f91929e18fda"),
 						Name:          kong.String("bar-route2"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -2014,6 +2024,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("ba843ee8-d63e-4c4f-be1c-ebea546d8fac"),
 						Name:          kong.String("dont-buffer-these"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -2028,6 +2039,7 @@ func Test_stateBuilder(t *testing.T) {
 						ID:            kong.String("13dd1aac-04ce-4ea2-877c-5579cfa2c78e"),
 						Name:          kong.String("buffer-these"),
 						PreserveHost:  kong.Bool(false),
+						PathHandling:  kong.String("v1"),
 						RegexPriority: kong.Int(0),
 						StripPath:     kong.Bool(false),
 						Protocols:     kong.StringSlice("http", "https"),
@@ -2046,7 +2058,8 @@ func Test_stateBuilder(t *testing.T) {
 						Slots: kong.Int(42),
 						Healthchecks: &kong.Healthcheck{
 							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
+								HTTPSVerifyCertificate: kong.Bool(true),
+								Concurrency:            kong.Int(10),
 								Healthy: &kong.Healthy{
 									HTTPStatuses: []int{200, 302},
 									Interval:     kong.Int(0),
