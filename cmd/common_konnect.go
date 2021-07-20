@@ -16,7 +16,7 @@ import (
 )
 
 func syncKonnect(ctx context.Context,
-	filenames []string, dry bool, parallelism int) error {
+	filenames []string, dry bool, parallelism int, noMaskValues bool) error {
 	httpClient := utils.HTTPClient()
 
 	// read target file
@@ -93,7 +93,7 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs := s.Solve(ctx, parallelism, dry, noMaskValues)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

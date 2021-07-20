@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	syncCmdKongStateFile []string
-	syncCmdParallelism   int
-	syncCmdDBUpdateDelay int
-	syncWorkspace        string
+	syncCmdKongStateFile          []string
+	syncCmdParallelism            int
+	syncCmdNoMaskDeckEnvVarsValue bool
+	syncCmdDBUpdateDelay          int
+	syncWorkspace                 string
 )
 
 // syncCmd represents the sync command
@@ -23,7 +24,7 @@ to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return syncMain(cmd.Context(), syncCmdKongStateFile, false,
-			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
+			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncCmdNoMaskDeckEnvVarsValue)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(syncCmdKongStateFile) == 0 {
@@ -49,6 +50,8 @@ func init() {
 			"any plugins associated with consumers")
 	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations")
+	syncCmd.Flags().BoolVar(&syncCmdNoMaskDeckEnvVarsValue, "no-mask-deck-env-vars-value",
+		false, "do not mask DECK_ environment variable values at diff output")
 	syncCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+

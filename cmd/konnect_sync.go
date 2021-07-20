@@ -20,7 +20,7 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 		}
 		_ = sendAnalytics("konnect-sync", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
-			konnectDiffCmdParallelism)
+			konnectDiffCmdParallelism, konnectDiffCmdNoMaskDeckEnvVarsValue)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		return preRunSilenceEventsFlag()
@@ -37,5 +37,7 @@ func init() {
 			"with consumers")
 	konnectSyncCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations")
+	konnectSyncCmd.Flags().BoolVar(&konnectDiffCmdNoMaskDeckEnvVarsValue, "no-mask-deck-env-vars-value",
+		false, "do not mask DECK_ environment variable values at diff output")
 	addSilenceEventsFlag(konnectSyncCmd.Flags())
 }

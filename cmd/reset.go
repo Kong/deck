@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	resetCmdForce      bool
-	resetWorkspace     string
-	resetAllWorkspaces bool
+	resetCmdForce               bool
+	resetWorkspace              string
+	resetAllWorkspaces          bool
+	resetNoMaskDeckEnvVarsValue bool
 )
 
 // resetCmd represents the reset command
@@ -92,7 +93,7 @@ By default, this command will ask for a confirmation prompt.`,
 			if err != nil {
 				return err
 			}
-			_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient)
+			_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, resetNoMaskDeckEnvVarsValue)
 			if err != nil {
 				return err
 			}
@@ -113,6 +114,8 @@ func init() {
 			"(Kong Enterprise only).")
 	resetCmd.Flags().BoolVar(&resetAllWorkspaces, "all-workspaces",
 		false, "reset configuration of all workspaces (Kong Enterprise only).")
+	resetCmd.Flags().BoolVar(&resetNoMaskDeckEnvVarsValue, "no-mask-deck-env-vars-value",
+		false, "do not mask DECK_ environment variable values at diff output")
 	resetCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are deleted.\n"+
