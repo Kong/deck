@@ -141,266 +141,28 @@ func (sc *Syncer) diff() error {
 }
 
 func (sc *Syncer) delete() error {
-	var err error
-
-	err = sc.entityDiffers[types.Plugin].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
+	for _, types := range reverseOrder() {
+		for _, entityType := range types {
+			err := sc.entityDiffers[entityType].Deletes(sc.queueEvent)
+			if err != nil {
+				return err
+			}
+			sc.wait()
+		}
 	}
-	err = sc.entityDiffers[types.KeyAuth].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.HMACAuth].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.JWTAuth].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.BasicAuth].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.OAuth2Cred].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.ACLGroup].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.MTLSAuth].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Target].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.SNI].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// plugins must be deleted before services, routes and consumers
-	// routes must be deleted before service can be deleted
-	// credentials must be deleted before consumers
-	// targets must be deleted before upstream
-
-	// PLEASE NOTE that if the order is not preserved, then decK will error
-	// out because deleting a child entity whose parent is already deleted
-	// will return a 404
-	sc.wait()
-
-	err = sc.entityDiffers[types.Route].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Consumer].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Upstream].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// routes must be deleted before services
-	sc.wait()
-
-	err = sc.entityDiffers[types.Service].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// services must be deleted before certificates (client_certificate)
-	sc.wait()
-
-	err = sc.entityDiffers[types.Certificate].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// services must be deleted before ca_certificates
-	err = sc.entityDiffers[types.CACertificate].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	err = sc.entityDiffers[types.RBACEndpointPermission].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// RBAC endpoint permissions must be deleted before RBAC roles
-	sc.wait()
-
-	err = sc.entityDiffers[types.RBACRole].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	err = sc.entityDiffers[types.Document].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// Documents must be deleted before ServiceVersions and Service packages
-	sc.wait()
-
-	err = sc.entityDiffers[types.ServiceVersion].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// ServiceVersions must be deleted before ServicePackages
-	sc.wait()
-
-	err = sc.entityDiffers[types.ServicePackage].Deletes(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// finish delete before returning
-	sc.wait()
-
 	return nil
 }
 
 func (sc *Syncer) createUpdate() error {
-	// TODO write an interface and register by types,
-	// then execute in a particular order
-
-	err := sc.entityDiffers[types.Certificate].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
+	for _, types := range order() {
+		for _, entityType := range types {
+			err := sc.entityDiffers[entityType].CreateAndUpdates(sc.queueEvent)
+			if err != nil {
+				return err
+			}
+			sc.wait()
+		}
 	}
-	err = sc.entityDiffers[types.CACertificate].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Consumer].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Upstream].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// upstreams must be created before targets
-	// certificates must be created before SNIs
-	// consumers must be created before creds of all kinds
-	// certificates must be created before services (client_certificate)
-	sc.wait()
-
-	err = sc.entityDiffers[types.Target].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.SNI].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.Service].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.KeyAuth].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.HMACAuth].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.JWTAuth].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.BasicAuth].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.OAuth2Cred].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.ACLGroup].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	err = sc.entityDiffers[types.MTLSAuth].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// services must be created before routes
-	sc.wait()
-
-	err = sc.entityDiffers[types.Route].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// services, routes and consumers must be created before plugins
-	sc.wait()
-
-	err = sc.entityDiffers[types.Plugin].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	err = sc.entityDiffers[types.RBACRole].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// RBAC roles must be created before endpoint permissions
-	sc.wait()
-
-	err = sc.entityDiffers[types.RBACEndpointPermission].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	err = sc.entityDiffers[types.ServicePackage].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-	// barrier for foreign relations
-	// services, routes and consumers must be created before plugins
-	sc.wait()
-
-	err = sc.entityDiffers[types.ServiceVersion].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// barrier for foreign relations
-	// service versions and packages must be created before documents
-	sc.wait()
-
-	err = sc.entityDiffers[types.Document].CreateAndUpdates(sc.queueEvent)
-	if err != nil {
-		return err
-	}
-
-	// finish createUpdate before returning
-	sc.wait()
-
 	return nil
 }
 
