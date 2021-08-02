@@ -80,6 +80,11 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
+	err = populateDevelopers(kongState, file, config)
+	if err != nil {
+		return err
+	}
+
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
@@ -117,6 +122,11 @@ func KonnectStateToFile(kongState *state.KongState, config WriteConfig) error {
 	}
 
 	err = populateConsumers(kongState, file, config)
+	if err != nil {
+		return err
+	}
+
+	err = populateDevelopers(kongState, file, config)
 	if err != nil {
 		return err
 	}
@@ -579,6 +589,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		utils.MustRemoveTags(&c.Consumer, config.SelectTags)
 		file.Consumers = append(file.Consumers, c)
 	}
+
 	rbacRoles, err := kongState.RBACRoles.GetAll()
 	if err != nil {
 		return err
@@ -601,6 +612,26 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
 		return compareOrder(file.Consumers[i], file.Consumers[j])
+	})
+	return nil
+}
+
+func populateDevelopers(kongState *state.KongState, file *Content,
+	config WriteConfig) error {
+	developers, err := kongState.Developers.GetAll()
+	if err != nil {
+		return err
+	}
+
+	for _, d := range developers {
+		d := FDeveloper{Developer: d.Developer}
+		utils.ZeroOutID(&d, d.Email, config.WithID)
+		utils.ZeroOutTimestamps(&d)
+		file.Developers = append(file.Developers, d)
+	}
+
+	sort.SliceStable(file.Developers, func(i, j int) bool {
+		return compareOrder(file.Developers[i], file.Developers[j])
 	})
 	return nil
 }

@@ -183,6 +183,13 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		}
 	}
 
+	for _, d := range raw.Developers {
+		err := kongState.Developers.Add(Developer{Developer: *d})
+		if err != nil {
+			return fmt.Errorf("inserting developers into state: %w", err)
+		}
+	}
+
 	for _, r := range raw.RBACRoles {
 		err := kongState.RBACRoles.Add(RBACRole{RBACRole: *r})
 		if err != nil {

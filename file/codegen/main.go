@@ -30,6 +30,15 @@ var (
 			Required: []string{"id"},
 		},
 	}
+
+	anyOfEmailOrID = []*jsonschema.Type{
+		{
+			Required: []string{"Email"},
+		},
+		{
+			Required: []string{"id"},
+		},
+	}
 )
 
 func main() {
@@ -53,6 +62,8 @@ func main() {
 	schema.Definitions["FRoute"].AnyOf = anyOfNameOrID
 
 	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrID
+
+	schema.Definitions["FDeveloper"].AnyOf = anyOfEmailOrID
 
 	schema.Definitions["FUpstream"].Required = []string{"name"}
 

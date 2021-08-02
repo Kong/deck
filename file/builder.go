@@ -64,6 +64,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.routes()
 	b.upstreams()
 	b.consumers()
+	b.developers()
 	b.plugins()
 	b.enterprise()
 
@@ -595,6 +596,35 @@ func (b *stateBuilder) routes() {
 	for _, r := range b.targetContent.Routes {
 		r := r
 		if err := b.ingestRoute(r); err != nil {
+			b.err = err
+			return
+		}
+	}
+}
+
+func (b *stateBuilder) developers() {
+	if b.err != nil {
+		return
+	}
+
+	for _, d := range b.targetContent.Developers {
+		d := d
+		if utils.Empty(d.ID) {
+			developer, err := b.currentState.Developers.Get(*d.Email)
+			if err == state.ErrNotFound {
+				d.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				d.ID = kong.String(*developer.ID)
+			}
+		}
+
+		b.rawState.Developers = append(b.rawState.Developers, &d.Developer)
+
+		err := b.intermediate.Developers.Add(state.Developer{Developer: d.Developer})
+		if err != nil {
 			b.err = err
 			return
 		}

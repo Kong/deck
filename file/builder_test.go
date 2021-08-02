@@ -262,6 +262,17 @@ func existingDocumentState() *state.KongState {
 	return s
 }
 
+func existingDeveloperState() *state.KongState {
+	s, _ := state.NewKongState()
+	s.Developers.Add(state.Developer{
+		Developer: kong.Developer{
+			ID:    kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+			Email: kong.String("foo"),
+		},
+	})
+	return s
+}
+
 var deterministicUUID = func() *string {
 	version := byte(4)
 	uuid := make([]byte, 16)
@@ -2486,6 +2497,80 @@ func Test_stateBuilder_fillPluginConfig(t *testing.T) {
 			if !tt.wantErr && !reflect.DeepEqual(tt.result, tt.args.plugin) {
 				assert.Equal(t, tt.result, *tt.args.plugin)
 			}
+		})
+	}
+}
+
+func Test_stateBuilder_developers(t *testing.T) {
+	assert := assert.New(t)
+	rand.Seed(42)
+	type fields struct {
+		currentState  *state.KongState
+		targetContent *Content
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *utils.KongRawState
+	}{
+		{
+			name: "generates ID for a non-existing developer",
+			fields: fields{
+				targetContent: &Content{
+					Developers: []FDeveloper{
+						{
+							Developer: kong.Developer{
+								Email: kong.String("foo@example.com"),
+							},
+						},
+					},
+				},
+				currentState: emptyState(),
+			},
+			want: &utils.KongRawState{
+				Developers: []*kong.Developer{
+					{
+						ID:    kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Email: kong.String("foo@example.com"),
+					},
+				},
+			},
+		},
+		{
+			name: "matches ID of an existing Developer",
+			fields: fields{
+				targetContent: &Content{
+					Developers: []FDeveloper{
+						{
+							Developer: kong.Developer{
+								Email: kong.String("foo@example.com"),
+							},
+						},
+					},
+				},
+				currentState: existingDeveloperState(),
+			},
+			want: &utils.KongRawState{
+				Developers: []*kong.Developer{
+					{
+						ID:    kong.String("5b1484f2-5209-49d9-b43e-92ba09dd9d52"),
+						Email: kong.String("foo@example.com"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &stateBuilder{
+				targetContent: tt.fields.targetContent,
+				currentState:  tt.fields.currentState,
+			}
+			d, _ := utils.GetKongDefaulter()
+			b.defaulter = d
+			b.build()
+			assert.Equal(tt.want, b.rawState)
 		})
 	}
 }

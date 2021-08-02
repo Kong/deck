@@ -592,6 +592,94 @@ func (s FServicePackage) sortKey() string {
 	return ""
 }
 
+// FDeveloper represents a developer in Kong.
+// +k8s:deepcopy-gen=true
+type FDeveloper struct {
+	kong.Developer `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (d FDeveloper) sortKey() string {
+	if d.Email != nil {
+		return *d.Email
+	}
+	if d.ID != nil {
+		return *d.ID
+	}
+	return ""
+}
+
+type developer struct {
+	CreatedAt *int                   `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string                `json:"id,omitempty" yaml:"id,omitempty"`
+	Status    *int                   `json:"status,omitempty" yaml:"status,omitempty"`
+	Email     *string                `json:"email,omitempty" yaml:"email,omitempty"`
+	CustomID  *string                `json:"custom_id,omitempty" yaml:"custom_id,omitempty"`
+	UpdatedAt *int                   `json:"updated_at,omitempty" yaml:"updated_at,omitempty"`
+	Roles     []*string              `json:"roles,omitempty" yaml:"roles,omitempty"`
+	RbacUser  *kong.RBACUser         `json:"rbac_user,omitempty" yaml:"rbac_user,omitempty"`
+	Meta      map[string]interface{} `json:"meta,omitempty" yaml:"meta,omitempty"`
+	Password  *string                `json:"password,omitempty" yaml:"password,omitempty"`
+}
+
+func copyToDeveloper(fDeveloper FDeveloper) (developer, error) {
+	d := developer{}
+
+	if fDeveloper.Meta != nil && !utils.Empty(fDeveloper.Meta) {
+		if err := json.Unmarshal([]byte(*fDeveloper.Meta), &d.Meta); err != nil {
+			return d, err
+		}
+	}
+	d.CreatedAt = fDeveloper.CreatedAt
+	d.ID = fDeveloper.ID
+	d.Status = fDeveloper.Status
+	d.Email = fDeveloper.Email
+	d.CustomID = fDeveloper.CustomID
+	d.UpdatedAt = fDeveloper.UpdatedAt
+	d.Roles = fDeveloper.Roles
+	d.RbacUser = fDeveloper.RbacUser
+	d.Password = fDeveloper.Password
+
+	return d, nil
+}
+
+func copyFromDeveloper(developer developer, fDeveloper *FDeveloper) error {
+	fDeveloper.CreatedAt = developer.CreatedAt
+	fDeveloper.ID = developer.ID
+	fDeveloper.Status = developer.Status
+	fDeveloper.Email = developer.Email
+	fDeveloper.CustomID = developer.CustomID
+	fDeveloper.UpdatedAt = developer.UpdatedAt
+	fDeveloper.Roles = developer.Roles
+	fDeveloper.RbacUser = developer.RbacUser
+	meta, _ := json.Marshal(&developer.Meta)
+	fDeveloper.Meta = kong.String(string(meta))
+	fDeveloper.Password = developer.Password
+
+	return nil
+}
+
+// MarshalJSON is a custom marshal method to handle
+// foreign references.
+func (d FDeveloper) MarshalJSON() ([]byte, error) {
+	developer, err := copyToDeveloper(d)
+	if err != nil {
+		return []byte(nil), err
+	}
+	return json.Marshal(developer)
+}
+
+// UnmarshalJSON is a custom marshal method to handle
+// foreign references.
+func (d *FDeveloper) UnmarshalJSON(b []byte) error {
+	var developer developer
+	err := json.Unmarshal(b, &developer)
+	if err != nil {
+		return err
+	}
+	return copyFromDeveloper(developer, d)
+}
+
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
@@ -608,6 +696,8 @@ type Content struct {
 	Upstreams      []FUpstream      `json:"upstreams,omitempty" yaml:",omitempty"`
 	Certificates   []FCertificate   `json:"certificates,omitempty" yaml:",omitempty"`
 	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
+
+	Developers []FDeveloper `json:"developers,omitempty" yaml:",omitempty"`
 
 	RBACRoles []FRBACRole `json:"rbac_roles,omitempty" yaml:"rbac_roles,omitempty"`
 

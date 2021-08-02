@@ -23,6 +23,7 @@ type KongState struct {
 	CACertificates *CACertificatesCollection
 	Plugins        *PluginsCollection
 	Consumers      *ConsumersCollection
+	Developers     *DevelopersCollection
 
 	KeyAuths                *KeyAuthsCollection
 	HMACAuths               *HMACAuthsCollection
@@ -61,6 +62,7 @@ func NewKongState() (*KongState, error) {
 			caCertTableName:                 caCertTableSchema,
 			pluginTableName:                 pluginTableSchema,
 			consumerTableName:               consumerTableSchema,
+			developerTableName:              developerTableSchema,
 			rbacRoleTableName:               rbacRoleTableSchema,
 			rbacEndpointPermissionTableName: rbacEndpointPermissionTableSchema,
 
@@ -98,6 +100,7 @@ func NewKongState() (*KongState, error) {
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
+	state.Developers = (*DevelopersCollection)(&state.common)
 	state.RBACRoles = (*RBACRolesCollection)(&state.common)
 	state.RBACEndpointPermissions = (*RBACEndpointPermissionsCollection)(&state.common)
 

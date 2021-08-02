@@ -525,6 +525,59 @@ func forConsumerString(c *kong.Consumer) string {
 	return ""
 }
 
+// Identifier returns the endpoint key name or ID.
+func (d1 *Developer) Identifier() string {
+	if d1.Email != nil {
+		return *d1.Email
+	}
+	return *d1.ID
+}
+
+// Developer represents a developer in Kong.
+// It adds some helper methods along with Meta to the original Developer object.
+type Developer struct {
+	kong.Developer `yaml:",inline"`
+	Meta
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (d1 *Developer) Console() string {
+	return d1.Identifier()
+}
+
+// Equal returns true if d1 and d2 are equal.
+func (d1 *Developer) Equal(d2 *Developer) bool {
+	return d1.EqualWithOpts(d2, false, false, false, false)
+}
+
+// EqualWithOpts returns true if d1 and d2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (d1 *Developer) EqualWithOpts(d2 *Developer,
+	ignoreID bool, ignoreTS bool, ignorePassword bool, ignoreRBACUser bool) bool {
+	d1Copy := d1.Developer.DeepCopy()
+	d2Copy := d2.Developer.DeepCopy()
+
+	if ignoreID {
+		d1Copy.ID = nil
+		d2Copy.ID = nil
+	}
+	if ignoreTS {
+		d1Copy.CreatedAt = nil
+		d2Copy.CreatedAt = nil
+	}
+	if ignorePassword {
+		d1Copy.Password = nil
+		d2Copy.Password = nil
+	}
+	if ignoreRBACUser {
+		d1Copy.RbacUser = nil
+		d2Copy.RbacUser = nil
+	}
+	return reflect.DeepEqual(d1Copy, d2Copy)
+}
+
 // KeyAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original KeyAuth object.
 type KeyAuth struct {

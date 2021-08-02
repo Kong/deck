@@ -239,6 +239,18 @@ func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
 	})
 }
 
+func getDeveloperConfiguration(ctx context.Context, group *errgroup.Group,
+	client *kong.Client, config Config, state *utils.KongRawState) {
+	group.Go(func() error {
+		developers, err := GetAllDevelopers(ctx, client, config.SelectorTags)
+		if err != nil {
+			return fmt.Errorf("developers: %w", err)
+		}
+		state.Developers = developers
+		return nil
+	})
+}
+
 // Get queries all the entities using client and returns
 // all the entities in KongRawState.
 func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRawState, error) {
@@ -258,6 +270,8 @@ func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRa
 		getProxyConfiguration(ctx, group, client, config, &state)
 		if !config.SkipConsumers {
 			getConsumerConfiguration(ctx, group, client, config, &state)
+		} else {
+			getDeveloperConfiguration(ctx, group, client, config, &state)
 		}
 	}
 
@@ -448,6 +462,33 @@ func GetAllConsumers(ctx context.Context,
 		opt = nextopt
 	}
 	return consumers, nil
+}
+
+// GetAllDevelopers queries Kong for all the developers using client.
+// Please use this method with caution if you have a lot of developers.
+func GetAllDevelopers(ctx context.Context,
+	client *kong.Client, tags []string) ([]*kong.Developer, error) {
+	var developers []*kong.Developer
+	opt := newOpt(tags)
+
+	for {
+		s, nextopt, err := client.Developers.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		developers = append(developers, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return developers, nil
 }
 
 // GetAllUpstreams queries Kong for all the Upstreams using client.

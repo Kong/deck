@@ -153,6 +153,22 @@ func (crud *consumerPostAction) Update(ctx context.Context, args ...crud.Arg) (c
 	return nil, crud.currentState.Consumers.Update(*args[0].(*state.Consumer))
 }
 
+type developerPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *developerPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Developers.Add(*args[0].(*state.Developer))
+}
+
+func (crud *developerPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Developers.Delete(*((args[0].(*state.Developer)).ID))
+}
+
+func (crud *developerPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Developers.Update(*args[0].(*state.Developer))
+}
+
 type keyAuthPostAction struct {
 	currentState *state.KongState
 }
