@@ -37,31 +37,31 @@ func validate(content []byte) error {
 		return fmt.Errorf("unmarshaling file into KongDefaults: %w", err)
 	}
 	if kongdefaults != nil {
-		if err := checkDefaults(*kongdefaults); err != nil {
+		if err := CheckDefaults(*kongdefaults); err != nil {
 			return fmt.Errorf("default values are not allowed for these fields: %w", err)
 		}
 	}
 	return errs
 }
 
-func check(item string, t *string) string {
+func Check(item string, t *string) string {
 	if t != nil || len(*t) > 0 {
 		return item
 	}
 	return ""
 }
 
-func checkDefaults(kd KongDefaults) error {
+func CheckDefaults(kd KongDefaults) error {
 	var invalid []string
-	if ret := check("Service.ID", kd.Service.ID); len(ret) > 0 {
+	if ret := Check("Service.ID", kd.Service.ID); len(ret) > 0 {
 		invalid = append(invalid, "Service.ID")
 	}
 
-	if ret := check("Service.Host", kd.Service.Host); len(ret) > 0 {
+	if ret := Check("Service.Host", kd.Service.Host); len(ret) > 0 {
 		invalid = append(invalid, "Service.Host")
 	}
 
-	if ret := check("Service.Name", kd.Service.Name); len(ret) > 0 {
+	if ret := Check("Service.Name", kd.Service.Name); len(ret) > 0 {
 		invalid = append(invalid, "Service.Name")
 	}
 
@@ -69,27 +69,27 @@ func checkDefaults(kd KongDefaults) error {
 		invalid = append(invalid, "Service.Port")
 	}
 
-	if ret := check("Route.Name", kd.Route.Name); len(ret) > 0 {
+	if ret := Check("Route.Name", kd.Route.Name); len(ret) > 0 {
 		invalid = append(invalid, "Route.Name")
 	}
 
-	if ret := check("Route.ID", kd.Route.ID); len(ret) > 0 {
+	if ret := Check("Route.ID", kd.Route.ID); len(ret) > 0 {
 		invalid = append(invalid, "Route.ID")
 	}
 
-	if ret := check("Target.Target", kd.Target.Target); len(ret) > 0 {
+	if ret := Check("Target.Target", kd.Target.Target); len(ret) > 0 {
 		invalid = append(invalid, "Target.Target")
 	}
 
-	if ret := check("Target.ID", kd.Target.ID); len(ret) > 0 {
+	if ret := Check("Target.ID", kd.Target.ID); len(ret) > 0 {
 		invalid = append(invalid, "Target.ID")
 	}
 
-	if ret := check("Upstream.Name", kd.Upstream.Name); len(ret) > 0 {
+	if ret := Check("Upstream.Name", kd.Upstream.Name); len(ret) > 0 {
 		invalid = append(invalid, "Upstream.Name")
 	}
 
-	if ret := check("Upstream.ID", kd.Upstream.ID); len(ret) > 0 {
+	if ret := Check("Upstream.ID", kd.Upstream.ID); len(ret) > 0 {
 		invalid = append(invalid, "Upstream.ID")
 	}
 
