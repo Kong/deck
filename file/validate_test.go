@@ -8,7 +8,7 @@ import (
 )
 
 func Test_checkDefaults(t *testing.T) {
-	serviceId := "serviceId"
+	serviceID := "serviceID"
 	host := "host"
 	name := "name"
 	port := 45
@@ -21,7 +21,7 @@ func Test_checkDefaults(t *testing.T) {
 			ID:   &id,
 		},
 		Service: &kong.Service{
-			ID:   &serviceId,
+			ID:   &serviceID,
 			Host: &host,
 			Name: &name,
 			Port: &port,
