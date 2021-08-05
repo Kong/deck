@@ -45,7 +45,7 @@ func validate(content []byte) error {
 }
 
 func Check(item string, t *string) string {
-	if t != nil || len(*t) > 0 {
+	if t != nil && len(*t) > 0 {
 		return item
 	}
 	return ""
