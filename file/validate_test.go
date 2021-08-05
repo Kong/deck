@@ -50,7 +50,6 @@ func Test_checkDefaults(t *testing.T) {
 		err := CheckDefaults(*entry.kongDefaults)
 		assert.NotEqual(t, err, entry.unbexpected)
 	}
-
 }
 
 func Test_Check(t *testing.T) {
