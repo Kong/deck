@@ -38,10 +38,10 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 var dumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export Kong configuration to a file",
-	Long: `Dump command reads all the entities present in Kong
-and writes them to a file on disk.
+	Long: `The dump command reads all entities present in Kong
+and writes them to a file on the disk.
 
-The file can then be read using the Sync o Diff command to again
+The file can then be read using the sync command or diff command to
 configure Kong.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -148,23 +148,23 @@ func init() {
 		"kong", "file to which to write Kong's configuration."+
 			"Use '-' to write to stdout.")
 	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
-		"yaml", "output file format: json or yaml")
+		"yaml", "output file format: json or yaml.")
 	dumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
 		false, "write ID of all entities in the output")
 	dumpCmd.Flags().StringVarP(&dumpWorkspace, "workspace", "w",
-		"", "dump configuration of a specific workspace"+
+		"", "dump configuration of a specific Workspace"+
 			"(Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&dumpAllWorkspaces, "all-workspaces",
-		false, "dump configuration of all workspaces (Kong Enterprise only).")
+		false, "dump configuration of all Workspaces (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "skip exporting consumers and any plugins associated "+
-			"with consumers")
+			"with consumers.")
 	dumpCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
-		"only entities matching tags specified via this flag are exported.\n"+
-			"Multiple tags are ANDed together.")
+		"only entities matching tags specified with this flag are exported.\n"+
+			"When there are multiple tags, entities must match all tags.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
-		false, "export only the RBAC resources (Kong Enterprise only)")
+		false, "export only the RBAC resources (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&assumeYes, "yes",
-		false, "Assume 'yes' to prompts and run non-interactively")
+		false, "assume 'yes' to prompts and run non-interactively.")
 }

@@ -26,11 +26,11 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "deck",
-	Short: "Administer your Kong declaratively",
-	Long: `decK helps you manage Kong clusters with a declarative
+	Short: "Administer your Kong clusters declaratively",
+	Long: `The deck command helps you manage Kong clusters with a declarative
 configuration file.
 
-It can be used to export, import or sync entities to Kong.`,
+It can be used to export, import, or sync entities to Kong.`,
 	SilenceUsage: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
@@ -59,17 +59,17 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
-		"config file (default is $HOME/.deck.yaml)")
+		"Config file (default is $HOME/.deck.yaml).")
 
 	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
-		"HTTP Address of Kong's Admin API.\n"+
-			"This value can also be set using DECK_KONG_ADDR\n"+
+		"HTTP address of Kong's Admin API.\n"+
+			"This value can also be set using the DECK_KONG_ADDR\n"+
 			" environment variable.")
 	viper.BindPFlag("kong-addr",
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
 
 	rootCmd.PersistentFlags().StringSlice("headers", []string{},
-		"HTTP Headers(key:value) to inject in all requests to Kong's Admin API.\n"+
+		"HTTP headers (key:value) to inject in all requests to Kong's Admin API.\n"+
 			"This flag can be specified multiple times to inject multiple headers.")
 	viper.BindPFlag("headers",
 		rootCmd.PersistentFlags().Lookup("headers"))
@@ -98,51 +98,51 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
-		"Enable verbose verbose logging levels\n"+
+		"Enable verbose logging levels\n"+
 			"Setting this value to 2 outputs all HTTP requests/responses\n"+
 			"between decK and Kong.")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))
 
 	rootCmd.PersistentFlags().Bool("no-color", false,
-		"disable colorized output")
+		"Disable colorized output")
 	viper.BindPFlag("no-color",
 		rootCmd.PersistentFlags().Lookup("no-color"))
 
 	rootCmd.PersistentFlags().Bool("skip-workspace-crud", false,
-		"Skip API calls related to Workspaces (Kong Enterprise only)")
+		"Skip API calls related to Workspaces (Kong Enterprise only).")
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 
 	// konnect-specific flags
 	rootCmd.PersistentFlags().String("konnect-email", "",
-		"Email address associated with your Konnect account")
+		"Email address associated with your Konnect account.")
 	viper.BindPFlag("konnect-email",
 		rootCmd.PersistentFlags().Lookup("konnect-email"))
 
 	rootCmd.PersistentFlags().String("konnect-password", "",
 		"Password associated with your Konnect account, "+
-			"this takes precedence over --konnect-password-file flag")
+			"this takes precedence over --konnect-password-file flag.")
 	viper.BindPFlag("konnect-password",
 		rootCmd.PersistentFlags().Lookup("konnect-password"))
 
 	rootCmd.PersistentFlags().String("konnect-password-file", "",
-		"File containing password to your Konnect account")
+		"File containing the password to your Konnect account.")
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 
 	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
-		"address of the Konnect endpoint")
+		"Address of the Konnect endpoint.")
 	viper.BindPFlag("konnect-addr",
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
 
 	rootCmd.PersistentFlags().Bool("analytics", true,
-		"share anonymized data to help improve decK")
+		"Share anonymized data to help improve decK.")
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
 	rootCmd.PersistentFlags().Int("timeout", 10,
-		"set requests timeout client to connect with kong, value in seconds.")
+		"Set requests timeout for client to connect with Kong (in seconds).")
 	viper.BindPFlag("timeout",
 		rootCmd.PersistentFlags().Lookup("timeout"))
 }

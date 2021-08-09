@@ -11,7 +11,7 @@ var konnectSyncCmd = &cobra.Command{
 	Use: "sync",
 	Short: "Sync performs operations to get Konnect's configuration " +
 		"to match the state file (in alpha)",
-	Long: `Sync command reads the state file and performs operation in Konnect
+	Long: `The sync command reads the state file and performs operations in Konnect
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -34,8 +34,8 @@ func init() {
 			"This flag can be specified multiple times for multiple files.")
 	konnectSyncCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
-			"with consumers")
+			"with consumers.")
 	konnectSyncCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
-		100, "Maximum number of concurrent operations")
+		100, "Maximum number of concurrent operations.")
 	addSilenceEventsFlag(konnectSyncCmd.Flags())
 }

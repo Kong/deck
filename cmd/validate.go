@@ -17,11 +17,11 @@ var (
 var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Validate the state file",
-	Long: `Validate reads the state file and ensures the validity.
+	Long: `The validate command reads the state file and ensures validity.
 
-It will read all the state files that are passed in. If there are YAML/JSON
-parsing issues, they will be reported. It also checks for foreign relationships
-and alerts if there are broken relationships, missing links present.
+It reads all the state files that are passed in. YAML/JSON
+parsing issues are reported. It also checks for foreign relationships
+and alerts if there are broken relationships, or missing links present.
 No communication takes places between decK and Kong during the execution of
 this command.
 `,
@@ -69,7 +69,7 @@ this command.
 func init() {
 	rootCmd.AddCommand(validateCmd)
 	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
-		false, "indicate that the state file(s) contain RBAC resources only (Kong Enterprise only)")
+		false, "indicate that the state file(s) contain RBAC resources only (Kong Enterprise only).")
 	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
