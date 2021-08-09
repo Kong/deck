@@ -24,7 +24,7 @@ var konnectDiffCmd = &cobra.Command{
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if konnectDumpCmdKongStateFile == "-" {
-			return fmt.Errorf("writing to stdout is not supported in Konnect mode.")
+			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 		}
 		_ = sendAnalytics("konnect-diff", "")
 		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
