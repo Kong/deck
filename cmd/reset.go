@@ -18,7 +18,7 @@ var (
 var resetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Reset deletes all entities in Kong",
-	Long: `Reset command will delete all entities in Kong's database.string.
+	Long: `The reset command deletes all entities in Kong's database.string.
 
 Use this command with extreme care as it's equivalent to running
 "kong migrations reset" on your Kong instance.
