@@ -27,7 +27,7 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "deck",
 	Short: "Administer your Kong clusters declaratively",
-	Long: `The deck command helps you manage Kong clusters with a declarative
+	Long: `The deck tool helps you manage Kong clusters with a declarative
 configuration file.
 
 It can be used to export, import, or sync entities to Kong.`,
