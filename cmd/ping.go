@@ -12,8 +12,8 @@ var pingWorkspace string
 var pingCmd = &cobra.Command{
 	Use:   "ping",
 	Short: "Verify connectivity with Kong",
-	Long: `Ping command can be used to verify if decK
-can connect to Kong's Admin API or not.`,
+	Long: `The ping command can be used to verify if decK
+can connect to Kong's Admin API.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
@@ -33,7 +33,7 @@ can connect to Kong's Admin API or not.`,
 func init() {
 	rootCmd.AddCommand(pingCmd)
 	pingCmd.Flags().StringVarP(&pingWorkspace, "workspace", "w",
-		"", "Ping configuration with a specific workspace "+
+		"", "Ping configuration with a specific Workspace "+
 			"(Kong Enterprise only).\n"+
-			"Useful when RBAC permissions are scoped to a workspace.")
+			"Useful when RBAC permissions are scoped to a Workspace.")
 }

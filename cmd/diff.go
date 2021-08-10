@@ -17,11 +17,11 @@ var (
 var diffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Diff the current entities in Kong with the one on disks",
-	Long: `Diff is like a dry run of 'decK sync' command.
+	Long: `The diff command is similar to a dry run of the 'decK sync' command.
 
-It will load entities form Kong and then perform a diff on those with
-the entities present in files locally. This allows you to see the entities
-that will be created or updated or deleted.
+It loads entities from Kong and performs a diff with
+the entities in local files. This allows you to see the entities
+that will be created, updated, or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -51,13 +51,13 @@ func init() {
 		false, "do not diff consumers or "+
 			"any plugins associated with consumers")
 	diffCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
-		10, "Maximum number of concurrent operations")
+		10, "Maximum number of concurrent operations.")
 	diffCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are diffed.\n"+
-			"Multiple tags are ANDed together.")
+			"When this setting has multiple tag values, entities must match each of them.")
 	diffCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
-		false, "sync only the RBAC resources (Kong Enterprise only)")
+		false, "sync only the RBAC resources (Kong Enterprise only).")
 	diffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+

@@ -16,11 +16,11 @@ var (
 var konnectDiffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Diff the current entities in Konnect with the one on disks (in alpha)",
-	Long: `Diff is like a dry run of 'decK sync' command.
+	Long: `The konnect diff command is similar to a dry run of the 'deck konnect sync' command.
 
-It will load entities form Konnect and then perform a diff on those with
-the entities present in files locally. This allows you to see the entities
-that will be created or updated or deleted.` + konnectAlphaState,
+	It loads entities from Konnect and performs a diff with
+	the entities in local files. This allows you to see the entities
+	that will be created, updated, or deleted.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if konnectDumpCmdKongStateFile == "-" {
@@ -42,9 +42,9 @@ func init() {
 			"This flag can be specified multiple times for multiple files.")
 	konnectDiffCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
-			"with consumers")
+			"with consumers.")
 	konnectDiffCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
-		100, "Maximum number of concurrent operations")
+		100, "Maximum number of concurrent operations.")
 	konnectDiffCmd.Flags().BoolVar(&konnectDiffCmdNonZeroExitCode, "non-zero-exit-code",
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+

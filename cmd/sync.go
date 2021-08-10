@@ -18,7 +18,7 @@ var syncCmd = &cobra.Command{
 	Use: "sync",
 	Short: "Sync performs operations to get Kong's configuration " +
 		"to match the state file",
-	Long: `Sync command reads the state file and performs operation on Kong
+	Long: `The sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -46,18 +46,18 @@ func init() {
 			"This takes precedence over _workspace fields in state files.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
 		false, "do not diff consumers or "+
-			"any plugins associated with consumers")
+			"any plugins associated with consumers.")
 	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
-		10, "Maximum number of concurrent operations")
+		10, "Maximum number of concurrent operations.")
 	syncCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
-			"Multiple tags are ANDed together.")
+			"When this setting has multiple tag values, entities must match every tag.")
 	syncCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
-		false, "diff only the RBAC resources (Kong Enterprise only)")
+		false, "diff only the RBAC resources (Kong Enterprise only).")
 	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
-		0, "aritificial delay in seconds that is injected between insert operations \n"+
-			"for related entities (usually for cassandra deployments).\n"+
+		0, "artificial delay (in seconds) that is injected between insert operations \n"+
+			"for related entities (usually for Cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
 	addSilenceEventsFlag(syncCmd.Flags())
 }

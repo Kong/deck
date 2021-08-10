@@ -18,10 +18,10 @@ var (
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
 	Use:   "convert",
-	Short: "Convert files in one format to another format",
-	Long: `Convert command converts files representing configuration in one format
-to another compatible format. For example: a configuration for 'kong-gateway'
-can be converted into 'konnect' configuration file.`,
+	Short: "Convert files from one format into another format",
+	Long: `The convert command changes configuration files from one format
+into another compatible format. For example, a configuration for 'kong-gateway'
+can be converted into a 'konnect' configuration file.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sourceFormat, err := convert.ParseFormat(convertCmdSourceFormat)
@@ -55,8 +55,8 @@ func init() {
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
 	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
-		"file containing configuration that needs to be converted. Use '-' to read from stdin.")
+		"configuration file to be converted. Use '-' to read from stdin.")
 	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "",
-		"file to which to write configuration after conversion. Use '-' to write to stdout.")
+		"file to write configuration to after conversion. Use '-' to write to stdout.")
 	rootCmd.AddCommand(convertCmd)
 }

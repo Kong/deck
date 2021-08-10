@@ -20,9 +20,11 @@ var (
 var konnectDumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export configuration from Konnect (in alpha)",
-	Long: `Dump command reads all entities present in Konnect and exports them to
-a file on disk. The file can then be read using the Sync or Diff command to again
-configure Konnect.` + konnectAlphaState,
+	Long: `The konnect dump command reads all entities present in Konnect
+	and writes them to a local file.
+	
+	The file can then be read using the 'deck konnect sync' command or 'deck konnect diff' command to
+	configure Konnect.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		httpClient := utils.HTTPClient()
@@ -87,12 +89,12 @@ func init() {
 	konnectDumpCmd.Flags().StringVarP(&konnectDumpCmdKongStateFile, "output-file", "o",
 		"konnect", "file to which to write Kong's configuration.")
 	konnectDumpCmd.Flags().StringVar(&konnectDumpCmdStateFormat, "format",
-		"yaml", "output file format: json or yaml")
+		"yaml", "output file format: json or yaml.")
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpWithID, "with-id",
-		false, "write ID of all entities in the output")
+		false, "write ID of all entities in the output.")
 	konnectDumpCmd.Flags().BoolVar(&konnectDumpIncludeConsumers, "include-consumers",
 		false, "export consumers, associated credentials and any plugins associated "+
-			"with consumers")
+			"with consumers.")
 	konnectDumpCmd.Flags().BoolVar(&assumeYes, "yes",
-		false, "Assume 'yes' to prompts and run non-interactively")
+		false, "Assume 'yes' to prompts and run non-interactively.")
 }
