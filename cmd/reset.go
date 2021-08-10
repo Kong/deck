@@ -116,7 +116,7 @@ func init() {
 	resetCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are deleted.\n"+
-			"When there are multiple tags, entities must match all tags.")
+			"When this setting has multiple tag values, entities must match every tag.")
 	resetCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "reset only the RBAC resources (Kong Enterprise only).")
 }

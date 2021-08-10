@@ -13,7 +13,7 @@ might have breaking changes in future releases.`
 var konnectCmd = &cobra.Command{
 	Use:   "konnect",
 	Short: "Configuration tool for Konnect (in alpha)",
-	Long: `The konnect command prints sub-commands that can be used to
+	Long: `The konnect command prints subcommands that can be used to
 configure Konnect.` + konnectAlphaState,
 }
 

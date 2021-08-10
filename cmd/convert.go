@@ -18,7 +18,7 @@ var (
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
 	Use:   "convert",
-	Short: "Convert files from one format to another format",
+	Short: "Convert files from one format into another format",
 	Long: `The convert command changes configuration files from one format
 into another compatible format. For example, a configuration for 'kong-gateway'
 can be converted into a 'konnect' configuration file.`,

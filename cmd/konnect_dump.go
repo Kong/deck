@@ -20,10 +20,10 @@ var (
 var konnectDumpCmd = &cobra.Command{
 	Use:   "dump",
 	Short: "Export configuration from Konnect (in alpha)",
-	Long: `The dump command reads all entities present in Konnect
-	and writes them to a file on the disk.
+	Long: `The konnect dump command reads all entities present in Konnect
+	and writes them to a local file.
 	
-	The file can then be read using the Konnect sync command or Konnect diff command to
+	The file can then be read using the 'deck konnect sync' command or 'deck konnect diff' command to
 	configure Konnect.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {

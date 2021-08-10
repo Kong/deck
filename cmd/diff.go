@@ -55,7 +55,7 @@ func init() {
 	diffCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are diffed.\n"+
-			"When there are multiple tags, entities must match all tags.")
+			"When this setting has multiple tag values, entities must match each of them.")
 	diffCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "sync only the RBAC resources (Kong Enterprise only).")
 	diffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",

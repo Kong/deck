@@ -63,7 +63,7 @@ func init() {
 
 	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
 		"HTTP address of Kong's Admin API.\n"+
-			"This value can also be set using the DECK_KONG_ADDR\n"+
+			"This value can also be set using the environment variable DECK_KONG_ADDR\n"+
 			" environment variable.")
 	viper.BindPFlag("kong-addr",
 		rootCmd.PersistentFlags().Lookup("kong-addr"))
@@ -142,7 +142,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
 	rootCmd.PersistentFlags().Int("timeout", 10,
-		"Set requests timeout for client to connect with Kong (in seconds).")
+		"Set a request timeout for the client to connect with Kong (in seconds).")
 	viper.BindPFlag("timeout",
 		rootCmd.PersistentFlags().Lookup("timeout"))
 }

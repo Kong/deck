@@ -11,7 +11,7 @@ import (
 var konnectPingCmd = &cobra.Command{
 	Use:   "ping",
 	Short: "Verify connectivity with Konnect (in alpha)",
-	Long: `The ping command can be used to verify if decK
+	Long: `The konnect ping command can be used to verify if decK
 can connect to Konnect's API endpoint. It also validates the supplied
 credentials.` + konnectAlphaState,
 	Args: validateNoArgs,

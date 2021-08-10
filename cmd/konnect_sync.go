@@ -11,7 +11,7 @@ var konnectSyncCmd = &cobra.Command{
 	Use: "sync",
 	Short: "Sync performs operations to get Konnect's configuration " +
 		"to match the state file (in alpha)",
-	Long: `The sync command reads the state file and performs operations in Konnect
+	Long: `The konnect sync command reads the state file and performs operations in Konnect
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {

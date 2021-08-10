@@ -16,7 +16,7 @@ var (
 var konnectDiffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Diff the current entities in Konnect with the one on disks (in alpha)",
-	Long: `The Konnect diff command is similar to a dry run of 'decK sync' command.
+	Long: `The konnect diff command is similar to a dry run of the 'deck konnect sync' command.
 
 	It loads entities from Konnect and performs a diff with
 	the entities in local files. This allows you to see the entities

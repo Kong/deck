@@ -52,11 +52,11 @@ func init() {
 	syncCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
-			"When there are multiple tags, entities must match all tags.")
+			"When this setting has multiple tag values, entities must match every tag.")
 	syncCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "diff only the RBAC resources (Kong Enterprise only).")
 	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
-		0, "artificial delay in seconds that is injected between insert operations \n"+
+		0, "artificial delay (in seconds) that is injected between insert operations \n"+
 			"for related entities (usually for Cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
 	addSilenceEventsFlag(syncCmd.Flags())
