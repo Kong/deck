@@ -47,7 +47,7 @@ func Test_checkDefaults(t *testing.T) {
 	}
 
 	for _, entry := range table {
-		err := CheckDefaults(*entry.kongDefaults)
+		err := checkDefaults(*entry.kongDefaults)
 		assert.NotEqual(t, err, entry.unbexpected)
 	}
 }
@@ -77,7 +77,7 @@ func Test_Check(t *testing.T) {
 	}
 
 	for _, entry := range table {
-		res := Check(entry.val1, entry.val2)
+		res := check(entry.val1, entry.val2)
 		assert.Equal(t, res, entry.expected)
 	}
 }
