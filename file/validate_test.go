@@ -13,45 +13,50 @@ func Test_checkDefaults(t *testing.T) {
 	name := "name"
 	port := 45
 	id := "id"
-	target := "target"
 
 	c := &Content{
 		Routes: []FRoute{
-			Route: kong.Route{
-				Name: &name,
-				ID:   &id,
+			{
+				Route: kong.Route{
+					Name: &name,
+					ID:   &id,
+				},
 			},
 		},
 
 		Services: []FService{
-			Service: kong.Service{
-				ID:   &serviceID,
-				Host: &host,
-				Name: &name,
-				Port: &port,
+			{
+				Service: kong.Service{
+					ID:   &serviceID,
+					Host: &host,
+					Name: &name,
+					Port: &port,
+				},
 			},
 		},
 
-		Upstream: []FUpstream{
-			UPstream: kong.FUpstream{
-				ID:   &id,
-				Name: &name,
+		Upstreams: []FUpstream{
+			{
+				Upstream: kong.Upstream{
+					ID:   &id,
+					Name: &name,
+				},
 			},
 		},
-	},
+	}
 
 	table := []struct {
-		Content     *c
+		content     *Content
 		unbexpected error
 	}{
 		{
-			Content:     c,
+			content:     c,
 			unbexpected: nil,
 		},
 	}
 
 	for _, entry := range table {
-		err := checkDefaults(*entry.Content)
+		err := checkDefaults(*(entry.content))
 		assert.NotEqual(t, err, entry.unbexpected)
 	}
 }
