@@ -52,9 +52,12 @@ func check(item string, t *string) string {
 }
 
 func checkDefaults(c Content) error {
-	defaults := c.Info.Defaults
+	if c.Info == nil {
+		return nil
+	}
 	var invalid []string
 
+	defaults := c.Info.Defaults
 	svc := defaults.Service
 	if svc != nil {
 		if ret := check("Service.ID", svc.ID); len(ret) > 0 {
@@ -86,12 +89,14 @@ func checkDefaults(c Content) error {
 	}
 
 	upstream := defaults.Upstream
-	if ret := check("Upstream.Name", upstream.Name); len(ret) > 0 {
-		invalid = append(invalid, "Upstream.Name")
-	}
+	if upstream != nil {
+		if ret := check("Upstream.Name", upstream.Name); len(ret) > 0 {
+			invalid = append(invalid, "Upstream.Name")
+		}
 
-	if ret := check("Upstream.ID", upstream.ID); len(ret) > 0 {
-		invalid = append(invalid, "Upstream.ID")
+		if ret := check("Upstream.ID", upstream.ID); len(ret) > 0 {
+			invalid = append(invalid, "Upstream.ID")
+		}
 	}
 
 	target := defaults.Target
