@@ -41,8 +41,8 @@ func Test_checkDefaults(t *testing.T) {
 
 	err := checkDefaults(c)
 	assert.Nil(t, err)
-
 }
+
 func Test_Check(t *testing.T) {
 	serviceID := "service_id"
 	table := []struct {
