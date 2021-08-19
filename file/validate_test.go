@@ -15,7 +15,9 @@ func Test_checkDefaults(t *testing.T) {
 	id := "id"
 
 	c := Content{}
+	info := Info{}
 	defaults := KongDefaults{}
+	c.Info = &info
 	c.Info.Defaults = defaults
 
 	defaults.Service = &kong.Service{
