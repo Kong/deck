@@ -52,43 +52,56 @@ func check(item string, t *string) string {
 }
 
 func checkDefaults(c Content) error {
+	defaults := c.Info.Defaults
 	var invalid []string
 
-	for _, svc := range c.Services {
-		if ret := check("Service.ID", svc.Service.ID); len(ret) > 0 {
+	svc := defaults.Service
+	if svc != nil {
+		if ret := check("Service.ID", svc.ID); len(ret) > 0 {
 			invalid = append(invalid, "Service.ID")
 		}
 
-		if ret := check("Service.Host", svc.Service.Host); len(ret) > 0 {
+		if ret := check("Service.Host", svc.Host); len(ret) > 0 {
 			invalid = append(invalid, "Service.Host")
 		}
 
-		if ret := check("Service.Name", svc.Service.Name); len(ret) > 0 {
+		if ret := check("Service.Name", svc.Name); len(ret) > 0 {
 			invalid = append(invalid, "Service.Name")
 		}
 
-		if svc.Service.Port != nil {
+		if svc.Port != nil {
 			invalid = append(invalid, "Service.Port")
 		}
 	}
 
-	for _, route := range c.Routes {
-		if ret := check("Route.Name", route.Route.Name); len(ret) > 0 {
+	route := defaults.Route
+	if route != nil {
+		if ret := check("Route.Name", route.Name); len(ret) > 0 {
 			invalid = append(invalid, "Route.Name")
 		}
 
-		if ret := check("Route.ID", route.Route.ID); len(ret) > 0 {
+		if ret := check("Route.ID", route.ID); len(ret) > 0 {
 			invalid = append(invalid, "Route.ID")
 		}
 	}
 
-	for _, upstream := range c.Upstreams {
-		if ret := check("Upstream.Name", upstream.Upstream.Name); len(ret) > 0 {
-			invalid = append(invalid, "Upstream.Name")
+	upstream := defaults.Upstream
+	if ret := check("Upstream.Name", upstream.Name); len(ret) > 0 {
+		invalid = append(invalid, "Upstream.Name")
+	}
+
+	if ret := check("Upstream.ID", upstream.ID); len(ret) > 0 {
+		invalid = append(invalid, "Upstream.ID")
+	}
+
+	target := defaults.Target
+	if target != nil {
+		if ret := check("target.ID", target.ID); len(ret) > 0 {
+			invalid = append(invalid, "target.ID")
 		}
 
-		if ret := check("Upstream.ID", upstream.Upstream.ID); len(ret) > 0 {
-			invalid = append(invalid, "Upstream.ID")
+		if ret := check("target.Target", target.Target); len(ret) > 0 {
+			invalid = append(invalid, "target.Target")
 		}
 	}
 
