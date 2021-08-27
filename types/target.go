@@ -64,7 +64,6 @@ func (s *targetCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, err
 	if err != nil {
 		return nil, err
 	}
-	target.ID = nil
 	createdTarget, err := s.client.Targets.Create(ctx,
 		target.Upstream.ID, &target.Target)
 	if err != nil {
