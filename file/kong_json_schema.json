@@ -1156,6 +1156,9 @@
         "created_at": {
           "type": "integer"
         },
+        "hash_secret": {
+          "type": "boolean"
+        },
         "id": {
           "type": "string"
         },
