@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.8.0](#v180---20210913)
 - [v1.7.0](#v170---20210520)
 - [v1.6.0](#v160---20210408)
 - [v1.5.1](#v151---20210323)
@@ -29,6 +30,38 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.8.0] - 2021/09/13
+
+### Added
+
+- Flag `--silence-events` has been added to `deck diff` and `deck sync` commands.
+  The flag disables output of events to stdout.
+  [#393](https://github.com/Kong/deck/pull/393)
+- decK now supports shell completions. To set up completion, please read the output
+  of `deck completion --help` command. Support shells are Bash, Zsh, Fish and Powershell.
+  [#416](https://github.com/Kong/deck/pull/416)
+- decK now support defaults. This feature helps with avoiding repetition of common
+  fields in Kong's configuration and instead specifying them in a single place.
+  [#419](https://github.com/Kong/deck/pull/419)
+- A new `--timeout` flag has been added to the root command to specify timeouts
+  in seconds for various requests to Kong.
+  [#450](https://github.com/Kong/deck/pull/450)
+
+### Fixed
+
+- Fix a data race with operations counters
+  [#381](https://github.com/Kong/deck/pull/381)
+- Correct the formats for conversion
+  [#460](https://github.com/Kong/deck/pull/460)
+- Updates to target entity do not result in an error anymore
+  [#480](https://github.com/Kong/deck/pull/480)
+
+### Misc
+
+- Variety of linting updates
+- Variety of refactors to improve the code health of the project
+- A security policy has been added to the repository
 
 ## [v1.7.0] - 2021/05/20
 
@@ -667,6 +700,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.8.0]: https://github.com/kong/deck/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/kong/deck/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/kong/deck/compare/v1.5.0...v1.5.1
