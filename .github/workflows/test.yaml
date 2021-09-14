@@ -21,7 +21,7 @@ jobs:
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v2.0.3
+        uses: codecov/codecov-action@v2.1.0
         with:
           name: codecov-deck
           fail_ci_if_error: true
