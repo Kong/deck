@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.8.1](#v181---20210922)
 - [v1.8.0](#v180---20210913)
 - [v1.7.0](#v170---20210520)
 - [v1.6.0](#v160---20210408)
@@ -30,6 +31,13 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.8.1] - 2021/09/22
+
+### Fixed
+
+- Update go-kong to v0.22.0 to fix a bug with detecting non-existent
+  workspaces.
 
 ## [v1.8.0] - 2021/09/13
 
@@ -700,6 +708,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.8.1]: https://github.com/kong/deck/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kong/deck/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/kong/deck/compare/v1.5.1...v1.6.0
