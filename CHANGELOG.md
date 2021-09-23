@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.8.2](#v182---20210927)
 - [v1.8.1](#v181---20210922)
 - [v1.8.0](#v180---20210913)
 - [v1.7.0](#v170---20210520)
@@ -31,6 +32,16 @@
 - [v0.3.0](#v030---20190514)
 - [v0.2.0](#v020---20190401)
 - [v0.1.0](#v010---20190112)
+
+## [v1.8.2] - 2021/09/27
+
+### Added
+
+- ARM64 Linux and Darwin binaries are now available.
+
+### Fixed
+
+- Workspace existence checks now work with workspace admins.
 
 ## [v1.8.1] - 2021/09/22
 
