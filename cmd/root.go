@@ -90,12 +90,21 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-server-name"))
 
 	rootCmd.PersistentFlags().String("ca-cert", "",
-		"Custom CA certificate to use to verify "+
-			"Kong's Admin TLS certificate.\n"+
+		"Custom CA certificate (raw contents) to use to "+
+			"verify Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_CA_CERT"+
-			" environment variable.")
+			" environment variable.\n"+
+			"This takes precedence over --ca-cert-file flag.")
 	viper.BindPFlag("ca-cert",
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
+
+	rootCmd.PersistentFlags().String("ca-cert-file", "",
+		"Path to a custom CA certificate to use "+
+			"to verify Kong's Admin TLS certificate.\n"+
+			"This value can also be set using DECK_CA_CERT_FILE"+
+			" environment variable.")
+	viper.BindPFlag("ca-cert-file",
+		rootCmd.PersistentFlags().Lookup("ca-cert-file"))
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
 		"Enable verbose logging levels\n"+
@@ -175,10 +184,24 @@ func initConfig() {
 		}
 	}
 
+	caCertContent := ""
+
+	if viper.GetString("ca-cert") != "" {
+		caCertContent = viper.GetString("ca-cert")
+	} else if viper.GetString("ca-cert-file") != "" {
+		fileContent, err := ioutil.ReadFile(viper.GetString("ca-cert-file"))
+		if err != nil {
+			fmt.Printf("read file %q: %s", viper.GetString("ca-cert-file"), err)
+			os.Exit(1)
+		}
+		caCertContent = string(fileContent)
+		caCertContent = strings.TrimRight(caCertContent, "\n")
+	}
+
 	rootConfig.Address = viper.GetString("kong-addr")
 	rootConfig.TLSServerName = viper.GetString("tls-server-name")
 	rootConfig.TLSSkipVerify = viper.GetBool("tls-skip-verify")
-	rootConfig.TLSCACert = viper.GetString("ca-cert")
+	rootConfig.TLSCACert = caCertContent
 	rootConfig.Headers = viper.GetStringSlice("headers")
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
