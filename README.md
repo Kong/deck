@@ -72,10 +72,20 @@ If you are Linux, you can either use the Debian or RPM archive from
 the Github [release page](https://github.com/kong/deck/releases)
 or install by downloading the binary:
 
-```shel
-$ curl -sL https://github.com/kong/deck/releases/download/v1.2.0/deck_1.2.0_linux_amd64.tar.gz -o deck.tar.gz
+```shell
+$ curl -sL https://github.com/kong/deck/releases/download/v1.8.1/deck_1.8.1_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
+```
+
+### Windows
+
+If you are on Windows, you can download the binary from the Github
+[release page](https://github.com/kong/deck/releases) or via PowerShell:
+
+```shell
+$ curl -sL https://github.com/kong/deck/releases/download/v1.8.1/deck_1.8.1_windows_amd64.tar.gz -o deck.tar.gz
+$ tar -xzvf deck.tar.gz
 ```
 
 ### Docker image
