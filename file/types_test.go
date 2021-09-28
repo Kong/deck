@@ -527,6 +527,70 @@ func Test_unwrapDeveloper(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"": "",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"\": \"\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name_key": "Foo BAR 1234",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"full_name_key\": \"Foo BAR 1234\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name":  "Foo BAR",
+						"test@char!": "ñîûæøœ€£ƒo©¥ßµ",
+						"789":        "123",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"full_name\": \"Foo BAR\", \"test@char!\": \"ñîûæøœ€£ƒo©¥ßµ\", \"789\": \"123\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name":    "Foo BAR",
+						"char_arabic":  " ؄ ي ظ ڠ ڜ",
+						"char_tibetan": " ༇ དྷ ༂ ༫ ཛྷ ཬ ",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"full_name\": \"Foo BAR\",\"char_arabic\": \" ؄ ي ظ ڠ ڜ\", \"char_tibetan\": \" ༇ དྷ ༂ ༫ ཛྷ ཬ \"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -535,7 +599,7 @@ func Test_unwrapDeveloper(t *testing.T) {
 				t.Errorf("copyFromDeveloper() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			dev, err := copyToDeveloper(*tt.args.fDeveloper)
-			if (err != nil) != tt.wantErr {
+			if !reflect.DeepEqual(tt.args.developer, dev) {
 				t.Errorf("copyToDeveloper() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			assert := assert.New(t)
