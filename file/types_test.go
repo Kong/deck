@@ -568,7 +568,8 @@ func Test_unwrapDeveloper(t *testing.T) {
 				},
 				fDeveloper: &FDeveloper{
 					Developer: kong.Developer{
-						Meta: kong.String("{\"full_name\": \"Foo BAR\", \"test@char!\": \"ñîûæøœ€£ƒo©¥ßµ\", \"789\": \"123\"}"),
+						Meta: kong.String(
+							"{\"full_name\": \"Foo BAR\", \"test@char!\": \"ñîûæøœ€£ƒo©¥ßµ\", \"789\": \"123\"}"),
 					},
 				},
 			},
@@ -580,12 +581,13 @@ func Test_unwrapDeveloper(t *testing.T) {
 					Meta: map[string]interface{}{
 						"full_name":    "Foo BAR",
 						"char_arabic":  " ؄ ي ظ ڠ ڜ",
-						"char_tibetan": " ༇ དྷ ༂ ༫ ཛྷ ཬ ",
+						"char_tibetan": "༇དྷ༂༫ཛྷཬ",
 					},
 				},
 				fDeveloper: &FDeveloper{
 					Developer: kong.Developer{
-						Meta: kong.String("{\"full_name\": \"Foo BAR\",\"char_arabic\": \" ؄ ي ظ ڠ ڜ\", \"char_tibetan\": \" ༇ དྷ ༂ ༫ ཛྷ ཬ \"}"),
+						Meta: kong.String(
+							"{\"full_name\": \"Foo BAR\",\"char_arabic\": \" ؄ ي ظ ڠ ڜ\", \"char_tibetan\": \"༇དྷ༂༫ཛྷཬ\"}"),
 					},
 				},
 			},
