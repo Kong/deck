@@ -18,6 +18,7 @@ func registerSignalHandler() context.Context {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
+		defer signal.Stop(sigs)
 		sig := <-sigs
 		fmt.Println("received", sig, ", terminating...")
 		cancel()

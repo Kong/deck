@@ -26,6 +26,19 @@ var (
 	assumeYes  bool
 )
 
+func performValidate(ctx context.Context, kongClient *kong.Client, entity string) (bool, error) {
+	endpoint := fmt.Sprintf("/schemas/%s/validate", entity)
+	req, err := kongClient.NewRequest("POST", endpoint, nil, nil)
+	if err != nil {
+		return false, err
+	}
+	resp, err := kongClient.Do(ctx, req, nil)
+	if err != nil {
+		return false, err
+	}
+	return resp.StatusCode == http.StatusOK, nil
+}
+
 // workspaceExists checks if workspace exists in Kong.
 func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspaceName string) (bool, error) {
 	rootConfig := config.ForWorkspace("")
