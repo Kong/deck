@@ -8,6 +8,11 @@ import (
 	"github.com/kong/deck/utils"
 )
 
+var (
+	kong230Version = semver.MustParse("2.3.0")
+	kong140Version = semver.MustParse("1.4.0")
+)
+
 // RenderConfig contains necessary information to render a correct
 // KongConfig from a file.
 type RenderConfig struct {
@@ -36,12 +41,17 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
 
 	kongState, konnectState, err := builder.build()
 	if err != nil {
 		return nil, nil, fmt.Errorf("building state: %w", err)
 	}
+	tags := []string{}
+	if fileContent.Info != nil {
+		tags = fileContent.Info.SelectorTags
+	}
+	mergeSelectorTags(kongState, opt.KongVersion, tags)
+
 	return kongState, konnectState, nil
 }
 
@@ -52,13 +62,33 @@ func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
-	builder.kongVersion = opt.KongVersion
 
 	state, _, err := builder.build()
 	if err != nil {
 		return nil, fmt.Errorf("building state: %w", err)
 	}
+	tags := []string{}
+	if fileContent.Info != nil {
+		tags = fileContent.Info.SelectorTags
+	}
+	mergeSelectorTags(state, opt.KongVersion, tags)
+
 	return state, nil
+}
+
+func mergeSelectorTags(state *utils.KongRawState, version semver.Version, tags []string) {
+	if version.GTE(kong140Version) {
+		utils.MustMergeTags(state.HMACAuths, tags)
+		utils.MustMergeTags(state.ACLGroups, tags)
+		utils.MustMergeTags(state.KeyAuths, tags)
+		utils.MustMergeTags(state.BasicAuths, tags)
+		utils.MustMergeTags(state.JWTAuths, tags)
+		utils.MustMergeTags(state.Oauth2Creds, tags)
+		utils.MustMergeTags(state.HMACAuths, tags)
+	}
+	if version.GTE(kong230Version) {
+		utils.MustMergeTags(state.MTLSAuths, tags)
+	}
 }
 
 func ensureJSON(m map[string]interface{}) map[string]interface{} {

@@ -3,7 +3,6 @@ package file
 import (
 	"fmt"
 
-	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -16,15 +15,12 @@ type stateBuilder struct {
 	konnectRawState *utils.KonnectRawState
 	currentState    *state.KongState
 	defaulter       *utils.Defaulter
-	kongVersion     semver.Version
 
 	selectTags   []string
 	intermediate *state.KongState
 
 	err error
 }
-
-var kong140Version = semver.MustParse("1.4.0")
 
 // uuid generates a UUID string and returns a pointer to it.
 // It is a variable for testing purpose, to override and supply
@@ -289,9 +285,6 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
 	}
 	return nil
@@ -309,9 +302,6 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 			} else {
 				cred.ID = kong.String(*existingCred.ID)
 			}
-		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
 	}
@@ -331,9 +321,6 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
 	}
 	return nil
@@ -352,9 +339,6 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
 	}
 	return nil
@@ -372,9 +356,6 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 			} else {
 				cred.ID = kong.String(*existingCred.ID)
 			}
-		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
 	}
@@ -396,26 +377,18 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
 	}
 	return nil
 }
 
 func (b *stateBuilder) ingestMTLSAuths(creds []kong.MTLSAuth) {
-	kong230Version := semver.MustParse("2.3.0")
 	for _, cred := range creds {
 		cred := cred
 		// normally, we'd want to look up existing resources in this case
 		// however, this is impossible here: mtls-auth simply has no unique fields other than ID,
 		// so we don't--schema validation requires the ID
 		// there's nothing more to do here
-
-		if b.kongVersion.GTE(kong230Version) {
-			utils.MustMergeTags(&cred, b.selectTags)
-		}
 		b.rawState.MTLSAuths = append(b.rawState.MTLSAuths, &cred)
 	}
 }

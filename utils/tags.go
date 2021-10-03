@@ -7,8 +7,7 @@ import (
 
 // MustMergeTags is same as MergeTags but panics if there is an error.
 func MustMergeTags(obj interface{}, tags []string) {
-	err := MergeTags(obj, tags)
-	if err != nil {
+	if err := MergeTags(obj, tags); err != nil {
 		panic(err)
 	}
 }
@@ -18,11 +17,21 @@ func MergeTags(obj interface{}, tags []string) error {
 	if len(tags) == 0 {
 		return nil
 	}
-	ptr := reflect.ValueOf(obj)
-	if ptr.Kind() != reflect.Ptr {
-		return fmt.Errorf("obj is not a pointer")
+	value := reflect.ValueOf(obj)
+
+	if value.Kind() == reflect.Slice {
+		for i := 0; i < value.Len(); i++ {
+			if err := MergeTags(value.Index(i).Interface(), tags); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
-	v := reflect.Indirect(ptr)
+
+	if value.Kind() != reflect.Ptr {
+		return fmt.Errorf("obj is not a pointer: %v", value.Kind())
+	}
+	v := reflect.Indirect(value)
 	structTags := v.FieldByName("Tags")
 	var zero reflect.Value
 	if structTags == zero {
