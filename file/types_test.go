@@ -580,12 +580,13 @@ func Test_unwrapDeveloper(t *testing.T) {
 				developer: developer{
 					Meta: map[string]interface{}{
 						"full_name":    "Foo BAR",
-						"char_arabic":  " ؄ ي ظ ڠ ڜ",
+						"char_arabic":  " ؄ ي ظ ڠ ڜ", //nolint:stylecheck
 						"char_tibetan": "༇དྷ༂༫ཛྷཬ",
 					},
 				},
 				fDeveloper: &FDeveloper{
 					Developer: kong.Developer{
+						//nolint:stylecheck
 						Meta: kong.String(
 							"{\"full_name\": \"Foo BAR\",\"char_arabic\": \" ؄ ي ظ ڠ ڜ\", \"char_tibetan\": \"༇དྷ༂༫ཛྷཬ\"}"),
 					},
