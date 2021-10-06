@@ -26,15 +26,16 @@ var (
 	assumeYes  bool
 )
 
-func performValidate(ctx context.Context, kongClient *kong.Client, entity interface{}, entityType string) (bool, error) {
+func validateEntity(ctx context.Context, kongClient *kong.Client, entityType string, entity interface{}) (bool, error) {
+	errWrap := "validate entity '%s': %s"
 	endpoint := fmt.Sprintf("/schemas/%s/validate", entityType)
-	req, err := kongClient.NewRequest("POST", endpoint, nil, entity)
+	req, err := kongClient.NewRequest(http.MethodPost, endpoint, nil, entity)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf(errWrap, entityType, err)
 	}
 	resp, err := kongClient.Do(ctx, req, nil)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf(errWrap, entityType, err)
 	}
 	return resp.StatusCode == http.StatusOK, nil
 }

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/fatih/color"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -17,8 +17,8 @@ import (
 var (
 	validateCmdKongStateFile     []string
 	validateCmdRBACResourcesOnly bool
-	validateCmdKongAPI           bool
-	validateCmdKongAPIEntity     []string
+	validateOnline               bool
+	validateOnlineErrors         []error
 )
 
 // validateCmd represents the diff command
@@ -30,7 +30,7 @@ It reads all the specified state files and reports YAML/JSON
 parsing issues. It also checks for foreign relationships
 and alerts if there are broken relationships, or missing links present.
 
-When ran with the --use-kong-api flag, it also uses the 'validate' endpoint in Kong
+When ran with the --online flag, it also uses the 'validate' endpoint in Kong
 to validate entities configuration.
 `,
 	Args: validateNoArgs,
@@ -63,9 +63,10 @@ to validate entities configuration.
 			return err
 		}
 
-		if validateCmdKongAPI {
-			if err := validateWithKong(cmd, ks); err != nil {
-				return err
+		if validateOnline {
+			validateWithKong(cmd, ks)
+			for _, e := range validateOnlineErrors {
+				cprint.DeletePrintln(e)
 			}
 		}
 		return nil
@@ -79,29 +80,26 @@ to validate entities configuration.
 	},
 }
 
-func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, entityType string) string {
-	_, err := performValidate(ctx, kongClient, entity, entityType)
-	output := ""
+func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, entityType string) error {
+	_, err := validateEntity(ctx, kongClient, entityType, entity)
 	if err != nil {
-		output = color.New(color.FgRed, color.Bold).Sprintf("%s: %v", entityType, err)
+		return err
 	}
-	return output
+	return nil
 }
 
 func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) {
 	// call GetAll on entity
 	method := reflect.ValueOf(obj).MethodByName("GetAll")
 	entities := method.Call([]reflect.Value{})[0].Interface()
-
 	values := reflect.ValueOf(entities)
 	var wg sync.WaitGroup
 	wg.Add(values.Len())
 	for i := 0; i < values.Len(); i++ {
 		go func(i int) {
 			defer wg.Done()
-			output := validate(ctx, values.Index(i).Interface(), kongClient, entityType)
-			if output != "" {
-				fmt.Println(output)
+			if err := validate(ctx, values.Index(i).Interface(), kongClient, entityType); err != nil {
+				validateOnlineErrors = append(validateOnlineErrors, err)
 			}
 		}(i)
 	}
@@ -141,6 +139,6 @@ func init() {
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
-	validateCmd.Flags().BoolVar(&validateCmdKongAPI, "use-kong-api",
+	validateCmd.Flags().BoolVar(&validateOnline, "online",
 		false, "perform schema validation against Kong API.")
 }
