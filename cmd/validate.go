@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sync"
 
 	"github.com/fatih/color"
@@ -23,97 +24,112 @@ var (
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
 	Use:   "validate",
-	Short: "Validate configuration",
-	Long: `The validate command supports 2 modes to ensure validity:
-	- reads the state file (default)
-	- queries Kong API
-
-By default, it reads all the specified state files and reports YAML/JSON
+	Short: "Validate the state file",
+	Long: `The validate command reads the state file and ensures validity.
+It reads all the specified state files and reports YAML/JSON
 parsing issues. It also checks for foreign relationships
 and alerts if there are broken relationships, or missing links present.
 
-When ran with the --use-kong-api flag, it uses the 'validate' endpoint in Kong
+When ran with the --use-kong-api flag, it also uses the 'validate' endpoint in Kong
 to validate entities configuration.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		_ = sendAnalytics("validate", "")
-		if validateCmdKongAPI {
-			return validateWithKong(cmd, validateCmdKongAPIEntity)
+		// read target file
+		// this does json schema validation as well
+		targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
+		if err != nil {
+			return err
 		}
-		return validateWithFile()
+
+		dummyEmptyState, err := state.NewKongState()
+		if err != nil {
+			return err
+		}
+
+		rawState, err := file.Get(targetContent, file.RenderConfig{
+			CurrentState: dummyEmptyState,
+		})
+		if err != nil {
+			return err
+		}
+		if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
+			return err
+		}
+		// this catches foreign relation errors
+		ks, err := state.Get(rawState)
+		if err != nil {
+			return err
+		}
+
+		if validateCmdKongAPI {
+			if err := validateWithKong(cmd, ks); err != nil {
+				return err
+			}
+		}
+		return nil
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(validateCmdKongStateFile) == 0 {
 			return fmt.Errorf("a state file with Kong's configuration " +
 				"must be specified using -s/--state flag")
-		} else if validateCmdKongAPI && len(validateCmdKongAPIEntity) == 0 {
-			return fmt.Errorf("a list of entities must be specified " +
-				"using the -e/--entity flag when validating via Kong API " +
-				"(e.g. -e entity1 -e entity2)")
 		}
 		return nil
 	},
 }
 
-func validate(ctx context.Context, entity string, kongClient *kong.Client) string {
-	_, err := performValidate(ctx, kongClient, entity)
-	output := color.New(color.FgGreen, color.Bold).Sprintf("%s: schema validation successful", entity)
+func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, entityType string) string {
+	_, err := performValidate(ctx, kongClient, entity, entityType)
+	output := ""
 	if err != nil {
-		output = color.New(color.FgRed, color.Bold).Sprintf("%s: %v", entity, err)
+		output = color.New(color.FgRed, color.Bold).Sprintf("%s: %v", entityType, err)
 	}
 	return output
 }
 
-func validateWithKong(cmd *cobra.Command, entity []string) error {
+func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) {
+	// call GetAll on entity
+	method := reflect.ValueOf(obj).MethodByName("GetAll")
+	entities := method.Call([]reflect.Value{})[0].Interface()
+
+	values := reflect.ValueOf(entities)
+	var wg sync.WaitGroup
+	wg.Add(values.Len())
+	for i := 0; i < values.Len(); i++ {
+		go func(i int) {
+			defer wg.Done()
+			output := validate(ctx, values.Index(i).Interface(), kongClient, entityType)
+			if output != "" {
+				fmt.Println(output)
+			}
+		}(i)
+	}
+	wg.Wait()
+}
+
+func validateWithKong(cmd *cobra.Command, ks *state.KongState) error {
 	ctx := cmd.Context()
 	kongClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
 		return err
 	}
-	var wg sync.WaitGroup
-	wg.Add(len(entity))
-
-	for _, e := range entity {
-		go func(e string) {
-			defer wg.Done()
-			output := validate(ctx, e, kongClient)
-			fmt.Println(output)
-		}(e)
-	}
-	wg.Wait()
-
-	return nil
-}
-
-func validateWithFile() error {
-	// read target file
-	// this does json schema validation as well
-	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
-	if err != nil {
-		return err
-	}
-
-	dummyEmptyState, err := state.NewKongState()
-	if err != nil {
-		return err
-	}
-
-	rawState, err := file.Get(targetContent, file.RenderConfig{
-		CurrentState: dummyEmptyState,
-	})
-	if err != nil {
-		return err
-	}
-	if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
-		return err
-	}
-	// this catches foreign relation errors
-	_, err = state.Get(rawState)
-	if err != nil {
-		return err
-	}
-
+	validateEntities(ctx, ks.Services, kongClient, "services")
+	validateEntities(ctx, ks.ACLGroups, kongClient, "acls")
+	validateEntities(ctx, ks.BasicAuths, kongClient, "basicauth_credentials")
+	validateEntities(ctx, ks.CACertificates, kongClient, "ca_certificates")
+	validateEntities(ctx, ks.Certificates, kongClient, "certificates")
+	validateEntities(ctx, ks.Consumers, kongClient, "consumers")
+	validateEntities(ctx, ks.Documents, kongClient, "documents")
+	validateEntities(ctx, ks.HMACAuths, kongClient, "hmacauth_credentials")
+	validateEntities(ctx, ks.JWTAuths, kongClient, "jwt_secrets")
+	validateEntities(ctx, ks.KeyAuths, kongClient, "keyauth_credentials")
+	validateEntities(ctx, ks.Oauth2Creds, kongClient, "oauth2_credentials")
+	validateEntities(ctx, ks.Plugins, kongClient, "plugins")
+	validateEntities(ctx, ks.Routes, kongClient, "routes")
+	validateEntities(ctx, ks.SNIs, kongClient, "snis")
+	validateEntities(ctx, ks.Targets, kongClient, "targets")
+	validateEntities(ctx, ks.Upstreams, kongClient, "upstreams")
 	return nil
 }
 
@@ -126,8 +142,5 @@ func init() {
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	validateCmd.Flags().BoolVar(&validateCmdKongAPI, "use-kong-api",
-		false, "whether to leverage Kong's API to validate configuration.")
-	validateCmd.Flags().StringSliceVarP(&validateCmdKongAPIEntity,
-		"entity", "e", []string{}, "entities to be validated via Kong API "+
-			"(e.g. -e entity1 -e entity2)")
+		false, "perform schema validation against Kong API.")
 }
