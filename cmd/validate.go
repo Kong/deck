@@ -174,6 +174,7 @@ func callGetAll(obj interface{}) reflect.Value {
 }
 
 func validateGetAllMethod() {
+	// let's make sure ASAP that all resources have the expected GetAll method
 	dummyEmptyState, _ := state.NewKongState()
 	callGetAll(dummyEmptyState.Services)
 	callGetAll(dummyEmptyState.ACLGroups)
