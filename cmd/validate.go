@@ -18,7 +18,6 @@ var (
 	validateCmdKongStateFile     []string
 	validateCmdRBACResourcesOnly bool
 	validateOnline               bool
-	validateOnlineErrors         []error
 )
 
 // validateCmd represents the diff command
@@ -64,9 +63,10 @@ to validate entities configuration.
 		}
 
 		if validateOnline {
-			validateWithKong(cmd, ks)
-			for _, e := range validateOnlineErrors {
-				cprint.DeletePrintln(e)
+			if err := validateWithKong(cmd, ks); err != nil {
+				for _, e := range err {
+					cprint.DeletePrintln(e)
+				}
 			}
 		}
 		return nil
@@ -88,47 +88,109 @@ func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, 
 	return nil
 }
 
-func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) {
-	// call GetAll on entity
-	method := reflect.ValueOf(obj).MethodByName("GetAll")
-	entities := method.Call([]reflect.Value{})[0].Interface()
-	values := reflect.ValueOf(entities)
+func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) []error {
+	entities := callGetAll(obj)
+	errors := []error{}
 	var wg sync.WaitGroup
-	wg.Add(values.Len())
-	for i := 0; i < values.Len(); i++ {
+	wg.Add(entities.Len())
+	mu := &sync.Mutex{}
+	for i := 0; i < entities.Len(); i++ {
 		go func(i int) {
 			defer wg.Done()
-			if err := validate(ctx, values.Index(i).Interface(), kongClient, entityType); err != nil {
-				validateOnlineErrors = append(validateOnlineErrors, err)
+			if err := validate(ctx, entities.Index(i).Interface(), kongClient, entityType); err != nil {
+				mu.Lock()
+				errors = append(errors, err)
+				mu.Unlock()
 			}
 		}(i)
 	}
 	wg.Wait()
+	return errors
 }
 
-func validateWithKong(cmd *cobra.Command, ks *state.KongState) error {
+func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
 	ctx := cmd.Context()
 	kongClient, err := utils.GetKongClient(rootConfig)
+	allErr := []error{}
 	if err != nil {
-		return err
+		return []error{err}
 	}
-	validateEntities(ctx, ks.Services, kongClient, "services")
-	validateEntities(ctx, ks.ACLGroups, kongClient, "acls")
-	validateEntities(ctx, ks.BasicAuths, kongClient, "basicauth_credentials")
-	validateEntities(ctx, ks.CACertificates, kongClient, "ca_certificates")
-	validateEntities(ctx, ks.Certificates, kongClient, "certificates")
-	validateEntities(ctx, ks.Consumers, kongClient, "consumers")
-	validateEntities(ctx, ks.Documents, kongClient, "documents")
-	validateEntities(ctx, ks.HMACAuths, kongClient, "hmacauth_credentials")
-	validateEntities(ctx, ks.JWTAuths, kongClient, "jwt_secrets")
-	validateEntities(ctx, ks.KeyAuths, kongClient, "keyauth_credentials")
-	validateEntities(ctx, ks.Oauth2Creds, kongClient, "oauth2_credentials")
-	validateEntities(ctx, ks.Plugins, kongClient, "plugins")
-	validateEntities(ctx, ks.Routes, kongClient, "routes")
-	validateEntities(ctx, ks.SNIs, kongClient, "snis")
-	validateEntities(ctx, ks.Targets, kongClient, "targets")
-	validateEntities(ctx, ks.Upstreams, kongClient, "upstreams")
-	return nil
+	if err := validateEntities(ctx, ks.Services, kongClient, "services"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.ACLGroups, kongClient, "acls"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.BasicAuths, kongClient, "basicauth_credentials"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.CACertificates, kongClient, "ca_certificates"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Certificates, kongClient, "certificates"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Consumers, kongClient, "consumers"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Documents, kongClient, "documents"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.HMACAuths, kongClient, "hmacauth_credentials"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.JWTAuths, kongClient, "jwt_secrets"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.KeyAuths, kongClient, "keyauth_credentials"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Oauth2Creds, kongClient, "oauth2_credentials"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Plugins, kongClient, "plugins"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Routes, kongClient, "routes"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.SNIs, kongClient, "snis"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Targets, kongClient, "targets"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.Upstreams, kongClient, "upstreams"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	return allErr
+}
+
+func callGetAll(obj interface{}) reflect.Value {
+	// call GetAll method on entity
+	method := reflect.ValueOf(obj).MethodByName("GetAll")
+	entities := method.Call([]reflect.Value{})[0].Interface()
+	return reflect.ValueOf(entities)
+}
+
+func validateGetAllMethod() {
+	dummyEmptyState, _ := state.NewKongState()
+	callGetAll(dummyEmptyState.Services)
+	callGetAll(dummyEmptyState.ACLGroups)
+	callGetAll(dummyEmptyState.BasicAuths)
+	callGetAll(dummyEmptyState.CACertificates)
+	callGetAll(dummyEmptyState.Certificates)
+	callGetAll(dummyEmptyState.Consumers)
+	callGetAll(dummyEmptyState.Documents)
+	callGetAll(dummyEmptyState.HMACAuths)
+	callGetAll(dummyEmptyState.JWTAuths)
+	callGetAll(dummyEmptyState.KeyAuths)
+	callGetAll(dummyEmptyState.Oauth2Creds)
+	callGetAll(dummyEmptyState.Plugins)
+	callGetAll(dummyEmptyState.Routes)
+	callGetAll(dummyEmptyState.SNIs)
+	callGetAll(dummyEmptyState.Targets)
+	callGetAll(dummyEmptyState.Upstreams)
 }
 
 func init() {
@@ -141,4 +203,5 @@ func init() {
 			"Use '-' to read from stdin.")
 	validateCmd.Flags().BoolVar(&validateOnline, "online",
 		false, "perform schema validation against Kong API.")
+	validateGetAllMethod()
 }
