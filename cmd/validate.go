@@ -6,7 +6,6 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -20,6 +19,8 @@ var (
 	validateOnline               bool
 )
 
+var maxConcurrency = 100
+
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
 	Use:   "validate",
@@ -29,8 +30,8 @@ It reads all the specified state files and reports YAML/JSON
 parsing issues. It also checks for foreign relationships
 and alerts if there are broken relationships, or missing links present.
 
-When ran with the --online flag, it also uses the 'validate' endpoint in Kong
-to validate entities configuration.
+No communication takes places between decK and Kong during the execution of
+this command unless --online flag is used.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -63,9 +64,9 @@ to validate entities configuration.
 		}
 
 		if validateOnline {
-			if err := validateWithKong(cmd, ks); err != nil {
-				for _, e := range err {
-					cprint.DeletePrintln(e)
+			if errs := validateWithKong(cmd, ks); errs != nil {
+				for _, e := range errs {
+					fmt.Println(e)
 				}
 			}
 		}
@@ -91,13 +92,26 @@ func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, 
 func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) []error {
 	entities := callGetAll(obj)
 	errors := []error{}
+
+	// create a buffer of channels. Creation of new coroutines
+	// are allowed only if the buffer is not full.
+	chanBuff := make(chan struct{}, maxConcurrency)
+
 	var wg sync.WaitGroup
 	wg.Add(entities.Len())
+	// each coroutine will append on a slice of errors.
+	// since slices are not thread-safe, let's add a mutex
+	// to handle access to the slice.
 	mu := &sync.Mutex{}
 	for i := 0; i < entities.Len(); i++ {
+		// reserve a slot
+		chanBuff <- struct{}{}
 		go func(i int) {
 			defer wg.Done()
-			if err := validate(ctx, entities.Index(i).Interface(), kongClient, entityType); err != nil {
+			// release a slot when completed
+			defer func() { <-chanBuff }()
+			_, err := validateEntity(ctx, kongClient, entityType, entities.Index(i).Interface())
+			if err != nil {
 				mu.Lock()
 				errors = append(errors, err)
 				mu.Unlock()
@@ -173,7 +187,10 @@ func callGetAll(obj interface{}) reflect.Value {
 	return reflect.ValueOf(entities)
 }
 
-func validateGetAllMethod() {
+// ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.
+// If the method doesn't exist, the code will panic. This increases the likelihood of catching such an
+// error during manual testing.
+func ensureGetAllMethods() {
 	// let's make sure ASAP that all resources have the expected GetAll method
 	dummyEmptyState, _ := state.NewKongState()
 	callGetAll(dummyEmptyState.Services)
@@ -204,5 +221,5 @@ func init() {
 			"Use '-' to read from stdin.")
 	validateCmd.Flags().BoolVar(&validateOnline, "online",
 		false, "perform schema validation against Kong API.")
-	validateGetAllMethod()
+	ensureGetAllMethods()
 }
