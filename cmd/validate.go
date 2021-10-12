@@ -81,14 +81,6 @@ this command unless --online flag is used.
 	},
 }
 
-func validate(ctx context.Context, entity interface{}, kongClient *kong.Client, entityType string) error {
-	_, err := validateEntity(ctx, kongClient, entityType, entity)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) []error {
 	entities := callGetAll(obj)
 	errors := []error{}
