@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"reflect"
 	"sync"
 
@@ -68,6 +69,7 @@ this command unless --online flag is used.
 				for _, e := range errs {
 					fmt.Println(e)
 				}
+				os.Exit(1)
 			}
 		}
 		return nil
@@ -169,6 +171,12 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
 	if err := validateEntities(ctx, ks.Upstreams, kongClient, "upstreams"); err != nil {
 		allErr = append(allErr, err...)
 	}
+	if err := validateEntities(ctx, ks.RBACEndpointPermissions, kongClient, "rbac-endpointpermission"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.RBACRoles, kongClient, "rbac-role"); err != nil {
+		allErr = append(allErr, err...)
+	}
 	return allErr
 }
 
@@ -201,6 +209,8 @@ func ensureGetAllMethods() {
 	callGetAll(dummyEmptyState.SNIs)
 	callGetAll(dummyEmptyState.Targets)
 	callGetAll(dummyEmptyState.Upstreams)
+	callGetAll(dummyEmptyState.RBACEndpointPermissions)
+	callGetAll(dummyEmptyState.RBACRoles)
 }
 
 func init() {
