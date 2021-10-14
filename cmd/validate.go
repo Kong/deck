@@ -118,6 +118,12 @@ func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Cli
 
 func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
 	ctx := cmd.Context()
+	// make sure we are able to connect to Kong
+	_, err := fetchKongVersion(ctx, rootConfig)
+	if err != nil {
+		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
+	}
+
 	kongClient, err := utils.GetKongClient(rootConfig)
 	allErr := []error{}
 	if err != nil {
