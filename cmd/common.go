@@ -58,11 +58,20 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 		return false, err
 	}
 
-	exists, err := rootClient.Workspaces.ExistsByName(ctx, &workspaceName)
+	exists, err := rootClient.Workspaces.Exists(ctx, &workspaceName)
 	if err != nil {
 		return false, fmt.Errorf("checking if workspace exists: %w", err)
 	}
 	return exists, nil
+}
+
+func getWorkspaceName(workspace string, targetContent *file.Content) string {
+	if workspace != targetContent.Workspace && workspace != "" {
+		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
+			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
+		return workspace
+	}
+	return targetContent.Workspace
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
@@ -79,16 +88,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	var wsConfig utils.KongClientConfig
-	var workspaceName string
 	// prepare to read the current state from Kong
-	if workspace != targetContent.Workspace && workspace != "" {
-		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
-			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
-		workspaceName = workspace
-	} else {
-		workspaceName = targetContent.Workspace
-	}
+	var wsConfig utils.KongClientConfig
+	workspaceName := getWorkspaceName(workspace, targetContent)
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace

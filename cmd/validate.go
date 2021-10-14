@@ -18,6 +18,7 @@ var (
 	validateCmdKongStateFile     []string
 	validateCmdRBACResourcesOnly bool
 	validateOnline               bool
+	validateWorkspace            string
 )
 
 var maxConcurrency = 100
@@ -65,7 +66,7 @@ this command unless --online flag is used.
 		}
 
 		if validateOnline {
-			if errs := validateWithKong(cmd, ks); errs != nil {
+			if errs := validateWithKong(cmd, ks, targetContent); errs != nil {
 				for _, e := range errs {
 					fmt.Println(e)
 				}
@@ -116,7 +117,7 @@ func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Cli
 	return errors
 }
 
-func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
+func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *file.Content) []error {
 	ctx := cmd.Context()
 	// make sure we are able to connect to Kong
 	_, err := fetchKongVersion(ctx, rootConfig)
@@ -124,11 +125,34 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
 		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
 	}
 
-	kongClient, err := utils.GetKongClient(rootConfig)
+	// check if workspace exists
+	workspaceName := getWorkspaceName(validateWorkspace, targetContent)
+	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
+	if err != nil {
+		return []error{err}
+	}
+	if !workspaceExists {
+		return []error{fmt.Errorf("workspace doesn't exist: %s", workspaceName)}
+	}
+
+	wsConfig := rootConfig.ForWorkspace(workspaceName)
+	kongClient, err := utils.GetKongClient(wsConfig)
 	allErr := []error{}
 	if err != nil {
 		return []error{err}
 	}
+
+	// validate RBAC resources first.
+	if err := validateEntities(ctx, ks.RBACEndpointPermissions, kongClient, "rbac-endpointpermission"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if err := validateEntities(ctx, ks.RBACRoles, kongClient, "rbac-role"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if validateCmdRBACResourcesOnly {
+		return allErr
+	}
+
 	if err := validateEntities(ctx, ks.Services, kongClient, "services"); err != nil {
 		allErr = append(allErr, err...)
 	}
@@ -177,12 +201,6 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState) []error {
 	if err := validateEntities(ctx, ks.Upstreams, kongClient, "upstreams"); err != nil {
 		allErr = append(allErr, err...)
 	}
-	if err := validateEntities(ctx, ks.RBACEndpointPermissions, kongClient, "rbac-endpointpermission"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.RBACRoles, kongClient, "rbac-role"); err != nil {
-		allErr = append(allErr, err...)
-	}
 	return allErr
 }
 
@@ -229,5 +247,9 @@ func init() {
 			"Use '-' to read from stdin.")
 	validateCmd.Flags().BoolVar(&validateOnline, "online",
 		false, "perform schema validation against Kong API.")
+	validateCmd.Flags().StringVarP(&validateWorkspace, "workspace", "w",
+		"", "validate configuration of a specific workspace "+
+			"(Kong Enterprise only).\n"+
+			"This takes precedence over _workspace fields in state files.")
 	ensureGetAllMethods()
 }
