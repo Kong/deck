@@ -66,7 +66,7 @@ this command unless --online flag is used.
 		}
 
 		if validateOnline {
-			if errs := validateWithKong(cmd, ks, targetContent); errs != nil {
+			if errs := validateWithKong(cmd, ks, targetContent); len(errs) != 0 {
 				for _, e := range errs {
 					fmt.Println(e)
 				}
