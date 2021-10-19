@@ -58,7 +58,7 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 		return false, err
 	}
 
-	exists, err := rootClient.Workspaces.Exists(ctx, &workspaceName)
+	exists, err := rootClient.Workspaces.ExistsByName(ctx, &workspaceName)
 	if err != nil {
 		return false, fmt.Errorf("checking if workspace exists: %w", err)
 	}
