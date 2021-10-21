@@ -65,11 +65,11 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 	return exists, nil
 }
 
-func getWorkspaceName(workspace string, targetContent *file.Content) string {
-	if workspace != targetContent.Workspace && workspace != "" {
+func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string {
+	if workspaceFlag != targetContent.Workspace && workspaceFlag != "" {
 		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
-			"different from workspace '%v' found in state file(s).\n", workspace, targetContent.Workspace)
-		return workspace
+			"different from workspace '%v' found in state file(s).\n", workspaceFlag, targetContent.Workspace)
+		return workspaceFlag
 	}
 	return targetContent.Workspace
 }
