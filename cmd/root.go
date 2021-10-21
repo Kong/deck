@@ -154,6 +154,20 @@ func init() {
 		"Set a request timeout for the client to connect with Kong (in seconds).")
 	viper.BindPFlag("timeout",
 		rootCmd.PersistentFlags().Lookup("timeout"))
+
+	rootCmd.PersistentFlags().String("tls-client-cert", "",
+		"Set the Kong's Admin TLS client certificate.\n"+
+			"This value can also be set using DECK_TLS_CLIENT_CERT "+
+			"environment variable. Must be used in conjunction with tls-client-key")
+	viper.BindPFlag("tls-client-cert",
+		rootCmd.PersistentFlags().Lookup("tls-client-cert"))
+
+	rootCmd.PersistentFlags().String("tls-client-key", "",
+		"Set the Kong's Admin TLS client key.\n"+
+			"This value can also be set using DECK_TLS_CLIENT_KEY "+
+			"environment variable. Must be used in conjunction with tls-client-cert")
+	viper.BindPFlag("tls-client-key",
+		rootCmd.PersistentFlags().Lookup("tls-client-key"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -206,6 +220,8 @@ func initConfig() {
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
+	rootConfig.TLSClientCert = viper.GetString("tls-client-cert")
+	rootConfig.TLSClientKey = viper.GetString("tls-client-key")
 
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 
