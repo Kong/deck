@@ -85,7 +85,10 @@ this command unless --online flag is used.
 }
 
 func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) []error {
-	entities := callGetAll(obj)
+	entities, err := callGetAll(obj)
+	if err != nil {
+		return []error{err}
+	}
 	errors := []error{}
 
 	// create a buffer of channels. Creation of new coroutines
@@ -204,37 +207,80 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *fi
 	return allErr
 }
 
-func callGetAll(obj interface{}) reflect.Value {
+func callGetAll(obj interface{}) (reflect.Value, error) {
 	// call GetAll method on entity
+	var result reflect.Value
 	method := reflect.ValueOf(obj).MethodByName("GetAll")
+	if !method.IsValid() {
+		return result, fmt.Errorf("GetAll() method not found for %v. "+
+			"Please file a bug with Kong Inc.", reflect.ValueOf(obj).Type())
+	}
 	entities := method.Call([]reflect.Value{})[0].Interface()
-	return reflect.ValueOf(entities)
+	result = reflect.ValueOf(entities)
+	return result, nil
 }
 
 // ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.
 // If the method doesn't exist, the code will panic. This increases the likelihood of catching such an
 // error during manual testing.
-func ensureGetAllMethods() {
+func ensureGetAllMethods() error {
 	// let's make sure ASAP that all resources have the expected GetAll method
 	dummyEmptyState, _ := state.NewKongState()
-	callGetAll(dummyEmptyState.Services)
-	callGetAll(dummyEmptyState.ACLGroups)
-	callGetAll(dummyEmptyState.BasicAuths)
-	callGetAll(dummyEmptyState.CACertificates)
-	callGetAll(dummyEmptyState.Certificates)
-	callGetAll(dummyEmptyState.Consumers)
-	callGetAll(dummyEmptyState.Documents)
-	callGetAll(dummyEmptyState.HMACAuths)
-	callGetAll(dummyEmptyState.JWTAuths)
-	callGetAll(dummyEmptyState.KeyAuths)
-	callGetAll(dummyEmptyState.Oauth2Creds)
-	callGetAll(dummyEmptyState.Plugins)
-	callGetAll(dummyEmptyState.Routes)
-	callGetAll(dummyEmptyState.SNIs)
-	callGetAll(dummyEmptyState.Targets)
-	callGetAll(dummyEmptyState.Upstreams)
-	callGetAll(dummyEmptyState.RBACEndpointPermissions)
-	callGetAll(dummyEmptyState.RBACRoles)
+	if _, err := callGetAll(dummyEmptyState.Services); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.ACLGroups); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.BasicAuths); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.CACertificates); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Certificates); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Consumers); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Documents); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.HMACAuths); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.JWTAuths); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.KeyAuths); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Oauth2Creds); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Plugins); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Routes); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.SNIs); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Targets); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.Upstreams); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.RBACEndpointPermissions); err != nil {
+		return err
+	}
+	if _, err := callGetAll(dummyEmptyState.RBACRoles); err != nil {
+		return err
+	}
+	return nil
 }
 
 func init() {
@@ -251,5 +297,8 @@ func init() {
 		"", "validate configuration of a specific workspace "+
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
-	ensureGetAllMethods()
+	if err := ensureGetAllMethods(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
