@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/dump"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 )
@@ -47,12 +48,15 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
+func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config) (*utils.KongRawState, error) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+	if len(dumpConfig.SelectorTags) > 0 {
+		builder.selectTags = dumpConfig.SelectorTags
+	}
 
 	state, _, err := builder.build()
 	if err != nil {

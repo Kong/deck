@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
 	"github.com/spf13/cobra"
@@ -42,7 +43,7 @@ this command.
 
 		rawState, err := file.Get(targetContent, file.RenderConfig{
 			CurrentState: dummyEmptyState,
-		})
+		}, dump.Config{})
 		if err != nil {
 			return err
 		}

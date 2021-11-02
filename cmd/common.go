@@ -137,7 +137,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	rawState, err := file.Get(targetContent, file.RenderConfig{
 		CurrentState: currentState,
 		KongVersion:  parsedKongVersion,
-	})
+	}, dumpConfig)
 	if err != nil {
 		return err
 	}

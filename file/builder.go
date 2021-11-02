@@ -2,6 +2,7 @@ package file
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
@@ -40,7 +41,13 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.konnectRawState = &utils.KonnectRawState{}
 
 	if b.targetContent.Info != nil {
-		b.selectTags = b.targetContent.Info.SelectorTags
+		if len(b.selectTags) > 0 {
+			if !reflect.DeepEqual(b.selectTags, b.targetContent.Info.SelectorTags) {
+				return nil, nil, fmt.Errorf("different tags specified by state file and --select-tags differ")
+			}
+		} else {
+			b.selectTags = b.targetContent.Info.SelectorTags
+		}
 	}
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
