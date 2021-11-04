@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"reflect"
+	"sort"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/cprint"
@@ -107,7 +109,17 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	if targetContent.Info != nil {
-		dumpConfig.SelectorTags = targetContent.Info.SelectorTags
+		if len(targetContent.Info.SelectorTags) > 0 {
+			if len(dumpConfig.SelectorTags) > 0 {
+				sort.Strings(dumpConfig.SelectorTags)
+				sort.Strings(targetContent.Info.SelectorTags)
+				if !reflect.DeepEqual(dumpConfig.SelectorTags, targetContent.Info.SelectorTags) {
+					return fmt.Errorf("different tags specified by state file and --select-tags differ")
+				}
+			} else {
+				dumpConfig.SelectorTags = targetContent.Info.SelectorTags
+			}
+		}
 	}
 
 	// read the current state
