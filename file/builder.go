@@ -3,6 +3,7 @@ package file
 import (
 	"fmt"
 	"reflect"
+	"sort"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
@@ -41,12 +42,16 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.konnectRawState = &utils.KonnectRawState{}
 
 	if b.targetContent.Info != nil {
-		if len(b.selectTags) > 0 {
-			if !reflect.DeepEqual(b.selectTags, b.targetContent.Info.SelectorTags) {
-				return nil, nil, fmt.Errorf("different tags specified by state file and --select-tags differ")
+		if len(b.targetContent.Info.SelectorTags) > 0 {
+			if len(b.selectTags) > 0 {
+				sort.Strings(b.selectTags)
+				sort.Strings(b.targetContent.Info.SelectorTags)
+				if !reflect.DeepEqual(b.selectTags, b.targetContent.Info.SelectorTags) {
+					return nil, nil, fmt.Errorf("different tags specified by state file and --select-tags differ")
+				}
+			} else {
+				b.selectTags = b.targetContent.Info.SelectorTags
 			}
-		} else {
-			b.selectTags = b.targetContent.Info.SelectorTags
 		}
 	}
 	b.intermediate, err = state.NewKongState()
