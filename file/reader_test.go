@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -69,6 +70,46 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 	c, err := GetContentFromFiles(filenames)
 	assert.NotNil(err)
 	assert.Nil(c)
+}
+
+func TestTransformNotFalse(t *testing.T) {
+	filenames := []string{"-"}
+	assert := assert.New(t)
+	assert.Equal("-", filenames[0])
+
+	var content bytes.Buffer
+	content.Write([]byte("_transform: false\nservices:\n- host: test.com\n  name: test service\n"))
+
+	tmpfile, err := ioutil.TempFile("", "example")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	if _, err := tmpfile.Write(content.Bytes()); err != nil {
+		panic(err)
+	}
+
+	if _, err := tmpfile.Seek(0, 0); err != nil {
+		panic(err)
+	}
+
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }() // Restore original Stdin
+
+	os.Stdin = tmpfile
+
+	c, err := GetContentFromFiles(filenames)
+	if err != nil {
+		panic(err)
+	}
+	parsed, err := Get(c, RenderConfig{})
+	assert.Equal(err, errors.New("_transform: false is not supported"))
+	assert.Nil(parsed)
+
+	parsed, _, err = GetForKonnect(c, RenderConfig{})
+	assert.Equal(err, errors.New("_transform: false is not supported"))
+	assert.Nil(parsed)
 }
 
 func TestReadKongStateFromStdin(t *testing.T) {
