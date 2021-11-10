@@ -114,7 +114,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 				sort.Strings(dumpConfig.SelectorTags)
 				sort.Strings(targetContent.Info.SelectorTags)
 				if !reflect.DeepEqual(dumpConfig.SelectorTags, targetContent.Info.SelectorTags) {
-					return fmt.Errorf("different tags specified by state file and --select-tags differ")
+					return fmt.Errorf("tags specified in the state file and via --select-tags flag are different. decK expects tags to be specified in either via flag or via state file. In case both are specified, they must match.")
 				}
 			} else {
 				dumpConfig.SelectorTags = targetContent.Info.SelectorTags
