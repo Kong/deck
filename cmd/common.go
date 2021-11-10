@@ -108,18 +108,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	if targetContent.Info != nil {
-		if len(targetContent.Info.SelectorTags) > 0 {
-			if len(dumpConfig.SelectorTags) > 0 {
-				sort.Strings(dumpConfig.SelectorTags)
-				sort.Strings(targetContent.Info.SelectorTags)
-				if !reflect.DeepEqual(dumpConfig.SelectorTags, targetContent.Info.SelectorTags) {
-					return fmt.Errorf("tags specified in the state file and via --select-tags flag are different. decK expects tags to be specified in either via flag or via state file. In case both are specified, they must match.")
-				}
-			} else {
-				dumpConfig.SelectorTags = targetContent.Info.SelectorTags
-			}
-		}
+	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
+	if err != nil {
+		return err
 	}
 
 	// read the current state
@@ -170,6 +161,28 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		os.Exit(exitCodeDiffDetection)
 	}
 	return nil
+}
+
+func determineSelectorTag(targetContent file.Content, config dump.Config) ([]string, error) {
+	if targetContent.Info != nil {
+		if len(targetContent.Info.SelectorTags) > 0 {
+			if len(config.SelectorTags) > 0 {
+				sort.Strings(config.SelectorTags)
+				sort.Strings(targetContent.Info.SelectorTags)
+				if !reflect.DeepEqual(config.SelectorTags, targetContent.Info.SelectorTags) {
+					return nil, fmt.Errorf(`tags specified in the state file and via --select-tags flag are different.
+					decK expects tags to be specified in either via flag or via state file.
+					In case both are specified, they must match`)
+				}
+				// Both present and equal, return whichever
+				return targetContent.Info.SelectorTags, nil
+			}
+			// Only targetContent.Info.SelectorTags present
+			return targetContent.Info.SelectorTags, nil
+		}
+	}
+	// Either targetContent.Info or targetContent.Info.SelectorTags is empty, return config tags
+	return config.SelectorTags, nil
 }
 
 func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump.Config) (*state.KongState, error) {
