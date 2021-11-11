@@ -98,6 +98,14 @@ You can get the image with the command:
 docker pull kong/deck
 ```
 
+### asdf plugin
+
+If you are using [asdf](https://github.com/asdf-vm/asdf), you can add the deck plugin using the following command:
+
+```
+asdf plugin add deck
+```
+
 ## Documentation
 
 You can use `--help` flag once you've decK installed on your system
