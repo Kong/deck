@@ -29,6 +29,15 @@ func TestDetermineSelectorTag(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "both present and equal order invariant",
+			args: args{
+				dumpConfig:  dump.Config{SelectorTags: []string{"foo", "bar"}},
+				fileContent: file.Content{Info: &file.Info{SelectorTags: []string{"bar", "foo"}}},
+			},
+			want:    []string{"bar", "foo"},
+			wantErr: false,
+		},
+		{
 			name: "both present and not equal",
 			args: args{
 				dumpConfig:  dump.Config{SelectorTags: []string{"bar"}},
