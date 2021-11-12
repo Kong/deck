@@ -39,9 +39,6 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.rawState = &utils.KongRawState{}
 	b.konnectRawState = &utils.KonnectRawState{}
 
-	if b.targetContent.Info != nil {
-		b.selectTags = b.targetContent.Info.SelectorTags
-	}
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
 		return nil, nil, err
