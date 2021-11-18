@@ -117,6 +117,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
+		fmt.Printf("DDB getting current state from Kong\n")
 		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 		if err != nil {
 			return err
@@ -146,6 +147,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	// read the target state
+	fmt.Printf("DDB getting target state from state file\n")
 	rawState, err := file.Get(targetContent, file.RenderConfig{
 		CurrentState: currentState,
 		KongVersion:  parsedKongVersion,

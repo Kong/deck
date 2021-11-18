@@ -1,6 +1,8 @@
 package state
 
 import (
+	"fmt"
+
 	"github.com/kong/deck/utils"
 	"github.com/pkg/errors"
 )
@@ -150,6 +152,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		if err != nil {
 			return errors.Wrap(err, "inserting target into state")
 		}
+		fmt.Printf("DDB buildKong added target to state: id %v, upstream %v, target %v\n", *t.ID, *t.Upstream.ID, *t.Target)
 	}
 
 	for _, c := range raw.Certificates {

@@ -1,6 +1,8 @@
 package file
 
 import (
+	"fmt"
+
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
@@ -675,6 +677,7 @@ func (b *stateBuilder) ingestTargets(targets []kong.Target) error {
 				t.ID = kong.String(*target.ID)
 			}
 		}
+		fmt.Printf("DDB ingestTargets found target: id %v, upstream %v, target %v\n", *t.ID, *t.Upstream.ID, *t.Target)
 		utils.MustMergeTags(&t, b.selectTags)
 		b.defaulter.MustSet(&t)
 		b.rawState.Targets = append(b.rawState.Targets, &t)

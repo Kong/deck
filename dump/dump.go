@@ -201,6 +201,9 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		}
 		state.Upstreams = upstreams
 		targets, err := GetAllTargets(ctx, client, upstreams, config.SelectorTags)
+		for _, target := range targets {
+			fmt.Printf("DDB getProxyConfiguration found target: id %v, upstream %v, target %v\n", *target.ID, *target.Upstream.ID, *target.Target)
+		}
 		if err != nil {
 			return errors.Wrap(err, "targets")
 		}
