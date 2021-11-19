@@ -13,8 +13,10 @@ func (sc *Syncer) deleteTargets() error {
 	if err != nil {
 		return errors.Wrap(err, "error fetching targets from state")
 	}
+	fmt.Printf("DDB deleteTargets() found %v targets in current state", len(currentTargets))
 
 	for _, target := range currentTargets {
+		fmt.Printf("DDB diff.deleteTargets processing target: id %v, upstream %v, target %v\n", *target.ID, *target.Upstream.ID, *target.Target.Target)
 		n, err := sc.deleteTarget(target)
 		if err != nil {
 			return err

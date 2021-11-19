@@ -2,6 +2,7 @@ package diff
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -83,12 +84,16 @@ func NewSyncer(current, target *state.KongState) (*Syncer, error) {
 
 func (sc *Syncer) diff() error {
 	var err error
+	fmt.Printf("DDB starting createUpdate() from diff()")
 	err = sc.createUpdate()
 	if err != nil {
+		fmt.Printf("DDB createUpdate() returned error: %v", err)
 		return err
 	}
+	fmt.Printf("DDB starting delete() from diff()")
 	err = sc.delete()
 	if err != nil {
+		fmt.Printf("DDB delete() returned error: %v", err)
 		return err
 	}
 	return nil
@@ -129,6 +134,7 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("DDB starting deleteTargets()")
 	err = sc.deleteTargets()
 	if err != nil {
 		return err
@@ -395,6 +401,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	wg.Add(parallelism)
 	for i := 0; i < parallelism; i++ {
 		go func() {
+			fmt.Printf("DDB starting eventLoop() consumer")
 			err := sc.eventLoop(d)
 			if err != nil {
 				sc.errChan <- err
@@ -406,6 +413,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	// start the producer
 	wg.Add(1)
 	go func() {
+		fmt.Printf("DDB starting diff() producer")
 		err := sc.diff()
 		if err != nil {
 			sc.errChan <- err
