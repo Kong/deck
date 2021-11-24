@@ -10,8 +10,10 @@ import (
 )
 
 var (
+	// ErrorTransformFalseNotSupported indicates that no transform mode is not supported
 	ErrorTransformFalseNotSupported = fmt.Errorf("_transform: false is not supported")
-	ErrorFilenameEmpty              = fmt.Errorf("filename cannot be empty")
+	// ErrorFilenameEmpty indicates that you must provide a filename
+	ErrorFilenameEmpty = fmt.Errorf("filename cannot be empty")
 )
 
 // RenderConfig contains necessary information to render a correct
