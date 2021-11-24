@@ -9,6 +9,11 @@ import (
 	"github.com/kong/deck/utils"
 )
 
+var (
+	ErrorTransformFalseNotSupported = fmt.Errorf("_transform: false is not supported")
+	ErrorFilenameEmpty              = fmt.Errorf("filename cannot be empty")
+)
+
 // RenderConfig contains necessary information to render a correct
 // KongConfig from a file.
 type RenderConfig struct {
@@ -26,7 +31,7 @@ type RenderConfig struct {
 // or if there is any error during processing.
 func GetContentFromFiles(filenames []string) (*Content, error) {
 	if len(filenames) == 0 {
-		return nil, fmt.Errorf("filename cannot be empty")
+		return nil, ErrorFilenameEmpty
 	}
 
 	return getContent(filenames)
@@ -41,7 +46,7 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 	builder.kongVersion = opt.KongVersion
 
 	if fileContent.Transform != nil && !*fileContent.Transform {
-		return nil, nil, fmt.Errorf("_transform: false is not supported")
+		return nil, nil, ErrorTransformFalseNotSupported
 	}
 
 	kongState, konnectState, err := builder.build()
@@ -64,7 +69,7 @@ func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config) (*utils
 	}
 
 	if fileContent.Transform != nil && !*fileContent.Transform {
-		return nil, fmt.Errorf("_transform: false is not supported")
+		return nil, ErrorTransformFalseNotSupported
 	}
 
 	state, _, err := builder.build()

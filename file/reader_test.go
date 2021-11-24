@@ -2,7 +2,6 @@ package file
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -103,11 +102,11 @@ func TestTransformNotFalse(t *testing.T) {
 		panic(err)
 	}
 	parsed, err := Get(c, RenderConfig{})
-	assert.Equal(err, errors.New("_transform: false is not supported"))
+	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
 	parsed, _, err = GetForKonnect(c, RenderConfig{})
-	assert.Equal(err, errors.New("_transform: false is not supported"))
+	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 }
 
