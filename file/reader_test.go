@@ -82,7 +82,8 @@ func TestTransformNotFalse(t *testing.T) {
 	}
 	defer os.Remove(tmpfile.Name())
 
-	if _, err := tmpfile.WriteString("_transform: false\nservices:\n- host: test.com\n  name: test service\n"); err != nil {
+	_, err = tmpfile.WriteString("_transform: false\nservices:\n- host: test.com\n  name: test service\n")
+	if err != nil {
 		panic(err)
 	}
 
