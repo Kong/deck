@@ -32,7 +32,7 @@ func GetContentFromFiles(filenames []string) (*Content, error) {
 	return getContent(filenames)
 }
 
-// GetForKonnect process the fileContent and renders a RawState and KonnectRawState
+// GetForKonnect processes the fileContent and renders a RawState and KonnectRawState
 func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState, *utils.KonnectRawState, error) {
 	var builder stateBuilder
 	// setup

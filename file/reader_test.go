@@ -75,7 +75,6 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 func TestTransformNotFalse(t *testing.T) {
 	filenames := []string{"-"}
 	assert := assert.New(t)
-	assert.Equal("-", filenames[0])
 
 	var content bytes.Buffer
 	content.Write([]byte("_transform: false\nservices:\n- host: test.com\n  name: test service\n"))
