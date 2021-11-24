@@ -75,16 +75,13 @@ func TestTransformNotFalse(t *testing.T) {
 	filenames := []string{"-"}
 	assert := assert.New(t)
 
-	var content bytes.Buffer
-	content.Write([]byte("_transform: false\nservices:\n- host: test.com\n  name: test service\n"))
-
 	tmpfile, err := ioutil.TempFile("", "example")
 	if err != nil {
 		panic(err)
 	}
 	defer os.Remove(tmpfile.Name())
 
-	if _, err := tmpfile.Write(content.Bytes()); err != nil {
+	if _, err := tmpfile.WriteString("_transform: false\nservices:\n- host: test.com\n  name: test service\n"); err != nil {
 		panic(err)
 	}
 
