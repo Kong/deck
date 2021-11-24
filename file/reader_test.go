@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kong/deck/dump"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
@@ -98,7 +99,7 @@ func TestTransformNotFalse(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	parsed, err := Get(c, RenderConfig{})
+	parsed, err := Get(c, RenderConfig{}, dump.Config{})
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
