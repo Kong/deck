@@ -477,6 +477,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 	var errs []error
 	select {
 	case <-ctx.Done():
+		errs = append(errs, fmt.Errorf("failed to sync all entities: %w", ctx.Err()))
 	case err, ok := <-sc.errChan:
 		if ok && err != nil {
 			if err != errEnqueueFailed {
