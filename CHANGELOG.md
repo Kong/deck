@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.8.3](#v183)
 - [v1.8.2](#v182)
 - [v1.8.1](#v181)
 - [v1.8.0](#v180)
@@ -32,6 +33,20 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.8.3]
+
+> Release date: 2021/12/02
+
+### Fixed
+
+- `--select-tag` applies its tags to newly-created entities whether or not the
+  tag is also present in the state file metadata.
+  [#517](https://github.com/Kong/deck/pull/517)
+- Timeouts in `Syncer.Run()` now return an error instead of syncing only a
+  subset of the requested changes and reporting success. Downstream clients
+  using decK as a library can determine when their sync attempt failed due to a
+  timeout. [#529](https://github.com/Kong/deck/pull/529)
 
 ## [v1.8.2]
 
