@@ -174,6 +174,21 @@ func Test_compareOrder(t *testing.T) {
 		},
 
 		{
+			sortable1: &FDeveloper{
+				Developer: kong.Developer{
+					Email: kong.String("my-developer-1"),
+					ID:    kong.String("my-id-2"),
+				},
+			},
+			sortable2: &FDeveloper{
+				Developer: kong.Developer{
+					Email: kong.String("my-developer-2"),
+					ID:    kong.String("my-id-2"),
+				},
+			},
+			expected: true,
+		},
+		{
 			sortable1: &FServicePackage{
 				Name: kong.String("my-service-package-1"),
 				ID:   kong.String("my-id-1"),

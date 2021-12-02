@@ -280,6 +280,27 @@ func Test_sortKey(t *testing.T) {
 			sortable:    FServiceVersion{},
 			expectedKey: "",
 		},
+		{
+			sortable: &FDeveloper{
+				Developer: kong.Developer{
+					Email: kong.String("my-developer"),
+					ID:    kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-developer",
+		},
+		{
+			sortable: &FDeveloper{
+				Developer: kong.Developer{
+					ID: kong.String("my-id"),
+				},
+			},
+			expectedKey: "my-id",
+		},
+		{
+			sortable:    FDeveloper{},
+			expectedKey: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -477,6 +498,115 @@ func Test_unwrapURL(t *testing.T) {
 			if !reflect.DeepEqual(tt.args.fService, &in) {
 				t.Errorf("unwrapURL() got = %v, want = %v", &in, tt.args.fService)
 			}
+		})
+	}
+}
+
+func Test_unwrapDeveloper(t *testing.T) {
+	type args struct {
+		developer  developer
+		fDeveloper *FDeveloper
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name": "Foo BAR",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"full_name\": \"Foo BAR\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"": "",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"\": \"\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name_key": "Foo BAR 1234",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String("{\"full_name_key\": \"Foo BAR 1234\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name":  "Foo BAR",
+						"test@char!": "ñîûæøœ€£ƒo©¥ßµ",
+						"789":        "123",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						Meta: kong.String(
+							"{\"full_name\": \"Foo BAR\", \"test@char!\": \"ñîûæøœ€£ƒo©¥ßµ\", \"789\": \"123\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			args: args{
+				developer: developer{
+					Meta: map[string]interface{}{
+						"full_name":    "Foo BAR",
+						"char_arabic":  " ؄ ي ظ ڠ ڜ", //nolint:stylecheck
+						"char_tibetan": "༇དྷ༂༫ཛྷཬ",
+					},
+				},
+				fDeveloper: &FDeveloper{
+					Developer: kong.Developer{
+						//nolint:stylecheck
+						Meta: kong.String(
+							"{\"full_name\": \"Foo BAR\",\"char_arabic\": \" ؄ ي ظ ڠ ڜ\", \"char_tibetan\": \"༇དྷ༂༫ཛྷཬ\"}"),
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			in := FDeveloper{}
+			if err := copyFromDeveloper(tt.args.developer, &in); (err != nil) != tt.wantErr {
+				t.Errorf("copyFromDeveloper() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			dev, err := copyToDeveloper(*tt.args.fDeveloper)
+			if !reflect.DeepEqual(tt.args.developer, dev) {
+				t.Errorf("copyToDeveloper() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			assert := assert.New(t)
+			assert.NotNil(dev)
 		})
 	}
 }

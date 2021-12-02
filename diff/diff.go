@@ -106,6 +106,7 @@ func (sc *Syncer) init() error {
 		types.Upstream, types.Target,
 
 		types.Consumer,
+		types.Developer,
 		types.ACLGroup, types.BasicAuth, types.KeyAuth,
 		types.HMACAuth, types.JWTAuth, types.OAuth2Cred,
 		types.MTLSAuth,
@@ -203,6 +204,10 @@ func (sc *Syncer) delete() error {
 	if err != nil {
 		return err
 	}
+	err = sc.entityDiffers[types.Developer].Deletes(sc.queueEvent)
+	if err != nil {
+		return err
+	}
 	err = sc.entityDiffers[types.Upstream].Deletes(sc.queueEvent)
 	if err != nil {
 		return err
@@ -288,6 +293,10 @@ func (sc *Syncer) createUpdate() error {
 		return err
 	}
 	err = sc.entityDiffers[types.Consumer].CreateAndUpdates(sc.queueEvent)
+	if err != nil {
+		return err
+	}
+	err = sc.entityDiffers[types.Developer].CreateAndUpdates(sc.queueEvent)
 	if err != nil {
 		return err
 	}

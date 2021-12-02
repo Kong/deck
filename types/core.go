@@ -91,6 +91,8 @@ const (
 	// OAuth2Cred identifies a OAuth2Cred in Kong.
 	OAuth2Cred EntityType = "oauth2-cred"
 
+	// Developer identifies a Developer in Kong.
+	Developer EntityType = "developer"
 	// RBACRole identifies a RBACRole in Kong Enterprise.
 	RBACRole EntityType = "rbac-role"
 	// RBACEndpointPermission identifies a RBACEndpointPermission in Kong Enterprise.
@@ -118,6 +120,7 @@ var AllTypes = []EntityType{
 	HMACAuth, JWTAuth, OAuth2Cred,
 	MTLSAuth,
 
+	Developer,
 	RBACRole, RBACEndpointPermission,
 
 	ServicePackage, ServiceVersion, Document,
@@ -305,6 +308,21 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 			},
 			differ: &sniDiffer{
 				kind:         entityTypeToKind(SNI),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case Developer:
+		return entityImpl{
+			typ: Developer,
+			crudActions: &developerCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &developerPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &developerDiffer{
+				kind:         entityTypeToKind(Developer),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},

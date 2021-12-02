@@ -328,6 +328,32 @@ func TestConsumerEqual(t *testing.T) {
 	assert.False(c1.EqualWithOpts(&c2, false, true))
 }
 
+func TestDeveloperEqual(t *testing.T) {
+	assert := assert.New(t)
+
+	var d1, d2 Developer
+	d1.ID = kong.String("foo")
+	d1.Email = kong.String("bar")
+
+	d2.ID = kong.String("foo")
+	d2.Email = kong.String("baz")
+
+	assert.False(d1.Equal(&d2))
+	assert.False(d1.EqualWithOpts(&d2, false, false, false, false))
+
+	d2.Email = kong.String("bar")
+	assert.True(d1.Equal(&d2))
+	assert.True(d1.EqualWithOpts(&d2, false, false, false, false))
+
+	d1.ID = kong.String("fuu")
+	assert.False(d1.EqualWithOpts(&d2, false, false, false, false))
+	assert.True(d1.EqualWithOpts(&d2, true, false, false, false))
+
+	d2.CreatedAt = kong.Int(1)
+	assert.False(d1.EqualWithOpts(&d2, false, false, false, false))
+	assert.False(d1.EqualWithOpts(&d2, false, true, false, false))
+}
+
 func TestKeyAuthEqual(t *testing.T) {
 	assert := assert.New(t)
 
