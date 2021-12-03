@@ -201,7 +201,7 @@ func Test_FilenameToName(t *testing.T) {
 	}
 }
 
-func Test_BasicAuthFormat (t *testing.T){
+func Test_BasicAuthFormat(t *testing.T) {
 	type args struct {
 		username string
 		password string

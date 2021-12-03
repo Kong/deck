@@ -134,7 +134,6 @@ func init() {
 	viper.BindPFlag("kong-password",
 		rootCmd.PersistentFlags().Lookup("kong-password"))
 
-
 	// konnect-specific flags
 	rootCmd.PersistentFlags().String("konnect-email", "",
 		"Email address associated with your Konnect account.")
@@ -222,7 +221,7 @@ func initConfig() {
 	rootConfig.Password = viper.GetString("kong-password")
 	if rootConfig.Email != "" && rootConfig.Password != "" {
 		rootConfig.ISSessionClient = true
-	} else{
+	} else {
 		rootConfig.ISSessionClient = false
 	}
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))

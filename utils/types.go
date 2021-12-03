@@ -94,13 +94,13 @@ type KongClientConfig struct {
 	Headers []string
 
 	HTTPClient *http.Client
-	Timeout int
+	Timeout    int
 
 	// Whether to initialize the Http client with a cookie jar or not
 	ISSessionClient bool
 
 	// Email is the username to login to admin server auth endpoint
-	Email    string
+	Email string
 
 	// Password is the associated password with the email.
 	Password string
@@ -120,7 +120,6 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 	result.Workspace = name
 	return result
 }
-
 
 // GetKongClient returns a Kong client
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
@@ -154,7 +153,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if opt.ISSessionClient {
 		jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize session jar:%w" , err)
+			return nil, fmt.Errorf("failed to initialize session jar:%w", err)
 		}
 		c.Jar = jar
 	}
@@ -182,7 +181,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	}
 	//We should try the hydration here
 	if opt.ISSessionClient {
-		err := loginBasicAuth(opt, kongClient)//we are passing reference so mutation
+		err := loginBasicAuth(opt, kongClient) //we are passing reference so mutation
 		if err != nil {
 			return nil, err
 		}
@@ -191,7 +190,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	return kongClient, nil
 }
 
-func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) (error) {
+func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) error {
 	req, err := http.NewRequest("GET", CleanAddress(opt.Address)+"/auth", nil)
 	req.Header.Add("Authorization", "Basic "+BasicAuthFormat(opt.Email, opt.Password))
 	if err != nil {
@@ -200,7 +199,7 @@ func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) (error) {
 	res, err := kongClient.DoRAW(nil, req)
 	defer res.Body.Close() //gracefully
 	if err != nil {
-		return  err
+		return err
 	}
 	if res.StatusCode != 200 {
 		return fmt.Errorf("failed to authenticate with basicauth at:%s, statuscode:%d",
