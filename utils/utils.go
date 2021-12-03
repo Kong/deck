@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"os"
@@ -51,4 +52,9 @@ func NameToFilename(name string) string {
 // if that separator was included originally, and only some names (document paths) typically include one.
 func FilenameToName(filename string) string {
 	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
+}
+
+func BasicAuthFormat(username, password string) string {
+	auth := username + ":" + password
+	return base64.StdEncoding.EncodeToString([]byte(auth))
 }

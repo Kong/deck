@@ -4,8 +4,10 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"golang.org/x/net/publicsuffix"
 	"net"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"path"
@@ -92,8 +94,16 @@ type KongClientConfig struct {
 	Headers []string
 
 	HTTPClient *http.Client
-
 	Timeout int
+
+	// Whether to initialize the Http client with a cookie jar or not
+	ISSessionClient bool
+
+	// Email is the username to login to admin server auth endpoint
+	Email    string
+
+	// Password is the associated password with the email.
+	Password string
 }
 
 type KonnectConfig struct {
@@ -110,6 +120,7 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 	result.Workspace = name
 	return result
 }
+
 
 // GetKongClient returns a Kong client
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
@@ -139,7 +150,16 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
 	address := CleanAddress(opt.Address)
-
+	//Check if the values are hydrated
+	fmt.Printf("Email:%s Password:%s ISSessionClient:%v\n", opt.Email, opt.Password, opt.ISSessionClient)
+	//Add Session Cookie support if required
+	if opt.ISSessionClient {
+		jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize session jar:%w" , err)
+		}
+		c.Jar = jar
+	}
 	headers, err := parseHeaders(opt.Headers)
 	if err != nil {
 		return nil, fmt.Errorf("parsing headers: %w", err)

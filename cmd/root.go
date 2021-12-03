@@ -123,6 +123,18 @@ func init() {
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 
+	//Add support for basic auth with sessions for Kong
+	rootCmd.PersistentFlags().String("kong-email", "",
+		"Email address associated with your Kong Manager account.")
+	viper.BindPFlag("kong-email",
+		rootCmd.PersistentFlags().Lookup("kong-email"))
+
+	rootCmd.PersistentFlags().String("kong-password", "",
+		"Password associated with your Kong Manager email.")
+	viper.BindPFlag("kong-password",
+		rootCmd.PersistentFlags().Lookup("kong-password"))
+
+
 	// konnect-specific flags
 	rootCmd.PersistentFlags().String("konnect-email", "",
 		"Email address associated with your Konnect account.")
@@ -206,7 +218,13 @@ func initConfig() {
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
-
+	rootConfig.Email = viper.GetString("kong-email")
+	rootConfig.Password = viper.GetString("kong-password")
+	if rootConfig.Email != "" && rootConfig.Password != "" {
+		rootConfig.ISSessionClient = true
+	} else{
+		rootConfig.ISSessionClient = false
+	}
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 
 	if err := initKonnectConfig(); err != nil {
