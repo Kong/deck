@@ -198,6 +198,7 @@ func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) (error) {
 		return fmt.Errorf("failed to create client with session login:%v", err)
 	}
 	res, err := kongClient.DoRAW(nil, req)
+	defer res.Body.Close() //gracefully
 	if err != nil {
 		return  err
 	}

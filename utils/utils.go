@@ -54,6 +54,8 @@ func FilenameToName(filename string) string {
 	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
 }
 
+// BasicAuthFormat Given a user (name/email etc.) and password, returns a base64
+//representation that can be sent as an Authorization header for login
 func BasicAuthFormat(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))

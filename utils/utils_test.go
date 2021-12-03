@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/base64"
+	"github.com/stretchr/testify/require"
 	"net/url"
 	"os"
 	"testing"
@@ -195,6 +197,38 @@ func Test_FilenameToName(t *testing.T) {
 			if got := FilenameToName(tt.args.filename); got != tt.want {
 				t.Errorf("FilenameToName() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func Test_BasicAuthFormat (t *testing.T){
+	type args struct {
+		username string
+		password string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "symmetric test",
+			args: args{
+				username: "mickey@mouse.com",
+				password: "showMeTheCheese$",
+			},
+			want: "mickey@mouse.com:showMeTheCheese$",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			//Encode
+			encoded := BasicAuthFormat(tt.args.username, tt.args.password)
+			//Decode
+			decoded := make([]byte, len(tt.want))
+			_, err := base64.StdEncoding.Decode(decoded, []byte(encoded))
+			require.NoError(t, err)
+			require.Equal(t, string(decoded), tt.want)
 		})
 	}
 }

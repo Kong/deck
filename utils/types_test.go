@@ -136,3 +136,9 @@ func Test_parseHeaders(t *testing.T) {
 		})
 	}
 }
+
+func Test_loginBasicAuth(t *testing.T){
+	//TODO: Don't see an interface for kong.Client, so can't substitute a mock
+	// to check if the right headers were being passed and we are able to handle
+	// non 200 codes
+}
