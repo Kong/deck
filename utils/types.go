@@ -150,8 +150,6 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
 	address := CleanAddress(opt.Address)
-	//Check if the values are hydrated
-	fmt.Printf("Email:%s Password:%s ISSessionClient:%v\n", opt.Email, opt.Password, opt.ISSessionClient)
 	//Add Session Cookie support if required
 	if opt.ISSessionClient {
 		jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
@@ -182,7 +180,32 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		kongClient.SetDebugMode(true)
 		kongClient.SetLogger(os.Stderr)
 	}
+	//We should try the hydration here
+	if opt.ISSessionClient {
+		err := loginBasicAuth(opt, kongClient)//we are passing reference so mutation
+		if err != nil {
+			return nil, err
+		}
+		//The client has the session cookies now
+	}
 	return kongClient, nil
+}
+
+func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) (error) {
+	req, err := http.NewRequest("GET", CleanAddress(opt.Address)+"/auth", nil)
+	req.Header.Add("Authorization", "Basic "+BasicAuthFormat(opt.Email, opt.Password))
+	if err != nil {
+		return fmt.Errorf("failed to create client with session login:%v", err)
+	}
+	res, err := kongClient.DoRAW(nil, req)
+	if err != nil {
+		return  err
+	}
+	if res.StatusCode != 200 {
+		return fmt.Errorf("failed to authenticate with basicauth at:%s, statuscode:%d",
+			CleanAddress(opt.Address)+"/auth", res.StatusCode)
+	}
+	return nil
 }
 
 func parseHeaders(headers []string) (http.Header, error) {

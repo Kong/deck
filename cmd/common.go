@@ -98,6 +98,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	_ = sendAnalytics(cmd, kongVersion)
 
+
 	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 	if err != nil {
 		return err
@@ -230,23 +231,6 @@ func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (strin
 	client, err := utils.GetKongClient(config)
 	if err != nil {
 		return "", err
-	}
-	//Do the login here if we have a session based client
-	if config.ISSessionClient {
-		req, err := http.NewRequest("GET", utils.CleanAddress(config.Address) + "/auth", nil)
-		req.Header.Add("Authorization","Basic " + utils.BasicAuthFormat(config.Email,config.Password))
-		if err != nil {
-			return "", fmt.Errorf("failed to create session login:%v", err)
-		}
-		res, err := client.DoRAW(ctx, req)
-		if err != nil {
-			return "", err
-		}
-		if res.StatusCode != 200 {
-			return "", fmt.Errorf("failed to authenticate with basicauth at:%s, statuscode:%d",
-				utils.CleanAddress(config.Address) + "/auth", res.StatusCode)
-		}
-		//The client has the session cookies now
 	}
 	root, err := client.Root(ctx)
 	if err != nil {
