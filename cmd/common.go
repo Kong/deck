@@ -98,7 +98,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	_ = sendAnalytics(cmd, kongVersion)
 
-
 	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 	if err != nil {
 		return err
