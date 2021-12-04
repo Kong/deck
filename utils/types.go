@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -196,12 +197,13 @@ func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) error {
 	if err != nil {
 		return fmt.Errorf("failed to create client with session login:%v", err)
 	}
-	res, err := kongClient.DoRAW(nil, req)
+	ctx := context.Background()
+	res, err := kongClient.DoRAW(ctx, req)
 	defer res.Body.Close() //gracefully
 	if err != nil {
 		return err
 	}
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to authenticate with basicauth at:%s, statuscode:%d",
 			CleanAddress(opt.Address)+"/auth", res.StatusCode)
 	}
