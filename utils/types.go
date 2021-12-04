@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"golang.org/x/net/publicsuffix"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
@@ -20,6 +19,7 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
+	"golang.org/x/net/publicsuffix"
 )
 
 var clientTimeout time.Duration
@@ -150,7 +150,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	defaultTransport.TLSClientConfig = &tlsConfig
 	c.Transport = defaultTransport
 	address := CleanAddress(opt.Address)
-	//Add Session Cookie support if required
+	// Add Session Cookie support if required
 	if opt.ISSessionClient {
 		jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
 		if err != nil {
@@ -180,13 +180,13 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		kongClient.SetDebugMode(true)
 		kongClient.SetLogger(os.Stderr)
 	}
-	//We should try the hydration here
+	// We should try the hydration here
 	if opt.ISSessionClient {
-		err := loginBasicAuth(opt, kongClient) //we are passing reference so mutation
+		err := loginBasicAuth(opt, kongClient) // we are passing reference so mutation
 		if err != nil {
 			return nil, err
 		}
-		//The client has the session cookies now
+		// The client has the session cookies now
 	}
 	return kongClient, nil
 }
@@ -199,7 +199,7 @@ func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) error {
 	}
 	ctx := context.Background()
 	res, err := kongClient.DoRAW(ctx, req)
-	defer res.Body.Close() //gracefully
+	defer res.Body.Close() // gracefully
 	if err != nil {
 		return err
 	}

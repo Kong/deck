@@ -123,7 +123,7 @@ func init() {
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 
-	//Add support for basic auth with sessions for Kong
+	// Add support for basic auth with sessions for Kong
 	rootCmd.PersistentFlags().String("kong-email", "",
 		"Email address associated with your Kong Manager account.")
 	viper.BindPFlag("kong-email",

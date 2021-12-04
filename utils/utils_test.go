@@ -2,12 +2,12 @@ package utils
 
 import (
 	"encoding/base64"
-	"github.com/stretchr/testify/require"
 	"net/url"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEmpty(t *testing.T) {
@@ -222,9 +222,9 @@ func Test_BasicAuthFormat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//Encode
+			// Encode
 			encoded := BasicAuthFormat(tt.args.username, tt.args.password)
-			//Decode
+			// Decode
 			decoded := make([]byte, len(tt.want))
 			_, err := base64.StdEncoding.Decode(decoded, []byte(encoded))
 			require.NoError(t, err)
