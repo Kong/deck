@@ -199,7 +199,9 @@ func loginBasicAuth(opt KongClientConfig, kongClient *kong.Client) error {
 	}
 	ctx := context.Background()
 	res, err := kongClient.DoRAW(ctx, req)
-	defer res.Body.Close() // gracefully
+	if res != nil {
+		defer res.Body.Close() // gracefully
+	}
 	if err != nil {
 		return err
 	}
