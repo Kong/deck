@@ -1,4 +1,4 @@
-eleasing a version
+# Releasing a version
 
 ## Prepare
 
