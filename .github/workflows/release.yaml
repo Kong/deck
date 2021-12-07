@@ -57,7 +57,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3.6.1
+        uses: docker/metadata-action@v3.6.2
         with:
           images: kong/deck
           tags: ${{ env.TAGS_STANDARD }}${{ env.TAGS_SUPPLEMENTAL }}
@@ -65,7 +65,7 @@ jobs:
             latest=${{ startsWith(github.ref, 'refs/tags/v1') }}
       - name: Docker meta (Harry's repo)
         id: harry_meta
-        uses: docker/metadata-action@v3.6.1
+        uses: docker/metadata-action@v3.6.2
         with:
           images: hbagdi/deck
           tags: ${{ env.TAGS_STANDARD }}${{ env.TAGS_SUPPLEMENTAL }}
