@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kong/deck/dump"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
@@ -69,6 +70,43 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 	c, err := GetContentFromFiles(filenames)
 	assert.NotNil(err)
 	assert.Nil(c)
+}
+
+func TestTransformNotFalse(t *testing.T) {
+	filenames := []string{"-"}
+	assert := assert.New(t)
+
+	tmpfile, err := ioutil.TempFile("", "example")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	_, err = tmpfile.WriteString("_transform: false\nservices:\n- host: test.com\n  name: test service\n")
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err := tmpfile.Seek(0, 0); err != nil {
+		panic(err)
+	}
+
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }() // Restore original Stdin
+
+	os.Stdin = tmpfile
+
+	c, err := GetContentFromFiles(filenames)
+	if err != nil {
+		panic(err)
+	}
+	parsed, err := Get(c, RenderConfig{}, dump.Config{})
+	assert.Equal(err, ErrorTransformFalseNotSupported)
+	assert.Nil(parsed)
+
+	parsed, _, err = GetForKonnect(c, RenderConfig{})
+	assert.Equal(err, ErrorTransformFalseNotSupported)
+	assert.Nil(parsed)
 }
 
 func TestReadKongStateFromStdin(t *testing.T) {
