@@ -2,7 +2,7 @@
 
 ## Prepare
 
-Ensure that your `go version` is at least 1.15.x.
+Ensure that your `go version` is not older than indicated in the header of `go.mod`.
 Create a `docs/changelog-v0.5.0` branch. Substitute v0.5.0 with the version
 you are releasing.
 Write the changelog, ensure the links are all created correctly and
