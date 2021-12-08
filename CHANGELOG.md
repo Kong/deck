@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [v1.8.3](#v183)
+- [v1.9.0](#v190)
 - [v1.8.2](#v182)
 - [v1.8.1](#v181)
 - [v1.8.0](#v180)
@@ -34,9 +34,14 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [v1.8.3]
+## [v1.9.0]
 
-> Release date: 2021/12/02
+> Release date: 2021/12/08
+
+### Added
+
+- decK now handles `_transform` state file metadata.
+  [#520](https://github.com/Kong/deck/pull/520)
 
 ### Fixed
 
@@ -798,6 +803,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
+[v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/kong/deck/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kong/deck/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0
