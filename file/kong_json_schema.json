@@ -17,6 +17,9 @@
       },
       "type": "object"
     },
+    "_transform": {
+      "type": "boolean"
+    },
     "_workspace": {
       "type": "string"
     },
