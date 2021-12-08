@@ -38,6 +38,12 @@
 
 > Release date: 2021/12/08
 
+### Breaking changes
+
+- The https://hub.docker.com/r/hbagdi/deck image is deprecated. 1.8.2 is the
+  last release uploaded to it. You must switch to https://hub.docker.com/r/kong/deck
+  to use 1.9.0 and future releases.
+
 ### Added
 
 - decK now handles `_transform` state file metadata.
