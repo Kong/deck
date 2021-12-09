@@ -36,7 +36,7 @@
 
 ## [v1.9.0]
 
-> Release date: 2021/12/08
+> Release date: 2021/12/09
 
 ### Breaking changes
 
