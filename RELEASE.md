@@ -18,7 +18,7 @@ Ensure you have Goreleaser and Docker installed locally.
 - Tag the `HEAD` with your version. In our example, we will tag it `v0.5.0`.
 - Push the tag to remote (Github).
 
-As of 1.8.3, the remaining steps are automated on tag pushes to Github. They are unnecessary unless the release job fails.
+As of 1.9.0, the remaining steps are automated on tag pushes to Github. They are unnecessary unless the release job fails.
 
 - Run Goreleaser: `goreleaser release --rm-dist`. This will create
   a release in Github and upload all the artifacts.
@@ -31,7 +31,7 @@ Git commit, git push to master
 
 ## Docker release
 
-As of 1.8.3, these steps are automated on tag pushes to Github. They are unnecessary unless the release job fails.
+As of 1.9.0, these steps are automated on tag pushes to Github. They are unnecessary unless the release job fails.
 
 Assuming you are on the TAG commit, you need to perform the following:
 
