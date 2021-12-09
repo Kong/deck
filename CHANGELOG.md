@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.9.0](#v190)
 - [v1.8.2](#v182)
 - [v1.8.1](#v181)
 - [v1.8.0](#v180)
@@ -32,6 +33,31 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.9.0]
+
+> Release date: 2021/12/09
+
+### Breaking changes
+
+- The https://hub.docker.com/r/hbagdi/deck image is deprecated. 1.8.2 is the
+  last release uploaded to it. You must switch to https://hub.docker.com/r/kong/deck
+  to use 1.9.0 and future releases.
+
+### Added
+
+- decK now handles `_transform` state file metadata.
+  [#520](https://github.com/Kong/deck/pull/520)
+
+### Fixed
+
+- `--select-tag` applies its tags to newly-created entities whether or not the
+  tag is also present in the state file metadata.
+  [#517](https://github.com/Kong/deck/pull/517)
+- Timeouts in `Syncer.Run()` now return an error instead of syncing only a
+  subset of the requested changes and reporting success. Downstream clients
+  using decK as a library can determine when their sync attempt failed due to a
+  timeout. [#529](https://github.com/Kong/deck/pull/529)
 
 ## [v1.8.2]
 
@@ -783,6 +809,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
+[v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/kong/deck/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kong/deck/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0
