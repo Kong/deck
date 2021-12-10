@@ -24,9 +24,6 @@ _testmain.go
 *.test
 *.prof
 
-#IDE ignore
-.idea
-
 # for this repo only
 deck
 dist/

@@ -124,11 +124,11 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 
 	// Support for Session Cookie
-	rootCmd.PersistentFlags().String("kong-session-cookie-path", "",
-		"Absolute path for the session-cookie file for auth with Admin Server.\n"+
+	rootCmd.PersistentFlags().String("kong-cookie-jar-path", "",
+		"Absolute path for cookie-jar file in Netscape file format for auth with Admin Server.\n"+
 			"You may also need to pass in as header the User-Agent that was used to create the session.")
-	viper.BindPFlag("kong-session-cookie-path",
-		rootCmd.PersistentFlags().Lookup("kong-session-cookie-path"))
+	viper.BindPFlag("kong-cookie-jar-path",
+		rootCmd.PersistentFlags().Lookup("kong-cookie-jar-path"))
 
 	// konnect-specific flags
 	rootCmd.PersistentFlags().String("konnect-email", "",
@@ -214,13 +214,9 @@ func initConfig() {
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
 
-	// Session cookie support
-	rootConfig.SessionFilePath = viper.GetString("kong-session-cookie-path")
-	if rootConfig.SessionFilePath != "" {
-		rootConfig.ISSessionClient = true
-	} else {
-		rootConfig.ISSessionClient = false
-	}
+	// cookie-jar support
+	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
+
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 
 	if err := initKonnectConfig(); err != nil {
