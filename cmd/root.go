@@ -125,8 +125,8 @@ func init() {
 
 	// Support for Session Cookie
 	rootCmd.PersistentFlags().String("kong-session-cookie-path", "",
-		"Absolute path for the session-cookie file for auth with Admin Server.\n" +
-		"You may also need to pass in as header the User-Agent that was used to create the session.")
+		"Absolute path for the session-cookie file for auth with Admin Server.\n"+
+			"You may also need to pass in as header the User-Agent that was used to create the session.")
 	viper.BindPFlag("kong-session-cookie-path",
 		rootCmd.PersistentFlags().Lookup("kong-session-cookie-path"))
 

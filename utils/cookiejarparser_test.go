@@ -4,13 +4,13 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/publicsuffix"
 )
 

@@ -167,7 +167,6 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		c.Jar = jar
 	}
 
-
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
 		return nil, fmt.Errorf("creating client for Kong's Admin API: %w", err)
