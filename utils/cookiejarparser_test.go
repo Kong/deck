@@ -30,11 +30,12 @@ func TestParseCookieLine(t *testing.T) {
 		c1, _ := json.Marshal(cookie)
 		c2, _ := json.Marshal(sampleCookie)
 
-		t.Errorf("Parsing normal cookie failed.  Expected:\n  cookie: %s err: nil,\ngot:\n  cookie: %s err: %s", c2, c1, err)
+		t.Errorf("Parsing normal cookie failed.  Expected:\n  "+
+			"cookie: %s err: nil,\ngot:\n  cookie: %s err: %s", c2, c1, err)
 	}
 	// httponly
-	cookieHttp, err := parseCookieLine("#HttpOnly_example.com	FALSE	/	FALSE	0	test_cookie_httponly	1", 1)
-	sampleCookieHttp := &http.Cookie{
+	cookieHTTP, err := parseCookieLine("#HttpOnly_example.com	FALSE	/	FALSE	0	test_cookie_httponly	1", 1)
+	sampleCookieHTTP := &http.Cookie{
 		Domain:   "example.com",
 		Path:     "/",
 		Name:     "test_cookie_httponly",
@@ -43,22 +44,25 @@ func TestParseCookieLine(t *testing.T) {
 		Secure:   false,
 	}
 
-	if !reflect.DeepEqual(cookieHttp, sampleCookieHttp) || err != nil {
-		c1, _ := json.Marshal(cookieHttp)
-		c2, _ := json.Marshal(sampleCookieHttp)
+	if !reflect.DeepEqual(cookieHTTP, sampleCookieHTTP) || err != nil {
+		c1, _ := json.Marshal(cookieHTTP)
+		c2, _ := json.Marshal(sampleCookieHTTP)
 
-		t.Errorf("Parsing httpOnly cookie failed.  Expected:\n  cookie: %s err: nil,\ngot:\n  cookie: %s err: %s", c2, c1, err)
+		t.Errorf("Parsing httpOnly cookie failed. Expected:\n  "+
+			"cookie: %s err: nil,\ngot:\n  cookie: %s err: %s", c2, c1, err)
 	}
 
 	// comment
 	cookieComment, err := parseCookieLine("# This is a comment", 1)
 	if cookieComment != nil || err != nil {
-		t.Errorf("Parsing comment failed.  Expected cookie: nil err: nil, got cookie: %s err: %s", cookie, err)
+		t.Errorf("Parsing comment failed.  Expected cookie: nil err: nil, "+
+			"got cookie: %s err: %s", cookie, err)
 	}
 
 	cookieBlank, err := parseCookieLine("", 1)
 	if cookieBlank != nil || err != nil {
-		t.Errorf("Parsing blank line failed.  Expected cookie: nil err: nil, got cookie: %s err: %s", cookie, err)
+		t.Errorf("Parsing blank line failed.  Expected cookie: nil err: nil, "+
+			"got cookie: %s err: %s", cookie, err)
 	}
 }
 
@@ -95,6 +99,7 @@ func TestLoadCookieJarFile(t *testing.T) {
 	c2, _ := json.Marshal(sampleCookieJar.Cookies(exampleURL))
 
 	if !reflect.DeepEqual(c1, c2) || err != nil {
-		t.Errorf("Cookie jar creation failed.  Expected:\n  cookieJar: %s err: nil,\ngot:\n  cookieJar: %s err: %s", c2, c1, err)
+		t.Errorf("Cookie jar creation failed.  Expected:\n  "+
+			"cookieJar: %s err: nil,\ngot:\n  cookieJar: %s err: %s", c2, c1, err)
 	}
 }

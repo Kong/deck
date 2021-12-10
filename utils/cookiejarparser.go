@@ -15,13 +15,16 @@ import (
 	"golang.org/x/net/publicsuffix"
 )
 
-const httpOnlyPrefix = "#HttpOnly_"
+const (
+	httpOnlyPrefix = "#HttpOnly_"
+	maxEntriesLen  = 7
+)
 
 func parseCookieLine(cookieLine string, lineNum int) (*http.Cookie, error) {
 	var err error
-	cookieLineHttpOnly := false
+	cookieLineHTTPOnly := false
 	if strings.HasPrefix(cookieLine, httpOnlyPrefix) {
-		cookieLineHttpOnly = true
+		cookieLineHTTPOnly = true
 		cookieLine = strings.TrimPrefix(cookieLine, httpOnlyPrefix)
 	}
 
@@ -32,7 +35,7 @@ func parseCookieLine(cookieLine string, lineNum int) (*http.Cookie, error) {
 	cookieFields := strings.Split(cookieLine, "\t")
 
 	if len(cookieFields) < 6 || len(cookieFields) > 7 {
-		return nil, fmt.Errorf("incorrect number of fields in line %d.  Expected 6 or 7, got %d.", lineNum, len(cookieFields))
+		return nil, fmt.Errorf("incorrect number of fields in line %d.  Expected 6 or 7, got %d", lineNum, len(cookieFields))
 	}
 
 	for i, v := range cookieFields {
@@ -43,7 +46,7 @@ func parseCookieLine(cookieLine string, lineNum int) (*http.Cookie, error) {
 		Domain:   cookieFields[0],
 		Path:     cookieFields[2],
 		Name:     cookieFields[5],
-		HttpOnly: cookieLineHttpOnly,
+		HttpOnly: cookieLineHTTPOnly,
 	}
 	cookie.Secure, err = strconv.ParseBool(cookieFields[3])
 	if err != nil {
@@ -57,7 +60,7 @@ func parseCookieLine(cookieLine string, lineNum int) (*http.Cookie, error) {
 		cookie.Expires = time.Unix(expiresInt, 0)
 	}
 
-	if len(cookieFields) == 7 {
+	if len(cookieFields) == maxEntriesLen {
 		cookie.Value = cookieFields[6]
 	}
 
@@ -95,14 +98,14 @@ func LoadCookieJarFile(path string) (http.CookieJar, error) {
 		} else {
 			cookieScheme = "http"
 		}
-		cookieUrl := &url.URL{
+		cookieURL := &url.URL{
 			Scheme: cookieScheme,
 			Host:   cookie.Domain,
 		}
 
-		cookies := jar.Cookies(cookieUrl)
+		cookies := jar.Cookies(cookieURL)
 		cookies = append(cookies, cookie)
-		jar.SetCookies(cookieUrl, cookies)
+		jar.SetCookies(cookieURL, cookies)
 
 		lineNum++
 	}
