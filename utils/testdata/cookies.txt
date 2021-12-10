@@ -1,0 +1,4 @@
+# Test cookie file
+
+example.com	FALSE	/	FALSE	0	test_cookie	1
+#HttpOnly_example.com	FALSE	/	FALSE	0	test_cookie_httponly	1

@@ -94,6 +94,11 @@ type KongClientConfig struct {
 	HTTPClient *http.Client
 
 	Timeout int
+
+	SessionFilePath string
+
+	// Whether to initialize the Http client with a cookie jar or not
+	ISSessionClient bool
 }
 
 type KonnectConfig struct {
@@ -153,6 +158,15 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if opt.Workspace != "" {
 		url.Path = path.Join(url.Path, opt.Workspace)
 	}
+	// Add Session Cookie support if required
+	if opt.ISSessionClient {
+		jar, err := LoadCookieJarFile(opt.SessionFilePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize session jar:%w", err)
+		}
+		c.Jar = jar
+	}
+
 
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
