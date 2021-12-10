@@ -156,7 +156,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		url.Path = path.Join(url.Path, opt.Workspace)
 	}
 	// Add Session Cookie support if required
-	if opt.CookieJarPath !="" {
+	if opt.CookieJarPath != "" {
 		jar, err := LoadCookieJarFile(opt.CookieJarPath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize session jar:%w", err)
