@@ -17,6 +17,7 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
+	"github.com/ssgelm/cookiejarparser"
 )
 
 var clientTimeout time.Duration
@@ -157,7 +158,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	}
 	// Add Session Cookie support if required
 	if opt.CookieJarPath != "" {
-		jar, err := LoadCookieJarFile(opt.CookieJarPath)
+		jar, err := cookiejarparser.LoadCookieJarFile(opt.CookieJarPath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize cookie-jar:%w", err)
 		}
