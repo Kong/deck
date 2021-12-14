@@ -17,6 +17,7 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
+	"github.com/ssgelm/cookiejarparser"
 )
 
 var clientTimeout time.Duration
@@ -94,6 +95,8 @@ type KongClientConfig struct {
 	HTTPClient *http.Client
 
 	Timeout int
+
+	CookieJarPath string
 }
 
 type KonnectConfig struct {
@@ -152,6 +155,14 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	}
 	if opt.Workspace != "" {
 		url.Path = path.Join(url.Path, opt.Workspace)
+	}
+	// Add Session Cookie support if required
+	if opt.CookieJarPath != "" {
+		jar, err := cookiejarparser.LoadCookieJarFile(opt.CookieJarPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize cookie-jar: %w", err)
+		}
+		c.Jar = jar
 	}
 
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
