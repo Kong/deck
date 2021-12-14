@@ -35,13 +35,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
 ## [v1.10.0]
 
 > Release date: 2021/12/14
-
 ### Added
 
-- decK now handles Netscape format cookie-jar files to populate client's cookie-jar.
+- decK can now inject cookies in its request to Kong Gateway.
   These cookies can be session cookies set by the Admin server for auth.
   `--kong-cookie-jar-path` is the cli flag that indicates path to cookie-jar file
   [#545](https://github.com/Kong/deck/pull/545)
@@ -164,7 +164,7 @@
   [#282](https://github.com/Kong/deck/pull/282)
 - Fix empty Service Package descriptions not syncing correctly.
   [#347](https://github.com/Kong/deck/pull/347)
-- Updating certificate fields no longer deletes SNI associations.
+- Updating certificate fields no longer deletes SNI associations. 
   [#386](https://github.com/Kong/deck/pull/386)
 
 ### Misc
@@ -223,7 +223,7 @@
 
 - decK now supports Kong Konnect. Configuration for Kong Konnect can be exported,
   diffed and synced using decK. A new command `konnect` has been introduced for
-  this purpose, which has 4 sub-commands: `ping`, `dump`, `diff`, and `sync`.
+  this purpose, which has 4 sub-commands: `ping`, `dump`, `diff`, and  `sync`.
   This feature in decK is currently in `alpha` state, which means there can be
   breaking changes to these commands in future releases.
 - decK now supports two new Kong Enterprise resources: RBAC role and RBAC
@@ -364,6 +364,7 @@ other changes introduced in this release.
   [#145](https://github.com/hbagdi/deck/pull/145)
 - Deduplicate `select_tags` input
   [#183](https://github.com/hbagdi/deck/pull/183)
+
 
 ### Enterprise-only
 
@@ -569,7 +570,7 @@ other changes introduced in this release.
   This performs a JSON-schema based sanity check on the file along-with foreign
   reference checks to check for dangling pointers.
 - Service-less routes are now supported by decK.
-- `name` is no longer a required field for routes and services entities
+- `name` is no longer a required field  for routes and services entities
   in Kong. If a `name` is not present, decK exports the entity with it's `ID`.
 - Client-certificates on Service entity are now a supported.
 - Credential entities like key-auth, basic-auth now support tagging.
@@ -598,6 +599,7 @@ other changes introduced in this release.
 - Errors are made more descriptive in few commands.
 - decK's binary inside the Docker image now contains versioning information.
   [#38](https://github.com/hbagdi/deck/issues/38)
+
 
 ### Internal
 
@@ -657,7 +659,6 @@ other changes introduced in this release.
 ### Summary
 
 This release brings the following features:
-
 - Consumer credentials are now supported
 - Support for Kong 1.3
 - Kong Enterprise workspace support
@@ -669,30 +670,29 @@ No breaking changes have been introduced in this release.
 
 ### Added
 
-- **Consumer credentials**
+- **Consumer credentials**  
   The following entities associate with a consumer in Kong are now supported [#12](https://github.com/hbagdi/deck/issues/12):
-
   - `key-auth`
   - `basic-auth`
   - `hmac-auth`
   - `jwt`
   - `acl`
-
+  
 - decK's exported YAML is now compatible with Kong's declarative config
   file.
-- **Homebrew support**
+- **Homebrew support**  
   decK can now be installed using Homebrew on macOS:
   ```
   brew tap hbagdi/deck
   brew install deck
   ```
-- **Multiple state files**
+- **Multiple state files**  
   decK can now read the configuration of Kong from multiple YAML files in a directory. You can split your configuration
   into files in any way you would like.
   [#22](https://github.com/hbagdi/deck/issues/22)
 - Upcoming Kong 1.3 is now supported.
   [#36](https://github.com/hbagdi/deck/issues/36)
-- **Kong Enterprise only features:**
+- **Kong Enterprise only features:**  
   Workspaces are now natively supported in decK
   - `-w/--workspace` flag can be specified in the `dump` command to
     export configuration of a single workspace.
@@ -709,7 +709,7 @@ No breaking changes have been introduced in this release.
   unhealthy active healthchecks
   [#45](https://github.com/hbagdi/deck/pull/45)
 - Docker image now contains only the binary and not the entire source code.
-  [#34](https://github.com/hbagdi/deck/pull/34)
+  [#34](https://github.com/hbagdi/deck/pull/34)  
   Thanks to [David Cruz](https://github.com/davidcv5) for the contribution.
 
 ## [v0.4.0]
@@ -741,7 +741,7 @@ No breaking changes have been introduced in this release.
 
 ### Added
 
-- **Tag-based distributed configuration management**
+- **Tag-based distributed configuration management**  
   Only a subset of Kong entities sharing a (set of) tag can now be exported,
   deleted, diffed or synced.
   decK can now manage your Kong's configuration in a distributed manner,
@@ -753,9 +753,9 @@ No breaking changes have been introduced in this release.
   Config file can now be read in from standard-input and written out to
   standard-output.
   [#10](https://github.com/hbagdi/deck/pull/10),
-  [#11](https://github.com/hbagdi/deck/pull/11)
+  [#11](https://github.com/hbagdi/deck/pull/11)  
   Thanks to [@matthewbednarski](https://github.com/matthewbednarski) for the contribution.
-- **Automated defaults**
+- **Automated defaults**  
   No need to specify default values for all core Kong entities,
   further simplifying your Kong's configuration.
   Default values for plugin configuration still need to be defined, this is on
@@ -775,11 +775,11 @@ No breaking changes have been introduced in this release.
   [#9](https://github.com/hbagdi/deck/pull/9)
 - Correctly sync plugins which are out of sync. Protocols field
   in plugins can be confused with protocols field in routes in Kong
-  [#6](https://github.com/hbagdi/deck/pull/6)
+  [#6](https://github.com/hbagdi/deck/pull/6)  
   Thanks to [@davidcv5](https://github.com/davidcv5) for the contribution.
 - Throw an error if an object is not marshalled into YAML correctly.
 - Correctly create service-level plugins for Kong >= 1.1
-  [#16](https://github.com/hbagdi/deck/pull/16)
+  [#16](https://github.com/hbagdi/deck/pull/16)  
 
 ### Misc
 
@@ -802,13 +802,13 @@ No breaking changes have been introduced in this release.
 - **Authentication support**: custom HTTP Headers (key:value) can be injected
   into requests that decK makes to Kong's Admin API using the `--headers`
   CLI flag.
-  [#1](https://github.com/hbagdi/deck/pull/1)
+  [#1](https://github.com/hbagdi/deck/pull/1)  
   Thanks to [@davidcv5](https://github.com/davidcv5) for the contribution.
 
 ### Fixed
 
 - Infinite loop in pagination for exporting entities in Kong
-  [#2](https://github.com/hbagdi/deck/pull/2)
+  [#2](https://github.com/hbagdi/deck/pull/2)  
   Thanks to [@lmika](https://github.com/lmika) for the contribution.
 - Plugins are updated using PUT requests instead of PATCH to
   avoid any schema violations.
@@ -820,6 +820,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+
 [v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
 [v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
