@@ -160,7 +160,7 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if opt.CookieJarPath != "" {
 		jar, err := cookiejarparser.LoadCookieJarFile(opt.CookieJarPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to initialize cookie-jar:%w", err)
+			return nil, fmt.Errorf("failed to initialize cookie-jar: %w", err)
 		}
 		c.Jar = jar
 	}

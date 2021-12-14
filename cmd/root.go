@@ -125,7 +125,7 @@ func init() {
 
 	// Support for Session Cookie
 	rootCmd.PersistentFlags().String("kong-cookie-jar-path", "",
-		"Absolute path for cookie-jar file in Netscape file format for auth with Admin Server.\n"+
+		"Absolute path to a cookie-jar file in the Netscape cookie format for auth with Admin Server.\n"+
 			"You may also need to pass in as header the User-Agent that was used to create the cookie-jar.")
 	viper.BindPFlag("kong-cookie-jar-path",
 		rootCmd.PersistentFlags().Lookup("kong-cookie-jar-path"))
