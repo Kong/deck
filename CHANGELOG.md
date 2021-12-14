@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.10.0](#v1100)
 - [v1.9.0](#v190)
 - [v1.8.2](#v182)
 - [v1.8.1](#v181)
@@ -33,6 +34,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+
+## [v1.10.0]
+
+> Release date: 2021/12/14
+### Added
+
+- decK can now inject cookies in its request to Kong Gateway.
+  These cookies can be session cookies set by the Admin server for auth.
+  `--kong-cookie-jar-path` is the cli flag that indicates path to cookie-jar file
+  [#545](https://github.com/Kong/deck/pull/545)
 
 ## [v1.9.0]
 
@@ -809,6 +821,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
 [v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/kong/deck/compare/v1.8.0...v1.8.1
