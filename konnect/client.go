@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/kong/go-kong/kong"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+
+	"github.com/kong/go-kong/kong"
 )
 
 var defaultCtx = context.Background()
