@@ -247,5 +247,6 @@ func initKonnectConfig() error {
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
+	konnectConfig.Headers = viper.GetStringSlice("headers")
 	return nil
 }

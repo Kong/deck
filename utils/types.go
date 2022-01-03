@@ -105,6 +105,8 @@ type KonnectConfig struct {
 	Debug    bool
 
 	Address string
+
+	Headers []string
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
@@ -193,9 +195,13 @@ func parseHeaders(headers []string) (http.Header, error) {
 func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.Client,
 	error) {
 	address := CleanAddress(config.Address)
+	headers, err := parseHeaders(config.Headers)
+	if err != nil {
+		return nil, fmt.Errorf("parsing headers: %w", err)
+	}
 	client, err := konnect.NewClient(httpClient, konnect.ClientOpts{
 		BaseURL: address,
-	})
+	}, headers)
 	if err != nil {
 		return nil, err
 	}

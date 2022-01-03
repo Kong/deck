@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/kong/go-kong/kong"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -39,10 +40,13 @@ type ClientOpts struct {
 }
 
 // NewClient returns a Client which talks to Konnect's API.
-func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
+func NewClient(httpClient *http.Client, opts ClientOpts, headers http.Header) (*Client, error) {
 	if httpClient == nil {
+		defaultTransport := http.DefaultTransport.(*http.Transport)
 		httpClient = http.DefaultClient
+		httpClient.Transport = defaultTransport
 	}
+	httpClient = kong.HTTPClientWithHeaders(httpClient, headers)
 	client := new(Client)
 	client.client = httpClient
 	url, err := url.ParseRequestURI(opts.BaseURL)
