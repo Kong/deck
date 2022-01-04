@@ -199,9 +199,13 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 	if err != nil {
 		return nil, fmt.Errorf("parsing headers: %w", err)
 	}
+	defaultTransport := http.DefaultTransport.(*http.Transport)
+	httpClient = http.DefaultClient
+	httpClient.Transport = defaultTransport
+	httpClient = kong.HTTPClientWithHeaders(httpClient, headers)
 	client, err := konnect.NewClient(httpClient, konnect.ClientOpts{
 		BaseURL: address,
-	}, headers)
+	})
 	if err != nil {
 		return nil, err
 	}

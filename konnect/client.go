@@ -9,8 +9,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-
-	"github.com/kong/go-kong/kong"
 )
 
 var defaultCtx = context.Background()
@@ -41,13 +39,10 @@ type ClientOpts struct {
 }
 
 // NewClient returns a Client which talks to Konnect's API.
-func NewClient(httpClient *http.Client, opts ClientOpts, headers http.Header) (*Client, error) {
+func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	if httpClient == nil {
-		defaultTransport := http.DefaultTransport.(*http.Transport)
-		httpClient = http.DefaultClient
-		httpClient.Transport = defaultTransport
+		return nil, fmt.Errorf("nil httpClient passed")
 	}
-	httpClient = kong.HTTPClientWithHeaders(httpClient, headers)
 	client := new(Client)
 	client.client = httpClient
 	url, err := url.ParseRequestURI(opts.BaseURL)
