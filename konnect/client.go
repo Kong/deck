@@ -41,7 +41,7 @@ type ClientOpts struct {
 // NewClient returns a Client which talks to Konnect's API.
 func NewClient(httpClient *http.Client, opts ClientOpts) (*Client, error) {
 	if httpClient == nil {
-		return nil, fmt.Errorf("nil httpClient passed")
+		httpClient = http.DefaultClient
 	}
 	client := new(Client)
 	client.client = httpClient
