@@ -30,8 +30,10 @@ func targetFromStruct(arg crud.Event) *state.Target {
 func (s *targetCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	target := targetFromStruct(event)
+	fmt.Printf("TRR starting Create() for target %v for upstream %v\n", target.Target, target.Upstream.ID)
 	createdTarget, err := s.client.Targets.Create(ctx,
 		target.Upstream.ID, &target.Target)
+	fmt.Printf("TRR finished Create() for target %v for upstream %v\n", target.Target, target.Upstream.ID)
 	if err != nil {
 		return nil, err
 	}

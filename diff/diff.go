@@ -366,7 +366,9 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 		if !dry {
 			// sync mode
 			// fire the request to Kong
+			fmt.Printf("TRR starting Do() for %v %v\n", e.Kind, c.Console())
 			result, err = sc.processor.Do(ctx, e.Kind, e.Op, e)
+			fmt.Printf("TRR finished Do() for %v %v\n", e.Kind, c.Console())
 			if err != nil {
 				return nil, fmt.Errorf("%v %v %v failed: %w", e.Op, e.Kind, c.Console(), err)
 			}
