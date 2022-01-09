@@ -1,39 +1,79 @@
 # Table of Contents
 
-- [v1.8.2](#v182---20210927)
-- [v1.8.1](#v181---20210922)
-- [v1.8.0](#v180---20210913)
-- [v1.7.0](#v170---20210520)
-- [v1.6.0](#v160---20210408)
-- [v1.5.1](#v151---20210323)
-- [v1.5.0](#v150---20210306)
-- [v1.4.0](#v140---20210201)
-- [v1.3.0](#v130---20210115)
-- [v1.2.4](#v124---20210106)
-- [v1.2.3](#v123---20201118)
-- [v1.2.2](#v122---20201019)
-- [v1.2.1](#v121---20200804)
-- [v1.2.0](#v120---20200804)
-- [v1.1.0](#v110---20200405)
-- [v1.0.3](#v103---20200314)
-- [v1.0.2](#v102---20200221)
-- [v1.0.1](#v101---20200214)
-- [v1.0.0](#v100---20200118)
-- [v0.7.2](#v072---20191229)
-- [v0.7.1](#v071---20191224)
-- [v0.7.0](#v070---20191207)
-- [v0.6.2](#v062---20191116)
-- [v0.6.1](#v061---20191108)
-- [v0.6.0](#v060---20191103)
-- [v0.5.2](#v052---20190915)
-- [v0.5.1](#v051---20190824)
-- [v0.5.0](#v050---20190818)
-- [v0.4.0](#v040---20190610)
-- [v0.3.0](#v030---20190514)
-- [v0.2.0](#v020---20190401)
-- [v0.1.0](#v010---20190112)
+- [v1.10.0](#v1100)
+- [v1.9.0](#v190)
+- [v1.8.2](#v182)
+- [v1.8.1](#v181)
+- [v1.8.0](#v180)
+- [v1.7.0](#v170)
+- [v1.6.0](#v160)
+- [v1.5.1](#v151)
+- [v1.5.0](#v150)
+- [v1.4.0](#v140)
+- [v1.3.0](#v130)
+- [v1.2.4](#v124)
+- [v1.2.3](#v123)
+- [v1.2.2](#v122)
+- [v1.2.1](#v121)
+- [v1.2.0](#v120)
+- [v1.1.0](#v110)
+- [v1.0.3](#v103)
+- [v1.0.2](#v102)
+- [v1.0.1](#v101)
+- [v1.0.0](#v100)
+- [v0.7.2](#v072)
+- [v0.7.1](#v071)
+- [v0.7.0](#v070)
+- [v0.6.2](#v062)
+- [v0.6.1](#v061)
+- [v0.6.0](#v060)
+- [v0.5.2](#v052)
+- [v0.5.1](#v051)
+- [v0.5.0](#v050)
+- [v0.4.0](#v040)
+- [v0.3.0](#v030)
+- [v0.2.0](#v020)
+- [v0.1.0](#v010)
 
-## [v1.8.2] - 2021/09/27
+
+## [v1.10.0]
+
+> Release date: 2021/12/14
+### Added
+
+- decK can now inject cookies in its request to Kong Gateway.
+  These cookies can be session cookies set by the Admin server for auth.
+  `--kong-cookie-jar-path` is the cli flag that indicates path to cookie-jar file
+  [#545](https://github.com/Kong/deck/pull/545)
+
+## [v1.9.0]
+
+> Release date: 2021/12/09
+
+### Breaking changes
+
+- The https://hub.docker.com/r/hbagdi/deck image is deprecated. 1.8.2 is the
+  last release uploaded to it. You must switch to https://hub.docker.com/r/kong/deck
+  to use 1.9.0 and future releases.
+
+### Added
+
+- decK now handles `_transform` state file metadata.
+  [#520](https://github.com/Kong/deck/pull/520)
+
+### Fixed
+
+- `--select-tag` applies its tags to newly-created entities whether or not the
+  tag is also present in the state file metadata.
+  [#517](https://github.com/Kong/deck/pull/517)
+- Timeouts in `Syncer.Run()` now return an error instead of syncing only a
+  subset of the requested changes and reporting success. Downstream clients
+  using decK as a library can determine when their sync attempt failed due to a
+  timeout. [#529](https://github.com/Kong/deck/pull/529)
+
+## [v1.8.2]
+
+> Release date: 2021/09/27
 
 ### Added
 
@@ -43,14 +83,18 @@
 
 - Workspace existence checks now work with workspace admins.
 
-## [v1.8.1] - 2021/09/22
+## [v1.8.1]
+
+> Release date: 2021/09/22
 
 ### Fixed
 
 - Update go-kong to v0.22.0 to fix a bug with detecting non-existent
   workspaces.
 
-## [v1.8.0] - 2021/09/13
+## [v1.8.0]
+
+> Release date: 2021/09/13
 
 ### Added
 
@@ -82,7 +126,9 @@
 - Variety of refactors to improve the code health of the project
 - A security policy has been added to the repository
 
-## [v1.7.0] - 2021/05/20
+## [v1.7.0]
+
+> Release date: 2021/05/20
 
 ### Added
 
@@ -128,7 +174,9 @@
 - Added reworked usage analytics.
   [#379](https://github.com/Kong/deck/pull/379)
 
-## [v1.6.0] - 2021/04/08
+## [v1.6.0]
+
+> Release date: 2021/04/08
 
 ### Added
 
@@ -149,7 +197,9 @@
   update the semver module used in your application.
   [#303](https://github.com/Kong/deck/pull/303)
 
-## [v1.5.1] - 2021/03/23
+## [v1.5.1]
+
+> Release date: 2021/03/23
 
 ### Fixed
 
@@ -165,7 +215,9 @@
   environment.
   [#284](https://github.com/Kong/deck/pull/284)
 
-## [v1.5.0] - 2021/03/06
+## [v1.5.0]
+
+> Release date: 2021/03/06
 
 ### Added
 
@@ -183,7 +235,9 @@
   existence of Certificate has been relaxed to make this possible.
   [#269](https://github.com/Kong/deck/pull/269)
 
-## [v1.4.0] - 2021/02/01
+## [v1.4.0]
+
+> Release date: 2021/02/01
 
 ### Added
 
@@ -197,7 +251,9 @@
 - Fixed YAML/JSON file detection logic
   [#255](https://github.com/Kong/deck/pull/255)
 
-## [v1.3.0] - 2021/01/15
+## [v1.3.0]
+
+> Release date: 2021/01/15
 
 ### Added
 
@@ -212,7 +268,9 @@
 - Analytics failures no longer delay execution.
   [#254](https://github.com/Kong/deck/pull/254)
 
-## [v1.2.4] - 2021/01/06
+## [v1.2.4]
+
+> Release date: 2021/01/06
 
 ### Fixed
 
@@ -222,7 +280,9 @@
   resource updates for Cassandra-backed clusters.
   [#240](https://github.com/Kong/deck/pull/240)
 
-## [v1.2.3] - 2020/11/18
+## [v1.2.3]
+
+> Release date: 2020/11/18
 
 ### Fixed
 
@@ -231,7 +291,9 @@
 - Removed unecessary permissions requirement for checking workspace existence.
   [#225](https://github.com/Kong/deck/pull/225)
 
-## [v1.2.2] - 2020/10/19
+## [v1.2.2]
+
+> Release date: 2020/10/19
 
 ### Added
 
@@ -252,7 +314,9 @@
 - Resolved a concurrency bug during syncs.
   [#202](https://github.com/hbagdi/deck/pull/202)
 
-## [v1.2.1] - 2020/08/04
+## [v1.2.1]
+
+> Release date: 2020/08/04
 
 ### Summary
 
@@ -262,7 +326,9 @@ to `github.com/kong/deck`.
 This release contains the updated `go.mod` over v1.2.0. There are no
 other changes introduced in this release.
 
-## [v1.2.0] - 2020/08/04
+## [v1.2.0]
+
+> Release date: 2020/08/04
 
 ### Added
 
@@ -328,7 +394,9 @@ other changes introduced in this release.
 - Improved code quality with addition of golangci-lint
 - Default branch for the project has been changed from `master` to `main`
 
-## [v1.1.0] - 2020/04/05
+## [v1.1.0]
+
+> Release date: 2020/04/05
 
 ### Added
 
@@ -358,28 +426,36 @@ other changes introduced in this release.
   These values can be set to `0` and `false` respectively now.
   [#134](https://github.com/hbagdi/deck/issues/134)
 
-## [v1.0.3] - 2020/03/14
+## [v1.0.3]
+
+> Release date: 2020/03/14
 
 ### Fixed
 
 - Fix certificate diff for certificates with no associated snis
   [#131](https://github.com/hbagdi/deck/issues/131)
 
-## [v1.0.2] - 2020/02/21
+## [v1.0.2]
+
+> Release date: 2020/02/21
 
 ### Fixed
 
 - Fix broken `ca_certificate` entity support
   [#127](https://github.com/hbagdi/deck/pull/127)
 
-## [v1.0.1] - 2020/02/14
+## [v1.0.1]
+
+> Release date: 2020/02/14
 
 ### Added
 
 - decK now supports the `url` sugar property on Service entity.
   [#123](https://github.com/hbagdi/deck/issues/123)
 
-## [v1.0.0] - 2020/01/18
+## [v1.0.0]
+
+> Release date: 2020/01/18
 
 ### Fixed
 
@@ -396,7 +472,9 @@ other changes introduced in this release.
   user-visible changes.
   [b603f9](https://github.com/hbagdi/deck/commit/b603f9)
 
-## [v0.7.2] - 2019/12/29
+## [v0.7.2]
+
+> Release date: 2019/12/29
 
 ### Fixed
 
@@ -404,7 +482,9 @@ other changes introduced in this release.
   of this bug.
   [#117](https://github.com/hbagdi/deck/issues/117)
 
-## [v0.7.1] - 2019/12/24
+## [v0.7.1]
+
+> Release date: 2019/12/24
 
 ### Fixed
 
@@ -412,7 +492,9 @@ other changes introduced in this release.
   credentials for Kong versions below 1.4
   [#114](https://github.com/hbagdi/deck/issues/114)
 
-## [v0.7.0] - 2019/12/07
+## [v0.7.0]
+
+> Release date: 2019/12/07
 
 ### Breaking changes
 
@@ -437,7 +519,9 @@ other changes introduced in this release.
 - A new docs website has been setup for the project:
   [https://deck.yolo42.com](https://deck.yolo42.com)
 
-## [v0.6.2] - 2019/11/16
+## [v0.6.2]
+
+> Release date: 2019/11/16
 
 ### Fixed
 
@@ -446,7 +530,9 @@ other changes introduced in this release.
 - Plugins for routes are correctly processed
   [#104](https://github.com/hbagdi/deck/issues/104)
 
-## [v0.6.1] - 2019/11/08
+## [v0.6.1]
+
+> Release date: 2019/11/08
 
 ### Fixed
 
@@ -457,7 +543,9 @@ other changes introduced in this release.
 - Multiple upstream definitions are read correctly and synced up
   [#96](https://github.com/hbagdi/deck/issues/96)
 
-## [v0.6.0] - 2019/11/03
+## [v0.6.0]
+
+> Release date: 2019/11/03
 
 ### Breaking changes
 
@@ -519,7 +607,9 @@ other changes introduced in this release.
 - `go-kong` has been bumped up to `v0.10.0`.
 - Reduced memory allocation, which should result in less GC pressure.
 
-## [v0.5.2] - 2019/09/15
+## [v0.5.2]
+
+> Release date: 2019/09/15
 
 ### Added
 
@@ -543,7 +633,9 @@ other changes introduced in this release.
 
 - Go version has been bumped to 1.13.
 
-## [v0.5.1] - 2019/08/24
+## [v0.5.1]
+
+> Release date: 2019/08/24
 
 ### Added
 
@@ -560,7 +652,9 @@ other changes introduced in this release.
   the configuration being synced.
   [#65](https://github.com/hbagdi/deck/issues/65)
 
-## [v0.5.0] - 2019/08/18
+## [v0.5.0]
+
+> Release date: 2019/08/18
 
 ### Summary
 
@@ -618,7 +712,9 @@ No breaking changes have been introduced in this release.
   [#34](https://github.com/hbagdi/deck/pull/34)  
   Thanks to [David Cruz](https://github.com/davidcv5) for the contribution.
 
-## [v0.4.0] - 2019/06/10
+## [v0.4.0]
+
+> Release date: 2019/06/10
 
 ### Summary
 
@@ -635,7 +731,9 @@ This release introduces support for Kong 1.2.x.
 - `https_redirect_status_code` attribute of Route in Kong can be set,
   and defaults to `426`.
 
-## [v0.3.0] - 2019/05/14
+## [v0.3.0]
+
+> Release date: 2019/05/14
 
 ### Breaking changes
 
@@ -687,7 +785,9 @@ No breaking changes have been introduced in this release.
 
 - `go-kong` has been bumped up to v0.4.1.
 
-## [v0.2.0] - 2019/04/01
+## [v0.2.0]
+
+> Release date: 2019/04/01
 
 ### Breaking changes
 
@@ -713,12 +813,17 @@ No breaking changes have been introduced in this release.
 - Plugins are updated using PUT requests instead of PATCH to
   avoid any schema violations.
 
-## [v0.1.0] - 2019/01/12
+## [v0.1.0]
+
+> Release date: 2019/01/12
 
 ### Summary
 
 Debut release of decK
 
+[v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
+[v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
+[v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
 [v1.8.1]: https://github.com/kong/deck/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kong/deck/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/kong/deck/compare/v1.6.0...v1.7.0

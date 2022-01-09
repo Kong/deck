@@ -598,6 +598,7 @@ func (s FServicePackage) sortKey() string {
 // +k8s:deepcopy-gen=true
 type Content struct {
 	FormatVersion string `json:"_format_version,omitempty" yaml:"_format_version,omitempty"`
+	Transform     *bool  `json:"_transform,omitempty" yaml:"_transform,omitempty"`
 	Info          *Info  `json:"_info,omitempty" yaml:"_info,omitempty"`
 	Workspace     string `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
 

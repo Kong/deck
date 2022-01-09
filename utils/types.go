@@ -17,6 +17,7 @@ import (
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
+	"github.com/ssgelm/cookiejarparser"
 )
 
 var clientTimeout time.Duration
@@ -95,9 +96,12 @@ type KongClientConfig struct {
 
 	Timeout int
 
+	CookieJarPath string
+
 	TLSClientCert string
 
 	TLSClientKey string
+
 }
 
 type KonnectConfig struct {
@@ -106,6 +110,8 @@ type KonnectConfig struct {
 	Debug    bool
 
 	Address string
+
+	Headers []string
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.
@@ -166,6 +172,14 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if opt.Workspace != "" {
 		url.Path = path.Join(url.Path, opt.Workspace)
 	}
+	// Add Session Cookie support if required
+	if opt.CookieJarPath != "" {
+		jar, err := cookiejarparser.LoadCookieJarFile(opt.CookieJarPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize cookie-jar: %w", err)
+		}
+		c.Jar = jar
+	}
 
 	kongClient, err := kong.NewClient(kong.String(url.String()), c)
 	if err != nil {
@@ -195,6 +209,17 @@ func parseHeaders(headers []string) (http.Header, error) {
 func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.Client,
 	error) {
 	address := CleanAddress(config.Address)
+
+	if httpClient == nil {
+		defaultTransport := http.DefaultTransport.(*http.Transport)
+		httpClient = http.DefaultClient
+		httpClient.Transport = defaultTransport
+	}
+	headers, err := parseHeaders(config.Headers)
+	if err != nil {
+		return nil, fmt.Errorf("parsing headers: %w", err)
+	}
+	httpClient = kong.HTTPClientWithHeaders(httpClient, headers)
 	client, err := konnect.NewClient(httpClient, konnect.ClientOpts{
 		BaseURL: address,
 	})

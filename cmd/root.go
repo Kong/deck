@@ -123,6 +123,13 @@ func init() {
 	viper.BindPFlag("skip-workspace-crud",
 		rootCmd.PersistentFlags().Lookup("skip-workspace-crud"))
 
+	// Support for Session Cookie
+	rootCmd.PersistentFlags().String("kong-cookie-jar-path", "",
+		"Absolute path to a cookie-jar file in the Netscape cookie format for auth with Admin Server.\n"+
+			"You may also need to pass in as header the User-Agent that was used to create the cookie-jar.")
+	viper.BindPFlag("kong-cookie-jar-path",
+		rootCmd.PersistentFlags().Lookup("kong-cookie-jar-path"))
+
 	// konnect-specific flags
 	rootCmd.PersistentFlags().String("konnect-email", "",
 		"Email address associated with your Konnect account.")
@@ -223,6 +230,9 @@ func initConfig() {
 	rootConfig.TLSClientCert = viper.GetString("tls-client-cert")
 	rootConfig.TLSClientKey = viper.GetString("tls-client-key")
 
+	// cookie-jar support
+	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
+
 	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
 
 	if err := initKonnectConfig(); err != nil {
@@ -253,5 +263,6 @@ func initKonnectConfig() error {
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
+	konnectConfig.Headers = viper.GetStringSlice("headers")
 	return nil
 }
