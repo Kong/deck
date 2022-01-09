@@ -4,8 +4,16 @@ import (
 	"fmt"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/dump"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+)
+
+var (
+	// ErrorTransformFalseNotSupported indicates that no transform mode is not supported
+	ErrorTransformFalseNotSupported = fmt.Errorf("_transform: false is not supported")
+	// ErrorFilenameEmpty indicates that you must provide a filename
+	ErrorFilenameEmpty = fmt.Errorf("filename cannot be empty")
 )
 
 // RenderConfig contains necessary information to render a correct
@@ -25,18 +33,23 @@ type RenderConfig struct {
 // or if there is any error during processing.
 func GetContentFromFiles(filenames []string) (*Content, error) {
 	if len(filenames) == 0 {
-		return nil, fmt.Errorf("filename cannot be empty")
+		return nil, ErrorFilenameEmpty
 	}
 
 	return getContent(filenames)
 }
 
+// GetForKonnect processes the fileContent and renders a RawState and KonnectRawState
 func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState, *utils.KonnectRawState, error) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+
+	if fileContent.Transform != nil && !*fileContent.Transform {
+		return nil, nil, ErrorTransformFalseNotSupported
+	}
 
 	kongState, konnectState, err := builder.build()
 	if err != nil {
@@ -47,12 +60,19 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content, opt RenderConfig) (*utils.KongRawState, error) {
+func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config) (*utils.KongRawState, error) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+	if len(dumpConfig.SelectorTags) > 0 {
+		builder.selectTags = dumpConfig.SelectorTags
+	}
+
+	if fileContent.Transform != nil && !*fileContent.Transform {
+		return nil, ErrorTransformFalseNotSupported
+	}
 
 	state, _, err := builder.build()
 	if err != nil {
