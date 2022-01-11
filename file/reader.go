@@ -7,6 +7,7 @@ import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 )
 
 var (
@@ -60,12 +61,15 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config) (*utils.KongRawState, error) {
+func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config, wsClient *kong.Client) (
+	*utils.KongRawState, error,
+) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+	builder.client = wsClient
 	if len(dumpConfig.SelectorTags) > 0 {
 		builder.selectTags = dumpConfig.SelectorTags
 	}

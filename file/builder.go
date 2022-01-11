@@ -1,7 +1,9 @@
 package file
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
@@ -20,6 +22,8 @@ type stateBuilder struct {
 
 	selectTags   []string
 	intermediate *state.KongState
+
+	client *kong.Client
 
 	err error
 }
@@ -195,6 +199,11 @@ func (b *stateBuilder) consumers() {
 		for _, p := range c.Plugins {
 			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
 			plugins = append(plugins, *p)
+		}
+		plugins, err = b.ingestPluginDefaults(plugins)
+		if err != nil {
+			b.err = err
+			return
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
 			b.err = err
@@ -569,6 +578,10 @@ func (b *stateBuilder) ingestService(s *FService) error {
 		p.Service = &kong.Service{ID: kong.String(*s.ID)}
 		plugins = append(plugins, *p)
 	}
+	plugins, err = b.ingestPluginDefaults(plugins)
+	if err != nil {
+		return err
+	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		return err
 	}
@@ -735,6 +748,11 @@ func (b *stateBuilder) plugins() {
 		}
 		plugins = append(plugins, p)
 	}
+	plugins, err := b.ingestPluginDefaults(plugins)
+	if err != nil {
+		b.err = err
+		return
+	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		b.err = err
 		return
@@ -768,7 +786,99 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
 		plugins = append(plugins, *p)
 	}
+	plugins, err = b.ingestPluginDefaults(plugins)
+	if err != nil {
+		return err
+	}
 	return b.ingestPlugins(plugins)
+}
+
+func ingestDefaultConfigFields(p *FPlugin, config interface{}) {
+	for _, field := range config.([]interface{}) {
+		for key, value := range field.(map[string]interface{}) {
+			if p.Config[key] != nil {
+				continue
+			}
+			if defaultValue, ok := value.(map[string]interface{})["default"]; ok {
+				p.Config[key] = defaultValue
+			} else if fields, ok := value.(map[string]interface{})["fields"]; ok {
+				innerField := map[string]interface{}{}
+				for _, field := range fields.([]interface{}) {
+					for fieldKey, value := range field.(map[string]interface{}) {
+						if defaultValue, ok := value.(map[string]interface{})["default"]; ok {
+							innerField[fieldKey] = defaultValue
+						} else {
+							innerField[fieldKey] = nil
+						}
+					}
+				}
+				p.Config[key] = innerField
+			} else {
+				p.Config[key] = nil
+			}
+		}
+	}
+}
+
+func ingestDefaultProtocols(p *FPlugin, protocols interface{}) {
+	if defaultValue, ok := protocols.(map[string]interface{})["default"]; ok {
+		for _, protocol := range defaultValue.([]interface{}) {
+			if protocolStr, ok := protocol.(string); ok {
+				p.Protocols = append(p.Protocols, &protocolStr)
+			}
+		}
+	}
+}
+
+func (b *stateBuilder) getDefaults(entity, entityID string) (map[string]interface{}, error) {
+	ctx := context.Background()
+	var schema map[string]interface{}
+	endpoint := fmt.Sprintf("/schemas/%s", entity)
+	if entityID != "" {
+		endpoint += fmt.Sprintf("/%s", entityID)
+	}
+	req, err := b.client.NewRequest(http.MethodGet, endpoint, nil, nil)
+	if err != nil {
+		return schema, err
+	}
+	_, err = b.client.Do(ctx, req, &schema)
+	return schema, err
+}
+
+func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
+	// skip for konnect and when kong client is not defined (like with validate)
+	if b.konnectRawState == nil ||
+		len(b.konnectRawState.Documents) > 0 ||
+		len(b.konnectRawState.ServicePackages) > 0 ||
+		b.client == nil {
+		return plugins, nil
+	}
+	pluginsWithDefault := []FPlugin{}
+	for _, p := range plugins {
+		p := p
+		defaults, err := b.getDefaults("plugins", *p.Name)
+		if err != nil {
+			return pluginsWithDefault, err
+		}
+
+		if p.Config == nil {
+			p.Config = make(map[string]interface{})
+		}
+
+		fields := defaults["fields"].([]interface{})
+		for _, field := range fields {
+			if protocols, ok := field.(map[string]interface{})["protocols"]; ok {
+				if p.Protocols != nil {
+					continue
+				}
+				ingestDefaultProtocols(&p, protocols)
+			} else if config, ok := field.(map[string]interface{})["config"]; ok {
+				ingestDefaultConfigFields(&p, config.(map[string]interface{})["fields"])
+			}
+		}
+		pluginsWithDefault = append(pluginsWithDefault, p)
+	}
+	return pluginsWithDefault, nil
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {

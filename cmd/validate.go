@@ -48,7 +48,7 @@ this command unless --online flag is used.
 
 		rawState, err := file.Get(targetContent, file.RenderConfig{
 			CurrentState: dummyEmptyState,
-		}, dump.Config{})
+		}, dump.Config{}, nil)
 		if err != nil {
 			return err
 		}
