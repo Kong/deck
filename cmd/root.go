@@ -163,7 +163,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("timeout"))
 
 	rootCmd.PersistentFlags().String("tls-client-cert", "",
-		"Set the Kong's Admin TLS client certificate.\n"+
+		"PEM-encoded TLS client certificate to use for authentication with Kong's Admin API.\n"+
 			"This value can also be set using DECK_TLS_CLIENT_CERT "+
 			"environment variable. Must be used in conjunction with tls-client-key")
 	viper.BindPFlag("tls-client-cert",
