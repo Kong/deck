@@ -45,7 +45,7 @@ func init() {
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
-		false, "do not diff consumers or "+
+		false, "do not sync consumers or "+
 			"any plugins associated with consumers.")
 	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations.")
