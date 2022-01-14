@@ -170,7 +170,7 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("tls-client-cert"))
 
 	rootCmd.PersistentFlags().String("tls-client-cert-file", "",
-		"Path to the Kong's Admin TLS client certificate file.\n"+
+		"Path to the file containing TLS client certificate to use for authentication with Kong's Admin API.\n"+
 			"This value can also be set using DECK_TLS_CLIENT_CERT_FILE "+
 			"environment variable. Must be used in conjunction with tls-client-key-file")
 	viper.BindPFlag("tls-client-cert",
