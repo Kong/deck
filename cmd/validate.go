@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"reflect"
-	"sync"
 
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
+	"github.com/kong/deck/validate"
 	"github.com/spf13/cobra"
 )
 
@@ -21,18 +18,6 @@ var (
 	validateWorkspace            string
 	validateParallelism          int
 )
-
-type validateErrorsWrapper struct {
-	errors []error
-}
-
-func (v validateErrorsWrapper) Error() string {
-	var errStr string
-	for _, e := range v.errors {
-		errStr += fmt.Sprintf("%s\n", e.Error())
-	}
-	return errStr
-}
 
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
@@ -78,7 +63,7 @@ this command unless --online flag is used.
 
 		if validateOnline {
 			if errs := validateWithKong(cmd, ks, targetContent); len(errs) != 0 {
-				return validateErrorsWrapper{errors: errs}
+				return validate.ErrorsWrapper{Errors: errs}
 			}
 		}
 		return nil
@@ -90,42 +75,6 @@ this command unless --online flag is used.
 		}
 		return nil
 	},
-}
-
-func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Client, entityType string) []error {
-	entities, err := callGetAll(obj)
-	if err != nil {
-		return []error{err}
-	}
-	errors := []error{}
-
-	// create a buffer of channels. Creation of new coroutines
-	// are allowed only if the buffer is not full.
-	chanBuff := make(chan struct{}, validateParallelism)
-
-	var wg sync.WaitGroup
-	wg.Add(entities.Len())
-	// each coroutine will append on a slice of errors.
-	// since slices are not thread-safe, let's add a mutex
-	// to handle access to the slice.
-	mu := &sync.Mutex{}
-	for i := 0; i < entities.Len(); i++ {
-		// reserve a slot
-		chanBuff <- struct{}{}
-		go func(i int) {
-			defer wg.Done()
-			// release a slot when completed
-			defer func() { <-chanBuff }()
-			_, err := validateEntity(ctx, kongClient, entityType, entities.Index(i).Interface())
-			if err != nil {
-				mu.Lock()
-				errors = append(errors, err)
-				mu.Unlock()
-			}
-		}(i)
-	}
-	wg.Wait()
-	return errors
 }
 
 func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *file.Content) []error {
@@ -148,84 +97,11 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *fi
 
 	wsConfig := rootConfig.ForWorkspace(workspaceName)
 	kongClient, err := utils.GetKongClient(wsConfig)
-	allErr := []error{}
 	if err != nil {
 		return []error{err}
 	}
-
-	// validate RBAC resources first.
-	if err := validateEntities(ctx, ks.RBACEndpointPermissions, kongClient, "rbac-endpointpermission"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.RBACRoles, kongClient, "rbac-role"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if validateCmdRBACResourcesOnly {
-		return allErr
-	}
-
-	if err := validateEntities(ctx, ks.Services, kongClient, "services"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.ACLGroups, kongClient, "acls"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.BasicAuths, kongClient, "basicauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.CACertificates, kongClient, "ca_certificates"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Certificates, kongClient, "certificates"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Consumers, kongClient, "consumers"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Documents, kongClient, "documents"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.HMACAuths, kongClient, "hmacauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.JWTAuths, kongClient, "jwt_secrets"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.KeyAuths, kongClient, "keyauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Oauth2Creds, kongClient, "oauth2_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Plugins, kongClient, "plugins"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Routes, kongClient, "routes"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.SNIs, kongClient, "snis"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Targets, kongClient, "targets"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := validateEntities(ctx, ks.Upstreams, kongClient, "upstreams"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	return allErr
-}
-
-func callGetAll(obj interface{}) (reflect.Value, error) {
-	// call GetAll method on entity
-	var result reflect.Value
-	method := reflect.ValueOf(obj).MethodByName("GetAll")
-	if !method.IsValid() {
-		return result, fmt.Errorf("GetAll() method not found for %v. "+
-			"Please file a bug with Kong Inc.", reflect.ValueOf(obj).Type())
-	}
-	entities := method.Call([]reflect.Value{})[0].Interface()
-	result = reflect.ValueOf(entities)
-	return result, nil
+	validator := validate.NewValidator(ctx, ks, kongClient, validateParallelism, validateCmdRBACResourcesOnly)
+	return validator.Validate()
 }
 
 // ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.
@@ -234,58 +110,58 @@ func callGetAll(obj interface{}) (reflect.Value, error) {
 func ensureGetAllMethods() error {
 	// let's make sure ASAP that all resources have the expected GetAll method
 	dummyEmptyState, _ := state.NewKongState()
-	if _, err := callGetAll(dummyEmptyState.Services); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Services); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.ACLGroups); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.ACLGroups); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.BasicAuths); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.BasicAuths); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.CACertificates); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.CACertificates); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Certificates); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Certificates); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Consumers); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Consumers); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Documents); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Documents); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.HMACAuths); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.HMACAuths); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.JWTAuths); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.JWTAuths); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.KeyAuths); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.KeyAuths); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Oauth2Creds); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Oauth2Creds); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Plugins); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Plugins); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Routes); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Routes); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.SNIs); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.SNIs); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Targets); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Targets); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.Upstreams); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.Upstreams); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.RBACEndpointPermissions); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.RBACEndpointPermissions); err != nil {
 		return err
 	}
-	if _, err := callGetAll(dummyEmptyState.RBACRoles); err != nil {
+	if _, err := utils.CallGetAll(dummyEmptyState.RBACRoles); err != nil {
 		return err
 	}
 	return nil
@@ -309,6 +185,7 @@ func init() {
 			"This takes precedence over _workspace fields in state files.")
 	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
 		10, "Maximum number of concurrent requests to Kong.")
+
 	if err := ensureGetAllMethods(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
