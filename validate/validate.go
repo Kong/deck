@@ -19,7 +19,13 @@ type Validator struct {
 	rbacResourcesOnly bool
 }
 
-func NewValidator(ctx context.Context, ks *state.KongState, client *kong.Client, parallelism int, rbacResourcesOnly bool) *Validator {
+func NewValidator(
+	ctx context.Context,
+	ks *state.KongState,
+	client *kong.Client,
+	parallelism int,
+	rbacResourcesOnly bool,
+) *Validator {
 	return &Validator{
 		ctx:               ctx,
 		state:             ks,
