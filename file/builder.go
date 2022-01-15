@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/tidwall/gjson"
 )
 
 type stateBuilder struct {
@@ -24,6 +26,9 @@ type stateBuilder struct {
 	intermediate *state.KongState
 
 	client *kong.Client
+	ctx    context.Context
+
+	schemas map[string]gjson.Result
 
 	err error
 }
@@ -793,56 +798,117 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	return b.ingestPlugins(plugins)
 }
 
-func ingestDefaultConfigFields(p *FPlugin, config interface{}) {
-	for _, field := range config.([]interface{}) {
-		for key, value := range field.(map[string]interface{}) {
-			if p.Config[key] != nil {
-				continue
-			}
-			if defaultValue, ok := value.(map[string]interface{})["default"]; ok {
-				p.Config[key] = defaultValue
-			} else if fields, ok := value.(map[string]interface{})["fields"]; ok {
-				innerField := map[string]interface{}{}
-				for _, field := range fields.([]interface{}) {
-					for fieldKey, value := range field.(map[string]interface{}) {
-						if defaultValue, ok := value.(map[string]interface{})["default"]; ok {
-							innerField[fieldKey] = defaultValue
-						} else {
-							innerField[fieldKey] = nil
-						}
-					}
-				}
-				p.Config[key] = innerField
-			} else {
-				p.Config[key] = nil
-			}
-		}
-	}
-}
-
-func ingestDefaultProtocols(p *FPlugin, protocols interface{}) {
-	if defaultValue, ok := protocols.(map[string]interface{})["default"]; ok {
-		for _, protocol := range defaultValue.([]interface{}) {
-			if protocolStr, ok := protocol.(string); ok {
-				p.Protocols = append(p.Protocols, &protocolStr)
-			}
-		}
-	}
-}
-
-func (b *stateBuilder) getDefaults(entity, entityID string) (map[string]interface{}, error) {
-	ctx := context.Background()
+func (b *stateBuilder) getPluginSchema(entityID string) (gjson.Result, error) {
 	var schema map[string]interface{}
-	endpoint := fmt.Sprintf("/schemas/%s", entity)
-	if entityID != "" {
-		endpoint += fmt.Sprintf("/%s", entityID)
+	var res gjson.Result
+
+	// lookup in cache
+	if b.schemas == nil {
+		b.schemas = make(map[string]gjson.Result)
 	}
+	if schema, ok := b.schemas[entityID]; ok {
+		return schema, nil
+	}
+
+	endpoint := fmt.Sprintf("/schemas/plugins/%s", entityID)
 	req, err := b.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
-		return schema, err
+		return res, err
 	}
-	_, err = b.client.Do(ctx, req, &schema)
-	return schema, err
+
+	_, err = b.client.Do(b.ctx, req, &schema)
+	if err != nil {
+		return res, err
+	}
+
+	jsonb, err := json.Marshal(&schema)
+	if err != nil {
+		return res, err
+	}
+
+	res = gjson.ParseBytes((jsonb))
+	b.schemas[entityID] = res
+	return res, err
+}
+
+func stringP(s string) *string { return &s }
+func boolP(b bool) *bool       { return &b }
+
+func fillProtocolsRecord(schema gjson.Result) ([]*string, error) {
+	var res []*string
+	fields := schema.Get("fields")
+
+	for _, field := range fields.Array() {
+		for key, value := range field.Map() {
+			if key != "protocols" {
+				continue
+			}
+			d := value.Get("default")
+			if d.Exists() {
+				for _, v := range d.Array() {
+					res = append(res, stringP(v.String()))
+				}
+				return res, nil
+			}
+		}
+	}
+	return res, nil
+}
+
+func fillConfigRecord(schema gjson.Result, config kong.Configuration) (kong.Configuration, error) {
+	if config == nil {
+		return nil, nil
+	}
+	res := config.DeepCopy()
+	value := schema.Get("fields")
+
+	value.ForEach(func(key, value gjson.Result) bool {
+		// get the key name
+		ms := value.Map()
+		fname := ""
+		for k := range ms {
+			fname = k
+			break
+		}
+
+		if fname == "config" {
+			newConfig, err := fillConfigRecord(value.Get(fname), config)
+			if err != nil {
+				panic(err)
+			}
+			res = newConfig
+			return true
+		}
+
+		// check if key is already set in the config
+		if _, ok := config[fname]; ok {
+			// yes, don't set it
+			return true
+		}
+		ftype := value.Get(fname + ".type")
+		if ftype.String() == "record" {
+			subConfig := config[fname]
+			if subConfig == nil {
+				subConfig = make(map[string]interface{})
+			}
+			newSubConfig, err := fillConfigRecord(value.Get(fname), subConfig.(map[string]interface{}))
+			if err != nil {
+				panic(err)
+			}
+			res[fname] = map[string]interface{}(newSubConfig)
+			return true
+		}
+		value = value.Get(fname + ".default")
+		if value.Exists() {
+			res[fname] = value.Value()
+		} else {
+			// if no default exists, set an explicit nil
+			res[fname] = nil
+		}
+		return true
+	})
+
+	return res, nil
 }
 
 func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
@@ -856,29 +922,40 @@ func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error
 	pluginsWithDefault := []FPlugin{}
 	for _, p := range plugins {
 		p := p
-		defaults, err := b.getDefaults("plugins", *p.Name)
+		schema, err := b.getPluginSchema(*p.Name)
 		if err != nil {
 			return pluginsWithDefault, err
 		}
-
-		if p.Config == nil {
-			p.Config = make(map[string]interface{})
-		}
-
-		fields := defaults["fields"].([]interface{})
-		for _, field := range fields {
-			if protocols, ok := field.(map[string]interface{})["protocols"]; ok {
-				if p.Protocols != nil {
-					continue
-				}
-				ingestDefaultProtocols(&p, protocols)
-			} else if config, ok := field.(map[string]interface{})["config"]; ok {
-				ingestDefaultConfigFields(&p, config.(map[string]interface{})["fields"])
-			}
+		p, err = fillRecords(schema, p)
+		if err != nil {
+			return pluginsWithDefault, err
 		}
 		pluginsWithDefault = append(pluginsWithDefault, p)
 	}
 	return pluginsWithDefault, nil
+}
+
+func fillRecords(schema gjson.Result, p FPlugin) (FPlugin, error) {
+	if p.Config == nil {
+		p.Config = make(kong.Configuration)
+	}
+	newConfig, err := fillConfigRecord(schema, p.Config)
+	if err != nil {
+		return p, fmt.Errorf("error filling in default config for plugin %s: %w", *p.Name, err)
+	}
+	if p.Protocols == nil {
+		protocols, err := fillProtocolsRecord(schema)
+		if err != nil {
+			return p, fmt.Errorf("error filling in default protocols for plugin %s: %w", *p.Name, err)
+		}
+		p.Protocols = protocols
+	}
+	p.Config = newConfig
+
+	if p.Enabled == nil {
+		p.Enabled = boolP(true)
+	}
+	return p, nil
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {

@@ -2,10 +2,12 @@ package file
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
@@ -107,7 +109,9 @@ func TestTransformNotFalse(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	parsed, err := Get(c, RenderConfig{}, dump.Config{}, wsClient)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*10))
+	defer cancel()
+	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 

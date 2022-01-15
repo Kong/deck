@@ -15,13 +15,14 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/kong/go-kong v0.25.1
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.12
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
 	github.com/ssgelm/cookiejarparser v1.0.1
 	github.com/stretchr/testify v1.7.0
+	github.com/tidwall/gjson v1.13.0
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
 	github.com/yudai/gojsondiff v1.0.0

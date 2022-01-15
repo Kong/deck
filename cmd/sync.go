@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -22,7 +24,9 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(cmd.Context(), syncCmdKongStateFile, false,
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(rootConfig.Timeout))
+		defer cancel()
+		return syncMain(ctx, syncCmdKongStateFile, false,
 			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {

@@ -142,7 +142,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	// read the target state
-	rawState, err := file.Get(targetContent, file.RenderConfig{
+	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 		CurrentState: currentState,
 		KongVersion:  parsedKongVersion,
 	}, dumpConfig, wsClient)

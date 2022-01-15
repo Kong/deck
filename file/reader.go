@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/blang/semver/v4"
@@ -61,7 +62,7 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config, wsClient *kong.Client) (
+func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig dump.Config, wsClient *kong.Client) (
 	*utils.KongRawState, error,
 ) {
 	var builder stateBuilder
@@ -70,6 +71,7 @@ func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config, wsClien
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
 	builder.client = wsClient
+	builder.ctx = ctx
 	if len(dumpConfig.SelectorTags) > 0 {
 		builder.selectTags = dumpConfig.SelectorTags
 	}
