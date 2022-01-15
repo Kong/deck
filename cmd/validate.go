@@ -19,9 +19,8 @@ var (
 	validateCmdRBACResourcesOnly bool
 	validateOnline               bool
 	validateWorkspace            string
+	validateParallelism          int
 )
-
-var maxConcurrency = 100
 
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
@@ -93,7 +92,7 @@ func validateEntities(ctx context.Context, obj interface{}, kongClient *kong.Cli
 
 	// create a buffer of channels. Creation of new coroutines
 	// are allowed only if the buffer is not full.
-	chanBuff := make(chan struct{}, maxConcurrency)
+	chanBuff := make(chan struct{}, validateParallelism)
 
 	var wg sync.WaitGroup
 	wg.Add(entities.Len())
@@ -292,11 +291,15 @@ func init() {
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
 	validateCmd.Flags().BoolVar(&validateOnline, "online",
-		false, "perform schema validation against Kong API.")
+		false, "perform validations against Kong API. When this flag is used, validation is done\n"+
+			"via communication with Kong. This increases the time for validation but catches \n"+
+			"significant errors. No resource is created in Kong.")
 	validateCmd.Flags().StringVarP(&validateWorkspace, "workspace", "w",
 		"", "validate configuration of a specific workspace "+
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
+	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
+		10, "Maximum number of concurrent requests to Kong.")
 	if err := ensureGetAllMethods(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
