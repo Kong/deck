@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/kong/go-kong/kong"
-
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 )
 
 type Validator struct {

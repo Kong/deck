@@ -85,14 +85,17 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *fi
 		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
 	}
 
-	// check if workspace exists
-	workspaceName := getWorkspaceName(validateWorkspace, targetContent)
-	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
-	if err != nil {
-		return []error{err}
-	}
-	if !workspaceExists {
-		return []error{fmt.Errorf("workspace doesn't exist: %s", workspaceName)}
+	workspaceName := validateWorkspace
+	if validateWorkspace != "" {
+		// check if workspace exists
+		workspaceName := getWorkspaceName(validateWorkspace, targetContent)
+		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
+		if err != nil {
+			return []error{err}
+		}
+		if !workspaceExists {
+			return []error{fmt.Errorf("workspace doesn't exist: %s", workspaceName)}
+		}
 	}
 
 	wsConfig := rootConfig.ForWorkspace(workspaceName)
