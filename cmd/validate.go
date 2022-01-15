@@ -22,6 +22,18 @@ var (
 	validateParallelism          int
 )
 
+type validateErrorsWrapper struct {
+	errors []error
+}
+
+func (v validateErrorsWrapper) Error() string {
+	var errStr string
+	for _, e := range v.errors {
+		errStr += fmt.Sprintf("%s\n", e.Error())
+	}
+	return errStr
+}
+
 // validateCmd represents the diff command
 var validateCmd = &cobra.Command{
 	Use:   "validate",
@@ -66,10 +78,7 @@ this command unless --online flag is used.
 
 		if validateOnline {
 			if errs := validateWithKong(cmd, ks, targetContent); len(errs) != 0 {
-				for _, e := range errs {
-					fmt.Println(e)
-				}
-				os.Exit(1)
+				return validateErrorsWrapper{errors: errs}
 			}
 		}
 		return nil
