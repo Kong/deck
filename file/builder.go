@@ -834,7 +834,7 @@ func (b *stateBuilder) getPluginSchema(entityID string) (gjson.Result, error) {
 func stringP(s string) *string { return &s }
 func boolP(b bool) *bool       { return &b }
 
-func fillProtocolsRecord(schema gjson.Result) ([]*string, error) {
+func fillProtocolsRecord(schema gjson.Result) []*string {
 	var res []*string
 	fields := schema.Get("fields")
 
@@ -848,16 +848,16 @@ func fillProtocolsRecord(schema gjson.Result) ([]*string, error) {
 				for _, v := range d.Array() {
 					res = append(res, stringP(v.String()))
 				}
-				return res, nil
+				return res
 			}
 		}
 	}
-	return res, nil
+	return res
 }
 
-func fillConfigRecord(schema gjson.Result, config kong.Configuration) (kong.Configuration, error) {
+func fillConfigRecord(schema gjson.Result, config kong.Configuration) kong.Configuration {
 	if config == nil {
-		return nil, nil
+		return nil
 	}
 	res := config.DeepCopy()
 	value := schema.Get("fields")
@@ -872,10 +872,7 @@ func fillConfigRecord(schema gjson.Result, config kong.Configuration) (kong.Conf
 		}
 
 		if fname == "config" {
-			newConfig, err := fillConfigRecord(value.Get(fname), config)
-			if err != nil {
-				panic(err)
-			}
+			newConfig := fillConfigRecord(value.Get(fname), config)
 			res = newConfig
 			return true
 		}
@@ -891,10 +888,7 @@ func fillConfigRecord(schema gjson.Result, config kong.Configuration) (kong.Conf
 			if subConfig == nil {
 				subConfig = make(map[string]interface{})
 			}
-			newSubConfig, err := fillConfigRecord(value.Get(fname), subConfig.(map[string]interface{}))
-			if err != nil {
-				panic(err)
-			}
+			newSubConfig := fillConfigRecord(value.Get(fname), subConfig.(map[string]interface{}))
 			res[fname] = map[string]interface{}(newSubConfig)
 			return true
 		}
@@ -908,7 +902,7 @@ func fillConfigRecord(schema gjson.Result, config kong.Configuration) (kong.Conf
 		return true
 	})
 
-	return res, nil
+	return res
 }
 
 func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
@@ -926,28 +920,19 @@ func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error
 		if err != nil {
 			return pluginsWithDefault, err
 		}
-		p, err = fillRecords(schema, p)
-		if err != nil {
-			return pluginsWithDefault, err
-		}
+		p = fillRecords(schema, p)
 		pluginsWithDefault = append(pluginsWithDefault, p)
 	}
 	return pluginsWithDefault, nil
 }
 
-func fillRecords(schema gjson.Result, p FPlugin) (FPlugin, error) {
+func fillRecords(schema gjson.Result, p FPlugin) FPlugin {
 	if p.Config == nil {
 		p.Config = make(kong.Configuration)
 	}
-	newConfig, err := fillConfigRecord(schema, p.Config)
-	if err != nil {
-		return p, fmt.Errorf("error filling in default config for plugin %s: %w", *p.Name, err)
-	}
+	newConfig := fillConfigRecord(schema, p.Config)
 	if p.Protocols == nil {
-		protocols, err := fillProtocolsRecord(schema)
-		if err != nil {
-			return p, fmt.Errorf("error filling in default protocols for plugin %s: %w", *p.Name, err)
-		}
+		protocols := fillProtocolsRecord(schema)
 		p.Protocols = protocols
 	}
 	p.Config = newConfig
@@ -955,7 +940,7 @@ func fillRecords(schema gjson.Result, p FPlugin) (FPlugin, error) {
 	if p.Enabled == nil {
 		p.Enabled = boolP(true)
 	}
-	return p, nil
+	return p
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {

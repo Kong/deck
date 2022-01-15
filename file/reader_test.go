@@ -109,7 +109,7 @@ func TestTransformNotFalse(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*10))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
