@@ -245,18 +245,6 @@ func initConfig() {
 
 	clientCertContent := ""
 
-	if (viper.GetString("tls-client-cert") == "" && viper.GetString("tls-client-key") != "") ||
-		(viper.GetString("tls-client-cert") != "" && viper.GetString("tls-client-key") == "") {
-		fmt.Printf("tls-client-cert and tls-client-key must be used in conjunction")
-		os.Exit(1)
-	}
-
-	if (viper.GetString("tls-client-cert-file") == "" && viper.GetString("tls-client-key-file") != "") ||
-		(viper.GetString("tls-client-cert-file") != "" && viper.GetString("tls-client-key-file") == "") {
-		fmt.Printf("tls-client-cert-file and tls-client-key-file must be used in conjunction")
-		os.Exit(1)
-	}
-
 	if viper.GetString("tls-client-cert") != "" {
 		clientCertContent = viper.GetString("tls-client-cert")
 	} else if viper.GetString("tls-client-cert-file") != "" {
@@ -284,6 +272,12 @@ func initConfig() {
 		clientKeyContent = strings.TrimRight(clientKeyContent, "\n")
 	}
 	rootConfig.TLSClientKey = clientKeyContent
+
+	if (rootConfig.TLSClientKey == "" && rootConfig.TLSClientCert != "") ||
+		(rootConfig.TLSClientKey != "" && rootConfig.TLSClientCert == "") {
+		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file must be used in conjunction")
+		os.Exit(1)
+	}
 
 	// cookie-jar support
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
