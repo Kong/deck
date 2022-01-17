@@ -163,28 +163,28 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("timeout"))
 
 	rootCmd.PersistentFlags().String("tls-client-cert", "",
-		"Set the Kong's Admin TLS client certificate.\n"+
+		"PEM-encoded TLS client certificate to use for authentication with Kong's Admin API.\n"+
 			"This value can also be set using DECK_TLS_CLIENT_CERT "+
 			"environment variable. Must be used in conjunction with tls-client-key")
 	viper.BindPFlag("tls-client-cert",
 		rootCmd.PersistentFlags().Lookup("tls-client-cert"))
 
 	rootCmd.PersistentFlags().String("tls-client-cert-file", "",
-		"Path to the Kong's Admin TLS client certificate file.\n"+
+		"Path to the file containing TLS client certificate to use for authentication with Kong's Admin API.\n"+
 			"This value can also be set using DECK_TLS_CLIENT_CERT_FILE "+
 			"environment variable. Must be used in conjunction with tls-client-key-file")
 	viper.BindPFlag("tls-client-cert",
 		rootCmd.PersistentFlags().Lookup("tls-client-cert-file"))
 
 	rootCmd.PersistentFlags().String("tls-client-key", "",
-		"Set the Kong's Admin TLS client key.\n"+
+		"PEM-encoded private key for the corresponding client certificate .\n"+
 			"This value can also be set using DECK_TLS_CLIENT_KEY "+
 			"environment variable. Must be used in conjunction with tls-client-cert")
 	viper.BindPFlag("tls-client-key",
 		rootCmd.PersistentFlags().Lookup("tls-client-key"))
 
 	rootCmd.PersistentFlags().String("tls-client-key-file", "",
-		"Path to the Kong's Admin TLS client key file.\n"+
+		"Path to file containing the private key for the corresponding client certificate.\n"+
 			"This value can also be set using DECK_TLS_CLIENT_KEY_FILE "+
 			"environment variable. Must be used in conjunction with tls-client-cert-file")
 	viper.BindPFlag("tls-client-key",
