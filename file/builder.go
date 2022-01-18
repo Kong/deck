@@ -2,16 +2,13 @@ package file
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/tidwall/gjson"
 )
 
 type stateBuilder struct {
@@ -28,7 +25,7 @@ type stateBuilder struct {
 	client *kong.Client
 	ctx    context.Context
 
-	schemas map[string]gjson.Result
+	schemas map[string]map[string]interface{}
 
 	err error
 }
@@ -798,111 +795,20 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	return b.ingestPlugins(plugins)
 }
 
-func (b *stateBuilder) getPluginSchema(entityID string) (gjson.Result, error) {
+func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}, error) {
 	var schema map[string]interface{}
-	var res gjson.Result
 
-	// lookup in cache
 	if b.schemas == nil {
-		b.schemas = make(map[string]gjson.Result)
+		b.schemas = make(map[string]map[string]interface{})
 	}
-	if schema, ok := b.schemas[entityID]; ok {
+	// lookup in cache
+	if schema, ok := b.schemas[*entityID]; ok {
 		return schema, nil
 	}
 
-	endpoint := fmt.Sprintf("/schemas/plugins/%s", entityID)
-	req, err := b.client.NewRequest(http.MethodGet, endpoint, nil, nil)
-	if err != nil {
-		return res, err
-	}
-
-	_, err = b.client.Do(b.ctx, req, &schema)
-	if err != nil {
-		return res, err
-	}
-
-	jsonb, err := json.Marshal(&schema)
-	if err != nil {
-		return res, err
-	}
-
-	res = gjson.ParseBytes((jsonb))
-	b.schemas[entityID] = res
-	return res, err
-}
-
-func stringP(s string) *string { return &s }
-func boolP(b bool) *bool       { return &b }
-
-func fillProtocolsRecord(schema gjson.Result) []*string {
-	var res []*string
-	fields := schema.Get("fields")
-
-	for _, field := range fields.Array() {
-		for key, value := range field.Map() {
-			if key != "protocols" {
-				continue
-			}
-			d := value.Get("default")
-			if d.Exists() {
-				for _, v := range d.Array() {
-					res = append(res, stringP(v.String()))
-				}
-				return res
-			}
-		}
-	}
-	return res
-}
-
-func fillConfigRecord(schema gjson.Result, config kong.Configuration) kong.Configuration {
-	if config == nil {
-		return nil
-	}
-	res := config.DeepCopy()
-	value := schema.Get("fields")
-
-	value.ForEach(func(key, value gjson.Result) bool {
-		// get the key name
-		ms := value.Map()
-		fname := ""
-		for k := range ms {
-			fname = k
-			break
-		}
-
-		if fname == "config" {
-			newConfig := fillConfigRecord(value.Get(fname), config)
-			res = newConfig
-			return true
-		}
-
-		// check if key is already set in the config
-		if _, ok := config[fname]; ok {
-			// yes, don't set it
-			return true
-		}
-		ftype := value.Get(fname + ".type")
-		if ftype.String() == "record" {
-			subConfig := config[fname]
-			if subConfig == nil {
-				subConfig = make(map[string]interface{})
-			}
-			newSubConfig := fillConfigRecord(value.Get(fname), subConfig.(map[string]interface{}))
-			res[fname] = map[string]interface{}(newSubConfig)
-			return true
-		}
-		value = value.Get(fname + ".default")
-		if value.Exists() {
-			res[fname] = value.Value()
-		} else {
-			// if no default exists, set an explicit nil
-			res[fname] = nil
-		}
-		return true
-	})
-
-	return res
+	schema, err := b.client.Plugins.GetFullSchema(b.ctx, entityID)
+	b.schemas[*entityID] = schema
+	return schema, err
 }
 
 func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
@@ -916,31 +822,19 @@ func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error
 	pluginsWithDefault := []FPlugin{}
 	for _, p := range plugins {
 		p := p
-		schema, err := b.getPluginSchema(*p.Name)
+		schema, err := b.getPluginSchema(p.Name)
 		if err != nil {
 			return pluginsWithDefault, err
 		}
-		p = fillRecords(schema, p)
+		kp, err := b.client.Plugins.FillDefaults(b.ctx, &p.Plugin, schema)
+		if err != nil {
+			return pluginsWithDefault, err
+		}
+		p.Config = kp.Config
+		p.Protocols = kp.Protocols
 		pluginsWithDefault = append(pluginsWithDefault, p)
 	}
 	return pluginsWithDefault, nil
-}
-
-func fillRecords(schema gjson.Result, p FPlugin) FPlugin {
-	if p.Config == nil {
-		p.Config = make(kong.Configuration)
-	}
-	newConfig := fillConfigRecord(schema, p.Config)
-	if p.Protocols == nil {
-		protocols := fillProtocolsRecord(schema)
-		p.Protocols = protocols
-	}
-	p.Config = newConfig
-
-	if p.Enabled == nil {
-		p.Enabled = boolP(true)
-	}
-	return p
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {

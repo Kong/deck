@@ -24,7 +24,7 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(rootConfig.Timeout))
+		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*time.Duration(rootConfig.Timeout))
 		defer cancel()
 		return syncMain(ctx, syncCmdKongStateFile, false,
 			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)

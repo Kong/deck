@@ -22,7 +22,6 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/ssgelm/cookiejarparser v1.0.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.13.0
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
 	github.com/yudai/gojsondiff v1.0.0
