@@ -170,20 +170,23 @@ func kongServiceIDs(cpID string,
 	return res
 }
 
-// excludeKonnectManagedPlugins filter out konnect-managed plugins
+// excludeKonnectManagedPlugins filters out konnect-managed plugins
 func excludeKonnectManagedPlugins(plugins []*kong.Plugin) []*kong.Plugin {
-	var filtered []*kong.Plugin
+	filtered := []*kong.Plugin{}
 	for _, p := range plugins {
-		var konnectManaged bool
-		for _, t := range p.Tags {
-			if *t == konnect.KonnectManagedPluginTag {
-				konnectManaged = true
-			}
-		}
-		if konnectManaged {
+		if isManagedByKonnect(p) {
 			continue
 		}
 		filtered = append(filtered, p)
 	}
 	return filtered
+}
+
+func isManagedByKonnect(plugin *kong.Plugin) bool {
+	for _, t := range plugin.Tags {
+		if *t == konnect.KonnectManagedPluginTag {
+			return true
+		}
+	}
+	return false
 }

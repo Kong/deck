@@ -288,7 +288,7 @@ func Test_excludeKonnectManagedPlugins(t *testing.T) {
 		want    []*kong.Plugin
 	}{
 		{
-			name: "eclude konnect tags",
+			name: "exclude konnect tags",
 			plugins: []*kong.Plugin{
 				{
 					Name: kong.String("rate-limiting"),
@@ -329,6 +329,37 @@ func Test_excludeKonnectManagedPlugins(t *testing.T) {
 					Tags: []*string{},
 				},
 			},
+		},
+		{
+			name:    "empty input",
+			plugins: []*kong.Plugin{},
+			want:    []*kong.Plugin{},
+		},
+		{
+			name: "all konnect managed",
+			plugins: []*kong.Plugin{
+				{
+					Name: kong.String("key-auth"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("acl"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("prometheus"),
+					Tags: []*string{
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+			},
+			want: []*kong.Plugin{},
 		},
 	}
 	for _, tt := range tests {
