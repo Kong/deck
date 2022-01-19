@@ -280,3 +280,94 @@ func Test_filterNonKongPackages(t *testing.T) {
 		})
 	}
 }
+
+func Test_excludeKonnectManagedPlugins(t *testing.T) {
+	tests := []struct {
+		name    string
+		plugins []*kong.Plugin
+		want    []*kong.Plugin
+	}{
+		{
+			name: "exclude konnect tags",
+			plugins: []*kong.Plugin{
+				{
+					Name: kong.String("rate-limiting"),
+					Tags: []*string{kong.String("tag1")},
+				},
+				{
+					Name: kong.String("basic-auth"),
+					Tags: []*string{},
+				},
+				{
+					Name: kong.String("key-auth"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("acl"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("prometheus"),
+					Tags: []*string{
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+			},
+			want: []*kong.Plugin{
+				{
+					Name: kong.String("rate-limiting"),
+					Tags: []*string{kong.String("tag1")},
+				},
+				{
+					Name: kong.String("basic-auth"),
+					Tags: []*string{},
+				},
+			},
+		},
+		{
+			name:    "empty input",
+			plugins: []*kong.Plugin{},
+			want:    []*kong.Plugin{},
+		},
+		{
+			name: "all konnect managed",
+			plugins: []*kong.Plugin{
+				{
+					Name: kong.String("key-auth"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("acl"),
+					Tags: []*string{
+						kong.String("konnect-app-registration"),
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+				{
+					Name: kong.String("prometheus"),
+					Tags: []*string{
+						kong.String("konnect-managed-plugin"),
+					},
+				},
+			},
+			want: []*kong.Plugin{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := excludeKonnectManagedPlugins(tt.plugins)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("excludeKonnectManagedPlugins() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

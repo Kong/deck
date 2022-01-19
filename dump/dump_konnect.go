@@ -7,6 +7,7 @@ import (
 
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/sync/semaphore"
 )
@@ -167,4 +168,25 @@ func kongServiceIDs(cpID string,
 		}
 	}
 	return res
+}
+
+// excludeKonnectManagedPlugins filters out konnect-managed plugins
+func excludeKonnectManagedPlugins(plugins []*kong.Plugin) []*kong.Plugin {
+	filtered := []*kong.Plugin{}
+	for _, p := range plugins {
+		if isManagedByKonnect(p) {
+			continue
+		}
+		filtered = append(filtered, p)
+	}
+	return filtered
+}
+
+func isManagedByKonnect(plugin *kong.Plugin) bool {
+	for _, t := range plugin.Tags {
+		if *t == konnect.KonnectManagedPluginTag {
+			return true
+		}
+	}
+	return false
 }

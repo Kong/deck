@@ -168,11 +168,11 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		if err != nil {
 			return fmt.Errorf("plugins: %w", err)
 		}
+		plugins = excludeKonnectManagedPlugins(plugins)
 		if config.SkipConsumers {
-			state.Plugins = excludeConsumersPlugins(plugins)
-		} else {
-			state.Plugins = plugins
+			plugins = excludeConsumersPlugins(plugins)
 		}
+		state.Plugins = plugins
 		return nil
 	})
 
