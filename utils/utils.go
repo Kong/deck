@@ -59,7 +59,7 @@ func CallGetAll(obj interface{}) (reflect.Value, error) {
 	var result reflect.Value
 	method := reflect.ValueOf(obj).MethodByName("GetAll")
 	if !method.IsValid() {
-		return result, fmt.Errorf("GetAll() method not found for %v. "+
+		return result, fmt.Errorf("GetAll() method not found for type '%v'. "+
 			"Please file a bug with Kong Inc", reflect.ValueOf(obj).Type())
 	}
 	entities := method.Call([]reflect.Value{})[0].Interface()

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
@@ -103,7 +102,15 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *fi
 	if err != nil {
 		return []error{err}
 	}
-	validator := validate.NewValidator(ctx, ks, kongClient, validateParallelism, validateCmdRBACResourcesOnly)
+
+	opts := validate.ValidatorOpts{
+		Ctx:               ctx,
+		State:             ks,
+		Client:            kongClient,
+		Parallelism:       validateParallelism,
+		RBACResourcesOnly: validateCmdRBACResourcesOnly,
+	}
+	validator := validate.NewValidator(opts)
 	return validator.Validate()
 }
 
@@ -190,7 +197,6 @@ func init() {
 		10, "Maximum number of concurrent requests to Kong.")
 
 	if err := ensureGetAllMethods(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		panic(err.Error())
 	}
 }

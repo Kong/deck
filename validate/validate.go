@@ -19,19 +19,21 @@ type Validator struct {
 	rbacResourcesOnly bool
 }
 
-func NewValidator(
-	ctx context.Context,
-	ks *state.KongState,
-	client *kong.Client,
-	parallelism int,
-	rbacResourcesOnly bool,
-) *Validator {
+type ValidatorOpts struct {
+	Ctx               context.Context
+	State             *state.KongState
+	Client            *kong.Client
+	Parallelism       int
+	RBACResourcesOnly bool
+}
+
+func NewValidator(opt ValidatorOpts) *Validator {
 	return &Validator{
-		ctx:               ctx,
-		state:             ks,
-		client:            client,
-		parallelism:       parallelism,
-		rbacResourcesOnly: rbacResourcesOnly,
+		ctx:               opt.Ctx,
+		state:             opt.State,
+		client:            opt.Client,
+		parallelism:       opt.Parallelism,
+		rbacResourcesOnly: opt.RBACResourcesOnly,
 	}
 }
 
@@ -42,7 +44,10 @@ type ErrorsWrapper struct {
 func (v ErrorsWrapper) Error() string {
 	var errStr string
 	for _, e := range v.Errors {
-		errStr += fmt.Sprintf("%s\n", e.Error())
+		errStr += e.Error()
+		if e != v.Errors[len(v.Errors)-1] {
+			errStr += "\n"
+		}
 	}
 	return errStr
 }
