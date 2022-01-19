@@ -805,7 +805,6 @@ func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}
 	if schema, ok := b.schemas[*entityID]; ok {
 		return schema, nil
 	}
-
 	schema, err := b.client.Plugins.GetFullSchema(b.ctx, entityID)
 	b.schemas[*entityID] = schema
 	return schema, err
@@ -826,7 +825,7 @@ func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error
 		if err != nil {
 			return pluginsWithDefault, err
 		}
-		kp, err := b.client.Plugins.FillDefaults(b.ctx, &p.Plugin, schema)
+		kp, err := kong.FillPluginsDefaults(&p.Plugin, schema)
 		if err != nil {
 			return pluginsWithDefault, err
 		}
