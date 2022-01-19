@@ -276,7 +276,7 @@ func initConfig() {
 	if (rootConfig.TLSClientKey == "" && rootConfig.TLSClientCert != "") ||
 		(rootConfig.TLSClientKey != "" && rootConfig.TLSClientCert == "") {
 		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file " +
-			"must be used in conjunction")
+			"must be used in conjunction but only one was provided")
 		os.Exit(1)
 	}
 
