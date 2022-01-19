@@ -97,6 +97,10 @@ type KongClientConfig struct {
 	Timeout int
 
 	CookieJarPath string
+
+	TLSClientCert string
+
+	TLSClientKey string
 }
 
 type KonnectConfig struct {
@@ -133,6 +137,15 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 			return nil, fmt.Errorf("failed to load TLSCACert")
 		}
 		tlsConfig.RootCAs = certPool
+	}
+
+	if opt.TLSClientCert != "" && opt.TLSClientKey != "" {
+		// Read the key pair to create certificate
+		cert, err := tls.X509KeyPair([]byte(opt.TLSClientCert), []byte(opt.TLSClientKey))
+		if err != nil {
+			return nil, fmt.Errorf("failed to load client certificate: %w", err)
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
 
 	clientTimeout = time.Duration(opt.Timeout) * time.Second

@@ -161,6 +161,34 @@ func init() {
 		"Set a request timeout for the client to connect with Kong (in seconds).")
 	viper.BindPFlag("timeout",
 		rootCmd.PersistentFlags().Lookup("timeout"))
+
+	rootCmd.PersistentFlags().String("tls-client-cert", "",
+		"PEM-encoded TLS client certificate to use for authentication with Kong's Admin API.\n"+
+			"This value can also be set using DECK_TLS_CLIENT_CERT "+
+			"environment variable. Must be used in conjunction with tls-client-key")
+	viper.BindPFlag("tls-client-cert",
+		rootCmd.PersistentFlags().Lookup("tls-client-cert"))
+
+	rootCmd.PersistentFlags().String("tls-client-cert-file", "",
+		"Path to the file containing TLS client certificate to use for authentication with Kong's Admin API.\n"+
+			"This value can also be set using DECK_TLS_CLIENT_CERT_FILE "+
+			"environment variable. Must be used in conjunction with tls-client-key-file")
+	viper.BindPFlag("tls-client-cert",
+		rootCmd.PersistentFlags().Lookup("tls-client-cert-file"))
+
+	rootCmd.PersistentFlags().String("tls-client-key", "",
+		"PEM-encoded private key for the corresponding client certificate .\n"+
+			"This value can also be set using DECK_TLS_CLIENT_KEY "+
+			"environment variable. Must be used in conjunction with tls-client-cert")
+	viper.BindPFlag("tls-client-key",
+		rootCmd.PersistentFlags().Lookup("tls-client-key"))
+
+	rootCmd.PersistentFlags().String("tls-client-key-file", "",
+		"Path to file containing the private key for the corresponding client certificate.\n"+
+			"This value can also be set using DECK_TLS_CLIENT_KEY_FILE "+
+			"environment variable. Must be used in conjunction with tls-client-cert-file")
+	viper.BindPFlag("tls-client-key",
+		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -191,18 +219,19 @@ func initConfig() {
 		}
 	}
 
-	caCertContent := ""
+	caCertContent := viper.GetString("ca-cert")
 
-	if viper.GetString("ca-cert") != "" {
-		caCertContent = viper.GetString("ca-cert")
-	} else if viper.GetString("ca-cert-file") != "" {
-		fileContent, err := ioutil.ReadFile(viper.GetString("ca-cert-file"))
-		if err != nil {
-			fmt.Printf("read file %q: %s", viper.GetString("ca-cert-file"), err)
-			os.Exit(1)
+	if caCertContent == "" {
+		caCertFileContent := viper.GetString("ca-cert-file")
+		if caCertFileContent != "" {
+			fileContent, err := ioutil.ReadFile(caCertFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", caCertFileContent, err)
+				os.Exit(1)
+			}
+			caCertContent = string(fileContent)
+			caCertContent = strings.TrimRight(caCertContent, "\n")
 		}
-		caCertContent = string(fileContent)
-		caCertContent = strings.TrimRight(caCertContent, "\n")
 	}
 
 	rootConfig.Address = viper.GetString("kong-addr")
@@ -213,6 +242,45 @@ func initConfig() {
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
+
+	clientCertContent := viper.GetString("tls-client-cert")
+
+	if clientCertContent == "" {
+		clientCertFileContent := viper.GetString("tls-client-cert-file")
+		if clientCertFileContent != "" {
+			fileContent, err := ioutil.ReadFile(clientCertFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", clientCertFileContent, err)
+				os.Exit(1)
+			}
+			clientCertContent = string(fileContent)
+			clientCertContent = strings.TrimRight(clientCertContent, "\n")
+		}
+	}
+	rootConfig.TLSClientCert = clientCertContent
+
+	clientKeyContent := viper.GetString("tls-client-key")
+
+	if clientKeyContent == "" {
+		clientKeyFileContent := viper.GetString("tls-client-key-file")
+		if clientKeyFileContent != "" {
+			fileContent, err := ioutil.ReadFile(clientKeyFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", clientKeyFileContent, err)
+				os.Exit(1)
+			}
+			clientKeyContent = string(fileContent)
+			clientKeyContent = strings.TrimRight(clientKeyContent, "\n")
+		}
+	}
+	rootConfig.TLSClientKey = clientKeyContent
+
+	if (rootConfig.TLSClientKey == "" && rootConfig.TLSClientCert != "") ||
+		(rootConfig.TLSClientKey != "" && rootConfig.TLSClientCert == "") {
+		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file " +
+			"must be used in conjunction but only one was provided")
+		os.Exit(1)
+	}
 
 	// cookie-jar support
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
