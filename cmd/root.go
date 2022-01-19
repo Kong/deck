@@ -189,7 +189,6 @@ func init() {
 			"environment variable. Must be used in conjunction with tls-client-cert-file")
 	viper.BindPFlag("tls-client-key",
 		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
-
 }
 
 // initConfig reads in config file and ENV variables if set.
