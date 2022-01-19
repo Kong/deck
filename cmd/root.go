@@ -220,18 +220,19 @@ func initConfig() {
 		}
 	}
 
-	caCertContent := ""
+	caCertContent := viper.GetString("ca-cert")
 
-	if viper.GetString("ca-cert") != "" {
-		caCertContent = viper.GetString("ca-cert")
-	} else if viper.GetString("ca-cert-file") != "" {
-		fileContent, err := ioutil.ReadFile(viper.GetString("ca-cert-file"))
-		if err != nil {
-			fmt.Printf("read file %q: %s", viper.GetString("ca-cert-file"), err)
-			os.Exit(1)
+	if caCertContent == "" {
+		caCertFileContent := viper.GetString("ca-cert-file")
+		if caCertFileContent != "" {
+			fileContent, err := ioutil.ReadFile(caCertFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", caCertFileContent, err)
+				os.Exit(1)
+			}
+			caCertContent = string(fileContent)
+			caCertContent = strings.TrimRight(caCertContent, "\n")
 		}
-		caCertContent = string(fileContent)
-		caCertContent = strings.TrimRight(caCertContent, "\n")
 	}
 
 	rootConfig.Address = viper.GetString("kong-addr")
@@ -243,40 +244,41 @@ func initConfig() {
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
 
-	clientCertContent := ""
+	clientCertContent := viper.GetString("tls-client-cert")
 
-	if viper.GetString("tls-client-cert") != "" {
-		clientCertContent = viper.GetString("tls-client-cert")
-	} else if viper.GetString("tls-client-cert-file") != "" {
-		fileContent, err := ioutil.ReadFile(viper.GetString("tls-client-cert-file"))
-		if err != nil {
-			fmt.Printf("read file %q: %s", viper.GetString("tls-client-cert-file"), err)
-			os.Exit(1)
+	if clientCertContent == "" {
+		clientCertFileContent := viper.GetString("tls-client-cert-file")
+		if clientCertFileContent != "" {
+			fileContent, err := ioutil.ReadFile(clientCertFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", clientCertFileContent, err)
+				os.Exit(1)
+			}
+			clientCertContent = string(fileContent)
+			clientCertContent = strings.TrimRight(clientCertContent, "\n")
 		}
-		clientCertContent = string(fileContent)
-		clientCertContent = strings.TrimRight(clientCertContent, "\n")
 	}
 	rootConfig.TLSClientCert = clientCertContent
 
-	clientKeyContent := ""
+	clientKeyContent := viper.GetString("tls-client-key")
 
-	if viper.GetString("tls-client-key") != "" {
-		clientKeyContent = viper.GetString("tls-client-key")
-	} else if viper.GetString("tls-client-key-file") != "" {
-		fileContent, err := ioutil.ReadFile(viper.GetString("tls-client-key-file"))
-		if err != nil {
-			fmt.Printf("read file %q: %s", viper.GetString("tls-client-key-file"), err)
-			os.Exit(1)
+	if clientKeyContent == "" {
+		clientKeyFileContent := viper.GetString("tls-client-key-file")
+		if clientKeyFileContent != "" {
+			fileContent, err := ioutil.ReadFile(clientKeyFileContent)
+			if err != nil {
+				fmt.Printf("read file %q: %s", clientKeyFileContent, err)
+				os.Exit(1)
+			}
+			clientKeyContent = string(fileContent)
+			clientKeyContent = strings.TrimRight(clientKeyContent, "\n")
 		}
-		clientKeyContent = string(fileContent)
-		clientKeyContent = strings.TrimRight(clientKeyContent, "\n")
 	}
 	rootConfig.TLSClientKey = clientKeyContent
 
 	if (rootConfig.TLSClientKey == "" && rootConfig.TLSClientCert != "") ||
 		(rootConfig.TLSClientKey != "" && rootConfig.TLSClientCert == "") {
-		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file " +
-			"must be used in conjunction")
+		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file must be used in conjunction")
 		os.Exit(1)
 	}
 
