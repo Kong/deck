@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 )
@@ -51,4 +52,17 @@ func NameToFilename(name string) string {
 // if that separator was included originally, and only some names (document paths) typically include one.
 func FilenameToName(filename string) string {
 	return strings.ReplaceAll(filename, url.PathEscape(string(os.PathSeparator)), string(os.PathSeparator))
+}
+
+func CallGetAll(obj interface{}) (reflect.Value, error) {
+	// call GetAll method on entity
+	var result reflect.Value
+	method := reflect.ValueOf(obj).MethodByName("GetAll")
+	if !method.IsValid() {
+		return result, fmt.Errorf("GetAll() method not found for type '%v'. "+
+			"Please file a bug with Kong Inc", reflect.ValueOf(obj).Type())
+	}
+	entities := method.Call([]reflect.Value{})[0].Interface()
+	result = reflect.ValueOf(entities)
+	return result, nil
 }
