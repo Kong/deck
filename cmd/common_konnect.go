@@ -73,7 +73,7 @@ func syncKonnect(ctx context.Context,
 
 	targetKongState, targetKonnectState, err := file.GetForKonnect(targetContent, file.RenderConfig{
 		CurrentState: currentState,
-	})
+	}, kongClient)
 	if err != nil {
 		return err
 	}

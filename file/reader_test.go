@@ -115,7 +115,7 @@ func TestTransformNotFalse(t *testing.T) {
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
-	parsed, _, err = GetForKonnect(c, RenderConfig{})
+	parsed, _, err = GetForKonnect(c, RenderConfig{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 }

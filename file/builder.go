@@ -811,11 +811,7 @@ func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}
 }
 
 func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
-	// skip for konnect and when kong client is not defined (like with validate)
-	if b.konnectRawState == nil ||
-		len(b.konnectRawState.Documents) > 0 ||
-		len(b.konnectRawState.ServicePackages) > 0 ||
-		b.client == nil {
+	if b.client == nil {
 		return plugins, nil
 	}
 	pluginsWithDefault := []FPlugin{}
