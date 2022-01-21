@@ -153,7 +153,8 @@ func init() {
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
 
 	rootCmd.PersistentFlags().Bool("analytics", true,
-		"Share anonymized data to help improve decK.")
+		"Share anonymized data to help improve decK.\n"+
+			"Use --analytics=false to disable this.")
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
