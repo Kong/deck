@@ -800,8 +800,11 @@ func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}
 		return schema, nil
 	}
 	schema, err := b.client.Plugins.GetFullSchema(b.ctx, entityID)
+	if err != nil {
+		return schema, err
+	}
 	b.schemas[*entityID] = schema
-	return schema, err
+	return schema, nil
 }
 
 func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
