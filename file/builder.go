@@ -25,7 +25,7 @@ type stateBuilder struct {
 	client *kong.Client
 	ctx    context.Context
 
-	schemas map[string]map[string]interface{}
+	schemas utils.Schemas
 
 	err error
 }
@@ -44,6 +44,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	var err error
 	b.rawState = &utils.KongRawState{}
 	b.konnectRawState = &utils.KonnectRawState{}
+	b.schemas = make(utils.Schemas)
 
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
@@ -798,9 +799,6 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}, error) {
 	var schema map[string]interface{}
 
-	if b.schemas == nil {
-		b.schemas = make(map[string]map[string]interface{})
-	}
 	// lookup in cache
 	if schema, ok := b.schemas[*entityID]; ok {
 		return schema, nil
