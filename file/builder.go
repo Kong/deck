@@ -825,6 +825,7 @@ func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error
 		}
 		p.Config = kp.Config
 		p.Protocols = kp.Protocols
+		p.Enabled = kp.Enabled
 		pluginsWithDefault = append(pluginsWithDefault, p)
 	}
 	return pluginsWithDefault, nil
