@@ -201,12 +201,11 @@ func (b *stateBuilder) consumers() {
 		var plugins []FPlugin
 		for _, p := range c.Plugins {
 			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
+			if err := b.ingestPluginDefaults(p); err != nil {
+				b.err = err
+				return
+			}
 			plugins = append(plugins, *p)
-		}
-		plugins, err = b.ingestPluginDefaults(plugins)
-		if err != nil {
-			b.err = err
-			return
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
 			b.err = err
@@ -579,11 +578,10 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	var plugins []FPlugin
 	for _, p := range s.Plugins {
 		p.Service = &kong.Service{ID: kong.String(*s.ID)}
+		if err := b.ingestPluginDefaults(p); err != nil {
+			return err
+		}
 		plugins = append(plugins, *p)
-	}
-	plugins, err = b.ingestPluginDefaults(plugins)
-	if err != nil {
-		return err
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		return err
@@ -749,12 +747,11 @@ func (b *stateBuilder) plugins() {
 			}
 			p.Route = &kong.Route{ID: kong.String(*s.ID)}
 		}
+		if err := b.ingestPluginDefaults(&p); err != nil {
+			b.err = err
+			return
+		}
 		plugins = append(plugins, p)
-	}
-	plugins, err := b.ingestPluginDefaults(plugins)
-	if err != nil {
-		b.err = err
-		return
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		b.err = err
@@ -787,11 +784,10 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	var plugins []FPlugin
 	for _, p := range r.Plugins {
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
+		if err := b.ingestPluginDefaults(p); err != nil {
+			return err
+		}
 		plugins = append(plugins, *p)
-	}
-	plugins, err = b.ingestPluginDefaults(plugins)
-	if err != nil {
-		return err
 	}
 	return b.ingestPlugins(plugins)
 }
@@ -808,27 +804,22 @@ func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}
 	return schema, err
 }
 
-func (b *stateBuilder) ingestPluginDefaults(plugins []FPlugin) ([]FPlugin, error) {
+func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
 	if b.client == nil {
-		return plugins, nil
+		return nil
 	}
-	pluginsWithDefault := []FPlugin{}
-	for _, p := range plugins {
-		p := p
-		schema, err := b.getPluginSchema(p.Name)
-		if err != nil {
-			return pluginsWithDefault, err
-		}
-		kp, err := kong.FillPluginsDefaults(&p.Plugin, schema)
-		if err != nil {
-			return pluginsWithDefault, err
-		}
-		p.Config = kp.Config
-		p.Protocols = kp.Protocols
-		p.Enabled = kp.Enabled
-		pluginsWithDefault = append(pluginsWithDefault, p)
+	schema, err := b.getPluginSchema(plugin.Name)
+	if err != nil {
+		return err
 	}
-	return pluginsWithDefault, nil
+	p, err := kong.FillPluginsDefaults(&plugin.Plugin, schema)
+	if err != nil {
+		return err
+	}
+	plugin.Config = p.Config
+	plugin.Protocols = p.Protocols
+	plugin.Enabled = p.Enabled
+	return nil
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
