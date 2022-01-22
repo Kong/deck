@@ -801,10 +801,7 @@ func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
 	if err != nil {
 		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
 	}
-	if err := kong.FillPluginsDefaults(&plugin.Plugin, schema); err != nil {
-		return err
-	}
-	return nil
+	return kong.FillPluginsDefaults(&plugin.Plugin, schema)
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
