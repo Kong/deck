@@ -10,10 +10,6 @@ import (
 	"strings"
 )
 
-type Schema map[string]interface{}
-
-type Schemas map[string]Schema
-
 var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
 
 // Empty checks if a string referenced by s or s itself is empty.

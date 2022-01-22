@@ -8,13 +8,12 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/fatih/color v1.13.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/google/go-cmp v0.5.7
 	github.com/google/go-querystring v1.1.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.25.2-0.20220121115307-36bf996b0c30
+	github.com/kong/go-kong v0.25.2-0.20220122081204-6d747f3f0d72
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.12

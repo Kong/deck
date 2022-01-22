@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -21,9 +19,7 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 			return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 		}
 		_ = sendAnalytics("konnect-sync", "")
-		ctx, cancel := context.WithTimeout(cmd.Context(), time.Second*time.Duration(rootConfig.Timeout))
-		defer cancel()
-		return syncKonnect(ctx, konnectDiffCmdKongStateFile, false,
+		return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 			konnectDiffCmdParallelism)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {

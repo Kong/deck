@@ -25,7 +25,7 @@ type stateBuilder struct {
 	client *kong.Client
 	ctx    context.Context
 
-	schemas utils.Schemas
+	schemas map[string]map[string]interface{}
 
 	err error
 }
@@ -44,7 +44,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	var err error
 	b.rawState = &utils.KongRawState{}
 	b.konnectRawState = &utils.KonnectRawState{}
-	b.schemas = make(utils.Schemas)
+	b.schemas = make(map[string]map[string]interface{})
 
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
@@ -201,10 +201,6 @@ func (b *stateBuilder) consumers() {
 		var plugins []FPlugin
 		for _, p := range c.Plugins {
 			p.Consumer = &kong.Consumer{ID: kong.String(*c.ID)}
-			if err := b.ingestPluginDefaults(p); err != nil {
-				b.err = err
-				return
-			}
 			plugins = append(plugins, *p)
 		}
 		if err := b.ingestPlugins(plugins); err != nil {
@@ -578,9 +574,6 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	var plugins []FPlugin
 	for _, p := range s.Plugins {
 		p.Service = &kong.Service{ID: kong.String(*s.ID)}
-		if err := b.ingestPluginDefaults(p); err != nil {
-			return err
-		}
 		plugins = append(plugins, *p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
@@ -747,10 +740,6 @@ func (b *stateBuilder) plugins() {
 			}
 			p.Route = &kong.Route{ID: kong.String(*s.ID)}
 		}
-		if err := b.ingestPluginDefaults(&p); err != nil {
-			b.err = err
-			return
-		}
 		plugins = append(plugins, p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
@@ -784,9 +773,6 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	var plugins []FPlugin
 	for _, p := range r.Plugins {
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
-		if err := b.ingestPluginDefaults(p); err != nil {
-			return err
-		}
 		plugins = append(plugins, *p)
 	}
 	return b.ingestPlugins(plugins)
@@ -813,21 +799,20 @@ func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
 	}
 	schema, err := b.getPluginSchema(plugin.Name)
 	if err != nil {
+		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
+	}
+	if err := kong.FillPluginsDefaults(&plugin.Plugin, schema); err != nil {
 		return err
 	}
-	p, err := kong.FillPluginsDefaults(&plugin.Plugin, schema)
-	if err != nil {
-		return err
-	}
-	plugin.Config = p.Config
-	plugin.Protocols = p.Protocols
-	plugin.Enabled = p.Enabled
 	return nil
 }
 
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
+		if err := b.ingestPluginDefaults(&p); err != nil {
+			return err
+		}
 		if utils.Empty(p.ID) {
 			cID, rID, sID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
