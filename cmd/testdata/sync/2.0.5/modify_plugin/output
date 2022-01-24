@@ -1,0 +1,36 @@
+updating plugin rate-limiting (global)  {
+   "config": {
+     "day": null,
+     "fault_tolerant": true,
+     "hide_client_headers": false,
+-    "hour": 10,
++    "hour": 100,
+     "limit_by": "consumer",
+     "minute": null,
+     "month": null,
+     "policy": "cluster",
+     "redis_database": 0,
+     "redis_host": null,
+     "redis_password": null,
+-    "redis_port": 6379,
++    "redis_port": 6380,
+-    "redis_timeout": 2000,
++    "redis_timeout": 1000,
+     "second": null,
+     "year": null
+   },
+   "enabled": true,
+   "id": "20cefd85-13d2-4339-afec-93e33de63fdf",
+   "name": "rate-limiting",
+   "protocols": [
+     "grpc",
+     "grpcs",
+-    "http",
+-    "https"
+   ]
+ }
+
+Summary:
+  Created: 0
+  Updated: 1
+  Deleted: 0

@@ -1,0 +1,28 @@
+updating route r1  {
+-  "https_redirect_status_code": 301,
++  "https_redirect_status_code": 302,
+   "id": "40898ada-4c87-412d-9206-9bf12bcbd488",
+   "name": "r1",
+-  "path_handling": "v0",
++  "path_handling": "v1",
+   "paths": [
+     "/r1"
+   ],
+   "preserve_host": false,
+   "protocols": [
+     "http",
+-    "https"
+   ],
+   "regex_priority": 0,
+   "request_buffering": true,
+   "response_buffering": true,
+   "service": {
+     "id": "58076db2-28b6-423b-ba39-a797193017f7"
+   },
+   "strip_path": true
+ }
+
+Summary:
+  Created: 0
+  Updated: 1
+  Deleted: 0

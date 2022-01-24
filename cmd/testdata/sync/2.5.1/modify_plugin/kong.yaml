@@ -1,0 +1,49 @@
+_format_version: "1.1"
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 8080
+  protocol: https
+  read_timeout: 60000
+  retries: 10
+  routes:
+  - https_redirect_status_code: 302
+    id: 40898ada-4c87-412d-9206-9bf12bcbd488
+    name: r1
+    path_handling: v1
+    paths:
+    - /r1
+    preserve_host: false
+    protocols:
+    - http
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+plugins:
+- config:
+    day: null
+    fault_tolerant: true
+    header_name: null
+    hide_client_headers: false
+    hour: 100
+    limit_by: consumer
+    minute: null
+    month: null
+    path: null
+    policy: cluster
+    redis_database: 0
+    redis_host: null
+    redis_password: null
+    redis_port: 6380
+    redis_timeout: 1000
+    second: null
+    year: null
+  enabled: true
+  id: 20cefd85-13d2-4339-afec-93e33de63fdf
+  name: rate-limiting
+  protocols:
+  - grpc
+  - grpcs

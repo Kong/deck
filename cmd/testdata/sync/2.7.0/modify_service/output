@@ -1,0 +1,19 @@
+updating service svc1  {
+   "connect_timeout": 60000,
+   "host": "mockbin.org",
+   "id": "58076db2-28b6-423b-ba39-a797193017f7",
+   "name": "svc1",
+-  "port": 80,
++  "port": 8080,
+-  "protocol": "http",
++  "protocol": "https",
+   "read_timeout": 60000,
+-  "retries": 5,
++  "retries": 10,
+   "write_timeout": 60000
+ }
+
+Summary:
+  Created: 0
+  Updated: 1
+  Deleted: 0
