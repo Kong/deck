@@ -42,7 +42,7 @@ func GetContentFromFiles(filenames []string) (*Content, error) {
 }
 
 // GetForKonnect processes the fileContent and renders a RawState and KonnectRawState
-func GetForKonnect(fileContent *Content,
+func GetForKonnect(ctx context.Context, fileContent *Content,
 	opt RenderConfig, client *kong.Client,
 ) (*utils.KongRawState, *utils.KonnectRawState, error) {
 	var builder stateBuilder
@@ -51,6 +51,7 @@ func GetForKonnect(fileContent *Content,
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
 	builder.client = client
+	builder.ctx = ctx
 
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, nil, ErrorTransformFalseNotSupported

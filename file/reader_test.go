@@ -7,7 +7,6 @@ import (
 	"os"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
@@ -109,13 +108,13 @@ func TestTransformNotFalse(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
+
+	ctx := context.Background()
 	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
-	parsed, _, err = GetForKonnect(c, RenderConfig{}, wsClient)
+	parsed, _, err = GetForKonnect(ctx, c, RenderConfig{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 }
