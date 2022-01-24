@@ -36,3 +36,7 @@ coverage:
 generate-cli-docs:
 	mkdir -p $(CLI_DOCS_PATH)
 	go run docs/generate-docs.go -output-path $(CLI_DOCS_PATH)
+
+.PHONY: setup-kong
+setup-kong:
+	bash .ci/setup_kong.sh
