@@ -808,7 +808,7 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
 		if err := b.ingestPluginDefaults(&p); err != nil {
-			return err
+			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
 		}
 		if utils.Empty(p.ID) {
 			cID, rID, sID := pluginRelations(&p.Plugin)
