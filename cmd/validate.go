@@ -72,7 +72,7 @@ this command unless --online flag is used.
 		}
 
 		if validateOnline {
-			if errs := validateWithKong(ctx, kongClient, ks, targetContent); len(errs) != 0 {
+			if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
 				return validate.ErrorsWrapper{Errors: errs}
 			}
 		}
@@ -87,9 +87,7 @@ this command unless --online flag is used.
 	},
 }
 
-func validateWithKong(ctx context.Context, kongClient *kong.Client,
-	ks *state.KongState, targetContent *file.Content,
-) []error {
+func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
 	// make sure we are able to connect to Kong
 	_, err := fetchKongVersion(ctx, rootConfig)
 	if err != nil {
