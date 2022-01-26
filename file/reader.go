@@ -1,12 +1,14 @@
 package file
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 )
 
 var (
@@ -40,12 +42,16 @@ func GetContentFromFiles(filenames []string) (*Content, error) {
 }
 
 // GetForKonnect processes the fileContent and renders a RawState and KonnectRawState
-func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState, *utils.KonnectRawState, error) {
+func GetForKonnect(ctx context.Context, fileContent *Content,
+	opt RenderConfig, client *kong.Client,
+) (*utils.KongRawState, *utils.KonnectRawState, error) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+	builder.client = client
+	builder.ctx = ctx
 
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, nil, ErrorTransformFalseNotSupported
@@ -60,12 +66,16 @@ func GetForKonnect(fileContent *Content, opt RenderConfig) (*utils.KongRawState,
 
 // Get process the fileContent and renders a RawState.
 // IDs of entities are matches based on currentState.
-func Get(fileContent *Content, opt RenderConfig, dumpConfig dump.Config) (*utils.KongRawState, error) {
+func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig dump.Config, wsClient *kong.Client) (
+	*utils.KongRawState, error,
+) {
 	var builder stateBuilder
 	// setup
 	builder.targetContent = fileContent
 	builder.currentState = opt.CurrentState
 	builder.kongVersion = opt.KongVersion
+	builder.client = wsClient
+	builder.ctx = ctx
 	if len(dumpConfig.SelectorTags) > 0 {
 		builder.selectTags = dumpConfig.SelectorTags
 	}

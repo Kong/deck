@@ -13,9 +13,9 @@ require (
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.25.1
+	github.com/kong/go-kong v0.25.2-0.20220123181121-e965de22d701
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.12
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5

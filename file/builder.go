@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/blang/semver/v4"
@@ -21,6 +22,11 @@ type stateBuilder struct {
 	selectTags   []string
 	intermediate *state.KongState
 
+	client *kong.Client
+	ctx    context.Context
+
+	schemasCache map[string]map[string]interface{}
+
 	err error
 }
 
@@ -38,6 +44,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	var err error
 	b.rawState = &utils.KongRawState{}
 	b.konnectRawState = &utils.KonnectRawState{}
+	b.schemasCache = make(map[string]map[string]interface{})
 
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
@@ -771,9 +778,38 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	return b.ingestPlugins(plugins)
 }
 
+func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{}, error) {
+	var schema map[string]interface{}
+
+	// lookup in cache
+	if schema, ok := b.schemasCache[pluginName]; ok {
+		return schema, nil
+	}
+	schema, err := b.client.Plugins.GetFullSchema(b.ctx, &pluginName)
+	if err != nil {
+		return schema, err
+	}
+	b.schemasCache[pluginName] = schema
+	return schema, nil
+}
+
+func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
+	if b.client == nil {
+		return nil
+	}
+	schema, err := b.getPluginSchema(*plugin.Name)
+	if err != nil {
+		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
+	}
+	return kong.FillPluginsDefaults(&plugin.Plugin, schema)
+}
+
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
+		if err := b.addPluginDefaults(&p); err != nil {
+			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
+		}
 		if utils.Empty(p.ID) {
 			cID, rID, sID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/kong/deck/dump"
@@ -8,6 +9,7 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/deck/validate"
+	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -45,10 +47,18 @@ this command unless --online flag is used.
 		if err != nil {
 			return err
 		}
+		ctx := cmd.Context()
+		var kongClient *kong.Client
+		if validateOnline {
+			kongClient, err = getKongClient(ctx, targetContent)
+			if err != nil {
+				return err
+			}
+		}
 
-		rawState, err := file.Get(targetContent, file.RenderConfig{
+		rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 			CurrentState: dummyEmptyState,
-		}, dump.Config{})
+		}, dump.Config{}, kongClient)
 		if err != nil {
 			return err
 		}
@@ -62,7 +72,7 @@ this command unless --online flag is used.
 		}
 
 		if validateOnline {
-			if errs := validateWithKong(cmd, ks, targetContent); len(errs) != 0 {
+			if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
 				return validate.ErrorsWrapper{Errors: errs}
 			}
 		}
@@ -77,33 +87,12 @@ this command unless --online flag is used.
 	},
 }
 
-func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *file.Content) []error {
-	ctx := cmd.Context()
+func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
 	// make sure we are able to connect to Kong
 	_, err := fetchKongVersion(ctx, rootConfig)
 	if err != nil {
 		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
 	}
-
-	workspaceName := validateWorkspace
-	if validateWorkspace != "" {
-		// check if workspace exists
-		workspaceName := getWorkspaceName(validateWorkspace, targetContent)
-		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
-		if err != nil {
-			return []error{err}
-		}
-		if !workspaceExists {
-			return []error{fmt.Errorf("workspace doesn't exist: %s", workspaceName)}
-		}
-	}
-
-	wsConfig := rootConfig.ForWorkspace(workspaceName)
-	kongClient, err := utils.GetKongClient(wsConfig)
-	if err != nil {
-		return []error{err}
-	}
-
 	opts := validate.ValidatorOpts{
 		Ctx:               ctx,
 		State:             ks,
@@ -113,6 +102,28 @@ func validateWithKong(cmd *cobra.Command, ks *state.KongState, targetContent *fi
 	}
 	validator := validate.NewValidator(opts)
 	return validator.Validate()
+}
+
+func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Client, error) {
+	workspaceName := validateWorkspace
+	if validateWorkspace != "" {
+		// check if workspace exists
+		workspaceName := getWorkspaceName(validateWorkspace, targetContent)
+		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
+		if err != nil {
+			return nil, err
+		}
+		if !workspaceExists {
+			return nil, fmt.Errorf("workspace doesn't exist: %s", workspaceName)
+		}
+	}
+
+	wsConfig := rootConfig.ForWorkspace(workspaceName)
+	kongClient, err := utils.GetKongClient(wsConfig)
+	if err != nil {
+		return nil, err
+	}
+	return kongClient, nil
 }
 
 // ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.
