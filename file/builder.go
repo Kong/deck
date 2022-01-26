@@ -25,7 +25,7 @@ type stateBuilder struct {
 	client *kong.Client
 	ctx    context.Context
 
-	schemas map[string]map[string]interface{}
+	schemasCache map[string]map[string]interface{}
 
 	err error
 }
@@ -44,7 +44,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	var err error
 	b.rawState = &utils.KongRawState{}
 	b.konnectRawState = &utils.KonnectRawState{}
-	b.schemas = make(map[string]map[string]interface{})
+	b.schemasCache = make(map[string]map[string]interface{})
 
 	b.intermediate, err = state.NewKongState()
 	if err != nil {
@@ -778,18 +778,18 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	return b.ingestPlugins(plugins)
 }
 
-func (b *stateBuilder) getPluginSchema(entityID *string) (map[string]interface{}, error) {
+func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{}, error) {
 	var schema map[string]interface{}
 
 	// lookup in cache
-	if schema, ok := b.schemas[*entityID]; ok {
+	if schema, ok := b.schemasCache[pluginName]; ok {
 		return schema, nil
 	}
-	schema, err := b.client.Plugins.GetFullSchema(b.ctx, entityID)
+	schema, err := b.client.Plugins.GetFullSchema(b.ctx, &pluginName)
 	if err != nil {
 		return schema, err
 	}
-	b.schemas[*entityID] = schema
+	b.schemasCache[pluginName] = schema
 	return schema, nil
 }
 
@@ -797,7 +797,7 @@ func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
 	if b.client == nil {
 		return nil
 	}
-	schema, err := b.getPluginSchema(plugin.Name)
+	schema, err := b.getPluginSchema(*plugin.Name)
 	if err != nil {
 		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
 	}
