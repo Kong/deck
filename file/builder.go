@@ -793,7 +793,7 @@ func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{
 	return schema, nil
 }
 
-func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
+func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
 	if b.client == nil {
 		return nil
 	}
@@ -807,7 +807,7 @@ func (b *stateBuilder) ingestPluginDefaults(plugin *FPlugin) error {
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
-		if err := b.ingestPluginDefaults(&p); err != nil {
+		if err := b.addPluginDefaults(&p); err != nil {
 			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
 		}
 		if utils.Empty(p.ID) {
