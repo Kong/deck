@@ -172,12 +172,13 @@ func determineSelectorTag(targetContent file.Content, config dump.Config) ([]str
 	if targetContent.Info != nil {
 		if len(targetContent.Info.SelectorTags) > 0 {
 			if len(config.SelectorTags) > 0 {
+				utils.RemoveDuplicates(&targetContent.Info.SelectorTags)
 				sort.Strings(config.SelectorTags)
 				sort.Strings(targetContent.Info.SelectorTags)
 				if !reflect.DeepEqual(config.SelectorTags, targetContent.Info.SelectorTags) {
-					return nil, fmt.Errorf(`tags specified in the state file and via --select-tags flag are different.
+					return nil, fmt.Errorf(`tags specified in the state file (%v) and via --select-tags flag (%v) are different.
 					decK expects tags to be specified in either via flag or via state file.
-					In case both are specified, they must match`)
+					In case both are specified, they must match`, targetContent.Info.SelectorTags, config.SelectorTags)
 				}
 				// Both present and equal, return whichever
 				return targetContent.Info.SelectorTags, nil
