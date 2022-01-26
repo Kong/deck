@@ -64,6 +64,24 @@ func TestDetermineSelectorTag(t *testing.T) {
 			want:    []string{"foo"},
 			wantErr: false,
 		},
+		{
+			name: "config has one tag and file has duplicates",
+			args: args{
+				dumpConfig:  dump.Config{SelectorTags: []string{"foo"}},
+				fileContent: file.Content{Info: &file.Info{SelectorTags: []string{"foo", "foo"}}},
+			},
+			want:    []string{"foo"},
+			wantErr: false,
+		},
+		{
+			name: "config has multiple tags and file has duplicates",
+			args: args{
+				dumpConfig:  dump.Config{SelectorTags: []string{"foo", "bar"}},
+				fileContent: file.Content{Info: &file.Info{SelectorTags: []string{"foo", "bar", "foo", "bar"}}},
+			},
+			want:    []string{"bar", "foo"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

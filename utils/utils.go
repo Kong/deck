@@ -66,3 +66,24 @@ func CallGetAll(obj interface{}) (reflect.Value, error) {
 	result = reflect.ValueOf(entities)
 	return result, nil
 }
+
+func alreadyInSlice(elem string, slice []string) bool {
+	for _, s := range slice {
+		if s == elem {
+			return true
+		}
+	}
+	return false
+}
+
+// RemoveDuplicates removes duplicated elements from a slice.
+func RemoveDuplicates(slice *[]string) {
+	newSlice := []string{}
+	for _, s := range *slice {
+		if alreadyInSlice(s, newSlice) {
+			continue
+		}
+		newSlice = append(newSlice, s)
+	}
+	*slice = newSlice
+}
