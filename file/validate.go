@@ -31,3 +31,11 @@ func validate(content []byte) error {
 	}
 	return errs
 }
+
+func validateWorkspaces(workspaces []string) error {
+	utils.RemoveDuplicates(&workspaces)
+	if len(workspaces) > 1 {
+		return fmt.Errorf("cannot sync multiple workspaces at the same time: %v", workspaces)
+	}
+	return nil
+}
