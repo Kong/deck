@@ -551,6 +551,9 @@ func (b *stateBuilder) services() {
 }
 
 func (b *stateBuilder) ingestService(s *FService) error {
+	if err := b.addEntityDefaults("services", &s.Service); err != nil {
+		return fmt.Errorf("add defaults to service '%v': %v", *s.Name, err)
+	}
 	if utils.Empty(s.ID) {
 		svc, err := b.currentState.Services.Get(*s.Name)
 		if err == state.ErrNotFound {
@@ -644,6 +647,10 @@ func (b *stateBuilder) upstreams() {
 
 	for _, u := range b.targetContent.Upstreams {
 		u := u
+		if err := b.addEntityDefaults("upstreams", &u.Upstream); err != nil {
+			b.err = fmt.Errorf("add defaults to upstream '%v': %v", *u.Name, err)
+			return
+		}
 		if utils.Empty(u.ID) {
 			ups, err := b.currentState.Upstreams.Get(*u.Name)
 			if err == state.ErrNotFound {
@@ -676,6 +683,9 @@ func (b *stateBuilder) upstreams() {
 func (b *stateBuilder) ingestTargets(targets []kong.Target) error {
 	for _, t := range targets {
 		t := t
+		if err := b.addEntityDefaults("targets", &t); err != nil {
+			return fmt.Errorf("add defaults to target '%v': %v", *t.Target, err)
+		}
 		if utils.Empty(t.ID) {
 			target, err := b.currentState.Targets.Get(*t.Upstream.ID, *t.Target)
 			if err == state.ErrNotFound {
@@ -749,6 +759,9 @@ func (b *stateBuilder) plugins() {
 }
 
 func (b *stateBuilder) ingestRoute(r FRoute) error {
+	if err := b.addEntityDefaults("routes", &r.Route); err != nil {
+		return fmt.Errorf("add defaults to route '%v': %v", *r.Name, err)
+	}
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
 		if err == state.ErrNotFound {
@@ -894,4 +907,30 @@ func defaulter(defaults KongDefaults) (*utils.Defaulter, error) {
 		}
 	}
 	return d, nil
+}
+
+func (b *stateBuilder) getEntitySchema(entityType string) (map[string]interface{}, error) {
+	var schema map[string]interface{}
+
+	// lookup in cache
+	if schema, ok := b.schemasCache[entityType]; ok {
+		return schema, nil
+	}
+	schema, err := b.client.Schemas.Get(b.ctx, entityType)
+	if err != nil {
+		return schema, err
+	}
+	b.schemasCache[entityType] = schema
+	return schema, nil
+}
+
+func (b *stateBuilder) addEntityDefaults(entityType string, entity interface{}) error {
+	if b.client == nil {
+		return nil
+	}
+	schema, err := b.getEntitySchema(entityType)
+	if err != nil {
+		return fmt.Errorf("retrieve schema for %v from Kong: %v", entityType, err)
+	}
+	return kong.FillEntityDefaults(entity, schema)
 }
