@@ -75,6 +75,7 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 }
 
 func TestTransformNotFalse(t *testing.T) {
+	var workspace string
 	filenames := []string{"-"}
 	assert := assert.New(t)
 
@@ -110,16 +111,18 @@ func TestTransformNotFalse(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, wsClient)
+	parsed, err := Get(ctx, c[workspace], RenderConfig{}, dump.Config{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
-	parsed, _, err = GetForKonnect(ctx, c, RenderConfig{}, wsClient)
+	parsed, _, err = GetForKonnect(ctx, c[workspace], RenderConfig{}, wsClient)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 }
 
-func TestReadKongStateFromStdin(t *testing.T) {
+func TestReadKongStateFromStdinEmptyWorkspace(t *testing.T) {
+	// if not set otherwise in input, workspace is an empty string
+	var workspace string
 	filenames := []string{"-"}
 	assert := assert.New(t)
 	assert.Equal("-", filenames[0])
@@ -154,5 +157,44 @@ func TestReadKongStateFromStdin(t *testing.T) {
 		Name: kong.String("test service"),
 		Host: kong.String("test.com"),
 	},
-		c.Services[0].Service)
+		c[workspace].Services[0].Service)
+}
+
+func TestReadKongStateFromStdinWithWorkspace(t *testing.T) {
+	workspace := "testWs"
+	filenames := []string{"-"}
+	assert := assert.New(t)
+	assert.Equal("-", filenames[0])
+
+	var content bytes.Buffer
+	content.Write([]byte("_workspace: testWs\nservices:\n- host: test.com\n  name: test service\n"))
+
+	tmpfile, err := ioutil.TempFile("", "example")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tmpfile.Name())
+
+	if _, err := tmpfile.Write(content.Bytes()); err != nil {
+		panic(err)
+	}
+
+	if _, err := tmpfile.Seek(0, 0); err != nil {
+		panic(err)
+	}
+
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }() // Restore original Stdin
+
+	os.Stdin = tmpfile
+
+	c, err := GetContentFromFiles(filenames)
+	assert.NotNil(c)
+	assert.Nil(err)
+
+	assert.Equal(kong.Service{
+		Name: kong.String("test service"),
+		Host: kong.String("test.com"),
+	},
+		c[workspace].Services[0].Service)
 }

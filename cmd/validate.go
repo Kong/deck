@@ -38,42 +38,13 @@ this command unless --online flag is used.
 		_ = sendAnalytics("validate", "")
 		// read target file
 		// this does json schema validation as well
-		targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
+		targetContents, err := file.GetContentFromFiles(validateCmdKongStateFile)
 		if err != nil {
 			return err
 		}
-
-		dummyEmptyState, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
-		ctx := cmd.Context()
-		var kongClient *kong.Client
-		if validateOnline {
-			kongClient, err = getKongClient(ctx, targetContent)
-			if err != nil {
+		for _, targetContent := range targetContents {
+			if err := validateWs(cmd.Context(), targetContent); err != nil {
 				return err
-			}
-		}
-
-		rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
-			CurrentState: dummyEmptyState,
-		}, dump.Config{}, kongClient)
-		if err != nil {
-			return err
-		}
-		if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
-			return err
-		}
-		// this catches foreign relation errors
-		ks, err := state.Get(rawState)
-		if err != nil {
-			return err
-		}
-
-		if validateOnline {
-			if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
-				return validate.ErrorsWrapper{Errors: errs}
 			}
 		}
 		return nil
@@ -85,6 +56,42 @@ this command unless --online flag is used.
 		}
 		return nil
 	},
+}
+
+func validateWs(ctx context.Context, targetContent *file.Content) error {
+	dummyEmptyState, err := state.NewKongState()
+	if err != nil {
+		return err
+	}
+	var kongClient *kong.Client
+	if validateOnline {
+		kongClient, err = getKongClient(ctx, targetContent)
+		if err != nil {
+			return err
+		}
+	}
+
+	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
+		CurrentState: dummyEmptyState,
+	}, dump.Config{}, kongClient)
+	if err != nil {
+		return err
+	}
+	if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
+		return err
+	}
+	// this catches foreign relation errors
+	ks, err := state.Get(rawState)
+	if err != nil {
+		return err
+	}
+
+	if validateOnline {
+		if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
+			return validate.ErrorsWrapper{Errors: errs}
+		}
+	}
+	return nil
 }
 
 func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {

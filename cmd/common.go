@@ -66,10 +66,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string) error {
 
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContents, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
 	}
+
+	for _, targetContent := range targetContents {
+		if err := syncWs(ctx, targetContent, dry, parallelism, delay, workspace); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func syncWs(ctx context.Context, targetContent *file.Content, dry bool, parallelism,
+	delay int, workspace string) error {
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 	}
@@ -157,7 +168,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient)
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient, workspaceName)
 	if err != nil {
 		return err
 	}
@@ -205,7 +216,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
-	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
+	dry bool, parallelism int, delay int, client *kong.Client, workspaceName string) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
@@ -218,7 +229,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 
 	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
-	printStats(stats)
+	printStats(stats, workspaceName)
 	if errs != nil {
 		return 0, utils.ErrArray{Errors: errs}
 	}

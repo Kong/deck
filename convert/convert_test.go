@@ -140,6 +140,8 @@ func zeroOutID(sp file.FServicePackage) file.FServicePackage {
 }
 
 func Test_Convert(t *testing.T) {
+	// if not set otherwise in input, workspace is an empty string
+	var workspace string
 	type args struct {
 		inputFilename          string
 		outputFilename         string
@@ -200,16 +202,16 @@ func Test_Convert(t *testing.T) {
 			}
 
 			if err == nil {
-				got, err := file.GetContentFromFiles([]string{tt.args.outputFilename})
+				gotMap, err := file.GetContentFromFiles([]string{tt.args.outputFilename})
 				if err != nil {
 					t.Errorf("failed to read output file: %v", err)
 				}
-				want, err := file.GetContentFromFiles([]string{tt.args.expectedOutputFilename})
+				wantMap, err := file.GetContentFromFiles([]string{tt.args.expectedOutputFilename})
 				if err != nil {
 					t.Errorf("failed to read output file: %v", err)
 				}
-				got = wipeServiceID(got)
-				want = wipeServiceID(want)
+				got := wipeServiceID(gotMap[workspace])
+				want := wipeServiceID(wantMap[workspace])
 				assert.Equal(t, want, got)
 			}
 		})

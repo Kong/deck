@@ -17,15 +17,25 @@ import (
 
 func syncKonnect(ctx context.Context,
 	filenames []string, dry bool, parallelism int) error {
-	httpClient := utils.HTTPClient()
-
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContents, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
 	}
 
-	err = targetContent.PopulateDocumentContent(filenames)
+	for _, targetContent := range targetContents {
+		if err := syncKonnectWs(ctx, filenames, targetContent, dry, parallelism); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func syncKonnectWs(ctx context.Context,
+	filenames []string, targetContent *file.Content, dry bool, parallelism int) error {
+	httpClient := utils.HTTPClient()
+
+	err := targetContent.PopulateDocumentContent(filenames)
 	if err != nil {
 		return fmt.Errorf("reading documents: %w", err)
 	}
@@ -95,7 +105,7 @@ func syncKonnect(ctx context.Context,
 
 	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
-	printStats(stats)
+	printStats(stats, "")
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
 	}

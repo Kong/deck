@@ -132,7 +132,7 @@ func Test_getContent(t *testing.T) {
 		name    string
 		args    args
 		envVars map[string]string
-		want    *Content
+		want    map[string]*Content
 		wantErr bool
 	}{
 		{
@@ -144,13 +144,15 @@ func Test_getContent(t *testing.T) {
 		{
 			name:    "empty directory",
 			args:    args{[]string{"testdata/emptydir"}},
-			want:    &Content{},
+			want:    nil,
 			wantErr: false,
 		},
 		{
-			name:    "directory with empty files",
-			args:    args{[]string{"testdata/emptyfiles"}},
-			want:    &Content{},
+			name: "directory with empty files",
+			args: args{[]string{"testdata/emptyfiles"}},
+			want: map[string]*Content{
+				"": {},
+			},
 			wantErr: false,
 		},
 		{
@@ -171,28 +173,30 @@ func Test_getContent(t *testing.T) {
 			envVars: map[string]string{
 				"DECK_SVC2_HOST": "2.example.com",
 			},
-			want: &Content{
-				Services: []FService{
-					{
-						Service: kong.Service{
-							Name: kong.String("svc2"),
-							Host: kong.String("2.example.com"),
-							Tags: kong.StringSlice("<"),
-						},
-						Routes: []*FRoute{
-							{
-								Route: kong.Route{
-									Name:  kong.String("r2"),
-									Paths: kong.StringSlice("/r2"),
+			want: map[string]*Content{
+				"": {
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("svc2"),
+								Host: kong.String("2.example.com"),
+								Tags: kong.StringSlice("<"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:  kong.String("r2"),
+										Paths: kong.StringSlice("/r2"),
+									},
 								},
 							},
 						},
 					},
-				},
-				Plugins: []FPlugin{
-					{
-						Plugin: kong.Plugin{
-							Name: kong.String("prometheus"),
+					Plugins: []FPlugin{
+						{
+							Plugin: kong.Plugin{
+								Name: kong.String("prometheus"),
+							},
 						},
 					},
 				},
@@ -215,40 +219,42 @@ func Test_getContent(t *testing.T) {
 			envVars: map[string]string{
 				"DECK_SVC2_HOST": "2.example.com",
 			},
-			want: &Content{
-				Services: []FService{
-					{
-						Service: kong.Service{
-							Name: kong.String("svc2"),
-							Host: kong.String("2.example.com"),
-							Tags: kong.StringSlice("<"),
-						},
-						Routes: []*FRoute{
-							{
-								Route: kong.Route{
-									Name:  kong.String("r2"),
-									Paths: kong.StringSlice("/r2"),
+			want: map[string]*Content{
+				"": {
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("svc2"),
+								Host: kong.String("2.example.com"),
+								Tags: kong.StringSlice("<"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:  kong.String("r2"),
+										Paths: kong.StringSlice("/r2"),
+									},
 								},
 							},
 						},
 					},
-				},
-				Plugins: []FPlugin{
-					{
-						Plugin: kong.Plugin{
-							Name: kong.String("prometheus"),
+					Plugins: []FPlugin{
+						{
+							Plugin: kong.Plugin{
+								Name: kong.String("prometheus"),
+							},
 						},
 					},
-				},
-				Consumers: []FConsumer{
-					{
-						Consumer: kong.Consumer{
-							Username: kong.String("foo"),
+					Consumers: []FConsumer{
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("foo"),
+							},
 						},
-					},
-					{
-						Consumer: kong.Consumer{
-							Username: kong.String("bar"),
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("bar"),
+							},
 						},
 					},
 				},
@@ -258,62 +264,83 @@ func Test_getContent(t *testing.T) {
 		{
 			name: "valid directory",
 			args: args{[]string{"testdata/valid"}},
-			want: &Content{
-				Info: &Info{
-					SelectorTags: []string{"tag1"},
-				},
-				Services: []FService{
-					{
-						Service: kong.Service{
-							Name: kong.String("svc2"),
-							Host: kong.String("2.example.com"),
+			want: map[string]*Content{
+				"": {
+					Info: &Info{
+						SelectorTags: []string{"tag1"},
+					},
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("svc2"),
+								Host: kong.String("2.example.com"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:  kong.String("r2"),
+										Paths: kong.StringSlice("/r2"),
+									},
+								},
+							},
 						},
-						Routes: []*FRoute{
-							{
-								Route: kong.Route{
-									Name:  kong.String("r2"),
-									Paths: kong.StringSlice("/r2"),
+						{
+							Service: kong.Service{
+								Name: kong.String("svc1"),
+								Host: kong.String("1.example.com"),
+								Tags: kong.StringSlice("team-svc1"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:  kong.String("r1"),
+										Paths: kong.StringSlice("/r1"),
+									},
 								},
 							},
 						},
 					},
-					{
-						Service: kong.Service{
-							Name: kong.String("svc1"),
-							Host: kong.String("1.example.com"),
-							Tags: kong.StringSlice("team-svc1"),
+					Consumers: []FConsumer{
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("foo"),
+							},
 						},
-						Routes: []*FRoute{
-							{
-								Route: kong.Route{
-									Name:  kong.String("r1"),
-									Paths: kong.StringSlice("/r1"),
-								},
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("bar"),
+							},
+						},
+						{
+							Consumer: kong.Consumer{
+								Username: kong.String("harry"),
+							},
+						},
+					},
+					Plugins: []FPlugin{
+						{
+							Plugin: kong.Plugin{
+								Name: kong.String("prometheus"),
 							},
 						},
 					},
 				},
-				Consumers: []FConsumer{
-					{
-						Consumer: kong.Consumer{
-							Username: kong.String("foo"),
-						},
-					},
-					{
-						Consumer: kong.Consumer{
-							Username: kong.String("bar"),
-						},
-					},
-					{
-						Consumer: kong.Consumer{
-							Username: kong.String("harry"),
-						},
-					},
-				},
-				Plugins: []FPlugin{
-					{
-						Plugin: kong.Plugin{
-							Name: kong.String("prometheus"),
+				"testWs": {
+					Workspace: "testWs",
+					Services: []FService{
+						{
+							Service: kong.Service{
+								Name: kong.String("svc3"),
+								Host: kong.String("3.example.com"),
+							},
+							Routes: []*FRoute{
+								{
+									Route: kong.Route{
+										Name:  kong.String("r3"),
+										Paths: kong.StringSlice("/r3"),
+									},
+								},
+							},
 						},
 					},
 				},

@@ -39,24 +39,26 @@ func Convert(inputFilename, outputFilename string, from, to Format) error {
 		err           error
 	)
 
-	inputContent, err := file.GetContentFromFiles([]string{inputFilename})
+	inputContents, err := file.GetContentFromFiles([]string{inputFilename})
 	if err != nil {
 		return err
 	}
 
-	switch {
-	case from == FormatKongGateway && to == FormatKonnect:
-		outputContent, err = convertKongGatewayToKonnect(inputContent)
+	for _, inputContent := range inputContents {
+		switch {
+		case from == FormatKongGateway && to == FormatKonnect:
+			outputContent, err = convertKongGatewayToKonnect(inputContent)
+			if err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("cannot convert from '%s' to '%s' format", from, to)
+		}
+
+		err = file.WriteContentToFile(outputContent, outputFilename, file.YAML)
 		if err != nil {
 			return err
 		}
-	default:
-		return fmt.Errorf("cannot convert from '%s' to '%s' format", from, to)
-	}
-
-	err = file.WriteContentToFile(outputContent, outputFilename, file.YAML)
-	if err != nil {
-		return err
 	}
 	return nil
 }

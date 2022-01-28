@@ -33,7 +33,7 @@ type RenderConfig struct {
 //
 // It will return an error if the file representation is invalid
 // or if there is any error during processing.
-func GetContentFromFiles(filenames []string) (*Content, error) {
+func GetContentFromFiles(filenames []string) (map[string]*Content, error) {
 	if len(filenames) == 0 {
 		return nil, ErrorFilenameEmpty
 	}

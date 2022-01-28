@@ -1,0 +1,8 @@
+_workspace: testWs
+services:
+- name: svc3
+  host: 3.example.com
+  routes:
+  - name: r3
+    paths:
+    - /r3

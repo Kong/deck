@@ -17,8 +17,8 @@ import (
 
 // getContent reads all the YAML and JSON files in the directory or the
 // file, depending on the type of each item in filenames, merges the content of
-// these files and renders a Content.
-func getContent(filenames []string) (*Content, error) {
+// these files and renders a Content. It returns a map of workspaces and Content.
+func getContent(filenames []string) (map[string]*Content, error) {
 	var allReaders []io.Reader
 	for _, fileOrDir := range filenames {
 		readers, err := getReaders(fileOrDir)
@@ -27,18 +27,26 @@ func getContent(filenames []string) (*Content, error) {
 		}
 		allReaders = append(allReaders, readers...)
 	}
-	var res Content
+	var res map[string]*Content
 	for _, r := range allReaders {
 		content, err := readContent(r)
 		if err != nil {
 			return nil, fmt.Errorf("reading file: %w", err)
 		}
-		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
+		// if no _workspace entry is found, default ws is an empty string
+		workspace := content.Workspace
+		if res == nil {
+			res = make(map[string]*Content)
+		}
+		if _, ok := res[workspace]; !ok {
+			res[workspace] = &Content{}
+		}
+		err = mergo.Merge(res[workspace], content, mergo.WithAppendSlice)
 		if err != nil {
 			return nil, fmt.Errorf("merging file contents: %w", err)
 		}
 	}
-	return &res, nil
+	return res, nil
 }
 
 // getReaders returns back io.Readers representing all the YAML and JSON
