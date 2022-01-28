@@ -1,70 +1,55 @@
 #!/bin/bash
 
 set -e
-# download Kong deb
 
-sudo apt-get update
-sudo apt-get install openssl libpcre3 procps perl wget zlibc
+KONG_IMAGE=${KONG_IMAGE:-kong:2.7.0}
+NETWORK_NAME=deck-test
 
-function setup_kong(){
-  SWITCH="1.3.000"
-  SWITCH2="2.0.000"
+PG_CONTAINER_NAME=pg
+DATABASE_USER=kong
+DATABASE_NAME=kong
+KONG_DB_PASSWORD=kong
+KONG_PG_HOST=pg
 
-  URL="https://download.konghq.com/gateway-1.x-ubuntu-xenial/pool/all/k/kong/kong_${KONG_VERSION}_all.deb"
+GATEWAY_CONTAINER_NAME=kong
 
-  if [[ "$KONG_VERSION" > "$SWITCH" ]];
-  then
-  URL="https://download.konghq.com/gateway-1.x-ubuntu-xenial/pool/all/k/kong/kong_${KONG_VERSION}_amd64.deb"
-  fi
+# create docker network
+docker network create $NETWORK_NAME
 
-  if [[ "$KONG_VERSION" > "$SWITCH2" ]];
-  then
-  URL="https://download.konghq.com/gateway-2.x-ubuntu-xenial/pool/all/k/kong/kong_${KONG_VERSION}_amd64.deb"
-  fi
+# Start a PostgreSQL container
+docker run --rm -d --name $PG_CONTAINER_NAME \
+  --network=$NETWORK_NAME \
+  -p 5432:5432 \
+  -e "POSTGRES_USER=$DATABASE_USER" \
+  -e "POSTGRES_DB=$DATABASE_NAME" \
+  -e "POSTGRES_PASSWORD=$KONG_DB_PASSWORD" \
+  postgres:9.6
 
-  /usr/bin/curl -sL $URL -o kong.deb
-}
+sleep 5
 
-function setup_kong_enterprise(){
-  KONG_VERSION="${KONG_VERSION#enterprise-}"
-  SWITCH="1.5.0.100"
-  SWITCH2="2.0.0.000"
+# Prepare the Kong database
+docker run --rm --network=$NETWORK_NAME \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=$KONG_PG_HOST" \
+  -e "KONG_PG_PASSWORD=$KONG_DB_PASSWORD" \
+  -e "KONG_PASSWORD=$KONG_DB_PASSWORD" \
+  $KONG_IMAGE kong migrations bootstrap
 
-  URL="https://download.konghq.com/private/gateway-1.x-ubuntu-xenial/pool/all/k/kong-enterprise-edition/kong-enterprise-edition_${KONG_VERSION}_all.deb"
-
-  if [[ "$KONG_VERSION" > "$SWITCH" ]];
-  then
-  URL="https://download.konghq.com/gateway-1.x-ubuntu-xenial/pool/all/k/kong-enterprise-edition/kong-enterprise-edition_${KONG_VERSION}_all.deb"
-  fi
-
-  if [[ "$KONG_VERSION" > "$SWITCH2" ]];
-  then
-  URL="https://download.konghq.com/gateway-2.x-ubuntu-xenial/pool/all/k/kong-enterprise-edition/kong-enterprise-edition_${KONG_VERSION}_all.deb"
-  fi
-
-  RESPONSE_CODE=$(/usr/bin/curl -sL \
-    -w "%{http_code}" \
-    -u $KONG_ENTERPRISE_REPO_USERNAME:$KONG_ENTERPRISE_REPO_PASSSWORD \
-    $URL -o kong.deb)
-  if [[ $RESPONSE_CODE != "200" ]]; then
-    echo "error retrieving kong enterprise package from ${URL}. response code ${RESPONSE_CODE}"
-    exit 1
-  fi
-}
-
-if [[ $KONG_VERSION == *"enterprise"* ]]; then
-  setup_kong_enterprise
-else
-  setup_kong
-fi
-
-sudo dpkg -i kong.deb
-echo $KONG_LICENSE_DATA | sudo tee /etc/kong/license.json
-export KONG_LICENSE_PATH=/tmp/license.json
-export KONG_PASSWORD=kong
-export KONG_ENFORCE_RBAC=on
-export KONG_PORTAL=on
-
-sudo kong migrations bootstrap
-sudo kong version
-sudo kong start
+# Start Kong Gateway
+docker run -d --name $GATEWAY_CONTAINER_NAME \
+  --network=$NETWORK_NAME \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=$KONG_PG_HOST" \
+  -e "KONG_PG_USER=$DATABASE_USER" \
+  -e "KONG_PG_PASSWORD=$KONG_DB_PASSWORD" \
+  -e "KONG_CASSANDRA_CONTACT_POINTS=kong-database" \
+  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl" \
+  -p 8000:8000 \
+  -p 8443:8443 \
+  -p 127.0.0.1:8001:8001 \
+  -p 127.0.0.1:8444:8444 \
+  $KONG_IMAGE

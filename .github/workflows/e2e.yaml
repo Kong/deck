@@ -3,22 +3,14 @@ name: e2e Test
 on: [push, pull_request]
 
 jobs:
-  test:
+  e2e-tests:
     strategy:
       matrix:
-        kong_version:
-        - '2.7.0'
+        kong_image:
+        - 'kong:2.7.0'
     env:
-      KONG_VERSION: ${{ matrix.kong_version }}
       KONG_ANONYMOUS_REPORTS: "off"
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:11.6-alpine
-        ports:
-          - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Setup go
         uses: actions/setup-go@v2
@@ -26,11 +18,6 @@ jobs:
           go-version: '^1.16'
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
-      - name: Setup Postgres
-        run: |
-          psql -c 'create database kong;' -U postgres -h 127.0.0.1 -p 5432
-          psql -c 'create user kong;' -U postgres -h 127.0.0.1 -p 5432
-          psql -c 'GRANT ALL PRIVILEGES ON DATABASE "kong" to kong;' -U postgres -h 127.0.0.1 -p 5432
       - name: Setup Kong
         run: make setup-kong
       - name: Build
