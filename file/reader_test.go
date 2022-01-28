@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/kong/deck/dump"
-	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
@@ -103,18 +102,12 @@ func TestTransformNotFalse(t *testing.T) {
 		panic(err)
 	}
 
-	config := utils.KongClientConfig{Address: "http://localhost:8001"}
-	wsClient, err := utils.GetKongClient(config)
-	if err != nil {
-		panic(err)
-	}
-
 	ctx := context.Background()
-	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, wsClient)
+	parsed, err := Get(ctx, c, RenderConfig{}, dump.Config{}, nil)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 
-	parsed, _, err = GetForKonnect(ctx, c, RenderConfig{}, wsClient)
+	parsed, _, err = GetForKonnect(ctx, c, RenderConfig{}, nil)
 	assert.Equal(err, ErrorTransformFalseNotSupported)
 	assert.Nil(parsed)
 }
