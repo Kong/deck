@@ -1,22 +1,24 @@
-package cmd
+//go:build e2e_tests
+// +build e2e_tests
+
+package e2e
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
 )
+
+var DECK = filepath.Join("../../deck")
 
 func getKongAddress() string {
 	if os.Getenv("KONG_ADDRESS") != "" {
@@ -26,18 +28,21 @@ func getKongAddress() string {
 }
 
 // cleanUpEnv removes all existing entities from Kong.
-func cleanUpEnv(client *kong.Client) error {
-	ctx := context.Background()
-	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
-	if err != nil {
-		return err
+func cleanUpEnv() error {
+	cmd := exec.Command(
+		DECK,
+		"--kong-addr",
+		getKongAddress(),
+		"reset",
+		"--force",
+	) // #nosec G204
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf(stderr.String())
 	}
-	targetState, err := state.NewKongState()
-	if err != nil {
-		return err
-	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client)
-	return err
+	return nil
 }
 
 func normalizeOutput(content string) string {
@@ -69,32 +74,6 @@ func testDeckOutput(t *testing.T, outputPath string, got string) {
 	}
 }
 
-func setupTest() (*kong.Client, string, error) {
-	var client *kong.Client
-	var kongVersion string
-
-	// Get Kong client.
-	config := utils.KongClientConfig{
-		Address: getKongAddress(),
-	}
-	client, err := utils.GetKongClient(config)
-	if err != nil {
-		return client, kongVersion, err
-	}
-
-	// Prepare environment.
-	if err := cleanUpEnv(client); err != nil {
-		return client, kongVersion, err
-	}
-
-	// Get Kong version to be used to collect testcases files.
-	kongVersion, err = fetchKongVersion(context.Background(), config)
-	if err != nil {
-		return client, kongVersion, err
-	}
-	return client, kongVersion, nil
-}
-
 func Test_Sync_output(t *testing.T) {
 	tests := []struct {
 		name string
@@ -103,16 +82,17 @@ func Test_Sync_output(t *testing.T) {
 			name: "create_service",
 		},
 	}
-	_, kongVersion, err := setupTest()
-	if err != nil {
+
+	if err := cleanUpEnv(); err != nil {
 		t.Errorf(err.Error())
 	}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tcPath := fmt.Sprintf("testdata/sync/%s/%s", kongVersion, tc.name)
+			tcPath := fmt.Sprintf("testdata/sync/%s", tc.name)
 			kongFile := fmt.Sprintf("%s/kong.yaml", tcPath)
 			cmd := exec.Command(
-				"../deck",
+				DECK,
 				"--kong-addr",
 				getKongAddress(),
 				"sync",
