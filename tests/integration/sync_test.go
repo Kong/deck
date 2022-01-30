@@ -1,5 +1,4 @@
-//go:build e2e_tests
-// +build e2e_tests
+//go:build integration
 
 package e2e
 
@@ -21,8 +20,9 @@ import (
 var DECK = filepath.Join("../../deck")
 
 func getKongAddress() string {
-	if os.Getenv("KONG_ADDRESS") != "" {
-		return os.Getenv("KONG_ADDRESS")
+	address := os.Getenv("KONG_ADDRESS")
+	if address != "" {
+		return address
 	}
 	return "http://localhost:8001"
 }
@@ -76,10 +76,14 @@ func testDeckOutput(t *testing.T, outputPath string, got string) {
 
 func Test_Sync_output(t *testing.T) {
 	tests := []struct {
-		name string
+		name               string
+		kongFile           string
+		expectedOutputFile string
 	}{
 		{
-			name: "create_service",
+			name:               "create_service",
+			kongFile:           "testdata/sync/create_service/kong.yaml",
+			expectedOutputFile: "testdata/sync/create_service/output",
 		},
 	}
 
@@ -89,15 +93,13 @@ func Test_Sync_output(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tcPath := fmt.Sprintf("testdata/sync/%s", tc.name)
-			kongFile := fmt.Sprintf("%s/kong.yaml", tcPath)
 			cmd := exec.Command(
 				DECK,
 				"--kong-addr",
 				getKongAddress(),
 				"sync",
 				"-s",
-				kongFile,
+				tc.kongFile,
 			) // #nosec G204
 
 			var stdout, stderr bytes.Buffer
@@ -108,7 +110,7 @@ func Test_Sync_output(t *testing.T) {
 			}
 
 			// Check deck output looks as expected.
-			testDeckOutput(t, fmt.Sprintf("%s/output", tcPath), stdout.String())
+			testDeckOutput(t, tc.expectedOutputFile, stdout.String())
 		})
 	}
 }

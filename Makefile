@@ -41,8 +41,8 @@ generate-cli-docs:
 setup-kong:
 	bash .ci/setup_kong.sh
 
-.PHONY: test.e2e
-test.e2e:
-	GOFLAGS="-tags=e2e_tests" go test -v \
+.PHONY: test-integration
+test-integration:
+	go test -v -tags=integration \
 		-race \
-		./tests/e2e/...
+		./tests/integration/...

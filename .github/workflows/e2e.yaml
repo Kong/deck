@@ -3,13 +3,23 @@ name: e2e Test
 on: [push, pull_request]
 
 jobs:
-  e2e-tests:
+  integration:
     strategy:
       matrix:
         kong_image:
+        - 'kong:1.4.3'
+        - 'kong:1.5.1'
+        - 'kong:2.0.5'
+        - 'kong:2.1.4'
+        - 'kong:2.2.2'
+        - 'kong:2.3.3'
+        - 'kong:2.4.1'
+        - 'kong:2.5.1'
+        - 'kong:2.6.0'
         - 'kong:2.7.0'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
+      KONG_IMAGE: ${{ matrix.kong_image }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup go
@@ -22,5 +32,5 @@ jobs:
         run: make setup-kong
       - name: Build
         run: make build
-      - name: Run e2e tests
-        run: make test.e2e
+      - name: Run integration tests
+        run: make test-integration
