@@ -17,10 +17,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-var DECK = filepath.Join("../../deck")
+var DECK = filepath.Join("../../main.go")
 
 func getKongAddress() string {
-	address := os.Getenv("KONG_ADDRESS")
+	address := os.Getenv("DECK_KONG_ADDR")
 	if address != "" {
 		return address
 	}
@@ -30,9 +30,9 @@ func getKongAddress() string {
 // cleanUpEnv removes all existing entities from Kong.
 func cleanUpEnv() error {
 	cmd := exec.Command(
+		"go",
+		"run",
 		DECK,
-		"--kong-addr",
-		getKongAddress(),
 		"reset",
 		"--force",
 	) // #nosec G204
@@ -75,6 +75,9 @@ func testDeckOutput(t *testing.T, outputPath string, got string) {
 }
 
 func Test_Sync_output(t *testing.T) {
+	// set up deck
+	t.Setenv("DECK_KONG_ADDR", getKongAddress())
+
 	tests := []struct {
 		name               string
 		kongFile           string
@@ -87,16 +90,16 @@ func Test_Sync_output(t *testing.T) {
 		},
 	}
 
-	if err := cleanUpEnv(); err != nil {
-		t.Errorf(err.Error())
-	}
-
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			if err := cleanUpEnv(); err != nil {
+				t.Errorf(err.Error())
+			}
+
 			cmd := exec.Command(
+				"go",
+				"run",
 				DECK,
-				"--kong-addr",
-				getKongAddress(),
 				"sync",
 				"-s",
 				tc.kongFile,
@@ -112,5 +115,9 @@ func Test_Sync_output(t *testing.T) {
 			// Check deck output looks as expected.
 			testDeckOutput(t, tc.expectedOutputFile, stdout.String())
 		})
+	}
+
+	if err := cleanUpEnv(); err != nil {
+		t.Errorf(err.Error())
 	}
 }
