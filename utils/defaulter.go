@@ -16,29 +16,46 @@ type Defaulter struct {
 
 	ctx    context.Context
 	client *kong.Client
+
+	service  *kong.Service
+	route    *kong.Route
+	upstream *kong.Upstream
+	target   *kong.Target
+}
+
+// NewDefaulter initializes a Defaulter with empty entities.
+func NewDefaulter() *Defaulter {
+	return &Defaulter{
+		service:  &kong.Service{},
+		route:    &kong.Route{},
+		upstream: &kong.Upstream{},
+		target:   &kong.Target{},
+	}
 }
 
 // GetKongDefaulter returns a defaulter which can set default values
 // for Kong entities.
-func GetKongDefaulter() (*Defaulter, error) {
-	var d Defaulter
-	err := d.Register(&serviceDefaults)
+func GetKongDefaulter(kongDefaults interface{}) (*Defaulter, error) {
+	d := NewDefaulter()
+	d.populateDefaultsFromInput(kongDefaults)
+
+	err := d.Register(d.service)
 	if err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
-	err = d.Register(&routeDefaults)
+	err = d.Register(d.route)
 	if err != nil {
 		return nil, fmt.Errorf("registering route with defaulter: %w", err)
 	}
-	err = d.Register(&upstreamDefaults)
+	err = d.Register(d.upstream)
 	if err != nil {
 		return nil, fmt.Errorf("registering upstream with defaulter: %w", err)
 	}
-	err = d.Register(&targetDefaults)
+	err = d.Register(d.target)
 	if err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
 	}
-	return &d, nil
+	return d, nil
 }
 
 func (d *Defaulter) once() {
@@ -149,51 +166,78 @@ func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) err
 	return kong.FillEntityDefaults(entity, schema)
 }
 
-func GetKongDefaulterWithClient(ctx context.Context, client *kong.Client) (*Defaulter, error) {
-	d, err := GetKongDefaulter()
+func getKongDefaulterWithClient(ctx context.Context, client *kong.Client,
+	kongDefaults interface{}) (*Defaulter, error) {
+	// fills defaults from input
+	d, err := GetKongDefaulter(kongDefaults)
 	if err != nil {
 		return nil, err
 	}
 	d.ctx = ctx
 	d.client = client
 
-	route := kong.Route{}
-	if err := d.addEntityDefaults("routes", &route); err != nil {
-		return nil, fmt.Errorf("get defaults for routes: %v", err)
-	}
-	if err := d.Register(&route); err != nil {
-		return nil, fmt.Errorf("registering route with defaulter: %w", err)
-	}
-
-	service := kong.Service{}
-	if err := d.addEntityDefaults("services", &service); err != nil {
+	// fills defaults from Kong API
+	if err := d.addEntityDefaults("services", d.service); err != nil {
 		return nil, fmt.Errorf("get defaults for services: %v", err)
 	}
-	if err := d.Register(&service); err != nil {
+	if err := d.Register(d.service); err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
 
-	upstream := kong.Upstream{}
-	if err := d.addEntityDefaults("upstreams", &upstream); err != nil {
+	if err := d.addEntityDefaults("routes", d.route); err != nil {
+		return nil, fmt.Errorf("get defaults for routes: %v", err)
+	}
+	if err := d.Register(d.route); err != nil {
+		return nil, fmt.Errorf("registering route with defaulter: %w", err)
+	}
+
+	if err := d.addEntityDefaults("upstreams", d.upstream); err != nil {
 		return nil, fmt.Errorf("get defaults for upstreams: %v", err)
 	}
-	if err := d.Register(&upstream); err != nil {
+	if err := d.Register(d.upstream); err != nil {
 		return nil, fmt.Errorf("registering upstream with defaulter: %w", err)
 	}
 
-	target := kong.Target{}
-	if err := d.addEntityDefaults("targets", &target); err != nil {
+	if err := d.addEntityDefaults("targets", d.target); err != nil {
 		return nil, fmt.Errorf("get defaults for targets: %v", err)
 	}
-	if err := d.Register(&target); err != nil {
+	if err := d.Register(d.target); err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
 	}
 	return d, nil
 }
 
-func GetDefaulter(ctx context.Context, client *kong.Client) (*Defaulter, error) {
+func GetDefaulter(ctx context.Context, client *kong.Client, kongDefaults interface{}) (*Defaulter, error) {
 	if client != nil {
-		return GetKongDefaulterWithClient(ctx, client)
+		return getKongDefaulterWithClient(ctx, client, kongDefaults)
 	}
-	return GetKongDefaulter()
+	return GetKongDefaulter(kongDefaults)
+}
+
+func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) {
+	r := reflect.ValueOf(defaults)
+
+	service := reflect.Indirect(r).FieldByName("Service")
+	serviceObj := service.Interface().(*kong.Service)
+	if serviceObj != nil {
+		d.service = serviceObj
+	}
+
+	route := reflect.Indirect(r).FieldByName("Route")
+	routeObj := route.Interface().(*kong.Route)
+	if routeObj != nil {
+		d.route = routeObj
+	}
+
+	upstream := reflect.Indirect(r).FieldByName("Upstream")
+	upstreamObj := upstream.Interface().(*kong.Upstream)
+	if upstreamObj != nil {
+		d.upstream = upstreamObj
+	}
+
+	target := reflect.Indirect(r).FieldByName("Target")
+	targetObj := target.Interface().(*kong.Target)
+	if targetObj != nil {
+		d.target = target.Interface().(*kong.Target)
+	}
 }

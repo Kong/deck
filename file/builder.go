@@ -51,17 +51,11 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 
-	// defaulter
-	var kongDefaults KongDefaults
-	if b.targetContent.Info != nil {
-		kongDefaults = b.targetContent.Info.Defaults
+	defaulter, err := defaulter(b.ctx, b.client, b.targetContent)
+	if err != nil {
+		return nil, nil, err
 	}
-	if !isKongDefaultEmpty(kongDefaults) || b.defaulter == nil {
-		b.defaulter, err = defaulter(kongDefaults)
-		if err != nil {
-			return nil, nil, fmt.Errorf("creating defaulter: %w", err)
-		}
-	}
+	b.defaulter = defaulter
 
 	// build
 	b.certificates()
@@ -870,40 +864,14 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 	return
 }
 
-func defaulter(defaults KongDefaults) (*utils.Defaulter, error) {
-	d, err := utils.GetKongDefaulter()
+func defaulter(ctx context.Context, client *kong.Client, fileContent *Content) (*utils.Defaulter, error) {
+	var kongDefaults KongDefaults
+	if fileContent.Info != nil {
+		kongDefaults = fileContent.Info.Defaults
+	}
+	defaulter, err := utils.GetDefaulter(ctx, client, kongDefaults)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating defaulter: %w", err)
 	}
-	if defaults.Route != nil {
-		if err = d.Register(defaults.Route); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Service != nil {
-		if err = d.Register(defaults.Service); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Upstream != nil {
-		if err = d.Register(defaults.Upstream); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Target != nil {
-		if err = d.Register(defaults.Target); err != nil {
-			return nil, err
-		}
-	}
-	return d, nil
-}
-
-func isKongDefaultEmpty(kongDefault KongDefaults) bool {
-	if kongDefault.Service != nil ||
-		kongDefault.Route != nil ||
-		kongDefault.Upstream != nil ||
-		kongDefault.Target != nil {
-		return false
-	}
-	return true
+	return defaulter, nil
 }

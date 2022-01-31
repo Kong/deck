@@ -53,12 +53,6 @@ func GetForKonnect(ctx context.Context, fileContent *Content,
 	builder.client = client
 	builder.ctx = ctx
 
-	defaulter, err := utils.GetDefaulter(ctx, client)
-	if err != nil {
-		return nil, nil, fmt.Errorf("creating defaulter: %w", err)
-	}
-	builder.defaulter = defaulter
-
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, nil, ErrorTransformFalseNotSupported
 	}
@@ -89,12 +83,6 @@ func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, ErrorTransformFalseNotSupported
 	}
-
-	defaulter, err := utils.GetDefaulter(ctx, wsClient)
-	if err != nil {
-		return nil, fmt.Errorf("creating defaulter: %w", err)
-	}
-	builder.defaulter = defaulter
 
 	state, _, err := builder.build()
 	if err != nil {
