@@ -22,7 +22,7 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(cmd.Context(), syncCmdKongStateFile, false,
+		return SyncMain(cmd.Context(), syncCmdKongStateFile, false,
 			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {

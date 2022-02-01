@@ -1,23 +1,21 @@
 //go:build integration
 
-package e2e
+package integration
 
 import (
-	"bytes"
-	"fmt"
-	"io/ioutil"
+	"context"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"reflect"
-	"sort"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/kong/deck/cmd"
+	"github.com/kong/deck/dump"
+	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
 )
 
-var DECK = filepath.Join("../../main.go")
+var deckCmd = cmd.RootCmdOnlyForDocsAndTest
 
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
@@ -28,96 +26,80 @@ func getKongAddress() string {
 }
 
 // cleanUpEnv removes all existing entities from Kong.
-func cleanUpEnv() error {
-	cmd := exec.Command(
-		"go",
-		"run",
-		DECK,
-		"reset",
-		"--force",
-	) // #nosec G204
-
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf(stderr.String())
+func cleanUpEnv(t *testing.T) error {
+	deckCmd.SetArgs([]string{"reset", "--force"})
+	if err := deckCmd.Execute(); err != nil {
+		t.Errorf(err.Error())
 	}
 	return nil
 }
 
-func normalizeOutput(content string) string {
-	lines := strings.Split(strings.TrimSuffix(content, "\n"), "\n")
-	sort.Strings(lines)
-	for i := range lines {
-		lines[i] = strings.TrimSpace(lines[i])
-	}
-	return strings.Join(lines, "\n")
+func getTestClient() (*kong.Client, error) {
+	return utils.GetKongClient(utils.KongClientConfig{
+		Address: getKongAddress(),
+	})
 }
 
-func loadExpectedOutput(path string) (string, error) {
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	return string(content), nil
-}
-
-func testDeckOutput(t *testing.T, outputPath string, got string) {
-	expected, err := loadExpectedOutput(outputPath)
+func testKongState(
+	t *testing.T,
+	client *kong.Client,
+	expectedServices []*kong.Service,
+) {
+	ctx := context.Background()
+	// Get entities from Kong
+	services, err := dump.GetAllServices(ctx, client, []string{})
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	expectedNormalized := normalizeOutput(expected)
-	obtainedNormalized := normalizeOutput(got)
-	if !reflect.DeepEqual(obtainedNormalized, expectedNormalized) {
-		t.Errorf(cmp.Diff(obtainedNormalized, expectedNormalized))
+	opt := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt"),
+	}
+	if diff := cmp.Diff(services, expectedServices, opt...); diff != "" {
+		t.Errorf(diff)
 	}
 }
 
 func Test_Sync_output(t *testing.T) {
-	// set up deck
-	t.Setenv("DECK_KONG_ADDR", getKongAddress())
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	tests := []struct {
-		name               string
-		kongFile           string
-		expectedOutputFile string
+		name             string
+		kongFile         string
+		expectedServices []*kong.Service
 	}{
 		{
-			name:               "create_service",
-			kongFile:           "testdata/sync/create_service/kong.yaml",
-			expectedOutputFile: "testdata/sync/create_service/output",
+			name:     "create_service",
+			kongFile: "testdata/sync/create_service/kong.yaml",
+			expectedServices: []*kong.Service{
+				{
+					Name:           kong.String("svc1"),
+					ConnectTimeout: kong.Int(60000),
+					Host:           kong.String("mockbin.org"),
+					Port:           kong.Int(80),
+					Protocol:       kong.String("http"),
+					ReadTimeout:    kong.Int(60000),
+					Retries:        kong.Int(5),
+					WriteTimeout:   kong.Int(60000),
+					Tags:           nil,
+				},
+			},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if err := cleanUpEnv(); err != nil {
+			if err := cleanUpEnv(t); err != nil {
 				t.Errorf(err.Error())
 			}
-
-			cmd := exec.Command(
-				"go",
-				"run",
-				DECK,
-				"sync",
-				"-s",
-				tc.kongFile,
-			) // #nosec G204
-
-			var stdout, stderr bytes.Buffer
-			cmd.Stdout = &stdout
-			cmd.Stderr = &stderr
-			if err := cmd.Run(); err != nil {
-				t.Errorf(stderr.String())
+			ctx := context.Background()
+			if err := cmd.SyncMain(ctx, []string{tc.kongFile}, false, 10, 0, ""); err != nil {
+				t.Error(err.Error())
 			}
-
-			// Check deck output looks as expected.
-			testDeckOutput(t, tc.expectedOutputFile, stdout.String())
+			testKongState(t, client, tc.expectedServices)
 		})
-	}
-
-	if err := cleanUpEnv(); err != nil {
-		t.Errorf(err.Error())
 	}
 }
