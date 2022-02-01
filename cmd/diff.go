@@ -25,7 +25,7 @@ that will be created, updated, or deleted.
 `,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return SyncMain(cmd.Context(), diffCmdKongStateFile, true,
+		return syncMain(cmd.Context(), diffCmdKongStateFile, true,
 			diffCmdParallelism, 0, diffWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {

@@ -59,7 +59,7 @@ func testKongState(
 	}
 }
 
-func Test_Sync_output(t *testing.T) {
+func Test_Sync(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -95,9 +95,10 @@ func Test_Sync_output(t *testing.T) {
 			if err := cleanUpEnv(t); err != nil {
 				t.Errorf(err.Error())
 			}
-			ctx := context.Background()
-			if err := cmd.SyncMain(ctx, []string{tc.kongFile}, false, 10, 0, ""); err != nil {
-				t.Error(err.Error())
+
+			deckCmd.SetArgs([]string{"sync", "-s", tc.kongFile})
+			if err := deckCmd.Execute(); err != nil {
+				t.Errorf(err.Error())
 			}
 			testKongState(t, client, tc.expectedServices)
 		})

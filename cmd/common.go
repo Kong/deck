@@ -62,7 +62,7 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 	return targetContent.Workspace
 }
 
-func SyncMain(ctx context.Context, filenames []string, dry bool, parallelism,
+func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string) error {
 
 	// read target file
