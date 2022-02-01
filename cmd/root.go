@@ -40,8 +40,8 @@ It can be used to export, import, or sync entities to Kong.`,
 	},
 }
 
-// RootCmdOnlyForDocs is used to generate makrdown documentation.
-var RootCmdOnlyForDocs = rootCmd
+// RootCmdOnlyForDocsAndTest is used to generate makrdown documentation and for tests.
+var RootCmdOnlyForDocsAndTest = rootCmd
 
 // Execute adds all child commands to the root command and sets
 // flags appropriately.

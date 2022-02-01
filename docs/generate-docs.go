@@ -13,7 +13,7 @@ func main() {
 	flag.StringVar(&outputPath, "output-path", ".", "path to output directory")
 	flag.Parse()
 
-	err := doc.GenMarkdownTree(cmd.RootCmdOnlyForDocs, outputPath)
+	err := doc.GenMarkdownTree(cmd.RootCmdOnlyForDocsAndTest, outputPath)
 	if err != nil {
 		log.Fatal(err)
 	}
