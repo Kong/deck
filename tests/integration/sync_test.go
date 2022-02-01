@@ -72,7 +72,7 @@ func Test_Sync(t *testing.T) {
 		expectedServices []*kong.Service
 	}{
 		{
-			name:     "create_service",
+			name:     "creates a service",
 			kongFile: "testdata/sync/create_service/kong.yaml",
 			expectedServices: []*kong.Service{
 				{
