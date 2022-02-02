@@ -52,7 +52,7 @@ func testKongState(
 		t.Errorf(err.Error())
 	}
 	opt := []cmp.Option{
-		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt", "Enabled"),
 	}
 	if diff := cmp.Diff(services, expectedServices, opt...); diff != "" {
 		t.Errorf(diff)
