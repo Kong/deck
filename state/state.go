@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
+	"github.com/kong/deck/utils"
 )
 
 type collection struct {
@@ -38,6 +39,8 @@ type KongState struct {
 	ServicePackages *ServicePackagesCollection
 	ServiceVersions *ServiceVersionsCollection
 	Documents       *DocumentsCollection
+
+	RawSharedPluginsMap map[string]map[string]utils.SharedPlugin
 }
 
 // NewKongState creates a new in-memory KongState.

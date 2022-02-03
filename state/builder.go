@@ -16,6 +16,7 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 	if err != nil {
 		return nil, err
 	}
+	kongState.RawSharedPluginsMap = raw.SharedPluginMap
 	return kongState, nil
 }
 

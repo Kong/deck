@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -26,6 +27,10 @@ type Config struct {
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
+
+	// If true, deduplicate plugins with the same configuration into a shared
+	// config object.
+	DedupPluginsConfig bool
 }
 
 func deduplicate(stringSlice []string) []string {
@@ -178,6 +183,9 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 			plugins = excludeConsumersPlugins(plugins)
 		}
 		state.Plugins = plugins
+		if config.DedupPluginsConfig {
+			dedupPluginsConfig(state, plugins)
+		}
 		return nil
 	})
 
@@ -223,6 +231,68 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		state.Targets = targets
 		return nil
 	})
+}
+
+func addSharedPluginConfig(state *utils.KongRawState, p *kong.Plugin,
+	sharedPlugin utils.SharedPlugin, name string) {
+	if p.Consumer != nil && p.Consumer.ID != nil {
+		sharedPlugin.Consumers = append(sharedPlugin.Consumers, *p.Consumer.ID)
+	}
+	if p.Service != nil && p.Service.ID != nil {
+		sharedPlugin.Services = append(sharedPlugin.Services, *p.Service.ID)
+	}
+	if p.Route != nil && p.Route.ID != nil {
+		sharedPlugin.Routes = append(sharedPlugin.Routes, *p.Route.ID)
+	}
+	state.SharedPluginMap[*p.Name][name] = sharedPlugin
+}
+
+// dedupPluginsConfig populates state.PluginConfigsMap, grouping consumers and services
+// sharing the same plugin configs.
+//
+// Example:
+//
+// {
+// 	"rate-limiting": {
+// 		"rate-limiting-0": {
+// 			"config": _specific_plugin_config_0,
+// 			"consumers": ["consumer-1", "consumer-2"],
+// 			"services": []
+// 		},
+// 		"rate-limiting-1": {
+// 			"config": _specific_plugin_config_1,
+// 			"consumers": ["consumer-3", "consumer-4"],
+// 			"services": []
+// 		}
+// 	  }
+// }
+func dedupPluginsConfig(state *utils.KongRawState, plugins []*kong.Plugin) {
+	state.SharedPluginMap = make(map[string]map[string]utils.SharedPlugin)
+	for n, p := range plugins {
+		name := fmt.Sprintf("%s-%d", *p.Name, n)
+		cfgMap := utils.SharedPlugin{Config: p.Config}
+		sharedPlugin, ok := state.SharedPluginMap[*p.Name]
+		// if plugin is not in state.SharedPluginMap, add it
+		if !ok {
+			state.SharedPluginMap[*p.Name] = make(map[string]utils.SharedPlugin)
+			addSharedPluginConfig(state, p, cfgMap, name)
+			continue
+		}
+
+		var found bool
+		// check that plugin config matches any already present in state.SharedPluginMap
+		for name, config := range sharedPlugin {
+			if reflect.DeepEqual(config.Config, p.Config) {
+				addSharedPluginConfig(state, p, config, name)
+				found = true
+				break
+			}
+		}
+		// if no match is found, add it
+		if !found {
+			addSharedPluginConfig(state, p, cfgMap, name)
+		}
+	}
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,

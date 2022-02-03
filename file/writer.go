@@ -45,6 +45,8 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		}
 	}
 
+	populateSharedPlugins(kongState, file)
+
 	err = populateServices(kongState, file, config)
 	if err != nil {
 		return err
@@ -81,6 +83,15 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	}
 
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
+}
+
+func populateSharedPlugins(kongState *state.KongState, file *Content) {
+	file.PluginConfigs = make(map[string]kong.Configuration)
+	for _, value := range kongState.RawSharedPluginsMap {
+		for name, config := range value {
+			file.PluginConfigs[name] = config.Config
+		}
+	}
 }
 
 func KonnectStateToFile(kongState *state.KongState, config WriteConfig) error {
@@ -258,12 +269,18 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 		utils.ZeroOutID(p, p.Name, config.WithID)
 		utils.ZeroOutTimestamps(p)
 		utils.MustRemoveTags(&p.Plugin, config.SelectTags)
-		s.Plugins = append(s.Plugins, &FPlugin{Plugin: p.Plugin})
+
+		fp := &FPlugin{Plugin: p.Plugin}
+		if sharedPlugins, ok := kongState.RawSharedPluginsMap[*p.Name]; ok {
+			setPluginSharedConfig(fp, sharedPlugins, "", *s.ID, "")
+		}
+		s.Plugins = append(s.Plugins, fp)
 	}
 	sort.SliceStable(s.Plugins, func(i, j int) bool {
 		return compareOrder(s.Plugins[i], s.Plugins[j])
 	})
 	for _, r := range routes {
+		id := *r.ID
 		plugins, err := kongState.Plugins.GetAllByRouteID(*r.ID)
 		if err != nil {
 			return nil, err
@@ -281,7 +298,13 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 			utils.ZeroOutID(p, p.Name, config.WithID)
 			utils.ZeroOutTimestamps(p)
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
-			route.Plugins = append(route.Plugins, &FPlugin{Plugin: p.Plugin})
+
+			fp := &FPlugin{Plugin: p.Plugin}
+			if sharedPlugins, ok := kongState.RawSharedPluginsMap[*p.Name]; ok {
+				setPluginSharedConfig(fp, sharedPlugins, "", "", id)
+			}
+
+			route.Plugins = append(route.Plugins, fp)
 		}
 		sort.SliceStable(route.Plugins, func(i, j int) bool {
 			return compareOrder(route.Plugins[i], route.Plugins[j])
@@ -507,7 +530,12 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			utils.ZeroOutTimestamps(p)
 			p.Consumer = nil
 			utils.MustRemoveTags(&p.Plugin, config.SelectTags)
-			c.Plugins = append(c.Plugins, &FPlugin{Plugin: p.Plugin})
+
+			fp := &FPlugin{Plugin: p.Plugin}
+			if sharedPlugins, ok := kongState.RawSharedPluginsMap[*p.Name]; ok {
+				setPluginSharedConfig(fp, sharedPlugins, *c.ID, "", "")
+			}
+			c.Plugins = append(c.Plugins, fp)
 		}
 		sort.SliceStable(c.Plugins, func(i, j int) bool {
 			return compareOrder(c.Plugins[i], c.Plugins[j])
@@ -611,6 +639,36 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		return compareOrder(file.Consumers[i], file.Consumers[j])
 	})
 	return nil
+}
+
+func setPluginSharedConfig(fp *FPlugin, sharedPlugins map[string]utils.SharedPlugin,
+	consumerID, serviceID, routeID string) {
+	for name, content := range sharedPlugins {
+		for _, consumer := range content.Consumers {
+			if consumer != consumerID {
+				continue
+			}
+			fp.Plugin.Config = nil
+			fp.ConfigSource = kong.String(name)
+			break
+		}
+		for _, service := range content.Services {
+			if service != serviceID {
+				continue
+			}
+			fp.Plugin.Config = nil
+			fp.ConfigSource = kong.String(name)
+			break
+		}
+		for _, route := range content.Routes {
+			if route != routeID {
+				continue
+			}
+			fp.Plugin.Config = nil
+			fp.ConfigSource = kong.String(name)
+			break
+		}
+	}
 }
 
 func WriteContentToFile(content *Content, filename string, format Format) error {
