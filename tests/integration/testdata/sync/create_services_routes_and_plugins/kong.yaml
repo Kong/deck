@@ -27,7 +27,10 @@ services:
     paths:
     - /r2
 plugins:
-- name: prometheus
+- name: basic-auth
+  config:
+    anonymous: nil
+    hide_credentials: false
   enabled: true
   protocols:
   - http
