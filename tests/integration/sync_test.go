@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -98,12 +99,18 @@ func sync(t *testing.T, kongFile string) {
 	}
 }
 
+func getKongVersionFromEnv() string {
+	return strings.Split(os.Getenv("KONG_IMAGE"), ":")[1]
+}
+
 func Test_Sync(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
+
+	kongVersion := getKongVersionFromEnv()
 
 	tests := []struct {
 		name            string
@@ -303,6 +310,10 @@ func Test_Sync(t *testing.T) {
 			teardown := setup(t, tc.initialKongFile)
 			defer teardown(t)
 
+			if kongVersion < "2.0" && len(tc.expectedState.Plugins) > 0 {
+				t.Log("skipping plugin tests for old version")
+				t.Skip()
+			}
 			sync(t, tc.kongFile)
 			testKongState(t, client, tc.expectedState)
 		})
