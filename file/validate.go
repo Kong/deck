@@ -35,7 +35,9 @@ func validate(content []byte) error {
 func validateWorkspaces(workspaces []string) error {
 	utils.RemoveDuplicates(&workspaces)
 	if len(workspaces) > 1 {
-		return fmt.Errorf("cannot sync multiple workspaces at the same time: %v", workspaces)
+		return fmt.Errorf("it seems like you are trying to sync multiple workspaces "+
+			"at the same time (%v).\ndecK doesn't support syncing multiple workspaces at the same time, "+
+			"please sync one workspace at a time", workspaces)
 	}
 	return nil
 }
