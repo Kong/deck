@@ -866,7 +866,9 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 	return
 }
 
-func defaulter(ctx context.Context, client *kong.Client, fileContent *Content, isKonnect bool) (*utils.Defaulter, error) {
+func defaulter(
+	ctx context.Context, client *kong.Client, fileContent *Content, isKonnect bool,
+) (*utils.Defaulter, error) {
 	var kongDefaults KongDefaults
 	if fileContent.Info != nil {
 		kongDefaults = fileContent.Info.Defaults

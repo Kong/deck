@@ -527,7 +527,7 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.intermediate, _ = state.NewKongState()
 			if err := b.ingestRoute(tt.args.route); (err != nil) != tt.wantErr {
@@ -633,7 +633,7 @@ func Test_stateBuilder_ingestTargets(t *testing.T) {
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			if err := b.ingestTargets(tt.args.targets); (err != nil) != tt.wantErr {
 				t.Errorf("stateBuilder.ingestPlugins() error = %v, wantErr %v", err, tt.wantErr)
@@ -1270,7 +1270,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			if tt.fields.kongVersion != nil {
 				b.kongVersion = *tt.fields.kongVersion
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1437,7 +1437,7 @@ func Test_stateBuilder_certificates(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1510,7 +1510,7 @@ func Test_stateBuilder_caCertificates(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1785,7 +1785,7 @@ func Test_stateBuilder_upstream(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1888,7 +1888,7 @@ func Test_stateBuilder_documents(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.konnectRawState)
@@ -2435,7 +2435,7 @@ func Test_stateBuilder(t *testing.T) {
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults)
+			d, _ := utils.GetKongDefaulter(kongDefaults, false)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
