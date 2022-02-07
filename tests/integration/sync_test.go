@@ -5,18 +5,29 @@ package integration
 import (
 	"context"
 	"os"
-	"strings"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 var deckCmd = cmd.RootCmdOnlyForDocsAndTest
+
+var syncCmd = func() *cobra.Command {
+	for _, command := range deckCmd.Commands() {
+		if command.Use == "sync" {
+			return command
+		}
+	}
+	return nil
+}
 
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
@@ -76,51 +87,44 @@ func testKongState(t *testing.T, client *kong.Client, expectedState utils.KongRa
 func reset(t *testing.T) {
 	deckCmd.SetArgs([]string{"reset", "--force"})
 	if err := deckCmd.Execute(); err != nil {
-		t.Errorf(err.Error())
+		t.Fatalf(err.Error(), "failed to reset Kong's state")
 	}
 }
 
-func setup(t *testing.T, kongFile string) func(t *testing.T) {
-	if kongFile != "" {
-		sync(t, kongFile)
-	}
+func setup(t *testing.T) func(t *testing.T) {
 	return func(t *testing.T) {
 		reset(t)
 	}
 }
 
 func sync(t *testing.T, kongFile string) {
-	// directly set flag value due to cobra keeping state across test runs
-	cmd.SyncCmdKongStateFile = []string{kongFile}
-	deckCmd.SetArgs([]string{"sync"})
-	err := deckCmd.Execute()
-	if err != nil {
-		t.Errorf(err.Error())
+	// set the --state flag directly due to slice
+	// flags value are persisted across test cases, and not
+	// overwritable otherwise.
+	stateFlag := syncCmd().Flags().Lookup("state")
+	if val, ok := stateFlag.Value.(pflag.SliceValue); ok {
+		_ = val.Replace([]string{kongFile})
 	}
+
+	deckCmd.SetArgs([]string{"sync"})
+	deckCmd.Execute()
 }
 
-func getKongVersionFromEnv() string {
-	return strings.Split(os.Getenv("KONG_IMAGE"), ":")[1]
-}
-
-func Test_Sync(t *testing.T) {
+func Test_Sync_ServicesRoutes(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 
-	kongVersion := getKongVersionFromEnv()
-
 	tests := []struct {
-		name            string
-		kongFile        string
-		initialKongFile string
-		expectedState   utils.KongRawState
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
 	}{
 		{
 			name:     "creates a service",
-			kongFile: "testdata/sync/create_service/kong.yaml",
+			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services: []*kong.Service{
 					{
@@ -138,29 +142,8 @@ func Test_Sync(t *testing.T) {
 			},
 		},
 		{
-			name:            "service already exists",
-			initialKongFile: "testdata/sync/create_service/kong.yaml",
-			kongFile:        "testdata/sync/create_service/kong.yaml",
-			expectedState: utils.KongRawState{
-				Services: []*kong.Service{
-					{
-						Name:           kong.String("svc1"),
-						ConnectTimeout: kong.Int(60000),
-						Host:           kong.String("mockbin.org"),
-						Port:           kong.Int(80),
-						Protocol:       kong.String("http"),
-						ReadTimeout:    kong.Int(60000),
-						Retries:        kong.Int(5),
-						WriteTimeout:   kong.Int(60000),
-						Tags:           nil,
-					},
-				},
-			},
-		},
-		{
-			name:            "create new service",
-			initialKongFile: "testdata/sync/create_new_service/base.yaml",
-			kongFile:        "testdata/sync/create_new_service/kong.yaml",
+			name:     "create multiple services",
+			kongFile: "testdata/sync/002-create-multiple-services/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services: []*kong.Service{
 					{
@@ -190,7 +173,7 @@ func Test_Sync(t *testing.T) {
 		},
 		{
 			name:     "create services and routes",
-			kongFile: "testdata/sync/create_services_and_routes/kong.yaml",
+			kongFile: "testdata/sync/003-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services: []*kong.Service{
 					{
@@ -236,70 +219,6 @@ func Test_Sync(t *testing.T) {
 						RegexPriority:           kong.Int(0),
 						StripPath:               kong.Bool(false),
 						HTTPSRedirectStatusCode: kong.Int(301),
-					},
-				},
-			},
-		},
-		{
-			name:     "create services routes and plugins",
-			kongFile: "testdata/sync/create_services_routes_and_plugins/kong.yaml",
-			expectedState: utils.KongRawState{
-				Services: []*kong.Service{
-					{
-						Name:           kong.String("svc1"),
-						ConnectTimeout: kong.Int(60000),
-						Host:           kong.String("mockbin.org"),
-						Port:           kong.Int(80),
-						Protocol:       kong.String("http"),
-						ReadTimeout:    kong.Int(60000),
-						Retries:        kong.Int(5),
-						WriteTimeout:   kong.Int(60000),
-						Tags:           nil,
-					},
-					{
-						Name:           kong.String("svc2"),
-						ConnectTimeout: kong.Int(60000),
-						Host:           kong.String("mockbin-v2.org"),
-						Port:           kong.Int(8080),
-						Protocol:       kong.String("https"),
-						ReadTimeout:    kong.Int(60000),
-						Retries:        kong.Int(5),
-						WriteTimeout:   kong.Int(60000),
-						Tags:           nil,
-					},
-				},
-				Routes: []*kong.Route{
-					{
-						Name:                    kong.String("r1"),
-						Paths:                   []*string{kong.String("/r1")},
-						PathHandling:            kong.String("v0"),
-						PreserveHost:            kong.Bool(false),
-						Protocols:               []*string{kong.String("http"), kong.String("https")},
-						RegexPriority:           kong.Int(0),
-						StripPath:               kong.Bool(false),
-						HTTPSRedirectStatusCode: kong.Int(301),
-						RequestBuffering:        kong.Bool(true),
-						ResponseBuffering:       kong.Bool(true),
-					},
-					{
-						Name:                    kong.String("r2"),
-						Paths:                   []*string{kong.String("/r2")},
-						PathHandling:            kong.String("v0"),
-						PreserveHost:            kong.Bool(false),
-						Protocols:               []*string{kong.String("http"), kong.String("https")},
-						RegexPriority:           kong.Int(0),
-						StripPath:               kong.Bool(false),
-						HTTPSRedirectStatusCode: kong.Int(301),
-						RequestBuffering:        kong.Bool(true),
-						ResponseBuffering:       kong.Bool(true),
-					},
-				},
-				Plugins: []*kong.Plugin{
-					{
-						Name:      kong.String("basic-auth"),
-						Protocols: []*string{kong.String("http"), kong.String("https")},
-						Enabled:   kong.Bool(true),
-						Config:    kong.Configuration{"anonymous": "nil", "hide_credentials": false},
 					},
 				},
 			},
@@ -307,13 +226,77 @@ func Test_Sync(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			teardown := setup(t, tc.initialKongFile)
+			teardown := setup(t)
 			defer teardown(t)
 
-			if kongVersion < "2.0" && len(tc.expectedState.Plugins) > 0 {
-				t.Log("skipping plugin tests for old version")
-				t.Skip()
-			}
+			sync(t, tc.kongFile)
+			testKongState(t, client, tc.expectedState)
+		})
+	}
+}
+
+// runWhenKong skips the current test if the version of Kong doesn't
+// fall in the semverRange.
+// This helper function can be used in tests to write version specific
+// tests for Kong.
+func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
+	// get kong version
+	ctx := context.Background()
+	info, err := client.Root(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+	kongVersion := kong.VersionFromInfo(info)
+	currentVersion, err := kong.ParseSemanticVersion(kongVersion)
+	if err != nil {
+		t.Error(err)
+	}
+	r, err := semver.ParseRange(semverRange)
+	if err != nil {
+		t.Error(err)
+	}
+	if !r(currentVersion) {
+		t.Skip()
+	}
+}
+
+func Test_Sync_Plugins(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/004-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:      kong.String("basic-auth"),
+						Protocols: []*string{kong.String("http"), kong.String("https")},
+						Enabled:   kong.Bool(true),
+						Config: kong.Configuration{
+							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+							"hide_credentials": false,
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, ">=2.0.5")
+			teardown := setup(t)
+			defer teardown(t)
+
 			sync(t, tc.kongFile)
 			testKongState(t, client, tc.expectedState)
 		})

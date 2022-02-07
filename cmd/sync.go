@@ -7,10 +7,7 @@ import (
 )
 
 var (
-	// SyncCmdKongStateFile holds kong files passed as an input
-	// NOTE: exported for testing purposes.
-	SyncCmdKongStateFile []string
-
+	syncCmdKongStateFile []string
 	syncCmdParallelism   int
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
@@ -25,11 +22,11 @@ var syncCmd = &cobra.Command{
 to get Kong's state in sync with the input state.`,
 	Args: validateNoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(cmd.Context(), SyncCmdKongStateFile, false,
+		return syncMain(cmd.Context(), syncCmdKongStateFile, false,
 			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(SyncCmdKongStateFile) == 0 {
+		if len(syncCmdKongStateFile) == 0 {
 			return fmt.Errorf("a state file with Kong's configuration " +
 				"must be specified using -s/--state flag")
 		}
@@ -39,7 +36,7 @@ to get Kong's state in sync with the input state.`,
 
 func init() {
 	rootCmd.AddCommand(syncCmd)
-	syncCmd.Flags().StringSliceVarP(&SyncCmdKongStateFile,
+	syncCmd.Flags().StringSliceVarP(&syncCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use '-' to read from stdin.")
