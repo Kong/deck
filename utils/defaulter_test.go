@@ -7,14 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	defaultPort        = 80
-	defaultTimeout     = 60000
-	defaultSlots       = 10000
-	defaultWeight      = 100
-	defaultConcurrency = 10
-)
-
 type kongDefaultForTesting struct {
 	Service  *kong.Service
 	Route    *kong.Route
@@ -23,64 +15,10 @@ type kongDefaultForTesting struct {
 }
 
 var kongDefaults = kongDefaultForTesting{
-	Service: &kong.Service{
-		Port:           kong.Int(defaultPort),
-		Protocol:       kong.String("http"),
-		ConnectTimeout: kong.Int(defaultTimeout),
-		WriteTimeout:   kong.Int(defaultTimeout),
-		ReadTimeout:    kong.Int(defaultTimeout),
-	},
-	Route: &kong.Route{
-		PreserveHost:  kong.Bool(false),
-		RegexPriority: kong.Int(0),
-		StripPath:     kong.Bool(false),
-		Protocols:     kong.StringSlice("http", "https"),
-	},
-	Upstream: &kong.Upstream{
-		Slots: kong.Int(defaultSlots),
-		Healthchecks: &kong.Healthcheck{
-			Active: &kong.ActiveHealthcheck{
-				Concurrency: kong.Int(defaultConcurrency),
-				Healthy: &kong.Healthy{
-					HTTPStatuses: []int{200, 302},
-					Interval:     kong.Int(0),
-					Successes:    kong.Int(0),
-				},
-				HTTPPath: kong.String("/"),
-				Type:     kong.String("http"),
-				Timeout:  kong.Int(1),
-				Unhealthy: &kong.Unhealthy{
-					HTTPFailures: kong.Int(0),
-					TCPFailures:  kong.Int(0),
-					Timeouts:     kong.Int(0),
-					Interval:     kong.Int(0),
-					HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
-				},
-			},
-			Passive: &kong.PassiveHealthcheck{
-				Healthy: &kong.Healthy{
-					HTTPStatuses: []int{
-						200, 201, 202, 203, 204, 205,
-						206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-						306, 307, 308,
-					},
-					Successes: kong.Int(0),
-				},
-				Unhealthy: &kong.Unhealthy{
-					HTTPFailures: kong.Int(0),
-					TCPFailures:  kong.Int(0),
-					Timeouts:     kong.Int(0),
-					HTTPStatuses: []int{429, 500, 503},
-				},
-			},
-		},
-		HashOn:           kong.String("none"),
-		HashFallback:     kong.String("none"),
-		HashOnCookiePath: kong.String("/"),
-	},
-	Target: &kong.Target{
-		Weight: kong.Int(defaultWeight),
-	},
+	Service:  &serviceDefaults,
+	Route:    &routeDefaults,
+	Upstream: &upstreamDefaults,
+	Target:   &targetDefaults,
 }
 
 func TestDefaulter(t *testing.T) {
@@ -142,7 +80,7 @@ func TestServiceSetTest(t *testing.T) {
 		{
 			desc: "empty service",
 			arg:  &kong.Service{},
-			want: kongDefaults.Service,
+			want: &serviceDefaults,
 		},
 		{
 			desc: "retries can be set to 0",
@@ -227,7 +165,7 @@ func TestRouteSetTest(t *testing.T) {
 		{
 			desc: "empty route",
 			arg:  &kong.Route{},
-			want: kongDefaults.Route,
+			want: &routeDefaults,
 		},
 		{
 			desc: "preserve host is not overridden",
@@ -319,7 +257,7 @@ func TestUpstreamSetTest(t *testing.T) {
 		{
 			desc: "empty upstream",
 			arg:  &kong.Upstream{},
-			want: kongDefaults.Upstream,
+			want: &upstreamDefaults,
 		},
 		{
 			desc: "Healthchecks.Active.Healthy.HTTPStatuses is not overridden",
