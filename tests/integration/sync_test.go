@@ -385,7 +385,7 @@ func Test_Sync_Upstreams(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.2.2")
+			runWhenKong(t, client, ">=2.4.1")
 			teardown := setup(t)
 			defer teardown(t)
 
