@@ -1,0 +1,11 @@
+_format_version: "1.1"
+_workspace: bar
+services:
+- name: svc2
+  host: 2.example.com
+  tags:
+  - team-svc2
+  routes:
+  - name: r2
+    paths:
+    - /r2

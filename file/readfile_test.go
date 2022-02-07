@@ -320,6 +320,53 @@ func Test_getContent(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:    "different workspaces",
+			args:    args{[]string{"testdata/differentworkspace"}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "same workspaces",
+			args: args{[]string{"testdata/sameworkspace"}},
+			want: &Content{
+				FormatVersion: *kong.String("1.1"),
+				Workspace:     *kong.String("bar"),
+				Services: []FService{
+					{
+						Service: kong.Service{
+							Name: kong.String("svc2"),
+							Host: kong.String("2.example.com"),
+							Tags: kong.StringSlice("team-svc2"),
+						},
+						Routes: []*FRoute{
+							{
+								Route: kong.Route{
+									Name:  kong.String("r2"),
+									Paths: kong.StringSlice("/r2"),
+								},
+							},
+						},
+					},
+					{
+						Service: kong.Service{
+							Name: kong.String("svc1"),
+							Host: kong.String("1.example.com"),
+							Tags: kong.StringSlice("team-svc1"),
+						},
+						Routes: []*FRoute{
+							{
+								Route: kong.Route{
+									Name:  kong.String("r1"),
+									Paths: kong.StringSlice("/r1"),
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -20,6 +20,7 @@ import (
 // these files and renders a Content.
 func getContent(filenames []string) (*Content, error) {
 	var allReaders []io.Reader
+	var workspaces []string
 	for _, fileOrDir := range filenames {
 		readers, err := getReaders(fileOrDir)
 		if err != nil {
@@ -33,10 +34,14 @@ func getContent(filenames []string) (*Content, error) {
 		if err != nil {
 			return nil, fmt.Errorf("reading file: %w", err)
 		}
+		workspaces = append(workspaces, content.Workspace)
 		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
 		if err != nil {
 			return nil, fmt.Errorf("merging file contents: %w", err)
 		}
+	}
+	if err := validateWorkspaces(workspaces); err != nil {
+		return nil, err
 	}
 	return &res, nil
 }
