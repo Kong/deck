@@ -27,6 +27,8 @@ type stateBuilder struct {
 
 	schemasCache map[string]map[string]interface{}
 
+	isKonnect bool
+
 	err error
 }
 
@@ -51,7 +53,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 
-	defaulter, err := defaulter(b.ctx, b.client, b.targetContent)
+	defaulter, err := defaulter(b.ctx, b.client, b.targetContent, b.isKonnect)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -864,12 +866,12 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 	return
 }
 
-func defaulter(ctx context.Context, client *kong.Client, fileContent *Content) (*utils.Defaulter, error) {
+func defaulter(ctx context.Context, client *kong.Client, fileContent *Content, isKonnect bool) (*utils.Defaulter, error) {
 	var kongDefaults KongDefaults
 	if fileContent.Info != nil {
 		kongDefaults = fileContent.Info.Defaults
 	}
-	defaulter, err := utils.GetDefaulter(ctx, client, kongDefaults)
+	defaulter, err := utils.GetDefaulter(ctx, client, kongDefaults, isKonnect)
 	if err != nil {
 		return nil, fmt.Errorf("creating defaulter: %w", err)
 	}

@@ -68,7 +68,7 @@ func TestDefaulter(t *testing.T) {
 
 func TestServiceSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults)
+	d, err := GetKongDefaulter(kongDefaults, false)
 	assert.NotNil(d)
 	assert.Nil(err)
 
@@ -153,7 +153,7 @@ func TestServiceSetTest(t *testing.T) {
 
 func TestRouteSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults)
+	d, err := GetKongDefaulter(kongDefaults, false)
 	assert.NotNil(d)
 	assert.Nil(err)
 
@@ -245,7 +245,7 @@ func TestRouteSetTest(t *testing.T) {
 
 func TestUpstreamSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults)
+	d, err := GetKongDefaulter(kongDefaults, false)
 	assert.NotNil(d)
 	assert.Nil(err)
 

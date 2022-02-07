@@ -52,6 +52,7 @@ func GetForKonnect(ctx context.Context, fileContent *Content,
 	builder.kongVersion = opt.KongVersion
 	builder.client = client
 	builder.ctx = ctx
+	builder.isKonnect = true
 
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, nil, ErrorTransformFalseNotSupported

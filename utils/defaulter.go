@@ -35,8 +35,11 @@ func NewDefaulter() *Defaulter {
 
 // GetKongDefaulter returns a defaulter which can set default values
 // for Kong entities.
-func GetKongDefaulter(kongDefaults interface{}) (*Defaulter, error) {
+func GetKongDefaulter(kongDefaults interface{}, isKonnect bool) (*Defaulter, error) {
 	d := NewDefaulter()
+	if isKonnect {
+		d.populateStaticDefaultsForKonnect()
+	}
 	d.populateDefaultsFromInput(kongDefaults)
 
 	err := d.Register(d.service)
@@ -169,7 +172,7 @@ func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) err
 func getKongDefaulterWithClient(ctx context.Context, client *kong.Client,
 	kongDefaults interface{}) (*Defaulter, error) {
 	// fills defaults from input
-	d, err := GetKongDefaulter(kongDefaults)
+	d, err := GetKongDefaulter(kongDefaults, false)
 	if err != nil {
 		return nil, err
 	}
@@ -207,11 +210,13 @@ func getKongDefaulterWithClient(ctx context.Context, client *kong.Client,
 	return d, nil
 }
 
-func GetDefaulter(ctx context.Context, client *kong.Client, kongDefaults interface{}) (*Defaulter, error) {
-	if client != nil {
+func GetDefaulter(
+	ctx context.Context, client *kong.Client, kongDefaults interface{}, isKonnect bool,
+) (*Defaulter, error) {
+	if client != nil && !isKonnect {
 		return getKongDefaulterWithClient(ctx, client, kongDefaults)
 	}
-	return GetKongDefaulter(kongDefaults)
+	return GetKongDefaulter(kongDefaults, isKonnect)
 }
 
 func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) {
@@ -240,4 +245,24 @@ func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) {
 	if targetObj != nil {
 		d.target = target.Interface().(*kong.Target)
 	}
+}
+
+func (d *Defaulter) populateStaticDefaultsForKonnect() error {
+	err := d.Register(&serviceDefaults)
+	if err != nil {
+		return fmt.Errorf("registering service with defaulter: %w", err)
+	}
+	err = d.Register(&routeDefaults)
+	if err != nil {
+		return fmt.Errorf("registering route with defaulter: %w", err)
+	}
+	err = d.Register(&upstreamDefaults)
+	if err != nil {
+		return fmt.Errorf("registering upstream with defaulter: %w", err)
+	}
+	err = d.Register(&targetDefaults)
+	if err != nil {
+		return fmt.Errorf("registering target with defaulter: %w", err)
+	}
+	return nil
 }
