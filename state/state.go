@@ -40,7 +40,7 @@ type KongState struct {
 	ServiceVersions *ServiceVersionsCollection
 	Documents       *DocumentsCollection
 
-	RawSharedPluginsMap map[string]map[string]utils.SharedPlugin
+	RawSharedPluginsMap map[string]utils.SharedPlugins
 }
 
 // NewKongState creates a new in-memory KongState.
