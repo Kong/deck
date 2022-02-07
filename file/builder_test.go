@@ -2523,3 +2523,76 @@ func Test_stateBuilder_fillPluginConfig(t *testing.T) {
 		})
 	}
 }
+
+func Test_getStripPathBasedOnProtocols(t *testing.T) {
+	tests := []struct {
+		name              string
+		initialStripPath  *bool
+		route             kong.Route
+		wantErr           bool
+		expectedStripPath *bool
+	}{
+		{
+			name: "no initial strip_path and grpc protocols",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+				StripPath: kong.Bool(true),
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+		{
+			name: "no strip_path and grpcs protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpcs")},
+				StripPath: kong.Bool(true),
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+		{
+			name: "no strip_path and http protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("http")},
+				StripPath: kong.Bool(true),
+			},
+			expectedStripPath: kong.Bool(true),
+		},
+		{
+			name:             "false initial strip_path and grpc protocol",
+			initialStripPath: kong.Bool(false),
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+				StripPath: kong.Bool(false),
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+		{
+			name:             "true initial strip_path and grpc protocol",
+			initialStripPath: kong.Bool(true),
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+				StripPath: kong.Bool(true),
+			},
+			wantErr: true,
+		},
+		{
+			name:             "true initial strip_path and grpcs protocol",
+			initialStripPath: kong.Bool(true),
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpcs")},
+				StripPath: kong.Bool(true),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stripPath, err := getStripPathBasedOnProtocols(tt.initialStripPath, tt.route)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getStripPathBasedOnProtocols() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				assert.Equal(t, *tt.expectedStripPath, *stripPath)
+			}
+		})
+	}
+}

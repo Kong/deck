@@ -746,6 +746,27 @@ func (b *stateBuilder) plugins() {
 	}
 }
 
+func getStripPathBasedOnProtocols(initialStripPath *bool, route kong.Route) (*bool, error) {
+	var grpcProtocols bool
+	for _, tag := range route.Protocols {
+		if *tag == "grpc" || *tag == "grpcs" {
+			grpcProtocols = true
+		}
+	}
+
+	if grpcProtocols {
+		if initialStripPath != nil {
+			if *initialStripPath {
+				return nil, fmt.Errorf("schema violation (strip_path: cannot set " +
+					"'strip_path' when 'protocols' is 'grpc' or 'grpcs')")
+			}
+			return initialStripPath, nil
+		}
+		return kong.Bool(false), nil
+	}
+	return route.StripPath, nil
+}
+
 func (b *stateBuilder) ingestRoute(r FRoute) error {
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
@@ -759,10 +780,17 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 
 	utils.MustMergeTags(&r, b.selectTags)
+
+	initialStripPath := r.Route.StripPath
 	b.defaulter.MustSet(&r.Route)
+	stripPath, err := getStripPathBasedOnProtocols(initialStripPath, r.Route)
+	if err != nil {
+		return err
+	}
+	r.Route.StripPath = stripPath
 
 	b.rawState.Routes = append(b.rawState.Routes, &r.Route)
-	err := b.intermediate.Routes.Add(state.Route{Route: r.Route})
+	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
 	if err != nil {
 		return err
 	}
