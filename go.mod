@@ -2,6 +2,8 @@ module github.com/kong/deck
 
 go 1.16
 
+replace github.com/imdario/mergo v0.3.12 => github.com/Kong/mergo v0.3.13
+
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
 	github.com/blang/semver/v4 v4.0.0
