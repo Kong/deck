@@ -746,6 +746,11 @@ func (b *stateBuilder) plugins() {
 	}
 }
 
+// strip_path schema default value is 'true', but it cannot be set when
+// protocols include 'grpc' and/or 'grpcs'. When users explicitly set
+// strip_path to 'true' with grpc/s protocols, deck returns a schema violation error.
+// When strip_path is not set and protocols include grpc/s, deck sets strip_path to 'false',
+// despite its default value would be 'true' under normal circumstances.
 func getStripPathBasedOnProtocols(initialStripPath *bool, route kong.Route) (*bool, error) {
 	var grpcProtocols bool
 	for _, tag := range route.Protocols {

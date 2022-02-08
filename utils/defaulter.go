@@ -37,11 +37,13 @@ func NewDefaulter() *Defaulter {
 // for Kong entities.
 func GetKongDefaulter(kongDefaults interface{}, isKonnect bool) (*Defaulter, error) {
 	d := NewDefaulter()
-	if isKonnect {
-		d.populateStaticDefaultsForKonnect()
-	}
 	if err := d.populateDefaultsFromInput(kongDefaults); err != nil {
 		return nil, err
+	}
+	if isKonnect {
+		if err := d.populateStaticDefaultsForKonnect(); err != nil {
+			return nil, err
+		}
 	}
 
 	err := d.Register(d.service)
@@ -269,9 +271,27 @@ func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
 	return nil
 }
 
-func (d *Defaulter) populateStaticDefaultsForKonnect() {
-	d.service = &serviceDefaults
-	d.route = &routeDefaults
-	d.upstream = &upstreamDefaults
-	d.target = &targetDefaults
+func (d *Defaulter) populateStaticDefaultsForKonnect() error {
+	if err := mergo.Merge(
+		d.service, &serviceDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging service static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.route, &routeDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging route static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.upstream, &upstreamDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging upstream static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.target, &targetDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging target static defaults: %w", err)
+	}
+
+	return nil
 }

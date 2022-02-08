@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/kong/go-kong/kong"
@@ -491,6 +492,67 @@ func TestUpstreamSetTest(t *testing.T) {
 			err := d.Set(tC.arg)
 			assert.Nil(err)
 			assert.Equal(tC.want, tC.arg)
+		})
+	}
+}
+
+func TestGetKongDefaulter_Konnect(t *testing.T) {
+	assert := assert.New(t)
+
+	testCases := []struct {
+		desc         string
+		userDefaults *kongDefaultForTesting
+		want         *Defaulter
+	}{
+		{
+			desc:         "empty user defaults",
+			userDefaults: &kongDefaultForTesting{},
+			want: &Defaulter{
+				service:  &serviceDefaults,
+				route:    &routeDefaults,
+				upstream: &upstreamDefaults,
+				target:   &targetDefaults,
+			},
+		},
+		{
+			desc: "user defaults take precedence",
+			userDefaults: &kongDefaultForTesting{
+				Service: &kong.Service{
+					Port: kong.Int(8080),
+				},
+			},
+			want: &Defaulter{
+				service: &kong.Service{
+					Port:           kong.Int(8080),
+					Protocol:       kong.String("http"),
+					ConnectTimeout: kong.Int(defaultTimeout),
+					WriteTimeout:   kong.Int(defaultTimeout),
+					ReadTimeout:    kong.Int(defaultTimeout),
+				},
+				route:    &routeDefaults,
+				upstream: &upstreamDefaults,
+				target:   &targetDefaults,
+			},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			d, err := GetKongDefaulter(tc.userDefaults, true)
+			assert.NotNil(d)
+			assert.Nil(err)
+
+			if !reflect.DeepEqual(d.service, tc.want.service) {
+				assert.Equal(t, tc.want.service, d.service)
+			}
+			if !reflect.DeepEqual(d.route, tc.want.route) {
+				assert.Equal(t, tc.want.route, d.route)
+			}
+			if !reflect.DeepEqual(d.upstream, tc.want.upstream) {
+				assert.Equal(t, tc.want.upstream, d.upstream)
+			}
+			if !reflect.DeepEqual(d.target, tc.want.target) {
+				assert.Equal(t, tc.want.target, d.target)
+			}
 		})
 	}
 }
