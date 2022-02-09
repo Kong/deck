@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.11.0](#v1110)
 - [v1.10.0](#v1100)
 - [v1.9.0](#v190)
 - [v1.8.2](#v182)
@@ -34,6 +35,35 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.11.0]
+
+> Release date: 2022/02/17
+
+### Added
+
+- decK now populates core entities defaults from their schema leveraging the Admin API.
+  [#573](https://github.com/Kong/deck/pull/573)
+- decK now populates plugins defaults from their schema leveraging the Admin API.
+  [#562](https://github.com/Kong/deck/pull/562)
+- decK prevents users to interact with any internal-only Konnect plugins.
+  [#564](https://github.com/Kong/deck/pull/564)
+- decK `validate` now has a `--online` flag enabling entities validation against
+  the Admin API. This lets users validate their configuration before deploying it.
+  [#502](https://github.com/Kong/deck/pull/502)
+
+### Fixes
+
+- decK now can set zero values in entity fields.
+  [#580](https://github.com/Kong/deck/pull/580)
+- fix unexpected behaviour when running `sync` against multiple workspaces at once.
+  [#576](https://github.com/Kong/deck/pull/576)
+- skip `consumers` when using `--skip-consumers` with the `sync` command.
+  [#559](https://github.com/Kong/deck/pull/559)
+- analytics flag now works with the `konnect ping` command.
+  [#569](https://github.com/Kong/deck/pull/569)
+- fix unexpected error with `--select-tag` and multiple files.
+  [#571](https://github.com/Kong/deck/pull/571)
 
 
 ## [v1.10.0]
@@ -164,7 +194,7 @@
   [#282](https://github.com/Kong/deck/pull/282)
 - Fix empty Service Package descriptions not syncing correctly.
   [#347](https://github.com/Kong/deck/pull/347)
-- Updating certificate fields no longer deletes SNI associations. 
+- Updating certificate fields no longer deletes SNI associations.
   [#386](https://github.com/Kong/deck/pull/386)
 
 ### Misc
@@ -670,29 +700,29 @@ No breaking changes have been introduced in this release.
 
 ### Added
 
-- **Consumer credentials**  
+- **Consumer credentials**
   The following entities associate with a consumer in Kong are now supported [#12](https://github.com/hbagdi/deck/issues/12):
   - `key-auth`
   - `basic-auth`
   - `hmac-auth`
   - `jwt`
   - `acl`
-  
+
 - decK's exported YAML is now compatible with Kong's declarative config
   file.
-- **Homebrew support**  
+- **Homebrew support**
   decK can now be installed using Homebrew on macOS:
   ```
   brew tap hbagdi/deck
   brew install deck
   ```
-- **Multiple state files**  
+- **Multiple state files**
   decK can now read the configuration of Kong from multiple YAML files in a directory. You can split your configuration
   into files in any way you would like.
   [#22](https://github.com/hbagdi/deck/issues/22)
 - Upcoming Kong 1.3 is now supported.
   [#36](https://github.com/hbagdi/deck/issues/36)
-- **Kong Enterprise only features:**  
+- **Kong Enterprise only features:**
   Workspaces are now natively supported in decK
   - `-w/--workspace` flag can be specified in the `dump` command to
     export configuration of a single workspace.
@@ -709,7 +739,7 @@ No breaking changes have been introduced in this release.
   unhealthy active healthchecks
   [#45](https://github.com/hbagdi/deck/pull/45)
 - Docker image now contains only the binary and not the entire source code.
-  [#34](https://github.com/hbagdi/deck/pull/34)  
+  [#34](https://github.com/hbagdi/deck/pull/34)
   Thanks to [David Cruz](https://github.com/davidcv5) for the contribution.
 
 ## [v0.4.0]
@@ -741,7 +771,7 @@ No breaking changes have been introduced in this release.
 
 ### Added
 
-- **Tag-based distributed configuration management**  
+- **Tag-based distributed configuration management**
   Only a subset of Kong entities sharing a (set of) tag can now be exported,
   deleted, diffed or synced.
   decK can now manage your Kong's configuration in a distributed manner,
@@ -753,9 +783,9 @@ No breaking changes have been introduced in this release.
   Config file can now be read in from standard-input and written out to
   standard-output.
   [#10](https://github.com/hbagdi/deck/pull/10),
-  [#11](https://github.com/hbagdi/deck/pull/11)  
+  [#11](https://github.com/hbagdi/deck/pull/11)
   Thanks to [@matthewbednarski](https://github.com/matthewbednarski) for the contribution.
-- **Automated defaults**  
+- **Automated defaults**
   No need to specify default values for all core Kong entities,
   further simplifying your Kong's configuration.
   Default values for plugin configuration still need to be defined, this is on
@@ -775,11 +805,11 @@ No breaking changes have been introduced in this release.
   [#9](https://github.com/hbagdi/deck/pull/9)
 - Correctly sync plugins which are out of sync. Protocols field
   in plugins can be confused with protocols field in routes in Kong
-  [#6](https://github.com/hbagdi/deck/pull/6)  
+  [#6](https://github.com/hbagdi/deck/pull/6)
   Thanks to [@davidcv5](https://github.com/davidcv5) for the contribution.
 - Throw an error if an object is not marshalled into YAML correctly.
 - Correctly create service-level plugins for Kong >= 1.1
-  [#16](https://github.com/hbagdi/deck/pull/16)  
+  [#16](https://github.com/hbagdi/deck/pull/16)
 
 ### Misc
 
@@ -802,13 +832,13 @@ No breaking changes have been introduced in this release.
 - **Authentication support**: custom HTTP Headers (key:value) can be injected
   into requests that decK makes to Kong's Admin API using the `--headers`
   CLI flag.
-  [#1](https://github.com/hbagdi/deck/pull/1)  
+  [#1](https://github.com/hbagdi/deck/pull/1)
   Thanks to [@davidcv5](https://github.com/davidcv5) for the contribution.
 
 ### Fixed
 
 - Infinite loop in pagination for exporting entities in Kong
-  [#2](https://github.com/hbagdi/deck/pull/2)  
+  [#2](https://github.com/hbagdi/deck/pull/2)
   Thanks to [@lmika](https://github.com/lmika) for the contribution.
 - Plugins are updated using PUT requests instead of PATCH to
   avoid any schema violations.
@@ -821,6 +851,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.11.0]: https://github.com/kong/deck/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
 [v1.8.2]: https://github.com/kong/deck/compare/v1.8.1...v1.8.2
