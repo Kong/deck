@@ -1,4 +1,4 @@
-//go:build integration
+//gos:build integration
 
 package integration
 
@@ -62,7 +62,8 @@ func sortSlices(x, y interface{}) bool {
 	return xName < yName
 }
 
-func testKongState(t *testing.T, client *kong.Client, expectedState utils.KongRawState) {
+func testKongState(t *testing.T, client *kong.Client,
+	expectedState utils.KongRawState, ignoreFields []cmp.Option) {
 	// Get entities from Kong
 	ctx := context.Background()
 	kongState, err := dump.Get(ctx, client, dump.Config{})
@@ -72,8 +73,7 @@ func testKongState(t *testing.T, client *kong.Client, expectedState utils.KongRa
 
 	opt := []cmp.Option{
 		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt"),
-		cmpopts.IgnoreFields(kong.Route{}, "ID", "CreatedAt", "UpdatedAt",
-			"Service", "RequestBuffering", "ResponseBuffering", "PathHandling"),
+		cmpopts.IgnoreFields(kong.Route{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Upstream{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Healthcheck{}, "Threshold"),
@@ -81,6 +81,7 @@ func testKongState(t *testing.T, client *kong.Client, expectedState utils.KongRa
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.EquateEmpty(),
 	}
+	opt = append(opt, ignoreFields...)
 
 	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
 		t.Errorf(diff)
@@ -118,6 +119,11 @@ func Test_Sync_ServicesRoutes(t *testing.T) {
 	client, err := getTestClient()
 	if err != nil {
 		t.Errorf(err.Error())
+	}
+
+	// ignore entities fields based on Kong version
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Route{}, "Service"),
 	}
 
 	tests := []struct {
@@ -229,11 +235,12 @@ func Test_Sync_ServicesRoutes(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			//runWhenKong(t, client, ">=2.0.5")
 			teardown := setup(t)
 			defer teardown(t)
 
 			sync(t, tc.kongFile)
-			testKongState(t, client, tc.expectedState)
+			testKongState(t, client, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -263,134 +270,134 @@ func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
 	}
 }
 
-func Test_Sync_Plugins(t *testing.T) {
-	// setup stage
-	client, err := getTestClient()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+// func Test_Sync_Plugins(t *testing.T) {
+// 	// setup stage
+// 	client, err := getTestClient()
+// 	if err != nil {
+// 		t.Errorf(err.Error())
+// 	}
 
-	tests := []struct {
-		name            string
-		kongFile        string
-		initialKongFile string
-		expectedState   utils.KongRawState
-	}{
-		{
-			name:     "create a plugin",
-			kongFile: "testdata/sync/004-create-a-plugin/kong.yaml",
-			expectedState: utils.KongRawState{
-				Plugins: []*kong.Plugin{
-					{
-						Name:      kong.String("basic-auth"),
-						Protocols: []*string{kong.String("http"), kong.String("https")},
-						Enabled:   kong.Bool(true),
-						Config: kong.Configuration{
-							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
-							"hide_credentials": false,
-						},
-					},
-				},
-			},
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.0.5")
-			teardown := setup(t)
-			defer teardown(t)
+// 	tests := []struct {
+// 		name            string
+// 		kongFile        string
+// 		initialKongFile string
+// 		expectedState   utils.KongRawState
+// 	}{
+// 		{
+// 			name:     "create a plugin",
+// 			kongFile: "testdata/sync/004-create-a-plugin/kong.yaml",
+// 			expectedState: utils.KongRawState{
+// 				Plugins: []*kong.Plugin{
+// 					{
+// 						Name:      kong.String("basic-auth"),
+// 						Protocols: []*string{kong.String("http"), kong.String("https")},
+// 						Enabled:   kong.Bool(true),
+// 						Config: kong.Configuration{
+// 							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+// 							"hide_credentials": false,
+// 						},
+// 					},
+// 				},
+// 			},
+// 		},
+// 	}
+// 	for _, tc := range tests {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			runWhenKong(t, client, ">=2.0.5")
+// 			teardown := setup(t)
+// 			defer teardown(t)
 
-			sync(t, tc.kongFile)
-			testKongState(t, client, tc.expectedState)
-		})
-	}
-}
+// 			sync(t, tc.kongFile)
+// 			testKongState(t, client, tc.expectedState)
+// 		})
+// 	}
+// }
 
-func Test_Sync_Upstreams(t *testing.T) {
-	// setup stage
-	client, err := getTestClient()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+// func Test_Sync_Upstreams(t *testing.T) {
+// 	// setup stage
+// 	client, err := getTestClient()
+// 	if err != nil {
+// 		t.Errorf(err.Error())
+// 	}
 
-	tests := []struct {
-		name          string
-		kongFile      string
-		expectedState utils.KongRawState
-	}{
-		{
-			name:     "creates an upstream and target",
-			kongFile: "testdata/sync/005-create-upstream-and-target/kong.yaml",
-			expectedState: utils.KongRawState{
-				Upstreams: []*kong.Upstream{
-					{
-						Name:      kong.String("upstream1"),
-						Algorithm: kong.String("round-robin"),
-						Slots:     kong.Int(10000),
-						Healthchecks: &kong.Healthcheck{
-							Active: &kong.ActiveHealthcheck{
-								Concurrency: kong.Int(10),
-								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{200, 302},
-									Interval:     kong.Int(0),
-									Successes:    kong.Int(0),
-								},
-								HTTPPath:               kong.String("/"),
-								Type:                   kong.String("http"),
-								Timeout:                kong.Int(1),
-								HTTPSVerifyCertificate: kong.Bool(true),
-								Unhealthy: &kong.Unhealthy{
-									HTTPFailures: kong.Int(0),
-									TCPFailures:  kong.Int(0),
-									Timeouts:     kong.Int(0),
-									Interval:     kong.Int(0),
-									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
-								},
-							},
-							Passive: &kong.PassiveHealthcheck{
-								Healthy: &kong.Healthy{
-									HTTPStatuses: []int{
-										200, 201, 202, 203, 204, 205,
-										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-										306, 307, 308,
-									},
-									Successes: kong.Int(0),
-								},
-								Type: kong.String("http"),
-								Unhealthy: &kong.Unhealthy{
-									HTTPFailures: kong.Int(0),
-									TCPFailures:  kong.Int(0),
-									Timeouts:     kong.Int(0),
-									HTTPStatuses: []int{429, 500, 503},
-								},
-							},
-						},
-						HashOn:           kong.String("none"),
-						HashFallback:     kong.String("none"),
-						HashOnCookiePath: kong.String("/"),
-					},
-				},
-				Targets: []*kong.Target{
-					{
-						Target: kong.String("198.51.100.11:80"),
-						Upstream: &kong.Upstream{
-							ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
-						},
-						Weight: kong.Int(0),
-					},
-				},
-			},
-		},
-	}
+// 	tests := []struct {
+// 		name          string
+// 		kongFile      string
+// 		expectedState utils.KongRawState
+// 	}{
+// 		{
+// 			name:     "creates an upstream and target",
+// 			kongFile: "testdata/sync/005-create-upstream-and-target/kong.yaml",
+// 			expectedState: utils.KongRawState{
+// 				Upstreams: []*kong.Upstream{
+// 					{
+// 						Name:      kong.String("upstream1"),
+// 						Algorithm: kong.String("round-robin"),
+// 						Slots:     kong.Int(10000),
+// 						Healthchecks: &kong.Healthcheck{
+// 							Active: &kong.ActiveHealthcheck{
+// 								Concurrency: kong.Int(10),
+// 								Healthy: &kong.Healthy{
+// 									HTTPStatuses: []int{200, 302},
+// 									Interval:     kong.Int(0),
+// 									Successes:    kong.Int(0),
+// 								},
+// 								HTTPPath:               kong.String("/"),
+// 								Type:                   kong.String("http"),
+// 								Timeout:                kong.Int(1),
+// 								HTTPSVerifyCertificate: kong.Bool(true),
+// 								Unhealthy: &kong.Unhealthy{
+// 									HTTPFailures: kong.Int(0),
+// 									TCPFailures:  kong.Int(0),
+// 									Timeouts:     kong.Int(0),
+// 									Interval:     kong.Int(0),
+// 									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+// 								},
+// 							},
+// 							Passive: &kong.PassiveHealthcheck{
+// 								Healthy: &kong.Healthy{
+// 									HTTPStatuses: []int{
+// 										200, 201, 202, 203, 204, 205,
+// 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+// 										306, 307, 308,
+// 									},
+// 									Successes: kong.Int(0),
+// 								},
+// 								Type: kong.String("http"),
+// 								Unhealthy: &kong.Unhealthy{
+// 									HTTPFailures: kong.Int(0),
+// 									TCPFailures:  kong.Int(0),
+// 									Timeouts:     kong.Int(0),
+// 									HTTPStatuses: []int{429, 500, 503},
+// 								},
+// 							},
+// 						},
+// 						HashOn:           kong.String("none"),
+// 						HashFallback:     kong.String("none"),
+// 						HashOnCookiePath: kong.String("/"),
+// 					},
+// 				},
+// 				Targets: []*kong.Target{
+// 					{
+// 						Target: kong.String("198.51.100.11:80"),
+// 						Upstream: &kong.Upstream{
+// 							ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+// 						},
+// 						Weight: kong.Int(0),
+// 					},
+// 				},
+// 			},
+// 		},
+// 	}
 
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.4.1")
-			teardown := setup(t)
-			defer teardown(t)
+// 	for _, tc := range tests {
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			runWhenKong(t, client, ">=2.4.1")
+// 			teardown := setup(t)
+// 			defer teardown(t)
 
-			sync(t, tc.kongFile)
-			testKongState(t, client, tc.expectedState)
-		})
-	}
-}
+// 			sync(t, tc.kongFile)
+// 			testKongState(t, client, tc.expectedState)
+// 		})
+// 	}
+// }
