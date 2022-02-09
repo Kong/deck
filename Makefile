@@ -41,6 +41,10 @@ generate-cli-docs:
 setup-kong:
 	bash .ci/setup_kong.sh
 
+.PHONY: setup-kong-ee
+setup-kong-ee:
+	bash .ci/setup_kong_ee.sh
+
 .PHONY: test-integration
 test-integration:
 	go test -v -tags=integration \
