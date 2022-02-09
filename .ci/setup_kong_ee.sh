@@ -2,8 +2,6 @@
 
 set -e
 
-export KONG_LICENSE_PATH=/tmp/license.json
-
 KONG_IMAGE=${KONG_IMAGE}
 NETWORK_NAME=deck-test
 
@@ -18,6 +16,14 @@ GATEWAY_CONTAINER_NAME=kong
 # create docker network
 docker network create $NETWORK_NAME
 
+waitContainer() {
+  for try in {1..10}; do
+    echo "waiting for $1.."
+    nc localhost $2 && break;
+    sleep $3
+  done
+}
+
 # Start a PostgreSQL container
 docker run --rm -d --name $PG_CONTAINER_NAME \
   --network=$NETWORK_NAME \
@@ -27,7 +33,7 @@ docker run --rm -d --name $PG_CONTAINER_NAME \
   -e "POSTGRES_PASSWORD=$KONG_DB_PASSWORD" \
   postgres:9.6
 
-sleep 5
+waitContainer "PostgreSQL" 5432 2
 
 # Prepare the Kong database
 docker run --rm --network=$NETWORK_NAME \
@@ -63,4 +69,4 @@ docker run -d --name $GATEWAY_CONTAINER_NAME \
   -p 8004:8004 \
   $KONG_IMAGE
 
-sleep 10
+waitContainer "Kong" 8001 5
