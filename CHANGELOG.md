@@ -48,6 +48,10 @@
   [#562](https://github.com/Kong/deck/pull/562)
 - decK prevents users to interact with any internal-only Konnect plugins.
   [#564](https://github.com/Kong/deck/pull/564)
+- decK now supports mTLS Kong Admin API authentication via
+  `--tls-client-cert`/`--tls-client-cert-file` and
+  `--tls-client-key`/`--tls-client-key-file` flags.
+  [#509](https://github.com/Kong/deck/pull/509)
 - decK `validate` now has a `--online` flag enabling entities validation against
   the Admin API. This lets users validate their configuration before deploying it.
   [#502](https://github.com/Kong/deck/pull/502)
@@ -64,6 +68,8 @@
   [#569](https://github.com/Kong/deck/pull/569)
 - fix unexpected error with `--select-tag` and multiple files.
   [#571](https://github.com/Kong/deck/pull/571)
+- enable `--header` flag for Konnect commands
+  [#557](https://github.com/Kong/deck/pull/557)
 
 
 ## [v1.10.0]
