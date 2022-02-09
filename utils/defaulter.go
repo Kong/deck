@@ -23,6 +23,12 @@ type Defaulter struct {
 	target   *kong.Target
 }
 
+type DefaulterOpts struct {
+	KongDefaults           interface{}
+	DisableDynamicDefaults bool
+	Client                 *kong.Client
+}
+
 // NewDefaulter initializes a Defaulter with empty entities.
 func NewDefaulter() *Defaulter {
 	return &Defaulter{
@@ -33,14 +39,12 @@ func NewDefaulter() *Defaulter {
 	}
 }
 
-// GetKongDefaulter returns a defaulter which can set default values
-// for Kong entities.
-func GetKongDefaulter(kongDefaults interface{}, isKonnect bool) (*Defaulter, error) {
+func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 	d := NewDefaulter()
-	if err := d.populateDefaultsFromInput(kongDefaults); err != nil {
+	if err := d.populateDefaultsFromInput(opts.KongDefaults); err != nil {
 		return nil, err
 	}
-	if isKonnect {
+	if opts.DisableDynamicDefaults {
 		if err := d.populateStaticDefaultsForKonnect(); err != nil {
 			return nil, err
 		}
@@ -173,15 +177,14 @@ func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) err
 	return kong.FillEntityDefaults(entity, schema)
 }
 
-func getKongDefaulterWithClient(ctx context.Context, client *kong.Client,
-	kongDefaults interface{}) (*Defaulter, error) {
+func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 	// fills defaults from input
-	d, err := GetKongDefaulter(kongDefaults, false)
+	d, err := getKongDefaulter(opts)
 	if err != nil {
 		return nil, err
 	}
 	d.ctx = ctx
-	d.client = client
+	d.client = opts.Client
 
 	// fills defaults from Kong API
 	if err := d.addEntityDefaults("services", d.service); err != nil {
@@ -221,13 +224,12 @@ func getKongDefaulterWithClient(ctx context.Context, client *kong.Client,
 // 2. values set in the {_info: defaults:} object in the state file
 // 3. schema defaults coming from Admin API (excluded Konnect)
 // 4. hardcoded defaults under utils/constants.go (Konnect-only)
-func GetDefaulter(
-	ctx context.Context, client *kong.Client, kongDefaults interface{}, isKonnect bool,
-) (*Defaulter, error) {
-	if client != nil && !isKonnect {
-		return getKongDefaulterWithClient(ctx, client, kongDefaults)
+func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
+	if opts.Client != nil && !opts.DisableDynamicDefaults {
+		return getKongDefaulterWithClient(ctx, opts)
 	}
-	return GetKongDefaulter(kongDefaults, isKonnect)
+	opts.DisableDynamicDefaults = true
+	return getKongDefaulter(opts)
 }
 
 func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {

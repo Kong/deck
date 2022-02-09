@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"encoding/hex"
 	"math/rand"
 	"os"
@@ -84,6 +85,11 @@ var kongDefaults = KongDefaults{
 	Target: &kong.Target{
 		Weight: kong.Int(defaultWeight),
 	},
+}
+
+var defaulterTestOpts = utils.DefaulterOpts{
+	KongDefaults:           kongDefaults,
+	DisableDynamicDefaults: false,
 }
 
 func emptyState() *state.KongState {
@@ -523,11 +529,12 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.intermediate, _ = state.NewKongState()
 			if err := b.ingestRoute(tt.args.route); (err != nil) != tt.wantErr {
@@ -629,11 +636,12 @@ func Test_stateBuilder_ingestTargets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			if err := b.ingestTargets(tt.args.targets); (err != nil) != tt.wantErr {
 				t.Errorf("stateBuilder.ingestPlugins() error = %v, wantErr %v", err, tt.wantErr)
@@ -1262,6 +1270,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
@@ -1270,7 +1279,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			if tt.fields.kongVersion != nil {
 				b.kongVersion = *tt.fields.kongVersion
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1433,11 +1442,12 @@ func Test_stateBuilder_certificates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1506,11 +1516,12 @@ func Test_stateBuilder_caCertificates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1781,11 +1792,12 @@ func Test_stateBuilder_upstream(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1884,11 +1896,12 @@ func Test_stateBuilder_documents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.konnectRawState)
@@ -2430,12 +2443,13 @@ func Test_stateBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			rand.Seed(42)
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter(kongDefaults, false)
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)

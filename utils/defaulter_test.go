@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
@@ -20,6 +21,11 @@ var kongDefaults = kongDefaultForTesting{
 	Route:    &routeDefaults,
 	Upstream: &upstreamDefaults,
 	Target:   &targetDefaults,
+}
+
+var defaulterTestOpts = DefaulterOpts{
+	KongDefaults:           kongDefaults,
+	DisableDynamicDefaults: false,
 }
 
 func TestDefaulter(t *testing.T) {
@@ -69,7 +75,8 @@ func TestDefaulter(t *testing.T) {
 
 func TestServiceSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults, false)
+	ctx := context.Background()
+	d, err := GetDefaulter(ctx, defaulterTestOpts)
 	assert.NotNil(d)
 	assert.Nil(err)
 
@@ -154,7 +161,8 @@ func TestServiceSetTest(t *testing.T) {
 
 func TestRouteSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults, false)
+	ctx := context.Background()
+	d, err := GetDefaulter(ctx, defaulterTestOpts)
 	assert.NotNil(d)
 	assert.Nil(err)
 
@@ -246,7 +254,8 @@ func TestRouteSetTest(t *testing.T) {
 
 func TestUpstreamSetTest(t *testing.T) {
 	assert := assert.New(t)
-	d, err := GetKongDefaulter(kongDefaults, false)
+	ctx := context.Background()
+	d, err := GetDefaulter(ctx, defaulterTestOpts)
 	assert.NotNil(d)
 	assert.Nil(err)
 
@@ -496,17 +505,20 @@ func TestUpstreamSetTest(t *testing.T) {
 	}
 }
 
-func TestGetKongDefaulter_Konnect(t *testing.T) {
+func TestGetDefaulter_Konnect(t *testing.T) {
 	assert := assert.New(t)
 
 	testCases := []struct {
-		desc         string
-		userDefaults *kongDefaultForTesting
-		want         *Defaulter
+		desc string
+		opts DefaulterOpts
+		want *Defaulter
 	}{
 		{
-			desc:         "empty user defaults",
-			userDefaults: &kongDefaultForTesting{},
+			desc: "empty user defaults",
+			opts: DefaulterOpts{
+				KongDefaults:           &kongDefaultForTesting{},
+				DisableDynamicDefaults: true,
+			},
 			want: &Defaulter{
 				service:  &serviceDefaults,
 				route:    &routeDefaults,
@@ -516,10 +528,13 @@ func TestGetKongDefaulter_Konnect(t *testing.T) {
 		},
 		{
 			desc: "user defaults take precedence",
-			userDefaults: &kongDefaultForTesting{
-				Service: &kong.Service{
-					Port: kong.Int(8080),
+			opts: DefaulterOpts{
+				KongDefaults: &kongDefaultForTesting{
+					Service: &kong.Service{
+						Port: kong.Int(8080),
+					},
 				},
+				DisableDynamicDefaults: true,
 			},
 			want: &Defaulter{
 				service: &kong.Service{
@@ -537,7 +552,8 @@ func TestGetKongDefaulter_Konnect(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			d, err := GetKongDefaulter(tc.userDefaults, true)
+			ctx := context.Background()
+			d, err := GetDefaulter(ctx, tc.opts)
 			assert.NotNil(d)
 			assert.Nil(err)
 
