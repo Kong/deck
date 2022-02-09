@@ -751,23 +751,15 @@ func (b *stateBuilder) plugins() {
 // strip_path to 'true' with grpc/s protocols, deck returns a schema violation error.
 // When strip_path is not set and protocols include grpc/s, deck sets strip_path to 'false',
 // despite its default value would be 'true' under normal circumstances.
-func getStripPathBasedOnProtocols(initialStripPath *bool, route kong.Route) (*bool, error) {
-	var grpcProtocols bool
-	for _, tag := range route.Protocols {
-		if *tag == "grpc" || *tag == "grpcs" {
-			grpcProtocols = true
-		}
-	}
-
-	if grpcProtocols {
-		if initialStripPath != nil {
-			if *initialStripPath {
+func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
+	for _, p := range route.Protocols {
+		if *p == "grpc" || *p == "grpcs" {
+			if route.StripPath != nil && *route.StripPath {
 				return nil, fmt.Errorf("schema violation (strip_path: cannot set " +
 					"'strip_path' when 'protocols' is 'grpc' or 'grpcs')")
 			}
-			return initialStripPath, nil
+			return kong.Bool(false), nil
 		}
-		return kong.Bool(false), nil
 	}
 	return route.StripPath, nil
 }
@@ -786,13 +778,12 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 
 	utils.MustMergeTags(&r, b.selectTags)
 
-	initialStripPath := r.Route.StripPath
-	b.defaulter.MustSet(&r.Route)
-	stripPath, err := getStripPathBasedOnProtocols(initialStripPath, r.Route)
+	stripPath, err := getStripPathBasedOnProtocols(r.Route)
 	if err != nil {
 		return err
 	}
 	r.Route.StripPath = stripPath
+	b.defaulter.MustSet(&r.Route)
 
 	b.rawState.Routes = append(b.rawState.Routes, &r.Route)
 	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
