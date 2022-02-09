@@ -46,29 +46,30 @@
   [#573](https://github.com/Kong/deck/pull/573)
 - decK now populates plugins defaults from their schema leveraging the Admin API.
   [#562](https://github.com/Kong/deck/pull/562)
-- decK prevents users to interact with any internal-only Konnect plugins.
+- decK prevents user interaction with any internal-only Konnect plugins.
   [#564](https://github.com/Kong/deck/pull/564)
 - decK now supports mTLS Kong Admin API authentication via
   `--tls-client-cert`/`--tls-client-cert-file` and
   `--tls-client-key`/`--tls-client-key-file` flags.
   [#509](https://github.com/Kong/deck/pull/509)
-- decK `validate` now has a `--online` flag enabling entities validation against
+- decK `validate` now has an `--online` flag enabling entity validation against
   the Admin API. This lets users validate their configuration before deploying it.
   [#502](https://github.com/Kong/deck/pull/502)
 
 ### Fixes
 
-- decK now can set zero values in entity fields.
+- decK now can set zero values (`false`, `""`, `0`) in entity fields.
   [#580](https://github.com/Kong/deck/pull/580)
-- fix unexpected behaviour when running `sync` against multiple workspaces at once.
+- Attempting to run `sync` on multiple workspaces now returns an error
+  rather than applying a single workspace to all entities.
   [#576](https://github.com/Kong/deck/pull/576)
-- skip `consumers` when using `--skip-consumers` with the `sync` command.
+- Skip `consumers` when using `--skip-consumers` with the `sync` command.
   [#559](https://github.com/Kong/deck/pull/559)
-- analytics flag now works with the `konnect ping` command.
+- The `--analytics` flag now works with the `konnect ping` command.
   [#569](https://github.com/Kong/deck/pull/569)
-- fix unexpected error with `--select-tag` and multiple files.
+- Duplicate `select_tags` in separate files and `--select-tags` no longer cause errors.
   [#571](https://github.com/Kong/deck/pull/571)
-- enable `--header` flag for Konnect commands
+- The `--header` flag is now enabled for Konnect commands.
   [#557](https://github.com/Kong/deck/pull/557)
 
 
