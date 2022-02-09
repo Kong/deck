@@ -31,161 +31,100 @@ var syncCmd = func() *cobra.Command {
 
 var (
 	// missing Enable
-	svc1 = &kong.Service{
-		Name:           kong.String("svc1"),
-		ConnectTimeout: kong.Int(60000),
-		Host:           kong.String("mockbin.org"),
-		Port:           kong.Int(80),
-		Protocol:       kong.String("http"),
-		ReadTimeout:    kong.Int(60000),
-		Retries:        kong.Int(5),
-		WriteTimeout:   kong.Int(60000),
-		Tags:           nil,
-	}
-	svc2 = &kong.Service{
-		Name:           kong.String("svc2"),
-		ConnectTimeout: kong.Int(60000),
-		Host:           kong.String("mockbin-v2.org"),
-		Port:           kong.Int(8080),
-		Protocol:       kong.String("https"),
-		ReadTimeout:    kong.Int(60000),
-		Retries:        kong.Int(5),
-		WriteTimeout:   kong.Int(60000),
-		Tags:           nil,
+	svc1 = []*kong.Service{
+		{
+			Name:           kong.String("svc1"),
+			ConnectTimeout: kong.Int(60000),
+			Host:           kong.String("mockbin.org"),
+			Port:           kong.Int(80),
+			Protocol:       kong.String("http"),
+			ReadTimeout:    kong.Int(60000),
+			Retries:        kong.Int(5),
+			WriteTimeout:   kong.Int(60000),
+			Tags:           nil,
+		},
 	}
 
 	// latest
-	svc1_207 = &kong.Service{
-		Name:           kong.String("svc1"),
-		ConnectTimeout: kong.Int(60000),
-		Host:           kong.String("mockbin.org"),
-		Port:           kong.Int(80),
-		Protocol:       kong.String("http"),
-		ReadTimeout:    kong.Int(60000),
-		Retries:        kong.Int(5),
-		WriteTimeout:   kong.Int(60000),
-		Enabled:        kong.Bool(true),
-		Tags:           nil,
-	}
-	svc2_207 = &kong.Service{
-		Name:           kong.String("svc2"),
-		ConnectTimeout: kong.Int(60000),
-		Host:           kong.String("mockbin-v2.org"),
-		Port:           kong.Int(8080),
-		Protocol:       kong.String("https"),
-		ReadTimeout:    kong.Int(60000),
-		Retries:        kong.Int(5),
-		WriteTimeout:   kong.Int(60000),
-		Enabled:        kong.Bool(true),
-		Tags:           nil,
+	svc1_207 = []*kong.Service{
+		{
+			Name:           kong.String("svc1"),
+			ConnectTimeout: kong.Int(60000),
+			Host:           kong.String("mockbin.org"),
+			Port:           kong.Int(80),
+			Protocol:       kong.String("http"),
+			ReadTimeout:    kong.Int(60000),
+			Retries:        kong.Int(5),
+			WriteTimeout:   kong.Int(60000),
+			Enabled:        kong.Bool(true),
+			Tags:           nil,
+		},
 	}
 
 	// missing RequestBuffering, ResponseBuffering, Service, PathHandling
-	route1_143 = &kong.Route{
-		Name:                    kong.String("r1"),
-		Paths:                   []*string{kong.String("/r1")},
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-	}
-	route2_143 = &kong.Route{
-		Name:                    kong.String("r2"),
-		Paths:                   []*string{kong.String("/r2")},
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
+	route1_143 = []*kong.Route{
+		{
+			Name:                    kong.String("r1"),
+			Paths:                   []*string{kong.String("/r1")},
+			PreserveHost:            kong.Bool(false),
+			Protocols:               []*string{kong.String("http"), kong.String("https")},
+			RegexPriority:           kong.Int(0),
+			StripPath:               kong.Bool(false),
+			HTTPSRedirectStatusCode: kong.Int(301),
+		},
 	}
 
 	// missing RequestBuffering, ResponseBuffering
 	// PathHandling set to v1
-	route1_151 = &kong.Route{
-		Name:                    kong.String("r1"),
-		Paths:                   []*string{kong.String("/r1")},
-		PathHandling:            kong.String("v1"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		Service: &kong.Service{
-			ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
-		},
-	}
-	route2_151 = &kong.Route{
-		Name:                    kong.String("r2"),
-		Paths:                   []*string{kong.String("/r2")},
-		PathHandling:            kong.String("v1"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		Service: &kong.Service{
-			ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+	route1_151 = []*kong.Route{
+		{
+			Name:                    kong.String("r1"),
+			Paths:                   []*string{kong.String("/r1")},
+			PathHandling:            kong.String("v1"),
+			PreserveHost:            kong.Bool(false),
+			Protocols:               []*string{kong.String("http"), kong.String("https")},
+			RegexPriority:           kong.Int(0),
+			StripPath:               kong.Bool(false),
+			HTTPSRedirectStatusCode: kong.Int(301),
+			Service: &kong.Service{
+				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+			},
 		},
 	}
 
 	// missing RequestBuffering, ResponseBuffering
-	route1_205_214 = &kong.Route{
-		Name:                    kong.String("r1"),
-		Paths:                   []*string{kong.String("/r1")},
-		PathHandling:            kong.String("v0"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		Service: &kong.Service{
-			ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
-		},
-	}
-	route2_205_214 = &kong.Route{
-		Name:                    kong.String("r2"),
-		Paths:                   []*string{kong.String("/r2")},
-		PathHandling:            kong.String("v0"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		Service: &kong.Service{
-			ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+	route1_205_214 = []*kong.Route{
+		{
+			Name:                    kong.String("r1"),
+			Paths:                   []*string{kong.String("/r1")},
+			PathHandling:            kong.String("v0"),
+			PreserveHost:            kong.Bool(false),
+			Protocols:               []*string{kong.String("http"), kong.String("https")},
+			RegexPriority:           kong.Int(0),
+			StripPath:               kong.Bool(false),
+			HTTPSRedirectStatusCode: kong.Int(301),
+			Service: &kong.Service{
+				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+			},
 		},
 	}
 
 	// latest
-	route1_20x = &kong.Route{
-		Name:                    kong.String("r1"),
-		Paths:                   []*string{kong.String("/r1")},
-		PathHandling:            kong.String("v0"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		RequestBuffering:        kong.Bool(true),
-		ResponseBuffering:       kong.Bool(true),
-		Service: &kong.Service{
-			ID: kong.String("8076db2-28b6-423b-ba39-a797193017f7"),
-		},
-	}
-	route2_20x = &kong.Route{
-		Name:                    kong.String("r2"),
-		Paths:                   []*string{kong.String("/r2")},
-		PathHandling:            kong.String("v0"),
-		PreserveHost:            kong.Bool(false),
-		Protocols:               []*string{kong.String("http"), kong.String("https")},
-		RegexPriority:           kong.Int(0),
-		StripPath:               kong.Bool(false),
-		HTTPSRedirectStatusCode: kong.Int(301),
-		RequestBuffering:        kong.Bool(true),
-		ResponseBuffering:       kong.Bool(true),
-		Service: &kong.Service{
-			ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+	route1_20x = []*kong.Route{
+		{
+			Name:                    kong.String("r1"),
+			Paths:                   []*string{kong.String("/r1")},
+			PathHandling:            kong.String("v0"),
+			PreserveHost:            kong.Bool(false),
+			Protocols:               []*string{kong.String("http"), kong.String("https")},
+			RegexPriority:           kong.Int(0),
+			StripPath:               kong.Bool(false),
+			HTTPSRedirectStatusCode: kong.Int(301),
+			RequestBuffering:        kong.Bool(true),
+			ResponseBuffering:       kong.Bool(true),
+			Service: &kong.Service{
+				ID: kong.String("8076db2-28b6-423b-ba39-a797193017f7"),
+			},
 		},
 	}
 )
@@ -221,6 +160,31 @@ func sortSlices(x, y interface{}) bool {
 		yName = *yEntity.Name
 	}
 	return xName < yName
+}
+
+// runWhenKong skips the current test if the version of Kong doesn't
+// fall in the semverRange.
+// This helper function can be used in tests to write version specific
+// tests for Kong.
+func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
+	// get kong version
+	ctx := context.Background()
+	info, err := client.Root(ctx)
+	if err != nil {
+		t.Error(err)
+	}
+	kongVersion := kong.VersionFromInfo(info)
+	currentVersion, err := kong.ParseSemanticVersion(kongVersion)
+	if err != nil {
+		t.Error(err)
+	}
+	r, err := semver.ParseRange(semverRange)
+	if err != nil {
+		t.Error(err)
+	}
+	if !r(currentVersion) {
+		t.Skip()
+	}
 }
 
 func testKongState(t *testing.T, client *kong.Client,
@@ -296,15 +260,15 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 			name:     "creates a service",
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1},
+				Services: svc1,
 			},
 		},
 		{
 			name:     "create services and routes",
 			kongFile: "testdata/sync/002-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1, svc2},
-				Routes:   []*kong.Route{route1_143, route2_143},
+				Services: svc1,
+				Routes:   route1_143,
 			},
 		},
 	}
@@ -336,15 +300,15 @@ func Test_Sync_ServicesRoutes_1_5_1(t *testing.T) {
 			name:     "creates a service",
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1},
+				Services: svc1,
 			},
 		},
 		{
 			name:     "create services and routes",
 			kongFile: "testdata/sync/002-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1, svc2},
-				Routes:   []*kong.Route{route1_151, route2_151},
+				Services: svc1,
+				Routes:   route1_151,
 			},
 		},
 	}
@@ -376,15 +340,15 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 			name:     "creates a service",
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1},
+				Services: svc1,
 			},
 		},
 		{
 			name:     "create services and routes",
 			kongFile: "testdata/sync/002-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1, svc2},
-				Routes:   []*kong.Route{route1_205_214, route2_205_214},
+				Services: svc1,
+				Routes:   route1_205_214,
 			},
 		},
 	}
@@ -417,15 +381,15 @@ func Test_Sync_ServicesRoutes_From_2_2_2_to_2_6_0(t *testing.T) {
 			name:     "creates a service",
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1},
+				Services: svc1,
 			},
 		},
 		{
 			name:     "create services and routes",
 			kongFile: "testdata/sync/002-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1, svc2},
-				Routes:   []*kong.Route{route1_20x, route2_20x},
+				Services: svc1,
+				Routes:   route1_20x,
 			},
 		},
 	}
@@ -458,15 +422,15 @@ func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
 			name:     "creates a service",
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1_207},
+				Services: svc1_207,
 			},
 		},
 		{
 			name:     "create services and routes",
 			kongFile: "testdata/sync/002-create-services-and-routes/kong.yaml",
 			expectedState: utils.KongRawState{
-				Services: []*kong.Service{svc1_207, svc2_207},
-				Routes:   []*kong.Route{route1_20x, route2_20x},
+				Services: svc1_207,
+				Routes:   route1_20x,
 			},
 		},
 	}
@@ -479,31 +443,6 @@ func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
 			sync(tc.kongFile)
 			testKongState(t, client, tc.expectedState, nil)
 		})
-	}
-}
-
-// runWhenKong skips the current test if the version of Kong doesn't
-// fall in the semverRange.
-// This helper function can be used in tests to write version specific
-// tests for Kong.
-func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
-	// get kong version
-	ctx := context.Background()
-	info, err := client.Root(ctx)
-	if err != nil {
-		t.Error(err)
-	}
-	kongVersion := kong.VersionFromInfo(info)
-	currentVersion, err := kong.ParseSemanticVersion(kongVersion)
-	if err != nil {
-		t.Error(err)
-	}
-	r, err := semver.ParseRange(semverRange)
-	if err != nil {
-		t.Error(err)
-	}
-	if !r(currentVersion) {
-		t.Skip()
 	}
 }
 

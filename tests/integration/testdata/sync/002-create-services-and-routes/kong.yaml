@@ -13,16 +13,3 @@ services:
     https_redirect_status_code: 301
     paths:
     - /r1
-- connect_timeout: 60000
-  id: 6d4e90fa-cb78-4607-8c4f-f12245ba8b59
-  host: mockbin-v2.org
-  name: svc2
-  port: 8080
-  protocol: https
-  read_timeout: 60000
-  retries: 5
-  routes:
-  - name: r2
-    https_redirect_status_code: 301
-    paths:
-    - /r2
