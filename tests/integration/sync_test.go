@@ -127,6 +127,75 @@ var (
 			},
 		},
 	}
+
+	upstream = []*kong.Upstream{
+		{
+			Name:      kong.String("upstream1"),
+			Algorithm: kong.String("round-robin"),
+			Slots:     kong.Int(10000),
+			Healthchecks: &kong.Healthcheck{
+				Active: &kong.ActiveHealthcheck{
+					Concurrency: kong.Int(10),
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{200, 302},
+						Interval:     kong.Int(0),
+						Successes:    kong.Int(0),
+					},
+					HTTPPath:               kong.String("/"),
+					Type:                   kong.String("http"),
+					Timeout:                kong.Int(1),
+					HTTPSVerifyCertificate: kong.Bool(true),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						Interval:     kong.Int(0),
+						HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+					},
+				},
+				Passive: &kong.PassiveHealthcheck{
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{
+							200, 201, 202, 203, 204, 205,
+							206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+							306, 307, 308,
+						},
+						Successes: kong.Int(0),
+					},
+					Type: kong.String("http"),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						HTTPStatuses: []int{429, 500, 503},
+					},
+				},
+			},
+			HashOn:           kong.String("none"),
+			HashFallback:     kong.String("none"),
+			HashOnCookiePath: kong.String("/"),
+		},
+	}
+
+	target = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight: kong.Int(100),
+		},
+	}
+
+	targetZeroWeight = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight: kong.Int(0),
+		},
+	}
 )
 
 func getKongAddress() string {
@@ -162,10 +231,6 @@ func sortSlices(x, y interface{}) bool {
 	return xName < yName
 }
 
-// runWhenKong skips the current test if the version of Kong doesn't
-// fall in the semverRange.
-// This helper function can be used in tests to write version specific
-// tests for Kong.
 func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
 	// get kong version
 	ctx := context.Background()
@@ -274,7 +339,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "==1.4.3")
+			runWhenKong(t, client, "<=1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -284,7 +349,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	}
 }
 
-func Test_Sync_ServicesRoutes_1_5_1(t *testing.T) {
+func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -314,7 +379,7 @@ func Test_Sync_ServicesRoutes_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "==1.5.1")
+			runWhenKong(t, client, ">1.4.3 <=1.5.1")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -354,8 +419,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.0.5")
-			runWhenKong(t, client, "<=2.1.4")
+			runWhenKong(t, client, ">=2.0.5 <=2.1.4")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -365,7 +429,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 }
 
-func Test_Sync_ServicesRoutes_From_2_2_2_to_2_6_0(t *testing.T) {
+func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -395,8 +459,7 @@ func Test_Sync_ServicesRoutes_From_2_2_2_to_2_6_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.2.2")
-			runWhenKong(t, client, "<=2.6.0")
+			runWhenKong(t, client, ">2.2.1 <=2.6.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -436,7 +499,7 @@ func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "==2.7.0")
+			runWhenKong(t, client, ">2.6.9")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -446,134 +509,199 @@ func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
 	}
 }
 
-// func Test_Sync_Plugins(t *testing.T) {
-// 	// setup stage
-// 	client, err := getTestClient()
-// 	if err != nil {
-// 		t.Errorf(err.Error())
-// 	}
+func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
-// 	tests := []struct {
-// 		name            string
-// 		kongFile        string
-// 		initialKongFile string
-// 		expectedState   utils.KongRawState
-// 	}{
-// 		{
-// 			name:     "create a plugin",
-// 			kongFile: "testdata/sync/004-create-a-plugin/kong.yaml",
-// 			expectedState: utils.KongRawState{
-// 				Plugins: []*kong.Plugin{
-// 					{
-// 						Name:      kong.String("basic-auth"),
-// 						Protocols: []*string{kong.String("http"), kong.String("https")},
-// 						Enabled:   kong.Bool(true),
-// 						Config: kong.Configuration{
-// 							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
-// 							"hide_credentials": false,
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
-// 	for _, tc := range tests {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			runWhenKong(t, client, ">=2.0.5")
-// 			teardown := setup(t)
-// 			defer teardown(t)
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:      kong.String("basic-auth"),
+						Protocols: []*string{kong.String("http"), kong.String("https")},
+						Enabled:   kong.Bool(true),
+						Config: kong.Configuration{
+							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+							"hide_credentials": false,
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, "<1.5.1 !1.4.3")
+			teardown := setup(t)
+			defer teardown(t)
 
-// 			sync( tc.kongFile)
-// 			testKongState(t, client, tc.expectedState)
-// 		})
-// 	}
-// }
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
 
-// func Test_Sync_Upstreams(t *testing.T) {
-// 	// setup stage
-// 	client, err := getTestClient()
-// 	if err != nil {
-// 		t.Errorf(err.Error())
-// 	}
+func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
-// 	tests := []struct {
-// 		name          string
-// 		kongFile      string
-// 		expectedState utils.KongRawState
-// 	}{
-// 		{
-// 			name:     "creates an upstream and target",
-// 			kongFile: "testdata/sync/005-create-upstream-and-target/kong.yaml",
-// 			expectedState: utils.KongRawState{
-// 				Upstreams: []*kong.Upstream{
-// 					{
-// 						Name:      kong.String("upstream1"),
-// 						Algorithm: kong.String("round-robin"),
-// 						Slots:     kong.Int(10000),
-// 						Healthchecks: &kong.Healthcheck{
-// 							Active: &kong.ActiveHealthcheck{
-// 								Concurrency: kong.Int(10),
-// 								Healthy: &kong.Healthy{
-// 									HTTPStatuses: []int{200, 302},
-// 									Interval:     kong.Int(0),
-// 									Successes:    kong.Int(0),
-// 								},
-// 								HTTPPath:               kong.String("/"),
-// 								Type:                   kong.String("http"),
-// 								Timeout:                kong.Int(1),
-// 								HTTPSVerifyCertificate: kong.Bool(true),
-// 								Unhealthy: &kong.Unhealthy{
-// 									HTTPFailures: kong.Int(0),
-// 									TCPFailures:  kong.Int(0),
-// 									Timeouts:     kong.Int(0),
-// 									Interval:     kong.Int(0),
-// 									HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
-// 								},
-// 							},
-// 							Passive: &kong.PassiveHealthcheck{
-// 								Healthy: &kong.Healthy{
-// 									HTTPStatuses: []int{
-// 										200, 201, 202, 203, 204, 205,
-// 										206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
-// 										306, 307, 308,
-// 									},
-// 									Successes: kong.Int(0),
-// 								},
-// 								Type: kong.String("http"),
-// 								Unhealthy: &kong.Unhealthy{
-// 									HTTPFailures: kong.Int(0),
-// 									TCPFailures:  kong.Int(0),
-// 									Timeouts:     kong.Int(0),
-// 									HTTPStatuses: []int{429, 500, 503},
-// 								},
-// 							},
-// 						},
-// 						HashOn:           kong.String("none"),
-// 						HashFallback:     kong.String("none"),
-// 						HashOnCookiePath: kong.String("/"),
-// 					},
-// 				},
-// 				Targets: []*kong.Target{
-// 					{
-// 						Target: kong.String("198.51.100.11:80"),
-// 						Upstream: &kong.Upstream{
-// 							ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
-// 						},
-// 						Weight: kong.Int(0),
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:      kong.String("basic-auth"),
+						Protocols: []*string{kong.String("http"), kong.String("https")},
+						Enabled:   kong.Bool(true),
+						Config: kong.Configuration{
+							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+							"hide_credentials": false,
+						},
+						RunOn: kong.String("first"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, "==1.5.1")
+			teardown := setup(t)
+			defer teardown(t)
 
-// 	for _, tc := range tests {
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			runWhenKong(t, client, ">=2.4.1")
-// 			teardown := setup(t)
-// 			defer teardown(t)
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
 
-// 			sync( tc.kongFile)
-// 			testKongState(t, client, tc.expectedState)
-// 		})
-// 	}
-// }
+func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:      kong.String("basic-auth"),
+						Protocols: []*string{kong.String("http"), kong.String("https")},
+						Enabled:   kong.Bool(true),
+						Config: kong.Configuration{
+							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+							"hide_credentials": false,
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, ">=2.0.5")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_Upstream_Target(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   target,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target with weight equals to zero",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetZeroWeight,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, ">=2.4.1")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}

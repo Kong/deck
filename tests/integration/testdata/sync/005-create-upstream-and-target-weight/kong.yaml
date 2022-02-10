@@ -3,3 +3,4 @@ upstreams:
   algorithm: round-robin
   targets:
   - target: 198.51.100.11:80
+    weight: 0
