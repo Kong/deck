@@ -134,6 +134,7 @@ var (
 			Algorithm: kong.String("round-robin"),
 			Slots:     kong.Int(10000),
 			Healthchecks: &kong.Healthcheck{
+				Threshold: kong.Float64(0),
 				Active: &kong.ActiveHealthcheck{
 					Concurrency: kong.Int(10),
 					Healthy: &kong.Healthy{
@@ -266,7 +267,6 @@ func testKongState(t *testing.T, client *kong.Client,
 		cmpopts.IgnoreFields(kong.Route{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Upstream{}, "ID", "CreatedAt"),
-		cmpopts.IgnoreFields(kong.Healthcheck{}, "Threshold"),
 		cmpopts.IgnoreFields(kong.Target{}, "ID", "CreatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.EquateEmpty(),
@@ -639,7 +639,46 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 	}
 }
 
-func Test_Sync_Upstream_Target(t *testing.T) {
+func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// ignore entities fields based on Kong version
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Healthcheck{}, "Threshold"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   target,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, "<=1.5.2")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, ignoreFields)
+		})
+	}
+}
+
+func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -663,6 +702,7 @@ func Test_Sync_Upstream_Target(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			runWhenKong(t, client, ">=2.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
