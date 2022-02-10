@@ -304,6 +304,8 @@ func sync(kongFile string) {
 	deckCmd.Execute()
 }
 
+// test scope:
+//   - 1.4.3
 func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -349,6 +351,9 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 1.5.1
+//   - 1.5.0.11+enterprise
 func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -389,6 +394,9 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 2.0.5
+//   - 2.1.4
 func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -429,6 +437,16 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 2.2.2
+//   - 2.3.3
+//   - 2.4.1
+//   - 2.5.1
+//   - 2.6.0
+//   - 2.2.1.3+enterprise
+//   - 2.3.3.4+enterprise
+//   - 2.4.1.3+enterprise
+//   - 2.5.1.2+enterprise
 func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -469,7 +487,11 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	}
 }
 
-func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
+// test scope:
+//   - 2.7.0
+//   - 2.6.0.2+enterprise
+//   - 2.7.0.0+enterprise
+func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -509,6 +531,8 @@ func Test_Sync_ServicesRoutes_2_7_0(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 1.5.0.11+enterprise
 func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -552,6 +576,8 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 1.5.1
 func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -596,6 +622,22 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 2.0.5
+//   - 2.1.4
+//   - 2.2.2
+//   - 2.3.3
+//   - 2.4.1
+//   - 2.5.1
+//   - 2.6.0
+//   - 2.7.0
+//   - 2.1.4.6+enterprise
+//   - 2.2.1.3+enterprise
+//   - 2.3.3.4+enterprise
+//   - 2.4.1.3+enterprise
+//   - 2.5.1.2+enterprise
+//   - 2.6.0.2+enterprise
+//   - 2.7.0.0+enterprise
 func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -639,6 +681,10 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 1.4.3
+//   - 1.5.1
+//   - 1.5.0.11+enterprise
 func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -678,6 +724,22 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 2.0.5
+//   - 2.1.4
+//   - 2.2.2
+//   - 2.3.3
+//   - 2.4.1
+//   - 2.5.1
+//   - 2.6.0
+//   - 2.7.0
+//   - 2.1.4.6+enterprise
+//   - 2.2.1.3+enterprise
+//   - 2.3.3.4+enterprise
+//   - 2.4.1.3+enterprise
+//   - 2.5.1.2+enterprise
+//   - 2.6.0.2+enterprise
+//   - 2.7.0.0+enterprise
 func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -712,6 +774,15 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - 2.4.1
+//   - 2.5.1
+//   - 2.6.0
+//   - 2.7.0
+//   - 2.4.1.3+enterprise
+//   - 2.5.1.2+enterprise
+//   - 2.6.0.2+enterprise
+//   - 2.7.0.0+enterprise
 func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
