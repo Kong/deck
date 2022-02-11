@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"sync"
 
 	"github.com/kong/deck/state"
@@ -52,16 +53,26 @@ func (v ErrorsWrapper) Error() string {
 	return errStr
 }
 
+func getEntityNameOrID(entity interface{}) string {
+	value := reflect.ValueOf(entity).Elem()
+	nameOrID := value.FieldByName("Name")
+	if !nameOrID.IsValid() {
+		nameOrID = value.FieldByName("ID")
+	}
+	return nameOrID.Elem().String()
+}
+
 func (v *Validator) validateEntity(entityType string, entity interface{}) (bool, error) {
-	errWrap := "validate entity '%s': %s"
+	nameOrID := getEntityNameOrID(entity)
+	errWrap := "validate entity '%s (%s)': %s"
 	endpoint := fmt.Sprintf("/schemas/%s/validate", entityType)
 	req, err := v.client.NewRequest(http.MethodPost, endpoint, nil, entity)
 	if err != nil {
-		return false, fmt.Errorf(errWrap, entityType, err)
+		return false, fmt.Errorf(errWrap, entityType, nameOrID, err)
 	}
 	resp, err := v.client.Do(v.ctx, req, nil)
 	if err != nil {
-		return false, fmt.Errorf(errWrap, entityType, err)
+		return false, fmt.Errorf(errWrap, entityType, nameOrID, err)
 	}
 	return resp.StatusCode == http.StatusOK, nil
 }
