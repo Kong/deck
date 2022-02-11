@@ -641,33 +641,35 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	return nil
 }
 
-func setPluginSharedConfig(fp *FPlugin, sharedPlugins map[string]utils.SharedPlugin,
-	consumerID, serviceID, routeID string) {
+func getSharedPlugin(sharedPlugins map[string]utils.SharedPlugin,
+	consumerID, serviceID, routeID string) string {
 	for name, content := range sharedPlugins {
 		for _, consumer := range content.Consumers {
-			if consumer != consumerID {
-				continue
+			if consumer == consumerID {
+				return name
 			}
-			fp.Plugin.Config = nil
-			fp.ConfigSource = kong.String(name)
-			break
 		}
 		for _, service := range content.Services {
-			if service != serviceID {
-				continue
+			if service == serviceID {
+				return name
 			}
-			fp.Plugin.Config = nil
-			fp.ConfigSource = kong.String(name)
-			break
 		}
 		for _, route := range content.Routes {
-			if route != routeID {
-				continue
+			if route == routeID {
+				return name
 			}
-			fp.Plugin.Config = nil
-			fp.ConfigSource = kong.String(name)
-			break
 		}
+	}
+	return ""
+}
+
+func setPluginSharedConfig(fp *FPlugin, sharedPlugins map[string]utils.SharedPlugin,
+	consumerID, serviceID, routeID string) {
+	if sharedPlugin := getSharedPlugin(
+		sharedPlugins, consumerID, serviceID, routeID,
+	); sharedPlugin != "" {
+		fp.Plugin.Config = nil
+		fp.ConfigSource = kong.String(sharedPlugin)
 	}
 }
 

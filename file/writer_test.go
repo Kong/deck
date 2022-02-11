@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/kong/deck/state"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
@@ -340,4 +341,72 @@ services:
   ]
 }`
 	assert.Equal(expected, output)
+}
+
+func Test_getSharedPlugin(t *testing.T) {
+	sharedPlugins := map[string]utils.SharedPlugin{
+		"prometheus-0": {
+			Config: kong.Configuration{
+				"per_consumer": false,
+			},
+			Consumers: []string{"consumer1", "consumer2"},
+			Services:  []string{"service1"},
+		},
+		"rate-limiting-0": {
+			Config: kong.Configuration{
+				"key": "value",
+			},
+			Routes: []string{"route1", "route2", "route3"},
+		},
+	}
+	tests := []struct {
+		name       string
+		consumerID string
+		serviceID  string
+		routeID    string
+		expected   string
+	}{
+		{
+			consumerID: "consumer1",
+			expected:   "prometheus-0",
+		},
+		{
+			consumerID: "consumer2",
+			expected:   "prometheus-0",
+		},
+		{
+			serviceID: "service1",
+			expected:  "prometheus-0",
+		},
+		{
+			routeID:  "route1",
+			expected: "rate-limiting-0",
+		},
+		{
+			routeID:  "route2",
+			expected: "rate-limiting-0",
+		},
+		{
+			routeID:  "route3",
+			expected: "rate-limiting-0",
+		},
+		{
+			routeID:  "not-existing",
+			expected: "",
+		},
+		{
+			serviceID: "not-existing",
+			expected:  "",
+		},
+		{
+			consumerID: "not-existing",
+			expected:   "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := getSharedPlugin(sharedPlugins, tt.consumerID, tt.serviceID, tt.routeID)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
 }
