@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/go-memdb v1.3.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.25.2-0.20220123181121-e965de22d701
+	github.com/kong/go-kong v0.27.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.12
@@ -31,7 +31,7 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	k8s.io/code-generator v0.23.1
+	k8s.io/code-generator v0.23.3
 )
 
 require (
@@ -68,7 +68,7 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/tidwall/gjson v1.13.0 // indirect
+	github.com/tidwall/gjson v1.14.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect

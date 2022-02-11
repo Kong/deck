@@ -27,6 +27,8 @@ type stateBuilder struct {
 
 	schemasCache map[string]map[string]interface{}
 
+	disableDynamicDefaults bool
+
 	err error
 }
 
@@ -51,15 +53,11 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 
-	// defaulter
-	var kongDefaults KongDefaults
-	if b.targetContent.Info != nil {
-		kongDefaults = b.targetContent.Info.Defaults
-	}
-	b.defaulter, err = defaulter(kongDefaults)
+	defaulter, err := defaulter(b.ctx, b.client, b.targetContent, b.disableDynamicDefaults)
 	if err != nil {
-		return nil, nil, fmt.Errorf("creating defaulter: %w", err)
+		return nil, nil, err
 	}
+	b.defaulter = defaulter
 
 	// build
 	b.certificates()
@@ -748,6 +746,24 @@ func (b *stateBuilder) plugins() {
 	}
 }
 
+// strip_path schema default value is 'true', but it cannot be set when
+// protocols include 'grpc' and/or 'grpcs'. When users explicitly set
+// strip_path to 'true' with grpc/s protocols, deck returns a schema violation error.
+// When strip_path is not set and protocols include grpc/s, deck sets strip_path to 'false',
+// despite its default value would be 'true' under normal circumstances.
+func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
+	for _, p := range route.Protocols {
+		if *p == "grpc" || *p == "grpcs" {
+			if route.StripPath != nil && *route.StripPath {
+				return nil, fmt.Errorf("schema violation (strip_path: cannot set " +
+					"'strip_path' when 'protocols' is 'grpc' or 'grpcs')")
+			}
+			return kong.Bool(false), nil
+		}
+	}
+	return route.StripPath, nil
+}
+
 func (b *stateBuilder) ingestRoute(r FRoute) error {
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
@@ -761,10 +777,16 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 
 	utils.MustMergeTags(&r, b.selectTags)
+
+	stripPath, err := getStripPathBasedOnProtocols(r.Route)
+	if err != nil {
+		return err
+	}
+	r.Route.StripPath = stripPath
 	b.defaulter.MustSet(&r.Route)
 
 	b.rawState.Routes = append(b.rawState.Routes, &r.Route)
-	err := b.intermediate.Routes.Add(state.Route{Route: r.Route})
+	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
 	if err != nil {
 		return err
 	}
@@ -868,30 +890,21 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 	return
 }
 
-func defaulter(defaults KongDefaults) (*utils.Defaulter, error) {
-	d, err := utils.GetKongDefaulter()
+func defaulter(
+	ctx context.Context, client *kong.Client, fileContent *Content, disableDynamicDefaults bool,
+) (*utils.Defaulter, error) {
+	var kongDefaults KongDefaults
+	if fileContent.Info != nil {
+		kongDefaults = fileContent.Info.Defaults
+	}
+	opts := utils.DefaulterOpts{
+		Client:                 client,
+		KongDefaults:           kongDefaults,
+		DisableDynamicDefaults: disableDynamicDefaults,
+	}
+	defaulter, err := utils.GetDefaulter(ctx, opts)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("creating defaulter: %w", err)
 	}
-	if defaults.Route != nil {
-		if err = d.Register(defaults.Route); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Service != nil {
-		if err = d.Register(defaults.Service); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Upstream != nil {
-		if err = d.Register(defaults.Upstream); err != nil {
-			return nil, err
-		}
-	}
-	if defaults.Target != nil {
-		if err = d.Register(defaults.Target); err != nil {
-			return nil, err
-		}
-	}
-	return d, nil
+	return defaulter, nil
 }

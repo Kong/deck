@@ -1,39 +1,72 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 
 	"github.com/imdario/mergo"
+	"github.com/kong/go-kong/kong"
 )
 
 // Defaulter registers types and fills in struct fields with
 // default values.
 type Defaulter struct {
 	r map[string]interface{}
+
+	ctx    context.Context
+	client *kong.Client
+
+	service  *kong.Service
+	route    *kong.Route
+	upstream *kong.Upstream
+	target   *kong.Target
 }
 
-// GetKongDefaulter returns a defaulter which can set default values
-// for Kong entities.
-func GetKongDefaulter() (*Defaulter, error) {
-	var d Defaulter
-	err := d.Register(&serviceDefaults)
+type DefaulterOpts struct {
+	KongDefaults           interface{}
+	DisableDynamicDefaults bool
+	Client                 *kong.Client
+}
+
+// NewDefaulter initializes a Defaulter with empty entities.
+func NewDefaulter() *Defaulter {
+	return &Defaulter{
+		service:  &kong.Service{},
+		route:    &kong.Route{},
+		upstream: &kong.Upstream{},
+		target:   &kong.Target{},
+	}
+}
+
+func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
+	d := NewDefaulter()
+	if err := d.populateDefaultsFromInput(opts.KongDefaults); err != nil {
+		return nil, err
+	}
+	if opts.DisableDynamicDefaults {
+		if err := d.populateStaticDefaultsForKonnect(); err != nil {
+			return nil, err
+		}
+	}
+
+	err := d.Register(d.service)
 	if err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
-	err = d.Register(&routeDefaults)
+	err = d.Register(d.route)
 	if err != nil {
 		return nil, fmt.Errorf("registering route with defaulter: %w", err)
 	}
-	err = d.Register(&upstreamDefaults)
+	err = d.Register(d.upstream)
 	if err != nil {
 		return nil, fmt.Errorf("registering upstream with defaulter: %w", err)
 	}
-	err = d.Register(&targetDefaults)
+	err = d.Register(d.target)
 	if err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
 	}
-	return &d, nil
+	return d, nil
 }
 
 func (d *Defaulter) once() {
@@ -125,4 +158,142 @@ func (d *Defaulter) MustSet(arg interface{}) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (d *Defaulter) getEntitySchema(entityType string) (map[string]interface{}, error) {
+	var schema map[string]interface{}
+	schema, err := d.client.Schemas.Get(d.ctx, entityType)
+	if err != nil {
+		return schema, err
+	}
+	return schema, nil
+}
+
+func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) error {
+	schema, err := d.getEntitySchema(entityType)
+	if err != nil {
+		return fmt.Errorf("retrieve schema for %v from Kong: %v", entityType, err)
+	}
+	return kong.FillEntityDefaults(entity, schema)
+}
+
+func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
+	// fills defaults from input
+	d, err := getKongDefaulter(opts)
+	if err != nil {
+		return nil, err
+	}
+	d.ctx = ctx
+	d.client = opts.Client
+
+	// fills defaults from Kong API
+	if err := d.addEntityDefaults("services", d.service); err != nil {
+		return nil, fmt.Errorf("get defaults for services: %v", err)
+	}
+	if err := d.Register(d.service); err != nil {
+		return nil, fmt.Errorf("registering service with defaulter: %w", err)
+	}
+
+	if err := d.addEntityDefaults("routes", d.route); err != nil {
+		return nil, fmt.Errorf("get defaults for routes: %v", err)
+	}
+	if err := d.Register(d.route); err != nil {
+		return nil, fmt.Errorf("registering route with defaulter: %w", err)
+	}
+
+	if err := d.addEntityDefaults("upstreams", d.upstream); err != nil {
+		return nil, fmt.Errorf("get defaults for upstreams: %v", err)
+	}
+	if err := d.Register(d.upstream); err != nil {
+		return nil, fmt.Errorf("registering upstream with defaulter: %w", err)
+	}
+
+	if err := d.addEntityDefaults("targets", d.target); err != nil {
+		return nil, fmt.Errorf("get defaults for targets: %v", err)
+	}
+	if err := d.Register(d.target); err != nil {
+		return nil, fmt.Errorf("registering target with defaulter: %w", err)
+	}
+	return d, nil
+}
+
+// GetDefaulter returns a Defaulter object to be used to set defaults
+// on Kong entities. The order of precedence is as follow, from higher to lower:
+//
+// 1. values set in the state file
+// 2. values set in the {_info: defaults:} object in the state file
+// 3. schema defaults coming from Admin API (excluded Konnect)
+// 4. hardcoded defaults under utils/constants.go (Konnect-only)
+func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
+	if opts.Client != nil && !opts.DisableDynamicDefaults {
+		return getKongDefaulterWithClient(ctx, opts)
+	}
+	opts.DisableDynamicDefaults = true
+	return getKongDefaulter(opts)
+}
+
+func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
+	r := reflect.ValueOf(defaults)
+
+	service := reflect.Indirect(r).FieldByName("Service")
+	serviceObj := service.Interface().(*kong.Service)
+	if serviceObj != nil {
+		err := mergo.Merge(d.service, serviceObj, mergo.WithTransformers(kongTransformer{}))
+		if err != nil {
+			return fmt.Errorf("merging: %w", err)
+		}
+	}
+
+	route := reflect.Indirect(r).FieldByName("Route")
+	routeObj := route.Interface().(*kong.Route)
+	if routeObj != nil {
+		err := mergo.Merge(d.route, routeObj, mergo.WithTransformers(kongTransformer{}))
+		if err != nil {
+			return fmt.Errorf("merging: %w", err)
+		}
+	}
+
+	upstream := reflect.Indirect(r).FieldByName("Upstream")
+	upstreamObj := upstream.Interface().(*kong.Upstream)
+	if upstreamObj != nil {
+		err := mergo.Merge(d.upstream, upstreamObj, mergo.WithTransformers(kongTransformer{}))
+		if err != nil {
+			return fmt.Errorf("merging: %w", err)
+		}
+	}
+
+	target := reflect.Indirect(r).FieldByName("Target")
+	targetObj := target.Interface().(*kong.Target)
+	if targetObj != nil {
+		err := mergo.Merge(d.target, targetObj, mergo.WithTransformers(kongTransformer{}))
+		if err != nil {
+			return fmt.Errorf("merging: %w", err)
+		}
+	}
+	return nil
+}
+
+func (d *Defaulter) populateStaticDefaultsForKonnect() error {
+	if err := mergo.Merge(
+		d.service, &serviceDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging service static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.route, &routeDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging route static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.upstream, &upstreamDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging upstream static defaults: %w", err)
+	}
+	if err := mergo.Merge(
+		d.target, &targetDefaults, mergo.WithTransformers(kongTransformer{}),
+	); err != nil {
+		return fmt.Errorf("merging target static defaults: %w", err)
+	}
+
+	return nil
 }

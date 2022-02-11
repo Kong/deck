@@ -183,6 +183,9 @@
         "cert": {
           "type": "string"
         },
+        "cert_digest": {
+          "type": "string"
+        },
         "created_at": {
           "type": "integer"
         },
@@ -216,6 +219,9 @@
         "cert": {
           "type": "string"
         },
+        "cert_alt": {
+          "type": "string"
+        },
         "created_at": {
           "type": "integer"
         },
@@ -223,6 +229,9 @@
           "type": "string"
         },
         "key": {
+          "type": "string"
+        },
+        "key_alt": {
           "type": "string"
         },
         "snis": {
@@ -271,6 +280,9 @@
       ],
       "properties": {
         "cert": {
+          "type": "string"
+        },
+        "cert_digest": {
           "type": "string"
         },
         "created_at": {
@@ -689,6 +701,9 @@
         },
         "created_at": {
           "type": "integer"
+        },
+        "enabled": {
+          "type": "boolean"
         },
         "host": {
           "type": "string"
@@ -1363,6 +1378,9 @@
         },
         "created_at": {
           "type": "integer"
+        },
+        "enabled": {
+          "type": "boolean"
         },
         "host": {
           "type": "string"

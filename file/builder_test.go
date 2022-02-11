@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"encoding/hex"
 	"math/rand"
 	"os"
@@ -15,7 +16,81 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	defaultPort        = 80
+	defaultTimeout     = 60000
+	defaultSlots       = 10000
+	defaultWeight      = 100
+	defaultConcurrency = 10
+)
+
 var kong130Version = semver.MustParse("1.3.0")
+
+var kongDefaults = KongDefaults{
+	Service: &kong.Service{
+		Port:           kong.Int(defaultPort),
+		Protocol:       kong.String("http"),
+		ConnectTimeout: kong.Int(defaultTimeout),
+		WriteTimeout:   kong.Int(defaultTimeout),
+		ReadTimeout:    kong.Int(defaultTimeout),
+	},
+	Route: &kong.Route{
+		PreserveHost:  kong.Bool(false),
+		RegexPriority: kong.Int(0),
+		StripPath:     kong.Bool(false),
+		Protocols:     kong.StringSlice("http", "https"),
+	},
+	Upstream: &kong.Upstream{
+		Slots: kong.Int(defaultSlots),
+		Healthchecks: &kong.Healthcheck{
+			Active: &kong.ActiveHealthcheck{
+				Concurrency: kong.Int(defaultConcurrency),
+				Healthy: &kong.Healthy{
+					HTTPStatuses: []int{200, 302},
+					Interval:     kong.Int(0),
+					Successes:    kong.Int(0),
+				},
+				HTTPPath: kong.String("/"),
+				Type:     kong.String("http"),
+				Timeout:  kong.Int(1),
+				Unhealthy: &kong.Unhealthy{
+					HTTPFailures: kong.Int(0),
+					TCPFailures:  kong.Int(0),
+					Timeouts:     kong.Int(0),
+					Interval:     kong.Int(0),
+					HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+				},
+			},
+			Passive: &kong.PassiveHealthcheck{
+				Healthy: &kong.Healthy{
+					HTTPStatuses: []int{
+						200, 201, 202, 203, 204, 205,
+						206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+						306, 307, 308,
+					},
+					Successes: kong.Int(0),
+				},
+				Unhealthy: &kong.Unhealthy{
+					HTTPFailures: kong.Int(0),
+					TCPFailures:  kong.Int(0),
+					Timeouts:     kong.Int(0),
+					HTTPStatuses: []int{429, 500, 503},
+				},
+			},
+		},
+		HashOn:           kong.String("none"),
+		HashFallback:     kong.String("none"),
+		HashOnCookiePath: kong.String("/"),
+	},
+	Target: &kong.Target{
+		Weight: kong.Int(defaultWeight),
+	},
+}
+
+var defaulterTestOpts = utils.DefaulterOpts{
+	KongDefaults:           kongDefaults,
+	DisableDynamicDefaults: false,
+}
 
 func emptyState() *state.KongState {
 	s, _ := state.NewKongState()
@@ -309,7 +384,9 @@ func Test_stateBuilder_services(t *testing.T) {
 			name: "matches ID of an existing service",
 			fields: fields{
 				targetContent: &Content{
-					Info: &Info{},
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Services: []FService{
 						{
 							Service: kong.Service{
@@ -339,6 +416,9 @@ func Test_stateBuilder_services(t *testing.T) {
 			name: "process a non-existent service",
 			fields: fields{
 				targetContent: &Content{
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Services: []FService{
 						{
 							Service: kong.Service{
@@ -449,11 +529,12 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.intermediate, _ = state.NewKongState()
 			if err := b.ingestRoute(tt.args.route); (err != nil) != tt.wantErr {
@@ -555,11 +636,12 @@ func Test_stateBuilder_ingestTargets(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				currentState: tt.fields.currentState,
 			}
 			b.rawState = &utils.KongRawState{}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			if err := b.ingestTargets(tt.args.targets); (err != nil) != tt.wantErr {
 				t.Errorf("stateBuilder.ingestPlugins() error = %v, wantErr %v", err, tt.wantErr)
@@ -1188,6 +1270,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
@@ -1196,7 +1279,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			if tt.fields.kongVersion != nil {
 				b.kongVersion = *tt.fields.kongVersion
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1359,11 +1442,12 @@ func Test_stateBuilder_certificates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1432,11 +1516,12 @@ func Test_stateBuilder_caCertificates(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1460,7 +1545,9 @@ func Test_stateBuilder_upstream(t *testing.T) {
 			name: "process a non-existent upstream",
 			fields: fields{
 				targetContent: &Content{
-					Info: &Info{},
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Upstreams: []FUpstream{
 						{
 							Upstream: kong.Upstream{
@@ -1525,6 +1612,9 @@ func Test_stateBuilder_upstream(t *testing.T) {
 			name: "matches ID of an existing service",
 			fields: fields{
 				targetContent: &Content{
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Upstreams: []FUpstream{
 						{
 							Upstream: kong.Upstream{
@@ -1588,6 +1678,9 @@ func Test_stateBuilder_upstream(t *testing.T) {
 			name: "multiple upstreams are handled correctly",
 			fields: fields{
 				targetContent: &Content{
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Upstreams: []FUpstream{
 						{
 							Upstream: kong.Upstream{
@@ -1699,11 +1792,12 @@ func Test_stateBuilder_upstream(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -1802,11 +1896,12 @@ func Test_stateBuilder_documents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.konnectRawState)
@@ -1829,7 +1924,9 @@ func Test_stateBuilder(t *testing.T) {
 			name: "end to end test with all entities",
 			fields: fields{
 				targetContent: &Content{
-					Info: &Info{},
+					Info: &Info{
+						Defaults: kongDefaults,
+					},
 					Services: []FService{
 						{
 							Service: kong.Service{
@@ -2346,12 +2443,13 @@ func Test_stateBuilder(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
 			rand.Seed(42)
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
 			}
-			d, _ := utils.GetKongDefaulter()
+			d, _ := utils.GetDefaulter(ctx, defaulterTestOpts)
 			b.defaulter = d
 			b.build()
 			assert.Equal(tt.want, b.rawState)
@@ -2435,6 +2533,74 @@ func Test_stateBuilder_fillPluginConfig(t *testing.T) {
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.result, tt.args.plugin) {
 				assert.Equal(t, tt.result, *tt.args.plugin)
+			}
+		})
+	}
+}
+
+func Test_getStripPathBasedOnProtocols(t *testing.T) {
+	tests := []struct {
+		name              string
+		route             kong.Route
+		wantErr           bool
+		expectedStripPath *bool
+	}{
+		{
+			name: "true strip_path and grpc protocols",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+				StripPath: kong.Bool(true),
+			},
+			wantErr: true,
+		},
+		{
+			name: "true strip_path and grpcs protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpcs")},
+				StripPath: kong.Bool(true),
+			},
+			wantErr: true,
+		},
+		{
+			name: "no strip_path and http protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("http")},
+			},
+			expectedStripPath: nil,
+		},
+		{
+			name: "no strip_path and grpc protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+		{
+			name: "no strip_path and grpcs protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpcs")},
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+		{
+			name: "false strip_path and grpc protocol",
+			route: kong.Route{
+				Protocols: []*string{kong.String("grpc")},
+				StripPath: kong.Bool(false),
+			},
+			expectedStripPath: kong.Bool(false),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stripPath, err := getStripPathBasedOnProtocols(tt.route)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getStripPathBasedOnProtocols() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr && tt.expectedStripPath != nil {
+				assert.Equal(t, *tt.expectedStripPath, *stripPath)
+			} else {
+				assert.Equal(t, tt.expectedStripPath, stripPath)
 			}
 		})
 	}
