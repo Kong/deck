@@ -19,7 +19,7 @@ require (
 	github.com/kong/go-kong v0.28.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/shirou/gopsutil/v3 v3.21.12
+	github.com/shirou/gopsutil/v3 v3.22.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
@@ -77,7 +77,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/net v0.0.0-20211209124913-491a49abca63 // indirect
-	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
+	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.6-0.20210820212750-d4cc65f0b2ff // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
