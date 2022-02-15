@@ -1,0 +1,5 @@
+upstreams:
+- name: upstream1
+  algorithm: round-robin
+  targets:
+  - target: 198.51.100.11:80
