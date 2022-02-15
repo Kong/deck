@@ -210,6 +210,11 @@ func Test_getContent(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "invalid file due to leading space",
+			args:    args{[]string{"testdata/badyamlwithspace/bar.yml"}},
+			wantErr: true,
+		},
+		{
 			name: "multiple files",
 			args: args{[]string{"testdata/file.yaml", "testdata/file.json"}},
 			envVars: map[string]string{
