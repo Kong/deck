@@ -103,7 +103,8 @@ func readContent(reader io.Reader) (*Content, error) {
 		return nil, fmt.Errorf("parsing file: %w", err)
 	}
 	// go-yaml implementation fails at correctly parsing a file whose first
-	// character is a space. If that is the case here, raise an error.
+	// character is a space, as shown in https://github.com/Kong/deck/issues/578
+	// If that is the case here, raise an error.
 	if hasLeadingSpace(renderedContent) {
 		return nil, fmt.Errorf("file must not begin with a whitespace")
 	}
