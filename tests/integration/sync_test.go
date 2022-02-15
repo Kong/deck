@@ -68,7 +68,7 @@ var (
 			PreserveHost:            kong.Bool(false),
 			Protocols:               []*string{kong.String("http"), kong.String("https")},
 			RegexPriority:           kong.Int(0),
-			StripPath:               kong.Bool(false),
+			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 		},
 	}
@@ -83,7 +83,7 @@ var (
 			PreserveHost:            kong.Bool(false),
 			Protocols:               []*string{kong.String("http"), kong.String("https")},
 			RegexPriority:           kong.Int(0),
-			StripPath:               kong.Bool(false),
+			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 			Service: &kong.Service{
 				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
@@ -100,7 +100,7 @@ var (
 			PreserveHost:            kong.Bool(false),
 			Protocols:               []*string{kong.String("http"), kong.String("https")},
 			RegexPriority:           kong.Int(0),
-			StripPath:               kong.Bool(false),
+			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 			Service: &kong.Service{
 				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
@@ -117,7 +117,7 @@ var (
 			PreserveHost:            kong.Bool(false),
 			Protocols:               []*string{kong.String("http"), kong.String("https")},
 			RegexPriority:           kong.Int(0),
-			StripPath:               kong.Bool(false),
+			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 			RequestBuffering:        kong.Bool(true),
 			ResponseBuffering:       kong.Bool(true),
