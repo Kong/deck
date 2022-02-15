@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/blang/semver/v4"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
@@ -232,27 +231,6 @@ func sortSlices(x, y interface{}) bool {
 	return xName < yName
 }
 
-func runWhenKong(t *testing.T, client *kong.Client, semverRange string) {
-	// get kong version
-	ctx := context.Background()
-	info, err := client.Root(ctx)
-	if err != nil {
-		t.Error(err)
-	}
-	kongVersion := kong.VersionFromInfo(info)
-	currentVersion, err := kong.ParseSemanticVersion(kongVersion)
-	if err != nil {
-		t.Error(err)
-	}
-	r, err := semver.ParseRange(semverRange)
-	if err != nil {
-		t.Error(err)
-	}
-	if !r(currentVersion) {
-		t.Skip()
-	}
-}
-
 func testKongState(t *testing.T, client *kong.Client,
 	expectedState utils.KongRawState, ignoreFields []cmp.Option) {
 	// Get entities from Kong
@@ -341,7 +319,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "<=1.4.3")
+			kong.RunWhenKong(t, "<=1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -384,7 +362,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">1.4.3 <=1.5.1")
+			kong.RunWhenKong(t, ">1.4.3 <=1.5.1")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -427,7 +405,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.0.5 <=2.1.4")
+			kong.RunWhenKong(t, ">=2.0.5 <=2.1.4")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -477,7 +455,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">2.2.1 <=2.6.0")
+			kong.RunWhenKong(t, ">2.2.1 <=2.6.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -521,7 +499,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">2.6.9")
+			kong.RunWhenKong(t, ">2.6.9")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -566,7 +544,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "<1.5.1 !1.4.3")
+			kong.RunWhenKong(t, "<1.5.1 !1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -612,7 +590,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "==1.5.1")
+			kong.RunWhenKong(t, "==1.5.1")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -671,7 +649,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.0.5")
+			kong.RunWhenKong(t, ">=2.0.5")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -714,7 +692,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, "<=1.5.2")
+			kong.RunWhenKong(t, "<=1.5.2")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -764,7 +742,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.1.0")
+			kong.RunWhenKong(t, ">=2.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -807,7 +785,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKong(t, client, ">=2.4.1")
+			kong.RunWhenKong(t, ">=2.4.1")
 			teardown := setup(t)
 			defer teardown(t)
 
