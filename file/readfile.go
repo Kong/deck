@@ -83,6 +83,13 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 	return res, nil
 }
 
+func hasLeadingSpace(fileContent string) bool {
+	if fileContent != "" && string(fileContent[0]) == " " {
+		return true
+	}
+	return false
+}
+
 // readContent reads all the byes until io.EOF and unmarshals the read
 // bytes into Content.
 func readContent(reader io.Reader) (*Content, error) {
@@ -94,6 +101,9 @@ func readContent(reader io.Reader) (*Content, error) {
 	renderedContent, err := renderTemplate(string(contentBytes))
 	if err != nil {
 		return nil, fmt.Errorf("parsing file: %w", err)
+	}
+	if hasLeadingSpace(renderedContent) {
+		return nil, fmt.Errorf("file must not begin with a whitespace")
 	}
 	renderedContentBytes := []byte(renderedContent)
 	err = validate(renderedContentBytes)
