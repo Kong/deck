@@ -13,32 +13,31 @@ var (
 	diffWorkspace          string
 )
 
-// diffCmd represents the diff command
-var diffCmd = &cobra.Command{
-	Use:   "diff",
-	Short: "Diff the current entities in Kong with the one on disks",
-	Long: `The diff command is similar to a dry run of the 'decK sync' command.
+// newDiffCmd represents the diff command
+func newDiffCmd() *cobra.Command {
+	diffCmd := &cobra.Command{
+		Use:   "diff",
+		Short: "Diff the current entities in Kong with the one on disks",
+		Long: `The diff command is similar to a dry run of the 'decK sync' command.
 
 It loads entities from Kong and performs a diff with
 the entities in local files. This allows you to see the entities
 that will be created, updated, or deleted.
 `,
-	Args: validateNoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(cmd.Context(), diffCmdKongStateFile, true,
-			diffCmdParallelism, 0, diffWorkspace)
-	},
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(diffCmdKongStateFile) == 0 {
-			return fmt.Errorf("a state file with Kong's configuration " +
-				"must be specified using -s/--state flag")
-		}
-		return preRunSilenceEventsFlag()
-	},
-}
+		Args: validateNoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return syncMain(cmd.Context(), diffCmdKongStateFile, true,
+				diffCmdParallelism, 0, diffWorkspace)
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(diffCmdKongStateFile) == 0 {
+				return fmt.Errorf("a state file with Kong's configuration " +
+					"must be specified using -s/--state flag")
+			}
+			return preRunSilenceEventsFlag()
+		},
+	}
 
-func init() {
-	rootCmd.AddCommand(diffCmd)
 	diffCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
@@ -63,4 +62,5 @@ func init() {
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
 	addSilenceEventsFlag(diffCmd.Flags())
+	return diffCmd
 }

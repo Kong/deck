@@ -23,39 +23,24 @@ var (
 	disableAnalytics bool
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "deck",
-	Short: "Administer your Kong clusters declaratively",
-	Long: `The deck tool helps you manage Kong clusters with a declarative
+//nolint:errcheck
+// NewRootCmd represents the base command when called without any subcommands
+func NewRootCmd() *cobra.Command {
+	rootCmd := &cobra.Command{
+		Use:   "deck",
+		Short: "Administer your Kong clusters declaratively",
+		Long: `The deck tool helps you manage Kong clusters with a declarative
 configuration file.
 
 It can be used to export, import, or sync entities to Kong.`,
-	SilenceUsage: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
-			return fmt.Errorf("invalid URL: %w", err)
-		}
-		return nil
-	},
-}
-
-// RootCmdOnlyForDocsAndTest is used to generate makrdown documentation and for tests.
-var RootCmdOnlyForDocsAndTest = rootCmd
-
-// Execute adds all child commands to the root command and sets
-// flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute(ctx context.Context) {
-	err := rootCmd.ExecuteContext(ctx)
-	if err != nil {
-		// do not print error because cobra already prints it
-		os.Exit(1)
+		SilenceUsage: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
+				return fmt.Errorf("invalid URL: %w", err)
+			}
+			return nil
+		},
 	}
-}
-
-//nolint:errcheck
-func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -130,28 +115,6 @@ func init() {
 	viper.BindPFlag("kong-cookie-jar-path",
 		rootCmd.PersistentFlags().Lookup("kong-cookie-jar-path"))
 
-	// konnect-specific flags
-	rootCmd.PersistentFlags().String("konnect-email", "",
-		"Email address associated with your Konnect account.")
-	viper.BindPFlag("konnect-email",
-		rootCmd.PersistentFlags().Lookup("konnect-email"))
-
-	rootCmd.PersistentFlags().String("konnect-password", "",
-		"Password associated with your Konnect account, "+
-			"this takes precedence over --konnect-password-file flag.")
-	viper.BindPFlag("konnect-password",
-		rootCmd.PersistentFlags().Lookup("konnect-password"))
-
-	rootCmd.PersistentFlags().String("konnect-password-file", "",
-		"File containing the password to your Konnect account.")
-	viper.BindPFlag("konnect-password-file",
-		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
-
-	rootCmd.PersistentFlags().String("konnect-addr", "https://konnect.konghq.com",
-		"Address of the Konnect endpoint.")
-	viper.BindPFlag("konnect-addr",
-		rootCmd.PersistentFlags().Lookup("konnect-addr"))
-
 	rootCmd.PersistentFlags().Bool("analytics", true,
 		"Share anonymized data to help improve decK.\n"+
 			"Use --analytics=false to disable this.")
@@ -190,6 +153,30 @@ func init() {
 			"environment variable. Must be used in conjunction with tls-client-cert-file")
 	viper.BindPFlag("tls-client-key",
 		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
+
+	rootCmd.AddCommand(newSyncCmd())
+	rootCmd.AddCommand(newVersionCmd())
+	rootCmd.AddCommand(newValidateCmd())
+	rootCmd.AddCommand(newResetCmd())
+	rootCmd.AddCommand(newPingCmd())
+	rootCmd.AddCommand(newDumpCmd())
+	rootCmd.AddCommand(newDiffCmd())
+	rootCmd.AddCommand(newConvertCmd())
+	rootCmd.AddCommand(newCompletionCmd())
+	rootCmd.AddCommand(newKonnectCmd())
+	return rootCmd
+}
+
+// Execute adds all child commands to the root command and sets
+// flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute(ctx context.Context) {
+	rootCmd := NewRootCmd()
+	err := rootCmd.ExecuteContext(ctx)
+	if err != nil {
+		// do not print error because cobra already prints it
+		os.Exit(1)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

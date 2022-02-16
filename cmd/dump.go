@@ -34,116 +34,115 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 	return res, nil
 }
 
-// dumpCmd represents the dump command
-var dumpCmd = &cobra.Command{
-	Use:   "dump",
-	Short: "Export Kong configuration to a file",
-	Long: `The dump command reads all entities present in Kong
+// newDumpCmd represents the dump command
+func newDumpCmd() *cobra.Command {
+	dumpCmd := &cobra.Command{
+		Use:   "dump",
+		Short: "Export Kong configuration to a file",
+		Long: `The dump command reads all entities present in Kong
 and writes them to a local file.
 
 The file can then be read using the sync command or diff command to
 configure Kong.`,
-	Args: validateNoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := cmd.Context()
+		Args: validateNoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 
-		wsClient, err := utils.GetKongClient(rootConfig)
-		if err != nil {
-			return err
-		}
+			wsClient, err := utils.GetKongClient(rootConfig)
+			if err != nil {
+				return err
+			}
 
-		format := file.Format(strings.ToUpper(dumpCmdStateFormat))
+			format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 
-		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
-		if err != nil {
-			return fmt.Errorf("reading Kong version: %w", err)
-		}
-		_ = sendAnalytics("dump", kongVersion)
+			kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
+			if err != nil {
+				return fmt.Errorf("reading Kong version: %w", err)
+			}
+			_ = sendAnalytics("dump", kongVersion)
 
-		// Kong Enterprise dump all workspace
-		if dumpAllWorkspaces {
+			// Kong Enterprise dump all workspace
+			if dumpAllWorkspaces {
+				if dumpWorkspace != "" {
+					return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
+				}
+				if dumpCmdKongStateFile != "kong" {
+					return fmt.Errorf("output-file cannot be specified with --all-workspace flag")
+				}
+				workspaces, err := listWorkspaces(ctx, wsClient)
+				if err != nil {
+					return err
+				}
+
+				for _, workspace := range workspaces {
+					wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
+					if err != nil {
+						return err
+					}
+
+					rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+					if err != nil {
+						return fmt.Errorf("reading configuration from Kong: %w", err)
+					}
+					ks, err := state.Get(rawState)
+					if err != nil {
+						return fmt.Errorf("building state: %w", err)
+					}
+
+					if err := file.KongStateToFile(ks, file.WriteConfig{
+						SelectTags: dumpConfig.SelectorTags,
+						Workspace:  workspace,
+						Filename:   workspace,
+						FileFormat: format,
+						WithID:     dumpWithID,
+					}); err != nil {
+						return err
+					}
+				}
+				return nil
+			}
+
+			if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+				return err
+			} else if !yes {
+				return nil
+			}
+
+			// Kong OSS
+			// or Kong Enterprise single workspace
 			if dumpWorkspace != "" {
-				return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
-			}
-			if dumpCmdKongStateFile != "kong" {
-				return fmt.Errorf("output-file cannot be specified with --all-workspace flag")
-			}
-			workspaces, err := listWorkspaces(ctx, wsClient)
-			if err != nil {
-				return err
-			}
-
-			for _, workspace := range workspaces {
-				wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
+				wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
+				exists, err := workspaceExists(ctx, rootConfig, dumpWorkspace)
 				if err != nil {
 					return err
 				}
-
-				rawState, err := dump.Get(ctx, wsClient, dumpConfig)
-				if err != nil {
-					return fmt.Errorf("reading configuration from Kong: %w", err)
+				if !exists {
+					return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
 				}
-				ks, err := state.Get(rawState)
+				wsClient, err = utils.GetKongClient(wsConfig)
 				if err != nil {
-					return fmt.Errorf("building state: %w", err)
-				}
-
-				if err := file.KongStateToFile(ks, file.WriteConfig{
-					SelectTags: dumpConfig.SelectorTags,
-					Workspace:  workspace,
-					Filename:   workspace,
-					FileFormat: format,
-					WithID:     dumpWithID,
-				}); err != nil {
 					return err
 				}
 			}
-			return nil
-		}
 
-		if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
-			return err
-		} else if !yes {
-			return nil
-		}
-
-		// Kong OSS
-		// or Kong Enterprise single workspace
-		if dumpWorkspace != "" {
-			wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
-			exists, err := workspaceExists(ctx, rootConfig, dumpWorkspace)
+			rawState, err := dump.Get(ctx, wsClient, dumpConfig)
 			if err != nil {
-				return err
+				return fmt.Errorf("reading configuration from Kong: %w", err)
 			}
-			if !exists {
-				return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
-			}
-			wsClient, err = utils.GetKongClient(wsConfig)
+			ks, err := state.Get(rawState)
 			if err != nil {
-				return err
+				return fmt.Errorf("building state: %w", err)
 			}
-		}
+			return file.KongStateToFile(ks, file.WriteConfig{
+				SelectTags: dumpConfig.SelectorTags,
+				Workspace:  dumpWorkspace,
+				Filename:   dumpCmdKongStateFile,
+				FileFormat: format,
+				WithID:     dumpWithID,
+			})
+		},
+	}
 
-		rawState, err := dump.Get(ctx, wsClient, dumpConfig)
-		if err != nil {
-			return fmt.Errorf("reading configuration from Kong: %w", err)
-		}
-		ks, err := state.Get(rawState)
-		if err != nil {
-			return fmt.Errorf("building state: %w", err)
-		}
-		return file.KongStateToFile(ks, file.WriteConfig{
-			SelectTags: dumpConfig.SelectorTags,
-			Workspace:  dumpWorkspace,
-			Filename:   dumpCmdKongStateFile,
-			FileFormat: format,
-			WithID:     dumpWithID,
-		})
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(dumpCmd)
 	dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
 		"kong", "file to which to write Kong's configuration."+
 			"Use '-' to write to stdout.")
@@ -167,4 +166,5 @@ func init() {
 		false, "export only the RBAC resources (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume 'yes' to prompts and run non-interactively.")
+	return dumpCmd
 }

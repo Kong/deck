@@ -14,95 +14,94 @@ var (
 	resetAllWorkspaces bool
 )
 
-// resetCmd represents the reset command
-var resetCmd = &cobra.Command{
-	Use:   "reset",
-	Short: "Reset deletes all entities in Kong",
-	Long: `The reset command deletes all entities in Kong's database.string.
+// newResetCmd represents the reset command
+func newResetCmd() *cobra.Command {
+	resetCmd := &cobra.Command{
+		Use:   "reset",
+		Short: "Reset deletes all entities in Kong",
+		Long: `The reset command deletes all entities in Kong's database.string.
 
 Use this command with extreme care as it's equivalent to running
 "kong migrations reset" on your Kong instance.
 
 By default, this command will ask for confirmation.`,
-	Args: validateNoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := cmd.Context()
+		Args: validateNoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
 
-		if resetAllWorkspaces && resetWorkspace != "" {
-			return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
-		}
+			if resetAllWorkspaces && resetWorkspace != "" {
+				return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
+			}
 
-		if !resetCmdForce {
-			ok, err := utils.Confirm("This will delete all configuration from Kong's database." +
-				"\n> Are you sure? ")
+			if !resetCmdForce {
+				ok, err := utils.Confirm("This will delete all configuration from Kong's database." +
+					"\n> Are you sure? ")
+				if err != nil {
+					return err
+				}
+				if !ok {
+					return nil
+				}
+			}
+
+			rootClient, err := utils.GetKongClient(rootConfig)
 			if err != nil {
 				return err
 			}
-			if !ok {
-				return nil
-			}
-		}
 
-		rootClient, err := utils.GetKongClient(rootConfig)
-		if err != nil {
-			return err
-		}
-
-		kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
-		if err != nil {
-			return fmt.Errorf("reading Kong version: %w", err)
-		}
-		_ = sendAnalytics("reset", kongVersion)
-
-		var workspaces []string
-		// Kong OSS or default workspace
-		if !resetAllWorkspaces && resetWorkspace == "" {
-			workspaces = append(workspaces, "")
-		}
-
-		// Kong Enterprise
-		if resetAllWorkspaces {
-			workspaces, err = listWorkspaces(ctx, rootClient)
+			kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
 			if err != nil {
-				return err
+				return fmt.Errorf("reading Kong version: %w", err)
 			}
-		}
-		if resetWorkspace != "" {
-			exists, err := workspaceExists(ctx, rootConfig, resetWorkspace)
-			if err != nil {
-				return err
-			}
-			if !exists {
-				return fmt.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
+			_ = sendAnalytics("reset", kongVersion)
+
+			var workspaces []string
+			// Kong OSS or default workspace
+			if !resetAllWorkspaces && resetWorkspace == "" {
+				workspaces = append(workspaces, "")
 			}
 
-			workspaces = append(workspaces, resetWorkspace)
-		}
+			// Kong Enterprise
+			if resetAllWorkspaces {
+				workspaces, err = listWorkspaces(ctx, rootClient)
+				if err != nil {
+					return err
+				}
+			}
+			if resetWorkspace != "" {
+				exists, err := workspaceExists(ctx, rootConfig, resetWorkspace)
+				if err != nil {
+					return err
+				}
+				if !exists {
+					return fmt.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
+				}
 
-		for _, workspace := range workspaces {
-			wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
-			if err != nil {
-				return err
+				workspaces = append(workspaces, resetWorkspace)
 			}
-			currentState, err := fetchCurrentState(ctx, wsClient, dumpConfig)
-			if err != nil {
-				return err
-			}
-			targetState, err := state.NewKongState()
-			if err != nil {
-				return err
-			}
-			_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	},
-}
 
-func init() {
-	rootCmd.AddCommand(resetCmd)
+			for _, workspace := range workspaces {
+				wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
+				if err != nil {
+					return err
+				}
+				currentState, err := fetchCurrentState(ctx, wsClient, dumpConfig)
+				if err != nil {
+					return err
+				}
+				targetState, err := state.NewKongState()
+				if err != nil {
+					return err
+				}
+				_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient)
+				if err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	}
+
 	resetCmd.Flags().BoolVarP(&resetCmdForce, "force", "f",
 		false, "Skip interactive confirmation prompt before reset.")
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
@@ -119,4 +118,6 @@ func init() {
 			"When this setting has multiple tag values, entities must match every tag.")
 	resetCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "reset only the RBAC resources (Kong Enterprise only).")
+
+	return resetCmd
 }
