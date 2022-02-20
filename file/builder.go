@@ -829,9 +829,6 @@ func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
-		if err := b.addPluginDefaults(&p); err != nil {
-			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
-		}
 		if utils.Empty(p.ID) {
 			cID, rID, sID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
@@ -851,6 +848,9 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 		err := b.fillPluginConfig(&p)
 		if err != nil {
 			return err
+		}
+		if err := b.addPluginDefaults(&p); err != nil {
+			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
 		}
 		utils.MustMergeTags(&p, b.selectTags)
 		b.rawState.Plugins = append(b.rawState.Plugins, &p.Plugin)
