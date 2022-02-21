@@ -196,6 +196,43 @@ var (
 			Weight: kong.Int(0),
 		},
 	}
+
+	rateLimitingPlugin = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting"),
+			Config: kong.Configuration{
+				"day":                 nil,
+				"fault_tolerant":      true,
+				"header_name":         nil,
+				"hide_client_headers": false,
+				"hour":                nil,
+				"limit_by":            "consumer",
+				"minute":              float64(123),
+				"month":               nil,
+				"path":                nil,
+				"policy":              "cluster",
+				"redis_database":      float64(0),
+				"redis_host":          nil,
+				"redis_password":      nil,
+				"redis_port":          float64(6379),
+				"redis_server_name":   nil,
+				"redis_ssl":           false,
+				"redis_ssl_verify":    false,
+				"redis_timeout":       float64(2000),
+				"second":              nil,
+				"year":                nil,
+			},
+			Enabled: kong.Bool(true),
+			RunOn:   nil,
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Tags: nil,
+		},
+	}
 )
 
 func getKongAddress() string {
@@ -786,6 +823,46 @@ func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kong.RunWhenKong(t, ">=2.4.1")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_RateLimitingPlugin(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "fill defaults",
+			kongFile: "testdata/sync/006-fill-defaults-rate-limiting/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: rateLimitingPlugin,
+			},
+		},
+		{
+			name:     "fill defaults with dedup",
+			kongFile: "testdata/sync/007-fill-defaults-rate-limiting-dedup/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: rateLimitingPlugin,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.7.0")
 			teardown := setup(t)
 			defer teardown(t)
 

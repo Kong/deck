@@ -1,0 +1,7 @@
+_plugin_configs:
+  rate-limiting-one:
+    minute: 123
+
+plugins:
+  - name: rate-limiting
+    _config: rate-limiting-one
