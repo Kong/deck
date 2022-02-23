@@ -838,7 +838,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 	}{
 		{
 			name:     "create services and routes",
-			kongFile: "testdata/sync/006-create-simple-entities/kong.yaml",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1,
 				Routes:    route1_205_214,
@@ -884,7 +884,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 	}{
 		{
 			name:     "create services and routes",
-			kongFile: "testdata/sync/006-create-simple-entities/kong.yaml",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1,
 				Routes:    route1_20x,
@@ -924,7 +924,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	}{
 		{
 			name:     "creates entities with minimum configuration",
-			kongFile: "testdata/sync/006-create-simple-entities/kong.yaml",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1_207,
 				Routes:    route1_20x,
