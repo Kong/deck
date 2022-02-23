@@ -737,6 +737,46 @@ func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
 	}
 }
 
+func Test_Sync_RateLimitingPlugin(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "fill defaults",
+			kongFile: "testdata/sync/006-fill-defaults-rate-limiting/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: rateLimitingPlugin,
+			},
+		},
+		{
+			name:     "fill defaults with dedup",
+			kongFile: "testdata/sync/007-fill-defaults-rate-limiting-dedup/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: rateLimitingPlugin,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.7.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
 // test scope:
 //   - 1.5.0.11+enterprise
 func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
@@ -759,7 +799,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 	}{
 		{
 			name:     "creates a service",
-			kongFile: "testdata/sync/006-create-simple-entities/kong.yaml",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1,
 				Routes:    route1_151,
