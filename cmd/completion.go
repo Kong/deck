@@ -7,10 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var completionCmd = &cobra.Command{
-	Use:   "completion [bash|zsh|fish|powershell]",
-	Short: "Generate completion script",
-	Long: `To load completions:
+func newCompletionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "completion [bash|zsh|fish|powershell]",
+		Short: "Generate completion script",
+		Long: `To load completions:
 
 Bash:
 
@@ -49,24 +50,21 @@ PowerShell:
   PS> deck completion powershell > deck.ps1
   # and source this file from your PowerShell profile.
 `,
-	DisableFlagsInUseLine: true,
-	Args:                  cobra.ExactArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		switch args[0] {
-		case "bash":
-			return cmd.Root().GenBashCompletion(os.Stdout)
-		case "zsh":
-			return cmd.Root().GenZshCompletion(os.Stdout)
-		case "fish":
-			return cmd.Root().GenFishCompletion(os.Stdout, true)
-		case "powershell":
-			return cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
-		default:
-			return fmt.Errorf("invalid shell: %q", args[0])
-		}
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(completionCmd)
+		DisableFlagsInUseLine: true,
+		Args:                  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			switch args[0] {
+			case "bash":
+				return cmd.Root().GenBashCompletion(os.Stdout)
+			case "zsh":
+				return cmd.Root().GenZshCompletion(os.Stdout)
+			case "fish":
+				return cmd.Root().GenFishCompletion(os.Stdout, true)
+			case "powershell":
+				return cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout)
+			default:
+				return fmt.Errorf("invalid shell: %q", args[0])
+			}
+		},
+	}
 }

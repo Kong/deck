@@ -7,35 +7,34 @@ import (
 )
 
 var (
-	syncCmdKongStateFile []string
 	syncCmdParallelism   int
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
 )
 
-// syncCmd represents the sync command
-var syncCmd = &cobra.Command{
-	Use: "sync",
-	Short: "Sync performs operations to get Kong's configuration " +
-		"to match the state file",
-	Long: `The sync command reads the state file and performs operation on Kong
+// newSyncCmd represents the sync command
+func newSyncCmd() *cobra.Command {
+	var syncCmdKongStateFile []string
+	syncCmd := &cobra.Command{
+		Use: "sync",
+		Short: "Sync performs operations to get Kong's configuration " +
+			"to match the state file",
+		Long: `The sync command reads the state file and performs operation on Kong
 to get Kong's state in sync with the input state.`,
-	Args: validateNoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return syncMain(cmd.Context(), syncCmdKongStateFile, false,
-			syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
-	},
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(syncCmdKongStateFile) == 0 {
-			return fmt.Errorf("a state file with Kong's configuration " +
-				"must be specified using -s/--state flag")
-		}
-		return preRunSilenceEventsFlag()
-	},
-}
+		Args: validateNoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return syncMain(cmd.Context(), syncCmdKongStateFile, false,
+				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace)
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(syncCmdKongStateFile) == 0 {
+				return fmt.Errorf("a state file with Kong's configuration " +
+					"must be specified using -s/--state flag")
+			}
+			return preRunSilenceEventsFlag()
+		},
+	}
 
-func init() {
-	rootCmd.AddCommand(syncCmd)
 	syncCmd.Flags().StringSliceVarP(&syncCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
@@ -60,4 +59,5 @@ func init() {
 			"for related entities (usually for Cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
 	addSilenceEventsFlag(syncCmd.Flags())
+	return syncCmd
 }

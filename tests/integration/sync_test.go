@@ -13,20 +13,7 @@ import (
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
-
-var deckCmd = cmd.RootCmdOnlyForDocsAndTest
-
-var syncCmd = func() *cobra.Command {
-	for _, command := range deckCmd.Commands() {
-		if command.Use == "sync" {
-			return command
-		}
-	}
-	return nil
-}
 
 var (
 	// missing Enable
@@ -294,6 +281,7 @@ func testKongState(t *testing.T, client *kong.Client,
 }
 
 func reset(t *testing.T) {
+	deckCmd := cmd.NewRootCmd()
 	deckCmd.SetArgs([]string{"reset", "--force"})
 	if err := deckCmd.Execute(); err != nil {
 		t.Fatalf(err.Error(), "failed to reset Kong's state")
@@ -307,16 +295,9 @@ func setup(t *testing.T) func(t *testing.T) {
 }
 
 func sync(kongFile string) {
-	// set the --state flag directly due to slice
-	// flags value are persisted across test cases, and not
-	// overwritable otherwise.
-	stateFlag := syncCmd().Flags().Lookup("state")
-	if val, ok := stateFlag.Value.(pflag.SliceValue); ok {
-		_ = val.Replace([]string{kongFile})
-	}
-
-	deckCmd.SetArgs([]string{"sync"})
-	deckCmd.Execute()
+	deckCmd := cmd.NewRootCmd()
+	deckCmd.SetArgs([]string{"sync", "-s", kongFile})
+	deckCmd.ExecuteContext(context.Background())
 }
 
 // test scope:

@@ -14,18 +14,16 @@ var VERSION = "dev"
 // This should be substituted by Git commit hash  during the build process.
 var COMMIT = "unknown"
 
-// versionCmd represents the version command
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Print the decK version",
-	Long: `The version command prints the version of decK along with a Git short
+// newVersionCmd represents the version command
+func newVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print the decK version",
+		Long: `The version command prints the version of decK along with a Git short
 commit hash of the source tree.`,
-	Args: validateNoArgs,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
+		Args: validateNoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)
+		},
+	}
 }

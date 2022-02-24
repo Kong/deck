@@ -21,11 +21,12 @@ var (
 	validateParallelism          int
 )
 
-// validateCmd represents the diff command
-var validateCmd = &cobra.Command{
-	Use:   "validate",
-	Short: "Validate the state file",
-	Long: `The validate command reads the state file and ensures validity.
+// newValidateCmd represents the diff command
+func newValidateCmd() *cobra.Command {
+	validateCmd := &cobra.Command{
+		Use:   "validate",
+		Short: "Validate the state file",
+		Long: `The validate command reads the state file and ensures validity.
 It reads all the specified state files and reports YAML/JSON
 parsing issues. It also checks for foreign relationships
 and alerts if there are broken relationships, or missing links present.
@@ -33,58 +34,80 @@ and alerts if there are broken relationships, or missing links present.
 No communication takes places between decK and Kong during the execution of
 this command unless --online flag is used.
 `,
-	Args: validateNoArgs,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		_ = sendAnalytics("validate", "")
-		// read target file
-		// this does json schema validation as well
-		targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
-		if err != nil {
-			return err
-		}
-
-		dummyEmptyState, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
-		ctx := cmd.Context()
-		var kongClient *kong.Client
-		if validateOnline {
-			kongClient, err = getKongClient(ctx, targetContent)
+		Args: validateNoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_ = sendAnalytics("validate", "")
+			// read target file
+			// this does json schema validation as well
+			targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
 			if err != nil {
 				return err
 			}
-		}
 
-		rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
-			CurrentState: dummyEmptyState,
-		}, dump.Config{}, kongClient)
-		if err != nil {
-			return err
-		}
-		if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
-			return err
-		}
-		// this catches foreign relation errors
-		ks, err := state.Get(rawState)
-		if err != nil {
-			return err
-		}
-
-		if validateOnline {
-			if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
-				return validate.ErrorsWrapper{Errors: errs}
+			dummyEmptyState, err := state.NewKongState()
+			if err != nil {
+				return err
 			}
-		}
-		return nil
-	},
-	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(validateCmdKongStateFile) == 0 {
-			return fmt.Errorf("a state file with Kong's configuration " +
-				"must be specified using -s/--state flag")
-		}
-		return nil
-	},
+			ctx := cmd.Context()
+			var kongClient *kong.Client
+			if validateOnline {
+				kongClient, err = getKongClient(ctx, targetContent)
+				if err != nil {
+					return err
+				}
+			}
+
+			rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
+				CurrentState: dummyEmptyState,
+			}, dump.Config{}, kongClient)
+			if err != nil {
+				return err
+			}
+			if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
+				return err
+			}
+			// this catches foreign relation errors
+			ks, err := state.Get(rawState)
+			if err != nil {
+				return err
+			}
+
+			if validateOnline {
+				if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
+					return validate.ErrorsWrapper{Errors: errs}
+				}
+			}
+			return nil
+		},
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(validateCmdKongStateFile) == 0 {
+				return fmt.Errorf("a state file with Kong's configuration " +
+					"must be specified using -s/--state flag")
+			}
+			return nil
+		},
+	}
+	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
+		false, "indicate that the state file(s) contains RBAC resources only (Kong Enterprise only).")
+	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
+		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+			"This flag can be specified multiple times for multiple files.\n"+
+			"Use '-' to read from stdin.")
+	validateCmd.Flags().BoolVar(&validateOnline, "online",
+		false, "perform validations against Kong API. When this flag is used, validation is done\n"+
+			"via communication with Kong. This increases the time for validation but catches \n"+
+			"significant errors. No resource is created in Kong.")
+	validateCmd.Flags().StringVarP(&validateWorkspace, "workspace", "w",
+		"", "validate configuration of a specific workspace "+
+			"(Kong Enterprise only).\n"+
+			"This takes precedence over _workspace fields in state files.")
+	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
+		10, "Maximum number of concurrent requests to Kong.")
+
+	if err := ensureGetAllMethods(); err != nil {
+		panic(err.Error())
+	}
+	return validateCmd
 }
 
 func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
@@ -187,28 +210,4 @@ func ensureGetAllMethods() error {
 		return err
 	}
 	return nil
-}
-
-func init() {
-	rootCmd.AddCommand(validateCmd)
-	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
-		false, "indicate that the state file(s) contains RBAC resources only (Kong Enterprise only).")
-	validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
-		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
-			"This flag can be specified multiple times for multiple files.\n"+
-			"Use '-' to read from stdin.")
-	validateCmd.Flags().BoolVar(&validateOnline, "online",
-		false, "perform validations against Kong API. When this flag is used, validation is done\n"+
-			"via communication with Kong. This increases the time for validation but catches \n"+
-			"significant errors. No resource is created in Kong.")
-	validateCmd.Flags().StringVarP(&validateWorkspace, "workspace", "w",
-		"", "validate configuration of a specific workspace "+
-			"(Kong Enterprise only).\n"+
-			"This takes precedence over _workspace fields in state files.")
-	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
-		10, "Maximum number of concurrent requests to Kong.")
-
-	if err := ensureGetAllMethods(); err != nil {
-		panic(err.Error())
-	}
 }
