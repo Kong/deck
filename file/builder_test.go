@@ -526,6 +526,33 @@ func Test_stateBuilder_ingestRoute(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "grpc route has strip_path=false",
+			fields: fields{
+				currentState: existingRouteState(),
+			},
+			args: args{
+				route: FRoute{
+					Route: kong.Route{
+						Name:      kong.String("foo"),
+						Protocols: kong.StringSlice("grpc"),
+					},
+				},
+			},
+			wantErr: false,
+			wantState: &utils.KongRawState{
+				Routes: []*kong.Route{
+					{
+						ID:            kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Name:          kong.String("foo"),
+						PreserveHost:  kong.Bool(false),
+						RegexPriority: kong.Int(0),
+						StripPath:     kong.Bool(false),
+						Protocols:     kong.StringSlice("grpc"),
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
