@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -168,9 +167,6 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse kong address: %w", err)
 	}
-	if opt.Workspace != "" {
-		url.Path = path.Join(url.Path, opt.Workspace)
-	}
 	// Add Session Cookie support if required
 	if opt.CookieJarPath != "" {
 		jar, err := cookiejarparser.LoadCookieJarFile(opt.CookieJarPath)
@@ -187,6 +183,9 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	if opt.Debug {
 		kongClient.SetDebugMode(true)
 		kongClient.SetLogger(os.Stderr)
+	}
+	if opt.Workspace != "" {
+		kongClient.SetWorkspace(opt.Workspace)
 	}
 	return kongClient, nil
 }

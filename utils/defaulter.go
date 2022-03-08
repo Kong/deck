@@ -225,7 +225,11 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 // 3. schema defaults coming from Admin API (excluded Konnect)
 // 4. hardcoded defaults under utils/constants.go (Konnect-only)
 func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
-	if opts.Client != nil && !opts.DisableDynamicDefaults {
+	exists, err := WorkspaceExists(ctx, opts.Client)
+	if err != nil {
+		return nil, fmt.Errorf("defaulter: checking if workspace exists: %w", err)
+	}
+	if opts.Client != nil && !opts.DisableDynamicDefaults && exists {
 		return getKongDefaulterWithClient(ctx, opts)
 	}
 	opts.DisableDynamicDefaults = true
