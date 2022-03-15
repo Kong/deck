@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/imdario/mergo"
 	"github.com/kong/go-kong/kong"
@@ -44,13 +45,20 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 	if err := d.populateDefaultsFromInput(opts.KongDefaults); err != nil {
 		return nil, err
 	}
+
+	// TODO check if it's OK to do the validation only for the user input
+	err := d.validateKongDefaults()
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
+
 	if opts.DisableDynamicDefaults {
 		if err := d.populateStaticDefaultsForKonnect(); err != nil {
 			return nil, err
 		}
 	}
 
-	err := d.Register(d.service)
+	err = d.Register(d.service)
 	if err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
@@ -67,6 +75,56 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
 	}
 	return d, nil
+}
+
+// Check if `entity` has restricted fields set
+func checkEntityDefaults(entity interface{}, restrictedFields []string) error {
+	var invalidFields []string
+	r := reflect.ValueOf(entity)
+	for _, fieldName := range restrictedFields {
+		field := reflect.Indirect(r).FieldByName(fieldName)
+		if field.IsValid() && !field.IsNil() {
+			invalidFields = append(invalidFields, fieldName)
+		}
+	}
+	if len(invalidFields) > 0 {
+		return fmt.Errorf("cannot have these restricted fields set: %s", strings.Join(invalidFields, ", "))
+	}
+	return nil
+}
+
+func (d *Defaulter) validateKongDefaults() error {
+	var errs ErrArray
+	// TODO ideally, I would like to avoid this code duplication, but got some
+	// issues with the reflect.Value -> interface{} translation... to fix
+	err := checkEntityDefaults(d.service, defaultsRestrictedFields["service"])
+	if err != nil {
+		entityErr := fmt.Errorf(
+			"service defaults %s", err)
+		errs.Errors = append(errs.Errors, entityErr)
+	}
+	err = checkEntityDefaults(d.route, defaultsRestrictedFields["route"])
+	if err != nil {
+		entityErr := fmt.Errorf(
+			"route defaults %s", err)
+		errs.Errors = append(errs.Errors, entityErr)
+	}
+	err = checkEntityDefaults(d.target, defaultsRestrictedFields["target"])
+	if err != nil {
+		entityErr := fmt.Errorf(
+			"target defaults %s", err)
+		errs.Errors = append(errs.Errors, entityErr)
+	}
+	err = checkEntityDefaults(d.upstream, defaultsRestrictedFields["upstream"])
+	if err != nil {
+		entityErr := fmt.Errorf(
+			"upstream defaults %s", err)
+		errs.Errors = append(errs.Errors, entityErr)
+	}
+	if errs.Errors != nil {
+		return errs
+	}
+	return nil
 }
 
 func (d *Defaulter) once() {

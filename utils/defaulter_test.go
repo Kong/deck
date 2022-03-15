@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/kong/go-kong/kong"
@@ -96,7 +97,6 @@ func TestServiceSetTest(t *testing.T) {
 				Retries: kong.Int(0),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Retries:        kong.Int(0),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
@@ -110,7 +110,6 @@ func TestServiceSetTest(t *testing.T) {
 				WriteTimeout: kong.Int(42),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
 				WriteTimeout:   kong.Int(42),
@@ -123,7 +122,6 @@ func TestServiceSetTest(t *testing.T) {
 				Path: kong.String("/foo"),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/foo"),
 				ConnectTimeout: kong.Int(60000),
@@ -141,7 +139,6 @@ func TestServiceSetTest(t *testing.T) {
 			want: &kong.Service{
 				Name:           kong.String("foo"),
 				Host:           kong.String("example.com"),
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/bar"),
 				ConnectTimeout: kong.Int(60000),
@@ -531,14 +528,18 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			opts: DefaulterOpts{
 				KongDefaults: &kongDefaultForTesting{
 					Service: &kong.Service{
-						Port: kong.Int(8080),
+						Path:           kong.String("/v1"),
+					  Protocol:       kong.String("http"),
+						ConnectTimeout: kong.Int(defaultTimeout),
+						WriteTimeout:   kong.Int(defaultTimeout),
+						ReadTimeout:    kong.Int(defaultTimeout),
 					},
 				},
 				DisableDynamicDefaults: true,
 			},
 			want: &Defaulter{
 				service: &kong.Service{
-					Port:           kong.Int(8080),
+					Path:           kong.String("/v1"),
 					Protocol:       kong.String("http"),
 					ConnectTimeout: kong.Int(defaultTimeout),
 					WriteTimeout:   kong.Int(defaultTimeout),
@@ -568,6 +569,164 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			}
 			if !reflect.DeepEqual(d.target, tc.want.target) {
 				assert.Equal(t, tc.want.target, d.target)
+			}
+		})
+	}
+}
+
+
+func TestCheckRestrictedFields(t *testing.T) {
+	assert := assert.New(t)
+
+	testCases := []struct {
+		desc string
+		entity *kong.Service
+		restrictedFields []string
+		invalidFields []string
+	}{
+		{
+			desc: "no restricted fields",
+			entity:  &kong.Service{
+				ID: kong.String("testID"),
+				Name: kong.String("testName"),
+			},
+			restrictedFields: []string{},
+		},
+		{
+			desc: "one restricted fields",
+			entity:  &kong.Service{
+				ID: kong.String("testID"),
+				Name: kong.String("testName"),
+			},
+			restrictedFields: []string{"ID"},
+			invalidFields: []string{"ID"},
+		},
+		{
+			desc: "multiple restricted fields",
+			entity:  &kong.Service{
+				ID: kong.String("testID"),
+				Name: kong.String("testName"),
+				Port: kong.Int(80),
+			},
+			restrictedFields: []string{"ID", "Name", "Port"},
+			invalidFields: []string{"ID", "Name", "Port"},
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			err := checkEntityDefaults(tC.entity, tC.restrictedFields)
+			if len(tC.invalidFields) > 0 {
+				assert.NotNil(err)
+				assert.Contains(err.Error(), strings.Join(tC.invalidFields, ", "))
+			} else {
+				assert.Nil(err)
+			}
+		})
+	}
+}
+
+func TestKongDefaultsRestrictedFields(t *testing.T) {
+	assert := assert.New(t)
+	ctx := context.Background()
+
+	testCases := []struct {
+		desc string
+		kongDefaults  *kongDefaultForTesting
+		invalidFields []string
+	}{
+		{
+			desc: "service no restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Service:  &kong.Service{
+					Path: kong.String("/v1"),
+				},
+			},
+		},
+		{
+			desc: "route no restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Route:  &kong.Route{
+					StripPath: kong.Bool(false),
+				},
+			},
+		},
+		{
+			desc: "target no restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Target:  &kong.Target{
+					Target: kong.String("testTarget"),
+				},
+			},
+		},
+		{
+			desc: "upstream no restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Upstream:  &kong.Upstream{
+					HostHeader: kong.String("testHostHeader"),
+				},
+			},
+		},
+		{
+			desc: "service restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Service:  &kong.Service{
+					ID: kong.String("testID"),
+					Name: kong.String("testName"),
+					Port: kong.Int(80),
+					Host: kong.String("testHost"),
+					Path: kong.String("/v1"),
+				},
+			},
+			invalidFields: defaultsRestrictedFields["service"],
+		},
+		{
+			desc: "route restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Route:  &kong.Route{
+					ID: kong.String("testID"),
+					Name: kong.String("testName"),
+					StripPath: kong.Bool(false),
+				},
+			},
+			invalidFields: defaultsRestrictedFields["route"],
+		},
+		{
+			desc: "target restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Target:  &kong.Target{
+					ID: kong.String("testID"),
+					Target: kong.String("testTarget"),
+				},
+			},
+			invalidFields: defaultsRestrictedFields["target"],
+		},
+		{
+			desc: "upstream restricted fields",
+			kongDefaults:  &kongDefaultForTesting{
+				Upstream:  &kong.Upstream{
+					ID: kong.String("testID"),
+					Name: kong.String("testName"),
+					HostHeader: kong.String("testHostHeader"),
+				},
+			},
+			invalidFields: defaultsRestrictedFields["upstream"],
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			opts := DefaulterOpts{
+				KongDefaults:	tC.kongDefaults,
+			}
+			d, err := GetDefaulter(ctx, opts)
+			if len(tC.invalidFields) > 0 {
+				assert.Nil(d)
+				assert.NotNil(err)
+				assert.Contains(err.Error(), strings.Join(tC.invalidFields, ", "))
+			} else {
+				assert.NotNil(d)
+				assert.Nil(err)
 			}
 		})
 	}
