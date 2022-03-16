@@ -73,6 +73,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 	}
+	if dumpConfig.SkipCACerts {
+		targetContent.CACertificates = []file.FCACertificate{}
+	}
 
 	rootClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {

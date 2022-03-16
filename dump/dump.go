@@ -20,6 +20,9 @@ type Config struct {
 	// are not exported.
 	SkipConsumers bool
 
+	// If true, CA certificates are not exported.
+	SkipCACerts bool
+
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
@@ -185,14 +188,16 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		return nil
 	})
 
-	group.Go(func() error {
-		caCerts, err := GetAllCACertificates(ctx, client, config.SelectorTags)
-		if err != nil {
-			return fmt.Errorf("ca-certificates: %w", err)
-		}
-		state.CACertificates = caCerts
-		return nil
-	})
+	if !config.SkipCACerts {
+		group.Go(func() error {
+			caCerts, err := GetAllCACertificates(ctx, client, config.SelectorTags)
+			if err != nil {
+				return fmt.Errorf("ca-certificates: %w", err)
+			}
+			state.CACertificates = caCerts
+			return nil
+		})
+	}
 
 	group.Go(func() error {
 		snis, err := GetAllSNIs(ctx, client, config.SelectorTags)

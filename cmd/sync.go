@@ -58,6 +58,8 @@ to get Kong's state in sync with the input state.`,
 		0, "artificial delay (in seconds) that is injected between insert operations \n"+
 			"for related entities (usually for Cassandra deployments).\n"+
 			"See 'db_update_propagation' in kong.conf.")
+	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
+		false, "do not sync CA certificates.")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }

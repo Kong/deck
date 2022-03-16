@@ -61,6 +61,8 @@ that will be created, updated, or deleted.
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
+	diffCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
+		false, "do not diff CA certificates.")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }

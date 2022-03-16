@@ -166,5 +166,7 @@ configure Kong.`,
 		false, "export only the RBAC resources (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume 'yes' to prompts and run non-interactively.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
+		false, "do not dump CA certificates.")
 	return dumpCmd
 }
