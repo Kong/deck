@@ -3,14 +3,10 @@
 package integration
 
 import (
-	"context"
-	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kong/deck/cmd"
-	"github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
@@ -221,84 +217,6 @@ var (
 		},
 	}
 )
-
-func getKongAddress() string {
-	address := os.Getenv("DECK_KONG_ADDR")
-	if address != "" {
-		return address
-	}
-	return "http://localhost:8001"
-}
-
-func getTestClient() (*kong.Client, error) {
-	return utils.GetKongClient(utils.KongClientConfig{
-		Address: getKongAddress(),
-	})
-}
-
-func sortSlices(x, y interface{}) bool {
-	var xName, yName string
-	switch xEntity := x.(type) {
-	case *kong.Service:
-		yEntity := y.(*kong.Service)
-		xName = *xEntity.Name
-		yName = *yEntity.Name
-	case *kong.Route:
-		yEntity := y.(*kong.Route)
-		xName = *xEntity.Name
-		yName = *yEntity.Name
-	case *kong.Plugin:
-		yEntity := y.(*kong.Plugin)
-		xName = *xEntity.Name
-		yName = *yEntity.Name
-	}
-	return xName < yName
-}
-
-func testKongState(t *testing.T, client *kong.Client,
-	expectedState utils.KongRawState, ignoreFields []cmp.Option) {
-	// Get entities from Kong
-	ctx := context.Background()
-	kongState, err := dump.Get(ctx, client, dump.Config{})
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-
-	opt := []cmp.Option{
-		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt"),
-		cmpopts.IgnoreFields(kong.Route{}, "ID", "CreatedAt", "UpdatedAt"),
-		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),
-		cmpopts.IgnoreFields(kong.Upstream{}, "ID", "CreatedAt"),
-		cmpopts.IgnoreFields(kong.Target{}, "ID", "CreatedAt"),
-		cmpopts.SortSlices(sortSlices),
-		cmpopts.EquateEmpty(),
-	}
-	opt = append(opt, ignoreFields...)
-
-	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
-		t.Errorf(diff)
-	}
-}
-
-func reset(t *testing.T) {
-	deckCmd := cmd.NewRootCmd()
-	deckCmd.SetArgs([]string{"reset", "--force"})
-	if err := deckCmd.Execute(); err != nil {
-		t.Fatalf(err.Error(), "failed to reset Kong's state")
-	}
-}
-
-func setup(t *testing.T) func(t *testing.T) {
-	return func(t *testing.T) {
-		reset(t)
-	}
-}
-
-func sync(kongFile string) {
-	deckCmd := cmd.NewRootCmd()
-	deckCmd.SetArgs([]string{"sync", "-s", kongFile})
-	deckCmd.ExecuteContext(context.Background())
-}
 
 // test scope:
 //   - 1.4.3
@@ -848,6 +766,43 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_SkipCACert(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "syncing with --skip-ca-certificates should ignore CA certs",
+			kongFile: "testdata/sync/008-skip-ca-cert/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:       svc1_207,
+				CACertificates: []*kong.CACertificate{},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// ca_certificates first appeared in 1.3, but we limit to 2.7+
+			// here because the schema changed and the entities aren't the same
+			// across all versions, even though the skip functionality works the same.
+			kong.RunWhenKong(t, ">=2.7.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile, "--skip-ca-certificates")
 			testKongState(t, client, tc.expectedState, nil)
 		})
 	}

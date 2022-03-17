@@ -118,6 +118,8 @@ By default, this command will ask for confirmation.`,
 			"When this setting has multiple tag values, entities must match every tag.")
 	resetCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "reset only the RBAC resources (Kong Enterprise only).")
+	resetCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
+		false, "do not reset CA certificates.")
 
 	return resetCmd
 }
