@@ -507,6 +507,32 @@ type FRBACEndpointPermission struct {
 	kong.RBACEndpointPermission `yaml:",inline,omitempty"`
 }
 
+func (frbac FRBACEndpointPermission) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{}
+	if frbac.Workspace != nil {
+		m["workspace"] = frbac.Workspace
+	}
+	if frbac.Actions != nil {
+		m["actions"] = frbac.Actions
+	}
+	if frbac.CreatedAt != nil {
+		m["created_at"] = frbac.CreatedAt
+	}
+	if frbac.Endpoint != nil {
+		m["endpoint"] = frbac.Endpoint
+	}
+	if frbac.Negative != nil {
+		m["negative"] = frbac.Negative
+	}
+	if frbac.Role != nil {
+		m["role"] = frbac.Role
+	}
+	if frbac.Comment != nil {
+		m["comment"] = frbac.Comment
+	}
+	return json.Marshal(m)
+}
+
 // KongDefaults represents default values that are filled in
 // for entities with corresponding missing properties.
 // +k8s:deepcopy-gen=true
