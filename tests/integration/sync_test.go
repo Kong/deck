@@ -807,3 +807,109 @@ func Test_Sync_SkipCACert(t *testing.T) {
 		})
 	}
 }
+
+func Test_Sync_RBAC(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "rbac",
+			kongFile: "testdata/sync/xxx-rbac-endpoint-permissions/kong.yaml",
+			expectedState: utils.KongRawState{
+				RBACRoles: []*kong.RBACRole{
+					{
+						Name:    kong.String("workspace-portal-admin"),
+						Comment: kong.String("Full access to Dev Portal related endpoints in the workspace"),
+					},
+				},
+				RBACEndpointPermissions: []*kong.RBACEndpointPermission{
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/developers"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/developers/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/files"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/files/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/kong"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/workspaces/default"),
+						Actions:   []*string{kong.String("read"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenEnterprise(t, ">=2.7.0", kong.RequiredFeatures{})
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile, "--rbac-resources-only")
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
