@@ -52,7 +52,11 @@ func testKongState(t *testing.T, client *kong.Client,
 ) {
 	// Get entities from Kong
 	ctx := context.Background()
-	kongState, err := dump.Get(ctx, client, dump.Config{})
+	dumpConfig := dump.Config{}
+	if expectedState.RBACEndpointPermissions != nil {
+		dumpConfig.RBACResourcesOnly = true
+	}
+	kongState, err := dump.Get(ctx, client, dumpConfig)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -64,7 +68,10 @@ func testKongState(t *testing.T, client *kong.Client,
 		cmpopts.IgnoreFields(kong.Upstream{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Target{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.CACertificate{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.RBACEndpointPermission{}, "Role", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.RBACRole{}, "ID", "CreatedAt"),
 		cmpopts.SortSlices(sortSlices),
+		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
 	}
 	opt = append(opt, ignoreFields...)
