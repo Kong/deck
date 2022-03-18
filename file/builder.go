@@ -20,6 +20,7 @@ type stateBuilder struct {
 	kongVersion     semver.Version
 
 	selectTags   []string
+	skipCACerts  bool
 	intermediate *state.KongState
 
 	client *kong.Client
@@ -61,7 +62,9 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 
 	// build
 	b.certificates()
-	b.caCertificates()
+	if !b.skipCACerts {
+		b.caCertificates()
+	}
 	b.services()
 	b.routes()
 	b.upstreams()
