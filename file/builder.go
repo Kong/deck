@@ -813,7 +813,7 @@ func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{
 
 	exists, err := utils.WorkspaceExists(b.ctx, b.client)
 	if err != nil {
-		return nil, fmt.Errorf("getPluginSchema: checking if workspace exists: %w", err)
+		return nil, fmt.Errorf("ensure workspace exists: %w", err)
 	}
 	if !exists {
 		return schema, nil

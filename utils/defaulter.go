@@ -227,7 +227,7 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 	exists, err := WorkspaceExists(ctx, opts.Client)
 	if err != nil {
-		return nil, fmt.Errorf("defaulter: checking if workspace exists: %w", err)
+		return nil, fmt.Errorf("ensure workspace exists: %w", err)
 	}
 	if opts.Client != nil && !opts.DisableDynamicDefaults && exists {
 		return getKongDefaulterWithClient(ctx, opts)

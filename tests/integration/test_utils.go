@@ -100,3 +100,13 @@ func sync(kongFile string, opts ...string) {
 	deckCmd.SetArgs(args)
 	deckCmd.ExecuteContext(context.Background()) //nolint:errcheck
 }
+
+func diff(kongFile string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"diff", "-s", kongFile}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(context.Background())
+}
