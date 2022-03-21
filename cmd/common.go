@@ -171,8 +171,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 func determineSelectorTag(targetContent file.Content, config dump.Config) ([]string, error) {
 	if targetContent.Info != nil {
 		if len(targetContent.Info.SelectorTags) > 0 {
+			utils.RemoveDuplicates(&targetContent.Info.SelectorTags)
 			if len(config.SelectorTags) > 0 {
-				utils.RemoveDuplicates(&targetContent.Info.SelectorTags)
 				sort.Strings(config.SelectorTags)
 				sort.Strings(targetContent.Info.SelectorTags)
 				if !reflect.DeepEqual(config.SelectorTags, targetContent.Info.SelectorTags) {
