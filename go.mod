@@ -19,7 +19,7 @@ require (
 	github.com/kong/go-kong v0.28.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/shirou/gopsutil/v3 v3.22.1
+	github.com/shirou/gopsutil/v3 v3.22.2
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.10.1
