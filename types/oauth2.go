@@ -118,7 +118,8 @@ func (d *oauth2CredDiffer) Deletes(handler func(crud.Event) error) error {
 }
 
 func (d *oauth2CredDiffer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) (
-	*crud.Event, error) {
+	*crud.Event, error,
+) {
 	_, err := d.targetState.Oauth2Creds.Get(*oauth2Cred.ID)
 	if err == state.ErrNotFound {
 		return &crud.Event{

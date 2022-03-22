@@ -10,8 +10,8 @@ type ServiceVersionService service
 
 // Create creates a ServiceVersion in Konnect.
 func (s *ServiceVersionService) Create(ctx context.Context,
-	sv *ServiceVersion) (*ServiceVersion, error) {
-
+	sv *ServiceVersion,
+) (*ServiceVersion, error) {
 	if sv == nil {
 		return nil, fmt.Errorf("cannot create a nil service-package")
 	}
@@ -63,8 +63,8 @@ func (s *ServiceVersionService) Delete(ctx context.Context, id *string) error {
 
 // Update updates a ServiceVersion in Konnect.
 func (s *ServiceVersionService) Update(ctx context.Context,
-	sv *ServiceVersion) (*ServiceVersion, error) {
-
+	sv *ServiceVersion,
+) (*ServiceVersion, error) {
 	if sv == nil {
 		return nil, fmt.Errorf("cannot update a nil service-package")
 	}
@@ -89,7 +89,8 @@ func (s *ServiceVersionService) Update(ctx context.Context,
 
 // ListForPackage fetches a list of Service Versions for a given servicePackageID.
 func (s *ServiceVersionService) ListForPackage(ctx context.Context,
-	servicePackageID *string) ([]ServiceVersion, error) {
+	servicePackageID *string,
+) ([]ServiceVersion, error) {
 	endpoint := "/api/service_packages/" + *servicePackageID + "/service_versions"
 	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {

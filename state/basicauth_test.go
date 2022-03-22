@@ -157,8 +157,8 @@ func TestBasicAuthGetByConsumer(t *testing.T) {
 }
 
 func populateWithBasicAuthFixtures(assert *assert.Assertions,
-	collection *BasicAuthsCollection) {
-
+	collection *BasicAuthsCollection,
+) {
 	basicAuths := []BasicAuth{
 		{
 			BasicAuth: kong.BasicAuth{

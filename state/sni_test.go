@@ -160,7 +160,6 @@ func TestSNIsCollection_Get(t *testing.T) {
 		want    *SNI
 		wantErr bool
 	}{
-
 		{
 			name: "gets a sni by ID",
 			args: args{

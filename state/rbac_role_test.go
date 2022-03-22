@@ -120,7 +120,6 @@ func TestRBACRolesCollection_Get(t *testing.T) {
 		want    *RBACRole
 		wantErr bool
 	}{
-
 		{
 			name: "gets a rbacRole by ID",
 			args: args{

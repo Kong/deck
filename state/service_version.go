@@ -218,7 +218,8 @@ func getAllByPackageID(txn *memdb.Txn, packageID string) ([]*ServiceVersion, err
 
 // GetAllByServicePackageID returns all serviceVersions for a servicePackage id.
 func (k *ServiceVersionsCollection) GetAllByServicePackageID(id string) ([]*ServiceVersion,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	return getAllByPackageID(txn, id)
 }

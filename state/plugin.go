@@ -194,7 +194,8 @@ func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin, error) {
 }
 
 func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
-	*Plugin, error) {
+	*Plugin, error,
+) {
 	if name == "" {
 		return nil, errPluginNameRequired
 	}
@@ -221,7 +222,8 @@ func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
 // searched.
 // name is required.
 func (k *PluginsCollection) GetByProp(name, serviceID,
-	routeID string, consumerID string) (*Plugin, error) {
+	routeID string, consumerID string,
+) (*Plugin, error) {
 	txn := k.db.Txn(false)
 	defer txn.Abort()
 
@@ -229,7 +231,8 @@ func (k *PluginsCollection) GetByProp(name, serviceID,
 }
 
 func (k *PluginsCollection) getAllPluginsBy(index, identifier string) (
-	[]*Plugin, error) {
+	[]*Plugin, error,
+) {
 	if identifier == "" {
 		return nil, errIDRequired
 	}
@@ -255,21 +258,24 @@ func (k *PluginsCollection) getAllPluginsBy(index, identifier string) (
 // GetAllByServiceID returns all plugins referencing a service
 // by its id.
 func (k *PluginsCollection) GetAllByServiceID(id string) ([]*Plugin,
-	error) {
+	error,
+) {
 	return k.getAllPluginsBy(pluginsByServiceID, id)
 }
 
 // GetAllByRouteID returns all plugins referencing a service
 // by its id.
 func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
-	error) {
+	error,
+) {
 	return k.getAllPluginsBy(pluginsByRouteID, id)
 }
 
 // GetAllByConsumerID returns all plugins referencing a consumer
 // by its id.
 func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
-	error) {
+	error,
+) {
 	return k.getAllPluginsBy(pluginsByConsumerID, id)
 }
 

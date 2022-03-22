@@ -63,7 +63,8 @@ func validateConfig(config Config) error {
 }
 
 func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
-	client *kong.Client, config Config, state *utils.KongRawState) {
+	client *kong.Client, config Config, state *utils.KongRawState,
+) {
 	group.Go(func() error {
 		consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
 		if err != nil {
@@ -147,7 +148,8 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 }
 
 func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
-	client *kong.Client, config Config, state *utils.KongRawState) {
+	client *kong.Client, config Config, state *utils.KongRawState,
+) {
 	group.Go(func() error {
 		services, err := GetAllServices(ctx, client, config.SelectorTags)
 		if err != nil {
@@ -224,7 +226,8 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
-	client *kong.Client, state *utils.KongRawState) {
+	client *kong.Client, state *utils.KongRawState,
+) {
 	group.Go(func() error {
 		roles, err := GetAllRBACRoles(ctx, client)
 		if err != nil {
@@ -276,7 +279,8 @@ func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRa
 
 // GetAllServices queries Kong for all the services using client.
 func GetAllServices(ctx context.Context, client *kong.Client,
-	tags []string) ([]*kong.Service, error) {
+	tags []string,
+) ([]*kong.Service, error) {
 	var services []*kong.Service
 	opt := newOpt(tags)
 
@@ -299,7 +303,8 @@ func GetAllServices(ctx context.Context, client *kong.Client,
 
 // GetAllRoutes queries Kong for all the routes using client.
 func GetAllRoutes(ctx context.Context, client *kong.Client,
-	tags []string) ([]*kong.Route, error) {
+	tags []string,
+) ([]*kong.Route, error) {
 	var routes []*kong.Route
 	opt := newOpt(tags)
 
@@ -322,7 +327,8 @@ func GetAllRoutes(ctx context.Context, client *kong.Client,
 
 // GetAllPlugins queries Kong for all the plugins using client.
 func GetAllPlugins(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.Plugin, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.Plugin, error) {
 	var plugins []*kong.Plugin
 	opt := newOpt(tags)
 
@@ -345,7 +351,8 @@ func GetAllPlugins(ctx context.Context,
 
 // GetAllCertificates queries Kong for all the certificates using client.
 func GetAllCertificates(ctx context.Context, client *kong.Client,
-	tags []string) ([]*kong.Certificate, error) {
+	tags []string,
+) ([]*kong.Certificate, error) {
 	var certificates []*kong.Certificate
 	opt := newOpt(tags)
 
@@ -373,7 +380,8 @@ func GetAllCertificates(ctx context.Context, client *kong.Client,
 // GetAllCACertificates queries Kong for all the CACertificates using client.
 func GetAllCACertificates(ctx context.Context,
 	client *kong.Client,
-	tags []string) ([]*kong.CACertificate, error) {
+	tags []string,
+) ([]*kong.CACertificate, error) {
 	var caCertificates []*kong.CACertificate
 	opt := newOpt(tags)
 
@@ -407,7 +415,8 @@ func GetAllCACertificates(ctx context.Context,
 
 // GetAllSNIs queries Kong for all the SNIs using client.
 func GetAllSNIs(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.SNI, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.SNI, error) {
 	var snis []*kong.SNI
 	opt := newOpt(tags)
 
@@ -431,7 +440,8 @@ func GetAllSNIs(ctx context.Context,
 // GetAllConsumers queries Kong for all the consumers using client.
 // Please use this method with caution if you have a lot of consumers.
 func GetAllConsumers(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.Consumer, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.Consumer, error) {
 	var consumers []*kong.Consumer
 	opt := newOpt(tags)
 
@@ -457,7 +467,8 @@ func GetAllConsumers(ctx context.Context,
 
 // GetAllUpstreams queries Kong for all the Upstreams using client.
 func GetAllUpstreams(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.Upstream, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.Upstream, error) {
 	var upstreams []*kong.Upstream
 	opt := newOpt(tags)
 
@@ -482,7 +493,8 @@ func GetAllUpstreams(ctx context.Context,
 // Targets are queries per upstream as there exists no endpoint in Kong
 // to list all targets of all upstreams.
 func GetAllTargets(ctx context.Context, client *kong.Client,
-	upstreams []*kong.Upstream, tags []string) ([]*kong.Target, error) {
+	upstreams []*kong.Upstream, tags []string,
+) ([]*kong.Target, error) {
 	var targets []*kong.Target
 	opt := newOpt(tags)
 
@@ -508,7 +520,8 @@ func GetAllTargets(ctx context.Context, client *kong.Client,
 
 // GetAllKeyAuths queries Kong for all key-auth credentials using client.
 func GetAllKeyAuths(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.KeyAuth, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.KeyAuth, error) {
 	var keyAuths []*kong.KeyAuth
 	opt := newOpt(tags)
 
@@ -534,7 +547,8 @@ func GetAllKeyAuths(ctx context.Context,
 
 // GetAllHMACAuths queries Kong for all hmac-auth credentials using client.
 func GetAllHMACAuths(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.HMACAuth, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.HMACAuth, error) {
 	var hmacAuths []*kong.HMACAuth
 	opt := newOpt(tags)
 
@@ -560,7 +574,8 @@ func GetAllHMACAuths(ctx context.Context,
 
 // GetAllJWTAuths queries Kong for all jwt credentials using client.
 func GetAllJWTAuths(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.JWTAuth, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.JWTAuth, error) {
 	var jwtAuths []*kong.JWTAuth
 	opt := newOpt(tags)
 
@@ -586,7 +601,8 @@ func GetAllJWTAuths(ctx context.Context,
 
 // GetAllBasicAuths queries Kong for all basic-auth credentials using client.
 func GetAllBasicAuths(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.BasicAuth, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.BasicAuth, error) {
 	var basicAuths []*kong.BasicAuth
 	opt := newOpt(tags)
 
@@ -612,7 +628,8 @@ func GetAllBasicAuths(ctx context.Context,
 
 // GetAllOauth2Creds queries Kong for all oauth2 credentials using client.
 func GetAllOauth2Creds(ctx context.Context, client *kong.Client,
-	tags []string) ([]*kong.Oauth2Credential, error) {
+	tags []string,
+) ([]*kong.Oauth2Credential, error) {
 	var oauth2Creds []*kong.Oauth2Credential
 	opt := newOpt(tags)
 
@@ -638,7 +655,8 @@ func GetAllOauth2Creds(ctx context.Context, client *kong.Client,
 
 // GetAllACLGroups queries Kong for all ACL groups using client.
 func GetAllACLGroups(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.ACLGroup, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.ACLGroup, error) {
 	var aclGroups []*kong.ACLGroup
 	opt := newOpt(tags)
 
@@ -664,7 +682,8 @@ func GetAllACLGroups(ctx context.Context,
 
 // GetAllMTLSAuths queries Kong for all basic-auth credentials using client.
 func GetAllMTLSAuths(ctx context.Context,
-	client *kong.Client, tags []string) ([]*kong.MTLSAuth, error) {
+	client *kong.Client, tags []string,
+) ([]*kong.MTLSAuth, error) {
 	var mtlsAuths []*kong.MTLSAuth
 	opt := newOpt(tags)
 
@@ -703,8 +722,8 @@ func GetAllMTLSAuths(ctx context.Context,
 
 // GetAllRBACRoles queries Kong for all the RBACRoles using client.
 func GetAllRBACRoles(ctx context.Context,
-	client *kong.Client) ([]*kong.RBACRole, error) {
-
+	client *kong.Client,
+) ([]*kong.RBACRole, error) {
 	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {
 		return nil, err
@@ -717,8 +736,8 @@ func GetAllRBACRoles(ctx context.Context,
 }
 
 func GetAllRBACREndpointPermissions(ctx context.Context,
-	client *kong.Client) ([]*kong.RBACEndpointPermission, error) {
-
+	client *kong.Client,
+) ([]*kong.RBACEndpointPermission, error) {
 	eps := []*kong.RBACEndpointPermission{}
 	roles, err := client.RBACRoles.ListAll(ctx)
 	if err != nil {

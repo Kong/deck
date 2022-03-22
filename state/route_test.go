@@ -128,7 +128,6 @@ func TestRoutesCollection_Get(t *testing.T) {
 		want    *Route
 		wantErr bool
 	}{
-
 		{
 			name: "gets a route by ID",
 			args: args{

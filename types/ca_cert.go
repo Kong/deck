@@ -94,7 +94,8 @@ func (d *caCertificateDiffer) Deletes(handler func(crud.Event) error) error {
 }
 
 func (d *caCertificateDiffer) deleteCACertificate(
-	caCert *state.CACertificate) (*crud.Event, error) {
+	caCert *state.CACertificate,
+) (*crud.Event, error) {
 	_, err := d.targetState.CACertificates.Get(*caCert.ID)
 	if err == state.ErrNotFound {
 		return &crud.Event{
@@ -132,7 +133,8 @@ func (d *caCertificateDiffer) CreateAndUpdates(handler func(crud.Event) error) e
 }
 
 func (d *caCertificateDiffer) createUpdateCACertificate(
-	caCert *state.CACertificate) (*crud.Event, error) {
+	caCert *state.CACertificate,
+) (*crud.Event, error) {
 	caCertCopy := &state.CACertificate{CACertificate: *caCert.DeepCopy()}
 	currentCACert, err := d.currentState.CACertificates.Get(*caCert.ID)
 

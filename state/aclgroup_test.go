@@ -183,8 +183,8 @@ func TestACLGroupGetByConsumer(t *testing.T) {
 }
 
 func populateWithACLGroupFixtures(assert *assert.Assertions,
-	collection *ACLGroupsCollection) {
-
+	collection *ACLGroupsCollection,
+) {
 	aclGroups := []ACLGroup{
 		{
 			ACLGroup: kong.ACLGroup{

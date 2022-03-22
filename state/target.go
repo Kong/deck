@@ -120,8 +120,8 @@ func getAllByUpstreamID(txn *memdb.Txn, upstreamID string) ([]*Target, error) {
 
 // Get returns a specific target for upstream with upstreamID.
 func (k *TargetsCollection) Get(upstreamID,
-	targetOrID string) (*Target, error) {
-
+	targetOrID string,
+) (*Target, error) {
 	txn := k.db.Txn(false)
 	defer txn.Abort()
 
@@ -228,7 +228,8 @@ func (k *TargetsCollection) GetAll() ([]*Target, error) {
 // GetAllByUpstreamID returns all targets referencing a Upstream
 // by its ID.
 func (k *TargetsCollection) GetAllByUpstreamID(id string) ([]*Target,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	return getAllByUpstreamID(txn, id)
 }

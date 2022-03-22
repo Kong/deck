@@ -10,8 +10,8 @@ type ServicePackageService service
 
 // Create creates a ServicePackage in Konnect.
 func (s *ServicePackageService) Create(ctx context.Context,
-	sp *ServicePackage) (*ServicePackage, error) {
-
+	sp *ServicePackage,
+) (*ServicePackage, error) {
 	if sp == nil {
 		return nil, fmt.Errorf("cannot create a nil service-package")
 	}
@@ -49,8 +49,8 @@ func (s *ServicePackageService) Delete(ctx context.Context, id *string) error {
 
 // Update updates a ServicePackage in Konnect.
 func (s *ServicePackageService) Update(ctx context.Context,
-	sp *ServicePackage) (*ServicePackage, error) {
-
+	sp *ServicePackage,
+) (*ServicePackage, error) {
 	if sp == nil {
 		return nil, fmt.Errorf("cannot update a nil service-package")
 	}
@@ -75,7 +75,8 @@ func (s *ServicePackageService) Update(ctx context.Context,
 
 // List fetches a list of Service packages.
 func (s *ServicePackageService) List(ctx context.Context,
-	opt *ListOpt) ([]*ServicePackage, *ListOpt, error) {
+	opt *ListOpt,
+) ([]*ServicePackage, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/api/service_packages", opt)
 	if err != nil {
 		return nil, nil, err
@@ -100,7 +101,8 @@ func (s *ServicePackageService) List(ctx context.Context,
 
 // ListAll fetches all Service packages.
 func (s *ServicePackageService) ListAll(ctx context.Context) ([]*ServicePackage,
-	error) {
+	error,
+) {
 	var servicePackages, data []*ServicePackage
 	var err error
 	opt := &ListOpt{Size: pageSize}

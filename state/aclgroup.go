@@ -157,7 +157,8 @@ func getAllACLGroupsByConsumerID(txn *memdb.Txn, consumerID string) ([]*ACLGroup
 
 // Get gets a acl-group for a consumer by group or ID.
 func (k *ACLGroupsCollection) Get(consumerID,
-	groupOrID string) (*ACLGroup, error) {
+	groupOrID string,
+) (*ACLGroup, error) {
 	if groupOrID == "" {
 		return nil, errIDRequired
 	}
@@ -170,7 +171,8 @@ func (k *ACLGroupsCollection) Get(consumerID,
 // GetAllByConsumerID returns all acl-group credentials
 // belong to a Consumer with id.
 func (k *ACLGroupsCollection) GetAllByConsumerID(id string) ([]*ACLGroup,
-	error) {
+	error,
+) {
 	if id == "" {
 		return nil, errIDRequired
 	}

@@ -161,7 +161,6 @@ func TestDocumentCollection_GetByParent(t *testing.T) {
 		want    *Document
 		wantErr bool
 	}{
-
 		{
 			name: "gets a document by parent and ID",
 			args: args{

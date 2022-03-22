@@ -37,7 +37,8 @@ func (k *KeyAuthsCollection) Get(keyOrID string) (*KeyAuth, error) {
 // GetAllByConsumerID returns all key-auth credentials
 // belong to a Consumer with id.
 func (k *KeyAuthsCollection) GetAllByConsumerID(id string) ([]*KeyAuth,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err

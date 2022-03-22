@@ -48,7 +48,8 @@ func sortSlices(x, y interface{}) bool {
 }
 
 func testKongState(t *testing.T, client *kong.Client,
-	expectedState utils.KongRawState, ignoreFields []cmp.Option) {
+	expectedState utils.KongRawState, ignoreFields []cmp.Option,
+) {
 	// Get entities from Kong
 	ctx := context.Background()
 	kongState, err := dump.Get(ctx, client, dump.Config{})

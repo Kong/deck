@@ -174,8 +174,8 @@ func TestKeyAuthGetByConsumer(t *testing.T) {
 }
 
 func populateWithKeyAuthFixtures(assert *assert.Assertions,
-	collection *KeyAuthsCollection) {
-
+	collection *KeyAuthsCollection,
+) {
 	keyAuths := []KeyAuth{
 		{
 			KeyAuth: kong.KeyAuth{

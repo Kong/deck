@@ -193,7 +193,8 @@ func (k *RoutesCollection) GetAll() ([]*Route, error) {
 // GetAllByServiceID returns all routes referencing a service
 // by its id.
 func (k *RoutesCollection) GetAllByServiceID(id string) ([]*Route,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	iter, err := txn.Get(routeTableName, routesByServiceID, id)
 	if err != nil {

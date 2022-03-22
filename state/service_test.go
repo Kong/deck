@@ -128,7 +128,6 @@ func TestServicesCollection_Get(t *testing.T) {
 		want    *Service
 		wantErr bool
 	}{
-
 		{
 			name: "gets a service by ID",
 			args: args{

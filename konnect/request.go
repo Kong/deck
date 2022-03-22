@@ -14,8 +14,8 @@ import (
 // client creation.
 // body is always marshaled into JSON.
 func (c *Client) NewRequest(method, endpoint string, qs interface{},
-	body interface{}) (*http.Request, error) {
-
+	body interface{},
+) (*http.Request, error) {
 	if endpoint == "" {
 		return nil, fmt.Errorf("endpoint can't be nil")
 	}

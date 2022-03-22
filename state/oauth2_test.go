@@ -149,8 +149,8 @@ func TestOauth2CredentialGetByConsumer(t *testing.T) {
 }
 
 func populateWithOauth2CredentialFixtures(assert *assert.Assertions,
-	collection *Oauth2CredsCollection) {
-
+	collection *Oauth2CredsCollection,
+) {
 	oauth2Creds := []Oauth2Credential{
 		{
 			Oauth2Credential: kong.Oauth2Credential{

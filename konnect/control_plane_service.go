@@ -11,7 +11,8 @@ type ControlPlaneService service
 // No pagination is being performed because the number of control planes
 // is expected to be very small.
 func (s *ControlPlaneService) List(ctx context.Context,
-	opt *ListOpt) ([]ControlPlane, *ListOpt, error) {
+	opt *ListOpt,
+) ([]ControlPlane, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/api/control_planes", opt)
 	if err != nil {
 		return nil, nil, err

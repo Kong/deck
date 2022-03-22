@@ -131,7 +131,8 @@ func (d *upstreamDiffer) CreateAndUpdates(handler func(crud.Event) error) error 
 }
 
 func (d *upstreamDiffer) createUpdateUpstream(upstream *state.Upstream) (*crud.Event,
-	error) {
+	error,
+) {
 	upstreamCopy := &state.Upstream{Upstream: *upstream.DeepCopy()}
 	currentUpstream, err := d.currentState.Upstreams.Get(*upstream.Name)
 

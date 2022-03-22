@@ -119,7 +119,8 @@ func getCertificateByCertKey(txn *memdb.Txn, cert, key string) (*Certificate, er
 // GetByCertKey gets a certificate with
 // the same key and cert from the collection.
 func (k *CertificatesCollection) GetByCertKey(cert,
-	key string) (*Certificate, error) {
+	key string,
+) (*Certificate, error) {
 	if cert == "" || key == "" {
 		return nil, fmt.Errorf("cert/key cannot be empty string")
 	}

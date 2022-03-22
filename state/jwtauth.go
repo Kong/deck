@@ -37,7 +37,8 @@ func (k *JWTAuthsCollection) Get(keyOrID string) (*JWTAuth, error) {
 // GetAllByConsumerID returns all jwt-auth credentials
 // belong to a Consumer with id.
 func (k *JWTAuthsCollection) GetAllByConsumerID(id string) ([]*JWTAuth,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err

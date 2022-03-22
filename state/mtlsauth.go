@@ -37,7 +37,8 @@ func (k *MTLSAuthsCollection) Get(ID string) (*MTLSAuth, error) {
 // GetAllByConsumerID returns all mtls-auth credentials
 // belong to a Consumer with id.
 func (k *MTLSAuthsCollection) GetAllByConsumerID(id string) ([]*MTLSAuth,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err

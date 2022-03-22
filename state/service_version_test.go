@@ -153,7 +153,6 @@ func TestServiceVersionCollection_Get(t *testing.T) {
 		want    *ServiceVersion
 		wantErr bool
 	}{
-
 		{
 			name: "gets a serviceVersion by package and version ID",
 			args: args{

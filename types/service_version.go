@@ -106,7 +106,8 @@ func (s *serviceVersionCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.
 }
 
 func (s *serviceVersionCRUD) relationCRUD(ctx context.Context, version,
-	oldVersion *konnect.ServiceVersion) error {
+	oldVersion *konnect.ServiceVersion,
+) error {
 	var err error
 
 	if version.ControlPlaneServiceRelation != nil &&

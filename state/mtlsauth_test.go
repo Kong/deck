@@ -142,8 +142,8 @@ func TestMTLSAuthGetByConsumer(t *testing.T) {
 }
 
 func populateWithMTLSAuthFixtures(assert *assert.Assertions,
-	collection *MTLSAuthsCollection) {
-
+	collection *MTLSAuthsCollection,
+) {
 	mtlsAuths := []MTLSAuth{
 		{
 			MTLSAuth: kong.MTLSAuth{
