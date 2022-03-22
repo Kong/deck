@@ -93,7 +93,8 @@ func (d *certificateDiffer) Deletes(handler func(crud.Event) error) error {
 }
 
 func (d *certificateDiffer) deleteCertificate(
-	certificate *state.Certificate) (*crud.Event, error) {
+	certificate *state.Certificate,
+) (*crud.Event, error) {
 	_, err := d.targetState.Certificates.Get(*certificate.ID)
 	if err == state.ErrNotFound {
 		return &crud.Event{
@@ -131,7 +132,8 @@ func (d *certificateDiffer) CreateAndUpdates(handler func(crud.Event) error) err
 }
 
 func (d *certificateDiffer) createUpdateCertificate(
-	certificate *state.Certificate) (*crud.Event, error) {
+	certificate *state.Certificate,
+) (*crud.Event, error) {
 	certificateCopy := &state.Certificate{Certificate: *certificate.DeepCopy()}
 	currentCertificate, err := d.currentState.Certificates.Get(*certificate.ID)
 

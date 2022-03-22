@@ -125,7 +125,8 @@ func KonnectStateToFile(kongState *state.KongState, config WriteConfig) error {
 }
 
 func populateServicePackages(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	packages, err := kongState.ServicePackages.GetAll()
 	if err != nil {
 		return err
@@ -216,7 +217,8 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 }
 
 func populateServices(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	services, err := kongState.Services.GetAll()
 	if err != nil {
 		return err
@@ -295,7 +297,8 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 }
 
 func populateServicelessRoutes(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	routes, err := kongState.Routes.GetAll()
 	if err != nil {
 		return err
@@ -334,7 +337,8 @@ func populateServicelessRoutes(kongState *state.KongState, file *Content,
 }
 
 func populatePlugins(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	plugins, err := kongState.Plugins.GetAll()
 	if err != nil {
 		return err
@@ -392,7 +396,8 @@ func populatePlugins(kongState *state.KongState, file *Content,
 }
 
 func populateUpstreams(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	upstreams, err := kongState.Upstreams.GetAll()
 	if err != nil {
 		return err
@@ -425,7 +430,8 @@ func populateUpstreams(kongState *state.KongState, file *Content,
 }
 
 func populateCertificates(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	certificates, err := kongState.Certificates.GetAll()
 	if err != nil {
 		return err
@@ -462,7 +468,8 @@ func populateCertificates(kongState *state.KongState, file *Content,
 }
 
 func populateCACertificates(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	caCertificates, err := kongState.CACertificates.GetAll()
 	if err != nil {
 		return err
@@ -480,7 +487,8 @@ func populateCACertificates(kongState *state.KongState, file *Content,
 }
 
 func populateConsumers(kongState *state.KongState, file *Content,
-	config WriteConfig) error {
+	config WriteConfig,
+) error {
 	consumers, err := kongState.Consumers.GetAll()
 	if err != nil {
 		return err

@@ -181,7 +181,8 @@ func (k *credentialsCollection) GetAll() ([]entity, error) {
 // GetAllByConsumerID returns all key-auth credentials
 // belong to a Consumer with id.
 func (k *credentialsCollection) GetAllByConsumerID(id string) ([]entity,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	iter, err := txn.Get(k.CredType, byConsumerID, id)
 	if err != nil {

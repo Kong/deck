@@ -18,7 +18,8 @@ type KonnectConfig struct {
 }
 
 func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
-	config KonnectConfig) (*utils.KonnectRawState, error) {
+	config KonnectConfig,
+) (*utils.KonnectRawState, error) {
 	var res utils.KonnectRawState
 	var servicePackages []*konnect.ServicePackage
 	var relations []*konnect.ControlPlaneServiceRelation
@@ -125,7 +126,8 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 }
 
 func filterNonKongPackages(controlPlaneID string, packages []*konnect.ServicePackage,
-	relations []*konnect.ControlPlaneServiceRelation) []*konnect.ServicePackage {
+	relations []*konnect.ControlPlaneServiceRelation,
+) []*konnect.ServicePackage {
 	kongServiceIDs := kongServiceIDs(controlPlaneID, relations)
 	var res []*konnect.ServicePackage
 	for _, p := range packages {
@@ -157,7 +159,8 @@ func filterNonKongPackages(controlPlaneID string, packages []*konnect.ServicePac
 }
 
 func kongServiceIDs(cpID string,
-	relations []*konnect.ControlPlaneServiceRelation) map[string]bool {
+	relations []*konnect.ControlPlaneServiceRelation,
+) map[string]bool {
 	res := map[string]bool{}
 	for _, relation := range relations {
 		if !utils.Empty(relation.ControlPlaneEntityID) &&

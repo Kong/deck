@@ -152,8 +152,8 @@ func TestJWTAuthGetByConsumer(t *testing.T) {
 }
 
 func populateWithJWTAuthFixtures(assert *assert.Assertions,
-	collection *JWTAuthsCollection) {
-
+	collection *JWTAuthsCollection,
+) {
 	jwtAuths := []JWTAuth{
 		{
 			JWTAuth: kong.JWTAuth{

@@ -38,8 +38,8 @@ var allIndex = &memdb.IndexSchema{
 // based on search on multiple indexes with same key.
 func multiIndexLookupUsingTxn(txn *memdb.Txn, tableName string,
 	indices []string,
-	args ...interface{}) (interface{}, error) {
-
+	args ...interface{},
+) (interface{}, error) {
 	for _, indexName := range indices {
 		res, err := txn.First(tableName, indexName, args...)
 		if res == nil && err == nil {

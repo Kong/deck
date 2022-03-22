@@ -122,7 +122,6 @@ func TestServicePackagesCollection_Get(t *testing.T) {
 		want    *ServicePackage
 		wantErr bool
 	}{
-
 		{
 			name: "gets a servicePackage by ID",
 			args: args{

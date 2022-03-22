@@ -10,8 +10,8 @@ import (
 type AuthService service
 
 func (s *AuthService) Login(ctx context.Context, email,
-	password string) (AuthResponse, error) {
-
+	password string,
+) (AuthResponse, error) {
 	body := map[string]string{
 		"username": email,
 		"password": password,

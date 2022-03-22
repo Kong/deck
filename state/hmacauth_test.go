@@ -156,8 +156,8 @@ func TestHMACAuthGetByConsumer(t *testing.T) {
 }
 
 func populateWithHMACAuthFixtures(assert *assert.Assertions,
-	collection *HMACAuthsCollection) {
-
+	collection *HMACAuthsCollection,
+) {
 	hmacAuths := []HMACAuth{
 		{
 			HMACAuth: kong.HMACAuth{

@@ -96,7 +96,6 @@ func TestRBACEndpointPermissionsCollection_Get(t *testing.T) {
 		want    *RBACEndpointPermission
 		wantErr bool
 	}{
-
 		{
 			name: "gets a rbacEndpointPermission by ID",
 			args: args{

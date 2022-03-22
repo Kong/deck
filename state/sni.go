@@ -206,7 +206,8 @@ func (k *SNIsCollection) GetAll() ([]*SNI, error) {
 // GetAllByCertID returns all routes referencing a service
 // by its id.
 func (k *SNIsCollection) GetAllByCertID(id string) ([]*SNI,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	iter, err := txn.Get(sniTableName, snisByCertID, id)
 	if err != nil {

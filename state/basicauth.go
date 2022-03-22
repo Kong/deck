@@ -37,7 +37,8 @@ func (k *BasicAuthsCollection) Get(keyOrID string) (*BasicAuth, error) {
 // GetAllByConsumerID returns all basic-auth credentials
 // belong to a Consumer with id.
 func (k *BasicAuthsCollection) GetAllByConsumerID(id string) ([]*BasicAuth,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err

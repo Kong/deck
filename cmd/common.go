@@ -63,8 +63,8 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string) error {
-
+	delay int, workspace string,
+) error {
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -205,7 +205,8 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
-	dry bool, parallelism int, delay int, client *kong.Client) (int, error) {
+	dry bool, parallelism int, delay int, client *kong.Client,
+) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
@@ -278,7 +279,8 @@ func validateNoArgs(cmd *cobra.Command, args []string) error {
 }
 
 func checkForRBACResources(content utils.KongRawState,
-	rbacResourcesOnly bool) error {
+	rbacResourcesOnly bool,
+) error {
 	proxyConfig := containsProxyConfiguration(content)
 	rbacConfig := containsRBACConfiguration(content)
 	if proxyConfig && rbacConfig {

@@ -69,8 +69,7 @@ func (c *Client) SetControlPlaneID(cpID string) {
 }
 
 // Do executes a HTTP request and returns a response
-func (c *Client) Do(ctx context.Context, req *http.Request,
-	v interface{}) (*http.Response, error) {
+func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*http.Response, error) {
 	var err error
 	if req == nil {
 		return nil, fmt.Errorf("request cannot be nil")

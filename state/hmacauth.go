@@ -37,7 +37,8 @@ func (k *HMACAuthsCollection) Get(keyOrID string) (*HMACAuth, error) {
 // GetAllByConsumerID returns all hmac-auth credentials
 // belong to a Consumer with id.
 func (k *HMACAuthsCollection) GetAllByConsumerID(id string) ([]*HMACAuth,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err

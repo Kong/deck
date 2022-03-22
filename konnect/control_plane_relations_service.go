@@ -21,9 +21,10 @@ type ControlPlaneServiceRelationUpdateRequest struct {
 }
 
 // Create creates a ControlPlaneServiceRelation in Konnect.
-func (s *ControlPlaneRelationsService) Create(ctx context.Context,
-	relation *ControlPlaneServiceRelationCreateRequest) (*ControlPlaneServiceRelation, error) {
-
+func (s *ControlPlaneRelationsService) Create(
+	ctx context.Context,
+	relation *ControlPlaneServiceRelationCreateRequest,
+) (*ControlPlaneServiceRelation, error) {
 	if relation == nil {
 		return nil, fmt.Errorf("cannot create a nil ControlPlaneServiceRelation")
 	}
@@ -47,7 +48,8 @@ func (s *ControlPlaneRelationsService) Create(ctx context.Context,
 
 // Delete deletes a ControlPlaneServiceRelation in Konnect.
 func (s *ControlPlaneRelationsService) Delete(ctx context.Context,
-	relationID *string) error {
+	relationID *string,
+) error {
 	if emptyString(relationID) {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}
@@ -65,8 +67,8 @@ func (s *ControlPlaneRelationsService) Delete(ctx context.Context,
 
 // Update updates a ControlPlaneServiceRelation in Konnect.
 func (s ControlPlaneRelationsService) Update(ctx context.Context,
-	relation *ControlPlaneServiceRelationUpdateRequest) (*ServiceVersion, error) {
-
+	relation *ControlPlaneServiceRelationUpdateRequest,
+) (*ServiceVersion, error) {
 	if relation == nil {
 		return nil, fmt.Errorf("cannot update a nil ControlPlaneServiceRelation")
 	}
@@ -92,7 +94,8 @@ func (s ControlPlaneRelationsService) Update(ctx context.Context,
 
 // List fetches a list of control_plane_service_relations.
 func (s *ControlPlaneRelationsService) List(ctx context.Context,
-	opt *ListOpt) ([]*ControlPlaneServiceRelation, *ListOpt, error) {
+	opt *ListOpt,
+) ([]*ControlPlaneServiceRelation, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/api/control_plane_service_relations", opt)
 	if err != nil {
 		return nil, nil, err
@@ -117,7 +120,8 @@ func (s *ControlPlaneRelationsService) List(ctx context.Context,
 
 // ListAll fetches all control_plane_service_relations.
 func (s *ControlPlaneRelationsService) ListAll(ctx context.Context) ([]*ControlPlaneServiceRelation,
-	error) {
+	error,
+) {
 	var relations, data []*ControlPlaneServiceRelation
 	var err error
 	opt := &ListOpt{Size: pageSize}

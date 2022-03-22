@@ -206,7 +206,8 @@ func parseHeaders(headers []string) (http.Header, error) {
 }
 
 func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.Client,
-	error) {
+	error,
+) {
 	address := CleanAddress(config.Address)
 
 	if httpClient == nil {

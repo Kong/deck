@@ -16,7 +16,8 @@ import (
 )
 
 func syncKonnect(ctx context.Context,
-	filenames []string, dry bool, parallelism int) error {
+	filenames []string, dry bool, parallelism int,
+) error {
 	httpClient := utils.HTTPClient()
 
 	// read target file
@@ -108,7 +109,8 @@ func syncKonnect(ctx context.Context,
 }
 
 func fetchKongControlPlaneID(ctx context.Context,
-	client *konnect.Client) (string, error) {
+	client *konnect.Client,
+) (string, error) {
 	controlPlanes, _, err := client.ControlPlanes.List(ctx, nil)
 	if err != nil {
 		return "", fmt.Errorf("fetching control planes: %w", err)

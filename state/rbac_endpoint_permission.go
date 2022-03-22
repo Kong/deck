@@ -190,7 +190,8 @@ func (k *RBACEndpointPermissionsCollection) GetAll() ([]*RBACEndpointPermission,
 // GetAllByRoleID returns all endpoint permissions by referencing a role
 // by its id.
 func (k *RBACEndpointPermissionsCollection) GetAllByRoleID(id string) ([]*RBACEndpointPermission,
-	error) {
+	error,
+) {
 	txn := k.db.Txn(false)
 	iter, err := txn.Get(rbacEndpointPermissionTableName, rbacEndpointPermissionsByRoleID, id)
 	if err != nil {

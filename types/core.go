@@ -89,7 +89,7 @@ const (
 	// KeyAuth identifies aKeyAuth in Kong.
 	KeyAuth EntityType = "key-auth"
 	// OAuth2Cred identifies a OAuth2Cred in Kong.
-	OAuth2Cred EntityType = "oauth2-cred"
+	OAuth2Cred EntityType = "oauth2-cred" //nolint:gosec
 
 	// RBACRole identifies a RBACRole in Kong Enterprise.
 	RBACRole EntityType = "rbac-role"

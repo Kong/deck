@@ -233,7 +233,8 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 }
 
 func GetKonnectState(rawKong *utils.KongRawState,
-	rawKonnect *utils.KonnectRawState) (*KongState, error) {
+	rawKonnect *utils.KonnectRawState,
+) (*KongState, error) {
 	kongState, err := NewKongState()
 	if err != nil {
 		return nil, fmt.Errorf("creating new in-memory state of Kong: %w", err)

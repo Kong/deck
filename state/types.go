@@ -93,7 +93,8 @@ func (s1 *Service) Equal(s2 *Service) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (s1 *Service) EqualWithOpts(s2 *Service,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID bool, ignoreTS bool,
+) bool {
 	s1Copy := s1.Service.DeepCopy()
 	s2Copy := s2.Service.DeepCopy()
 
@@ -147,7 +148,8 @@ func (r1 *Route) Equal(r2 *Route) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	r1Copy := r1.Route.DeepCopy()
 	r2Copy := r2.Route.DeepCopy()
 
@@ -202,7 +204,8 @@ func (u1 *Upstream) Equal(u2 *Upstream) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (u1 *Upstream) EqualWithOpts(u2 *Upstream,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID bool, ignoreTS bool,
+) bool {
 	u1Copy := u1.Upstream.DeepCopy()
 	u2Copy := u2.Upstream.DeepCopy()
 
@@ -260,7 +263,8 @@ func (t1 *Target) Equal(t2 *Target) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (t1 *Target) EqualWithOpts(t2 *Target, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	t1Copy := t1.Target.DeepCopy()
 	t2Copy := t2.Target.DeepCopy()
 
@@ -313,7 +317,8 @@ func (c1 *Certificate) Equal(c2 *Certificate) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (c1 *Certificate) EqualWithOpts(c2 *Certificate,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID bool, ignoreTS bool,
+) bool {
 	c1Copy := c1.Certificate.DeepCopy()
 	c2Copy := c2.Certificate.DeepCopy()
 
@@ -362,7 +367,8 @@ func (s1 *SNI) Console() string {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (s1 *SNI) EqualWithOpts(s2 *SNI, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	s1Copy := s1.SNI.DeepCopy()
 	s2Copy := s2.SNI.DeepCopy()
 
@@ -439,7 +445,8 @@ func (p1 *Plugin) Equal(p2 *Plugin) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	p1Copy := p1.Plugin.DeepCopy()
 	p2Copy := p2.Plugin.DeepCopy()
 
@@ -495,7 +502,8 @@ func (c1 *Consumer) Equal(c2 *Consumer) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID bool, ignoreTS bool,
+) bool {
 	c1Copy := c1.Consumer.DeepCopy()
 	c2Copy := c2.Consumer.DeepCopy()
 
@@ -557,7 +565,8 @@ func (k1 *KeyAuth) Equal(k2 *KeyAuth) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	k1Copy := k1.KeyAuth.DeepCopy()
 	k2Copy := k2.KeyAuth.DeepCopy()
 
@@ -628,7 +637,8 @@ func (h1 *HMACAuth) Equal(h2 *HMACAuth) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	h1Copy := h1.HMACAuth.DeepCopy()
 	h2Copy := h2.HMACAuth.DeepCopy()
 
@@ -699,7 +709,8 @@ func (j1 *JWTAuth) Equal(j2 *JWTAuth) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	j1Copy := j1.JWTAuth.DeepCopy()
 	j2Copy := j2.JWTAuth.DeepCopy()
 
@@ -770,7 +781,8 @@ func (b1 *BasicAuth) Equal(b2 *BasicAuth) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
-	ignoreTS, ignorePassword, ignoreForeign bool) bool {
+	ignoreTS, ignorePassword, ignoreForeign bool,
+) bool {
 	b1Copy := b1.BasicAuth.DeepCopy()
 	b2Copy := b2.BasicAuth.DeepCopy()
 
@@ -845,7 +857,8 @@ func (b1 *ACLGroup) Equal(b2 *ACLGroup) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	b1Copy := b1.ACLGroup.DeepCopy()
 	b2Copy := b2.ACLGroup.DeepCopy()
 
@@ -898,7 +911,8 @@ func (c1 *CACertificate) Equal(c2 *CACertificate) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (c1 *CACertificate) EqualWithOpts(c2 *CACertificate,
-	ignoreID bool, ignoreTS bool) bool {
+	ignoreID bool, ignoreTS bool,
+) bool {
 	c1Copy := c1.CACertificate.DeepCopy()
 	c2Copy := c2.CACertificate.DeepCopy()
 
@@ -938,7 +952,8 @@ func (k1 *Oauth2Credential) Equal(k2 *Oauth2Credential) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (k1 *Oauth2Credential) EqualWithOpts(k2 *Oauth2Credential, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	k1Copy := k1.Oauth2Credential.DeepCopy()
 	k2Copy := k2.Oauth2Credential.DeepCopy()
 
@@ -1009,7 +1024,8 @@ func (b1 *MTLSAuth) Equal(b2 *MTLSAuth) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	b1Copy := b1.MTLSAuth.DeepCopy()
 	b2Copy := b2.MTLSAuth.DeepCopy()
 
@@ -1062,7 +1078,8 @@ func (r1 *RBACRole) Equal(r2 *RBACRole) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (r1 *RBACRole) EqualWithOpts(r2 *RBACRole, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	r1Copy := r1.RBACRole.DeepCopy()
 	r2Copy := r2.RBACRole.DeepCopy()
 
@@ -1110,7 +1127,8 @@ func (r1 *RBACEndpointPermission) Equal(r2 *RBACEndpointPermission) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (r1 *RBACEndpointPermission) EqualWithOpts(r2 *RBACEndpointPermission, ignoreID,
-	ignoreTS, ignoreForeign bool) bool {
+	ignoreTS, ignoreForeign bool,
+) bool {
 	r1Copy := r1.RBACEndpointPermission.DeepCopy()
 	r2Copy := r2.RBACEndpointPermission.DeepCopy()
 

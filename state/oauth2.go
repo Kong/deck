@@ -37,7 +37,8 @@ func (k *Oauth2CredsCollection) Get(keyOrID string) (*Oauth2Credential, error) {
 // GetAllByConsumerID returns all oauth2 credentials
 // belong to a Consumer with id.
 func (k *Oauth2CredsCollection) GetAllByConsumerID(id string) ([]*Oauth2Credential,
-	error) {
+	error,
+) {
 	creds, err := k.credentialsCollection.GetAllByConsumerID(id)
 	if err != nil {
 		return nil, err
