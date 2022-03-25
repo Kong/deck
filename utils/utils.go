@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -8,6 +9,8 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/kong/go-kong/kong"
 )
 
 var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
@@ -86,4 +89,15 @@ func RemoveDuplicates(slice *[]string) {
 		newSlice = append(newSlice, s)
 	}
 	*slice = newSlice
+}
+
+func WorkspaceExists(ctx context.Context, client *kong.Client) (bool, error) {
+	if client == nil {
+		return false, nil
+	}
+	workspace := client.Workspace()
+	if workspace == "" {
+		return true, nil
+	}
+	return client.Workspaces.Exists(ctx, &workspace)
 }

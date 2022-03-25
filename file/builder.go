@@ -810,7 +810,16 @@ func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{
 	if schema, ok := b.schemasCache[pluginName]; ok {
 		return schema, nil
 	}
-	schema, err := b.client.Plugins.GetFullSchema(b.ctx, &pluginName)
+
+	exists, err := utils.WorkspaceExists(b.ctx, b.client)
+	if err != nil {
+		return nil, fmt.Errorf("ensure workspace exists: %w", err)
+	}
+	if !exists {
+		return schema, nil
+	}
+
+	schema, err = b.client.Plugins.GetFullSchema(b.ctx, &pluginName)
 	if err != nil {
 		return schema, err
 	}
