@@ -258,7 +258,7 @@ func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
 	err := validateKongDefaults(defaults)
 	if err != nil {
-		return fmt.Errorf("%w", err)
+		return fmt.Errorf("validating defaults: %w", err)
 	}
 
 	r := reflect.ValueOf(defaults)
