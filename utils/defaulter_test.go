@@ -529,7 +529,7 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 				KongDefaults: &kongDefaultForTesting{
 					Service: &kong.Service{
 						Path:           kong.String("/v1"),
-					  Protocol:       kong.String("http"),
+						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(defaultTimeout),
 						WriteTimeout:   kong.Int(defaultTimeout),
 						ReadTimeout:    kong.Int(defaultTimeout),
@@ -574,42 +574,41 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 	}
 }
 
-
 func TestCheckRestrictedFields(t *testing.T) {
 	assert := assert.New(t)
 
 	testCases := []struct {
-		desc string
-		entity *kong.Service
+		desc             string
+		entity           *kong.Service
 		restrictedFields []string
-		invalidFields []string
+		invalidFields    []string
 	}{
 		{
 			desc: "no restricted fields",
-			entity:  &kong.Service{
-				ID: kong.String("testID"),
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
 				Name: kong.String("testName"),
 			},
 			restrictedFields: []string{},
 		},
 		{
 			desc: "one restricted fields",
-			entity:  &kong.Service{
-				ID: kong.String("testID"),
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
 				Name: kong.String("testName"),
 			},
 			restrictedFields: []string{"ID"},
-			invalidFields: []string{"ID"},
+			invalidFields:    []string{"ID"},
 		},
 		{
 			desc: "multiple restricted fields",
-			entity:  &kong.Service{
-				ID: kong.String("testID"),
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
 				Name: kong.String("testName"),
 				Port: kong.Int(80),
 			},
 			restrictedFields: []string{"ID", "Name", "Port"},
-			invalidFields: []string{"ID", "Name", "Port"},
+			invalidFields:    []string{"ID", "Name", "Port"},
 		},
 	}
 
@@ -618,7 +617,7 @@ func TestCheckRestrictedFields(t *testing.T) {
 			err := checkEntityDefaults(tC.entity, tC.restrictedFields)
 			if len(tC.invalidFields) > 0 {
 				assert.NotNil(err)
-				assert.Contains(err.Error(), strings.Join(tC.invalidFields, ", "))
+				assert.Contains(err.Error(), strings.ToLower(strings.Join(tC.invalidFields, ", ")))
 			} else {
 				assert.Nil(err)
 			}
@@ -631,99 +630,99 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 	ctx := context.Background()
 
 	testCases := []struct {
-		desc string
+		desc          string
 		kongDefaults  *kongDefaultForTesting
 		invalidFields []string
 	}{
 		{
 			desc: "service no restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Service:  &kong.Service{
+			kongDefaults: &kongDefaultForTesting{
+				Service: &kong.Service{
 					Path: kong.String("/v1"),
 				},
 			},
 		},
 		{
 			desc: "route no restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Route:  &kong.Route{
+			kongDefaults: &kongDefaultForTesting{
+				Route: &kong.Route{
 					StripPath: kong.Bool(false),
 				},
 			},
 		},
 		{
 			desc: "target no restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Target:  &kong.Target{
-					Target: kong.String("testTarget"),
+			kongDefaults: &kongDefaultForTesting{
+				Target: &kong.Target{
+					Weight: kong.Int(42),
 				},
 			},
 		},
 		{
 			desc: "upstream no restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Upstream:  &kong.Upstream{
+			kongDefaults: &kongDefaultForTesting{
+				Upstream: &kong.Upstream{
 					HostHeader: kong.String("testHostHeader"),
 				},
 			},
 		},
 		{
 			desc: "service restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Service:  &kong.Service{
-					ID: kong.String("testID"),
+			kongDefaults: &kongDefaultForTesting{
+				Service: &kong.Service{
+					ID:   kong.String("testID"),
 					Name: kong.String("testName"),
 					Port: kong.Int(80),
 					Host: kong.String("testHost"),
 					Path: kong.String("/v1"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["service"],
+			invalidFields: defaultsRestrictedFields["Service"],
 		},
 		{
 			desc: "route restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Route:  &kong.Route{
-					ID: kong.String("testID"),
-					Name: kong.String("testName"),
+			kongDefaults: &kongDefaultForTesting{
+				Route: &kong.Route{
+					ID:        kong.String("testID"),
+					Name:      kong.String("testName"),
 					StripPath: kong.Bool(false),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["route"],
+			invalidFields: defaultsRestrictedFields["Route"],
 		},
 		{
 			desc: "target restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Target:  &kong.Target{
-					ID: kong.String("testID"),
+			kongDefaults: &kongDefaultForTesting{
+				Target: &kong.Target{
+					ID:     kong.String("testID"),
 					Target: kong.String("testTarget"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["target"],
+			invalidFields: defaultsRestrictedFields["Target"],
 		},
 		{
 			desc: "upstream restricted fields",
-			kongDefaults:  &kongDefaultForTesting{
-				Upstream:  &kong.Upstream{
-					ID: kong.String("testID"),
-					Name: kong.String("testName"),
+			kongDefaults: &kongDefaultForTesting{
+				Upstream: &kong.Upstream{
+					ID:         kong.String("testID"),
+					Name:       kong.String("testName"),
 					HostHeader: kong.String("testHostHeader"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["upstream"],
+			invalidFields: defaultsRestrictedFields["Upstream"],
 		},
 	}
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			opts := DefaulterOpts{
-				KongDefaults:	tC.kongDefaults,
+				KongDefaults: tC.kongDefaults,
 			}
 			d, err := GetDefaulter(ctx, opts)
 			if len(tC.invalidFields) > 0 {
 				assert.Nil(d)
 				assert.NotNil(err)
-				assert.Contains(err.Error(), strings.Join(tC.invalidFields, ", "))
+				assert.Contains(err.Error(), strings.ToLower(strings.Join(tC.invalidFields, ", ")))
 			} else {
 				assert.NotNil(d)
 				assert.Nil(err)

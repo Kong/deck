@@ -46,19 +46,13 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 		return nil, err
 	}
 
-	// TODO check if it's OK to do the validation only for the user input
-	err := d.validateKongDefaults()
-	if err != nil {
-		return nil, fmt.Errorf("%w", err)
-	}
-
 	if opts.DisableDynamicDefaults {
 		if err := d.populateStaticDefaultsForKonnect(); err != nil {
 			return nil, err
 		}
 	}
 
-	err = d.Register(d.service)
+	err := d.Register(d.service)
 	if err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
@@ -84,45 +78,12 @@ func checkEntityDefaults(entity interface{}, restrictedFields []string) error {
 	for _, fieldName := range restrictedFields {
 		field := reflect.Indirect(r).FieldByName(fieldName)
 		if field.IsValid() && !field.IsNil() {
-			invalidFields = append(invalidFields, fieldName)
+			invalidFields = append(invalidFields, strings.ToLower(fieldName))
 		}
 	}
 	if len(invalidFields) > 0 {
-		return fmt.Errorf("cannot have these restricted fields set: %s", strings.Join(invalidFields, ", "))
-	}
-	return nil
-}
-
-func (d *Defaulter) validateKongDefaults() error {
-	var errs ErrArray
-	// TODO ideally, I would like to avoid this code duplication, but got some
-	// issues with the reflect.Value -> interface{} translation... to fix
-	err := checkEntityDefaults(d.service, defaultsRestrictedFields["service"])
-	if err != nil {
-		entityErr := fmt.Errorf(
-			"service defaults %s", err)
-		errs.Errors = append(errs.Errors, entityErr)
-	}
-	err = checkEntityDefaults(d.route, defaultsRestrictedFields["route"])
-	if err != nil {
-		entityErr := fmt.Errorf(
-			"route defaults %s", err)
-		errs.Errors = append(errs.Errors, entityErr)
-	}
-	err = checkEntityDefaults(d.target, defaultsRestrictedFields["target"])
-	if err != nil {
-		entityErr := fmt.Errorf(
-			"target defaults %s", err)
-		errs.Errors = append(errs.Errors, entityErr)
-	}
-	err = checkEntityDefaults(d.upstream, defaultsRestrictedFields["upstream"])
-	if err != nil {
-		entityErr := fmt.Errorf(
-			"upstream defaults %s", err)
-		errs.Errors = append(errs.Errors, entityErr)
-	}
-	if errs.Errors != nil {
-		return errs
+		return fmt.Errorf("cannot have these restricted fields set: %s",
+			strings.Join(invalidFields, ", "))
 	}
 	return nil
 }
@@ -295,6 +256,11 @@ func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 }
 
 func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
+	err := validateKongDefaults(defaults)
+	if err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
 	r := reflect.ValueOf(defaults)
 
 	service := reflect.Indirect(r).FieldByName("Service")
@@ -331,6 +297,28 @@ func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
 		if err != nil {
 			return fmt.Errorf("merging: %w", err)
 		}
+	}
+	return nil
+}
+
+func validateKongDefaults(defaults interface{}) error {
+	var errs ErrArray
+	r := reflect.ValueOf(defaults)
+	for objectName, restrictedFields := range defaultsRestrictedFields {
+		objectValue := reflect.Indirect(r).FieldByName(objectName)
+		if objectValue.IsNil() || !objectValue.IsValid() {
+			continue
+		}
+		object := objectValue.Interface()
+		err := checkEntityDefaults(object, restrictedFields)
+		if err != nil {
+			entityErr := fmt.Errorf(
+				"%s defaults %s", strings.ToLower(objectName), err)
+			errs.Errors = append(errs.Errors, entityErr)
+		}
+	}
+	if errs.Errors != nil {
+		return errs
 	}
 	return nil
 }

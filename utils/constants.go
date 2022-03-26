@@ -5,7 +5,6 @@ import (
 )
 
 const (
-//	defaultPort        = 80
 	defaultTimeout     = 60000
 	defaultSlots       = 10000
 	defaultWeight      = 100
@@ -71,10 +70,10 @@ var (
 		HashOnCookiePath: kong.String("/"),
 	}
 	defaultsRestrictedFields = map[string][]string{
-		"service": {"ID", "Host", "Name", "Port"},
-		"route": {"ID", "Name"},
-		"target": {"ID"}, // TODO check what is target4..
-		"upstream": {"ID", "Name"},
+		"Service":  {"ID", "Host", "Name", "Port"},
+		"Route":    {"ID", "Name"},
+		"Target":   {"ID", "Target"},
+		"Upstream": {"ID", "Name"},
 	}
 )
 
