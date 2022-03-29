@@ -3,7 +3,6 @@ package utils
 import (
 	"context"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/kong/go-kong/kong"
@@ -581,7 +580,8 @@ func TestCheckRestrictedFields(t *testing.T) {
 		desc             string
 		entity           *kong.Service
 		restrictedFields []string
-		invalidFields    []string
+		wantErr          bool
+		expectedErr      string
 	}{
 		{
 			desc: "no restricted fields",
@@ -598,7 +598,8 @@ func TestCheckRestrictedFields(t *testing.T) {
 				Name: kong.String("testName"),
 			},
 			restrictedFields: []string{"ID"},
-			invalidFields:    []string{"ID"},
+			wantErr:          true,
+			expectedErr:      "cannot have these restricted fields set: id",
 		},
 		{
 			desc: "multiple restricted fields",
@@ -608,18 +609,19 @@ func TestCheckRestrictedFields(t *testing.T) {
 				Port: kong.Int(80),
 			},
 			restrictedFields: []string{"ID", "Name", "Port"},
-			invalidFields:    []string{"ID", "Name", "Port"},
+			wantErr:          true,
+			expectedErr:      "cannot have these restricted fields set: id, name, port",
 		},
 	}
 
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			err := checkEntityDefaults(tC.entity, tC.restrictedFields)
-			if len(tC.invalidFields) > 0 {
-				assert.NotNil(err)
-				assert.Contains(err.Error(), strings.ToLower(strings.Join(tC.invalidFields, ", ")))
-			} else {
-				assert.Nil(err)
+			if (err != nil) != tC.wantErr {
+				t.Errorf("got error = %v, expected error = %v", err, tC.wantErr)
+			}
+			if tC.expectedErr != "" {
+				assert.Equal(err.Error(), tC.expectedErr)
 			}
 		})
 	}
@@ -630,9 +632,10 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 	ctx := context.Background()
 
 	testCases := []struct {
-		desc          string
-		kongDefaults  *kongDefaultForTesting
-		invalidFields []string
+		desc         string
+		kongDefaults *kongDefaultForTesting
+		wantErr      bool
+		expectedErr  string
 	}{
 		{
 			desc: "service no restricted fields",
@@ -677,7 +680,8 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 					Path: kong.String("/v1"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["Service"],
+			wantErr:     true,
+			expectedErr: "service defaults cannot have these restricted fields set: id, host, name, port",
 		},
 		{
 			desc: "route restricted fields",
@@ -688,7 +692,8 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 					StripPath: kong.Bool(false),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["Route"],
+			wantErr:     true,
+			expectedErr: "route defaults cannot have these restricted fields set: id, name",
 		},
 		{
 			desc: "target restricted fields",
@@ -698,7 +703,8 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 					Target: kong.String("testTarget"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["Target"],
+			wantErr:     true,
+			expectedErr: "target defaults cannot have these restricted fields set: id, target",
 		},
 		{
 			desc: "upstream restricted fields",
@@ -709,7 +715,8 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 					HostHeader: kong.String("testHostHeader"),
 				},
 			},
-			invalidFields: defaultsRestrictedFields["Upstream"],
+			wantErr:     true,
+			expectedErr: "upstream defaults cannot have these restricted fields set: id, name",
 		},
 	}
 
@@ -718,14 +725,12 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 			opts := DefaulterOpts{
 				KongDefaults: tC.kongDefaults,
 			}
-			d, err := GetDefaulter(ctx, opts)
-			if len(tC.invalidFields) > 0 {
-				assert.Nil(d)
-				assert.NotNil(err)
-				assert.Contains(err.Error(), strings.ToLower(strings.Join(tC.invalidFields, ", ")))
-			} else {
-				assert.NotNil(d)
-				assert.Nil(err)
+			_, err := GetDefaulter(ctx, opts)
+			if (err != nil) != tC.wantErr {
+				t.Errorf("got error = %v, expected error = %v", err, tC.wantErr)
+			}
+			if tC.expectedErr != "" {
+				assert.Contains(err.Error(), tC.expectedErr)
 			}
 		})
 	}
