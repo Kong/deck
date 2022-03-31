@@ -96,7 +96,6 @@ func TestServiceSetTest(t *testing.T) {
 				Retries: kong.Int(0),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Retries:        kong.Int(0),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
@@ -110,7 +109,6 @@ func TestServiceSetTest(t *testing.T) {
 				WriteTimeout: kong.Int(42),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
 				WriteTimeout:   kong.Int(42),
@@ -123,7 +121,6 @@ func TestServiceSetTest(t *testing.T) {
 				Path: kong.String("/foo"),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/foo"),
 				ConnectTimeout: kong.Int(60000),
@@ -141,7 +138,6 @@ func TestServiceSetTest(t *testing.T) {
 			want: &kong.Service{
 				Name:           kong.String("foo"),
 				Host:           kong.String("example.com"),
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/bar"),
 				ConnectTimeout: kong.Int(60000),
@@ -531,14 +527,18 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			opts: DefaulterOpts{
 				KongDefaults: &kongDefaultForTesting{
 					Service: &kong.Service{
-						Port: kong.Int(8080),
+						Path:           kong.String("/v1"),
+						Protocol:       kong.String("http"),
+						ConnectTimeout: kong.Int(defaultTimeout),
+						WriteTimeout:   kong.Int(defaultTimeout),
+						ReadTimeout:    kong.Int(defaultTimeout),
 					},
 				},
 				DisableDynamicDefaults: true,
 			},
 			want: &Defaulter{
 				service: &kong.Service{
-					Port:           kong.Int(8080),
+					Path:           kong.String("/v1"),
 					Protocol:       kong.String("http"),
 					ConnectTimeout: kong.Int(defaultTimeout),
 					WriteTimeout:   kong.Int(defaultTimeout),
@@ -568,6 +568,169 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			}
 			if !reflect.DeepEqual(d.target, tc.want.target) {
 				assert.Equal(t, tc.want.target, d.target)
+			}
+		})
+	}
+}
+
+func TestCheckRestrictedFields(t *testing.T) {
+	assert := assert.New(t)
+
+	testCases := []struct {
+		desc             string
+		entity           *kong.Service
+		restrictedFields []string
+		wantErr          bool
+		expectedErr      string
+	}{
+		{
+			desc: "no restricted fields",
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
+				Name: kong.String("testName"),
+			},
+			restrictedFields: []string{},
+		},
+		{
+			desc: "one restricted fields",
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
+				Name: kong.String("testName"),
+			},
+			restrictedFields: []string{"ID"},
+			wantErr:          true,
+			expectedErr:      "cannot have these restricted fields set: id",
+		},
+		{
+			desc: "multiple restricted fields",
+			entity: &kong.Service{
+				ID:   kong.String("testID"),
+				Name: kong.String("testName"),
+				Port: kong.Int(80),
+			},
+			restrictedFields: []string{"ID", "Name", "Port"},
+			wantErr:          true,
+			expectedErr:      "cannot have these restricted fields set: id, name, port",
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			err := checkEntityDefaults(tC.entity, tC.restrictedFields)
+			if (err != nil) != tC.wantErr {
+				t.Errorf("got error = %v, expected error = %v", err, tC.wantErr)
+			}
+			if tC.expectedErr != "" {
+				assert.Equal(err.Error(), tC.expectedErr)
+			}
+		})
+	}
+}
+
+func TestKongDefaultsRestrictedFields(t *testing.T) {
+	assert := assert.New(t)
+	ctx := context.Background()
+
+	testCases := []struct {
+		desc         string
+		kongDefaults *kongDefaultForTesting
+		wantErr      bool
+		expectedErr  string
+	}{
+		{
+			desc: "service no restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Service: &kong.Service{
+					Path: kong.String("/v1"),
+				},
+			},
+		},
+		{
+			desc: "route no restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Route: &kong.Route{
+					StripPath: kong.Bool(false),
+				},
+			},
+		},
+		{
+			desc: "target no restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Target: &kong.Target{
+					Weight: kong.Int(42),
+				},
+			},
+		},
+		{
+			desc: "upstream no restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Upstream: &kong.Upstream{
+					HostHeader: kong.String("testHostHeader"),
+				},
+			},
+		},
+		{
+			desc: "service restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Service: &kong.Service{
+					ID:   kong.String("testID"),
+					Name: kong.String("testName"),
+					Port: kong.Int(80),
+					Host: kong.String("testHost"),
+					Path: kong.String("/v1"),
+				},
+			},
+			wantErr:     true,
+			expectedErr: "service defaults cannot have these restricted fields set: id, host, name, port",
+		},
+		{
+			desc: "route restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Route: &kong.Route{
+					ID:        kong.String("testID"),
+					Name:      kong.String("testName"),
+					StripPath: kong.Bool(false),
+				},
+			},
+			wantErr:     true,
+			expectedErr: "route defaults cannot have these restricted fields set: id, name",
+		},
+		{
+			desc: "target restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Target: &kong.Target{
+					ID:     kong.String("testID"),
+					Target: kong.String("testTarget"),
+				},
+			},
+			wantErr:     true,
+			expectedErr: "target defaults cannot have these restricted fields set: id, target",
+		},
+		{
+			desc: "upstream restricted fields",
+			kongDefaults: &kongDefaultForTesting{
+				Upstream: &kong.Upstream{
+					ID:         kong.String("testID"),
+					Name:       kong.String("testName"),
+					HostHeader: kong.String("testHostHeader"),
+				},
+			},
+			wantErr:     true,
+			expectedErr: "upstream defaults cannot have these restricted fields set: id, name",
+		},
+	}
+
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			opts := DefaulterOpts{
+				KongDefaults: tC.kongDefaults,
+			}
+			_, err := GetDefaulter(ctx, opts)
+			if (err != nil) != tC.wantErr {
+				t.Errorf("got error = %v, expected error = %v", err, tC.wantErr)
+			}
+			if tC.expectedErr != "" {
+				assert.Contains(err.Error(), tC.expectedErr)
 			}
 		})
 	}

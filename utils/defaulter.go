@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/imdario/mergo"
 	"github.com/kong/go-kong/kong"
@@ -44,6 +45,7 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 	if err := d.populateDefaultsFromInput(opts.KongDefaults); err != nil {
 		return nil, err
 	}
+
 	if opts.DisableDynamicDefaults {
 		if err := d.populateStaticDefaultsForKonnect(); err != nil {
 			return nil, err
@@ -67,6 +69,23 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
 	}
 	return d, nil
+}
+
+// Check if `entity` has restricted fields set
+func checkEntityDefaults(entity interface{}, restrictedFields []string) error {
+	var invalidFields []string
+	r := reflect.ValueOf(entity)
+	for _, fieldName := range restrictedFields {
+		field := reflect.Indirect(r).FieldByName(fieldName)
+		if field.IsValid() && !field.IsNil() {
+			invalidFields = append(invalidFields, strings.ToLower(fieldName))
+		}
+	}
+	if len(invalidFields) > 0 {
+		return fmt.Errorf("cannot have these restricted fields set: %s",
+			strings.Join(invalidFields, ", "))
+	}
+	return nil
 }
 
 func (d *Defaulter) once() {
@@ -237,6 +256,11 @@ func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 }
 
 func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
+	err := validateKongDefaults(defaults)
+	if err != nil {
+		return fmt.Errorf("validating defaults: %w", err)
+	}
+
 	r := reflect.ValueOf(defaults)
 
 	service := reflect.Indirect(r).FieldByName("Service")
@@ -273,6 +297,28 @@ func (d *Defaulter) populateDefaultsFromInput(defaults interface{}) error {
 		if err != nil {
 			return fmt.Errorf("merging: %w", err)
 		}
+	}
+	return nil
+}
+
+func validateKongDefaults(defaults interface{}) error {
+	var errs ErrArray
+	r := reflect.ValueOf(defaults)
+	for objectName, restrictedFields := range defaultsRestrictedFields {
+		objectValue := reflect.Indirect(r).FieldByName(objectName)
+		if objectValue.IsNil() || !objectValue.IsValid() {
+			continue
+		}
+		object := objectValue.Interface()
+		err := checkEntityDefaults(object, restrictedFields)
+		if err != nil {
+			entityErr := fmt.Errorf(
+				"%s defaults %s", strings.ToLower(objectName), err)
+			errs.Errors = append(errs.Errors, entityErr)
+		}
+	}
+	if errs.Errors != nil {
+		return errs
 	}
 	return nil
 }

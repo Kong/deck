@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	defaultPort        = 80
 	defaultTimeout     = 60000
 	defaultSlots       = 10000
 	defaultWeight      = 100
@@ -14,7 +13,6 @@ const (
 
 var (
 	serviceDefaults = kong.Service{
-		Port:           kong.Int(defaultPort),
 		Protocol:       kong.String("http"),
 		ConnectTimeout: kong.Int(defaultTimeout),
 		WriteTimeout:   kong.Int(defaultTimeout),
@@ -70,6 +68,12 @@ var (
 		HashOn:           kong.String("none"),
 		HashFallback:     kong.String("none"),
 		HashOnCookiePath: kong.String("/"),
+	}
+	defaultsRestrictedFields = map[string][]string{
+		"Service":  {"ID", "Host", "Name", "Port"},
+		"Route":    {"ID", "Name"},
+		"Target":   {"ID", "Target"},
+		"Upstream": {"ID", "Name"},
 	}
 )
 
