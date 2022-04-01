@@ -111,7 +111,7 @@ var (
 	}
 
 	// has run-on set to 'first'
-	plugin_151 = []*kong.Plugin{
+	plugin_143_151 = []*kong.Plugin{
 		{
 			Name: kong.String("basic-auth"),
 			Protocols: []*string{
@@ -483,6 +483,41 @@ func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
 }
 
 // test scope:
+//   - 1.4.3
+func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: plugin_143_151,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, "==1.4.3")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
 //   - 1.5.0.11+enterprise
 func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	// setup stage
@@ -536,7 +571,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: plugin_151,
+				Plugins: plugin_143_151,
 			},
 		},
 	}
