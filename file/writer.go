@@ -642,7 +642,8 @@ func populateConsumers(kongState *state.KongState, file *Content,
 }
 
 func getSharedPlugin(sharedPlugins map[string]utils.SharedPlugin,
-	consumerID, serviceID, routeID string) string {
+	consumerID, serviceID, routeID string,
+) string {
 	for name, content := range sharedPlugins {
 		for _, consumer := range content.Consumers {
 			if consumer == consumerID {
@@ -664,7 +665,8 @@ func getSharedPlugin(sharedPlugins map[string]utils.SharedPlugin,
 }
 
 func setPluginSharedConfig(fp *FPlugin, sharedPlugins map[string]utils.SharedPlugin,
-	consumerID, serviceID, routeID string) {
+	consumerID, serviceID, routeID string,
+) {
 	if sharedPlugin := getSharedPlugin(
 		sharedPlugins, consumerID, serviceID, routeID,
 	); sharedPlugin != "" {
