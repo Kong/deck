@@ -1,0 +1,17 @@
+_format_version: "1.1"
+services:
+- name: svc1
+  host: mockbin.org
+  routes:
+  - name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+upstreams:
+- name: upstream1
+  targets:
+  - target: 198.51.100.11:80
+plugins:
+- name: basic-auth
+  config:
+    anonymous: 58076db2-28b6-423b-ba39-a797193017f7

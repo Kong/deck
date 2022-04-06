@@ -110,6 +110,43 @@ var (
 		},
 	}
 
+	// has run-on set to 'first'
+	plugin_143_151 = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+			},
+			RunOn: kong.String("first"),
+		},
+	}
+
+	// latest
+	plugin = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+			},
+		},
+	}
+
 	upstream = []*kong.Upstream{
 		{
 			Name:      kong.String("upstream1"),
@@ -446,6 +483,41 @@ func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
 }
 
 // test scope:
+//   - 1.4.3
+func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: plugin_143_151,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, "==1.4.3")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
 //   - 1.5.0.11+enterprise
 func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	// setup stage
@@ -464,17 +536,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: []*kong.Plugin{
-					{
-						Name:      kong.String("basic-auth"),
-						Protocols: []*string{kong.String("http"), kong.String("https")},
-						Enabled:   kong.Bool(true),
-						Config: kong.Configuration{
-							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
-							"hide_credentials": false,
-						},
-					},
-				},
+				Plugins: plugin,
 			},
 		},
 	}
@@ -509,18 +571,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: []*kong.Plugin{
-					{
-						Name:      kong.String("basic-auth"),
-						Protocols: []*string{kong.String("http"), kong.String("https")},
-						Enabled:   kong.Bool(true),
-						Config: kong.Configuration{
-							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
-							"hide_credentials": false,
-						},
-						RunOn: kong.String("first"),
-					},
-				},
+				Plugins: plugin_143_151,
 			},
 		},
 	}
@@ -569,17 +620,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: []*kong.Plugin{
-					{
-						Name:      kong.String("basic-auth"),
-						Protocols: []*string{kong.String("http"), kong.String("https")},
-						Enabled:   kong.Bool(true),
-						Config: kong.Configuration{
-							"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
-							"hide_credentials": false,
-						},
-					},
-				},
+				Plugins: plugin,
 			},
 		},
 	}
@@ -762,6 +803,175 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kong.RunWhenKong(t, ">=2.7.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 1.5.0.11+enterprise
+func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// ignore entities fields based on Kong version
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Route{}, "Service"),
+		cmpopts.IgnoreFields(kong.Healthcheck{}, "Threshold"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates a service",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1,
+				Routes:    route1_151,
+				Plugins:   plugin,
+				Targets:   target,
+				Upstreams: upstream,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, "<1.5.1 !1.4.3")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//   - 2.0.5
+//   - 2.1.4
+func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create services and routes",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1,
+				Routes:    route1_205_214,
+				Upstreams: upstream,
+				Targets:   target,
+				Plugins:   plugin,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.0.5 <=2.1.4")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 2.2.2
+//   - 2.3.3
+//   - 2.4.1
+//   - 2.5.1
+//   - 2.6.0
+//   - 2.2.1.3+enterprise
+//   - 2.3.3.4+enterprise
+//   - 2.4.1.3+enterprise
+//   - 2.5.1.2+enterprise
+func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create services and routes",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1,
+				Routes:    route1_20x,
+				Upstreams: upstream,
+				Targets:   target,
+				Plugins:   plugin,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">2.2.1 <=2.6.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 2.7.0
+//   - 2.6.0.2+enterprise
+//   - 2.7.0.0+enterprise
+func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates entities with minimum configuration",
+			kongFile: "testdata/sync/008-create-simple-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin,
+				Targets:   target,
+				Upstreams: upstream,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">2.6.9")
 			teardown := setup(t)
 			defer teardown(t)
 

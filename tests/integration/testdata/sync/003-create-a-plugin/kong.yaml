@@ -6,5 +6,7 @@ plugins:
     hide_credentials: false
   enabled: true
   protocols:
+  - grpc
+  - grpcs
   - http
   - https
