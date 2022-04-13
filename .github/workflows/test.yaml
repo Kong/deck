@@ -15,7 +15,7 @@ jobs:
       - name: Setup golangci-lint
         uses: golangci/golangci-lint-action@v3.1.0
         with:
-          version: v1.45.0
+          version: v1.45.2
       - name: Verify Codegen
         run: make verify-codegen
       - name: Run tests with Coverage

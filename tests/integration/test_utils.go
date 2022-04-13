@@ -1,4 +1,4 @@
-//nolint:unused,deadcode
+//nolint:deadcode
 package integration
 
 import (
@@ -93,7 +93,7 @@ func reset(t *testing.T, opts ...string) {
 	}
 }
 
-func setup(t *testing.T) func(t *testing.T) { //nolint:unparam
+func setup(t *testing.T) func(t *testing.T) {
 	// disable analytics for integration tests
 	os.Setenv("DECK_ANALYTICS", "off")
 	return func(t *testing.T) {
