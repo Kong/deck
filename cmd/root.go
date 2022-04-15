@@ -79,7 +79,7 @@ It can be used to export, import, or sync entities to Kong.`,
 			"verify Kong's Admin TLS certificate.\n"+
 			"This value can also be set using DECK_CA_CERT"+
 			" environment variable.\n"+
-			"This takes precedence over --ca-cert-file flag.")
+			"This takes precedence over `--ca-cert-file` flag.")
 	viper.BindPFlag("ca-cert",
 		rootCmd.PersistentFlags().Lookup("ca-cert"))
 
@@ -117,7 +117,7 @@ It can be used to export, import, or sync entities to Kong.`,
 
 	rootCmd.PersistentFlags().Bool("analytics", true,
 		"Share anonymized data to help improve decK.\n"+
-			"Use --analytics=false to disable this.")
+			"Use `--analytics=false` to disable this.")
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 

@@ -29,7 +29,7 @@ to get Kong's state in sync with the input state.`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(syncCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
-					"must be specified using -s/--state flag")
+					"must be specified using `-s`/`--state` flag")
 			}
 			return preRunSilenceEventsFlag()
 		},
