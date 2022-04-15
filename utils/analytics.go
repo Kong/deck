@@ -14,9 +14,10 @@ import (
 const (
 	reportsHost = "kong-hf.konghq.com"
 	reportsPort = 61829
+	konnectMode = "konnect"
 )
 
-func SendAnalytics(cmd, deckVersion, kongVersion string) error {
+func SendAnalytics(cmd, deckVersion, kongVersion, mode string) error {
 	if strings.ToLower(os.Getenv("DECK_ANALYTICS")) == "off" {
 		return nil
 	}
@@ -24,7 +25,7 @@ func SendAnalytics(cmd, deckVersion, kongVersion string) error {
 		return fmt.Errorf("invalid argument, 'cmd' cannot be empty")
 	}
 
-	stats := collectStats(cmd, deckVersion, kongVersion)
+	stats := collectStats(cmd, deckVersion, kongVersion, mode)
 	body := formatStats(stats)
 
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", reportsHost, reportsPort))
@@ -53,7 +54,7 @@ func formatStats(stats map[string]string) string {
 	return buffer.String()
 }
 
-func collectStats(cmd, deckVersion, kongVersion string) map[string]string {
+func collectStats(cmd, deckVersion, kongVersion, mode string) map[string]string {
 	result := map[string]string{
 		"signal": "decK",
 		"v":      deckVersion,
@@ -61,7 +62,10 @@ func collectStats(cmd, deckVersion, kongVersion string) map[string]string {
 		"os":     runtime.GOOS,
 		"arch":   runtime.GOARCH,
 	}
-	if kongVersion != "" {
+	if mode == konnectMode {
+		result["mode"] = mode
+	}
+	if kongVersion != "" || mode != konnectMode {
 		result["kv"] = kongVersion
 	}
 	info, err := host.Info()

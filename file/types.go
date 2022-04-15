@@ -550,6 +550,12 @@ type Info struct {
 	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
+// Konnect contains configuration specific to Konnect.
+// +k8s:deepcopy-gen=true
+type Konnect struct {
+	RuntimeGroupName string `json:"runtime_group_name,omitempty" yaml:"runtime_group_name,omitempty"`
+}
+
 // Kong represents Kong implementation of a Service in Konnect.
 // +k8s:deepcopy-gen=true
 type Kong struct {
@@ -623,10 +629,11 @@ func (s FServicePackage) sortKey() string {
 // Content represents a serialized Kong state.
 // +k8s:deepcopy-gen=true
 type Content struct {
-	FormatVersion string `json:"_format_version,omitempty" yaml:"_format_version,omitempty"`
-	Transform     *bool  `json:"_transform,omitempty" yaml:"_transform,omitempty"`
-	Info          *Info  `json:"_info,omitempty" yaml:"_info,omitempty"`
-	Workspace     string `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
+	FormatVersion string   `json:"_format_version,omitempty" yaml:"_format_version,omitempty"`
+	Transform     *bool    `json:"_transform,omitempty" yaml:"_transform,omitempty"`
+	Info          *Info    `json:"_info,omitempty" yaml:"_info,omitempty"`
+	Workspace     string   `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
+	Konnect       *Konnect `json:"_konnect,omitempty" yaml:"_konnect,omitempty"`
 
 	Services       []FService       `json:"services,omitempty" yaml:",omitempty"`
 	Routes         []FRoute         `json:"routes,omitempty" yaml:",omitempty"`

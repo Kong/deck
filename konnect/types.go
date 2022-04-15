@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	authEndpoint = "/api/auth"
+	authEndpoint   = "/api/auth"
+	authEndpointV2 = "/kauth/api/v1/authenticate"
 )
 
 type ParentInfoer interface {
@@ -16,6 +17,13 @@ type ParentInfoer interface {
 func BaseURL() string {
 	const baseURL = "https://konnect.konghq.com"
 	return baseURL
+}
+
+// RuntimeGroup represents a Runtime Group in Konnect.
+// +k8s:deepcopy-gen=true
+type RuntimeGroup struct {
+	ID   *string `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 // ServicePackage represents a Service Package in Konnect.
@@ -132,4 +140,6 @@ type AuthResponse struct {
 	FirstName      string `json:"first_name"`
 	LastName       string `json:"last_name"`
 	OrganizationID string `json:"org_id"`
+
+	FullName string `json:"full_name"`
 }

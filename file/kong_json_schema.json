@@ -8,6 +8,10 @@
       "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/Info"
     },
+    "_konnect": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "$ref": "#/definitions/Konnect"
+    },
     "_plugin_configs": {
       "patternProperties": {
         ".*": {
@@ -1117,6 +1121,15 @@
         "upstream": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Upstream"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Konnect": {
+      "properties": {
+        "runtime_group_name": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

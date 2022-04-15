@@ -15,12 +15,16 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultKonnectURL = "https://us.api.konghq.com"
+
 var (
 	cfgFile       string
 	rootConfig    utils.KongClientConfig
 	konnectConfig utils.KonnectConfig
 
 	disableAnalytics bool
+
+	konnectRuntimeGroup string
 )
 
 //nolint:errcheck
@@ -153,6 +157,33 @@ It can be used to export, import, or sync entities to Kong.`,
 			"environment variable. Must be used in conjunction with tls-client-cert-file")
 	viper.BindPFlag("tls-client-key",
 		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
+
+	// konnect-specific flags
+	rootCmd.PersistentFlags().String("konnect-email", "",
+		"Email address associated with your Konnect account.")
+	viper.BindPFlag("konnect-email",
+		rootCmd.PersistentFlags().Lookup("konnect-email"))
+
+	rootCmd.PersistentFlags().String("konnect-password", "",
+		"Password associated with your Konnect account, "+
+			"this takes precedence over `--konnect-password-file` flag.")
+	viper.BindPFlag("konnect-password",
+		rootCmd.PersistentFlags().Lookup("konnect-password"))
+
+	rootCmd.PersistentFlags().String("konnect-password-file", "",
+		"File containing the password to your Konnect account.")
+	viper.BindPFlag("konnect-password-file",
+		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
+
+	rootCmd.PersistentFlags().String("konnect-addr", defaultKonnectURL,
+		"Address of the Konnect endpoint.")
+	viper.BindPFlag("konnect-addr",
+		rootCmd.PersistentFlags().Lookup("konnect-addr"))
+
+	rootCmd.PersistentFlags().String("konnect-runtime-group-name", "",
+		"Konnect Runtime group name.")
+	viper.BindPFlag("konnect-runtime-group-name",
+		rootCmd.PersistentFlags().Lookup("konnect-runtime-group-name"))
 
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
@@ -304,5 +335,6 @@ func initKonnectConfig() error {
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
 	konnectConfig.Headers = viper.GetStringSlice("headers")
+	konnectRuntimeGroup = viper.GetString("konnect-runtime-group-name")
 	return nil
 }

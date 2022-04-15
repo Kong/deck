@@ -48,6 +48,17 @@ configure Kong.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
+			if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
+				return err
+			} else if !yes {
+				return nil
+			}
+
+			if inKonnectMode(nil) {
+				_ = sendAnalytics("dump", "", modeKonnect)
+				return dumpKonnectV2(ctx)
+			}
+
 			wsClient, err := utils.GetKongClient(rootConfig)
 			if err != nil {
 				return err
@@ -59,7 +70,7 @@ configure Kong.`,
 			if err != nil {
 				return fmt.Errorf("reading Kong version: %w", err)
 			}
-			_ = sendAnalytics("dump", kongVersion)
+			_ = sendAnalytics("dump", kongVersion, modeKong)
 
 			// Kong Enterprise dump all workspace
 			if dumpAllWorkspaces {
@@ -99,12 +110,6 @@ configure Kong.`,
 						return err
 					}
 				}
-				return nil
-			}
-
-			if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
-				return err
-			} else if !yes {
 				return nil
 			}
 

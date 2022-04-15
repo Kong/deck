@@ -19,7 +19,7 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 			if konnectDumpCmdKongStateFile == "-" {
 				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 			}
-			_ = sendAnalytics("konnect-sync", "")
+			_ = sendAnalytics("konnect-sync", "", modeKonnect)
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 				konnectDiffCmdParallelism)
 		},

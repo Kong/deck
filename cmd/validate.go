@@ -36,7 +36,8 @@ this command unless --online flag is used.
 `,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_ = sendAnalytics("validate", "")
+			mode := getMode(nil)
+			_ = sendAnalytics("validate", "", mode)
 			// read target file
 			// this does json schema validation as well
 			targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
@@ -73,6 +74,9 @@ this command unless --online flag is used.
 			}
 
 			if validateOnline {
+				if mode == modeKonnect {
+					return fmt.Errorf("online validation not yet supported in konnect mode")
+				}
 				if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
 					return validate.ErrorsWrapper{Errors: errs}
 				}

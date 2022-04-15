@@ -20,13 +20,29 @@ import (
 )
 
 const (
-	exitCodeDiffDetection = 2
+	exitCodeDiffDetection     = 2
+	defaultFetchedKongVersion = "2.8.0"
 )
 
 var (
 	dumpConfig dump.Config
 	assumeYes  bool
 )
+
+type mode int
+
+const (
+	modeKonnect = iota
+	modeKong
+	modeKongEnterprise
+)
+
+func getMode(targetContent *file.Content) mode {
+	if inKonnectMode(targetContent) {
+		return modeKonnect
+	}
+	return modeKong
+}
 
 // workspaceExists checks if workspace exists in Kong.
 func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspaceName string) (bool, error) {
@@ -73,6 +89,34 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 	}
+	if dumpConfig.SkipCACerts {
+		targetContent.CACertificates = []file.FCACertificate{}
+	}
+
+	cmd := "sync"
+	if dry {
+		cmd = "diff"
+	}
+
+	var kongClient *kong.Client
+	mode := getMode(targetContent)
+	if mode == modeKonnect {
+		if targetContent.Konnect != nil {
+			if konnectRuntimeGroup != "" &&
+				targetContent.Konnect.RuntimeGroupName != konnectRuntimeGroup {
+				return fmt.Errorf("warning: runtime group '%v' specified via "+
+					"--konnect-runtime-group flag is "+
+					"different from '%v' found in state file(s)",
+					konnectRuntimeGroup, targetContent.Konnect.RuntimeGroupName)
+			}
+			konnectRuntimeGroup = targetContent.Konnect.RuntimeGroupName
+		}
+		kongClient, err = getKonnectClient(ctx)
+		if err != nil {
+			return err
+		}
+		dumpConfig.KonnectRuntimeGroup = konnectRuntimeGroup
+	}
 
 	rootClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
@@ -85,11 +129,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
-	kongVersion, err := fetchKongVersion(ctx, wsConfig)
-	if err != nil {
-		return fmt.Errorf("reading Kong version: %w", err)
+	kongVersion := defaultFetchedKongVersion
+	var parsedKongVersion semver.Version
+	if mode == modeKong {
+		kongVersion, err = fetchKongVersion(ctx, wsConfig)
+		if err != nil {
+			return fmt.Errorf("reading Kong version: %w", err)
+		}
 	}
-	parsedKongVersion, err := parseKongVersion(kongVersion)
+	parsedKongVersion, err = parseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
 	}
@@ -97,20 +145,18 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
 	// call to the RunE function. That is not trivial because it requires the
 	// workspace name and kong client to be present on that level.
-	cmd := "sync"
-	if dry {
-		cmd = "diff"
-	}
-	_ = sendAnalytics(cmd, kongVersion)
+	_ = sendAnalytics(cmd, kongVersion, mode)
 
 	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 	if err != nil {
 		return err
 	}
 
-	wsClient, err := utils.GetKongClient(wsConfig)
-	if err != nil {
-		return err
+	if kongClient == nil {
+		kongClient, err = utils.GetKongClient(wsConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
@@ -121,7 +167,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
-		currentState, err = fetchCurrentState(ctx, wsClient, dumpConfig)
+		currentState, err = fetchCurrentState(ctx, kongClient, dumpConfig)
 		if err != nil {
 			return err
 		}
@@ -145,7 +191,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 		CurrentState: currentState,
 		KongVersion:  parsedKongVersion,
-	}, dumpConfig, wsClient)
+	}, dumpConfig, kongClient)
 	if err != nil {
 		return err
 	}
@@ -157,7 +203,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, wsClient)
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, kongClient)
 	if err != nil {
 		return err
 	}
@@ -310,9 +356,27 @@ func containsRBACConfiguration(content utils.KongRawState) bool {
 	return len(content.RBACRoles) != 0
 }
 
-func sendAnalytics(cmd, kongVersion string) error {
+func sendAnalytics(cmd, kongVersion string, mode mode) error {
 	if disableAnalytics {
 		return nil
 	}
-	return utils.SendAnalytics(cmd, VERSION, kongVersion)
+	var modeStr string
+	switch mode {
+	case modeKong:
+		modeStr = "kong"
+	case modeKonnect:
+		modeStr = "konnect"
+	case modeKongEnterprise:
+		modeStr = "enterprise"
+	}
+	return utils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
+}
+
+func inKonnectMode(targetContent *file.Content) bool {
+	if (targetContent != nil && targetContent.Konnect != nil) ||
+		konnectConfig.Email != "" ||
+		konnectConfig.Password != "" {
+		return true
+	}
+	return false
 }

@@ -44,6 +44,12 @@ By default, this command will ask for confirmation.`,
 				}
 			}
 
+			mode := getMode(nil)
+			if mode == modeKonnect {
+				_ = sendAnalytics("reset", "", mode)
+				return resetKonnectV2(ctx)
+			}
+
 			rootClient, err := utils.GetKongClient(rootConfig)
 			if err != nil {
 				return err
@@ -53,7 +59,7 @@ By default, this command will ask for confirmation.`,
 			if err != nil {
 				return fmt.Errorf("reading Kong version: %w", err)
 			}
-			_ = sendAnalytics("reset", kongVersion)
+			_ = sendAnalytics("reset", kongVersion, mode)
 
 			var workspaces []string
 			// Kong OSS or default workspace
