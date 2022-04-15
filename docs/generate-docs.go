@@ -91,13 +91,15 @@ func flagUsagesWrapped(f *pflag.FlagSet) string {
 		}
 
 		line += usage
-		if flag.Value.Type() == "string" {
-			line += fmt.Sprintf(" (default %q)", flag.DefValue)
-		} else {
-			line += fmt.Sprintf(" (default %s)", flag.DefValue)
-		}
-		if len(flag.Deprecated) != 0 {
-			line += fmt.Sprintf(" (DEPRECATED: %s)", flag.Deprecated)
+		if flag.DefValue != "" && flag.DefValue != "[]" {
+			if flag.Value.Type() == "string" {
+				line += fmt.Sprintf(" (Default: `%q`)", flag.DefValue)
+			} else {
+				line += fmt.Sprintf(" (Default: `%s`)", flag.DefValue)
+			}
+			if len(flag.Deprecated) != 0 {
+				line += fmt.Sprintf(" (DEPRECATED: %s)", flag.Deprecated)
+			}
 		}
 		line += "\n"
 
