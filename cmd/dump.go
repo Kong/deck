@@ -145,7 +145,7 @@ configure Kong.`,
 
 	dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
 		"kong", "file to which to write Kong's configuration."+
-			"Use '-' to write to stdout.")
+			"Use `-` to write to stdout.")
 	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml.")
 	dumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
@@ -165,7 +165,7 @@ configure Kong.`,
 	dumpCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "export only the RBAC resources (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&assumeYes, "yes",
-		false, "assume 'yes' to prompts and run non-interactively.")
+		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
 	return dumpCmd

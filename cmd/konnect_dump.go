@@ -95,6 +95,6 @@ func newKonnectDumpCmd() *cobra.Command {
 		false, "export consumers, associated credentials and any plugins associated "+
 			"with consumers.")
 	konnectDumpCmd.Flags().BoolVar(&assumeYes, "yes",
-		false, "Assume 'yes' to prompts and run non-interactively.")
+		false, "Assume `yes` to prompts and run non-interactively.")
 	return konnectDumpCmd
 }
