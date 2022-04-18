@@ -29,7 +29,7 @@ to get Kong's state in sync with the input state.`,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(syncCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
-					"must be specified using -s/--state flag")
+					"must be specified using `-s`/`--state` flag")
 			}
 			return preRunSilenceEventsFlag()
 		},
@@ -38,7 +38,7 @@ to get Kong's state in sync with the input state.`,
 	syncCmd.Flags().StringSliceVarP(&syncCmdKongStateFile,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
-			"Use '-' to read from stdin.")
+			"Use `-` to read from stdin.")
 	syncCmd.Flags().StringVar(&syncWorkspace, "workspace", "",
 		"Sync configuration to a specific workspace "+
 			"(Kong Enterprise only).\n"+
@@ -57,7 +57,7 @@ to get Kong's state in sync with the input state.`,
 	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
 		0, "artificial delay (in seconds) that is injected between insert operations \n"+
 			"for related entities (usually for Cassandra deployments).\n"+
-			"See 'db_update_propagation' in kong.conf.")
+			"See `db_update_propagation` in kong.conf.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
 	addSilenceEventsFlag(syncCmd.Flags())

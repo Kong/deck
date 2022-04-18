@@ -27,7 +27,7 @@ configure Konnect.` + konnectAlphaState,
 
 	konnectCmd.PersistentFlags().String("konnect-password", "",
 		"Password associated with your Konnect account, "+
-			"this takes precedence over --konnect-password-file flag.")
+			"this takes precedence over `--konnect-password-file` flag.")
 	viper.BindPFlag("konnect-password",
 		konnectCmd.PersistentFlags().Lookup("konnect-password"))
 
