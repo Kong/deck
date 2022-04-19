@@ -48,6 +48,17 @@ type KongRawState struct {
 
 	RBACRoles               []*kong.RBACRole
 	RBACEndpointPermissions []*kong.RBACEndpointPermission
+
+	SharedPluginsMap map[string]SharedPlugins
+}
+
+type SharedPlugins map[string]SharedPlugin
+
+type SharedPlugin struct {
+	Config    kong.Configuration
+	Consumers []string
+	Services  []string
+	Routes    []string
 }
 
 // KonnectRawState contains all of Konnect resources.

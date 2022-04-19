@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -26,6 +27,10 @@ type Config struct {
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
+
+	// If true, deduplicate plugins with the same configuration into a shared
+	// config object.
+	DedupPluginsConfig bool
 }
 
 func deduplicate(stringSlice []string) []string {
@@ -178,6 +183,10 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 			plugins = excludeConsumersPlugins(plugins)
 		}
 		state.Plugins = plugins
+		if config.DedupPluginsConfig {
+			state.SharedPluginsMap = make(map[string]utils.SharedPlugins)
+			state.SharedPluginsMap = dedupPluginsConfig(plugins)
+		}
 		return nil
 	})
 
@@ -223,6 +232,89 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		state.Targets = targets
 		return nil
 	})
+}
+
+func addSharedPluginConfig(p *kong.Plugin, sharedPlugin utils.SharedPlugin) utils.SharedPlugin {
+	if p.Consumer != nil && p.Consumer.ID != nil {
+		sharedPlugin.Consumers = append(sharedPlugin.Consumers, *p.Consumer.ID)
+	}
+	if p.Service != nil && p.Service.ID != nil {
+		sharedPlugin.Services = append(sharedPlugin.Services, *p.Service.ID)
+	}
+	if p.Route != nil && p.Route.ID != nil {
+		sharedPlugin.Routes = append(sharedPlugin.Routes, *p.Route.ID)
+	}
+	return sharedPlugin
+}
+
+// dedupPluginsConfig populates state.PluginConfigsMap, grouping consumers and services
+// sharing the same plugin configs.
+//
+// Example:
+//
+// {
+// 	"rate-limiting": {
+// 		"rate-limiting-0": {
+// 			"config": _specific_plugin_config_0,
+// 			"consumers": ["consumer-1", "consumer-2"],
+// 			"services": [],
+// 			"routes": []
+// 		},
+// 		"rate-limiting-1": {
+// 			"config": _specific_plugin_config_1,
+// 			"consumers": ["consumer-3", "consumer-4"],
+// 			"services": [],
+// 			"routes": []
+// 		}
+// 	  }
+// }
+func dedupPluginsConfig(plugins []*kong.Plugin) map[string]utils.SharedPlugins {
+	sharedPluginMap := make(map[string]utils.SharedPlugins)
+	for n, p := range plugins {
+		name := fmt.Sprintf("%s-%d", *p.Name, n)
+		cfgMap := utils.SharedPlugin{Config: p.Config}
+		sharedPlugin, ok := sharedPluginMap[*p.Name]
+		// if plugin is not in sharedPluginMap, add it
+		if !ok {
+			sharedPluginMap[*p.Name] = make(utils.SharedPlugins)
+			sharedPluginMap[*p.Name][name] = addSharedPluginConfig(p, cfgMap)
+			continue
+		}
+
+		var found bool
+		// check that plugin config matches any already present in sharedPluginMap
+		for name, config := range sharedPlugin {
+			if reflect.DeepEqual(config.Config, p.Config) {
+				sharedPluginMap[*p.Name][name] = addSharedPluginConfig(p, config)
+				found = true
+				break
+			}
+		}
+		// if no match is found, add it
+		if !found {
+			sharedPluginMap[*p.Name][name] = addSharedPluginConfig(p, cfgMap)
+		}
+	}
+	return removeSingleEntries(sharedPluginMap)
+}
+
+// remove plugins from sharedPlugins that are not reused by different entities
+func removeSingleEntries(
+	sharedPlugins map[string]utils.SharedPlugins,
+) map[string]utils.SharedPlugins {
+	newSharedPlugins := make(map[string]utils.SharedPlugins)
+	for plugin, content := range sharedPlugins {
+		for _, entry := range content {
+			if len(entry.Consumers) > 1 || len(entry.Routes) > 1 || len(entry.Services) > 1 {
+				if _, ok := newSharedPlugins[plugin]; !ok {
+					newSharedPlugins[plugin] = make(map[string]utils.SharedPlugin)
+					newSharedPlugins[plugin] = content
+					break
+				}
+			}
+		}
+	}
+	return newSharedPlugins
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
