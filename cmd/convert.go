@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/convert"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
@@ -43,6 +44,11 @@ can be converted into a 'konnect' configuration file.`,
 			err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
 			if err != nil {
 				return fmt.Errorf("converting file: %v", err)
+			}
+			if convertCmdDestinationFormat == "konnect" {
+				cprint.UpdatePrintf("Warning: konnect format type was deprecated in v1.12 and it will be removed\n" +
+					"in a future version. Please use your Kong configuration files with deck <cmd>.\n" +
+					"Please see https://docs.konghq.com/konnect/deployment/import.\n")
 			}
 			return nil
 		},
