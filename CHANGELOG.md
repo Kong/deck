@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.12.0](#v1120)
 - [v1.11.0](#v1110)
 - [v1.10.0](#v1100)
 - [v1.9.0](#v190)
@@ -35,6 +36,57 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.12.0]
+
+> Release date: 2022/04/22
+
+### Added
+
+- Inject decK version into `User-Agent` header for requests originating from decK
+  [#652](https://github.com/Kong/deck/pull/652)
+- Konnect can now be configured via the main `deck` command, while
+  `deck konnect` is now considered deprecated.
+  [#645](https://github.com/Kong/deck/pull/645)
+- Added `--skip-ca-certificates` flag. When present, decK will not attempt to
+  sync CA certificates. This assists with using decK to manage multiple
+  workspaces. CA certificates do not belong to a specific workspace, but can be
+  seen and managed through workspaced endpoints. decK will attempt to
+  remove them if they are not present in a state file when syncing a workspace,
+  even if they were created for use with configuration in another workspace.
+  [#617](https://github.com/Kong/deck/pull/617)
+- Users can no longer set default values for fields where a default value
+  does not make sense (such as fields with unique constraints, like `id`), and
+  will print an error indicating the restricted field.
+  [#613](https://github.com/Kong/deck/pull/613)
+- Universal binaries are now available for OS X.
+  [#585](https://github.com/Kong/deck/pull/585)
+- Validation failures now log the name or ID of the invalid entity.
+  [#588](https://github.com/Kong/deck/pull/588)
+
+### Fixes
+
+- Fixed unreliable diff outputs due to external dependency (gojsondiff).
+  [#538](https://github.com/Kong/deck/issues/538)
+- De-duplicated `select_tags` in file metadata to avoid erroneous mismatch
+  reports when using `--select-tags` with multiple state files.
+  [#623](https://github.com/Kong/deck/pull/623)
+- Fixed several marshalling and URL construction issues for RBAC endpoint
+  permissions.
+  [#619](https://github.com/Kong/deck/pull/619)
+  [go-kong #148](https://github.com/Kong/go-kong/pull/148)
+- Fixed a regression that broke workspace creation in v1.11.0.
+  [#608](https://github.com/Kong/deck/pull/608)
+- Fixed a regression that broke plugins dedup feature in v1.11.0.
+  [#594](https://github.com/Kong/deck/pull/594)
+- Invalid YAML in state files no longer parses as an empty target state.
+  [#590](https://github.com/Kong/deck/pull/590)
+
+### Under the hood
+
+- decK now uses Go 1.18.
+  [#626](https://github.com/Kong/deck/pull/626)
+
 
 ## [v1.11.0]
 
@@ -858,6 +910,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.12.0]: https://github.com/kong/deck/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/kong/deck/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kong/deck/compare/v1.8.2...v1.9.0
