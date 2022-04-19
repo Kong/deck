@@ -28,6 +28,9 @@ func newKonnectDiffCmd() *cobra.Command {
 				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 			}
 			_ = sendAnalytics("konnect-diff", "", modeKonnect)
+			if konnectConfig.Address == defaultKonnectURL {
+				konnectConfig.Address = defaultLegacyKonnectURL
+			}
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 				konnectDiffCmdParallelism)
 		},

@@ -18,9 +18,16 @@ import (
 )
 
 const (
+	defaultLegacyKonnectURL = "https://konnect.konghq.com"
+
 	defaultRuntimeGroupName        = "default"
 	konnectWithRuntimeGroupsDomain = "api.konghq"
 )
+
+var addresses = []string{
+	defaultKonnectURL,
+	defaultLegacyKonnectURL,
+}
 
 func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
@@ -33,19 +40,34 @@ func authenticate(ctx context.Context, client *konnect.Client, host string) (kon
 
 func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 	httpClient := utils.HTTPClient()
-	// get Konnect client
-	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
-	if err != nil {
-		return nil, err
+	if konnectConfig.Address != defaultKonnectURL {
+		addresses = []string{konnectConfig.Address}
 	}
-
-	var address string
-	u, _ := url.Parse(konnectConfig.Address)
 	// authenticate with konnect
-	if _, err := authenticate(ctx, konnectClient, u.Host); err != nil {
+	var err error
+	var konnectClient *konnect.Client
+	var parsedAddress *url.URL
+	var konnectAddress string
+	for _, address := range addresses {
+		// get Konnect client
+		konnectConfig.Address = address
+		konnectClient, err = utils.GetKonnectClient(httpClient, konnectConfig)
+		if err != nil {
+			return nil, err
+		}
+		parsedAddress, _ = url.Parse(address)
+		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
+		if err == nil {
+			break
+		}
+		if konnect.IsUnauthorizedErr(err) {
+			continue
+		}
+	}
+	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	if strings.Contains(u.Host, konnectWithRuntimeGroupsDomain) {
+	if strings.Contains(parsedAddress.Host, konnectWithRuntimeGroupsDomain) {
 		// get kong runtime group ID
 		kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
 		if err != nil {
@@ -54,7 +76,7 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 
 		// set the kong runtime group ID in the client
 		konnectClient.SetRuntimeGroupID(kongRGID)
-		address = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID
+		konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID
 	} else {
 		// get kong control plane ID
 		kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
@@ -64,11 +86,11 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 
 		// set the kong control plane ID in the client
 		konnectClient.SetControlPlaneID(kongCPID)
-		address = konnectConfig.Address + "/api/control_planes/" + kongCPID
+		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
 	}
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
-		Address:    address,
+		Address:    konnectAddress,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 	})

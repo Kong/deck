@@ -56,3 +56,14 @@ func IsNotFoundErr(e error) bool {
 		return false
 	}
 }
+
+// IsUnauthorizedErr returns true if the error or it's cause is
+// a 401 response from Konnect.
+func IsUnauthorizedErr(e error) bool {
+	switch e := e.(type) {
+	case *APIError:
+		return e.httpCode == http.StatusUnauthorized
+	default:
+		return false
+	}
+}
