@@ -140,7 +140,7 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	buf := new(bytes.Buffer)
 	name := cmd.CommandPath()
 
-	buf.WriteString(fmt.Sprintf("---\ntitle: %s\n---\n\n", name))
+	buf.WriteString(fmt.Sprintf("---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name))
 	buf.WriteString(cmd.Long + "\n\n")
 
 	if cmd.Runnable() {
