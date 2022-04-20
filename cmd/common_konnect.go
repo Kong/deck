@@ -38,7 +38,12 @@ func authenticate(ctx context.Context, client *konnect.Client, host string) (kon
 		konnectConfig.Password)
 }
 
-func getKonnectClient(ctx context.Context) (*kong.Client, error) {
+// getKongClientForKonnectMode abstracts the different cloud environments users
+// may be using, creating a Konnect client with the proper attributes set.
+// This also includes a fallback mechanism using an address pool to establish
+// a session with Konnect, making the different cloud environments completely
+// transparent to users.
+func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 	httpClient := utils.HTTPClient()
 	if konnectConfig.Address != defaultKonnectURL {
 		addresses = []string{konnectConfig.Address}
@@ -55,7 +60,10 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		parsedAddress, _ = url.Parse(address)
+		parsedAddress, err = url.Parse(address)
+		if err != nil {
+			return nil, fmt.Errorf("parsing %s address: %v", address, err)
+		}
 		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
 		if err == nil {
 			break
@@ -97,7 +105,7 @@ func getKonnectClient(ctx context.Context) (*kong.Client, error) {
 }
 
 func resetKonnectV2(ctx context.Context) error {
-	client, err := getKonnectClient(ctx)
+	client, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
@@ -117,7 +125,7 @@ func resetKonnectV2(ctx context.Context) error {
 }
 
 func dumpKonnectV2(ctx context.Context) error {
-	client, err := getKonnectClient(ctx)
+	client, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
