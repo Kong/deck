@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net/url"
 
+	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -18,16 +21,11 @@ can connect to Kong's Admin API.`,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			wsConfig := rootConfig.ForWorkspace(pingWorkspace)
-			version, err := fetchKongVersion(ctx, wsConfig)
-			if err != nil {
-				return fmt.Errorf("reading Kong version: %w", err)
+			mode := getMode(nil)
+			if mode == modeKonnect {
+				return pingKonnect(ctx)
 			}
-			_ = sendAnalytics("ping", version)
-			fmt.Println("Successfully connected to Kong!")
-			fmt.Println("Kong version: ", version)
-			return nil
+			return pingKong(ctx)
 		},
 	}
 
@@ -36,4 +34,42 @@ can connect to Kong's Admin API.`,
 			"(Kong Enterprise only).\n"+
 			"Useful when RBAC permissions are scoped to a Workspace.")
 	return pingCmd
+}
+
+func pingKonnect(ctx context.Context) error {
+	// get Konnect client
+	httpClient := utils.HTTPClient()
+	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
+	if err != nil {
+		return err
+	}
+	u, _ := url.Parse(konnectConfig.Address)
+	// authenticate with konnect
+	res, err := authenticate(ctx, konnectClient, u.Host)
+	if err != nil {
+		return fmt.Errorf("authenticating with Konnect: %w", err)
+	}
+	fullName := res.FullName
+	if res.FullName == "" {
+		fullName = fmt.Sprintf("%s %s", res.FirstName, res.LastName)
+	}
+	fmt.Printf("Successfully Konnected as %s (%s)!\n",
+		fullName, res.Organization)
+	if konnectConfig.Debug {
+		fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+	}
+	_ = sendAnalytics("ping", "", modeKonnect)
+	return nil
+}
+
+func pingKong(ctx context.Context) error {
+	wsConfig := rootConfig.ForWorkspace(pingWorkspace)
+	version, err := fetchKongVersion(ctx, wsConfig)
+	if err != nil {
+		return fmt.Errorf("reading Kong version: %w", err)
+	}
+	fmt.Println("Successfully connected to Kong!")
+	fmt.Println("Kong version: ", version)
+	_ = sendAnalytics("ping", version, modeKong)
+	return nil
 }

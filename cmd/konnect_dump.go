@@ -29,7 +29,7 @@ func newKonnectDumpCmd() *cobra.Command {
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			httpClient := utils.HTTPClient()
-			_ = sendAnalytics("konnect-dump", "")
+			_ = sendAnalytics("konnect-dump", "", modeKonnect)
 
 			if konnectDumpCmdKongStateFile == "-" {
 				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
