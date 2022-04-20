@@ -78,6 +78,8 @@ func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig
 	builder.client = wsClient
 	builder.ctx = ctx
 	builder.skipCACerts = dumpConfig.SkipCACerts
+	// Konnect doesn't support the schema endpoint yet,
+	// therefore dynamic defaults injection must be disabled
 	if dumpConfig.KonnectRuntimeGroup != "" {
 		builder.disableDynamicDefaults = true
 	}

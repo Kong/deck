@@ -65,7 +65,7 @@ func collectStats(cmd, deckVersion, kongVersion, mode string) map[string]string 
 	if mode == konnectMode {
 		result["mode"] = mode
 	}
-	if kongVersion != "" || mode != konnectMode {
+	if kongVersion != "" && mode != konnectMode {
 		result["kv"] = kongVersion
 	}
 	info, err := host.Info()

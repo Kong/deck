@@ -2,6 +2,7 @@ package konnect
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -61,12 +62,12 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 	}
 	req, err := s.client.NewRequest(http.MethodPost, authEndpointV2, nil, body)
 	if err != nil {
-		return AuthResponse{}, err
+		return AuthResponse{}, fmt.Errorf("build http request: %v", err)
 	}
 	var authResponse AuthResponse
 	resp, err := s.client.Do(ctx, req, &authResponse)
 	if err != nil {
-		return AuthResponse{}, err
+		return AuthResponse{}, fmt.Errorf("authenticate http request: %v", err)
 	}
 	url, _ := url.Parse(s.client.baseURL)
 	jar, err := cookiejar.New(nil)
@@ -79,7 +80,7 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 
 	info, err := s.UserInfo(ctx)
 	if err != nil {
-		return AuthResponse{}, err
+		return AuthResponse{}, fmt.Errorf("fetch user-info: %v", err)
 	}
 	authResponse.FullName = info.Profile.FullName
 	authResponse.Organization = info.Org.Name
