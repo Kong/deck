@@ -132,6 +132,7 @@ func dumpKonnectV2(ctx context.Context) error {
 	if dumpCmdKongStateFile == "-" {
 		return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 	}
+	dumpConfig.KonnectRuntimeGroup = konnectRuntimeGroup
 	rawState, err := dump.Get(ctx, client, dumpConfig)
 	if err != nil {
 		return fmt.Errorf("reading configuration from Kong: %w", err)
