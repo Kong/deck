@@ -257,7 +257,7 @@ func initConfig() {
 	rootConfig.TLSServerName = viper.GetString("tls-server-name")
 	rootConfig.TLSSkipVerify = viper.GetBool("tls-skip-verify")
 	rootConfig.TLSCACert = caCertContent
-	rootConfig.Headers = viper.GetStringSlice("headers")
+	rootConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
@@ -334,7 +334,13 @@ func initKonnectConfig() error {
 	konnectConfig.Password = password
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
-	konnectConfig.Headers = viper.GetStringSlice("headers")
+	konnectConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	konnectRuntimeGroup = viper.GetString("konnect-runtime-group-name")
 	return nil
+}
+
+func extendHeaders(headers []string) []string {
+	userAgentHeader := fmt.Sprintf("User-Agent:decK/%s", VERSION)
+	headers = append(headers, userAgentHeader)
+	return headers
 }
