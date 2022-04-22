@@ -101,6 +101,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		Address:    konnectAddress,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
+		Headers:    konnectConfig.Headers,
 	})
 }
 
@@ -194,6 +195,7 @@ func syncKonnect(ctx context.Context,
 		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
+		Headers:    konnectConfig.Headers,
 	})
 	if err != nil {
 		return err
