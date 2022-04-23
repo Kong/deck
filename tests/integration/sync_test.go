@@ -802,7 +802,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.7.0")
+			kong.RunWhenKong(t, "==2.7.0")
 			teardown := setup(t)
 			defer teardown(t)
 

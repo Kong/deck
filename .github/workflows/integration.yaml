@@ -17,6 +17,7 @@ jobs:
         - 'kong:2.5.1'
         - 'kong:2.6.0'
         - 'kong:2.7.0'
+        - 'kong:2.8.0'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
