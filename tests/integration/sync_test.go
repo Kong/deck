@@ -1123,3 +1123,37 @@ func Test_Sync_RBAC(t *testing.T) {
 		})
 	}
 }
+
+func Test_Sync_Create_Route_With_Service_Name_Reference(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create a route with a service name reference",
+			kongFile: "testdata/sync/010-create-route-with-service-name-reference/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+				Routes:   route1_20x,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.7.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}

@@ -1,0 +1,17 @@
+_format_version: "1.1"
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+routes:
+- name: r1
+  https_redirect_status_code: 301
+  paths:
+  - /r1
+  service:
+    name: svc1
