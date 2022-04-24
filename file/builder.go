@@ -800,7 +800,18 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 		p.Route = &kong.Route{ID: kong.String(*r.ID)}
 		plugins = append(plugins, *p)
 	}
-	return b.ingestPlugins(plugins)
+	if err := b.ingestPlugins(plugins); err != nil {
+		return err
+	}
+	if r.Service != nil && utils.Empty(r.Service.ID) && !utils.Empty(r.Service.Name) {
+		s, err := b.intermediate.Services.Get(*r.Service.Name)
+		if err != nil {
+			return fmt.Errorf("retrieve intermediate services (%s): %w", *r.Service.Name, err)
+		}
+		r.Service.ID = s.ID
+		r.Service.Name = nil
+	}
+	return nil
 }
 
 func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{}, error) {
