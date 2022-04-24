@@ -995,7 +995,7 @@ func Test_Sync_SkipCACert(t *testing.T) {
 	}{
 		{
 			name:     "syncing with --skip-ca-certificates should ignore CA certs",
-			kongFile: "testdata/sync/008-skip-ca-cert/kong.yaml",
+			kongFile: "testdata/sync/009-skip-ca-cert/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:       svc1_207,
 				CACertificates: []*kong.CACertificate{},
