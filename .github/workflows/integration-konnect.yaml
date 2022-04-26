@@ -1,0 +1,21 @@
+name: Konnect Integration Test
+
+on: [push, pull_request]
+
+jobs:
+  integration:
+    env:
+      KONG_ANONYMOUS_REPORTS: "off"
+      DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
+      DECK_KONNECT_PASSWORD : ${{ secrets.DECK_KONNECT_PASSWORD }}
+      DECK_KONNECT_ADDR : ${{ secrets.DECK_KONNECT_ADDR }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.18'
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run integration tests
+        run: make test-integration
