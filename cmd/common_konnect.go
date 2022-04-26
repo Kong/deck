@@ -29,7 +29,9 @@ var addresses = []string{
 	defaultLegacyKonnectURL,
 }
 
-func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
+func authenticate(
+	ctx context.Context, client *konnect.Client, host string, konnectConfig utils.KonnectConfig,
+) (konnect.AuthResponse, error) {
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
 		return client.Auth.LoginV2(ctx, konnectConfig.Email,
 			konnectConfig.Password, konnectConfig.Token)
@@ -38,12 +40,14 @@ func authenticate(ctx context.Context, client *konnect.Client, host string) (kon
 		konnectConfig.Password)
 }
 
-// getKongClientForKonnectMode abstracts the different cloud environments users
+// GetKongClientForKonnectMode abstracts the different cloud environments users
 // may be using, creating a Konnect client with the proper attributes set.
 // This also includes a fallback mechanism using an address pool to establish
 // a session with Konnect, making the different cloud environments completely
 // transparent to users.
-func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
+func GetKongClientForKonnectMode(
+	ctx context.Context, konnectConfig utils.KonnectConfig,
+) (*kong.Client, error) {
 	httpClient := utils.HTTPClient()
 	if konnectConfig.Address != defaultKonnectURL {
 		addresses = []string{konnectConfig.Address}
@@ -71,7 +75,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s address: %v", address, err)
 		}
-		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
+		_, err = authenticate(ctx, konnectClient, parsedAddress.Host, konnectConfig)
 		if err == nil {
 			break
 		}
@@ -120,7 +124,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 }
 
 func resetKonnectV2(ctx context.Context) error {
-	client, err := getKongClientForKonnectMode(ctx)
+	client, err := GetKongClientForKonnectMode(ctx, konnectConfig)
 	if err != nil {
 		return err
 	}
@@ -140,7 +144,7 @@ func resetKonnectV2(ctx context.Context) error {
 }
 
 func dumpKonnectV2(ctx context.Context) error {
-	client, err := getKongClientForKonnectMode(ctx)
+	client, err := GetKongClientForKonnectMode(ctx, konnectConfig)
 	if err != nil {
 		return err
 	}
