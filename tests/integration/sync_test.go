@@ -461,7 +461,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "<=1.4.3")
+			runWhen(t, "kong", "<=1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -504,7 +504,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">1.4.3 <=1.5.1")
+			runWhen(t, "kong", ">1.4.3 <=1.5.1")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -547,7 +547,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.0.5 <=2.1.4")
+			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -597,7 +597,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.2.1 <=2.6.0")
+			runWhen(t, "kong", ">2.2.1 <=2.6.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -642,7 +642,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.6.9 <3.0.0")
+			runWhen(t, "kong", ">2.6.9 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -684,7 +684,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -719,7 +719,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "==1.4.3")
+			runWhen(t, "kong", "==1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -754,7 +754,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "<1.5.1 !1.4.3")
+			runWhen(t, "kong", "<1.5.1 !1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -789,7 +789,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "==1.5.1")
+			runWhen(t, "kong", "==1.5.1")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -839,7 +839,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.0.5 <3.0.0")
+			runWhen(t, "kong", ">=2.0.5 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -874,7 +874,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -917,7 +917,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "<=1.5.2")
+			runWhen(t, "kong", "<=1.5.2")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -968,7 +968,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.1.0 <3.0.0")
+			runWhen(t, "kong", ">=2.1.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1004,7 +1004,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1048,7 +1048,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.4.1 <3.0.0")
+			runWhen(t, "kong", ">=2.4.1 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1084,7 +1084,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1124,7 +1124,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "==2.7.0")
+			runWhen(t, "kong", "==2.7.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1168,7 +1168,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "<1.5.1 !1.4.3")
+			runWhen(t, "kong", "<1.5.1 !1.4.3")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1207,7 +1207,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.0.5 <=2.1.4")
+			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1253,7 +1253,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.2.1 <=2.6.0")
+			runWhen(t, "kong", ">2.2.1 <=2.6.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1294,7 +1294,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.6.9 <3.0.0")
+			runWhen(t, "kong", ">2.6.9 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1331,7 +1331,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1368,7 +1368,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1474,7 +1474,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenEnterprise(t, ">=2.7.0 <3.0.0", kong.RequiredFeatures{})
+			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1580,7 +1580,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
+			runWhen(t, "enterprise", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1614,7 +1614,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1648,7 +1648,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1687,7 +1687,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			runWhen(t, "kong", ">=2.8.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1725,7 +1725,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1784,7 +1784,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
+			runWhen(t, "enterprise", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1812,7 +1812,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1962,7 +1962,7 @@ func Test_Sync_Vault(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
+			runWhen(t, "enterprise", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
