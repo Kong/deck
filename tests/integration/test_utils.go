@@ -23,9 +23,45 @@ func getKongAddress() string {
 }
 
 func getTestClient() (*kong.Client, error) {
+	ctx := context.Background()
+	konnectConfig := utils.KonnectConfig{
+		Address:  os.Getenv("DECK_KONNECT_ADDR"),
+		Email:    os.Getenv("DECK_KONNECT_EMAIL"),
+		Password: os.Getenv("DECK_KONNECT_PASSWORD"),
+	}
+	if konnectConfig.Email != "" && konnectConfig.Password != "" {
+		return cmd.GetKongClientForKonnectMode(ctx, konnectConfig)
+	}
 	return utils.GetKongClient(utils.KongClientConfig{
 		Address: getKongAddress(),
 	})
+}
+
+func runWhenKonnect(t *testing.T) {
+	if os.Getenv("DECK_KONNECT_EMAIL") == "" || os.Getenv("DECK_KONNECT_PASSWORD") == "" {
+		t.Log("non-Konnect test instance, skipping")
+		t.Skip()
+	}
+}
+
+func skipWhenKonnect(t *testing.T) {
+	if os.Getenv("DECK_KONNECT_EMAIL") != "" || os.Getenv("DECK_KONNECT_PASSWORD") != "" {
+		t.Log("non-Kong test instance, skipping")
+		t.Skip()
+	}
+}
+
+func runWhen(t *testing.T, mode string, semverRange string) {
+	switch mode {
+	case "kong":
+		skipWhenKonnect(t)
+		kong.RunWhenKong(t, semverRange)
+	case "enterprise":
+		skipWhenKonnect(t)
+		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+	case "konnect":
+		runWhenKonnect(t)
+	}
 }
 
 func sortSlices(x, y interface{}) bool {

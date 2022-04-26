@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +25,7 @@ func Test_Diff_Workspace_OlderThan3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, "<3.0.0")
+			runWhen(t, "kong", "<3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -51,7 +50,7 @@ func Test_Diff_Workspace_NewerThan3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 

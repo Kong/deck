@@ -61,7 +61,7 @@ func Test_Reset_SkipCACert_2x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -98,7 +98,7 @@ func Test_Reset_SkipCACert_3x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
