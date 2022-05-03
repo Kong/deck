@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.13.0](#v1130)
 - [v1.12.0](#v1120)
 - [v1.11.0](#v1110)
 - [v1.10.0](#v1100)
@@ -36,6 +37,24 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.13.0]
+
+> Release date: unreleased/TBD
+
+### Added
+
+- Docker images now include `jq` to assist with pre-processing environment
+  substitutions.
+  [#660](https://github.com/Kong/deck/pull/660)
+
+### Fixes
+
+- Route references to services by name are now properly handled when printing
+  diffs.
+  [#657](https://github.com/Kong/deck/pull/657)
+- decK  uses its own user-agent header value for Konnect commands also.
+  [#654](https://github.com/Kong/deck/pull/654)
 
 ## [v1.12.0]
 
@@ -910,6 +929,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.13.0]: https://github.com/kong/deck/compare/v1.12.0...v1.13.0
 [v1.12.0]: https://github.com/kong/deck/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/kong/deck/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/kong/deck/compare/v1.9.0...v1.10.0
