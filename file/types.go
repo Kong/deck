@@ -70,6 +70,7 @@ type service struct {
 	TLSVerify         *bool      `json:"tls_verify,omitempty" yaml:"tls_verify,omitempty"`
 	TLSVerifyDepth    *int       `json:"tls_verify_depth,omitempty" yaml:"tls_verify_depth,omitempty"`
 	CACertificates    []*string  `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
+	Enabled           *bool      `json:"enabled,omitempty" yaml:"enabled,omitempty"`
 	Routes            []*FRoute  `json:"routes,omitempty" yaml:",omitempty"`
 	Plugins           []*FPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 
@@ -101,6 +102,7 @@ func copyToService(fService FService) service {
 	s.Tags = fService.Tags
 	s.Routes = fService.Routes
 	s.Plugins = fService.Plugins
+	s.Enabled = fService.Enabled
 
 	return s
 }
@@ -176,6 +178,7 @@ func copyFromService(service service, fService *FService) error {
 	fService.TLSVerifyDepth = service.TLSVerifyDepth
 	fService.Routes = service.Routes
 	fService.Plugins = service.Plugins
+	fService.Enabled = service.Enabled
 	return nil
 }
 
