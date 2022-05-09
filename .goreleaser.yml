@@ -1,5 +1,5 @@
 universal_binaries:
-- replace: true
+- replace: false
 builds:
 - env:
   - CGO_ENABLED=0
