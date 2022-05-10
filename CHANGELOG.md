@@ -50,6 +50,8 @@
 
 ### Fixes
 
+- Service's `enabled` field is now correctly parsed when present in config files.
+  [#677](https://github.com/Kong/deck/pull/677)
 - Route references to services by name are now properly handled when printing
   diffs.
   [#657](https://github.com/Kong/deck/pull/657)

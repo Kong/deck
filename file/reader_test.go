@@ -149,3 +149,21 @@ func TestReadKongStateFromStdin(t *testing.T) {
 	},
 		c.Services[0].Service)
 }
+
+func TestReadKongStateFromFile(t *testing.T) {
+	filenames := []string{"testdata/config.yaml"}
+	assert := assert.New(t)
+	assert.Equal("testdata/config.yaml", filenames[0])
+
+	c, err := GetContentFromFiles(filenames)
+	assert.NotNil(c)
+	assert.Nil(err)
+
+	t.Run("enabled field for service is read", func(t *testing.T) {
+		assert.Equal(kong.Service{
+			Name:    kong.String("svc1"),
+			Host:    kong.String("mockbin.org"),
+			Enabled: kong.Bool(true),
+		}, c.Services[0].Service)
+	})
+}
