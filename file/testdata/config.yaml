@@ -1,0 +1,4 @@
+services:
+- name: svc1
+  host: mockbin.org
+  enabled: true
