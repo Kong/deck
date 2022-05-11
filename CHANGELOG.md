@@ -44,6 +44,8 @@
 
 ### Added
 
+- Log descriptive names when configuring plugins on other entities.
+  [#662](https://github.com/Kong/deck/pull/662)
 - Docker images now include `jq` to assist with pre-processing environment
   substitutions.
   [#660](https://github.com/Kong/deck/pull/660)
