@@ -43,6 +43,24 @@ func sortSlices(x, y interface{}) bool {
 		yEntity := y.(*kong.Plugin)
 		xName = *xEntity.Name
 		yName = *yEntity.Name
+		if xEntity.Route != nil {
+			xName += *xEntity.Route.ID
+		}
+		if xEntity.Service != nil {
+			xName += *xEntity.Service.ID
+		}
+		if xEntity.Consumer != nil {
+			xName += *xEntity.Consumer.ID
+		}
+		if yEntity.Route != nil {
+			yName += *yEntity.Route.ID
+		}
+		if yEntity.Service != nil {
+			yName += *yEntity.Service.ID
+		}
+		if yEntity.Consumer != nil {
+			yName += *yEntity.Consumer.ID
+		}
 	}
 	return xName < yName
 }
@@ -62,14 +80,15 @@ func testKongState(t *testing.T, client *kong.Client,
 	}
 
 	opt := []cmp.Option{
-		cmpopts.IgnoreFields(kong.Service{}, "ID", "CreatedAt", "UpdatedAt"),
-		cmpopts.IgnoreFields(kong.Route{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Service{}, "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Route{}, "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Upstream{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Target{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.CACertificate{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.RBACEndpointPermission{}, "Role", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.RBACRole{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.Consumer{}, "CreatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),

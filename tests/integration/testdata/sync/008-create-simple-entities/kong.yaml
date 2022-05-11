@@ -1,9 +1,11 @@
 _format_version: "1.1"
 services:
-- name: svc1
+- id: 58076db2-28b6-423b-ba39-a797193017f7
+  name: svc1
   host: mockbin.org
   routes:
-  - name: r1
+  - id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    name: r1
     https_redirect_status_code: 301
     paths:
     - /r1

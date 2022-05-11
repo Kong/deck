@@ -10,6 +10,7 @@ services:
   retries: 5
   routes:
   - name: r1
+    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
     https_redirect_status_code: 301
     paths:
     - /r1
