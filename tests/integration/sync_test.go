@@ -15,6 +15,7 @@ var (
 	// missing Enable
 	svc1 = []*kong.Service{
 		{
+			ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 			Name:           kong.String("svc1"),
 			ConnectTimeout: kong.Int(60000),
 			Host:           kong.String("mockbin.org"),
@@ -30,6 +31,7 @@ var (
 	// latest
 	svc1_207 = []*kong.Service{
 		{
+			ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 			Name:           kong.String("svc1"),
 			ConnectTimeout: kong.Int(60000),
 			Host:           kong.String("mockbin.org"),
@@ -46,6 +48,7 @@ var (
 	// missing RequestBuffering, ResponseBuffering, Service, PathHandling
 	route1_143 = []*kong.Route{
 		{
+			ID:                      kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
 			Name:                    kong.String("r1"),
 			Paths:                   []*string{kong.String("/r1")},
 			PreserveHost:            kong.Bool(false),
@@ -60,6 +63,7 @@ var (
 	// PathHandling set to v1
 	route1_151 = []*kong.Route{
 		{
+			ID:                      kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
 			Name:                    kong.String("r1"),
 			Paths:                   []*string{kong.String("/r1")},
 			PathHandling:            kong.String("v1"),
@@ -69,7 +73,7 @@ var (
 			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 			Service: &kong.Service{
-				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 			},
 		},
 	}
@@ -77,6 +81,7 @@ var (
 	// missing RequestBuffering, ResponseBuffering
 	route1_205_214 = []*kong.Route{
 		{
+			ID:                      kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
 			Name:                    kong.String("r1"),
 			Paths:                   []*string{kong.String("/r1")},
 			PathHandling:            kong.String("v0"),
@@ -86,7 +91,7 @@ var (
 			StripPath:               kong.Bool(true),
 			HTTPSRedirectStatusCode: kong.Int(301),
 			Service: &kong.Service{
-				ID: kong.String("6d4e90fa-cb78-4607-8c4f-f12245ba8b59"),
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 			},
 		},
 	}
@@ -94,6 +99,7 @@ var (
 	// latest
 	route1_20x = []*kong.Route{
 		{
+			ID:                      kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
 			Name:                    kong.String("r1"),
 			Paths:                   []*string{kong.String("/r1")},
 			PathHandling:            kong.String("v0"),
@@ -105,7 +111,7 @@ var (
 			RequestBuffering:        kong.Bool(true),
 			ResponseBuffering:       kong.Bool(true),
 			Service: &kong.Service{
-				ID: kong.String("8076db2-28b6-423b-ba39-a797193017f7"),
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 			},
 		},
 	}
@@ -143,6 +149,77 @@ var (
 			Config: kong.Configuration{
 				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
 				"hide_credentials": false,
+			},
+		},
+	}
+
+	plugin_on_entities = []*kong.Plugin{
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"per_consumer": false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"per_consumer": false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("rate-limiting"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"day":                 nil,
+				"fault_tolerant":      true,
+				"header_name":         nil,
+				"hide_client_headers": false,
+				"hour":                float64(10),
+				"limit_by":            "consumer",
+				"minute":              nil,
+				"month":               nil,
+				"path":                nil,
+				"policy":              "cluster",
+				"redis_username":      nil,
+				"redis_database":      float64(0),
+				"redis_host":          nil,
+				"redis_password":      nil,
+				"redis_port":          float64(6379),
+				"redis_server_name":   nil,
+				"redis_ssl":           false,
+				"redis_ssl_verify":    false,
+				"redis_timeout":       float64(2000),
+				"second":              nil,
+				"year":                nil,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
 			},
 		},
 	}
@@ -251,6 +328,13 @@ var (
 				kong.String("https"),
 			},
 			Tags: nil,
+		},
+	}
+
+	consumer = []*kong.Consumer{
+		{
+			Username: kong.String("yolo"),
+			ID:       kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
 		},
 	}
 )
@@ -1149,6 +1233,42 @@ func Test_Sync_Create_Route_With_Service_Name_Reference(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kong.RunWhenKong(t, ">=2.7.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_PluginsOnEntities(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create plugins on services, routes and consumers",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities,
+				Consumers: consumer,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.8.0")
 			teardown := setup(t)
 			defer teardown(t)
 

@@ -81,7 +81,7 @@ func (s1 *Service) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (s1 *Service) Console() string {
-	return s1.Identifier()
+	return s1.FriendlyName()
 }
 
 // Equal returns true if s1 and s2 are equal.
@@ -135,7 +135,7 @@ func (r1 *Route) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *Route) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -171,6 +171,13 @@ func (r1 *Route) EqualWithOpts(r2 *Route, ignoreID,
 		r1Copy.Service = nil
 		r2Copy.Service = nil
 	}
+
+	if r1Copy.Service != nil {
+		r1Copy.Service.Name = nil
+	}
+	if r2Copy.Service != nil {
+		r2Copy.Service.Name = nil
+	}
 	return reflect.DeepEqual(r1Copy, r2Copy)
 }
 
@@ -192,7 +199,7 @@ func (u1 *Upstream) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (u1 *Upstream) Console() string {
-	return u1.Identifier()
+	return u1.FriendlyName()
 }
 
 // Equal returns true if u1 and u2 are equal.
@@ -241,14 +248,9 @@ func (t1 *Target) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (t1 *Target) Console() string {
-	res := t1.Identifier()
+	res := t1.FriendlyName()
 	if t1.Upstream != nil {
-		if t1.Upstream.ID != nil {
-			res = res + " for upstream " + *t1.Upstream.ID
-		}
-		if t1.Upstream.Name != nil {
-			res = res + " for upstream " + *t1.Upstream.Name
-		}
+		res = res + " for upstream " + t1.Upstream.FriendlyName()
 	}
 	return res
 }
@@ -305,7 +307,7 @@ func (c1 *Certificate) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *Certificate) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -343,12 +345,6 @@ type SNI struct {
 	Meta
 }
 
-// Equal returns true if s1 and s2 are equal.
-// TODO add compare array without position
-func (s1 *SNI) Equal(s2 *SNI) bool {
-	return s1.EqualWithOpts(s2, false, false, false)
-}
-
 // Identifier returns the endpoint key name or ID.
 func (s1 *SNI) Identifier() string {
 	if s1.Name != nil {
@@ -357,10 +353,16 @@ func (s1 *SNI) Identifier() string {
 	return *s1.ID
 }
 
+// Equal returns true if s1 and s2 are equal.
+// TODO add compare array without position
+func (s1 *SNI) Equal(s2 *SNI) bool {
+	return s1.EqualWithOpts(s2, false, false, false)
+}
+
 // Console returns an entity's identity in a human
 // readable string.
 func (s1 *SNI) Console() string {
-	return s1.Identifier()
+	return s1.FriendlyName()
 }
 
 // EqualWithOpts returns true if s1 and s2 are equal.
@@ -415,13 +417,13 @@ func (p1 *Plugin) Console() string {
 	}
 	associations := []string{}
 	if p1.Service != nil {
-		associations = append(associations, "service "+*p1.Service.ID)
+		associations = append(associations, "service "+p1.Service.FriendlyName())
 	}
 	if p1.Route != nil {
-		associations = append(associations, "route "+*p1.Route.ID)
+		associations = append(associations, "route "+p1.Route.FriendlyName())
 	}
 	if p1.Consumer != nil {
-		associations = append(associations, "consumer "+*p1.Consumer.ID)
+		associations = append(associations, "consumer "+p1.Consumer.FriendlyName())
 	}
 	if len(associations) > 0 {
 		res += "for "
@@ -469,6 +471,25 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 		p2Copy.Route = nil
 		p2Copy.Consumer = nil
 	}
+
+	if p1Copy.Service != nil {
+		p1Copy.Service.Name = nil
+	}
+	if p2Copy.Service != nil {
+		p2Copy.Service.Name = nil
+	}
+	if p1Copy.Route != nil {
+		p1Copy.Route.Name = nil
+	}
+	if p2Copy.Route != nil {
+		p2Copy.Route.Name = nil
+	}
+	if p1Copy.Consumer != nil {
+		p1Copy.Consumer.Username = nil
+	}
+	if p2Copy.Consumer != nil {
+		p2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(p1Copy, p2Copy)
 }
 
@@ -490,7 +511,7 @@ func (c1 *Consumer) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *Consumer) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -523,11 +544,9 @@ func (c1 *Consumer) EqualWithOpts(c2 *Consumer,
 
 func forConsumerString(c *kong.Consumer) string {
 	if c != nil {
-		if c.Username != nil {
-			return " for consumer " + *c.Username
-		}
-		if c.ID != nil {
-			return " for consumer " + *c.ID
+		friendlyName := c.FriendlyName()
+		if friendlyName != "" {
+			return " for consumer " + friendlyName
 		}
 	}
 	return ""
@@ -584,6 +603,12 @@ func (k1 *KeyAuth) EqualWithOpts(k2 *KeyAuth, ignoreID,
 	if ignoreForeign {
 		k1Copy.Consumer = nil
 		k2Copy.Consumer = nil
+	}
+	if k1Copy.Consumer != nil {
+		k1Copy.Consumer.Username = nil
+	}
+	if k2Copy.Consumer != nil {
+		k2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
@@ -657,6 +682,12 @@ func (h1 *HMACAuth) EqualWithOpts(h2 *HMACAuth, ignoreID,
 		h1Copy.Consumer = nil
 		h2Copy.Consumer = nil
 	}
+	if h1Copy.Consumer != nil {
+		h1Copy.Consumer.Username = nil
+	}
+	if h2Copy.Consumer != nil {
+		h2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(h1Copy, h2Copy)
 }
 
@@ -728,6 +759,12 @@ func (j1 *JWTAuth) EqualWithOpts(j2 *JWTAuth, ignoreID,
 	if ignoreForeign {
 		j1Copy.Consumer = nil
 		j2Copy.Consumer = nil
+	}
+	if j1Copy.Consumer != nil {
+		j1Copy.Consumer.Username = nil
+	}
+	if j2Copy.Consumer != nil {
+		j2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(j1Copy, j2Copy)
 }
@@ -805,6 +842,12 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
 	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
@@ -877,6 +920,12 @@ func (b1 *ACLGroup) EqualWithOpts(b2 *ACLGroup, ignoreID,
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
 	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
@@ -899,7 +948,7 @@ func (c1 *CACertificate) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *CACertificate) Console() string {
-	return c1.Identifier()
+	return c1.FriendlyName()
 }
 
 // Equal returns true if c1 and c2 are equal.
@@ -971,6 +1020,12 @@ func (k1 *Oauth2Credential) EqualWithOpts(k2 *Oauth2Credential, ignoreID,
 	if ignoreForeign {
 		k1Copy.Consumer = nil
 		k2Copy.Consumer = nil
+	}
+	if k1Copy.Consumer != nil {
+		k1Copy.Consumer.Username = nil
+	}
+	if k2Copy.Consumer != nil {
+		k2Copy.Consumer.Username = nil
 	}
 	return reflect.DeepEqual(k1Copy, k2Copy)
 }
@@ -1044,6 +1099,12 @@ func (b1 *MTLSAuth) EqualWithOpts(b2 *MTLSAuth, ignoreID,
 		b1Copy.Consumer = nil
 		b2Copy.Consumer = nil
 	}
+	if b1Copy.Consumer != nil {
+		b1Copy.Consumer.Username = nil
+	}
+	if b2Copy.Consumer != nil {
+		b2Copy.Consumer.Username = nil
+	}
 	return reflect.DeepEqual(b1Copy, b2Copy)
 }
 
@@ -1065,7 +1126,7 @@ func (r1 *RBACRole) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *RBACRole) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.
@@ -1114,7 +1175,7 @@ func (r1 *RBACEndpointPermission) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (r1 *RBACEndpointPermission) Console() string {
-	return r1.Identifier()
+	return r1.FriendlyName()
 }
 
 // Equal returns true if r1 and r2 are equal.

@@ -1,0 +1,70 @@
+---
+_format_version: "1.1"
+consumers:
+- plugins:
+  - config:
+      day: null
+      fault_tolerant: true
+      header_name: null
+      hide_client_headers: false
+      hour: 10
+      limit_by: consumer
+      minute: null
+      month: null
+      path: null
+      policy: cluster
+      redis_database: 0
+      redis_host: null
+      redis_password: null
+      redis_port: 6379
+      redis_server_name: null
+      redis_ssl: false
+      redis_ssl_verify: false
+      redis_timeout: 2000
+      redis_username: null
+      second: null
+      year: null
+    enabled: true
+    name: rate-limiting
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  username: yolo
+  id: d2965b9b-0608-4458-a9f8-0b93d88d03b8
+services:
+- id: 58076db2-28b6-423b-ba39-a797193017f7
+  connect_timeout: 60000
+  host: mockbin.org
+  name: svc1
+  plugins:
+    - config:
+        per_consumer: false
+      enabled: true
+      name: prometheus
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+    plugins:
+    - config:
+        per_consumer: false
+      enabled: true
+      name: prometheus
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https

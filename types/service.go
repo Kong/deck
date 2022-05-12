@@ -104,7 +104,7 @@ func (d *serviceDiffer) deleteService(service *state.Service) (*crud.Event, erro
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up service %q: %w",
-			service.Identifier(), err)
+			service.FriendlyName(), err)
 	}
 	return nil, nil
 }
