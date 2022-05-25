@@ -141,6 +141,7 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	name := cmd.CommandPath()
 
 	buf.WriteString(fmt.Sprintf("---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name))
+	buf.WriteString("{% if_version gte:1.13.x %}" + "\n\n")
 	buf.WriteString(cmd.Long + "\n\n")
 
 	if cmd.Runnable() {
@@ -158,6 +159,8 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	if err := printFlags(buf, cmd); err != nil {
 		return err
 	}
+
+	buf.WriteString("{% endif_version %}" + "\n\n")
 
 	if hasSeeAlso(cmd) {
 		buf.WriteString("## See also\n\n")
