@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -20,6 +21,28 @@ func genMarkdownTree(cmd *cobra.Command, dir string) error {
 	identity := func(s string) string { return s }
 	emptyStr := func(s string) string { return "" }
 	return genMarkdownTreeCustom(cmd, dir, emptyStr, identity)
+}
+func genVer() (cleanVersion string) {
+	f, err := os.Open("../changelog.md")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	var lineNum int
+	var ver string
+	for scanner.Scan() {
+		if lineNum == 2 {
+			ver = scanner.Text()
+			cleanVersion = string(ver[4 : len(ver)-10])
+		}
+		lineNum++
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatalln(err)
+	}
+	return string(cleanVersion)
 }
 
 func genMarkdownTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHandler func(string) string) error {
@@ -141,7 +164,7 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	name := cmd.CommandPath()
 
 	buf.WriteString(fmt.Sprintf("---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name))
-	buf.WriteString("{% if_version gte:1.13.x %}" + "\n\n")
+	buf.WriteString("{% if_version gte:" + string(genVer()) + "x %}" + "\n\n")
 	buf.WriteString(cmd.Long + "\n\n")
 
 	if cmd.Runnable() {
