@@ -35,14 +35,14 @@ func genVer() (cleanVersion string) {
 	for scanner.Scan() {
 		if lineNum == 2 {
 			ver = scanner.Text()
-			cleanVersion = string(ver[4 : len(ver)-10])
+			cleanVersion = (ver[4 : len(ver)-10])
 		}
 		lineNum++
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalln(err)
 	}
-	return string(cleanVersion)
+	return (cleanVersion)
 }
 
 func genMarkdownTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHandler func(string) string) error {
@@ -164,7 +164,7 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	name := cmd.CommandPath()
 
 	buf.WriteString(fmt.Sprintf("---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name))
-	buf.WriteString("{% if_version gte:" + string(genVer()) + "x %}" + "\n\n")
+	buf.WriteString("{% if_version gte:" + (genVer()) + "x %}" + "\n\n")
 	buf.WriteString(cmd.Long + "\n\n")
 
 	if cmd.Runnable() {
