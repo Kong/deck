@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.13.0](#v1130)
 - [v1.12.1](#v1121)
 - [v1.12.0](#v1120)
 - [v1.11.0](#v1110)
@@ -37,6 +38,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.13.0]
+
+> Release date: unreleased/TBD
+
+### Fixes
+
+- Make Oauth2Credential's `redirect_uris` field not required as it's been so
+  since Kong `1.4.0`.
+  [#688](https://github.com/Kong/deck/pull/688)
 
 ## [v1.12.1]
 
@@ -934,6 +945,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.13.0]: https://github.com/kong/deck/compare/v1.12.1...v1.13.0
 [v1.12.1]: https://github.com/kong/deck/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/kong/deck/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/kong/deck/compare/v1.10.0...v1.11.0
