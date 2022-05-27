@@ -1171,7 +1171,6 @@
       "required": [
         "name",
         "client_id",
-        "redirect_uris",
         "client_secret"
       ],
       "properties": {
