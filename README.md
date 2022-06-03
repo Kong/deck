@@ -69,7 +69,7 @@ $ brew install deck
 ### Linux
 
 If you are Linux, you can either use the Debian or RPM archive from
-the Github [release page](https://github.com/kong/deck/releases)
+the GitHub [release page](https://github.com/kong/deck/releases)
 or install by downloading the binary:
 
 ```shell
@@ -80,7 +80,7 @@ $ sudo cp /tmp/deck /usr/local/bin/
 
 ### Windows
 
-If you are on Windows, you can download the binary from the Github
+If you are on Windows, you can download the binary from the GitHub
 [release page](https://github.com/kong/deck/releases) or via PowerShell:
 
 ```shell
