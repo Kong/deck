@@ -14,12 +14,19 @@ type routeCRUD struct {
 	client *kong.Client
 }
 
+// kong and konnect APIs only require IDs for referenced entities.
+func stripRouteReferencesName(route *state.Route) {
+	if route.Route.Service != nil && route.Route.Service.Name != nil {
+		route.Route.Service.Name = nil
+	}
+}
+
 func routeFromStruct(arg crud.Event) *state.Route {
 	route, ok := arg.Obj.(*state.Route)
 	if !ok {
 		panic("unexpected type, expected *state.Route")
 	}
-
+	stripRouteReferencesName(route)
 	return route
 }
 

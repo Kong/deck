@@ -14,12 +14,25 @@ type pluginCRUD struct {
 	client *kong.Client
 }
 
+// kong and konnect APIs only require IDs for referenced entities.
+func stripPluginReferencesName(plugin *state.Plugin) {
+	if plugin.Plugin.Service != nil && plugin.Plugin.Service.Name != nil {
+		plugin.Plugin.Service.Name = nil
+	}
+	if plugin.Plugin.Route != nil && plugin.Plugin.Route.Name != nil {
+		plugin.Plugin.Route.Name = nil
+	}
+	if plugin.Plugin.Consumer != nil && plugin.Plugin.Consumer.Username != nil {
+		plugin.Plugin.Consumer.Username = nil
+	}
+}
+
 func pluginFromStruct(arg crud.Event) *state.Plugin {
 	plugin, ok := arg.Obj.(*state.Plugin)
 	if !ok {
 		panic("unexpected type, expected *state.Plugin")
 	}
-
+	stripPluginReferencesName(plugin)
 	return plugin
 }
 
