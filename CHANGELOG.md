@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [v1.13.0](#v1130)
+- [v1.12.2](#v1122)
 - [v1.12.1](#v1121)
 - [v1.12.0](#v1120)
 - [v1.11.0](#v1110)
@@ -39,12 +39,14 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [v1.13.0]
+## [v1.12.2]
 
-> Release date: unreleased/TBD
+> Release date: 2022/06/06
 
 ### Fixes
 
+- Only include referenced objects IDs in API requests to fix issue with Konnect.
+  [#693](https://github.com/Kong/deck/pull/693)
 - Make Oauth2Credential's `redirect_uris` field not required as it's been so
   since Kong `1.4.0`.
   [#688](https://github.com/Kong/deck/pull/688)
@@ -945,7 +947,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[v1.13.0]: https://github.com/kong/deck/compare/v1.12.1...v1.13.0
+[v1.12.2]: https://github.com/kong/deck/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/kong/deck/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/kong/deck/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/kong/deck/compare/v1.10.0...v1.11.0
