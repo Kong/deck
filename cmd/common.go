@@ -103,6 +103,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
 	if mode == modeKonnect {
+		if targetContent.Workspace != "" {
+			return fmt.Errorf("_workspace set in config file.\n"+
+				"Workspaces are not supported in Konnect. "+
+				"Please remove '_workspace: %s' from your "+
+				"configuration and try again", targetContent.Workspace)
+		}
+		if workspace != "" {
+			return fmt.Errorf("--workspace flag is not supported when running against Konnect")
+		}
 		if targetContent.Konnect != nil {
 			if konnectRuntimeGroup != "" &&
 				targetContent.Konnect.RuntimeGroupName != konnectRuntimeGroup {
