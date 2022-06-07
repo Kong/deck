@@ -66,6 +66,8 @@
   with Konnect cloud. A clear error message is provided when this
   command is invoked.
   [#718](https://github.com/Kong/deck/pull/#718)
+- Improve error message when workspace is used in Konnect mode.
+  [#696](https://github.com/Kong/deck/pull/696)
 
 ## [v1.14.0]
 
