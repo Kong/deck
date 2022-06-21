@@ -2,3 +2,7 @@ _workspace: test
 services:
 - name: svc1
   host: mockbin.org
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 123
