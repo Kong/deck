@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -42,6 +43,8 @@ var kong140Version = semver.MustParse("1.4.0")
 var uuid = func() *string {
 	return kong.String(utils.UUID())
 }
+
+var ErrWorkspaceNotFound = fmt.Errorf("workspace not found")
 
 func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, error) {
 	// setup
@@ -827,7 +830,7 @@ func (b *stateBuilder) getPluginSchema(pluginName string) (map[string]interface{
 		return nil, fmt.Errorf("ensure workspace exists: %w", err)
 	}
 	if !exists {
-		return schema, nil
+		return schema, ErrWorkspaceNotFound
 	}
 
 	schema, err = b.client.Plugins.GetFullSchema(b.ctx, &pluginName)
@@ -844,6 +847,9 @@ func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
 	}
 	schema, err := b.getPluginSchema(*plugin.Name)
 	if err != nil {
+		if errors.Is(err, ErrWorkspaceNotFound) {
+			return nil
+		}
 		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
 	}
 	return kong.FillPluginsDefaults(&plugin.Plugin, schema)
