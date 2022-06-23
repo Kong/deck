@@ -32,16 +32,15 @@ var dependencyOrder = [][]types.EntityType{
 	{
 		types.ServicePackage,
 		types.RBACRole,
-		types.Upstream,
 		types.Certificate,
 		types.CACertificate,
 		types.Consumer,
 	},
 	{
 		types.RBACEndpointPermission,
-		types.Target,
 		types.SNI,
 		types.Service,
+		types.Upstream,
 
 		types.KeyAuth, types.HMACAuth, types.JWTAuth,
 		types.BasicAuth, types.OAuth2Cred, types.ACLGroup,
@@ -50,6 +49,7 @@ var dependencyOrder = [][]types.EntityType{
 	{
 		types.ServiceVersion,
 		types.Route,
+		types.Target,
 	},
 	{
 		types.Plugin,
