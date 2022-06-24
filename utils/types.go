@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -13,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
@@ -100,6 +103,9 @@ type KongClientConfig struct {
 	TLSClientCert string
 
 	TLSClientKey string
+
+	// whether or not the client should retry on 429s
+	Retryable bool
 }
 
 type KonnectConfig struct {
@@ -117,6 +123,73 @@ func (kc *KongClientConfig) ForWorkspace(name string) KongClientConfig {
 	result := *kc
 	result.Workspace = name
 	return result
+}
+
+// backoffStrategy provides a callback for Client.Backoff which
+// will perform exponential backoff based on the attempt number and limited
+// by the provided minimum and maximum durations.
+//
+// It also tries to parse Retry-After response header when a http.StatusTooManyRequests
+// (HTTP Code 429) is found in the resp parameter. Hence it will return the number of
+// seconds the server states it may be ready to process more requests from this client.
+//
+// This is the same as DefaultBackoff (https://github.com/hashicorp/go-retryablehttp/blob/v0.7.1/client.go#L503)
+// except that here we are only retrying on 429s.
+func backoffStrategy(min, max time.Duration, attemptNum int, resp *http.Response) time.Duration {
+	const (
+		base            = 10
+		bitSize         = 64
+		baseExponential = 2
+	)
+	if resp != nil && resp.StatusCode == http.StatusTooManyRequests {
+		if s, ok := resp.Header["Retry-After"]; ok {
+			if sleep, err := strconv.ParseInt(s[0], base, bitSize); err == nil {
+				return time.Second * time.Duration(sleep)
+			}
+		}
+	}
+
+	mult := math.Pow(baseExponential, float64(attemptNum)) * float64(min)
+	sleep := time.Duration(mult)
+	if float64(sleep) != mult || sleep > max {
+		sleep = max
+	}
+	return sleep
+}
+
+// retryPolicy provides a callback for Client.CheckRetry, which
+// will retry on 429s errors.
+func retryPolicy(ctx context.Context, resp *http.Response, err error) (bool, error) {
+	// do not retry on context.Canceled or context.DeadlineExceeded
+	if ctx.Err() != nil {
+		return false, ctx.Err()
+	}
+
+	// 429 Too Many Requests is recoverable. Sometimes the server puts
+	// a Retry-After response header to indicate when the server is
+	// available to start processing request from client.
+	if resp.StatusCode == http.StatusTooManyRequests {
+		return true, nil
+	}
+	return false, nil
+}
+
+func getRetryableClient(client *http.Client) *http.Client {
+	const (
+		minRetryWait = 10 * time.Second
+		maxRetryWait = 60 * time.Second
+		retryMax     = 10
+	)
+	retryClient := retryablehttp.NewClient()
+	retryClient.HTTPClient = client
+	retryClient.Backoff = backoffStrategy
+	retryClient.CheckRetry = retryPolicy
+	retryClient.RetryMax = retryMax
+	retryClient.RetryWaitMax = maxRetryWait
+	retryClient.RetryWaitMin = minRetryWait
+	// logging is handled by deck.
+	retryClient.Logger = nil
+	return retryClient.StandardClient()
 }
 
 // GetKongClient returns a Kong client
@@ -162,6 +235,10 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 		return nil, fmt.Errorf("parsing headers: %w", err)
 	}
 	c = kong.HTTPClientWithHeaders(c, headers)
+
+	if opt.Retryable {
+		c = getRetryableClient(c)
+	}
 
 	url, err := url.ParseRequestURI(address)
 	if err != nil {

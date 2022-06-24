@@ -102,6 +102,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 		Headers:    konnectConfig.Headers,
+		Retryable:  true,
 	})
 }
 
