@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.12.3](#v1123)
 - [v1.12.2](#v1122)
 - [v1.12.1](#v1121)
 - [v1.12.0](#v1120)
@@ -38,6 +39,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.12.3]
+
+> Release date: 2022/07/05
+
+### Added
+
+- Add rate-limiting capabilities to Konnect client.
+  [#705](https://github.com/Kong/deck/pull/705)
 
 ## [v1.12.2]
 
@@ -947,6 +957,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.12.3]: https://github.com/kong/deck/compare/v1.12.2...v1.12.3
 [v1.12.2]: https://github.com/kong/deck/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/kong/deck/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/kong/deck/compare/v1.11.0...v1.12.0
