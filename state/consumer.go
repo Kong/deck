@@ -25,6 +25,12 @@ var consumerTableSchema = &memdb.TableSchema{
 			Indexer:      &memdb.StringFieldIndex{Field: "Username"},
 			AllowMissing: true,
 		},
+		"CustomID": {
+			Name:         "CustomID",
+			Unique:       true,
+			Indexer:      &memdb.StringFieldIndex{Field: "CustomID"},
+			AllowMissing: true,
+		},
 		all: allIndex,
 	},
 }
@@ -47,6 +53,9 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	if !utils.Empty(consumer.Username) {
 		searchBy = append(searchBy, *consumer.Username)
 	}
+	if !utils.Empty(consumer.CustomID) {
+		searchBy = append(searchBy, *consumer.CustomID)
+	}
 	_, err := getConsumer(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
@@ -65,7 +74,7 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 func getConsumer(txn *memdb.Txn, IDs ...string) (*Consumer, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, consumerTableName,
-			[]string{"Username", "id"}, id)
+			[]string{"Username", "id", "CustomID"}, id)
 		if err == ErrNotFound {
 			continue
 		}
