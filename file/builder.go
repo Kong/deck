@@ -188,7 +188,15 @@ func (b *stateBuilder) consumers() {
 		if utils.Empty(c.ID) {
 			consumer, err := b.currentState.Consumers.Get(*c.Username)
 			if err == state.ErrNotFound {
-				c.ID = uuid()
+				if c.CustomID != nil {
+					consumer, err = b.currentState.Consumers.Get(*c.CustomID)
+					if err == nil {
+						c.ID = kong.String(*consumer.ID)
+					}
+				}
+				if c.ID == nil {
+					c.ID = uuid()
+				}
 			} else if err != nil {
 				b.err = err
 				return

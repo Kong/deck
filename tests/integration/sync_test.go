@@ -2187,3 +2187,183 @@ func Test_Sync_Vault(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - 2.8.x
+func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/013-update-username-consumer-with-custom-id/kong.yaml",
+			kongFileInitial: "testdata/sync/013-update-username-consumer-with-custom-id/kong-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test_new"),
+						CustomID: kong.String("custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 2.8.x
+func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/014-update-consumer-with-custom-id/kong.yaml",
+			kongFileInitial: "testdata/sync/014-update-consumer-with-custom-id/kong-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test"),
+						CustomID: kong.String("new_custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/013-update-username-consumer-with-custom-id/kong3x.yaml",
+			kongFileInitial: "testdata/sync/013-update-username-consumer-with-custom-id/kong3x-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test_new"),
+						CustomID: kong.String("custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/014-update-consumer-with-custom-id/kong3x.yaml",
+			kongFileInitial: "testdata/sync/014-update-consumer-with-custom-id/kong3x-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test"),
+						CustomID: kong.String("new_custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}

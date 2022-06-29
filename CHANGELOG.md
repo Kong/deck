@@ -67,6 +67,9 @@
   [#765](https://github.com/Kong/deck/pull/765)
 - Handle correctly encoded whitespaces into services' `url`
   [#755](https://github.com/Kong/deck/pull/755)
+- Make sure decK can update in place consumers' username when
+  `custom_id` is also set.
+  [#707](https://github.com/Kong/deck/pull/707)
 
 ## [v1.15.1]
 
