@@ -478,6 +478,10 @@
         "name": {
           "type": "string"
         },
+        "ordering": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/PluginOrdering"
+        },
         "protocols": {
           "items": {
             "type": "string"
@@ -1224,6 +1228,34 @@
         },
         "unhealthy": {
           "$ref": "#/definitions/Unhealthy"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PluginOrdering": {
+      "properties": {
+        "after": {
+          "patternProperties": {
+            ".*": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "before": {
+          "patternProperties": {
+            ".*": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
         }
       },
       "additionalProperties": false,
