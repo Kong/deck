@@ -35,6 +35,7 @@ type Client struct {
 	debug                 bool
 	prefix                string
 	token                 string
+	prefix                string
 
 	RuntimeGroups *RuntimeGroupService
 }
