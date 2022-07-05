@@ -1029,6 +1029,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 //   - 2.7.0
 //   - 2.6.0.2+enterprise
 //   - 2.7.0.0+enterprise
+//   - 2.8.0.0+enterprise
 func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -1055,7 +1056,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.6.9")
+			kong.RunWhenKong(t, ">2.6.9 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1269,6 +1270,65 @@ func Test_Sync_PluginsOnEntities(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kong.RunWhenKong(t, ">=2.8.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0.0+
+func Test_Sync_PluginOrdering(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin with ordering",
+			kongFile: "testdata/sync/011-plugin-ordering/kong.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name: kong.String("request-termination"),
+						Protocols: []*string{
+							kong.String("grpc"),
+							kong.String("grpcs"),
+							kong.String("http"),
+							kong.String("https"),
+						},
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"status_code":  float64(200),
+							"echo":         false,
+							"content_type": nil,
+							"body":         nil,
+							"message":      nil,
+							"trigger":      nil,
+						},
+						Ordering: &kong.PluginOrdering{
+							Before: kong.PluginOrderingPhase{
+								"access": []string{"basic-auth"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
 			teardown := setup(t)
 			defer teardown(t)
 
