@@ -319,17 +319,18 @@ type FPlugin struct {
 // foo is a shadow type of Plugin.
 // It is used for custom marshalling of plugin.
 type foo struct {
-	CreatedAt *int               `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	ID        *string            `json:"id,omitempty" yaml:"id,omitempty"`
-	Name      *string            `json:"name,omitempty" yaml:"name,omitempty"`
-	Config    kong.Configuration `json:"config,omitempty" yaml:"config,omitempty"`
-	Service   string             `json:"service,omitempty" yaml:",omitempty"`
-	Consumer  string             `json:"consumer,omitempty" yaml:",omitempty"`
-	Route     string             `json:"route,omitempty" yaml:",omitempty"`
-	Enabled   *bool              `json:"enabled,omitempty" yaml:"enabled,omitempty"`
-	RunOn     *string            `json:"run_on,omitempty" yaml:"run_on,omitempty"`
-	Protocols []*string          `json:"protocols,omitempty" yaml:"protocols,omitempty"`
-	Tags      []*string          `json:"tags,omitempty" yaml:"tags,omitempty"`
+	CreatedAt *int                 `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID        *string              `json:"id,omitempty" yaml:"id,omitempty"`
+	Name      *string              `json:"name,omitempty" yaml:"name,omitempty"`
+	Config    kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
+	Service   string               `json:"service,omitempty" yaml:",omitempty"`
+	Consumer  string               `json:"consumer,omitempty" yaml:",omitempty"`
+	Route     string               `json:"route,omitempty" yaml:",omitempty"`
+	Enabled   *bool                `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	RunOn     *string              `json:"run_on,omitempty" yaml:"run_on,omitempty"`
+	Ordering  *kong.PluginOrdering `json:"ordering,omitempty" yaml:"ordering,omitempty"`
+	Protocols []*string            `json:"protocols,omitempty" yaml:"protocols,omitempty"`
+	Tags      []*string            `json:"tags,omitempty" yaml:"tags,omitempty"`
 
 	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
 }
@@ -350,6 +351,9 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.Protocols != nil {
 		f.Protocols = p.Protocols
+	}
+	if p.Ordering != nil {
+		f.Ordering = p.Ordering
 	}
 	if p.Tags != nil {
 		f.Tags = p.Tags
@@ -387,6 +391,9 @@ func copyFromFoo(f foo, p *FPlugin) {
 	}
 	if f.Protocols != nil {
 		p.Protocols = f.Protocols
+	}
+	if f.Ordering != nil {
+		p.Ordering = f.Ordering
 	}
 	if f.Tags != nil {
 		p.Tags = f.Tags
