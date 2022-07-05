@@ -1892,15 +1892,17 @@ func Test_stateBuilder_documents(t *testing.T) {
 						Published: kong.Bool(true),
 						Content:   kong.String("foo"),
 						Parent: &konnect.ServicePackage{
-							ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
-							Name: kong.String("foo"),
+							ID:          kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+							Name:        kong.String("foo"),
+							DisplayName: kong.String("foo"),
 						},
 					},
 				},
 				ServicePackages: []*konnect.ServicePackage{
 					{
-						ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
-						Name: kong.String("foo"),
+						ID:          kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+						Name:        kong.String("foo"),
+						DisplayName: kong.String("foo"),
 					},
 				},
 			},
@@ -1930,15 +1932,17 @@ func Test_stateBuilder_documents(t *testing.T) {
 						Published: kong.Bool(true),
 						Content:   kong.String("bar"),
 						Parent: &konnect.ServicePackage{
-							ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
-							Name: kong.String("bar"),
+							ID:          kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+							Name:        kong.String("bar"),
+							DisplayName: kong.String("bar"),
 						},
 					},
 				},
 				ServicePackages: []*konnect.ServicePackage{
 					{
-						ID:   kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
-						Name: kong.String("bar"),
+						ID:          kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
+						Name:        kong.String("bar"),
+						DisplayName: kong.String("bar"),
 					},
 				},
 			},

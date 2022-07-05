@@ -143,6 +143,11 @@ func (in *ServicePackage) DeepCopyInto(out *ServicePackage) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.DisplayName != nil {
+		in, out := &in.DisplayName, &out.DisplayName
+		*out = new(string)
+		**out = **in
+	}
 	if in.Versions != nil {
 		in, out := &in.Versions, &out.Versions
 		*out = make([]ServiceVersion, len(*in))

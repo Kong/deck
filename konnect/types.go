@@ -32,6 +32,7 @@ type ServicePackage struct {
 	ID          *string `json:"id,omitempty"`
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description"`
+	DisplayName *string `json:"display_name,omitempty"`
 
 	Versions []ServiceVersion `json:"versions,omitempty"`
 }

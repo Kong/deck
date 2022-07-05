@@ -43,7 +43,7 @@ func authenticate(ctx context.Context, client *konnect.Client, host string) (kon
 // This also includes a fallback mechanism using an address pool to establish
 // a session with Konnect, making the different cloud environments completely
 // transparent to users.
-func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
+func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Client, error) {
 	httpClient := utils.HTTPClient()
 	if konnectConfig.Address != defaultKonnectURL {
 		addresses = []string{konnectConfig.Address}
@@ -58,11 +58,11 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		konnectConfig.Address = address
 		konnectClient, err = utils.GetKonnectClient(httpClient, konnectConfig)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		parsedAddress, err = url.Parse(address)
 		if err != nil {
-			return nil, fmt.Errorf("parsing %s address: %v", address, err)
+			return nil, nil, fmt.Errorf("parsing %s address: %v", address, err)
 		}
 		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
 		if err == nil {
@@ -73,13 +73,13 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+		return nil, nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 	if strings.Contains(parsedAddress.Host, konnectWithRuntimeGroupsDomain) {
 		// get kong runtime group ID
 		kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		// set the kong runtime group ID in the client
@@ -89,7 +89,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		// get kong control plane ID
 		kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		// set the kong control plane ID in the client
@@ -97,16 +97,17 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
 	}
 	// initialize kong client
-	return utils.GetKongClient(utils.KongClientConfig{
+	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 		Headers:    konnectConfig.Headers,
 	})
+	return kongClient, konnectClient, err
 }
 
 func resetKonnectV2(ctx context.Context) error {
-	client, err := getKongClientForKonnectMode(ctx)
+	client, _, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
@@ -126,7 +127,7 @@ func resetKonnectV2(ctx context.Context) error {
 }
 
 func dumpKonnectV2(ctx context.Context) error {
-	client, err := getKongClientForKonnectMode(ctx)
+	client, _, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
@@ -152,8 +153,6 @@ func dumpKonnectV2(ctx context.Context) error {
 func syncKonnect(ctx context.Context,
 	filenames []string, dry bool, parallelism int,
 ) error {
-	httpClient := utils.HTTPClient()
-
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -168,40 +167,34 @@ func syncKonnect(ctx context.Context,
 	targetContent.StripLocalDocumentPath()
 
 	// get Konnect client
-	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
+	kongClient, konnectClient, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
 
-	// authenticate with konnect
-	_, err = konnectClient.Auth.Login(ctx,
-		konnectConfig.Email,
-		konnectConfig.Password)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
+	var entityID string
+	if strings.Contains(konnectConfig.Address, konnectWithRuntimeGroupsDomain) {
+		// get kong runtime group ID
+		entityID, err = fetchKongRuntimeGroupID(ctx, konnectClient)
+		if err != nil {
+			return err
+		}
+
+		// set the kong runtime group and control plane IDs in the client
+		konnectClient.SetRuntimeGroupID(entityID)
+		konnectClient.SetControlPlaneID(entityID)
+	} else {
+		// get kong control plane ID
+		entityID, err = fetchKongControlPlaneID(ctx, konnectClient)
+		if err != nil {
+			return err
+		}
+
+		// set the kong control plane ID in the client
+		konnectClient.SetControlPlaneID(entityID)
 	}
 
-	// get kong control plane ID
-	kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
-	if err != nil {
-		return err
-	}
-
-	// set the kong control plane ID in the client
-	konnectClient.SetControlPlaneID(kongCPID)
-
-	// initialize kong client
-	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-		Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
-		HTTPClient: httpClient,
-		Debug:      konnectConfig.Debug,
-		Headers:    konnectConfig.Headers,
-	})
-	if err != nil {
-		return err
-	}
-
-	currentState, err := getKonnectState(ctx, kongClient, konnectClient, kongCPID,
+	currentState, err := getKonnectState(ctx, kongClient, konnectClient, entityID,
 		!konnectDumpIncludeConsumers)
 	if err != nil {
 		return err
@@ -214,7 +207,7 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	targetState, err := state.GetKonnectState(targetKongState, targetKonnectState)
+	targetState, err := state.GetKonnectState(targetKongState, targetKonnectState, excludeServiceVersions)
 	if err != nil {
 		return err
 	}
@@ -333,7 +326,7 @@ func getKonnectState(ctx context.Context,
 		return nil, err
 	}
 
-	ks, err := state.GetKonnectState(kongState, konnectState)
+	ks, err := state.GetKonnectState(kongState, konnectState, false)
 	if err != nil {
 		return nil, fmt.Errorf("building state: %w", err)
 	}

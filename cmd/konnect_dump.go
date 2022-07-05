@@ -41,10 +41,6 @@ func newKonnectDumpCmd() *cobra.Command {
 				return nil
 			}
 
-			// get Konnect client
-			if konnectConfig.Address == defaultKonnectURL {
-				konnectConfig.Address = defaultLegacyKonnectURL
-			}
 			konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 			if err != nil {
 				return err

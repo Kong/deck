@@ -267,7 +267,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 	return nil
 }
 
-func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
+func buildKonnect(kongState *KongState, raw *utils.KonnectRawState, excludeServiceVersions bool) error {
 	for _, s := range raw.ServicePackages {
 		servicePackage := s.DeepCopy()
 		servicePackage.Versions = nil
@@ -278,6 +278,9 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 			return fmt.Errorf("inserting service-package into state: %w", err)
 		}
 
+		if excludeServiceVersions {
+			continue
+		}
 		for _, v := range s.Versions {
 			v = *v.DeepCopy()
 			v.ServicePackage = servicePackage.DeepCopy()
@@ -288,6 +291,9 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 				return fmt.Errorf("inserting service-version into state: %w", err)
 			}
 		}
+	}
+	if excludeServiceVersions {
+		return nil
 	}
 	for _, d := range raw.Documents {
 		document := d.ShallowCopy()
@@ -302,7 +308,7 @@ func buildKonnect(kongState *KongState, raw *utils.KonnectRawState) error {
 }
 
 func GetKonnectState(rawKong *utils.KongRawState,
-	rawKonnect *utils.KonnectRawState,
+	rawKonnect *utils.KonnectRawState, excludeServiceVersions bool,
 ) (*KongState, error) {
 	kongState, err := NewKongState()
 	if err != nil {
@@ -314,7 +320,7 @@ func GetKonnectState(rawKong *utils.KongRawState,
 		return nil, err
 	}
 
-	err = buildKonnect(kongState, rawKonnect)
+	err = buildKonnect(kongState, rawKonnect, excludeServiceVersions)
 	if err != nil {
 		return nil, err
 	}

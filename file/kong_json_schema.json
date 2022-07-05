@@ -791,6 +791,9 @@
         "description": {
           "type": "string"
         },
+        "display_name": {
+          "type": "string"
+        },
         "document": {
           "$ref": "#/definitions/FDocument"
         },

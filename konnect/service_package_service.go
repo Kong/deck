@@ -16,7 +16,7 @@ func (s *ServicePackageService) Create(ctx context.Context,
 		return nil, fmt.Errorf("cannot create a nil service-package")
 	}
 
-	endpoint := "/api/service_packages"
+	endpoint := fmt.Sprintf("%s/api/service_packages", s.client.prefix)
 	method := "POST"
 	req, err := s.client.NewRequest(method, endpoint, nil, sp)
 	if err != nil {
@@ -28,6 +28,9 @@ func (s *ServicePackageService) Create(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
+	if sp.ID != nil {
+		createdSP.ID = sp.ID
+	}
 	return &createdSP, nil
 }
 
@@ -37,7 +40,7 @@ func (s *ServicePackageService) Delete(ctx context.Context, id *string) error {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}
 
-	endpoint := fmt.Sprintf("/api/service_packages/%v", *id)
+	endpoint := fmt.Sprintf("%s/api/service_packages/%v", s.client.prefix, *id)
 	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -59,7 +62,7 @@ func (s *ServicePackageService) Update(ctx context.Context,
 		return nil, fmt.Errorf("ID cannot be nil for Update operation")
 	}
 
-	endpoint := fmt.Sprintf("/api/service_packages/%v", *sp.ID)
+	endpoint := fmt.Sprintf("%s/api/service_packages/%v", s.client.prefix, *sp.ID)
 	req, err := s.client.NewRequest("PATCH", endpoint, nil, sp)
 	if err != nil {
 		return nil, err
@@ -77,7 +80,8 @@ func (s *ServicePackageService) Update(ctx context.Context,
 func (s *ServicePackageService) List(ctx context.Context,
 	opt *ListOpt,
 ) ([]*ServicePackage, *ListOpt, error) {
-	data, next, err := s.client.list(ctx, "/api/service_packages", opt)
+	endpoint := fmt.Sprintf("%s/api/service_packages", s.client.prefix)
+	data, next, err := s.client.list(ctx, endpoint, opt)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -19,7 +19,7 @@ func (d *DocumentService) Create(ctx context.Context, doc *Document) (*Document,
 		return nil, fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := doc.Parent.URL() + "/documents/"
+	endpoint := d.client.prefix + doc.Parent.URL() + "/documents/"
 	method := http.MethodPost
 	if doc.ID != nil {
 		method = "PUT"
@@ -49,7 +49,7 @@ func (d *DocumentService) Delete(ctx context.Context, doc *Document) error {
 		return fmt.Errorf("document must have a Parent")
 	}
 
-	endpoint := fmt.Sprintf("%s/documents/%s", doc.Parent.URL(), *doc.ID)
+	endpoint := fmt.Sprintf("%s/%s/documents/%s", d.client.prefix, doc.Parent.URL(), *doc.ID)
 	req, err := d.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (d *DocumentService) Update(ctx context.Context, doc *Document) (*Document,
 	// Document PATCHes run through POST validation logic. Attempting to PATCH a Published: true
 	// document without toggling Published results in a 400, as if you'd tried to POST another
 	// Published: true document under the same resource. As such, this PUTs instead.
-	endpoint := fmt.Sprintf("%s/documents/%s", doc.Parent.URL(), *doc.ID)
+	endpoint := fmt.Sprintf("%s/%s/documents/%s", d.client.prefix, doc.Parent.URL(), *doc.ID)
 	putReq, err := d.client.NewRequest("PUT", endpoint, nil, doc)
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (d *DocumentService) ListAllForParent(ctx context.Context, parent ParentInf
 	}
 	var docs []*Document
 	var err error
-	docs, err = d.listAllByPath(ctx, parent.URL()+"/documents")
+	docs, err = d.listAllByPath(ctx, d.client.prefix+parent.URL()+"/documents")
 	if err != nil {
 		return nil, err
 	}

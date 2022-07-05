@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var excludeServiceVersions bool
+
 // newKonnectSyncCmd represents the 'deck konnect diff' command.
 func newKonnectSyncCmd() *cobra.Command {
 	konnectSyncCmd := &cobra.Command{
@@ -20,9 +22,6 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
 			}
 			_ = sendAnalytics("konnect-sync", "", modeKonnect)
-			if konnectConfig.Address == defaultKonnectURL {
-				konnectConfig.Address = defaultLegacyKonnectURL
-			}
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 				konnectDiffCmdParallelism)
 		},
@@ -39,6 +38,8 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 			"with consumers.")
 	konnectSyncCmd.Flags().IntVar(&konnectDiffCmdParallelism, "parallelism",
 		100, "Maximum number of concurrent operations.")
+	konnectSyncCmd.Flags().BoolVar(&excludeServiceVersions, "exclude-service-versions",
+		false, "do not sync Gateway entities.")
 	addSilenceEventsFlag(konnectSyncCmd.Flags())
 	return konnectSyncCmd
 }

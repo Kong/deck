@@ -30,7 +30,7 @@ func (s *ControlPlaneRelationsService) Create(
 	}
 	relation.ControlPlane = s.controlPlaneID
 
-	endpoint := "/api/control_plane_service_relations"
+	endpoint := fmt.Sprintf("%s/api/control_plane_service_relations", s.client.prefix)
 	method := http.MethodPost
 
 	req, err := s.client.NewRequest(method, endpoint, nil, relation)
@@ -54,8 +54,7 @@ func (s *ControlPlaneRelationsService) Delete(ctx context.Context,
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}
 
-	endpoint := fmt.Sprintf("/api/control_plane_service_relations/%v",
-		*relationID)
+	endpoint := fmt.Sprintf("%s/api/control_plane_service_relations/%v", s.client.prefix, *relationID)
 	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -78,7 +77,7 @@ func (s ControlPlaneRelationsService) Update(ctx context.Context,
 	}
 	relation.ControlPlane = s.controlPlaneID
 
-	endpoint := fmt.Sprintf("/api/control_plane_service_relations/%v", relation.ID)
+	endpoint := fmt.Sprintf("%s/api/control_plane_service_relations/%v", s.client.prefix, relation.ID)
 	req, err := s.client.NewRequest("PATCH", endpoint, nil, relation)
 	if err != nil {
 		return nil, err
@@ -96,7 +95,8 @@ func (s ControlPlaneRelationsService) Update(ctx context.Context,
 func (s *ControlPlaneRelationsService) List(ctx context.Context,
 	opt *ListOpt,
 ) ([]*ControlPlaneServiceRelation, *ListOpt, error) {
-	data, next, err := s.client.list(ctx, "/api/control_plane_service_relations", opt)
+	endpoint := fmt.Sprintf("%s/api/control_plane_service_relations", s.client.prefix)
+	data, next, err := s.client.list(ctx, endpoint, opt)
 	if err != nil {
 		return nil, nil, err
 	}

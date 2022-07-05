@@ -16,7 +16,7 @@ func (s *ServiceVersionService) Create(ctx context.Context,
 		return nil, fmt.Errorf("cannot create a nil service-package")
 	}
 
-	endpoint := "/api/service_versions"
+	endpoint := fmt.Sprintf("%s/api/service_versions", s.client.prefix)
 	method := "POST"
 
 	if !emptyString(sv.ID) {
@@ -48,7 +48,7 @@ func (s *ServiceVersionService) Delete(ctx context.Context, id *string) error {
 		return fmt.Errorf("id cannot be nil for Delete operation")
 	}
 
-	endpoint := fmt.Sprintf("/api/service_versions/%v", *id)
+	endpoint := fmt.Sprintf("%s/api/service_versions/%v", s.client.prefix, *id)
 	req, err := s.client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func (s *ServiceVersionService) Update(ctx context.Context,
 		return nil, fmt.Errorf("ID cannot be nil for Update operation")
 	}
 
-	endpoint := fmt.Sprintf("/api/service_versions/%v", *sv.ID)
+	endpoint := fmt.Sprintf("%s/api/service_versions/%v", s.client.prefix, *sv.ID)
 	req, err := s.client.NewRequest("PATCH", endpoint, nil, sv)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (s *ServiceVersionService) Update(ctx context.Context,
 func (s *ServiceVersionService) ListForPackage(ctx context.Context,
 	servicePackageID *string,
 ) ([]ServiceVersion, error) {
-	endpoint := "/api/service_packages/" + *servicePackageID + "/service_versions"
+	endpoint := s.client.prefix + "/api/service_packages/" + *servicePackageID + "/service_versions"
 	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
 		return nil, err

@@ -142,7 +142,8 @@ func populateServicePackages(kongState *state.KongState, file *Content,
 		safePackageName := utils.NameToFilename(*sp.Name)
 		p := FServicePackage{
 			ID:          sp.ID,
-			Name:        sp.Name,
+			Name:        kong.String(strings.ReplaceAll(*sp.Name, " ", "-")),
+			DisplayName: sp.Name,
 			Description: sp.Description,
 		}
 		versions, err := kongState.ServiceVersions.GetAllByServicePackageID(*p.ID)

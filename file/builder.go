@@ -3,6 +3,7 @@ package file
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/konnect"
@@ -444,7 +445,8 @@ func (b *stateBuilder) konnect() {
 
 		targetKonnectSP := konnect.ServicePackage{
 			ID:          targetSP.ID,
-			Name:        targetSP.Name,
+			Name:        kong.String(strings.ReplaceAll(*targetSP.Name, " ", "-")),
+			DisplayName: targetSP.Name,
 			Description: targetSP.Description,
 		}
 

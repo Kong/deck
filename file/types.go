@@ -588,6 +588,7 @@ type FServiceVersion struct {
 type FServicePackage struct {
 	ID          *string           `json:"id,omitempty" yaml:"id,omitempty"`
 	Name        *string           `json:"name,omitempty" yaml:"name,omitempty"`
+	DisplayName *string           `json:"display_name,omitempty" yaml:"name,omitempty"`
 	Description *string           `json:"description,omitempty" yaml:"description,omitempty"`
 	Versions    []FServiceVersion `json:"versions,omitempty" yaml:"versions,omitempty"`
 	Document    *FDocument        `json:"document,omitempty" yaml:"document,omitempty"`
