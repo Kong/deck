@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.12.4](#v1124)
 - [v1.12.3](#v1123)
 - [v1.12.2](#v1122)
 - [v1.12.1](#v1121)
@@ -39,6 +40,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.12.4]
+
+> Release date: 2022/07/07
+
+### Fixes
+
+- Make sure decK correctly includes select_tags when dumping
+  from Konnect.
+  [#711](https://github.com/Kong/deck/pull/711)
 
 ## [v1.12.3]
 
@@ -957,6 +968,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.12.4]: https://github.com/kong/deck/compare/v1.12.3...v1.12.4
 [v1.12.3]: https://github.com/kong/deck/compare/v1.12.2...v1.12.3
 [v1.12.2]: https://github.com/kong/deck/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/kong/deck/compare/v1.12.0...v1.12.1
