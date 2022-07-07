@@ -143,6 +143,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		return fmt.Errorf("building state: %w", err)
 	}
 	return file.KongStateToFile(ks, file.WriteConfig{
+		SelectTags:       dumpConfig.SelectorTags,
 		Filename:         dumpCmdKongStateFile,
 		FileFormat:       file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 		WithID:           dumpWithID,
