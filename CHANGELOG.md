@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.13.0](#v1130)
 - [v1.12.4](#v1124)
 - [v1.12.3](#v1123)
 - [v1.12.2](#v1122)
@@ -40,6 +41,20 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.13.0]
+
+> Release date: 2022/07/14
+
+### Fixes
+
+- Fixed a failure when performing a diff against non-existent workspaces.
+  [#702](https://github.com/Kong/deck/pull/702)
+
+### Added
+
+- Added support for plugin `ordering` field.
+  [#710](https://github.com/Kong/deck/pull/710)
 
 ## [v1.12.4]
 
@@ -968,6 +983,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.13.0]: https://github.com/kong/deck/compare/v1.12.4...v1.13.0
 [v1.12.4]: https://github.com/kong/deck/compare/v1.12.3...v1.12.4
 [v1.12.3]: https://github.com/kong/deck/compare/v1.12.2...v1.12.3
 [v1.12.2]: https://github.com/kong/deck/compare/v1.12.1...v1.12.2
