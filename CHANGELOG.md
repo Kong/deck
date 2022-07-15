@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [Unreleased](#Unreleased)
 - [v1.14.0](#v1140)
 - [v1.13.0](#v1130)
 - [v1.12.4](#v1124)
@@ -42,6 +43,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [Unreleased]
+
+> Release date: TBD
+
+### Fixes
+
+- Make sure `validate` with `--online` flag fails when running against Konnect.
+  [##718](https://github.com/Kong/deck/pull/#718)
 
 ## [v1.14.0]
 
@@ -995,6 +1005,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[Unreleased]: https://github.com/kong/deck/compare/v1.14.0...Unreleased
 [v1.14.0]: https://github.com/kong/deck/compare/v1.13.0...v1.14.0
 [v1.13.0]: https://github.com/kong/deck/compare/v1.12.4...v1.13.0
 [v1.12.4]: https://github.com/kong/deck/compare/v1.12.3...v1.12.4
