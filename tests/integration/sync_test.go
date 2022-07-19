@@ -1269,7 +1269,7 @@ func Test_Sync_PluginsOnEntities(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.8.0")
+			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
