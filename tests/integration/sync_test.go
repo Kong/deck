@@ -224,6 +224,85 @@ var (
 		},
 	}
 
+	plugin_on_entities3x = []*kong.Plugin{
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"bandwidth_metrics":       false,
+				"lantency_metrics":        false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"bandwidth_metrics":       false,
+				"lantency_metrics":        false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("rate-limiting"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"day":                 nil,
+				"fault_tolerant":      true,
+				"header_name":         nil,
+				"hide_client_headers": false,
+				"hour":                float64(10),
+				"limit_by":            "consumer",
+				"minute":              nil,
+				"month":               nil,
+				"path":                nil,
+				"policy":              "cluster",
+				"redis_username":      nil,
+				"redis_database":      float64(0),
+				"redis_host":          nil,
+				"redis_password":      nil,
+				"redis_port":          float64(6379),
+				"redis_server_name":   nil,
+				"redis_ssl":           false,
+				"redis_ssl_verify":    false,
+				"redis_timeout":       float64(2000),
+				"second":              nil,
+				"year":                nil,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
 	upstream = []*kong.Upstream{
 		{
 			Name:      kong.String("upstream1"),
@@ -1243,7 +1322,10 @@ func Test_Sync_Create_Route_With_Service_Name_Reference(t *testing.T) {
 	}
 }
 
-func Test_Sync_PluginsOnEntities(t *testing.T) {
+// test scope:
+//   - 1.x.x
+//   - 2.x.x
+func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -1270,6 +1352,44 @@ func Test_Sync_PluginsOnEntities(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0.0+
+func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create plugins on services, routes and consumers",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities3x,
+				Consumers: consumer,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
