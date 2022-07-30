@@ -32,7 +32,7 @@ var addresses = []string{
 func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
 		return client.Auth.LoginV2(ctx, konnectConfig.Email,
-			konnectConfig.Password)
+			konnectConfig.Password, konnectConfig.Token)
 	}
 	return client.Auth.Login(ctx, konnectConfig.Email,
 		konnectConfig.Password)
@@ -98,11 +98,12 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 	}
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
-		Address:    konnectAddress,
-		HTTPClient: httpClient,
-		Debug:      konnectConfig.Debug,
-		Headers:    konnectConfig.Headers,
-		Retryable:  true,
+		Address:     konnectAddress,
+		HTTPClient:  httpClient,
+		Debug:       konnectConfig.Debug,
+		Headers:     konnectConfig.Headers,
+		Retryable:   true,
+		BearerToken: konnectConfig.Token,
 	})
 }
 

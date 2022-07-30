@@ -53,7 +53,7 @@ func (s *AuthService) Login(ctx context.Context, email,
 	return authResponse, nil
 }
 
-func (s *AuthService) LoginV2(ctx context.Context, email,
+func (s *AuthService) basicAuth(ctx context.Context, email,
 	password string,
 ) (AuthResponse, error) {
 	body := map[string]string{
@@ -77,6 +77,24 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 
 	jar.SetCookies(url, resp.Cookies())
 	s.client.client.Jar = jar
+	return authResponse, nil
+}
+
+func (s *AuthService) LoginV2(ctx context.Context, email,
+	password, token string,
+) (AuthResponse, error) {
+	var (
+		err          error
+		authResponse AuthResponse
+	)
+	if email != "" && password != "" {
+		authResponse, err = s.basicAuth(ctx, email, password)
+		if err != nil {
+			return AuthResponse{}, fmt.Errorf("basic authentication: %v", err)
+		}
+	} else if token != "" {
+		s.client.token = token
+	}
 
 	info, err := s.UserInfo(ctx)
 	if err != nil {

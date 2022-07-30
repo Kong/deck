@@ -41,6 +41,11 @@ func (c *Client) NewRequest(method, endpoint string, qs interface{},
 		req.Header.Add("Content-Type", "application/json")
 	}
 
+	// add bearer token
+	if c.token != "" {
+		req.Header.Add("Authorization", "Bearer "+c.token)
+	}
+
 	// add query string if any
 	if qs != nil {
 		values, err := query.Values(qs)
