@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [Unreleased](#Unreleased)
 - [v1.13.0](#v1130)
 - [v1.12.4](#v1124)
 - [v1.12.3](#v1123)
@@ -41,6 +42,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [Unreleased]
+
+> Release date: TBD
+
+### Added
+
+- Support PAT (Personal Access Tokens) for Konnect authentication.
+  [#710](https://github.com/Kong/deck/pull/710)
 
 ## [v1.13.0]
 

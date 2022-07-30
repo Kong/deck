@@ -32,7 +32,7 @@ var addresses = []string{
 func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
 		return client.Auth.LoginV2(ctx, konnectConfig.Email,
-			konnectConfig.Password)
+			konnectConfig.Password, konnectConfig.Token)
 	}
 	return client.Auth.Login(ctx, konnectConfig.Email,
 		konnectConfig.Password)

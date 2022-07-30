@@ -34,6 +34,7 @@ type Client struct {
 	logger                io.Writer
 	debug                 bool
 	prefix                string
+	token                 string
 
 	RuntimeGroups *RuntimeGroupService
 }
