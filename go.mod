@@ -7,6 +7,7 @@ replace github.com/imdario/mergo v0.3.12 => github.com/Kong/mergo v0.3.13
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 require (
+	github.com/Kong/gojsondiff v1.3.2
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cenkalti/backoff/v4 v4.1.3
@@ -21,7 +22,6 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/kong/go-kong v0.30.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.22.6
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
@@ -30,13 +30,13 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0
-	github.com/yudai/gojsondiff v1.0.0
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	k8s.io/code-generator v0.24.3
 )
 
 require (
+	github.com/Kong/go-diff v1.2.2 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/adrg/strutil v0.2.3 // indirect
