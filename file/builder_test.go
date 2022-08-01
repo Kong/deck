@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	defaultPort        = 80
 	defaultTimeout     = 60000
 	defaultSlots       = 10000
 	defaultWeight      = 100
@@ -27,6 +28,7 @@ var kong130Version = semver.MustParse("1.3.0")
 
 var kongDefaults = KongDefaults{
 	Service: &kong.Service{
+		Port:           kong.Int(defaultPort),
 		Protocol:       kong.String("http"),
 		ConnectTimeout: kong.Int(defaultTimeout),
 		WriteTimeout:   kong.Int(defaultTimeout),
@@ -407,6 +409,7 @@ func Test_stateBuilder_services(t *testing.T) {
 					{
 						ID:             kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
 						Name:           kong.String("foo"),
+						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
 						WriteTimeout:   kong.Int(60000),
@@ -438,6 +441,7 @@ func Test_stateBuilder_services(t *testing.T) {
 					{
 						ID:             kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
 						Name:           kong.String("foo"),
+						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
 						WriteTimeout:   kong.Int(60000),
@@ -2051,6 +2055,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
 						Name:           kong.String("foo-service"),
+						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
 						WriteTimeout:   kong.Int(60000),
@@ -2059,6 +2064,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
 						Name:           kong.String("bar-service"),
+						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
 						WriteTimeout:   kong.Int(60000),
@@ -2067,6 +2073,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
 						Name:           kong.String("large-payload-service"),
+						Port:           kong.Int(80),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(60000),
 						WriteTimeout:   kong.Int(60000),
@@ -2214,6 +2221,7 @@ func Test_stateBuilder(t *testing.T) {
 								RequestBuffering: kong.Bool(false),
 							},
 							Service: &kong.Service{
+								Port:           kong.Int(443),
 								Protocol:       kong.String("https"),
 								ConnectTimeout: kong.Int(5000),
 								WriteTimeout:   kong.Int(5000),
@@ -2337,6 +2345,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("538c7f96-b164-4f1b-97bb-9f4bb472e89f"),
 						Name:           kong.String("foo-service"),
+						Port:           kong.Int(443),
 						Protocol:       kong.String("https"),
 						ConnectTimeout: kong.Int(5000),
 						WriteTimeout:   kong.Int(5000),
@@ -2345,6 +2354,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("dfd79b4d-7642-4b61-ba0c-9f9f0d3ba55b"),
 						Name:           kong.String("bar-service"),
+						Port:           kong.Int(443),
 						Protocol:       kong.String("https"),
 						ConnectTimeout: kong.Int(5000),
 						WriteTimeout:   kong.Int(5000),
@@ -2353,6 +2363,7 @@ func Test_stateBuilder(t *testing.T) {
 					{
 						ID:             kong.String("9e6f82e5-4e74-4e81-a79e-4bbd6fe34cdc"),
 						Name:           kong.String("large-payload-service"),
+						Port:           kong.Int(443),
 						Protocol:       kong.String("https"),
 						ConnectTimeout: kong.Int(5000),
 						WriteTimeout:   kong.Int(5000),
