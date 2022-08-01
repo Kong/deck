@@ -38,8 +38,12 @@ cloud.google.com/go/storage v1.14.0/go.mod h1:GrKmX003DSIwi9o29oFT7YDnHYwZoctc3f
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/Kong/go-diff v1.2.2 h1:KKKaqHc8IxuguFVIZMNt3bi6YuC/t9r7BGD8bOOpSgM=
+github.com/Kong/go-diff v1.2.2/go.mod h1:nlvdwVZQk3Rm+tbI0cDmKFrOjghtcZTrZBp+UruvvA8=
 github.com/Kong/gojsondiff v1.3.0 h1:Z3bOGcqLDoeF3OP8o4KNr9ceTkTSvuXOXfT8vTkgg8k=
 github.com/Kong/gojsondiff v1.3.0/go.mod h1:dbd2hU4/ecVIVMCKypBnQ5/ol5ALWb1f+XNJFE25j+c=
+github.com/Kong/gojsondiff v1.3.1 h1:aQhuDT9KYcPiEr+ZxYhtiWz8ALXmHWk4z7KDEzf58Aw=
+github.com/Kong/gojsondiff v1.3.1/go.mod h1:Ul5BEb6YOg6DWb72ECuQARthfuZQ/aoO34vuZvEfkco=
 github.com/Kong/mergo v0.3.13 h1:J+RyBootTG0GSmmzPBF4GqhHDLBKuSZeuaIyAHtOF9Y=
 github.com/Kong/mergo v0.3.13/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64994WTCIhntQ=
