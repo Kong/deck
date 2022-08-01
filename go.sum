@@ -38,8 +38,10 @@ cloud.google.com/go/storage v1.14.0/go.mod h1:GrKmX003DSIwi9o29oFT7YDnHYwZoctc3f
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/Kong/gojsondiff v1.3.0 h1:Z3bOGcqLDoeF3OP8o4KNr9ceTkTSvuXOXfT8vTkgg8k=
-github.com/Kong/gojsondiff v1.3.0/go.mod h1:dbd2hU4/ecVIVMCKypBnQ5/ol5ALWb1f+XNJFE25j+c=
+github.com/Kong/go-diff v1.2.2 h1:KKKaqHc8IxuguFVIZMNt3bi6YuC/t9r7BGD8bOOpSgM=
+github.com/Kong/go-diff v1.2.2/go.mod h1:nlvdwVZQk3Rm+tbI0cDmKFrOjghtcZTrZBp+UruvvA8=
+github.com/Kong/gojsondiff v1.3.2 h1:qIOVq2mUXt+NXy8Be5gRUee9TP3Ve0MbQSafg9bXKZE=
+github.com/Kong/gojsondiff v1.3.2/go.mod h1:DiIxtU59q4alK7ecP+7k56C5UjgOviJ5gQVR2esEhYw=
 github.com/Kong/mergo v0.3.13 h1:J+RyBootTG0GSmmzPBF4GqhHDLBKuSZeuaIyAHtOF9Y=
 github.com/Kong/mergo v0.3.13/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb06e3pkSAbeQ52E9H9iFoQsEEwGN64994WTCIhntQ=
@@ -276,8 +278,6 @@ github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.6.1 h1:/FiVV8dS/e+YqF2JvO3yXRFbBLTIuSDkuC7aBOAvL+k=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sergi/go-diff v1.2.0 h1:XU+rvMAioB0UC3q1MFrIQy4Vo5/4VsRDQQXHsEya6xQ=
-github.com/sergi/go-diff v1.2.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/shirou/gopsutil/v3 v3.22.6 h1:FnHOFOh+cYAM0C30P+zysPISzlknLC5Z1G4EAElznfQ=
 github.com/shirou/gopsutil/v3 v3.22.6/go.mod h1:EdIubSnZhbAvBS1yJ7Xi+AShB/hxwLHOMz4MCYz7yMs=
 github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
