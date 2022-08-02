@@ -96,7 +96,6 @@ func TestServiceSetTest(t *testing.T) {
 				Retries: kong.Int(0),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Retries:        kong.Int(0),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
@@ -110,7 +109,6 @@ func TestServiceSetTest(t *testing.T) {
 				WriteTimeout: kong.Int(42),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				ConnectTimeout: kong.Int(60000),
 				WriteTimeout:   kong.Int(42),
@@ -123,7 +121,6 @@ func TestServiceSetTest(t *testing.T) {
 				Path: kong.String("/foo"),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Protocol:       kong.String("http"),
 				Path:           kong.String("/foo"),
 				ConnectTimeout: kong.Int(60000),
@@ -139,7 +136,6 @@ func TestServiceSetTest(t *testing.T) {
 				Path: kong.String("/bar"),
 			},
 			want: &kong.Service{
-				Port:           kong.Int(80),
 				Name:           kong.String("foo"),
 				Host:           kong.String("example.com"),
 				Protocol:       kong.String("http"),
