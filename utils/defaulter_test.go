@@ -527,6 +527,7 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			opts: DefaulterOpts{
 				KongDefaults: &kongDefaultForTesting{
 					Service: &kong.Service{
+						Port:           kong.Int(8080),
 						Path:           kong.String("/v1"),
 						Protocol:       kong.String("http"),
 						ConnectTimeout: kong.Int(defaultTimeout),
@@ -538,6 +539,7 @@ func TestGetDefaulter_Konnect(t *testing.T) {
 			},
 			want: &Defaulter{
 				service: &kong.Service{
+					Port:           kong.Int(8080),
 					Path:           kong.String("/v1"),
 					Protocol:       kong.String("http"),
 					ConnectTimeout: kong.Int(defaultTimeout),
@@ -675,13 +677,11 @@ func TestKongDefaultsRestrictedFields(t *testing.T) {
 				Service: &kong.Service{
 					ID:   kong.String("testID"),
 					Name: kong.String("testName"),
-					Port: kong.Int(80),
-					Host: kong.String("testHost"),
 					Path: kong.String("/v1"),
 				},
 			},
 			wantErr:     true,
-			expectedErr: "service defaults cannot have these restricted fields set: id, host, name, port",
+			expectedErr: "service defaults cannot have these restricted fields set: id, name",
 		},
 		{
 			desc: "route restricted fields",

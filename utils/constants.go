@@ -70,7 +70,7 @@ var (
 		HashOnCookiePath: kong.String("/"),
 	}
 	defaultsRestrictedFields = map[string][]string{
-		"Service":  {"ID", "Host", "Name", "Port"},
+		"Service":  {"ID", "Name"},
 		"Route":    {"ID", "Name"},
 		"Target":   {"ID", "Target"},
 		"Upstream": {"ID", "Name"},
