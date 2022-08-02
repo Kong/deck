@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
@@ -182,14 +183,26 @@ func sync(kongFile string, opts ...string) error {
 	return deckCmd.ExecuteContext(context.Background())
 }
 
-func diff(kongFile string, opts ...string) error {
+func diff(kongFile string, opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"diff", "-s", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	return deckCmd.ExecuteContext(context.Background())
+
+	// overwrite default standard output
+	r, w, _ := os.Pipe()
+	color.Output = w
+
+	// execute decK command
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	// read command output
+	w.Close()
+	out, _ := ioutil.ReadAll(r)
+
+	return string(out), cmdErr
 }
 
 func dump(opts ...string) (string, error) {

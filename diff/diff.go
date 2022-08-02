@@ -322,8 +322,34 @@ type Stats struct {
 	DeleteOps *utils.AtomicInt32Counter
 }
 
+// Generete Diff output for 'sync' and 'diff' commands
+func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string, error) {
+	var diffString string
+	var err error
+	if oldObj, ok := e.OldObj.(*state.Document); ok {
+		if !isDelete {
+			diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
+		} else {
+			diffString, err = getDocumentDiff(e.Obj.(*state.Document), oldObj)
+		}
+	} else {
+		if !isDelete {
+			diffString, err = getDiff(e.OldObj, e.Obj)
+		} else {
+			diffString, err = getDiff(e.Obj, e.OldObj)
+		}
+	}
+	if err != nil {
+		return "", err
+	}
+	if !noMaskValues {
+		diffString = maskEnvVarValue(diffString)
+	}
+	return diffString, err
+}
+
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, noMaskValues bool) (Stats, []error) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -347,20 +373,23 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			cprint.CreatePrintln("creating", e.Kind, c.Console())
-		case crud.Update:
-			var diffString string
-			if oldObj, ok := e.OldObj.(*state.Document); ok {
-				diffString, err = getDocumentDiff(oldObj, e.Obj.(*state.Document))
-			} else {
-				diffString, err = getDiff(e.OldObj, e.Obj)
+			diffString, err := generateDiffString(e, false, noMaskValues)
+			if err != nil {
+				return nil, err
 			}
+			cprint.CreatePrintln("creating", e.Kind, c.Console(), diffString)
+		case crud.Update:
+			diffString, err := generateDiffString(e, false, noMaskValues)
 			if err != nil {
 				return nil, err
 			}
 			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			cprint.DeletePrintln("deleting", e.Kind, c.Console())
+			diffString, err := generateDiffString(e, true, noMaskValues)
+			if err != nil {
+				return nil, err
+			}
+			cprint.DeletePrintln("deleting", e.Kind, c.Console(), diffString)
 		default:
 			panic("unknown operation " + e.Op.String())
 		}

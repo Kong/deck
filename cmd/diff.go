@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	diffCmdKongStateFile   []string
-	diffCmdParallelism     int
-	diffCmdNonZeroExitCode bool
-	diffWorkspace          string
+	diffCmdKongStateFile          []string
+	diffCmdParallelism            int
+	diffCmdNoMaskDeckEnvVarsValue bool
+	diffCmdNonZeroExitCode        bool
+	diffWorkspace                 string
 )
 
 // newDiffCmd represents the diff command
@@ -27,7 +28,7 @@ that will be created, updated, or deleted.
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return syncMain(cmd.Context(), diffCmdKongStateFile, true,
-				diffCmdParallelism, 0, diffWorkspace)
+				diffCmdParallelism, 0, diffWorkspace, diffCmdNoMaskDeckEnvVarsValue)
 		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(diffCmdKongStateFile) == 0 {
@@ -51,6 +52,8 @@ that will be created, updated, or deleted.
 			"any plugins associated with consumers")
 	diffCmd.Flags().IntVar(&diffCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations.")
+	diffCmd.Flags().BoolVar(&diffCmdNoMaskDeckEnvVarsValue, "no-mask-deck-env-vars-value",
+		false, "do not mask DECK_ environment variable values at diff output.")
 	diffCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are diffed.\n"+
