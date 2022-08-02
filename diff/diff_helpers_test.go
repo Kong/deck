@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"os"
 	"testing"
 
 	"github.com/kong/deck/konnect"
@@ -141,6 +142,38 @@ bar
 		t.Run(tt.name, func(t *testing.T) {
 			if got, _ := getDocumentDiff(tt.args.docA, tt.args.docB); got != tt.want {
 				t.Errorf("getDocumentDiff() = %v\nwant %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_MaskEnvVarsValues(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    string
+		want    string
+		envVars map[string]string
+	}{
+		{
+			name: "JSON",
+			envVars: map[string]string{
+				"DECK_BAR": "barbar",
+				"DECK_BAZ": "bazbaz",
+			},
+			args: `{"foo":"foo","bar":"barbar","baz":"bazbaz"}`,
+			want: `{"foo":"foo","bar":"[masked]","baz":"[masked]"}`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for k, v := range tt.envVars {
+				os.Setenv(k, v)
+				defer func(k string) {
+					os.Unsetenv(k)
+				}(k)
+			}
+			if got := maskEnvVarValue(tt.args); got != tt.want {
+				t.Errorf("maskEnvVarValue() = %v\nwant %v", got, tt.want)
 			}
 		})
 	}

@@ -3,6 +3,9 @@ package diff
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"sort"
+	"strings"
 
 	"github.com/Kong/gojsondiff"
 	"github.com/Kong/gojsondiff/formatter"
@@ -82,4 +85,36 @@ func getDiff(a, b interface{}) (string, error) {
 		formatter.AsciiFormatterConfig{})
 	diffString, err := formatter.Format(d)
 	return diffString, err
+}
+
+type EnvVar struct {
+	Key   string
+	Value string
+}
+
+func parseDeckEnvVars() []EnvVar {
+	const envVarPrefix = "DECK_"
+	var parsedEnvVars []EnvVar
+
+	for _, envVarStr := range os.Environ() {
+		envPair := strings.SplitN(envVarStr, "=", 2)
+		if strings.HasPrefix(envPair[0], envVarPrefix) {
+			envVar := EnvVar{}
+			envVar.Key = envPair[0]
+			envVar.Value = envPair[1]
+			parsedEnvVars = append(parsedEnvVars, envVar)
+		}
+	}
+
+	sort.Slice(parsedEnvVars, func(i, j int) bool {
+		return len(parsedEnvVars[i].Value) > len(parsedEnvVars[j].Value)
+	})
+	return parsedEnvVars
+}
+
+func maskEnvVarValue(diffString string) string {
+	for _, envVar := range parseDeckEnvVars() {
+		diffString = strings.Replace(diffString, envVar.Value, "[masked]", -1)
+	}
+	return diffString
 }
