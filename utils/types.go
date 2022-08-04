@@ -106,8 +106,6 @@ type KongClientConfig struct {
 
 	// whether or not the client should retry on 429s
 	Retryable bool
-
-	BearerToken string
 }
 
 type KonnectConfig struct {
@@ -236,9 +234,6 @@ func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	headers, err := parseHeaders(opt.Headers)
 	if err != nil {
 		return nil, fmt.Errorf("parsing headers: %w", err)
-	}
-	if opt.BearerToken != "" {
-		headers.Add("Authorization", "Bearer "+opt.BearerToken)
 	}
 	c = kong.HTTPClientWithHeaders(c, headers)
 

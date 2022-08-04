@@ -2,6 +2,7 @@ package konnect
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
@@ -87,13 +88,18 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 		err          error
 		authResponse AuthResponse
 	)
-	if email != "" && password != "" {
+
+	if token != "" {
+		s.client.token = token
+	} else if email != "" && password != "" {
 		authResponse, err = s.basicAuth(ctx, email, password)
 		if err != nil {
 			return AuthResponse{}, fmt.Errorf("basic authentication: %v", err)
 		}
-	} else if token != "" {
-		s.client.token = token
+	} else {
+		return AuthResponse{}, errors.New(
+			"at least one of email/password or personal access token must be provided",
+		)
 	}
 
 	info, err := s.UserInfo(ctx)

@@ -96,6 +96,11 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 		konnectClient.SetControlPlaneID(kongCPID)
 		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
 	}
+
+	if konnectConfig.Token != "" {
+		konnectConfig.Headers = append(konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token)
+	}
+
 	// initialize kong client
 	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
