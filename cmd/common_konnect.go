@@ -39,7 +39,7 @@ func authenticate(ctx context.Context, client *konnect.Client, host string) erro
 		return err
 	}
 	konnectAuthResponse, err = client.Auth.Login(ctx, konnectConfig.Email,
-		konnectConfig.Password)
+		konnectConfig.Password, konnectConfig.Token)
 	return err
 }
 
