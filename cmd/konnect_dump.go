@@ -49,7 +49,7 @@ func newKonnectDumpCmd() *cobra.Command {
 			// authenticate with konnect
 			_, err = konnectClient.Auth.Login(cmd.Context(),
 				konnectConfig.Email,
-				konnectConfig.Password)
+				konnectConfig.Password, konnectConfig.Token)
 			if err != nil {
 				return fmt.Errorf("authenticating with Konnect: %w", err)
 			}

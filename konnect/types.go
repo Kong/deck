@@ -7,6 +7,9 @@ import (
 const (
 	authEndpoint   = "/api/auth"
 	authEndpointV2 = "/kauth/api/v1/authenticate"
+
+	userInfoEndpoint   = "/api/userinfo"
+	userInfoEndpointV2 = "/konnect-api/api/userinfo/"
 )
 
 type ParentInfoer interface {

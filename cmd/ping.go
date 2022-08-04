@@ -3,9 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/url"
 
-	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -37,30 +35,20 @@ can connect to Kong's Admin API.`,
 }
 
 func pingKonnect(ctx context.Context) error {
-	// get Konnect client
-	httpClient := utils.HTTPClient()
+	// authenticate with Konnect
 	_, _, err := getKongClientForKonnectMode(ctx)
 	if err != nil {
 		return err
 	}
-	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
-	if err != nil {
-		return err
-	}
-	u, _ := url.Parse(konnectConfig.Address)
-	// authenticate with konnect
-	res, err := authenticate(ctx, konnectClient, u.Host)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
-	}
-	fullName := res.FullName
-	if res.FullName == "" {
-		fullName = fmt.Sprintf("%s %s", res.FirstName, res.LastName)
+
+	fullName := konnectAuthResponse.FullName
+	if fullName == "" {
+		fullName = fmt.Sprintf("%s %s", konnectAuthResponse.FirstName, konnectAuthResponse.LastName)
 	}
 	fmt.Printf("Successfully Konnected as %s (%s)!\n",
-		fullName, res.Organization)
+		fullName, konnectAuthResponse.Organization)
 	if konnectConfig.Debug {
-		fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+		fmt.Printf("Organization ID: %s\n", konnectAuthResponse.OrganizationID)
 	}
 	_ = sendAnalytics("ping", "", modeKonnect)
 	return nil

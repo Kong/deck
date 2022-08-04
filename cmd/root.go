@@ -175,6 +175,28 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-password-file",
 		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
 
+	rootCmd.PersistentFlags().String("konnect-token", "",
+		"Personal Access Token associated with your Konnect account, "+
+			"this takes precedence over `--konnect-token-file` flag.")
+	viper.BindPFlag("konnect-token",
+		rootCmd.PersistentFlags().Lookup("konnect-token"))
+
+	rootCmd.PersistentFlags().String("konnect-token-file", "",
+		"File containing the Peronsal Access Token to your Konnect account.")
+	viper.BindPFlag("konnect-token-file",
+		rootCmd.PersistentFlags().Lookup("konnect-token-file"))
+
+	// user must provide at most one auth method to Konnect
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-email", "konnect-token")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-email", "konnect-token-file")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-password", "konnect-token")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-password", "konnect-token-file")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-password-file", "konnect-token")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-password-file", "konnect-token-file")
+
+	// user must provide at most one token to authenticate to Konnect
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-token-file", "konnect-token")
+
 	rootCmd.PersistentFlags().String("konnect-addr", defaultKonnectURL,
 		"Address of the Konnect endpoint.")
 	viper.BindPFlag("konnect-addr",
@@ -329,9 +351,26 @@ func initKonnectConfig() error {
 		password = strings.TrimRight(password, "\n")
 	}
 
+	token := viper.GetString("konnect-token")
+	tokenFile := viper.GetString("konnect-token-file")
+	// read from token file only if token is not supplied using an
+	// environment variable or flag
+	if token == "" && tokenFile != "" {
+		fileContent, err := ioutil.ReadFile(tokenFile)
+		if err != nil {
+			return fmt.Errorf("read file %q: %w", tokenFile, err)
+		}
+		if len(fileContent) == 0 {
+			return fmt.Errorf("file %q: empty", tokenFile)
+		}
+		token = string(fileContent)
+		token = strings.TrimRight(token, "\n")
+	}
+
 	disableAnalytics = !viper.GetBool("analytics")
 	konnectConfig.Email = viper.GetString("konnect-email")
 	konnectConfig.Password = password
+	konnectConfig.Token = token
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
 	konnectConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))

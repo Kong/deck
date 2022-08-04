@@ -29,13 +29,18 @@ var addresses = []string{
 	defaultLegacyKonnectURL,
 }
 
-func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
+var konnectAuthResponse konnect.AuthResponse
+
+func authenticate(ctx context.Context, client *konnect.Client, host string) error {
+	var err error
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
-		return client.Auth.LoginV2(ctx, konnectConfig.Email,
-			konnectConfig.Password)
+		konnectAuthResponse, err = client.Auth.LoginV2(ctx, konnectConfig.Email,
+			konnectConfig.Password, konnectConfig.Token)
+		return err
 	}
-	return client.Auth.Login(ctx, konnectConfig.Email,
-		konnectConfig.Password)
+	konnectAuthResponse, err = client.Auth.Login(ctx, konnectConfig.Email,
+		konnectConfig.Password, konnectConfig.Token)
+	return err
 }
 
 // getKongClientForKonnectMode abstracts the different cloud environments users
@@ -47,6 +52,9 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 	httpClient := utils.HTTPClient()
 	if konnectConfig.Address != defaultKonnectURL {
 		addresses = []string{konnectConfig.Address}
+	}
+	if konnectConfig.Token != "" {
+		konnectConfig.Headers = append(konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token)
 	}
 	// authenticate with konnect
 	var err error
@@ -64,7 +72,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 		if err != nil {
 			return nil, nil, fmt.Errorf("parsing %s address: %v", address, err)
 		}
-		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
+		err = authenticate(ctx, konnectClient, parsedAddress.Host)
 		if err == nil {
 			break
 		}
@@ -96,6 +104,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 		konnectClient.SetControlPlaneID(kongCPID)
 		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
 	}
+
 	// initialize kong client
 	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
@@ -103,6 +112,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 		Debug:      konnectConfig.Debug,
 		Headers:    konnectConfig.Headers,
 	})
+
 	return kongClient, konnectClient, err
 }
 
@@ -175,13 +185,12 @@ func syncKonnect(ctx context.Context,
 	var entityID string
 	if strings.Contains(konnectConfig.Address, konnectWithRuntimeGroupsDomain) {
 		// get kong runtime group ID
-		entityID, err = fetchKongRuntimeGroupID(ctx, konnectClient)
+		entityID = konnectClient.GetRuntimeGroupID()
 		if err != nil {
 			return err
 		}
 
-		// set the kong runtime group and control plane IDs in the client
-		konnectClient.SetRuntimeGroupID(entityID)
+		// set the kong control plane IDs in the client
 		konnectClient.SetControlPlaneID(entityID)
 	} else {
 		// get kong control plane ID

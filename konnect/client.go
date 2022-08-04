@@ -34,6 +34,7 @@ type Client struct {
 	logger                io.Writer
 	debug                 bool
 	prefix                string
+	token                 string
 
 	RuntimeGroups *RuntimeGroupService
 }
@@ -79,6 +80,11 @@ func (c *Client) SetControlPlaneID(cpID string) {
 func (c *Client) SetRuntimeGroupID(rgID string) {
 	c.prefix = "/konnect-api"
 	c.common.runtimeGroupID = rgID
+}
+
+// GetRuntimeGroupID returns the konnect runtime-group ID set in the client.
+func (c *Client) GetRuntimeGroupID() string {
+	return c.common.runtimeGroupID
 }
 
 // Do executes a HTTP request and returns a response

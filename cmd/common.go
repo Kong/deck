@@ -375,7 +375,8 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 func inKonnectMode(targetContent *file.Content) bool {
 	if (targetContent != nil && targetContent.Konnect != nil) ||
 		konnectConfig.Email != "" ||
-		konnectConfig.Password != "" {
+		konnectConfig.Password != "" ||
+		konnectConfig.Token != "" {
 		return true
 	}
 	return false

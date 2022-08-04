@@ -105,6 +105,7 @@ type KongClientConfig struct {
 type KonnectConfig struct {
 	Email    string
 	Password string
+	Token    string
 	Debug    bool
 
 	Address string
