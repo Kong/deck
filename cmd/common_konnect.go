@@ -29,13 +29,18 @@ var addresses = []string{
 	defaultLegacyKonnectURL,
 }
 
-func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
+var konnectAuthResponse konnect.AuthResponse
+
+func authenticate(ctx context.Context, client *konnect.Client, host string) error {
+	var err error
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
-		return client.Auth.LoginV2(ctx, konnectConfig.Email,
+		konnectAuthResponse, err = client.Auth.LoginV2(ctx, konnectConfig.Email,
 			konnectConfig.Password, konnectConfig.Token)
+		return err
 	}
-	return client.Auth.Login(ctx, konnectConfig.Email,
+	konnectAuthResponse, err = client.Auth.Login(ctx, konnectConfig.Email,
 		konnectConfig.Password)
+	return err
 }
 
 // getKongClientForKonnectMode abstracts the different cloud environments users
@@ -64,7 +69,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, *konnect.Cl
 		if err != nil {
 			return nil, nil, fmt.Errorf("parsing %s address: %v", address, err)
 		}
-		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
+		err = authenticate(ctx, konnectClient, parsedAddress.Host)
 		if err == nil {
 			break
 		}
