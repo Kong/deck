@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	baseEndpointUS = "https://global.api.konghq"
 	authEndpoint   = "/api/auth"
 	authEndpointV2 = "/kauth/api/v1/authenticate"
 )
