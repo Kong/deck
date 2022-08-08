@@ -1,12 +1,14 @@
 package konnect
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strings"
 )
 
 type user struct {
@@ -54,17 +56,41 @@ func (s *AuthService) Login(ctx context.Context, email,
 	return authResponse, nil
 }
 
+// getGlobalAuthEndpoint returns the global auth endpoint
+// given a base Konnect URL.
+func getGlobalAuthEndpoint(baseURL string) string {
+	parts := strings.Split(baseURL, "api.konghq")
+	return baseEndpointUS + parts[len(parts)-1] + authEndpointV2
+}
+
+func createAuthRequest(baseURL, email, password string) (*http.Request, error) {
+	var (
+		buf []byte
+		err error
+
+		body = map[string]string{
+			"username": email,
+			"password": password,
+		}
+	)
+
+	buf, err = json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := getGlobalAuthEndpoint(baseURL)
+	return http.NewRequest(http.MethodPost, endpoint, bytes.NewBuffer(buf))
+}
+
 func (s *AuthService) sessionAuth(ctx context.Context, email,
 	password string,
 ) (AuthResponse, error) {
-	body := map[string]string{
-		"username": email,
-		"password": password,
-	}
-	req, err := s.client.NewRequest(http.MethodPost, authEndpointV2, nil, body)
+	req, err := createAuthRequest(s.client.baseURL, email, password)
 	if err != nil {
-		return AuthResponse{}, fmt.Errorf("build http request: %v", err)
+		return AuthResponse{}, err
 	}
+
 	var authResponse AuthResponse
 	resp, err := s.client.Do(ctx, req, &authResponse)
 	if err != nil {

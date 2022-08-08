@@ -49,6 +49,8 @@
 
 ### Added
 
+- Add support to multi-geo for Konnect.
+  [#732](https://github.com/Kong/deck/pull/732)
 - Support PAT (Personal Access Tokens) for Konnect authentication.
   [#710](https://github.com/Kong/deck/pull/710)
 
