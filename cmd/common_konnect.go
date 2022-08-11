@@ -75,6 +75,11 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		if err == nil {
 			break
 		}
+		// Personal Access Token authentication is not supported with the
+		// legacy Konnect, so we don't need to fallback in case of 401s.
+		if konnect.IsUnauthorizedErr(err) && konnectConfig.Token != "" {
+			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+		}
 		if konnect.IsUnauthorizedErr(err) {
 			continue
 		}

@@ -68,7 +68,7 @@ func (s *AuthService) basicAuth(ctx context.Context, email,
 	var authResponse AuthResponse
 	resp, err := s.client.Do(ctx, req, &authResponse)
 	if err != nil {
-		return AuthResponse{}, fmt.Errorf("authenticate http request: %v", err)
+		return AuthResponse{}, err
 	}
 	url, _ := url.Parse(s.client.baseURL)
 	jar, err := cookiejar.New(nil)
@@ -94,7 +94,7 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 	} else if email != "" && password != "" {
 		authResponse, err = s.basicAuth(ctx, email, password)
 		if err != nil {
-			return AuthResponse{}, fmt.Errorf("basic authentication: %v", err)
+			return AuthResponse{}, err
 		}
 	} else {
 		return AuthResponse{}, errors.New(
@@ -104,7 +104,7 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 
 	info, err := s.UserInfo(ctx)
 	if err != nil {
-		return AuthResponse{}, fmt.Errorf("fetch user-info: %v", err)
+		return AuthResponse{}, err
 	}
 	authResponse.FullName = info.Profile.FullName
 	authResponse.Organization = info.Org.Name
