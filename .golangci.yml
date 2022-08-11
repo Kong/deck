@@ -45,3 +45,25 @@ issues:
     - gosec
     text:  "Expect WriteFile permissions to be 0600 or less"
     path: file/codegen/main.go
+  # ignore unused warnings in test utils files
+  - linters:
+    - unused
+    - unparam
+    path: test_.*
+  # ignore SA1019 deprecation warning
+  - linters:
+    - staticcheck
+    text:  "SA1019.*"
+  # ignore formatting warnings in cmd/root.go due to nolint statements
+  - linters:
+    - gofumpt
+    text:  "File is not `gofumpt`-ed"
+    path: cmd/root.go
+  - linters:
+    - gofmt
+    text:  "File is not `gofmt`-ed with `-s`"
+    path: cmd/root.go
+  - linters:
+    - goimports
+    text:  "File is not `goimports`-ed"
+    path: cmd/root.go
