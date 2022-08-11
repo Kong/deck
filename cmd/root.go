@@ -186,14 +186,6 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-token-file",
 		rootCmd.PersistentFlags().Lookup("konnect-token-file"))
 
-	// user must provide at most one auth method to Konnect
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-email", "konnect-token")
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-email", "konnect-token-file")
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-password", "konnect-token")
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-password", "konnect-token-file")
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-password-file", "konnect-token")
-	rootCmd.MarkFlagsMutuallyExclusive("konnect-password-file", "konnect-token-file")
-
 	// user must provide at most one token to authenticate to Konnect
 	rootCmd.MarkFlagsMutuallyExclusive("konnect-token-file", "konnect-token")
 
