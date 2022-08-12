@@ -33,6 +33,7 @@ type Client struct {
 	ControlPlaneRelations *ControlPlaneRelationsService
 	logger                io.Writer
 	debug                 bool
+	token                 string
 
 	RuntimeGroups *RuntimeGroupService
 }

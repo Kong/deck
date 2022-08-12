@@ -32,7 +32,7 @@ var addresses = []string{
 func authenticate(ctx context.Context, client *konnect.Client, host string) (konnect.AuthResponse, error) {
 	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
 		return client.Auth.LoginV2(ctx, konnectConfig.Email,
-			konnectConfig.Password)
+			konnectConfig.Password, konnectConfig.Token)
 	}
 	return client.Auth.Login(ctx, konnectConfig.Email,
 		konnectConfig.Password)
@@ -48,6 +48,13 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 	if konnectConfig.Address != defaultKonnectURL {
 		addresses = []string{konnectConfig.Address}
 	}
+
+	if konnectConfig.Token != "" {
+		konnectConfig.Headers = append(
+			konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token,
+		)
+	}
+
 	// authenticate with konnect
 	var err error
 	var konnectClient *konnect.Client
@@ -67,6 +74,11 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		_, err = authenticate(ctx, konnectClient, parsedAddress.Host)
 		if err == nil {
 			break
+		}
+		// Personal Access Token authentication is not supported with the
+		// legacy Konnect, so we don't need to fallback in case of 401s.
+		if konnect.IsUnauthorizedErr(err) && konnectConfig.Token != "" {
+			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 		}
 		if konnect.IsUnauthorizedErr(err) {
 			continue
@@ -96,6 +108,7 @@ func getKongClientForKonnectMode(ctx context.Context) (*kong.Client, error) {
 		konnectClient.SetControlPlaneID(kongCPID)
 		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
 	}
+
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
