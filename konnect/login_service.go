@@ -54,7 +54,7 @@ func (s *AuthService) Login(ctx context.Context, email,
 	return authResponse, nil
 }
 
-func (s *AuthService) basicAuth(ctx context.Context, email,
+func (s *AuthService) sessionAuth(ctx context.Context, email,
 	password string,
 ) (AuthResponse, error) {
 	body := map[string]string{
@@ -92,7 +92,7 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 	if token != "" {
 		s.client.token = token
 	} else if email != "" && password != "" {
-		authResponse, err = s.basicAuth(ctx, email, password)
+		authResponse, err = s.sessionAuth(ctx, email, password)
 		if err != nil {
 			return AuthResponse{}, err
 		}
