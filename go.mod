@@ -20,7 +20,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.30.0
+	github.com/kong/go-kong v0.31.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.22.6
 	github.com/spf13/cobra v1.5.0
@@ -71,7 +71,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.3.0 // indirect
-	github.com/tidwall/gjson v1.14.1 // indirect
+	github.com/tidwall/gjson v1.14.2 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
@@ -87,7 +87,7 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/gengo v0.0.0-20211129171323-c02415ce4185 // indirect
+	k8s.io/gengo v0.0.0-20220613173612-397b4ae3bce7 // indirect
 	k8s.io/klog/v2 v2.60.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220328201542-3ee0da9b0b42 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect

@@ -888,6 +888,12 @@
         "hash_fallback_header": {
           "type": "string"
         },
+        "hash_fallback_query_arg": {
+          "type": "string"
+        },
+        "hash_fallback_uri_capture": {
+          "type": "string"
+        },
         "hash_on": {
           "type": "string"
         },
@@ -898,6 +904,12 @@
           "type": "string"
         },
         "hash_on_header": {
+          "type": "string"
+        },
+        "hash_on_query_arg": {
+          "type": "string"
+        },
+        "hash_on_uri_capture": {
           "type": "string"
         },
         "healthchecks": {
@@ -1543,6 +1555,12 @@
         "hash_fallback_header": {
           "type": "string"
         },
+        "hash_fallback_query_arg": {
+          "type": "string"
+        },
+        "hash_fallback_uri_capture": {
+          "type": "string"
+        },
         "hash_on": {
           "type": "string"
         },
@@ -1553,6 +1571,12 @@
           "type": "string"
         },
         "hash_on_header": {
+          "type": "string"
+        },
+        "hash_on_query_arg": {
+          "type": "string"
+        },
+        "hash_on_uri_capture": {
           "type": "string"
         },
         "healthchecks": {
