@@ -236,7 +236,7 @@ var (
 			Enabled: kong.Bool(true),
 			Config: kong.Configuration{
 				"bandwidth_metrics":       false,
-				"lantency_metrics":        false,
+				"latency_metrics":         false,
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
@@ -256,7 +256,7 @@ var (
 			Enabled: kong.Bool(true),
 			Config: kong.Configuration{
 				"bandwidth_metrics":       false,
-				"lantency_metrics":        false,
+				"latency_metrics":         false,
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
