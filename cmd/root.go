@@ -15,7 +15,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-const defaultKonnectURL = "https://us.api.konghq.com"
+const (
+	defaultKongURL    = "http://localhost:8001"
+	defaultKonnectURL = "https://us.api.konghq.com"
+)
 
 var (
 	cfgFile       string
@@ -27,8 +30,9 @@ var (
 	konnectRuntimeGroup string
 )
 
-//nolint:errcheck
 // NewRootCmd represents the base command when called without any subcommands
+//
+//nolint:errcheck
 func NewRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "deck",
@@ -50,7 +54,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
 		"Config file (default is $HOME/.deck.yaml).")
 
-	rootCmd.PersistentFlags().String("kong-addr", "http://localhost:8001",
+	rootCmd.PersistentFlags().String("kong-addr", defaultKongURL,
 		"HTTP address of Kong's Admin API.\n"+
 			"This value can also be set using the environment variable DECK_KONG_ADDR\n"+
 			" environment variable.")

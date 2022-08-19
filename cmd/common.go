@@ -378,8 +378,11 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 }
 
 func inKonnectMode(targetContent *file.Content) bool {
-	if (targetContent != nil && targetContent.Konnect != nil) ||
-		konnectConfig.Email != "" ||
+	if targetContent != nil && targetContent.Konnect != nil {
+		return true
+	} else if rootConfig.Address != defaultKongURL {
+		return false
+	} else if konnectConfig.Email != "" ||
 		konnectConfig.Password != "" ||
 		konnectConfig.Token != "" {
 		return true
