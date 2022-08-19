@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [Unreleased](#Unreleased)
+- [v1.14.0](#v1140)
 - [v1.13.0](#v1130)
 - [v1.12.4](#v1124)
 - [v1.12.3](#v1123)
@@ -43,9 +43,9 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [Unreleased]
+## [v1.14.0]
 
-> Release date: TBD
+> Release date: 2022/08/19
 
 ### Added
 
@@ -995,6 +995,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.14.0]: https://github.com/kong/deck/compare/v1.13.0...v1.14.0
 [v1.13.0]: https://github.com/kong/deck/compare/v1.12.4...v1.13.0
 [v1.12.4]: https://github.com/kong/deck/compare/v1.12.3...v1.12.4
 [v1.12.3]: https://github.com/kong/deck/compare/v1.12.2...v1.12.3
