@@ -32,7 +32,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	k8s.io/code-generator v0.24.3
+	k8s.io/code-generator v0.24.4
 )
 
 require (
