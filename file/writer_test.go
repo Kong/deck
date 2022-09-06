@@ -214,18 +214,20 @@ func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: YAML,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "2.8.0",
 		})
 	})
 	assert.Equal("_format_version: \"1.1\"\n_workspace: foo\n", output)
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected := `{
@@ -247,22 +249,24 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Filename:   filename,
-			FileFormat: YAML,
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "3.0.0",
 		})
 	})
-	expected := fmt.Sprintf("_format_version: \"1.1\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
+	expected := fmt.Sprintf("_format_version: \"3.0\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
 	assert.Equal(expected, output)
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "3.0.0",
 		})
 	})
 	expected = `{
-  "_format_version": "1.1",
+  "_format_version": "3.0",
   "_workspace": "foo",
   "services": [
     {
@@ -297,8 +301,9 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Filename:   filename,
-			FileFormat: YAML,
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected := fmt.Sprintf(`_format_version: "1.1"
@@ -315,9 +320,10 @@ services:
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected = `{

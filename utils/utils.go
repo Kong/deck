@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/blang/semver/v4"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -138,4 +139,12 @@ func GetRouteReference(r kong.Route) *kong.Route {
 		route.Name = kong.String(*r.Name)
 	}
 	return route
+}
+
+func ParseKongVersion(version string) (semver.Version, error) {
+	v, err := CleanKongVersion(version)
+	if err != nil {
+		return semver.Version{}, err
+	}
+	return semver.ParseTolerant(v)
 }

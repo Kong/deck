@@ -9,11 +9,14 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/blang/semver/v4"
 	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
+
+var kongVersion300 = semver.MustParse("3.0.0")
 
 // WriteConfig holds settings to use to write the state file.
 type WriteConfig struct {
@@ -23,6 +26,7 @@ type WriteConfig struct {
 	FileFormat       Format
 	WithID           bool
 	RuntimeGroupName string
+	KongVersion      string
 }
 
 func compareOrder(obj1, obj2 sortable) bool {
@@ -36,8 +40,16 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 	var err error
 
 	file.Workspace = config.Workspace
-	// hardcoded as only one version exists currently
-	file.FormatVersion = "1.1"
+	parsedKongVersion, err := utils.ParseKongVersion(config.KongVersion)
+	if err != nil {
+		return fmt.Errorf("parsing Kong version: %w", err)
+	}
+
+	formatVersion := "1.1"
+	if parsedKongVersion.GTE(kongVersion300) {
+		formatVersion = "3.0"
+	}
+	file.FormatVersion = formatVersion
 	if config.RuntimeGroupName != "" {
 		file.Konnect = &Konnect{
 			RuntimeGroupName: config.RuntimeGroupName,

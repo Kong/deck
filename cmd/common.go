@@ -137,7 +137,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return fmt.Errorf("reading Kong version: %w", err)
 		}
 	}
-	parsedKongVersion, err = parseKongVersion(kongVersion)
+	parsedKongVersion, err = utils.ParseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
 	}
@@ -306,14 +306,6 @@ func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (strin
 		version = root["version"].(string)
 	}
 	return version, nil
-}
-
-func parseKongVersion(version string) (semver.Version, error) {
-	v, err := utils.CleanKongVersion(version)
-	if err != nil {
-		return semver.Version{}, err
-	}
-	return semver.ParseTolerant(v)
 }
 
 func validateNoArgs(cmd *cobra.Command, args []string) error {
