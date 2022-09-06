@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/blang/semver/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -194,6 +195,94 @@ func Test_FilenameToName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := FilenameToName(tt.args.filename); got != tt.want {
 				t.Errorf("FilenameToName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_ParseKongVersion(t *testing.T) {
+	type args struct {
+		version string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    semver.Version
+		wantErr bool
+	}{
+		{
+			args: args{
+				version: "1.0.1",
+			},
+			want:    semver.Version{Major: 1, Minor: 0},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "1.3.0.1",
+			},
+			want:    semver.Version{Major: 1, Minor: 3},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "0.14.1",
+			},
+			want:    semver.Version{Major: 0, Minor: 14},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "0.14.2rc",
+			},
+			want:    semver.Version{Major: 0, Minor: 14},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "0.14.2rc1",
+			},
+			want:    semver.Version{Major: 0, Minor: 14},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "0.33-enterprise-edition",
+			},
+			want:    semver.Version{Major: 0, Minor: 33},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "1.3.0-0-enterprise-edition",
+			},
+			want:    semver.Version{Major: 1, Minor: 3},
+			wantErr: false,
+		},
+		{
+			args: args{
+				version: "",
+			},
+			want:    semver.Version{},
+			wantErr: true,
+		},
+		{
+			args: args{
+				version: "0-1.1",
+			},
+			want:    semver.Version{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := ParseKongVersion(tt.args.version)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseKongVersion() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !got.Equals(tt.want) {
+				t.Errorf("ParseKongVersion() = %v, want %v", got.String(), tt.want.String())
 			}
 		})
 	}
