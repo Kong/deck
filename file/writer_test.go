@@ -214,18 +214,20 @@ func TestWriteKongStateToStdoutEmptyState(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: YAML,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "2.8.0",
 		})
 	})
 	assert.Equal("_format_version: \"1.1\"\n_workspace: foo\n", output)
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected := `{
@@ -247,22 +249,24 @@ func TestWriteKongStateToStdoutStateWithOneService(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Filename:   filename,
-			FileFormat: YAML,
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "3.0.0",
 		})
 	})
-	expected := fmt.Sprintf("_format_version: \"1.1\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
+	expected := fmt.Sprintf("_format_version: \"3.0\"\nservices:\n- host: %s\n  name: %s\n", *service.Host, *service.Name)
 	assert.Equal(expected, output)
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "3.0.0",
 		})
 	})
 	expected = `{
-  "_format_version": "1.1",
+  "_format_version": "3.0",
   "_workspace": "foo",
   "services": [
     {
@@ -297,8 +301,9 @@ func TestWriteKongStateToStdoutStateWithOneServiceOneRoute(t *testing.T) {
 	// YAML
 	output := captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Filename:   filename,
-			FileFormat: YAML,
+			Filename:    filename,
+			FileFormat:  YAML,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected := fmt.Sprintf(`_format_version: "1.1"
@@ -315,9 +320,10 @@ services:
 	// JSON
 	output = captureOutput(func() {
 		KongStateToFile(ks, WriteConfig{
-			Workspace:  "foo",
-			Filename:   filename,
-			FileFormat: JSON,
+			Workspace:   "foo",
+			Filename:    filename,
+			FileFormat:  JSON,
+			KongVersion: "2.8.0",
 		})
 	})
 	expected = `{
@@ -340,4 +346,60 @@ services:
   ]
 }`
 	assert.Equal(expected, output)
+}
+
+func Test_getFormatVersion(t *testing.T) {
+	tests := []struct {
+		name        string
+		kongVersion string
+		expected    string
+		expectedErr string
+		wantErr     bool
+	}{
+		{
+			name:        "3.0.0 version",
+			kongVersion: "3.0.0",
+			expected:    "3.0",
+		},
+		{
+			name:        "3.0.0.0 version",
+			kongVersion: "3.0.0.0",
+			expected:    "3.0",
+		},
+		{
+			name:        "2.8.0 version",
+			kongVersion: "2.8.0",
+			expected:    "1.1",
+		},
+		{
+			name:        "2.8.0.0 version",
+			kongVersion: "2.8.0.0",
+			expected:    "1.1",
+		},
+		{
+			name:        "2.8.0.1-enterprise-edition version",
+			kongVersion: "2.8.0.1-enterprise-edition",
+			expected:    "1.1",
+		},
+		{
+			name:        "unsupported version",
+			kongVersion: "test",
+			wantErr:     true,
+			expectedErr: "parsing Kong version: unknown Kong version",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res, err := getFormatVersion(tt.kongVersion)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("got error = %v, expected error = %v", err, tt.wantErr)
+			}
+			if tt.expectedErr != "" {
+				assert.Equal(t, err.Error(), tt.expectedErr)
+			}
+			if res != tt.expected {
+				t.Errorf("Expected %v, but isn't: %v", tt.expected, res)
+			}
+		})
+	}
 }

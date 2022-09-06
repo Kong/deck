@@ -101,11 +101,12 @@ configure Kong.`,
 					}
 
 					if err := file.KongStateToFile(ks, file.WriteConfig{
-						SelectTags: dumpConfig.SelectorTags,
-						Workspace:  workspace,
-						Filename:   workspace,
-						FileFormat: format,
-						WithID:     dumpWithID,
+						SelectTags:  dumpConfig.SelectorTags,
+						Workspace:   workspace,
+						Filename:    workspace,
+						FileFormat:  format,
+						WithID:      dumpWithID,
+						KongVersion: kongVersion,
 					}); err != nil {
 						return err
 					}
@@ -139,11 +140,12 @@ configure Kong.`,
 				return fmt.Errorf("building state: %w", err)
 			}
 			return file.KongStateToFile(ks, file.WriteConfig{
-				SelectTags: dumpConfig.SelectorTags,
-				Workspace:  dumpWorkspace,
-				Filename:   dumpCmdKongStateFile,
-				FileFormat: format,
-				WithID:     dumpWithID,
+				SelectTags:  dumpConfig.SelectorTags,
+				Workspace:   dumpWorkspace,
+				Filename:    dumpCmdKongStateFile,
+				FileFormat:  format,
+				WithID:      dumpWithID,
+				KongVersion: kongVersion,
 			})
 		},
 	}
