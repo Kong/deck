@@ -22,11 +22,14 @@ import (
 const (
 	exitCodeDiffDetection     = 2
 	defaultFetchedKongVersion = "2.8.0"
+	defaultFormatVersion      = "1.1"
 )
 
 var (
 	dumpConfig dump.Config
 	assumeYes  bool
+
+	kongVersion300 = semver.MustParse("3.0.0")
 )
 
 type mode int
@@ -140,6 +143,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	parsedKongVersion, err = utils.ParseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
+	}
+
+	if mode == modeKong || mode == modeKongEnterprise {
+		if targetContent.FormatVersion == defaultFormatVersion &&
+			parsedKongVersion.GTE(kongVersion300) {
+			return fmt.Errorf("cannot apply 1.1 format config to Kong instance running " +
+				"a release higher or equals to 3.0.\nPlease upgrade your configuration format " +
+				"before applying any change")
+		}
 	}
 
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
