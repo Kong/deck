@@ -120,14 +120,14 @@ func setup(t *testing.T) func(t *testing.T) {
 	}
 }
 
-func sync(kongFile string, opts ...string) {
+func sync(kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"sync", "-s", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	deckCmd.ExecuteContext(context.Background()) //nolint:errcheck
+	return deckCmd.ExecuteContext(context.Background())
 }
 
 func diff(kongFile string, opts ...string) error {

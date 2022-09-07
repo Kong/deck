@@ -1,14 +1,11 @@
 _format_version: "3.0"
 plugins:
 - id: efead952-0a1d-43ec-9794-0ac6abdc7f55
-  name: request-termination
+  name: basic-auth
   config:
-    status_code: 200
+    anonymous: 58076db2-28b6-423b-ba39-a797193017f7
+    hide_credentials: false
   enabled: true
-  ordering:
-    before:
-      access:
-      - basic-auth
   protocols:
   - grpc
   - grpcs

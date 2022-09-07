@@ -35,7 +35,7 @@ u8S6yNlu2Q==
 -----END CERTIFICATE-----`),
 }
 
-func Test_Reset_SkipCACert(t *testing.T) {
+func Test_Reset_SkipCACert_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -61,7 +61,44 @@ func Test_Reset_SkipCACert(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=2.7.0")
+			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			reset(t, "--skip-ca-certificates")
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Reset_SkipCACert_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "reset with --skip-ca-certificates should ignore CA certs",
+			kongFile: "testdata/reset/001-skip-ca-cert/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				CACertificates: []*kong.CACertificate{caCert},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// ca_certificates first appeared in 1.3, but we limit to 2.7+
+			// here because the schema changed and the entities aren't the same
+			// across all versions, even though the skip functionality works the same.
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 

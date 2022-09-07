@@ -3,12 +3,14 @@
 package integration
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -605,7 +607,8 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 //   - 2.7.0
 //   - 2.6.0.2+enterprise
 //   - 2.7.0.0+enterprise
-func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
+//   - 2.8.0.0+enterprise
+func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -635,7 +638,49 @@ func Test_Sync_ServicesRoutes_From_2_6_9(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">2.6.9")
+			kong.RunWhenKong(t, ">2.6.9 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates a service",
+			kongFile: "testdata/sync/001-create-a-service/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+			},
+		},
+		{
+			name:     "create services and routes",
+			kongFile: "testdata/sync/002-create-services-and-routes/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+				Routes:   route1_20x,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -766,7 +811,8 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 //   - 2.5.1.2+enterprise
 //   - 2.6.0.2+enterprise
 //   - 2.7.0.0+enterprise
-func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
+//   - 2.8.0.0+enterprise
+func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -789,7 +835,42 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.0.5")
+			kong.RunWhenKong(t, ">=2.0.5 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: plugin,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -858,6 +939,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 //   - 2.5.1.2+enterprise
 //   - 2.6.0.2+enterprise
 //   - 2.7.0.0+enterprise
+//   - 2.8.0.0+enterprise
 func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -882,7 +964,43 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.1.0")
+			kong.RunWhenKong(t, ">=2.1.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   target,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -901,7 +1019,8 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 //   - 2.5.1.2+enterprise
 //   - 2.6.0.2+enterprise
 //   - 2.7.0.0+enterprise
-func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
+//   - 2.8.0.0+enterprise
+func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -925,7 +1044,43 @@ func Test_Sync_Upstreams_Target_ZeroWeight(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.4.1")
+			kong.RunWhenKong(t, ">=2.4.1 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target with weight equals to zero",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetZeroWeight,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1145,7 +1300,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	}
 }
 
-func Test_Sync_SkipCACert(t *testing.T) {
+func Test_Sync_SkipCACert_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -1172,7 +1327,7 @@ func Test_Sync_SkipCACert(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			kong.RunWhenKong(t, ">=2.7.0")
+			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1182,7 +1337,44 @@ func Test_Sync_SkipCACert(t *testing.T) {
 	}
 }
 
-func Test_Sync_RBAC(t *testing.T) {
+func Test_Sync_SkipCACert_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "syncing with --skip-ca-certificates should ignore CA certs",
+			kongFile: "testdata/sync/009-skip-ca-cert/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services:       svc1_207,
+				CACertificates: []*kong.CACertificate{},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// ca_certificates first appeared in 1.3, but we limit to 2.7+
+			// here because the schema changed and the entities aren't the same
+			// across all versions, even though the skip functionality works the same.
+			kong.RunWhenKong(t, ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile, "--skip-ca-certificates")
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_RBAC_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -1278,7 +1470,7 @@ func Test_Sync_RBAC(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenEnterprise(t, ">=2.7.0", kong.RequiredFeatures{})
+			kong.RunWhenEnterprise(t, ">=2.7.0 <3.0.0", kong.RequiredFeatures{})
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1288,7 +1480,113 @@ func Test_Sync_RBAC(t *testing.T) {
 	}
 }
 
-func Test_Sync_Create_Route_With_Service_Name_Reference(t *testing.T) {
+func Test_Sync_RBAC_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "rbac",
+			kongFile: "testdata/sync/xxx-rbac-endpoint-permissions/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				RBACRoles: []*kong.RBACRole{
+					{
+						Name:    kong.String("workspace-portal-admin"),
+						Comment: kong.String("Full access to Dev Portal related endpoints in the workspace"),
+					},
+				},
+				RBACEndpointPermissions: []*kong.RBACEndpointPermission{
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/developers"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/developers/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/files"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/files/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/kong"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/rbac/*/*/*/*/*"),
+						Actions:   []*string{kong.String("read"), kong.String("delete"), kong.String("create"), kong.String("update")},
+						Negative:  kong.Bool(true),
+					},
+					{
+						Workspace: kong.String("default"),
+						Endpoint:  kong.String("/workspaces/default"),
+						Actions:   []*string{kong.String("read"), kong.String("update")},
+						Negative:  kong.Bool(false),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile, "--rbac-resources-only")
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -1312,7 +1610,41 @@ func Test_Sync_Create_Route_With_Service_Name_Reference(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.7.0")
+			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create a route with a service name reference",
+			kongFile: "testdata/sync/010-create-route-with-service-name-reference/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+				Routes:   route1_20x,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=2.7.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1454,6 +1786,47 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 
 			sync(tc.kongFile)
 			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_Unsupported_Formats(t *testing.T) {
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedError error
+	}{
+		{
+			name:     "creates a service",
+			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
+			expectedError: errors.New(
+				"cannot apply '1.1' config format version to Kong version 3.0 or above.\n" +
+					"Please upgrade your configuration to account for 3.0\n" +
+					"breaking changes using the following command:\n\n" +
+					"deck convert --from kong-gateway-2.x --to kong-gateway-3.x\n\n" +
+					"This command performs the following changes:\n" +
+					"  - upgrade the `_format_version` value to `3.0`\n" +
+					"  - add the `~` prefix to all routes' paths containing a regex-pattern\n\n" +
+					"These changes may not be correct or exhaustive enough.\n" +
+					"It is strongly recommended to perform a manual audit\n" +
+					"of the updated configuration file before applying\n" +
+					"the configuration in production. Incorrect changes will result in\n" +
+					"unintended traffic routing by Kong Gateway.\n\n" +
+
+					"For more information about this and related changes,\n" +
+					"please visit: https://docs.konghq.com/deck/latest/3.0-upgrade"),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenKong(t, ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			err := sync(tc.kongFile)
+			assert.Equal(t, err, tc.expectedError)
 		})
 	}
 }
