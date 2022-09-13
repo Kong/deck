@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -31,10 +33,10 @@ type stateBuilder struct {
 
 	disableDynamicDefaults bool
 
+	checkRoutePaths bool
+
 	err error
 }
-
-var kong140Version = semver.MustParse("1.4.0")
 
 // uuid generates a UUID string and returns a pointer to it.
 // It is a variable for testing purpose, to override and supply
@@ -62,6 +64,10 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 	b.defaulter = defaulter
+
+	if utils.Kong300Version.LTE(b.kongVersion) {
+		b.checkRoutePaths = true
+	}
 
 	// build
 	b.certificates()
@@ -295,7 +301,7 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
@@ -316,7 +322,7 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
@@ -337,7 +343,7 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
@@ -358,7 +364,7 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
@@ -379,7 +385,7 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
@@ -402,7 +408,7 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 				cred.ID = kong.String(*existingCred.ID)
 			}
 		}
-		if b.kongVersion.GTE(kong140Version) {
+		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
 		b.rawState.ACLGroups = append(b.rawState.ACLGroups, &cred)
@@ -768,6 +774,29 @@ func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
 	return route.StripPath, nil
 }
 
+func checkRoutePaths300AndAbove(route FRoute) {
+	pathsWarnings := []string{}
+	for _, p := range route.Paths {
+		if strings.HasPrefix(*p, "~/") || !utils.IsPathRegexLike(*p) {
+			continue
+		}
+		pathsWarnings = append(pathsWarnings, *p)
+	}
+	if len(pathsWarnings) > 0 {
+		cprint.UpdatePrintf(
+			"In Route '%s', a path with regular expression was detected.\n"+
+				"In Kong Gateway versions 3.0 and above, all paths that use regular expressions \n"+
+				"must be prefixed with a ~ character. Without the ~ prefix, regular expression \n"+
+				"based paths will not be matched and processed correctly. \n\n"+
+				"Please run the following command to upgrade your config: \n\n"+
+				"deck convert --from kong-gateway-2.x --to kong-gateway-3.x "+
+				"--input-file <config-file> --output-file <new-config-file>\n\n"+
+				"Please refer to the following document for further details:\n"+
+				"https://docs.konghq.com/deck/latest/3.0-upgrade.\n\n",
+			*route.ID)
+	}
+}
+
 func (b *stateBuilder) ingestRoute(r FRoute) error {
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
@@ -793,6 +822,10 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
 	if err != nil {
 		return err
+	}
+
+	if b.checkRoutePaths {
+		checkRoutePaths300AndAbove(r)
 	}
 
 	// plugins for the route

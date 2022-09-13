@@ -1324,7 +1324,7 @@ func Test_stateBuilder_consumers(t *testing.T) {
 			b := &stateBuilder{
 				targetContent: tt.fields.targetContent,
 				currentState:  tt.fields.currentState,
-				kongVersion:   kong140Version,
+				kongVersion:   utils.Kong140Version,
 			}
 			if tt.fields.kongVersion != nil {
 				b.kongVersion = *tt.fields.kongVersion
