@@ -7,12 +7,12 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 	"text/template"
 
 	ghodss "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
+	"github.com/kong/deck/utils"
 )
 
 // getContent reads all the YAML and JSON files in the directory or the
@@ -64,7 +64,7 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 
 	var files []string
 	if finfo.IsDir() {
-		files, err = configFilesInDir(fileOrDir)
+		files, err = utils.ConfigFilesInDir(fileOrDir)
 		if err != nil {
 			return nil, fmt.Errorf("getting files from directory: %w", err)
 		}
@@ -128,32 +128,6 @@ func readContent(reader io.Reader) (*Content, error) {
 // The verification for this is done using a test.
 func yamlUnmarshal(bytes []byte, v interface{}) error {
 	return ghodss.Unmarshal(bytes, v)
-}
-
-// configFilesInDir traverses the directory rooted at dir and
-// returns all the files with a case-insensitive extension of `yml` or `yaml`.
-func configFilesInDir(dir string) ([]string, error) {
-	var res []string
-	err := filepath.Walk(
-		dir,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if info.IsDir() {
-				return nil
-			}
-			switch strings.ToLower(filepath.Ext(path)) {
-			case ".yaml", ".yml", ".json":
-				res = append(res, path)
-			}
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("reading state directory: %w", err)
-	}
-	return res, nil
 }
 
 func getPrefixedEnvVar(key string) (string, error) {

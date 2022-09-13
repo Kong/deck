@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/kong/deck/convert"
 	"github.com/kong/deck/cprint"
@@ -35,15 +36,32 @@ can be converted into a 'konnect' configuration file.`,
 				return err
 			}
 
-			if yes, err := utils.ConfirmFileOverwrite(convertCmdOutputFile, "", false); err != nil {
-				return err
-			} else if !yes {
-				return nil
-			}
+			if convertCmdInputFile != "" {
+				if yes, err := utils.ConfirmFileOverwrite(convertCmdOutputFile, "", false); err != nil {
+					return err
+				} else if !yes {
+					return nil
+				}
 
-			err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
-			if err != nil {
-				return fmt.Errorf("converting file: %v", err)
+				err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
+				if err != nil {
+					return fmt.Errorf("converting file: %v", err)
+				}
+			} else if is2xTo3xConversion() {
+				path, err := os.Getwd()
+				if err != nil {
+					return fmt.Errorf("getting current working directory: %w", err)
+				}
+				files, err := utils.ConfigFilesInDir(path)
+				if err != nil {
+					return fmt.Errorf("getting files from directory: %w", err)
+				}
+				for _, filename := range files {
+					err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
+					if err != nil {
+						return fmt.Errorf("converting '%s' file: %v", filename, err)
+					}
+				}
 			}
 			if convertCmdDestinationFormat == "konnect" {
 				cprint.UpdatePrintf("Warning: konnect format type was deprecated in v1.12 and it will be removed\n" +
@@ -54,8 +72,8 @@ can be converted into a 'konnect' configuration file.`,
 		},
 	}
 
-	sourceFormats := []convert.Format{convert.FormatKongGateway}
-	destinationFormats := []convert.Format{convert.FormatKonnect}
+	sourceFormats := []convert.Format{convert.FormatKongGateway, convert.FormatKongGateway2x}
+	destinationFormats := []convert.Format{convert.FormatKonnect, convert.FormatKongGateway3x}
 	convertCmd.Flags().StringVar(&convertCmdSourceFormat, "from", "",
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
@@ -65,4 +83,9 @@ can be converted into a 'konnect' configuration file.`,
 	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "",
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	return convertCmd
+}
+
+func is2xTo3xConversion() bool {
+	return convertCmdSourceFormat == string(convert.FormatKongGateway2x) &&
+		convertCmdDestinationFormat == string(convert.FormatKongGateway3x)
 }

@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -45,7 +46,7 @@ func Test_configFilesInDir(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := configFilesInDir(tt.args.dir)
+			got, err := utils.ConfigFilesInDir(tt.args.dir)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("configFilesInDir() error = %v, wantErr %v", err, tt.wantErr)
 				return

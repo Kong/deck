@@ -29,6 +29,22 @@ func TestParseFormat(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "parses valid values",
+			args: args{
+				key: "kong-gateway-2.x",
+			},
+			want:    FormatKongGateway2x,
+			wantErr: false,
+		},
+		{
+			name: "parses valid values",
+			args: args{
+				key: "kong-gateway-3.x",
+			},
+			want:    FormatKongGateway3x,
+			wantErr: false,
+		},
+		{
 			name: "parses values in a case-insensitive manner",
 			args: args{
 				key: "koNNect",
@@ -162,6 +178,15 @@ func Test_Convert(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "errors out due to invalid conversion",
+			args: args{
+				inputFilename: "testdata/3/input.yaml",
+				fromFormat:    FormatKongGateway3x,
+				toFormat:      FormatKongGateway2x,
+			},
+			wantErr: true,
+		},
+		{
 			name: "errors out when a nameless service is present in the input",
 			args: args{
 				inputFilename: "testdata/1/input.yaml",
@@ -187,6 +212,28 @@ func Test_Convert(t *testing.T) {
 				expectedOutputFilename: "testdata/2/output-expected.yaml",
 				fromFormat:             FormatKongGateway,
 				toFormat:               FormatKonnect,
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from Kong Gateway 2.x to Kong Gateway 3.x format",
+			args: args{
+				inputFilename:          "testdata/3/input.yaml",
+				outputFilename:         "testdata/3/output.yaml",
+				expectedOutputFilename: "testdata/3/output-expected.yaml",
+				fromFormat:             FormatKongGateway2x,
+				toFormat:               FormatKongGateway3x,
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from Kong Gateway 2.x to Kong Gateway 3.x format (no _format_version input)",
+			args: args{
+				inputFilename:          "testdata/4/input.yaml",
+				outputFilename:         "testdata/4/output.yaml",
+				expectedOutputFilename: "testdata/4/output-expected.yaml",
+				fromFormat:             FormatKongGateway2x,
+				toFormat:               FormatKongGateway3x,
 			},
 			wantErr: false,
 		},

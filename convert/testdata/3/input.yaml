@@ -1,0 +1,9 @@
+services:
+- name: svc1
+  host: mockbin.org
+  path: /status/200
+  routes:
+  - name: r1
+    paths:
+    - /status/\d+
+    - /code/\d+
