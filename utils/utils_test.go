@@ -287,3 +287,42 @@ func Test_ParseKongVersion(t *testing.T) {
 		})
 	}
 }
+
+func Test_IsPathRegexLike(t *testing.T) {
+	tests := []struct {
+		name     string
+		paths    []string
+		expected bool
+	}{
+		{
+			name: "regex-like paths",
+			paths: []string{
+				`/.*`,
+				`/[fF][oO]{2}`,
+				`/foo|bar`,
+				`/blog-\\d+`,
+				`/bl[ao]go(sphere|web)`,
+			},
+			expected: true,
+		},
+		{
+			name: "no regex-like paths",
+			paths: []string{
+				"/",
+				"/foo",
+				"/foo/",
+				"/abcd~user~2",
+				"/abcd%aa%10%ff%AA%FF",
+			},
+			expected: false,
+		},
+	}
+
+	for _, test := range tests {
+		for _, path := range test.paths {
+			assert.Equal(
+				t, test.expected, IsPathRegexLike(path), "test: '%v', path: '%v'", test.name, path,
+			)
+		}
+	}
+}

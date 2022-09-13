@@ -14,7 +14,18 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
-var kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
+var (
+	kongVersionRegex = regexp.MustCompile(`^\d+\.\d+`)
+	pathRegexPattern = regexp.MustCompile(`[^a-zA-Z0-9._~/%-]`)
+
+	Kong140Version = semver.MustParse("1.4.0")
+	Kong300Version = semver.MustParse("3.0.0")
+)
+
+// IsPathRegexLike checks if a path string contains a regex pattern.
+func IsPathRegexLike(path string) bool {
+	return pathRegexPattern.MatchString(path)
+}
 
 // Empty checks if a string referenced by s or s itself is empty.
 func Empty(s *string) bool {
