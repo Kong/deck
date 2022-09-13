@@ -162,3 +162,29 @@ func ParseKongVersion(version string) (semver.Version, error) {
 	}
 	return semver.ParseTolerant(v)
 }
+
+// ConfigFilesInDir traverses the directory rooted at dir and
+// returns all the files with a case-insensitive extension of `yml` or `yaml`.
+func ConfigFilesInDir(dir string) ([]string, error) {
+	var res []string
+	err := filepath.Walk(
+		dir,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
+				return nil
+			}
+			switch strings.ToLower(filepath.Ext(path)) {
+			case ".yaml", ".yml", ".json":
+				res = append(res, path)
+			}
+			return nil
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("reading state directory: %w", err)
+	}
+	return res, nil
+}
