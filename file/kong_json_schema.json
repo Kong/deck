@@ -584,6 +584,9 @@
           },
           "type": "array"
         },
+        "expression": {
+          "type": "string"
+        },
         "headers": {
           "patternProperties": {
             ".*": {
@@ -634,6 +637,9 @@
         },
         "preserve_host": {
           "type": "boolean"
+        },
+        "priority": {
+          "type": "integer"
         },
         "protocols": {
           "items": {
@@ -1302,6 +1308,9 @@
           },
           "type": "array"
         },
+        "expression": {
+          "type": "string"
+        },
         "headers": {
           "patternProperties": {
             ".*": {
@@ -1345,6 +1354,9 @@
         },
         "preserve_host": {
           "type": "boolean"
+        },
+        "priority": {
+          "type": "integer"
         },
         "protocols": {
           "items": {
