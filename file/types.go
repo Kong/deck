@@ -134,7 +134,9 @@ func unwrapURL(urlString string, fService *FService) error {
 		}
 	}
 	if parsed.Path != "" {
-		fService.Path = kong.String(parsed.Path)
+		// make sure that decoded whitespaces are encoded back
+		encodedParsedPath := strings.ReplaceAll(parsed.Path, " ", "%20")
+		fService.Path = kong.String(encodedParsedPath)
 	}
 	return nil
 }

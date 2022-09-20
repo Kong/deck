@@ -11,19 +11,19 @@ import (
 )
 
 var (
-	jsonString = `{                                                                           
-  "name": "rate-limiting",                                                  
-  "config": {                                                               
+	jsonString = `{
+  "name": "rate-limiting",
+  "config": {
     "minute": 10
-  },                                                                        
-  "service": "foo",                                                         
-  "route": "bar",                                                         
-  "consumer": "baz",                                                        
-  "enabled": true,                                                          
-  "run_on": "first",                                                        
-  "protocols": [                                                            
+  },
+  "service": "foo",
+  "route": "bar",
+  "consumer": "baz",
+  "enabled": true,
+  "run_on": "first",
+  "protocols": [
     "http"
-  ]                                                                         
+  ]
 }`
 	yamlString = `
 name: rate-limiting
@@ -466,6 +466,20 @@ func Test_unwrapURL(t *testing.T) {
 				},
 			},
 			wantErr: true,
+		},
+		{
+			args: args{
+				urlString: "http://foo.com/Spaced%20Test/bar",
+				fService: &FService{
+					Service: kong.Service{
+						Host:     kong.String("foo.com"),
+						Protocol: kong.String("http"),
+						Port:     kong.Int(80),
+						Path:     kong.String("/Spaced%20Test/bar"),
+					},
+				},
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
