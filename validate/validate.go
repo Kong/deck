@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/blang/semver/v4"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
@@ -113,7 +114,7 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 	return errors
 }
 
-func (v *Validator) Validate() []error {
+func (v *Validator) Validate(kongVersion semver.Version) []error {
 	allErr := []error{}
 
 	// validate RBAC resources first.
@@ -175,5 +176,17 @@ func (v *Validator) Validate() []error {
 	if err := v.entities(v.state.Upstreams, "upstreams"); err != nil {
 		allErr = append(allErr, err...)
 	}
+
+	// validate routes format with Kong 3.x
+	if utils.Kong300Version.LTE(kongVersion) {
+		validate3xRoutes(v.state.Routes)
+	}
 	return allErr
+}
+
+func validate3xRoutes(routes *state.RoutesCollection) {
+	results, _ := routes.GetAll()
+	for _, r := range results {
+		utils.CheckRoutePaths300AndAbove(r.Route)
+	}
 }

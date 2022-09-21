@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -187,4 +188,29 @@ func ConfigFilesInDir(dir string) ([]string, error) {
 		return nil, fmt.Errorf("reading state directory: %w", err)
 	}
 	return res, nil
+}
+
+// CheckRoutePaths300AndAbove checks routes' paths format and prints out
+// a warning if regex-like patters without the '~' prefix are found.
+func CheckRoutePaths300AndAbove(route kong.Route) {
+	pathsWarnings := []string{}
+	for _, p := range route.Paths {
+		if strings.HasPrefix(*p, "~/") || !IsPathRegexLike(*p) {
+			continue
+		}
+		pathsWarnings = append(pathsWarnings, *p)
+	}
+	if len(pathsWarnings) > 0 {
+		cprint.UpdatePrintf(
+			"In Route '%s', a path with regular expression was detected.\n"+
+				"In Kong Gateway versions 3.0 and above, all paths that use regular expressions \n"+
+				"must be prefixed with a ~ character. Without the ~ prefix, regular expression \n"+
+				"based paths will not be matched and processed correctly. \n\n"+
+				"Please run the following command to upgrade your config: \n\n"+
+				"deck convert --from kong-gateway-2.x --to kong-gateway-3.x "+
+				"--input-file <config-file> --output-file <new-config-file>\n\n"+
+				"Please refer to the following document for further details:\n"+
+				"https://docs.konghq.com/deck/latest/3.0-upgrade.\n\n",
+			*route.ID)
+	}
 }
