@@ -9,14 +9,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/blang/semver/v4"
 	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
-
-var kongVersion300 = semver.MustParse("3.0.0")
 
 // WriteConfig holds settings to use to write the state file.
 type WriteConfig struct {
@@ -39,7 +36,7 @@ func getFormatVersion(kongVersion string) (string, error) {
 		return "", fmt.Errorf("parsing Kong version: %w", err)
 	}
 	formatVersion := "1.1"
-	if parsedKongVersion.GTE(kongVersion300) {
+	if parsedKongVersion.GTE(utils.Kong300Version) {
 		formatVersion = "3.0"
 	}
 	return formatVersion, nil

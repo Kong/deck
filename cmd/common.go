@@ -29,8 +29,6 @@ const (
 var (
 	dumpConfig dump.Config
 	assumeYes  bool
-
-	kongVersion300 = semver.MustParse("3.0.0")
 )
 
 type mode int
@@ -146,7 +144,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return fmt.Errorf("parsing Kong version: %w", err)
 	}
 
-	if parsedKongVersion.GTE(kongVersion300) &&
+	if parsedKongVersion.GTE(utils.Kong300Version) &&
 		targetContent.FormatVersion != formatVersion30 {
 		formatVersion := targetContent.FormatVersion
 		if formatVersion == "" {
