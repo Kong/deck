@@ -116,9 +116,13 @@ this command unless --online flag is used.
 
 func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
 	// make sure we are able to connect to Kong
-	_, err := fetchKongVersion(ctx, rootConfig)
+	kongVersion, err := fetchKongVersion(ctx, rootConfig)
 	if err != nil {
 		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
+	}
+	parsedKongVersion, err := utils.ParseKongVersion(kongVersion)
+	if err != nil {
+		return []error{fmt.Errorf("parsing Kong version: %w", err)}
 	}
 	opts := validate.ValidatorOpts{
 		Ctx:               ctx,
@@ -128,7 +132,7 @@ func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.Ko
 		RBACResourcesOnly: validateCmdRBACResourcesOnly,
 	}
 	validator := validate.NewValidator(opts)
-	return validator.Validate()
+	return validator.Validate(parsedKongVersion)
 }
 
 func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Client, error) {

@@ -4,10 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/blang/semver/v4"
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -774,29 +772,6 @@ func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
 	return route.StripPath, nil
 }
 
-func checkRoutePaths300AndAbove(route FRoute) {
-	pathsWarnings := []string{}
-	for _, p := range route.Paths {
-		if strings.HasPrefix(*p, "~/") || !utils.IsPathRegexLike(*p) {
-			continue
-		}
-		pathsWarnings = append(pathsWarnings, *p)
-	}
-	if len(pathsWarnings) > 0 {
-		cprint.UpdatePrintf(
-			"In Route '%s', a path with regular expression was detected.\n"+
-				"In Kong Gateway versions 3.0 and above, all paths that use regular expressions \n"+
-				"must be prefixed with a ~ character. Without the ~ prefix, regular expression \n"+
-				"based paths will not be matched and processed correctly. \n\n"+
-				"Please run the following command to upgrade your config: \n\n"+
-				"deck convert --from kong-gateway-2.x --to kong-gateway-3.x "+
-				"--input-file <config-file> --output-file <new-config-file>\n\n"+
-				"Please refer to the following document for further details:\n"+
-				"https://docs.konghq.com/deck/latest/3.0-upgrade.\n\n",
-			*route.ID)
-	}
-}
-
 func (b *stateBuilder) ingestRoute(r FRoute) error {
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
@@ -825,7 +800,7 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 
 	if b.checkRoutePaths {
-		checkRoutePaths300AndAbove(r)
+		utils.CheckRoutePaths300AndAbove(r.Route)
 	}
 
 	// plugins for the route
