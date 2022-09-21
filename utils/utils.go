@@ -23,6 +23,21 @@ var (
 	Kong300Version = semver.MustParse("3.0.0")
 )
 
+var UpgradeMessage = "Please upgrade your configuration to account for 3.0\n" +
+	"breaking changes using the following command:\n\n" +
+	"deck convert --from kong-gateway-2.x --to kong-gateway-3.x\n\n" +
+	"This command performs the following changes:\n" +
+	"  - upgrade the `_format_version` value to `3.0`\n" +
+	"  - add the `~` prefix to all routes' paths containing a regex-pattern\n\n" +
+	"These changes may not be correct or exhaustive enough.\n" +
+	"It is strongly recommended to perform a manual audit\n" +
+	"of the updated configuration file before applying\n" +
+	"the configuration in production. Incorrect changes will result in\n" +
+	"unintended traffic routing by Kong Gateway.\n\n" +
+
+	"For more information about this and related changes,\n" +
+	"please visit: https://docs.konghq.com/deck/latest/3.0-upgrade\n\n"
+
 // IsPathRegexLike checks if a path string contains a regex pattern.
 func IsPathRegexLike(path string) bool {
 	return pathRegexPattern.MatchString(path)
@@ -190,27 +205,29 @@ func ConfigFilesInDir(dir string) ([]string, error) {
 	return res, nil
 }
 
-// CheckRoutePaths300AndAbove checks routes' paths format and prints out
-// a warning if regex-like patters without the '~' prefix are found.
-func CheckRoutePaths300AndAbove(route kong.Route) {
-	pathsWarnings := []string{}
+// HasPathsWithRegex300AndAbove checks routes' paths format and returns true
+// if these math a regex-pattern without a '~' prefix.
+func HasPathsWithRegex300AndAbove(route kong.Route) bool {
 	for _, p := range route.Paths {
 		if strings.HasPrefix(*p, "~/") || !IsPathRegexLike(*p) {
 			continue
 		}
-		pathsWarnings = append(pathsWarnings, *p)
+		return true
 	}
-	if len(pathsWarnings) > 0 {
-		cprint.UpdatePrintf(
-			"In Route '%s', a path with regular expression was detected.\n"+
-				"In Kong Gateway versions 3.0 and above, all paths that use regular expressions \n"+
-				"must be prefixed with a ~ character. Without the ~ prefix, regular expression \n"+
-				"based paths will not be matched and processed correctly. \n\n"+
-				"Please run the following command to upgrade your config: \n\n"+
-				"deck convert --from kong-gateway-2.x --to kong-gateway-3.x "+
-				"--input-file <config-file> --output-file <new-config-file>\n\n"+
-				"Please refer to the following document for further details:\n"+
-				"https://docs.konghq.com/deck/latest/3.0-upgrade.\n\n",
-			*route.ID)
+	return false
+}
+
+// PrintRouteRegexWarning prints out a warning about 3.x routes' path usage.
+func PrintRouteRegexWarning(unsupportedRoutes []string) {
+	unsupportedRoutesLen := len(unsupportedRoutes)
+	// do not consider more than 10 sample routes to print out.
+	if unsupportedRoutesLen > 10 {
+		unsupportedRoutes = unsupportedRoutes[:10]
 	}
+	cprint.UpdatePrintf(
+		"%d unsupported routes' paths format with Kong version 3.0\n"+
+			"or above were detected. Some of these routes are (not an exhaustive list):\n\n"+
+			"%s\n\n"+UpgradeMessage,
+		unsupportedRoutesLen, strings.Join(unsupportedRoutes, "\n"),
+	)
 }
