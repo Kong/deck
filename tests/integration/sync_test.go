@@ -1803,20 +1803,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 			kongFile: "testdata/sync/001-create-a-service/kong.yaml",
 			expectedError: errors.New(
 				"cannot apply '1.1' config format version to Kong version 3.0 or above.\n" +
-					"Please upgrade your configuration to account for 3.0\n" +
-					"breaking changes using the following command:\n\n" +
-					"deck convert --from kong-gateway-2.x --to kong-gateway-3.x\n\n" +
-					"This command performs the following changes:\n" +
-					"  - upgrade the `_format_version` value to `3.0`\n" +
-					"  - add the `~` prefix to all routes' paths containing a regex-pattern\n\n" +
-					"These changes may not be correct or exhaustive enough.\n" +
-					"It is strongly recommended to perform a manual audit\n" +
-					"of the updated configuration file before applying\n" +
-					"the configuration in production. Incorrect changes will result in\n" +
-					"unintended traffic routing by Kong Gateway.\n\n" +
-
-					"For more information about this and related changes,\n" +
-					"please visit: https://docs.konghq.com/deck/latest/3.0-upgrade"),
+					utils.UpgradeMessage),
 		},
 	}
 	for _, tc := range tests {

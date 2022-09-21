@@ -609,6 +609,24 @@ func (b *stateBuilder) routes() {
 			return
 		}
 	}
+
+	// check routes' paths format
+	if b.checkRoutePaths {
+		unsupportedRoutes := []string{}
+		allRoutes, err := b.intermediate.Routes.GetAll()
+		if err != nil {
+			b.err = err
+			return
+		}
+		for _, r := range allRoutes {
+			if utils.HasPathsWithRegex300AndAbove(r.Route) {
+				unsupportedRoutes = append(unsupportedRoutes, *r.Route.ID)
+			}
+		}
+		if len(unsupportedRoutes) > 0 {
+			utils.PrintRouteRegexWarning(unsupportedRoutes)
+		}
+	}
 }
 
 func (b *stateBuilder) enterprise() {
@@ -797,10 +815,6 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
 	if err != nil {
 		return err
-	}
-
-	if b.checkRoutePaths {
-		utils.CheckRoutePaths300AndAbove(r.Route)
 	}
 
 	// plugins for the route

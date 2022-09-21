@@ -186,7 +186,13 @@ func (v *Validator) Validate(kongVersion semver.Version) []error {
 
 func validate3xRoutes(routes *state.RoutesCollection) {
 	results, _ := routes.GetAll()
+	unsupportedRoutes := []string{}
 	for _, r := range results {
-		utils.CheckRoutePaths300AndAbove(r.Route)
+		if utils.HasPathsWithRegex300AndAbove(r.Route) {
+			unsupportedRoutes = append(unsupportedRoutes, *r.Route.ID)
+		}
+	}
+	if len(unsupportedRoutes) > 0 {
+		utils.PrintRouteRegexWarning(unsupportedRoutes)
 	}
 }

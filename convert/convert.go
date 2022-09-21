@@ -82,11 +82,37 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 	outputContent := input.DeepCopy()
 
 	convertedRoutes := []*file.FRoute{}
+	changedRoutes := []string{}
 	for _, service := range outputContent.Services {
 		for _, route := range service.Routes {
-			convertedRoutes = append(convertedRoutes, migrateRoutesPathFieldPre300(route, filename))
+			route, hasChanged := migrateRoutesPathFieldPre300(route)
+			convertedRoutes = append(convertedRoutes, route)
+			if hasChanged {
+				if route.ID != nil {
+					changedRoutes = append(changedRoutes, *route.ID)
+				} else {
+					changedRoutes = append(changedRoutes, *route.Name)
+				}
+			}
 		}
 		service.Routes = convertedRoutes
+	}
+
+	if len(changedRoutes) > 0 {
+		changedRoutesLen := len(changedRoutes)
+		// do not consider more than 10 sample routes to print out.
+		if changedRoutesLen > 10 {
+			changedRoutes = changedRoutes[:10]
+		}
+		cprint.UpdatePrintf(
+			"From the '%s' config file,\n"+
+				"%d unsupported routes' paths format with Kong version 3.0\n"+
+				"or above were detected. Some of these routes are (not an exhaustive list):\n\n"+
+				"%s\n\n"+
+				"Kong gateway versions 3.0 and above require that regular expressions\n"+
+				"start with a '~' character to distinguish from simple prefix match.\n"+
+				"In order to make these paths compatible with 3.x, a '~' prefix has been added.\n\n",
+			filename, changedRoutesLen, strings.Join(changedRoutes, "\n"))
 	}
 
 	cprint.UpdatePrintf(
@@ -102,31 +128,15 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 	return outputContent, nil
 }
 
-func migrateRoutesPathFieldPre300(route *file.FRoute, filename string) *file.FRoute {
-	changedPaths := []string{}
+func migrateRoutesPathFieldPre300(route *file.FRoute) (*file.FRoute, bool) {
+	var hasChanged bool
 	for _, path := range route.Paths {
 		if !strings.HasPrefix(*path, "~/") && utils.IsPathRegexLike(*path) {
-			changedPaths = append(changedPaths, *path)
 			*path = "~" + *path
+			hasChanged = true
 		}
 	}
-	if len(changedPaths) > 0 {
-		changedPathsLen := len(changedPaths)
-		// do not consider more than 3 sample routes to print out.
-		if changedPathsLen > 3 {
-			changedPaths = changedPaths[:3]
-		}
-		cprint.UpdatePrintf(
-			"From the '%s' config file,\n"+
-				"%d routes paths matching an unsupported regex pattern usage\n"+
-				"with Kong version 3.0 or above were detected\n"+
-				"(e.g. %s).\n\n"+
-				"Kong gateway versions 3.0 and above require that regular expressions\n"+
-				"start with a '~' character to distinguish from simple prefix match.\n"+
-				"In order to make these paths compatible with 3.x, a '~' prefix has been added.\n\n",
-			filename, changedPathsLen, strings.Join(changedPaths, ", "))
-	}
-	return route
+	return route, hasChanged
 }
 
 func convertKongGatewayToKonnect(input *file.Content) (*file.Content, error) {
