@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [Unreleased](#Unreleased)
+- [v1.15.0](#v1150)
 - [v1.14.0](#v1140)
 - [v1.13.0](#v1130)
 - [v1.12.4](#v1124)
@@ -44,14 +44,28 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [Unreleased]
+## [v1.15.0]
 
-> Release date: TBD
+> Release date: 2022/09/26
+
+### Added
+
+- Add support for Kong Gateway 3.0.
+- Add support to 2.x to 3.x format migration.
+  [#753](https://github.com/Kong/deck/pull/753)
+- Add support to the new Kong `expressions` flavor fields.
+  [#752](https://github.com/Kong/deck/pull/752)
 
 ### Fixes
 
-- Make sure `validate` with `--online` flag fails when running against Konnect.
-  [##718](https://github.com/Kong/deck/pull/#718)
+- Make sure decK runs against Kong Gateway if a non-default
+  `--kong-addr` is provided, even if some lingering Konnect
+  environment variables are present.
+  [#738](https://github.com/Kong/deck/pull/738)
+- `deck validate` with `--online` flag is not currently supported
+  with Konnect cloud. A clear error message is provided when this
+  command is invoked.
+  [#718](https://github.com/Kong/deck/pull/#718)
 
 ## [v1.14.0]
 
@@ -1005,7 +1019,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[Unreleased]: https://github.com/kong/deck/compare/v1.14.0...Unreleased
+[v1.15.0]: https://github.com/kong/deck/compare/v1.14.0...v1.15.0
 [v1.14.0]: https://github.com/kong/deck/compare/v1.13.0...v1.14.0
 [v1.13.0]: https://github.com/kong/deck/compare/v1.12.4...v1.13.0
 [v1.12.4]: https://github.com/kong/deck/compare/v1.12.3...v1.12.4
