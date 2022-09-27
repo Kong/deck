@@ -161,6 +161,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		FileFormat:       file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 		WithID:           dumpWithID,
 		RuntimeGroupName: konnectRuntimeGroup,
+		KongVersion:      defaultFetchedKongVersion,
 	})
 }
 
