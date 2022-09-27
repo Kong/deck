@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.15.1](#v1151)
 - [v1.15.0](#v1150)
 - [v1.14.0](#v1140)
 - [v1.13.0](#v1130)
@@ -43,6 +44,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.15.1]
+
+> Release date: 2022/09/27
+
+### Fixes
+
+- Fix decK dump when running against Konnect
+  [#758](https://github.com/Kong/deck/pull/758)
 
 ## [v1.15.0]
 
@@ -1021,6 +1031,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.15.1]: https://github.com/kong/deck/compare/v1.15.0...v1.15.1
 [v1.15.0]: https://github.com/kong/deck/compare/v1.14.0...v1.15.0
 [v1.14.0]: https://github.com/kong/deck/compare/v1.13.0...v1.14.0
 [v1.13.0]: https://github.com/kong/deck/compare/v1.12.4...v1.13.0
