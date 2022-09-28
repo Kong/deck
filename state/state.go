@@ -13,17 +13,20 @@ type collection struct {
 // KongState is an in-memory database representation
 // of Kong's configuration.
 type KongState struct {
-	common         collection
-	Services       *ServicesCollection
-	Routes         *RoutesCollection
-	Upstreams      *UpstreamsCollection
-	Targets        *TargetsCollection
-	Certificates   *CertificatesCollection
-	SNIs           *SNIsCollection
-	CACertificates *CACertificatesCollection
-	Plugins        *PluginsCollection
-	Consumers      *ConsumersCollection
-	Vaults         *VaultsCollection
+	common                 collection
+	Services               *ServicesCollection
+	Routes                 *RoutesCollection
+	Upstreams              *UpstreamsCollection
+	Targets                *TargetsCollection
+	Certificates           *CertificatesCollection
+	SNIs                   *SNIsCollection
+	CACertificates         *CACertificatesCollection
+	Plugins                *PluginsCollection
+	Consumers              *ConsumersCollection
+	Vaults                 *VaultsCollection
+	ConsumerGroups         *ConsumerGroupsCollection
+	ConsumerGroupConsumers *ConsumerGroupConsumersCollection
+	ConsumerGroupPlugins   *ConsumerGroupPluginsCollection
 
 	KeyAuths                *KeyAuthsCollection
 	HMACAuths               *HMACAuthsCollection
@@ -62,6 +65,9 @@ func NewKongState() (*KongState, error) {
 			caCertTableName:                 caCertTableSchema,
 			pluginTableName:                 pluginTableSchema,
 			consumerTableName:               consumerTableSchema,
+			consumerGroupTableName:          consumerGroupTableSchema,
+			consumerGroupConsumerTableName:  consumerGroupConsumerTableSchema,
+			consumerGroupPluginTableName:    consumerGroupPluginTableSchema,
 			rbacRoleTableName:               rbacRoleTableSchema,
 			rbacEndpointPermissionTableName: rbacEndpointPermissionTableSchema,
 			vaultTableName:                  vaultTableSchema,
@@ -100,6 +106,9 @@ func NewKongState() (*KongState, error) {
 	state.CACertificates = (*CACertificatesCollection)(&state.common)
 	state.Plugins = (*PluginsCollection)(&state.common)
 	state.Consumers = (*ConsumersCollection)(&state.common)
+	state.ConsumerGroups = (*ConsumerGroupsCollection)(&state.common)
+	state.ConsumerGroupConsumers = (*ConsumerGroupConsumersCollection)(&state.common)
+	state.ConsumerGroupPlugins = (*ConsumerGroupPluginsCollection)(&state.common)
 	state.RBACRoles = (*RBACRolesCollection)(&state.common)
 	state.RBACEndpointPermissions = (*RBACEndpointPermissionsCollection)(&state.common)
 	state.Vaults = (*VaultsCollection)(&state.common)

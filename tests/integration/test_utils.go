@@ -81,6 +81,18 @@ func sortSlices(x, y interface{}) bool {
 		yEntity := y.(*kong.Vault)
 		xName = *xEntity.Prefix
 		yName = *yEntity.Prefix
+	case *kong.Consumer:
+		yEntity := y.(*kong.Consumer)
+		xName = *xEntity.Username
+		yName = *yEntity.Username
+	case *kong.ConsumerGroup:
+		yEntity := y.(*kong.ConsumerGroup)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case *kong.ConsumerGroupObject:
+		yEntity := y.(*kong.ConsumerGroupObject)
+		xName = *xEntity.ConsumerGroup.Name
+		yName = *yEntity.ConsumerGroup.Name
 	case *kong.Plugin:
 		yEntity := y.(*kong.Plugin)
 		xName = *xEntity.Name
@@ -90,6 +102,9 @@ func sortSlices(x, y interface{}) bool {
 		}
 		if xEntity.Service != nil {
 			xName += *xEntity.Service.ID
+		}
+		if xEntity.Consumer != nil {
+			xName += *xEntity.Consumer.ID
 		}
 		if xEntity.Consumer != nil {
 			xName += *xEntity.Consumer.ID
@@ -134,6 +149,8 @@ func testKongState(t *testing.T, client *kong.Client,
 		cmpopts.IgnoreFields(kong.Vault{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Certificate{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.SNI{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.ConsumerGroup{}, "CreatedAt", "ID"),
+		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID", "ConsumerGroup"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),

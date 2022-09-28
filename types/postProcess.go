@@ -153,6 +153,60 @@ func (crud *consumerPostAction) Update(ctx context.Context, args ...crud.Arg) (c
 	return nil, crud.currentState.Consumers.Update(*args[0].(*state.Consumer))
 }
 
+type consumerGroupPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *consumerGroupPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroups.Add(*args[0].(*state.ConsumerGroup))
+}
+
+func (crud *consumerGroupPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroups.Delete(*((args[0].(*state.ConsumerGroup)).ID))
+}
+
+func (crud *consumerGroupPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroups.Update(*args[0].(*state.ConsumerGroup))
+}
+
+type consumerGroupConsumerPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *consumerGroupConsumerPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupConsumers.Add(*args[0].(*state.ConsumerGroupConsumer))
+}
+
+func (crud *consumerGroupConsumerPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupConsumers.Delete(
+		*((args[0].(*state.ConsumerGroupConsumer)).Consumer.ID),
+		*((args[0].(*state.ConsumerGroupConsumer)).ConsumerGroup.ID),
+	)
+}
+
+func (crud *consumerGroupConsumerPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupConsumers.Update(*args[0].(*state.ConsumerGroupConsumer))
+}
+
+type consumerGroupPluginPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud *consumerGroupPluginPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupPlugins.Add(*args[0].(*state.ConsumerGroupPlugin))
+}
+
+func (crud *consumerGroupPluginPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupPlugins.Delete(
+		*((args[0].(*state.ConsumerGroupPlugin)).ID),
+		*((args[0].(*state.ConsumerGroupConsumer)).ConsumerGroup.ID),
+	)
+}
+
+func (crud *consumerGroupPluginPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.ConsumerGroupPlugins.Update(*args[0].(*state.ConsumerGroupPlugin))
+}
+
 type keyAuthPostAction struct {
 	currentState *state.KongState
 }

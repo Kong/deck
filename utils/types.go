@@ -39,6 +39,7 @@ type KongRawState struct {
 	CACertificates []*kong.CACertificate
 
 	Consumers      []*kong.Consumer
+	ConsumerGroups []*kong.ConsumerGroupObject
 	CustomEntities []*custom.Entity
 
 	Vaults []*kong.Vault

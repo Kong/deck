@@ -386,6 +386,138 @@ var (
 			ID:       kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
 		},
 	}
+
+	consumerGroupsConsumers = []*kong.Consumer{
+		{
+			Username: kong.String("foo"),
+		},
+		{
+			Username: kong.String("bar"),
+		},
+		{
+			Username: kong.String("baz"),
+		},
+	}
+
+	consumerGroups = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+				{
+					Username: kong.String("baz"),
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+		},
+	}
+
+	consumerGroupsWithRLA = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+				{
+					Username: kong.String("baz"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(100)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            string("sliding"),
+					},
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(1000)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            string("sliding"),
+					},
+				},
+			},
+		},
+	}
+
+	rlaPlugin = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"consumer_groups":         []any{string("silver"), string("gold")},
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"enforce_consumer_groups": bool(true),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"namespace":               string("dNRC6xKsRL8Koc1uVYA4Nki6DLW7XIdx"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(30),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(0),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+	}
 )
 
 // test scope:
@@ -2306,6 +2438,90 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			// set up initial state
 			sync(tc.kongFileInitial)
 			// update with desired final state
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 2.7+
+func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/015-consumer-groups/kong.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{},
+			},
+		},
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroupsWithRLA,
+				Plugins:        rlaPlugin,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_ConsumerGroupsFrom30(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/015-consumer-groups/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroups,
+			},
+		},
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroupsWithRLA,
+				Plugins:        rlaPlugin,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
 			sync(tc.kongFile)
 			testKongState(t, client, tc.expectedState, nil)
 		})

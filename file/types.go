@@ -493,6 +493,7 @@ type FConsumer struct {
 	Oauth2Creds   []*kong.Oauth2Credential `json:"oauth2_credentials,omitempty" yaml:"oauth2_credentials,omitempty"`
 	ACLGroups     []*kong.ACLGroup         `json:"acls,omitempty" yaml:"acls,omitempty"`
 	MTLSAuths     []*kong.MTLSAuth         `json:"mtls_auth_credentials,omitempty" yaml:"mtls_auth_credentials,omitempty"`
+	Groups        []*kong.ConsumerGroup    `json:"groups,omitempty" yaml:"groups,omitempty"`
 }
 
 // sortKey is used for sorting.
@@ -502,6 +503,25 @@ func (c FConsumer) sortKey() string {
 	}
 	if c.ID != nil {
 		return *c.ID
+	}
+	return ""
+}
+
+// FConsumerGroupObject represents a Kong ConsumerGroup and its associated consumers and plugins.
+// +k8s:deepcopy-gen=true
+type FConsumerGroupObject struct {
+	kong.ConsumerGroup `yaml:",inline,omitempty"`
+	Consumers          []*kong.Consumer            `json:"consumers,omitempty" yaml:",omitempty"`
+	Plugins            []*kong.ConsumerGroupPlugin `json:"plugins,omitempty" yaml:",omitempty"`
+}
+
+// sortKey is used for sorting.
+func (u FConsumerGroupObject) sortKey() string {
+	if u.Name != nil {
+		return *u.Name
+	}
+	if u.ID != nil {
+		return *u.ID
 	}
 	return ""
 }
@@ -664,13 +684,14 @@ type Content struct {
 	Workspace     string   `json:"_workspace,omitempty" yaml:"_workspace,omitempty"`
 	Konnect       *Konnect `json:"_konnect,omitempty" yaml:"_konnect,omitempty"`
 
-	Services       []FService       `json:"services,omitempty" yaml:",omitempty"`
-	Routes         []FRoute         `json:"routes,omitempty" yaml:",omitempty"`
-	Consumers      []FConsumer      `json:"consumers,omitempty" yaml:",omitempty"`
-	Plugins        []FPlugin        `json:"plugins,omitempty" yaml:",omitempty"`
-	Upstreams      []FUpstream      `json:"upstreams,omitempty" yaml:",omitempty"`
-	Certificates   []FCertificate   `json:"certificates,omitempty" yaml:",omitempty"`
-	CACertificates []FCACertificate `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
+	Services       []FService             `json:"services,omitempty" yaml:",omitempty"`
+	Routes         []FRoute               `json:"routes,omitempty" yaml:",omitempty"`
+	Consumers      []FConsumer            `json:"consumers,omitempty" yaml:",omitempty"`
+	ConsumerGroups []FConsumerGroupObject `json:"consumer_groups,omitempty" yaml:",omitempty"`
+	Plugins        []FPlugin              `json:"plugins,omitempty" yaml:",omitempty"`
+	Upstreams      []FUpstream            `json:"upstreams,omitempty" yaml:",omitempty"`
+	Certificates   []FCertificate         `json:"certificates,omitempty" yaml:",omitempty"`
+	CACertificates []FCACertificate       `json:"ca_certificates,omitempty" yaml:"ca_certificates,omitempty"`
 
 	RBACRoles []FRBACRole `json:"rbac_roles,omitempty" yaml:"rbac_roles,omitempty"`
 

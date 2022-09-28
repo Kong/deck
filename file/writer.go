@@ -107,6 +107,11 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
+	err = populateConsumerGroups(kongState, file, config)
+	if err != nil {
+		return err
+	}
+
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
@@ -541,6 +546,10 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	if err != nil {
 		return err
 	}
+	consumerGroups, err := kongState.ConsumerGroups.GetAll()
+	if err != nil {
+		return err
+	}
 	for _, c := range consumers {
 		c := FConsumer{Consumer: c.Consumer}
 		plugins, err := kongState.Plugins.GetAllByConsumerID(*c.ID)
@@ -637,6 +646,24 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			c.MTLSAuths = append(c.MTLSAuths, &k.MTLSAuth)
 		}
+		// populate groups
+		for _, cg := range consumerGroups {
+			cg := *cg
+			_, err := kongState.ConsumerGroupConsumers.Get(*c.ID, *cg.ID)
+			if err != nil {
+				if err != state.ErrNotFound {
+					return err
+				}
+				continue
+			}
+			utils.ZeroOutID(&cg, cg.Name, config.WithID)
+			utils.ZeroOutTimestamps(&cg)
+			utils.MustRemoveTags(&cg.ConsumerGroup, config.SelectTags)
+			c.Groups = append(c.Groups, cg.DeepCopy())
+		}
+		sort.SliceStable(c.Plugins, func(i, j int) bool {
+			return compareOrder(c.Plugins[i], c.Plugins[j])
+		})
 		utils.ZeroOutID(&c, c.Username, config.WithID)
 		utils.ZeroOutTimestamps(&c)
 		utils.MustRemoveTags(&c.Consumer, config.SelectTags)
@@ -664,6 +691,40 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
 		return compareOrder(file.Consumers[i], file.Consumers[j])
+	})
+	return nil
+}
+
+func populateConsumerGroups(kongState *state.KongState, file *Content,
+	config WriteConfig,
+) error {
+	consumerGroups, err := kongState.ConsumerGroups.GetAll()
+	if err != nil {
+		return err
+	}
+	plugins, err := kongState.ConsumerGroupPlugins.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, cg := range consumerGroups {
+		group := FConsumerGroupObject{ConsumerGroup: cg.ConsumerGroup}
+		for _, plugin := range plugins {
+			if plugin.ID != nil && cg.ID != nil {
+				if *plugin.ConsumerGroup.ID == *cg.ID {
+					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
+					utils.ZeroOutID(plugin.ConsumerGroup, plugin.ConsumerGroup.Name, config.WithID)
+					utils.ZeroOutTimestamps(plugin.ConsumerGroupPlugin.ConsumerGroup)
+					utils.ZeroOutField(&plugin.ConsumerGroupPlugin, "ConsumerGroup")
+					group.Plugins = append(group.Plugins, &plugin.ConsumerGroupPlugin)
+				}
+			}
+		}
+		utils.ZeroOutID(&group, group.Name, config.WithID)
+		utils.ZeroOutTimestamps(&group)
+		file.ConsumerGroups = append(file.ConsumerGroups, group)
+	}
+	sort.SliceStable(file.ConsumerGroups, func(i, j int) bool {
+		return compareOrder(file.ConsumerGroups[i], file.ConsumerGroups[j])
 	})
 	return nil
 }

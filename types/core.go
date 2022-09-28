@@ -76,6 +76,12 @@ const (
 
 	// Consumer identifies a Consumer in Kong.
 	Consumer EntityType = "consumer"
+	// ConsumerGroup identifies a ConsumerGroup in Kong.
+	ConsumerGroup EntityType = "consumer-group"
+	// ConsumerGroupConsumer identifies a ConsumerGroupConsumer in Kong.
+	ConsumerGroupConsumer EntityType = "consumer-group-consumer"
+	// ConsumerGroupPlugin identifies a ConsumerGroupPlugin in Kong.
+	ConsumerGroupPlugin EntityType = "consumer-group-plugin"
 	// ACLGroup identifies a ACLGroup in Kong.
 	ACLGroup EntityType = "acl-group"
 	// BasicAuth identifies a BasicAuth in Kong.
@@ -117,6 +123,7 @@ var AllTypes = []EntityType{
 	Upstream, Target,
 
 	Consumer,
+	ConsumerGroup, ConsumerGroupConsumer, ConsumerGroupPlugin,
 	ACLGroup, BasicAuth, KeyAuth,
 	HMACAuth, JWTAuth, OAuth2Cred,
 	MTLSAuth,
@@ -220,6 +227,51 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 			},
 			differ: &consumerDiffer{
 				kind:         entityTypeToKind(Consumer),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case ConsumerGroup:
+		return entityImpl{
+			typ: ConsumerGroup,
+			crudActions: &consumerGroupCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &consumerGroupPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &consumerGroupDiffer{
+				kind:         entityTypeToKind(ConsumerGroup),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case ConsumerGroupConsumer:
+		return entityImpl{
+			typ: ConsumerGroupConsumer,
+			crudActions: &consumerGroupConsumerCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &consumerGroupConsumerPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &consumerGroupConsumerDiffer{
+				kind:         entityTypeToKind(ConsumerGroupConsumer),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case ConsumerGroupPlugin:
+		return entityImpl{
+			typ: ConsumerGroupPlugin,
+			crudActions: &consumerGroupPluginCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &consumerGroupPluginPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &consumerGroupPluginDiffer{
+				kind:         entityTypeToKind(ConsumerGroupPlugin),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},
