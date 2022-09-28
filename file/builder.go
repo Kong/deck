@@ -107,7 +107,7 @@ func (b *stateBuilder) consumerGroups() {
 			} else {
 				u.ID = kong.String(*ups.ID)
 			}
-			u.ConsumerGroup = ups.ConsumerGroup
+			// u.ConsumerGroup = ups.ConsumerGroup
 			// u.Consumers = """
 		}
 		utils.MustMergeTags(&u.ConsumerGroup, b.selectTags)

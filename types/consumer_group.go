@@ -25,17 +25,15 @@ func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroup {
 // Create creates a consumerGroup in Kong.
 // The arg should be of type crud.Event, containing the consumerGroup to be created,
 // else the function will panic.
-// It returns a the created *state.consumerGroup.
+// It returns the created *state.consumerGroup.
 func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
-	createdconsumerGroup, err := s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
+	createdConsumerGroup, err := s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
 	if err != nil {
 		return nil, err
 	}
-	return &state.ConsumerGroupObject{ConsumerGroupObject: kong.ConsumerGroupObject{
-		ConsumerGroup: createdconsumerGroup,
-	}}, nil
+	return &state.ConsumerGroup{ConsumerGroup: *createdConsumerGroup}, nil
 }
 
 // Delete deletes a consumerGroup in Kong.
