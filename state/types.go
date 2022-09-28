@@ -552,6 +552,96 @@ func forConsumerString(c *kong.Consumer) string {
 	return ""
 }
 
+// ConsumerGroupObject represents a ConsumerGroupObject in Kong.
+// It adds some helper methods along with Meta to the original Upstream object.
+type ConsumerGroupObject struct {
+	kong.ConsumerGroupObject `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (u1 *ConsumerGroupObject) Identifier() string {
+	if u1.ConsumerGroup != nil && u1.ConsumerGroup.Name != nil {
+		return *u1.ConsumerGroup.Name
+	}
+	return *u1.ConsumerGroup.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (u1 *ConsumerGroupObject) Console() string {
+	return u1.ConsumerGroup.FriendlyName()
+}
+
+// Equal returns true if u1 and u2 are equal.
+func (u1 *ConsumerGroupObject) Equal(u2 *ConsumerGroupObject) bool {
+	return u1.EqualWithOpts(u2, false, false)
+}
+
+// EqualWithOpts returns true if u1 and u2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (u1 *ConsumerGroupObject) EqualWithOpts(u2 *ConsumerGroupObject,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	u1Copy := u1.ConsumerGroup.DeepCopy()
+	u2Copy := u2.ConsumerGroup.DeepCopy()
+
+	sort.Slice(u1Copy.Tags, func(i, j int) bool { return *(u1Copy.Tags[i]) < *(u1Copy.Tags[j]) })
+	sort.Slice(u2Copy.Tags, func(i, j int) bool { return *(u2Copy.Tags[i]) < *(u2Copy.Tags[j]) })
+
+	if ignoreID {
+		u1Copy.ID = nil
+		u2Copy.ID = nil
+	}
+	return reflect.DeepEqual(u1Copy, u2Copy)
+}
+
+// ConsumerGroupObject represents a ConsumerGroupObject in Kong.
+// It adds some helper methods along with Meta to the original Upstream object.
+type ConsumerGroup struct {
+	kong.ConsumerGroup `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (u1 *ConsumerGroup) Identifier() string {
+	if u1.ConsumerGroup.Name != nil {
+		return *u1.ConsumerGroup.Name
+	}
+	return *u1.ConsumerGroup.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (u1 *ConsumerGroup) Console() string {
+	return u1.ConsumerGroup.FriendlyName()
+}
+
+// Equal returns true if u1 and u2 are equal.
+func (u1 *ConsumerGroup) Equal(u2 *ConsumerGroup) bool {
+	return u1.EqualWithOpts(u2, false, false)
+}
+
+// EqualWithOpts returns true if u1 and u2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (u1 *ConsumerGroup) EqualWithOpts(u2 *ConsumerGroup,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	u1Copy := u1.ConsumerGroup.DeepCopy()
+	u2Copy := u2.ConsumerGroup.DeepCopy()
+
+	sort.Slice(u1Copy.Tags, func(i, j int) bool { return *(u1Copy.Tags[i]) < *(u1Copy.Tags[j]) })
+	sort.Slice(u2Copy.Tags, func(i, j int) bool { return *(u2Copy.Tags[i]) < *(u2Copy.Tags[j]) })
+
+	if ignoreID {
+		u1Copy.ID = nil
+		u2Copy.ID = nil
+	}
+	return reflect.DeepEqual(u1Copy, u2Copy)
+}
+
 // KeyAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original KeyAuth object.
 type KeyAuth struct {

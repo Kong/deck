@@ -226,6 +226,15 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		state.Targets = targets
 		return nil
 	})
+
+	group.Go(func() error {
+		consumerGroups, err := GetAllConsumerGroups(ctx, client, config.SelectorTags)
+		if err != nil {
+			return fmt.Errorf("consumer_groups: %w", err)
+		}
+		state.ConsumerGroups = consumerGroups
+		return nil
+	})
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
@@ -490,6 +499,45 @@ func GetAllUpstreams(ctx context.Context,
 		opt = nextopt
 	}
 	return upstreams, nil
+}
+
+// GetAllConsumerGroups queries Kong for all the ConsumerGroups using client.
+func GetAllConsumerGroups(ctx context.Context,
+	client *kong.Client, tags []string,
+) ([]*kong.ConsumerGroupObject, error) {
+	var consumerGroupObjects []*kong.ConsumerGroupObject
+	opt := newOpt(tags)
+
+	for {
+		cgs, nextopt, err := client.ConsumerGroups.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
+		for _, cg := range cgs {
+			r, err := client.ConsumerGroupConsumers.ListAll(ctx, cg.Name)
+			if err != nil {
+				return nil, err
+			}
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+
+			group := &kong.ConsumerGroupObject{
+				ConsumerGroup: cg,
+				Consumers:     r.Consumers,
+			}
+			consumerGroupObjects = append(consumerGroupObjects, group)
+		}
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return consumerGroupObjects, nil
 }
 
 // GetAllTargets queries Kong for all the Targets of upstreams using client.

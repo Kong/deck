@@ -106,6 +106,7 @@ func (sc *Syncer) init() error {
 		types.Upstream, types.Target,
 
 		types.Consumer,
+		types.ConsumerGroup,
 		types.ACLGroup, types.BasicAuth, types.KeyAuth,
 		types.HMACAuth, types.JWTAuth, types.OAuth2Cred,
 		types.MTLSAuth,

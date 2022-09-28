@@ -6,6 +6,8 @@ replace github.com/imdario/mergo v0.3.12 => github.com/Kong/mergo v0.3.13
 
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
+replace github.com/kong/go-kong v0.32.0 => /Users/ggerbino/go/github.com/Kong/go-kong
+
 require (
 	github.com/Kong/gojsondiff v1.3.2
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2

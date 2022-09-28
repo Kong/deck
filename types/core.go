@@ -76,6 +76,8 @@ const (
 
 	// Consumer identifies a Consumer in Kong.
 	Consumer EntityType = "consumer"
+	// Consumer identifies a Consumer in Kong.
+	ConsumerGroup EntityType = "consumer-group"
 	// ACLGroup identifies a ACLGroup in Kong.
 	ACLGroup EntityType = "acl-group"
 	// BasicAuth identifies a BasicAuth in Kong.
@@ -215,6 +217,21 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 			},
 			differ: &consumerDiffer{
 				kind:         entityTypeToKind(Consumer),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case ConsumerGroup:
+		return entityImpl{
+			typ: ConsumerGroup,
+			crudActions: &consumerGroupCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &consumerGroupPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &consumerGroupDiffer{
+				kind:         entityTypeToKind(ConsumerGroup),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},

@@ -84,6 +84,12 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting consumer into state: %w", err)
 		}
 	}
+	for _, c := range raw.ConsumerGroups {
+		err := kongState.ConsumerGroups.Add(ConsumerGroup{ConsumerGroup: *c.ConsumerGroup})
+		if err != nil {
+			return fmt.Errorf("inserting consumer group into state: %w", err)
+		}
+	}
 	for _, cred := range raw.KeyAuths {
 		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {

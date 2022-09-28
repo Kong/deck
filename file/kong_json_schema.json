@@ -41,6 +41,13 @@
       },
       "type": "array"
     },
+    "consumer_groups": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FConsumerGroupObject"
+      },
+      "type": "array"
+    },
     "consumers": {
       "items": {
         "$schema": "http://json-schema.org/draft-04/schema#",
@@ -435,6 +442,30 @@
           ]
         }
       ]
+    },
+    "FConsumerGroupObject": {
+      "properties": {
+        "consumers": {
+          "items": {
+            "$ref": "#/definitions/Consumer"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "FDocument": {
       "properties": {

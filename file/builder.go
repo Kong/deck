@@ -76,6 +76,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.routes()
 	b.upstreams()
 	b.consumers()
+	b.consumerGroups()
 	b.plugins()
 	b.enterprise()
 
@@ -87,6 +88,35 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, b.err
 	}
 	return b.rawState, b.konnectRawState, nil
+}
+
+func (b *stateBuilder) consumerGroups() {
+	if b.err != nil {
+		return
+	}
+
+	for _, u := range b.targetContent.ConsumerGroups {
+		u := u
+		if utils.Empty(u.ID) {
+			ups, err := b.currentState.ConsumerGroups.Get(*u.Name)
+			if err == state.ErrNotFound {
+				u.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				u.ID = kong.String(*ups.ID)
+			}
+			u.ConsumerGroup = ups.ConsumerGroup
+			// u.Consumers = """
+		}
+		utils.MustMergeTags(&u.ConsumerGroup, b.selectTags)
+
+		cgo := kong.ConsumerGroupObject{
+			ConsumerGroup: &u.ConsumerGroup,
+		}
+		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
+	}
 }
 
 func (b *stateBuilder) certificates() {

@@ -37,6 +37,7 @@ var dependencyOrder = [][]types.EntityType{
 		types.Consumer,
 	},
 	{
+		types.ConsumerGroup,
 		types.RBACEndpointPermission,
 		types.SNI,
 		types.Service,

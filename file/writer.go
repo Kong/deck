@@ -102,6 +102,11 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
+	err = populateConsumerGroups(kongState, file, config)
+	if err != nil {
+		return err
+	}
+
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
@@ -631,6 +636,31 @@ func populateConsumers(kongState *state.KongState, file *Content,
 	}
 	sort.SliceStable(file.Consumers, func(i, j int) bool {
 		return compareOrder(file.Consumers[i], file.Consumers[j])
+	})
+	return nil
+}
+
+func populateConsumerGroups(kongState *state.KongState, file *Content,
+	config WriteConfig,
+) error {
+	consumerGroups, err := kongState.ConsumerGroups.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, cg := range consumerGroups {
+		group := FConsumerGroupObject{ConsumerGroup: cg.ConsumerGroup}
+		utils.ZeroOutID(&group, group.Name, config.WithID)
+		utils.ZeroOutTimestamps(&group)
+		utils.MustRemoveTags(&group.ConsumerGroup, config.SelectTags)
+		// for _, c := range cg.Consumers {
+		// 	utils.ZeroOutID(c, c.Username, config.WithID)
+		// 	utils.ZeroOutTimestamps(c)
+		// 	group.Consumers = append(group.Consumers, c)
+		// }
+		file.ConsumerGroups = append(file.ConsumerGroups, group)
+	}
+	sort.SliceStable(file.ConsumerGroups, func(i, j int) bool {
+		return compareOrder(file.ConsumerGroups[i], file.ConsumerGroups[j])
 	})
 	return nil
 }
