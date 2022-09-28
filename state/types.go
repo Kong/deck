@@ -552,6 +552,195 @@ func forConsumerString(c *kong.Consumer) string {
 	return ""
 }
 
+// ConsumerGroupObject represents a ConsumerGroupObject in Kong.
+// It adds some helper methods along with Meta to the original Upstream object.
+type ConsumerGroupObject struct {
+	kong.ConsumerGroupObject `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (c1 *ConsumerGroupObject) Identifier() string {
+	if c1.ConsumerGroup != nil && c1.ConsumerGroup.Name != nil {
+		return *c1.ConsumerGroup.Name
+	}
+	return *c1.ConsumerGroup.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *ConsumerGroupObject) Console() string {
+	return c1.ConsumerGroup.FriendlyName()
+}
+
+// Equal returns true if u1 and u2 are equal.
+func (c1 *ConsumerGroupObject) Equal(c2 *ConsumerGroupObject) bool {
+	return c1.EqualWithOpts(c2, false, false)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *ConsumerGroupObject) EqualWithOpts(c2 *ConsumerGroupObject,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	c1Copy := c1.ConsumerGroup.DeepCopy()
+	c2Copy := c2.ConsumerGroup.DeepCopy()
+
+	if ignoreID {
+		c1Copy.ID = nil
+		c2Copy.ID = nil
+	}
+
+	if ignoreTS {
+		c1Copy.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copy, c2Copy)
+}
+
+// ConsumerGroup represents a ConsumerGroup in Kong.
+// It adds some helper methods along with Meta to the original ConsumerGroup object.
+type ConsumerGroup struct {
+	kong.ConsumerGroup `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (c1 *ConsumerGroup) Identifier() string {
+	if c1.ConsumerGroup.Name != nil {
+		return *c1.ConsumerGroup.Name
+	}
+	return *c1.ConsumerGroup.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *ConsumerGroup) Console() string {
+	return c1.ConsumerGroup.FriendlyName()
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *ConsumerGroup) Equal(c2 *ConsumerGroup) bool {
+	return c1.EqualWithOpts(c2, false, false)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *ConsumerGroup) EqualWithOpts(c2 *ConsumerGroup,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	u1Copy := c1.ConsumerGroup.DeepCopy()
+	u2Copy := c2.ConsumerGroup.DeepCopy()
+
+	if ignoreID {
+		u1Copy.ID = nil
+		u2Copy.ID = nil
+	}
+	if ignoreTS {
+		u1Copy.CreatedAt = nil
+		u2Copy.CreatedAt = nil
+	}
+	return reflect.DeepEqual(u1Copy, u2Copy)
+}
+
+// ConsumerGroupConsumer represents a ConsumerGroupConsumer in Kong.
+// It adds some helper methods along with Meta to the original ConsumerGroupConsumer object.
+type ConsumerGroupConsumer struct {
+	kong.ConsumerGroupConsumer `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key Ursername or ID.
+func (c1 *ConsumerGroupConsumer) Identifier() string {
+	if c1.Consumer.Username != nil {
+		return *c1.Consumer.Username
+	}
+	return *c1.Consumer.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *ConsumerGroupConsumer) Console() string {
+	return *c1.ConsumerGroupConsumer.Consumer.Username
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *ConsumerGroupConsumer) Equal(c2 *ConsumerGroupConsumer) bool {
+	return c1.EqualWithOpts(c2, false, false)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *ConsumerGroupConsumer) EqualWithOpts(c2 *ConsumerGroupConsumer,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	c1Copy := c1.ConsumerGroupConsumer.DeepCopy()
+	c2Copy := c2.ConsumerGroupConsumer.DeepCopy()
+	if ignoreID {
+		c1Copy.Consumer.ID = nil
+		c2Copy.Consumer.ID = nil
+	}
+	if ignoreTS {
+		c1Copy.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+		c1Copy.Consumer.CreatedAt = nil
+		c2Copy.Consumer.CreatedAt = nil
+		c2Copy.ConsumerGroup.CreatedAt = nil
+		c1Copy.ConsumerGroup.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copy, c2Copy)
+}
+
+// ConsumerGroupPlugin represents a ConsumerGroupConsumer in Kong.
+// It adds some helper methods along with Meta to the original ConsumerGroupConsumer object.
+type ConsumerGroupPlugin struct {
+	kong.ConsumerGroupPlugin `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (c1 *ConsumerGroupPlugin) Identifier() string {
+	if c1.Name != nil {
+		return *c1.Name
+	}
+	return *c1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (c1 *ConsumerGroupPlugin) Console() string {
+	return *c1.Name
+}
+
+// Equal returns true if c1 and c2 are equal.
+func (c1 *ConsumerGroupPlugin) Equal(c2 *ConsumerGroupPlugin) bool {
+	return c1.EqualWithOpts(c2, false, false)
+}
+
+// EqualWithOpts returns true if c1 and c2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (c1 *ConsumerGroupPlugin) EqualWithOpts(c2 *ConsumerGroupPlugin,
+	ignoreID bool, ignoreTS bool,
+) bool {
+	c1Copy := c1.DeepCopy()
+	c2Copy := c2.DeepCopy()
+	if ignoreID {
+		c1Copy.ID = nil
+		c2Copy.ID = nil
+	}
+	if ignoreTS {
+		c1Copy.CreatedAt = nil
+		c2Copy.CreatedAt = nil
+		c1Copy.ConsumerGroup.CreatedAt = nil
+		c2Copy.ConsumerGroup.CreatedAt = nil
+	}
+	return reflect.DeepEqual(c1Copy, c2Copy)
+}
+
 // KeyAuth represents a key-auth credential in Kong.
 // It adds some helper methods along with Meta to the original KeyAuth object.
 type KeyAuth struct {

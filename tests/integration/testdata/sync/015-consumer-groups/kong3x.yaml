@@ -1,0 +1,14 @@
+_format_version: "3.0"
+consumer_groups:
+- name: silver
+- name: gold
+consumers:
+- username: foo
+  groups:
+    - name: gold
+- username: bar
+  groups:
+    - name: silver
+- username: baz
+  groups:
+    - name: silver

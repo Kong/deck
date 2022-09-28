@@ -84,6 +84,42 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting consumer into state: %w", err)
 		}
 	}
+	for _, cg := range raw.ConsumerGroups {
+		err := kongState.ConsumerGroups.Add(ConsumerGroup{ConsumerGroup: *cg.ConsumerGroup})
+		if err != nil {
+			return fmt.Errorf("inserting consumer group into state: %w", err)
+		}
+
+		for _, c := range cg.Consumers {
+			utils.ZeroOutTimestamps(cg.ConsumerGroup)
+			err := kongState.ConsumerGroupConsumers.Add(
+				ConsumerGroupConsumer{
+					ConsumerGroupConsumer: kong.ConsumerGroupConsumer{
+						Consumer: c, ConsumerGroup: cg.ConsumerGroup,
+					},
+				},
+			)
+			if err != nil {
+				return fmt.Errorf("inserting consumer group consumer into state: %w", err)
+			}
+		}
+
+		for _, p := range cg.Plugins {
+			err := kongState.ConsumerGroupPlugins.Add(
+				ConsumerGroupPlugin{
+					ConsumerGroupPlugin: kong.ConsumerGroupPlugin{
+						ID:            p.ID,
+						Name:          p.Name,
+						Config:        p.Config,
+						ConsumerGroup: cg.ConsumerGroup,
+					},
+				},
+			)
+			if err != nil {
+				return fmt.Errorf("inserting consumer group plugin into state: %w", err)
+			}
+		}
+	}
 	for _, cred := range raw.KeyAuths {
 		ok, c, err := ensureConsumer(kongState, *cred.Consumer.ID)
 		if err != nil {

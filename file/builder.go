@@ -77,6 +77,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 	b.services()
 	b.routes()
 	b.upstreams()
+	b.consumerGroups()
 	b.consumers()
 	b.plugins()
 	b.enterprise()
@@ -89,6 +90,50 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, b.err
 	}
 	return b.rawState, b.konnectRawState, nil
+}
+
+func (b *stateBuilder) consumerGroups() {
+	if b.err != nil {
+		return
+	}
+
+	for _, cg := range b.targetContent.ConsumerGroups {
+		cg := cg
+		if utils.Empty(cg.ID) {
+			current, err := b.currentState.ConsumerGroups.Get(*cg.Name)
+			if err == state.ErrNotFound {
+				cg.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				cg.ID = kong.String(*current.ID)
+			}
+		}
+		utils.MustMergeTags(&cg.ConsumerGroup, b.selectTags)
+
+		cgo := kong.ConsumerGroupObject{
+			ConsumerGroup: &cg.ConsumerGroup,
+		}
+
+		for _, plugin := range cg.Plugins {
+			if utils.Empty(plugin.ID) {
+				current, err := b.currentState.ConsumerGroupPlugins.Get(
+					*plugin.Name, *cg.ConsumerGroup.ID,
+				)
+				if err == state.ErrNotFound {
+					plugin.ID = uuid()
+				} else if err != nil {
+					b.err = err
+					return
+				} else {
+					plugin.ID = kong.String(*current.ID)
+				}
+			}
+			cgo.Plugins = append(cgo.Plugins, plugin)
+		}
+		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
+	}
 }
 
 func (b *stateBuilder) certificates() {
@@ -215,6 +260,12 @@ func (b *stateBuilder) consumers() {
 			return
 		}
 
+		// ingest consumer into consumer group
+		if err := b.ingestIntoConsumerGroup(c); err != nil {
+			b.err = err
+			return
+		}
+
 		// plugins for the Consumer
 		var plugins []FPlugin
 		for _, p := range c.Plugins {
@@ -294,6 +345,37 @@ func (b *stateBuilder) consumers() {
 
 		b.ingestMTLSAuths(mtlsAuths)
 	}
+}
+
+func (b *stateBuilder) ingestIntoConsumerGroup(consumer FConsumer) error {
+	for _, group := range consumer.Groups {
+		found := false
+		for _, cg := range b.rawState.ConsumerGroups {
+			if group.ID != nil && *cg.ConsumerGroup.ID == *group.ID {
+				cg.Consumers = append(cg.Consumers, &consumer.Consumer)
+				found = true
+				break
+
+			}
+			if group.Name != nil && *cg.ConsumerGroup.Name == *group.Name {
+				cg.Consumers = append(cg.Consumers, &consumer.Consumer)
+				found = true
+				break
+			}
+		}
+		if !found {
+			var groupIdentifier string
+			if group.Name != nil {
+				groupIdentifier = *group.Name
+			} else {
+				groupIdentifier = *group.ID
+			}
+			return fmt.Errorf(
+				"consumer-group '%s' not found for consumer '%s'", groupIdentifier, *consumer.ID,
+			)
+		}
+	}
+	return nil
 }
 
 func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
