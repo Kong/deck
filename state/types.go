@@ -584,15 +584,29 @@ func (u1 *ConsumerGroupObject) Equal(u2 *ConsumerGroupObject) bool {
 func (u1 *ConsumerGroupObject) EqualWithOpts(u2 *ConsumerGroupObject,
 	ignoreID bool, ignoreTS bool,
 ) bool {
-	u1Copy := u1.ConsumerGroup.DeepCopy()
-	u2Copy := u2.ConsumerGroup.DeepCopy()
+	u1Copy := u1.ConsumerGroupObject.DeepCopy()
+	u2Copy := u2.ConsumerGroupObject.DeepCopy()
 
-	sort.Slice(u1Copy.Tags, func(i, j int) bool { return *(u1Copy.Tags[i]) < *(u1Copy.Tags[j]) })
-	sort.Slice(u2Copy.Tags, func(i, j int) bool { return *(u2Copy.Tags[i]) < *(u2Copy.Tags[j]) })
+	sort.Slice(
+		u1Copy.ConsumerGroup.Tags,
+		func(i, j int) bool { return *(u1Copy.ConsumerGroup.Tags[i]) < *(u1Copy.ConsumerGroup.Tags[j]) },
+	)
+	sort.Slice(
+		u2Copy.ConsumerGroup.Tags,
+		func(i, j int) bool { return *(u2Copy.ConsumerGroup.Tags[i]) < *(u2Copy.ConsumerGroup.Tags[j]) },
+	)
 
 	if ignoreID {
-		u1Copy.ID = nil
-		u2Copy.ID = nil
+		u1Copy.ConsumerGroup.ID = nil
+		u2Copy.ConsumerGroup.ID = nil
+	}
+	if ignoreTS {
+		for _, consumer := range u1Copy.Consumers {
+			consumer.CreatedAt = nil
+		}
+		for _, consumer := range u2Copy.Consumers {
+			consumer.CreatedAt = nil
+		}
 	}
 	return reflect.DeepEqual(u1Copy, u2Copy)
 }

@@ -652,11 +652,11 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 		utils.ZeroOutID(&group, group.Name, config.WithID)
 		utils.ZeroOutTimestamps(&group)
 		utils.MustRemoveTags(&group.ConsumerGroup, config.SelectTags)
-		// for _, c := range cg.Consumers {
-		// 	utils.ZeroOutID(c, c.Username, config.WithID)
-		// 	utils.ZeroOutTimestamps(c)
-		// 	group.Consumers = append(group.Consumers, c)
-		// }
+		for _, c := range cg.Consumers {
+			utils.ZeroOutID(c, c.Username, config.WithID)
+			utils.ZeroOutTimestamps(c)
+			group.Consumers = append(group.Consumers, c)
+		}
 		file.ConsumerGroups = append(file.ConsumerGroups, group)
 	}
 	sort.SliceStable(file.ConsumerGroups, func(i, j int) bool {

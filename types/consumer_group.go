@@ -7,6 +7,7 @@ import (
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
+	"github.com/samber/lo"
 )
 
 // consumerGroupCRUD implements crud.Actions interface.
@@ -17,7 +18,7 @@ type consumerGroupCRUD struct {
 func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroupObject {
 	consumerGroup, ok := arg.Obj.(*state.ConsumerGroupObject)
 	if !ok {
-		panic("unexpected type, expected *state.ConsumerGroup")
+		panic("unexpected type, expected *state.ConsumerGroupObject")
 	}
 	return consumerGroup
 }
@@ -28,14 +29,33 @@ func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroupObject {
 // It returns the created *state.consumerGroup.
 func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
+	fmt.Println("HEHEHEHEH")
 	consumerGroup := consumerGroupFromStruct(event)
 	createdConsumerGroup, err := s.client.ConsumerGroups.Create(ctx, consumerGroup.ConsumerGroup)
 	if err != nil {
 		return nil, err
 	}
+	existingConsumers := []string{}
+	cg, err := s.client.ConsumerGroups.Get(ctx, createdConsumerGroup.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, consumer := range cg.Consumers {
+		existingConsumers = append(existingConsumers, *consumer.Username)
+	}
+	for _, consumer := range consumerGroup.Consumers {
+		if !lo.Contains(existingConsumers, *consumer.Username) {
+			_, err := s.client.ConsumerGroupConsumers.Create(
+				ctx, createdConsumerGroup.ID, consumer.Username)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	return &state.ConsumerGroupObject{
 		ConsumerGroupObject: kong.ConsumerGroupObject{
 			ConsumerGroup: createdConsumerGroup,
+			Consumers:     consumerGroup.Consumers,
 		},
 	}, nil
 }
@@ -61,14 +81,46 @@ func (s *consumerGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.A
 func (s *consumerGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
-
+	fmt.Println("HEHEHEHEH1")
 	updatedconsumerGroup, err := s.client.ConsumerGroups.Create(ctx, consumerGroup.ConsumerGroup)
 	if err != nil {
 		return nil, err
 	}
+	existingConsumers := []string{}
+	proposedConsumers := []string{}
+	cg, err := s.client.ConsumerGroups.Get(ctx, updatedconsumerGroup.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, consumer := range cg.Consumers {
+		existingConsumers = append(existingConsumers, *consumer.Username)
+	}
+	for _, consumer := range consumerGroup.Consumers {
+		proposedConsumers = append(proposedConsumers, *consumer.Username)
+	}
+	for _, consumer := range consumerGroup.Consumers {
+		if !lo.Contains(existingConsumers, *consumer.Username) {
+			_, err := s.client.ConsumerGroupConsumers.Create(
+				ctx, updatedconsumerGroup.ID, consumer.Username)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	for _, consumer := range existingConsumers {
+		if !lo.Contains(proposedConsumers, consumer) {
+			err := s.client.ConsumerGroupConsumers.Delete(
+				ctx, updatedconsumerGroup.ID, &consumer)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	return &state.ConsumerGroupObject{
 		ConsumerGroupObject: kong.ConsumerGroupObject{
 			ConsumerGroup: updatedconsumerGroup,
+			Consumers:     consumerGroup.Consumers,
 		},
 	}, nil
 }
@@ -159,7 +211,7 @@ func (d *consumerGroupDiffer) createUpdateconsumerGroup(consumerGroup *state.Con
 	}
 
 	// found, check if update needed
-	if !currentconsumerGroup.EqualWithOpts(consumerGroupCopy, false, true) {
+	if !currentconsumerGroup.EqualWithOpts(consumerGroupCopy, true, true) {
 		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "consumer-group",

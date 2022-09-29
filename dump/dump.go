@@ -525,12 +525,10 @@ func GetAllConsumerGroups(ctx context.Context,
 			if err := ctx.Err(); err != nil {
 				return nil, err
 			}
-
 			group := &kong.ConsumerGroupObject{
 				ConsumerGroup: cg,
 				Consumers:     r.Consumers,
 			}
-			fmt.Println("CONSUMERS ", group.Consumers)
 			consumerGroupObjects = append(consumerGroupObjects, group)
 		}
 		if nextopt == nil {

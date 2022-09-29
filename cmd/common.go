@@ -264,7 +264,6 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 	if err != nil {
 		return nil, err
 	}
-
 	currentState, err := state.Get(rawState)
 	if err != nil {
 		return nil, err

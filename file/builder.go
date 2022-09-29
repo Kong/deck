@@ -107,13 +107,32 @@ func (b *stateBuilder) consumerGroups() {
 			} else {
 				u.ID = kong.String(*ups.ConsumerGroup.ID)
 			}
-			// u.ConsumerGroup = ups.ConsumerGroup
-			// u.Consumers = """
+
 		}
 		utils.MustMergeTags(&u.ConsumerGroup, b.selectTags)
 
 		cgo := kong.ConsumerGroupObject{
 			ConsumerGroup: &u.ConsumerGroup,
+			// Consumers:     u.Consumers,
+		}
+		for _, consumer := range u.Consumers {
+			if utils.Empty(consumer.ID) {
+				ups, err := b.currentState.Consumers.Get(*consumer.Username)
+				if err == state.ErrNotFound {
+					consumer.ID = uuid()
+				} else if err != nil {
+					b.err = err
+					return
+				} else {
+					consumer.ID = kong.String(*ups.ID)
+				}
+
+			}
+			// cgo.Consumers = append(cgo.Consumers, &kong.Consumer{
+			// 	ID:       consumer.ID,
+			// 	Username: consumer.Username,
+			// })
+			cgo.Consumers = append(cgo.Consumers, consumer)
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
 	}

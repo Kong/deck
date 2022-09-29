@@ -89,6 +89,7 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			ConsumerGroupObject{
 				ConsumerGroupObject: kong.ConsumerGroupObject{
 					ConsumerGroup: c.ConsumerGroup,
+					Consumers:     c.Consumers,
 				},
 			})
 		if err != nil {
