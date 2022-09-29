@@ -92,7 +92,8 @@ func getconsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroupObject, erro
 			panic(unexpectedType)
 		}
 		return &ConsumerGroupObject{
-			ConsumerGroupObject: *consumerGroup.DeepCopy()}, nil
+			ConsumerGroupObject: *consumerGroup.DeepCopy(),
+		}, nil
 	}
 	return nil, ErrNotFound
 }
@@ -187,7 +188,8 @@ func (k *ConsumerGroupsCollection) GetAll() ([]*ConsumerGroupObject, error) {
 			panic(unexpectedType)
 		}
 		res = append(res, &ConsumerGroupObject{
-			ConsumerGroupObject: *u.DeepCopy()})
+			ConsumerGroupObject: *u.DeepCopy(),
+		})
 	}
 	txn.Commit()
 	return res, nil

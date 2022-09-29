@@ -29,7 +29,6 @@ func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroupObject {
 // It returns the created *state.consumerGroup.
 func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
-	fmt.Println("HEHEHEHEH")
 	consumerGroup := consumerGroupFromStruct(event)
 	createdConsumerGroup, err := s.client.ConsumerGroups.Create(ctx, consumerGroup.ConsumerGroup)
 	if err != nil {
@@ -81,7 +80,6 @@ func (s *consumerGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.A
 func (s *consumerGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
-	fmt.Println("HEHEHEHEH1")
 	updatedconsumerGroup, err := s.client.ConsumerGroups.Create(ctx, consumerGroup.ConsumerGroup)
 	if err != nil {
 		return nil, err
@@ -111,7 +109,7 @@ func (s *consumerGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.A
 	for _, consumer := range existingConsumers {
 		if !lo.Contains(proposedConsumers, consumer) {
 			err := s.client.ConsumerGroupConsumers.Delete(
-				ctx, updatedconsumerGroup.ID, &consumer)
+				ctx, updatedconsumerGroup.ID, kong.String(consumer))
 			if err != nil {
 				return nil, err
 			}
@@ -211,7 +209,9 @@ func (d *consumerGroupDiffer) createUpdateconsumerGroup(consumerGroup *state.Con
 	}
 
 	// found, check if update needed
-	if !currentconsumerGroup.EqualWithOpts(consumerGroupCopy, true, true) {
+	zeroOutConsumerTimestamps(consumerGroupCopy)
+	zeroOutConsumerTimestamps(currentconsumerGroup)
+	if !currentconsumerGroup.EqualWithOpts(consumerGroupCopy, false, true) {
 		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   "consumer-group",
@@ -220,4 +220,10 @@ func (d *consumerGroupDiffer) createUpdateconsumerGroup(consumerGroup *state.Con
 		}, nil
 	}
 	return nil, nil
+}
+
+func zeroOutConsumerTimestamps(obj *state.ConsumerGroupObject) {
+	for _, consumer := range obj.Consumers {
+		consumer.CreatedAt = nil
+	}
 }

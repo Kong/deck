@@ -2,7 +2,6 @@ package types
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -159,7 +158,6 @@ type consumerGroupPostAction struct {
 }
 
 func (crud *consumerGroupPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	fmt.Println("YOYO ", args[0])
 	return nil, crud.currentState.ConsumerGroups.Add(*args[0].(*state.ConsumerGroupObject))
 }
 

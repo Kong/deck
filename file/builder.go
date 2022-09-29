@@ -126,12 +126,7 @@ func (b *stateBuilder) consumerGroups() {
 				} else {
 					consumer.ID = kong.String(*ups.ID)
 				}
-
 			}
-			// cgo.Consumers = append(cgo.Consumers, &kong.Consumer{
-			// 	ID:       consumer.ID,
-			// 	Username: consumer.Username,
-			// })
 			cgo.Consumers = append(cgo.Consumers, consumer)
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)

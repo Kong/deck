@@ -418,6 +418,44 @@ var (
 			ID:       kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
 		},
 	}
+
+	consumerGroupsConsumers = []*kong.Consumer{
+		{
+			Username: kong.String("foo"),
+		},
+		{
+			Username: kong.String("bar"),
+		},
+		{
+			Username: kong.String("baz"),
+		},
+	}
+
+	consumerGroups = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+				{
+					Username: kong.String("baz"),
+				},
+			},
+		},
+	}
 )
 
 // test scope:
@@ -1814,6 +1852,72 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 
 			err := sync(tc.kongFile)
 			assert.Equal(t, err, tc.expectedError)
+		})
+	}
+}
+
+// test scope:
+//   - 2.7+
+func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/012-consumer-groups/kong.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenEnterprise(t, ">=2.7.0 <3.0.0", kong.RequiredFeatures{})
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_ConsumerGroupsFrom30(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/012-consumer-groups/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroups,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			kong.RunWhenEnterprise(t, ">=3.0.0", kong.RequiredFeatures{})
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, tc.expectedState, nil)
 		})
 	}
 }

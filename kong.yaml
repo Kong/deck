@@ -1,7 +1,16 @@
 _format_version: "3.0"
 consumer_groups:
-- name: foo1
-- name: foo2
+- consumers:
+  - username: test
+  - username: new-test
+  name: foo1
+- consumers:
+  - username: test
+  name: foo2
 - name: foo3
 consumers:
+- username: new-test
 - username: test
+services:
+- name: svc1
+  host: mockbin.org
