@@ -324,6 +324,17 @@ func (in *FConsumerGroupObject) DeepCopyInto(out *FConsumerGroupObject) {
 			}
 		}
 	}
+	if in.Plugins != nil {
+		in, out := &in.Plugins, &out.Plugins
+		*out = make([]*kong.ConsumerGroupPlugin, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(kong.ConsumerGroupPlugin)
+				(*in).DeepCopyInto(*out)
+			}
+		}
+	}
 	return
 }
 

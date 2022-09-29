@@ -587,15 +587,6 @@ func (u1 *ConsumerGroupObject) EqualWithOpts(u2 *ConsumerGroupObject,
 	u1Copy := u1.ConsumerGroupObject.DeepCopy()
 	u2Copy := u2.ConsumerGroupObject.DeepCopy()
 
-	sort.Slice(
-		u1Copy.ConsumerGroup.Tags,
-		func(i, j int) bool { return *(u1Copy.ConsumerGroup.Tags[i]) < *(u1Copy.ConsumerGroup.Tags[j]) },
-	)
-	sort.Slice(
-		u2Copy.ConsumerGroup.Tags,
-		func(i, j int) bool { return *(u2Copy.ConsumerGroup.Tags[i]) < *(u2Copy.ConsumerGroup.Tags[j]) },
-	)
-
 	if ignoreID {
 		u1Copy.ConsumerGroup.ID = nil
 		u2Copy.ConsumerGroup.ID = nil
@@ -645,9 +636,6 @@ func (u1 *ConsumerGroup) EqualWithOpts(u2 *ConsumerGroup,
 ) bool {
 	u1Copy := u1.ConsumerGroup.DeepCopy()
 	u2Copy := u2.ConsumerGroup.DeepCopy()
-
-	sort.Slice(u1Copy.Tags, func(i, j int) bool { return *(u1Copy.Tags[i]) < *(u1Copy.Tags[j]) })
-	sort.Slice(u2Copy.Tags, func(i, j int) bool { return *(u2Copy.Tags[i]) < *(u2Copy.Tags[j]) })
 
 	if ignoreID {
 		u1Copy.ID = nil

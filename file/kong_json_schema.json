@@ -285,6 +285,50 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "ConsumerGroup": {
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ConsumerGroupPlugin": {
+      "properties": {
+        "config": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "consumer_group": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/ConsumerGroup"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "FCACertificate": {
       "required": [
         "cert"
@@ -451,11 +495,21 @@
           },
           "type": "array"
         },
+        "created_at": {
+          "type": "integer"
+        },
         "id": {
           "type": "string"
         },
         "name": {
           "type": "string"
+        },
+        "plugins": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ConsumerGroupPlugin"
+          },
+          "type": "array"
         },
         "tags": {
           "items": {

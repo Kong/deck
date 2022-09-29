@@ -434,16 +434,6 @@ var (
 	consumerGroups = []*kong.ConsumerGroupObject{
 		{
 			ConsumerGroup: &kong.ConsumerGroup{
-				Name: kong.String("gold"),
-			},
-			Consumers: []*kong.Consumer{
-				{
-					Username: kong.String("foo"),
-				},
-			},
-		},
-		{
-			ConsumerGroup: &kong.ConsumerGroup{
 				Name: kong.String("silver"),
 			},
 			Consumers: []*kong.Consumer{
@@ -452,6 +442,16 @@ var (
 				},
 				{
 					Username: kong.String("baz"),
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
 				},
 			},
 		},

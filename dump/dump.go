@@ -518,7 +518,7 @@ func GetAllConsumerGroups(ctx context.Context,
 		}
 
 		for _, cg := range cgs {
-			r, err := client.ConsumerGroupConsumers.ListAll(ctx, cg.Name)
+			r, err := client.ConsumerGroups.Get(ctx, cg.Name)
 			if err != nil {
 				return nil, err
 			}
@@ -526,8 +526,9 @@ func GetAllConsumerGroups(ctx context.Context,
 				return nil, err
 			}
 			group := &kong.ConsumerGroupObject{
-				ConsumerGroup: cg,
+				ConsumerGroup: r.ConsumerGroup,
 				Consumers:     r.Consumers,
+				Plugins:       r.Plugins,
 			}
 			consumerGroupObjects = append(consumerGroupObjects, group)
 		}

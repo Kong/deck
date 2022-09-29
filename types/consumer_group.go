@@ -51,6 +51,17 @@ func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.A
 			}
 		}
 	}
+
+	for _, plugin := range consumerGroup.Plugins {
+		config := map[string]kong.Configuration{
+			"config": plugin.Config,
+		}
+		_, err := s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(
+			ctx, createdConsumerGroup.ID, config)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &state.ConsumerGroupObject{
 		ConsumerGroupObject: kong.ConsumerGroupObject{
 			ConsumerGroup: createdConsumerGroup,
@@ -113,6 +124,17 @@ func (s *consumerGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.A
 			if err != nil {
 				return nil, err
 			}
+		}
+	}
+
+	for _, plugin := range consumerGroup.Plugins {
+		config := map[string]kong.Configuration{
+			"config": plugin.Config,
+		}
+		_, err := s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(
+			ctx, updatedconsumerGroup.ID, config)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return &state.ConsumerGroupObject{
@@ -226,4 +248,10 @@ func zeroOutConsumerTimestamps(obj *state.ConsumerGroupObject) {
 	for _, consumer := range obj.Consumers {
 		consumer.CreatedAt = nil
 	}
+	for _, plugin := range obj.Plugins {
+		plugin.ID = nil
+		plugin.CreatedAt = nil
+		plugin.ConsumerGroup = nil
+	}
+	obj.ConsumerGroup.CreatedAt = nil
 }

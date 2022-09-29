@@ -98,14 +98,14 @@ func (b *stateBuilder) consumerGroups() {
 	for _, u := range b.targetContent.ConsumerGroups {
 		u := u
 		if utils.Empty(u.ID) {
-			ups, err := b.currentState.ConsumerGroups.Get(*u.Name)
+			consumerGroups, err := b.currentState.ConsumerGroups.Get(*u.Name)
 			if err == state.ErrNotFound {
 				u.ID = uuid()
 			} else if err != nil {
 				b.err = err
 				return
 			} else {
-				u.ID = kong.String(*ups.ConsumerGroup.ID)
+				u.ID = kong.String(*consumerGroups.ConsumerGroup.ID)
 			}
 
 		}
@@ -113,7 +113,7 @@ func (b *stateBuilder) consumerGroups() {
 
 		cgo := kong.ConsumerGroupObject{
 			ConsumerGroup: &u.ConsumerGroup,
-			// Consumers:     u.Consumers,
+			Plugins:       u.Plugins,
 		}
 		for _, consumer := range u.Consumers {
 			if utils.Empty(consumer.ID) {

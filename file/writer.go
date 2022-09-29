@@ -651,11 +651,16 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 		group := FConsumerGroupObject{ConsumerGroup: *cg.ConsumerGroup}
 		utils.ZeroOutID(&group, group.Name, config.WithID)
 		utils.ZeroOutTimestamps(&group)
-		utils.MustRemoveTags(&group.ConsumerGroup, config.SelectTags)
 		for _, c := range cg.Consumers {
 			utils.ZeroOutID(c, c.Username, config.WithID)
 			utils.ZeroOutTimestamps(c)
 			group.Consumers = append(group.Consumers, c)
+		}
+		for _, p := range cg.Plugins {
+			utils.ZeroOutID(p, p.Name, config.WithID)
+			utils.ZeroOutTimestamps(p)
+			p.ConsumerGroup = nil
+			group.Plugins = append(group.Plugins, p)
 		}
 		file.ConsumerGroups = append(file.ConsumerGroups, group)
 	}

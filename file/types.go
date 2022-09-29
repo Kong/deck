@@ -508,7 +508,8 @@ func (c FConsumer) sortKey() string {
 // +k8s:deepcopy-gen=true
 type FConsumerGroupObject struct {
 	kong.ConsumerGroup `yaml:",inline,omitempty"`
-	Consumers          []*kong.Consumer `json:"consumers,omitempty" yaml:",omitempty"`
+	Consumers          []*kong.Consumer            `json:"consumers,omitempty" yaml:",omitempty"`
+	Plugins            []*kong.ConsumerGroupPlugin `json:"plugins,omitempty" yaml:",omitempty"`
 }
 
 // sortKey is used for sorting.
