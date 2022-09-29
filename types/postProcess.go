@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -158,15 +159,16 @@ type consumerGroupPostAction struct {
 }
 
 func (crud *consumerGroupPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.ConsumerGroups.Add(*args[0].(*state.ConsumerGroup))
+	fmt.Println("YOYO ", args[0])
+	return nil, crud.currentState.ConsumerGroups.Add(*args[0].(*state.ConsumerGroupObject))
 }
 
 func (crud *consumerGroupPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.ConsumerGroups.Delete(*((args[0].(*state.ConsumerGroup)).ID))
+	return nil, crud.currentState.ConsumerGroups.Delete(*(args[0].(*state.ConsumerGroupObject)))
 }
 
 func (crud *consumerGroupPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.ConsumerGroups.Update(*args[0].(*state.ConsumerGroup))
+	return nil, crud.currentState.ConsumerGroups.Update(*args[0].(*state.ConsumerGroupObject))
 }
 
 type keyAuthPostAction struct {

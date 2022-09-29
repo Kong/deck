@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
+	"github.com/kong/deck/state/indexers"
 	"github.com/kong/deck/utils"
 )
 
@@ -15,14 +16,28 @@ var consumerGroupTableSchema = &memdb.TableSchema{
 	Name: consumerGroupTableName,
 	Indexes: map[string]*memdb.IndexSchema{
 		"id": {
-			Name:    "id",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "ID"},
+			Name:   "id",
+			Unique: true,
+			Indexer: &indexers.SubFieldIndexer{
+				Fields: []indexers.Field{
+					{
+						Struct: "ConsumerGroup",
+						Sub:    "ID",
+					},
+				},
+			},
 		},
 		"name": {
-			Name:    "name",
-			Unique:  true,
-			Indexer: &memdb.StringFieldIndex{Field: "Name"},
+			Name:   "name",
+			Unique: true,
+			Indexer: &indexers.SubFieldIndexer{
+				Fields: []indexers.Field{
+					{
+						Struct: "ConsumerGroup",
+						Sub:    "Name",
+					},
+				},
+			},
 		},
 		all: allIndex,
 	},
@@ -33,18 +48,18 @@ type ConsumerGroupsCollection collection
 
 // Add adds an consumerGroup to the collection.
 // consumerGroup.ID should not be nil else an error is thrown.
-func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroup) error {
+func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroupObject) error {
 	// TODO abstract this check in the go-memdb library itself
-	if utils.Empty(consumerGroup.ID) {
+	if utils.Empty(consumerGroup.ConsumerGroup.ID) {
 		return errIDRequired
 	}
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
 	var searchBy []string
-	searchBy = append(searchBy, *consumerGroup.ID)
-	if !utils.Empty(consumerGroup.Name) {
-		searchBy = append(searchBy, *consumerGroup.Name)
+	searchBy = append(searchBy, *consumerGroup.ConsumerGroup.ID)
+	if !utils.Empty(consumerGroup.ConsumerGroup.Name) {
+		searchBy = append(searchBy, *consumerGroup.ConsumerGroup.Name)
 	}
 	_, err := getconsumerGroup(txn, searchBy...)
 	if err == nil {
@@ -61,7 +76,7 @@ func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroup) error {
 	return nil
 }
 
-func getconsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroup, error) {
+func getconsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroupObject, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, consumerGroupTableName,
 			[]string{"name", "id"}, id)
@@ -72,17 +87,18 @@ func getconsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroup, error) {
 			return nil, err
 		}
 
-		consumerGroup, ok := res.(*ConsumerGroup)
+		consumerGroup, ok := res.(*ConsumerGroupObject)
 		if !ok {
 			panic(unexpectedType)
 		}
-		return &ConsumerGroup{ConsumerGroup: *consumerGroup.DeepCopy()}, nil
+		return &ConsumerGroupObject{
+			ConsumerGroupObject: *consumerGroup.DeepCopy()}, nil
 	}
 	return nil, ErrNotFound
 }
 
 // Get gets an consumerGroup by name or ID.
-func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroup, error) {
+func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroupObject, error) {
 	if nameOrID == "" {
 		return nil, errIDRequired
 	}
@@ -100,16 +116,16 @@ func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroup, error) 
 }
 
 // Update udpates an existing consumerGroup.
-func (k *ConsumerGroupsCollection) Update(consumerGroup ConsumerGroup) error {
+func (k *ConsumerGroupsCollection) Update(consumerGroup ConsumerGroupObject) error {
 	// TODO abstract this in the go-memdb library itself
-	if utils.Empty(consumerGroup.ID) {
+	if utils.Empty(consumerGroup.ConsumerGroup.ID) {
 		return errIDRequired
 	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteconsumerGroup(txn, *consumerGroup.ID)
+	err := deleteconsumerGroup(txn, *consumerGroup.ConsumerGroup.ID)
 	if err != nil {
 		return err
 	}
@@ -137,15 +153,15 @@ func deleteconsumerGroup(txn *memdb.Txn, nameOrID string) error {
 }
 
 // Delete deletes an consumerGroup by it's name or ID.
-func (k *ConsumerGroupsCollection) Delete(nameOrID string) error {
-	if nameOrID == "" {
+func (k *ConsumerGroupsCollection) Delete(consumerGroup ConsumerGroupObject) error {
+	if utils.Empty(consumerGroup.ConsumerGroup.ID) && utils.Empty(consumerGroup.ConsumerGroup.Name) {
 		return errIDRequired
 	}
 
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteconsumerGroup(txn, nameOrID)
+	err := deleteconsumerGroup(txn, *consumerGroup.ConsumerGroup.ID)
 	if err != nil {
 		return err
 	}
@@ -155,7 +171,7 @@ func (k *ConsumerGroupsCollection) Delete(nameOrID string) error {
 }
 
 // GetAll gets all consumerGroups in the state.
-func (k *ConsumerGroupsCollection) GetAll() ([]*ConsumerGroup, error) {
+func (k *ConsumerGroupsCollection) GetAll() ([]*ConsumerGroupObject, error) {
 	txn := k.db.Txn(false)
 	defer txn.Abort()
 
@@ -164,13 +180,14 @@ func (k *ConsumerGroupsCollection) GetAll() ([]*ConsumerGroup, error) {
 		return nil, err
 	}
 
-	var res []*ConsumerGroup
+	var res []*ConsumerGroupObject
 	for el := iter.Next(); el != nil; el = iter.Next() {
-		u, ok := el.(*ConsumerGroup)
+		u, ok := el.(*ConsumerGroupObject)
 		if !ok {
 			panic(unexpectedType)
 		}
-		res = append(res, &ConsumerGroup{ConsumerGroup: *u.DeepCopy()})
+		res = append(res, &ConsumerGroupObject{
+			ConsumerGroupObject: *u.DeepCopy()})
 	}
 	txn.Commit()
 	return res, nil

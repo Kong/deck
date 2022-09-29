@@ -105,7 +105,7 @@ func (b *stateBuilder) consumerGroups() {
 				b.err = err
 				return
 			} else {
-				u.ID = kong.String(*ups.ID)
+				u.ID = kong.String(*ups.ConsumerGroup.ID)
 			}
 			// u.ConsumerGroup = ups.ConsumerGroup
 			// u.Consumers = """
