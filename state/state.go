@@ -23,6 +23,7 @@ type KongState struct {
 	CACertificates *CACertificatesCollection
 	Plugins        *PluginsCollection
 	Consumers      *ConsumersCollection
+	Vaults         *VaultsCollection
 
 	KeyAuths                *KeyAuthsCollection
 	HMACAuths               *HMACAuthsCollection
@@ -63,6 +64,7 @@ func NewKongState() (*KongState, error) {
 			consumerTableName:               consumerTableSchema,
 			rbacRoleTableName:               rbacRoleTableSchema,
 			rbacEndpointPermissionTableName: rbacEndpointPermissionTableSchema,
+			vaultTableName:                  vaultTableSchema,
 
 			keyAuthTemp.TableName():     keyAuthTemp.Schema(),
 			hmacAuthTemp.TableName():    hmacAuthTemp.Schema(),
@@ -100,6 +102,7 @@ func NewKongState() (*KongState, error) {
 	state.Consumers = (*ConsumersCollection)(&state.common)
 	state.RBACRoles = (*RBACRolesCollection)(&state.common)
 	state.RBACEndpointPermissions = (*RBACEndpointPermissionsCollection)(&state.common)
+	state.Vaults = (*VaultsCollection)(&state.common)
 
 	state.KeyAuths = newKeyAuthsCollection(state.common)
 	state.HMACAuths = newHMACAuthsCollection(state.common)

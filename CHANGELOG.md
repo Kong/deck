@@ -50,6 +50,11 @@
 
 > Release date: TBD
 
+### Added
+
+- Add support to Kong Vaults.
+  [#761](https://github.com/Kong/deck/pull/761)
+
 ### Fixes
 
 - Handle correctly encoded whitespaces into services' `url`

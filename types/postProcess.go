@@ -346,3 +346,19 @@ func (crud documentPostAction) Delete(ctx context.Context, args ...crud.Arg) (cr
 func (crud documentPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.Documents.Update(*args[0].(*state.Document))
 }
+
+type vaultPostAction struct {
+	currentState *state.KongState
+}
+
+func (crud vaultPostAction) Create(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Vaults.Add(*args[0].(*state.Vault))
+}
+
+func (crud vaultPostAction) Delete(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Vaults.Delete(*((args[0].(*state.Vault)).ID))
+}
+
+func (crud vaultPostAction) Update(ctx context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Vaults.Update(*args[0].(*state.Vault))
+}

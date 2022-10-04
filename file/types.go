@@ -636,6 +636,23 @@ func (s FServicePackage) sortKey() string {
 	return ""
 }
 
+// FVault represents a vault in Kong.
+// +k8s:deepcopy-gen=true
+type FVault struct {
+	kong.Vault `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (c FVault) sortKey() string {
+	if c.Prefix != nil {
+		return *c.Prefix
+	}
+	if c.ID != nil {
+		return *c.ID
+	}
+	return ""
+}
+
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
@@ -660,4 +677,6 @@ type Content struct {
 	PluginConfigs map[string]kong.Configuration `json:"_plugin_configs,omitempty" yaml:"_plugin_configs,omitempty"`
 
 	ServicePackages []FServicePackage `json:"service_packages,omitempty" yaml:"service_packages,omitempty"`
+
+	Vaults []FVault `json:"vaults,omitempty" yaml:"vaults,omitempty"`
 }

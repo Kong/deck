@@ -41,6 +41,8 @@ type KongRawState struct {
 	Consumers      []*kong.Consumer
 	CustomEntities []*custom.Entity
 
+	Vaults []*kong.Vault
+
 	KeyAuths    []*kong.KeyAuth
 	HMACAuths   []*kong.HMACAuth
 	JWTAuths    []*kong.JWTAuth

@@ -39,6 +39,10 @@ func sortSlices(x, y interface{}) bool {
 		yEntity := y.(*kong.Route)
 		xName = *xEntity.Name
 		yName = *yEntity.Name
+	case *kong.Vault:
+		yEntity := y.(*kong.Vault)
+		xName = *xEntity.Prefix
+		yName = *yEntity.Prefix
 	case *kong.Plugin:
 		yEntity := y.(*kong.Plugin)
 		xName = *xEntity.Name
@@ -89,6 +93,9 @@ func testKongState(t *testing.T, client *kong.Client,
 		cmpopts.IgnoreFields(kong.RBACEndpointPermission{}, "Role", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.RBACRole{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.Consumer{}, "CreatedAt"),
+		cmpopts.IgnoreFields(kong.Vault{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Certificate{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.SNI{}, "ID", "CreatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
