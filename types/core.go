@@ -102,6 +102,9 @@ const (
 	ServiceVersion EntityType = "service-version"
 	// Document identifies a Document in Konnect.
 	Document EntityType = "document"
+
+	// Vault identifies a Vault in Kong.
+	Vault EntityType = "vault"
 )
 
 // AllTypes represents all types defined in the
@@ -121,6 +124,8 @@ var AllTypes = []EntityType{
 	RBACRole, RBACEndpointPermission,
 
 	ServicePackage, ServiceVersion, Document,
+
+	Vault,
 }
 
 func entityTypeToKind(t EntityType) crud.Kind {
@@ -440,6 +445,21 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 			},
 			differ: &oauth2CredDiffer{
 				kind:         entityTypeToKind(OAuth2Cred),
+				currentState: opts.CurrentState,
+				targetState:  opts.TargetState,
+			},
+		}, nil
+	case Vault:
+		return entityImpl{
+			typ: Vault,
+			crudActions: &vaultCRUD{
+				client: opts.KongClient,
+			},
+			postProcessActions: &vaultPostAction{
+				currentState: opts.CurrentState,
+			},
+			differ: &vaultDiffer{
+				kind:         entityTypeToKind(Vault),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
 			},

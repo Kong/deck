@@ -264,6 +264,12 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting rbac endpoint permissions into state: %w", err)
 		}
 	}
+	for _, v := range raw.Vaults {
+		err := kongState.Vaults.Add(Vault{Vault: *v})
+		if err != nil {
+			return fmt.Errorf("inserting vault into state: %w", err)
+		}
+	}
 	return nil
 }
 

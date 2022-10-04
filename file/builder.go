@@ -631,6 +631,31 @@ func (b *stateBuilder) routes() {
 
 func (b *stateBuilder) enterprise() {
 	b.rbacRoles()
+	b.vaults()
+}
+
+func (b *stateBuilder) vaults() {
+	if b.err != nil {
+		return
+	}
+
+	for _, v := range b.targetContent.Vaults {
+		v := v
+		if utils.Empty(v.ID) {
+			vault, err := b.currentState.Vaults.Get(*v.Prefix)
+			if err == state.ErrNotFound {
+				v.ID = uuid()
+			} else if err != nil {
+				b.err = err
+				return
+			} else {
+				v.ID = kong.String(*vault.ID)
+			}
+		}
+		utils.MustMergeTags(&v.Vault, b.selectTags)
+
+		b.rawState.Vaults = append(b.rawState.Vaults, &v.Vault)
+	}
 }
 
 func (b *stateBuilder) rbacRoles() {

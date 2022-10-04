@@ -1,0 +1,24 @@
+_format_version: "3.0"
+vaults:
+- config:
+    prefix: MY_SECRET_
+  description: ENV vault for secrets
+  name: env
+  prefix: my-env-vault
+services:
+- id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  path: /status/200
+  routes:
+  - name: r1
+    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+certificates:
+- id: 13c562a1-191c-4464-9b18-e5222b46035b
+  cert: "{vault://my-env-vault/cert}"
+  key: "{vault://my-env-vault/key}"
+  snis:
+  - name: localhost

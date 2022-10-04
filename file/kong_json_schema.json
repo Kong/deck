@@ -87,6 +87,13 @@
         "$ref": "#/definitions/FUpstream"
       },
       "type": "array"
+    },
+    "vaults": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FVault"
+      },
+      "type": "array"
     }
   },
   "additionalProperties": false,
@@ -945,6 +952,40 @@
             "$ref": "#/definitions/FTarget"
           },
           "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FVault": {
+      "properties": {
+        "config": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "created_at": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updated_at": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,

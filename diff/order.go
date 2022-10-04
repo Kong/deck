@@ -35,6 +35,7 @@ var dependencyOrder = [][]types.EntityType{
 		types.Certificate,
 		types.CACertificate,
 		types.Consumer,
+		types.Vault,
 	},
 	{
 		types.RBACEndpointPermission,

@@ -102,6 +102,11 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 		return err
 	}
 
+	err = populateVaults(kongState, file, config)
+	if err != nil {
+		return err
+	}
+
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
@@ -447,6 +452,26 @@ func populateUpstreams(kongState *state.KongState, file *Content,
 	}
 	sort.SliceStable(file.Upstreams, func(i, j int) bool {
 		return compareOrder(file.Upstreams[i], file.Upstreams[j])
+	})
+	return nil
+}
+
+func populateVaults(kongState *state.KongState, file *Content,
+	config WriteConfig,
+) error {
+	vaults, err := kongState.Vaults.GetAll()
+	if err != nil {
+		return err
+	}
+	for _, v := range vaults {
+		v := FVault{Vault: v.Vault}
+		utils.ZeroOutID(&v, v.Prefix, config.WithID)
+		utils.ZeroOutTimestamps(&v)
+		utils.MustRemoveTags(&v.Vault, config.SelectTags)
+		file.Vaults = append(file.Vaults, v)
+	}
+	sort.SliceStable(file.Vaults, func(i, j int) bool {
+		return compareOrder(file.Vaults[i], file.Vaults[j])
 	})
 	return nil
 }

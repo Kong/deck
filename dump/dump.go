@@ -226,6 +226,15 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		state.Targets = targets
 		return nil
 	})
+
+	group.Go(func() error {
+		vaults, err := GetAllVaults(ctx, client, config.SelectorTags)
+		if err != nil {
+			return fmt.Errorf("vaults: %w", err)
+		}
+		state.Vaults = vaults
+		return nil
+	})
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
@@ -519,6 +528,34 @@ func GetAllTargets(ctx context.Context, client *kong.Client,
 	}
 
 	return targets, nil
+}
+
+// GetAllVaults queries Kong for all the Vaults using client.
+func GetAllVaults(
+	ctx context.Context, client *kong.Client, tags []string,
+) ([]*kong.Vault, error) {
+	var vaults []*kong.Vault
+	opt := newOpt(tags)
+
+	for {
+		s, nextopt, err := client.Vaults.List(ctx, opt)
+		if kong.IsNotFoundErr(err) {
+			return vaults, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		vaults = append(vaults, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+
+	return vaults, nil
 }
 
 // GetAllKeyAuths queries Kong for all key-auth credentials using client.

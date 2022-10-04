@@ -1230,3 +1230,54 @@ func (b1 *MTLSAuth) GetConsumer() string {
 	}
 	return *b1.Consumer.ID
 }
+
+// Vault represents a vault in Kong.
+// It adds some helper methods along with Meta to the original Vault object.
+type Vault struct {
+	kong.Vault `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (v1 *Vault) Identifier() string {
+	if v1.Name != nil {
+		return *v1.Name
+	}
+	return *v1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (v1 *Vault) Console() string {
+	return v1.FriendlyName()
+}
+
+// Equal returns true if v1 and v2 are equal.
+// TODO add compare array without position
+func (v1 *Vault) Equal(v2 *Vault) bool {
+	return v1.EqualWithOpts(v2, false, false)
+}
+
+// EqualWithOpts returns true if v1 and v2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (v1 *Vault) EqualWithOpts(v2 *Vault, ignoreID, ignoreTS bool) bool {
+	v1Copy := v1.Vault.DeepCopy()
+	v2Copy := v2.Vault.DeepCopy()
+
+	sort.Slice(v1Copy.Tags, func(i, j int) bool { return *(v1Copy.Tags[i]) < *(v1Copy.Tags[j]) })
+	sort.Slice(v2Copy.Tags, func(i, j int) bool { return *(v2Copy.Tags[i]) < *(v2Copy.Tags[j]) })
+
+	if ignoreID {
+		v1Copy.ID = nil
+		v2Copy.ID = nil
+	}
+	if ignoreTS {
+		v1Copy.CreatedAt = nil
+		v2Copy.CreatedAt = nil
+
+		v1Copy.UpdatedAt = nil
+		v2Copy.UpdatedAt = nil
+	}
+	return reflect.DeepEqual(v1Copy, v2Copy)
+}
