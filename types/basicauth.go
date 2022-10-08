@@ -3,9 +3,7 @@ package types
 import (
 	"context"
 	"fmt"
-	"sync"
 
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
@@ -93,19 +91,8 @@ func (s *basicAuthCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, 
 
 type basicAuthDiffer struct {
 	kind crud.Kind
-	once sync.Once
 
 	currentState, targetState *state.KongState
-}
-
-func (d *basicAuthDiffer) warnBasicAuth() {
-	const (
-		basicAuthPasswordWarning = "Warning: import/export of basic-auth" +
-			"credentials using decK doesn't work due to hashing of passwords in Kong."
-	)
-	d.once.Do(func() {
-		cprint.UpdatePrintln(basicAuthPasswordWarning)
-	})
 }
 
 func (d *basicAuthDiffer) Deletes(handler func(crud.Event) error) error {
@@ -130,7 +117,6 @@ func (d *basicAuthDiffer) Deletes(handler func(crud.Event) error) error {
 }
 
 func (d *basicAuthDiffer) deleteBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
-	d.warnBasicAuth()
 	_, err := d.targetState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {
 		return &crud.Event{
@@ -168,7 +154,6 @@ func (d *basicAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error
 }
 
 func (d *basicAuthDiffer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
-	d.warnBasicAuth()
 	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
 	currentBasicAuth, err := d.currentState.BasicAuths.Get(*basicAuth.ID)
 	if err == state.ErrNotFound {

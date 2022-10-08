@@ -1,6 +1,8 @@
 package state
 
 import (
+	"crypto/sha1" //nolint:gosec
+	"encoding/hex"
 	"fmt"
 	"reflect"
 	"sort"
@@ -826,6 +828,13 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 	sort.Slice(b1Copy.Tags, func(i, j int) bool { return *(b1Copy.Tags[i]) < *(b1Copy.Tags[j]) })
 	sort.Slice(b2Copy.Tags, func(i, j int) bool { return *(b2Copy.Tags[i]) < *(b2Copy.Tags[j]) })
 
+	hsha1 := sha1.Sum([]byte(*b2Copy.Password + *b2Copy.Consumer.ID)) //#nosec G401
+	hashedPwd := hex.EncodeToString(hsha1[:])
+	if *b1Copy.Password == hashedPwd {
+		b1Copy.Password = nil
+		b2Copy.Password = nil
+	}
+
 	if ignoreID {
 		b1Copy.ID = nil
 		b2Copy.ID = nil
@@ -833,10 +842,6 @@ func (b1 *BasicAuth) EqualWithOpts(b2 *BasicAuth, ignoreID,
 	if ignoreTS {
 		b1Copy.CreatedAt = nil
 		b2Copy.CreatedAt = nil
-	}
-	if ignorePassword {
-		b1Copy.Password = nil
-		b2Copy.Password = nil
 	}
 	if ignoreForeign {
 		b1Copy.Consumer = nil
