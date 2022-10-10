@@ -57,6 +57,8 @@
 
 ### Fixes
 
+- Add `-w` shorthand flag support to `sync`.
+  [#765](https://github.com/Kong/deck/pull/765)
 - Handle correctly encoded whitespaces into services' `url`
   [#755](https://github.com/Kong/deck/pull/755)
 
