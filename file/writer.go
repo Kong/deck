@@ -320,6 +320,7 @@ func fetchService(id string, kongState *state.KongState, config WriteConfig) (*F
 	})
 	utils.ZeroOutID(&s, s.Name, config.WithID)
 	utils.ZeroOutTimestamps(&s)
+	utils.MustRemoveTags(&s, config.SelectTags)
 	return &s, nil
 }
 
@@ -567,6 +568,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		for _, k := range keyAuths {
 			utils.ZeroOutID(k, k.Key, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			k.Consumer = nil
 			c.KeyAuths = append(c.KeyAuths, &k.KeyAuth)
 		}
@@ -578,6 +580,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			utils.ZeroOutID(k, k.Username, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			c.HMACAuths = append(c.HMACAuths, &k.HMACAuth)
 		}
 		jwtSecrets, err := kongState.JWTAuths.GetAllByConsumerID(*c.ID)
@@ -588,6 +591,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			utils.ZeroOutID(k, k.Key, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			c.JWTAuths = append(c.JWTAuths, &k.JWTAuth)
 		}
 		basicAuths, err := kongState.BasicAuths.GetAllByConsumerID(*c.ID)
@@ -598,6 +602,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			utils.ZeroOutID(k, k.Username, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			c.BasicAuths = append(c.BasicAuths, &k.BasicAuth)
 		}
 		oauth2Creds, err := kongState.Oauth2Creds.GetAllByConsumerID(*c.ID)
@@ -608,6 +613,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			utils.ZeroOutID(k, k.ClientID, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			c.Oauth2Creds = append(c.Oauth2Creds, &k.Oauth2Credential)
 		}
 		aclGroups, err := kongState.ACLGroups.GetAllByConsumerID(*c.ID)
@@ -618,6 +624,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			k.Consumer = nil
 			utils.ZeroOutID(k, k.Group, config.WithID)
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			c.ACLGroups = append(c.ACLGroups, &k.ACLGroup)
 		}
 		mtlsAuths, err := kongState.MTLSAuths.GetAllByConsumerID(*c.ID)
@@ -626,6 +633,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 		}
 		for _, k := range mtlsAuths {
 			utils.ZeroOutTimestamps(k)
+			utils.MustRemoveTags(k, config.SelectTags)
 			k.Consumer = nil
 			c.MTLSAuths = append(c.MTLSAuths, &k.MTLSAuth)
 		}
