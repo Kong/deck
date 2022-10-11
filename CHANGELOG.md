@@ -60,6 +60,9 @@
 
 ### Fixes
 
+- Remove selected tags information from entities level when
+  using `dump`.
+  [#766](https://github.com/Kong/deck/pull/766)
 - Use `kong.yaml` as default value with `convert` subcommand
   when no `--output-file` is provided.
   [#775](https://github.com/Kong/deck/pull/775)

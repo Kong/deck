@@ -3,13 +3,14 @@ package integration
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
-	"github.com/kong/deck/dump"
+	deckDump "github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
@@ -110,11 +111,11 @@ func testKongState(t *testing.T, client *kong.Client,
 ) {
 	// Get entities from Kong
 	ctx := context.Background()
-	dumpConfig := dump.Config{}
+	dumpConfig := deckDump.Config{}
 	if expectedState.RBACEndpointPermissions != nil {
 		dumpConfig.RBACResourcesOnly = true
 	}
-	kongState, err := dump.Get(ctx, client, dumpConfig)
+	kongState, err := deckDump.Get(ctx, client, dumpConfig)
 	if err != nil {
 		t.Errorf(err.Error())
 	}
@@ -155,6 +156,14 @@ func reset(t *testing.T, opts ...string) {
 	}
 }
 
+func readFile(filepath string) (string, error) {
+	content, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
+}
+
 func setup(t *testing.T) func(t *testing.T) {
 	// disable analytics for integration tests
 	os.Setenv("DECK_ANALYTICS", "off")
@@ -181,4 +190,26 @@ func diff(kongFile string, opts ...string) error {
 	}
 	deckCmd.SetArgs(args)
 	return deckCmd.ExecuteContext(context.Background())
+}
+
+func dump(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"dump"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := ioutil.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return string(out), cmdErr
 }
