@@ -27,8 +27,9 @@ const (
 )
 
 var (
-	dumpConfig dump.Config
-	assumeYes  bool
+	dumpConfig   dump.Config
+	assumeYes    bool
+	noMaskValues bool
 )
 
 type mode int
@@ -81,7 +82,7 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, noMaskValues bool,
+	delay int, workspace string,
 ) error {
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -225,7 +226,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, kongClient, noMaskValues)
+	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, kongClient)
 	if err != nil {
 		return err
 	}
@@ -273,19 +274,20 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
-	dry bool, parallelism int, delay int, client *kong.Client, noMaskValues bool,
+	dry bool, parallelism int, delay int, client *kong.Client,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
 		KongClient:    client,
 		StageDelaySec: delay,
+		NoMaskValues:  noMaskValues,
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry, noMaskValues)
+	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

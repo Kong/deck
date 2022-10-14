@@ -123,7 +123,7 @@ func GetKongClientForKonnectMode(
 	})
 }
 
-func resetKonnectV2(ctx context.Context, resetNoMaskDeckEnvVarsValue bool) error {
+func resetKonnectV2(ctx context.Context) error {
 	client, err := GetKongClientForKonnectMode(ctx, konnectConfig)
 	if err != nil {
 		return err
@@ -136,7 +136,7 @@ func resetKonnectV2(ctx context.Context, resetNoMaskDeckEnvVarsValue bool) error
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, resetNoMaskDeckEnvVarsValue)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client)
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func dumpKonnectV2(ctx context.Context) error {
 }
 
 func syncKonnect(ctx context.Context,
-	filenames []string, dry bool, parallelism int, noMaskValues bool,
+	filenames []string, dry bool, parallelism int,
 ) error {
 	httpClient := utils.HTTPClient()
 
@@ -244,12 +244,13 @@ func syncKonnect(ctx context.Context,
 		TargetState:   targetState,
 		KongClient:    kongClient,
 		KonnectClient: konnectClient,
+		NoMaskValues:  noMaskValues,
 	})
 	if err != nil {
 		return err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry, noMaskValues)
+	stats, errs := s.Solve(ctx, parallelism, dry)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {
