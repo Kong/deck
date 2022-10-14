@@ -55,6 +55,8 @@ type Syncer struct {
 	konnectClient *konnect.Client
 
 	entityDiffers map[types.EntityType]types.Differ
+
+	noMaskValues bool
 }
 
 type SyncerOpts struct {
@@ -66,6 +68,8 @@ type SyncerOpts struct {
 
 	SilenceWarnings bool
 	StageDelaySec   int
+
+	NoMaskValues bool
 }
 
 // NewSyncer constructs a Syncer.
@@ -79,6 +83,8 @@ func NewSyncer(opts SyncerOpts) (*Syncer, error) {
 
 		silenceWarnings: opts.SilenceWarnings,
 		stageDelaySec:   opts.StageDelaySec,
+
+		noMaskValues: opts.NoMaskValues,
 	}
 
 	err := s.init()
@@ -349,7 +355,7 @@ func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string,
 }
 
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, noMaskValues bool) (Stats, []error) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -373,19 +379,19 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, noMaskVa
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			diffString, err := generateDiffString(e, false, noMaskValues)
+			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
 			cprint.CreatePrintln("creating", e.Kind, c.Console(), diffString)
 		case crud.Update:
-			diffString, err := generateDiffString(e, false, noMaskValues)
+			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
 			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			diffString, err := generateDiffString(e, true, noMaskValues)
+			diffString, err := generateDiffString(e, true, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
