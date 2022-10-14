@@ -39,7 +39,7 @@ to get Kong's state in sync with the input state.`,
 		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
 			"This flag can be specified multiple times for multiple files.\n"+
 			"Use `-` to read from stdin.")
-	syncCmd.Flags().StringVar(&syncWorkspace, "workspace", "",
+	syncCmd.Flags().StringVarP(&syncWorkspace, "workspace", "w", "",
 		"Sync configuration to a specific workspace "+
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
