@@ -51,6 +51,10 @@ type Syncer struct {
 	silenceWarnings bool
 	stageDelaySec   int
 
+	createPrintln func(a ...interface{})
+	updatePrintln func(a ...interface{})
+	deletePrintln func(a ...interface{})
+
 	kongClient    *kong.Client
 	konnectClient *konnect.Client
 
@@ -70,6 +74,10 @@ type SyncerOpts struct {
 	StageDelaySec   int
 
 	NoMaskValues bool
+
+	CreatePrintln func(a ...interface{})
+	UpdatePrintln func(a ...interface{})
+	DeletePrintln func(a ...interface{})
 }
 
 // NewSyncer constructs a Syncer.
@@ -85,6 +93,20 @@ func NewSyncer(opts SyncerOpts) (*Syncer, error) {
 		stageDelaySec:   opts.StageDelaySec,
 
 		noMaskValues: opts.NoMaskValues,
+
+		createPrintln: opts.CreatePrintln,
+		updatePrintln: opts.UpdatePrintln,
+		deletePrintln: opts.DeletePrintln,
+	}
+
+	if s.createPrintln == nil {
+		s.createPrintln = cprint.CreatePrintln
+	}
+	if s.updatePrintln == nil {
+		s.updatePrintln = cprint.UpdatePrintln
+	}
+	if s.deletePrintln == nil {
+		s.deletePrintln = cprint.DeletePrintln
 	}
 
 	err := s.init()
@@ -383,19 +405,19 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 			if err != nil {
 				return nil, err
 			}
-			cprint.CreatePrintln("creating", e.Kind, c.Console(), diffString)
+			sc.createPrintln("creating", e.Kind, c.Console(), diffString)
 		case crud.Update:
 			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
-			cprint.UpdatePrintln("updating", e.Kind, c.Console(), diffString)
+			sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
 			diffString, err := generateDiffString(e, true, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
-			cprint.DeletePrintln("deleting", e.Kind, c.Console(), diffString)
+			sc.deletePrintln("deleting", e.Kind, c.Console(), diffString)
 		default:
 			panic("unknown operation " + e.Op.String())
 		}
