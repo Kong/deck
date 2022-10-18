@@ -15,6 +15,7 @@ var (
 	convertCmdDestinationFormat string
 	convertCmdInputFile         string
 	convertCmdOutputFile        string
+	convertCmdAssumeYes         bool
 )
 
 // newConvertCmd represents the convert command
@@ -37,7 +38,9 @@ can be converted into a 'konnect' configuration file.`,
 			}
 
 			if convertCmdInputFile != "" {
-				if yes, err := utils.ConfirmFileOverwrite(convertCmdOutputFile, "", false); err != nil {
+				if yes, err := utils.ConfirmFileOverwrite(
+					convertCmdOutputFile, "", convertCmdAssumeYes,
+				); err != nil {
 					return err
 				} else if !yes {
 					return nil
@@ -82,6 +85,8 @@ can be converted into a 'konnect' configuration file.`,
 		"configuration file to be converted. Use `-` to read from stdin.")
 	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "kong.yaml",
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
+	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
+		false, "assume `yes` to prompts and run non-interactively.")
 	return convertCmd
 }
 
