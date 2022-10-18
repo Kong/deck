@@ -52,11 +52,17 @@
 
 ### Added
 
+- Add `--yes` flag to `convert` subcommand to bypass
+  user confirmation and run non-interactively.
+  [#775](https://github.com/Kong/deck/pull/775)
 - Add support to Kong Vaults.
   [#761](https://github.com/Kong/deck/pull/761)
 
 ### Fixes
 
+- Use `kong.yaml` as default value with `convert` subcommand
+  when no `--output-file` is provided.
+  [#775](https://github.com/Kong/deck/pull/775)
 - Add `-w` shorthand flag support to `sync`.
   [#765](https://github.com/Kong/deck/pull/765)
 - Handle correctly encoded whitespaces into services' `url`
