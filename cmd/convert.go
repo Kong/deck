@@ -80,7 +80,7 @@ can be converted into a 'konnect' configuration file.`,
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
 	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
 		"configuration file to be converted. Use `-` to read from stdin.")
-	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "",
+	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "kong.yaml",
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	return convertCmd
 }
