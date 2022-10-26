@@ -2220,7 +2220,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			runWhen(t, "kong", ">=2.8.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2265,7 +2265,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=2.8.0 <3.0.0")
+			runWhen(t, "kong", ">=2.8.0 <3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2310,7 +2310,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2355,7 +2355,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			kong.RunWhenKong(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
