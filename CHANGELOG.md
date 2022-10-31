@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [Unreleased](#Unreleased)
+- [v1.16.0](#v1160)
 - [v1.15.1](#v1151)
 - [v1.15.0](#v1150)
 - [v1.14.0](#v1140)
@@ -46,12 +46,14 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [Unreleased]
+## [v1.16.0]
 
-> Release date: TBD
+> Release date: 2022/11/09
 
 ### Added
 
+- Mask DECK_ environment variable values at diff outputs.
+  [#463](https://github.com/Kong/deck/pull/463)
 - Add `--yes` flag to `convert` subcommand to bypass
   user confirmation and run non-interactively.
   [#775](https://github.com/Kong/deck/pull/775)
@@ -1060,7 +1062,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[Unreleased]: https://github.com/kong/deck/compare/v1.15.1...Unreleased
+[v1.16.0]: https://github.com/kong/deck/compare/v1.15.1...v1.16.0
 [v1.15.1]: https://github.com/kong/deck/compare/v1.15.0...v1.15.1
 [v1.15.0]: https://github.com/kong/deck/compare/v1.14.0...v1.15.0
 [v1.14.0]: https://github.com/kong/deck/compare/v1.13.0...v1.14.0
