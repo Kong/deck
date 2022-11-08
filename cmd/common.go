@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"sort"
+	"time"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/cprint"
@@ -206,6 +207,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			if err != nil {
 				return err
 			}
+			// make sure the DB is updated and ready to receive new workspace queries.
+			time.Sleep(time.Duration(syncCmdDBWSUpdateDelay) * time.Second)
 		}
 	}
 

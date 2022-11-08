@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	syncCmdParallelism   int
-	syncCmdDBUpdateDelay int
-	syncWorkspace        string
+	syncCmdParallelism     int
+	syncCmdDBUpdateDelay   int
+	syncCmdDBWSUpdateDelay int
+	syncWorkspace          string
 )
 
 // newSyncCmd represents the sync command
@@ -58,6 +59,9 @@ to get Kong's state in sync with the input state.`,
 		0, "artificial delay (in seconds) that is injected between insert operations \n"+
 			"for related entities (usually for Cassandra deployments).\n"+
 			"See `db_update_propagation` in kong.conf.")
+	syncCmd.Flags().IntVar(&syncCmdDBWSUpdateDelay, "db-workspace-update-propagation-delay",
+		0, "artificial delay (in seconds) that is injected between new workspaces creation \n"+
+			"and all the remaining operations.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
 	addSilenceEventsFlag(syncCmd.Flags())
