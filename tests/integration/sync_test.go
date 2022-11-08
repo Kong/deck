@@ -122,26 +122,6 @@ var (
 		},
 	}
 
-	// konnect
-	route1_konnect = []*kong.Route{
-		{
-			ID:                      kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
-			Name:                    kong.String("r1"),
-			Paths:                   []*string{kong.String("/r1")},
-			PathHandling:            kong.String("v0"),
-			PreserveHost:            kong.Bool(false),
-			Protocols:               []*string{kong.String("http"), kong.String("https")},
-			RegexPriority:           kong.Int(0),
-			StripPath:               kong.Bool(false),
-			HTTPSRedirectStatusCode: kong.Int(301),
-			RequestBuffering:        kong.Bool(true),
-			ResponseBuffering:       kong.Bool(true),
-			Service: &kong.Service{
-				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
-			},
-		},
-	}
-
 	// has run-on set to 'first'
 	plugin_143_151 = []*kong.Plugin{
 		{
@@ -704,7 +684,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 			kongFile: "testdata/sync/002-create-services-and-routes/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Services: svc1_207,
-				Routes:   route1_konnect,
+				Routes:   route1_20x,
 			},
 		},
 	}

@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [Unreleased](#Unreleased)
 - [v1.16.1](#v1161)
 - [v1.16.0](#v1160)
 - [v1.15.1](#v1151)
@@ -46,6 +47,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [Unreleased]
+
+> Release date: TBD
+
+### Added
+
+- Add support to defaults injection when running
+  against Konnect.
+  [#788](https://github.com/Kong/deck/pull/788)
 
 ## [v1.16.1]
 
@@ -1073,6 +1084,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[Unreleased]: https://github.com/kong/deck/compare/v1.16.1...Unreleased
 [v1.16.1]: https://github.com/kong/deck/compare/v1.16.0...v1.16.1
 [v1.16.0]: https://github.com/kong/deck/compare/v1.15.1...v1.16.0
 [v1.15.1]: https://github.com/kong/deck/compare/v1.15.0...v1.15.1

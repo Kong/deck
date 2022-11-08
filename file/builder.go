@@ -31,6 +31,8 @@ type stateBuilder struct {
 
 	disableDynamicDefaults bool
 
+	isKonnect bool
+
 	checkRoutePaths bool
 
 	err error
@@ -57,7 +59,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, err
 	}
 
-	defaulter, err := defaulter(b.ctx, b.client, b.targetContent, b.disableDynamicDefaults)
+	defaulter, err := defaulter(b.ctx, b.client, b.targetContent, b.disableDynamicDefaults, b.isKonnect)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -973,7 +975,7 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 }
 
 func defaulter(
-	ctx context.Context, client *kong.Client, fileContent *Content, disableDynamicDefaults bool,
+	ctx context.Context, client *kong.Client, fileContent *Content, disableDynamicDefaults, isKonnect bool,
 ) (*utils.Defaulter, error) {
 	var kongDefaults KongDefaults
 	if fileContent.Info != nil {
@@ -983,6 +985,7 @@ func defaulter(
 		Client:                 client,
 		KongDefaults:           kongDefaults,
 		DisableDynamicDefaults: disableDynamicDefaults,
+		IsKonnect:              isKonnect,
 	}
 	defaulter, err := utils.GetDefaulter(ctx, opts)
 	if err != nil {

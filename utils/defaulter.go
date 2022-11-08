@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -10,13 +11,21 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+var kongToKonnectEntitiesMap = map[string]string{
+	"services":  "service",
+	"routes":    "route",
+	"upstreams": "upstream",
+	"targets":   "target",
+}
+
 // Defaulter registers types and fills in struct fields with
 // default values.
 type Defaulter struct {
 	r map[string]interface{}
 
-	ctx    context.Context
-	client *kong.Client
+	ctx       context.Context
+	client    *kong.Client
+	isKonnect bool
 
 	service  *kong.Service
 	route    *kong.Route
@@ -27,6 +36,7 @@ type Defaulter struct {
 type DefaulterOpts struct {
 	KongDefaults           interface{}
 	DisableDynamicDefaults bool
+	IsKonnect              bool
 	Client                 *kong.Client
 }
 
@@ -181,11 +191,17 @@ func (d *Defaulter) MustSet(arg interface{}) {
 
 func (d *Defaulter) getEntitySchema(entityType string) (map[string]interface{}, error) {
 	var schema map[string]interface{}
-	schema, err := d.client.Schemas.Get(d.ctx, entityType)
+	endpoint := fmt.Sprintf("/schemas/%s", entityType)
+	if d.isKonnect {
+		entityType = kongToKonnectEntitiesMap[entityType]
+		endpoint = fmt.Sprintf("/v1/schemas/json/%s", entityType)
+	}
+	req, err := d.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
 		return schema, err
 	}
-	return schema, nil
+	_, err = d.client.Do(d.ctx, req, &schema)
+	return schema, err
 }
 
 func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) error {
@@ -204,6 +220,7 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 	}
 	d.ctx = ctx
 	d.client = opts.Client
+	d.isKonnect = opts.IsKonnect
 
 	// fills defaults from Kong API
 	if err := d.addEntityDefaults("services", d.service); err != nil {
@@ -241,8 +258,7 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 //
 // 1. values set in the state file
 // 2. values set in the {_info: defaults:} object in the state file
-// 3. schema defaults coming from Admin API (excluded Konnect)
-// 4. hardcoded defaults under utils/constants.go (Konnect-only)
+// 3. hardcoded defaults under utils/constants.go (Konnect-only)
 func GetDefaulter(ctx context.Context, opts DefaulterOpts) (*Defaulter, error) {
 	exists, err := WorkspaceExists(ctx, opts.Client)
 	if err != nil {
