@@ -39,7 +39,7 @@ can connect to Kong's Admin API.`,
 func pingKonnect(ctx context.Context) error {
 	// get Konnect client
 	httpClient := utils.HTTPClient()
-	_, err := GetKongClientForKonnectMode(ctx, konnectConfig)
+	_, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
 	}

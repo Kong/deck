@@ -32,7 +32,7 @@ func getTestClient() (*kong.Client, error) {
 		Password: os.Getenv("DECK_KONNECT_PASSWORD"),
 	}
 	if konnectConfig.Email != "" && konnectConfig.Password != "" {
-		return cmd.GetKongClientForKonnectMode(ctx, konnectConfig)
+		return cmd.GetKongClientForKonnectMode(ctx, &konnectConfig)
 	}
 	return utils.GetKongClient(utils.KongClientConfig{
 		Address: getKongAddress(),

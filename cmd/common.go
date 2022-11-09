@@ -123,7 +123,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			}
 			konnectRuntimeGroup = targetContent.Konnect.RuntimeGroupName
 		}
-		kongClient, err = GetKongClientForKonnectMode(ctx, konnectConfig)
+		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return err
 		}
