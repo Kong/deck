@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.16.1](#v1161)
 - [v1.16.0](#v1160)
 - [v1.15.1](#v1151)
 - [v1.15.0](#v1150)
@@ -1072,6 +1073,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.16.1]: https://github.com/kong/deck/compare/v1.16.0...v1.16.1
 [v1.16.0]: https://github.com/kong/deck/compare/v1.15.1...v1.16.0
 [v1.15.1]: https://github.com/kong/deck/compare/v1.15.0...v1.15.1
 [v1.15.0]: https://github.com/kong/deck/compare/v1.14.0...v1.15.0
