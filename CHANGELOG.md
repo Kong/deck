@@ -46,6 +46,16 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.16.1]
+
+> Release date: 2022/11/09
+
+### Fixes
+
+- Fix issue with `ping` when running against Konnect
+  using a PAT.
+  [#790](https://github.com/Kong/deck/pull/790)
+
 ## [v1.16.0]
 
 > Release date: 2022/11/09
