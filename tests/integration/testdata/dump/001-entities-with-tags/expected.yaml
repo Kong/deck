@@ -73,37 +73,6 @@ consumers:
   keyauth_credentials:
   - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
   username: harry
-- plugins:
-  - config:
-      day: null
-      fault_tolerant: true
-      header_name: null
-      hide_client_headers: false
-      hour: null
-      limit_by: consumer
-      minute: 10
-      month: null
-      path: null
-      policy: redis
-      redis_database: 0
-      redis_host: redis.common.svc
-      redis_password: null
-      redis_port: 6379
-      redis_server_name: null
-      redis_ssl: false
-      redis_ssl_verify: false
-      redis_timeout: 2000
-      redis_username: null
-      second: null
-      year: null
-    enabled: true
-    name: rate-limiting
-    protocols:
-    - http
-    - https
-  tags:
-  - internal-user
-  username: yolo
 plugins:
 - config:
     bandwidth_metrics: false

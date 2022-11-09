@@ -3,29 +3,9 @@ _format_version: "3.0"
 consumers:
 - plugins:
   - config:
-      day: null
-      fault_tolerant: true
-      header_name: null
-      hide_client_headers: false
-      hour: 10
-      limit_by: consumer
-      minute: null
-      month: null
-      path: null
-      policy: cluster
-      redis_database: 0
-      redis_host: null
-      redis_password: null
-      redis_port: 6379
-      redis_server_name: null
-      redis_ssl: false
-      redis_ssl_verify: false
-      redis_timeout: 2000
-      redis_username: null
-      second: null
-      year: null
+      per_consumer: false
     enabled: true
-    name: rate-limiting
+    name: prometheus
     protocols:
     - grpc
     - grpcs
