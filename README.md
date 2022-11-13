@@ -20,8 +20,14 @@ decK provides declarative configuration and drift detection for Kong.
 ## Features
 
 - **Export**  
-  Existing Kong configuration to a YAML configuration file
+  Existing Kong configuration to a YAML/JSON configuration file
   This can be used to backup Kong's configuration.
+  
+  Usage:
+  ```bash
+  deck dump
+  deck dump --format json
+  ```
 - **Import**  
   Kong's database can be populated using the exported or a hand written config
   file.
