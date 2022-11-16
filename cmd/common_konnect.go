@@ -258,7 +258,7 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

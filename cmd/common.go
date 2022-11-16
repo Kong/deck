@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -39,6 +40,25 @@ const (
 	modeKongEnterprise
 )
 
+type summary struct 
+{
+	Creating int32
+	Updating int32
+	Deleting int32
+	Total int32
+}
+
+type jsonOutput struct 
+{
+	Changes diff.EntityChanges
+	Summary summary
+	Warnings []string
+	Errors []string
+}
+
+var jsonOut jsonOutput
+var isJsonOut bool
+
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {
 		return modeKonnect
@@ -73,17 +93,27 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 
 func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string {
 	if workspaceFlag != targetContent.Workspace && workspaceFlag != "" {
-		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
-			"different from workspace '%v' found in state file(s).\n", workspaceFlag, targetContent.Workspace)
+		warning := fmt.Sprintf("Warning: Workspace '%v' specified via --workspace flag is "+
+		"different from workspace '%v' found in state file(s).", workspaceFlag, targetContent.Workspace)
+		if(isJsonOut){
+			jsonOut.Warnings = append(jsonOut.Warnings, warning)
+		}else{
+			cprint.DeletePrintf(warning+"\n")
+		}
 		return workspaceFlag
 	}
 	return targetContent.Workspace
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string,
+	delay int, workspace string, isJsonOutput bool,
 ) error {
 	// read target file
+	if(isJsonOutput){
+		isJsonOut = true
+		jsonOut.Errors = []string{}
+		jsonOut.Warnings = []string{}
+	}
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
@@ -234,11 +264,20 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	totalOps, err := performDiff(
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
 	if err != nil {
+		if(isJsonOut){
+			jsonOut.Errors = append(jsonOut.Errors, err.Error())
+		}
 		return err
 	}
-
 	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
+	}
+	if(isJsonOutput){
+		jsonOutStr, jsonErr := json.MarshalIndent(jsonOut, "", " ")
+		if jsonErr != nil {
+			return jsonErr
+		}
+		cprint.CreatePrintf(string(jsonOutStr)+"\n")
 	}
 	return nil
 }
@@ -294,13 +333,23 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		return 0, err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, isJsonOut)
 	// print stats before error to report completed operations
-	printStats(stats)
+	if(!isJsonOut){
+		printStats(stats)
+	}
 	if errs != nil {
 		return 0, utils.ErrArray{Errors: errs}
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
+
+	jsonOut.Changes = changes
+	jsonOut.Summary = summary{
+		Creating: stats.CreateOps.Count(),
+		Updating: stats.UpdateOps.Count(),
+		Deleting: stats.DeleteOps.Count(),
+		Total: totalOps,
+	}
 	return int(totalOps), nil
 }
 

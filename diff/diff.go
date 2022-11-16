@@ -19,6 +19,20 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+type entityState struct 
+{
+	Name string
+	OldState any
+	NewState any
+}
+
+type EntityChanges struct 
+{
+	Creating []entityState
+	Updating []entityState
+	Deleting []entityState
+}
+
 var errEnqueueFailed = errors.New("failed to queue event")
 
 func defaultBackOff() backoff.BackOff {
@@ -444,7 +458,7 @@ func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string,
 }
 
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOut bool) (Stats, []error, EntityChanges) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -460,23 +474,47 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 			stats.DeleteOps.Increment(1)
 		}
 	}
-
+	
+	output := EntityChanges{
+			Creating: []entityState{},
+			Updating: []entityState{},
+			Deleting: []entityState{},
+		}
+	
 	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
 		var err error
 		var result crud.Arg
 
 		c := e.Obj.(state.ConsoleString)
+		
+		item := entityState{
+			OldState: e.Obj,
+			NewState: e.OldObj,
+			Name: c.Console(),
+		}
 		switch e.Op {
 		case crud.Create:
-			sc.createPrintln("creating", e.Kind, c.Console())
+			if(isJsonOut){
+				output.Creating = append(output.Creating, item)
+			}else{
+				sc.createPrintln("creating", e.Kind, c.Console())
+			}
 		case crud.Update:
 			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
-			sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
+			if(isJsonOut){
+				output.Updating = append(output.Updating, item)
+			}else{
+				sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
+			}
 		case crud.Delete:
-			sc.deletePrintln("deleting", e.Kind, c.Console())
+			if(isJsonOut){
+				output.Deleting = append(output.Deleting, item)
+			}else{
+				sc.deletePrintln("deleting", e.Kind, c.Console())
+			}
 		default:
 			panic("unknown operation " + e.Op.String())
 		}
@@ -498,5 +536,5 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 
 		return result, nil
 	})
-	return stats, errs
+	return stats, errs, output
 }
