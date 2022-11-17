@@ -42,18 +42,18 @@ const (
 
 type summary struct 
 {
-	Creating int32
-	Updating int32
-	Deleting int32
-	Total int32
+	Creating int32 `json:"creating"`
+	Updating int32 `json:"updating"`
+	Deleting int32 `json:"deleting"`
+	Total 	 int32 `json:"total"`
 }
 
 type jsonOutput struct 
 {
-	Changes diff.EntityChanges
-	Summary summary
-	Warnings []string
-	Errors []string
+	Changes diff.EntityChanges `json:"changes"`
+	Summary summary `json:"summary"`
+	Warnings []string `json:"warnings"`
+	Errors []string `json:"errors"`
 }
 
 var jsonOut jsonOutput
@@ -93,12 +93,12 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 
 func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string {
 	if workspaceFlag != targetContent.Workspace && workspaceFlag != "" {
-		warning := fmt.Sprintf("Warning: Workspace '%v' specified via --workspace flag is "+
+		warning := fmt.Sprintf("Workspace '%v' specified via --workspace flag is "+
 		"different from workspace '%v' found in state file(s).", workspaceFlag, targetContent.Workspace)
 		if(isJsonOut){
 			jsonOut.Warnings = append(jsonOut.Warnings, warning)
 		}else{
-			cprint.DeletePrintf(warning+"\n")
+			cprint.DeletePrintf("Warning: "+warning+"\n")
 		}
 		return workspaceFlag
 	}
@@ -113,6 +113,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		isJsonOut = true
 		jsonOut.Errors = []string{}
 		jsonOut.Warnings = []string{}
+		jsonOut.Changes = diff.EntityChanges{
+			Creating: []diff.EntityState{},
+			Updating: []diff.EntityState{},
+			Deleting: []diff.EntityState{},
+		}
 	}
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
@@ -236,7 +241,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 
-		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
+		if(isJsonOutput){
+			workspace := diff.EntityState{
+				Name: wsConfig.Workspace,
+				Type: "Workspace",
+			}
+			jsonOut.Changes.Creating = append(jsonOut.Changes.Creating, workspace)
+		}else{
+			cprint.CreatePrintln("Creating workspace", wsConfig.Workspace)
+		}
 		if !dry {
 			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
@@ -264,10 +277,17 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	totalOps, err := performDiff(
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
 	if err != nil {
+
 		if(isJsonOut){
-			jsonOut.Errors = append(jsonOut.Errors, err.Error())
+			if errs, ok := err.(utils.ErrArray)
+			ok {
+				jsonOut.Errors = append(jsonOut.Errors, errs.ErrorList()...)
+			} else {
+				jsonOut.Errors = append(jsonOut.Errors, fmt.Sprintf("%v", err))
+			}
+		}else{
+			return err
 		}
-		return err
 	}
 	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
@@ -343,7 +363,11 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
 
-	jsonOut.Changes = changes
+	jsonOut.Changes = diff.EntityChanges{
+		Creating: append(jsonOut.Changes.Creating, changes.Creating...),
+		Updating: append(jsonOut.Changes.Updating, changes.Updating...),
+		Deleting: append(jsonOut.Changes.Deleting, changes.Deleting...),
+	}
 	jsonOut.Summary = summary{
 		Creating: stats.CreateOps.Count(),
 		Updating: stats.UpdateOps.Count(),

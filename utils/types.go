@@ -81,6 +81,18 @@ func (e ErrArray) Error() string {
 	return res
 }
 
+func (e ErrArray) ErrorList() []string {
+	errList := []string{}
+	if len(e.Errors) == 0 {
+		return errList
+	}
+
+	for _, err := range e.Errors {
+		errList = append(errList, fmt.Sprintf("%v", err)) 
+	}
+	return errList
+}
+
 // KongClientConfig holds config details to use to talk to a Kong server.
 type KongClientConfig struct {
 	Address   string
