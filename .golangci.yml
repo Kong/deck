@@ -67,3 +67,17 @@ issues:
     - goimports
     text:  "File is not `goimports`-ed"
     path: cmd/root.go
+
+linters-settings:
+  gomodguard:
+    blocked:
+      modules:
+      - github.com/ghodss/yaml:
+          recommendations:
+          - sigs.k8s.io/yaml
+      - gopkg.in/yaml.v2:
+          recommendations:
+          - sigs.k8s.io/yaml
+      - gopkg.in/yaml.v3:
+          recommendations:
+          - sigs.k8s.io/yaml

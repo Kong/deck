@@ -9,10 +9,10 @@ import (
 	"sort"
 	"strings"
 
-	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"sigs.k8s.io/yaml"
 )
 
 // WriteConfig holds settings to use to write the state file.
@@ -673,7 +673,7 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 	var err error
 	switch format {
 	case YAML:
-		c, err = ghodss.Marshal(content)
+		c, err = yaml.Marshal(content)
 		if err != nil {
 			return err
 		}

@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+	"sigs.k8s.io/yaml"
 )
 
 var (
@@ -294,7 +294,7 @@ func Test_sortKey(t *testing.T) {
 func TestPluginUnmarshalYAML(t *testing.T) {
 	var p FPlugin
 	assert := assert.New(t)
-	assert.Nil(ghodss.Unmarshal([]byte(yamlString), &p))
+	assert.Nil(yaml.Unmarshal([]byte(yamlString), &p))
 	assert.Equal(kong.Plugin{
 		Name:      p.Name,
 		Config:    p.Config,

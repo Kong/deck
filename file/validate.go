@@ -3,14 +3,14 @@ package file
 import (
 	"fmt"
 
-	ghodss "github.com/ghodss/yaml"
 	"github.com/kong/deck/utils"
 	"github.com/xeipuuv/gojsonschema"
+	"sigs.k8s.io/yaml"
 )
 
 func validate(content []byte) error {
 	var c map[string]interface{}
-	err := ghodss.Unmarshal(content, &c)
+	err := yaml.Unmarshal(content, &c)
 	if err != nil {
 		return fmt.Errorf("unmarshaling file content: %w", err)
 	}
