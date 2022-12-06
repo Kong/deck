@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"golang.org/x/sync/errgroup"
@@ -237,11 +238,19 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 	})
 
 	group.Go(func() error {
-		consumerGroups, err := GetAllConsumerGroups(ctx, client, config.SelectorTags)
-		if kong.IsNotFoundErr(err) {
-			return nil
+		var (
+			err            error
+			consumerGroups []*kong.ConsumerGroupObject
+		)
+		if config.KonnectRuntimeGroup != "" {
+			consumerGroups, err = GetAllKonnectConsumerGroups(ctx, client, config.SelectorTags)
+		} else {
+			consumerGroups, err = GetAllConsumerGroups(ctx, client, config.SelectorTags)
 		}
 		if err != nil {
+			if kong.IsNotFoundErr(err) {
+				return nil
+			}
 			return fmt.Errorf("consumer_groups: %w", err)
 		}
 		state.ConsumerGroups = consumerGroups
@@ -511,6 +520,29 @@ func GetAllUpstreams(ctx context.Context,
 		opt = nextopt
 	}
 	return upstreams, nil
+}
+
+// GetAllConsumerGroups queries Konnect for all the ConsumerGroups using client.
+func GetAllKonnectConsumerGroups(ctx context.Context,
+	client *kong.Client, tags []string,
+) ([]*kong.ConsumerGroupObject, error) {
+	var consumerGroupObjects []*kong.ConsumerGroupObject
+	opt := newOpt(tags)
+	cgs, err := konnect.ListAllConsumerGroups(ctx, client, opt.Tags)
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	for _, cg := range cgs {
+		r, err := konnect.GetConsumerGroupObject(ctx, client, cg.ID)
+		if err != nil {
+			return nil, err
+		}
+		consumerGroupObjects = append(consumerGroupObjects, r)
+	}
+	return consumerGroupObjects, nil
 }
 
 // GetAllConsumerGroups queries Kong for all the ConsumerGroups using client.

@@ -49,6 +49,8 @@ type EntityOpts struct {
 	TargetState   *state.KongState
 	KongClient    *kong.Client
 	KonnectClient *konnect.Client
+
+	IsKonnect bool
 }
 
 // EntityType defines a type of entity that is managed by decK.
@@ -235,7 +237,8 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 		return entityImpl{
 			typ: ConsumerGroup,
 			crudActions: &consumerGroupCRUD{
-				client: opts.KongClient,
+				client:    opts.KongClient,
+				isKonnect: opts.IsKonnect,
 			},
 			postProcessActions: &consumerGroupPostAction{
 				currentState: opts.CurrentState,
@@ -250,7 +253,8 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 		return entityImpl{
 			typ: ConsumerGroupConsumer,
 			crudActions: &consumerGroupConsumerCRUD{
-				client: opts.KongClient,
+				client:    opts.KongClient,
+				isKonnect: opts.IsKonnect,
 			},
 			postProcessActions: &consumerGroupConsumerPostAction{
 				currentState: opts.CurrentState,
@@ -265,7 +269,8 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 		return entityImpl{
 			typ: ConsumerGroupPlugin,
 			crudActions: &consumerGroupPluginCRUD{
-				client: opts.KongClient,
+				client:    opts.KongClient,
+				isKonnect: opts.IsKonnect,
 			},
 			postProcessActions: &consumerGroupPluginPostAction{
 				currentState: opts.CurrentState,

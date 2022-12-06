@@ -130,6 +130,7 @@ func (b *stateBuilder) consumerGroups() {
 					plugin.ID = kong.String(*current.ID)
 				}
 			}
+			b.defaulter.MustSet(plugin)
 			cgo.Plugins = append(cgo.Plugins, plugin)
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)

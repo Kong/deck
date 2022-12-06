@@ -16,6 +16,11 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+func int32p(i int) *int32 {
+	p := int32(i)
+	return &p
+}
+
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
 	if address != "" {
@@ -93,6 +98,14 @@ func sortSlices(x, y interface{}) bool {
 		yEntity := y.(*kong.ConsumerGroupObject)
 		xName = *xEntity.ConsumerGroup.Name
 		yName = *yEntity.ConsumerGroup.Name
+	case *kong.ConsumerGroupPlugin:
+		yEntity := y.(*kong.ConsumerGroupPlugin)
+		xName = *xEntity.ConsumerGroup.ID
+		yName = *yEntity.ConsumerGroup.ID
+	case *kong.KeyAuth:
+		yEntity := y.(*kong.KeyAuth)
+		xName = *xEntity.Key
+		yName = *yEntity.Key
 	case *kong.Plugin:
 		yEntity := y.(*kong.Plugin)
 		xName = *xEntity.Name
@@ -122,7 +135,7 @@ func sortSlices(x, y interface{}) bool {
 	return xName < yName
 }
 
-func testKongState(t *testing.T, client *kong.Client,
+func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	expectedState utils.KongRawState, ignoreFields []cmp.Option,
 ) {
 	// Get entities from Kong
@@ -130,6 +143,10 @@ func testKongState(t *testing.T, client *kong.Client,
 	dumpConfig := deckDump.Config{}
 	if expectedState.RBACEndpointPermissions != nil {
 		dumpConfig.RBACResourcesOnly = true
+	}
+	if isKonnect {
+		// use default RG for testing
+		dumpConfig.KonnectRuntimeGroup = "default"
 	}
 	kongState, err := deckDump.Get(ctx, client, dumpConfig)
 	if err != nil {
@@ -150,7 +167,8 @@ func testKongState(t *testing.T, client *kong.Client,
 		cmpopts.IgnoreFields(kong.Certificate{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.SNI{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.ConsumerGroup{}, "CreatedAt", "ID"),
-		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID", "ConsumerGroup"),
+		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID"),
+		cmpopts.IgnoreFields(kong.KeyAuth{}, "ID", "CreatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),

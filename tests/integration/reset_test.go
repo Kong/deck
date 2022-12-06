@@ -67,7 +67,7 @@ func Test_Reset_SkipCACert_2x(t *testing.T) {
 
 			sync(tc.kongFile)
 			reset(t, "--skip-ca-certificates")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -104,7 +104,7 @@ func Test_Reset_SkipCACert_3x(t *testing.T) {
 
 			sync(tc.kongFile)
 			reset(t, "--skip-ca-certificates")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }

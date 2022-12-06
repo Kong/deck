@@ -434,18 +434,18 @@ var (
 				{
 					Username: kong.String("bar"),
 				},
-				{
-					Username: kong.String("baz"),
-				},
 			},
 			Plugins: []*kong.ConsumerGroupPlugin{
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []any{float64(100)},
+						"limit":                  []any{float64(7)},
 						"retry_after_jitter_max": float64(1),
 						"window_size":            []any{float64(60)},
-						"window_type":            string("sliding"),
+						"window_type":            "sliding",
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
 					},
 				},
 			},
@@ -463,10 +463,115 @@ var (
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []any{float64(1000)},
+						"limit":                  []any{float64(10)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
+					},
+				},
+			},
+		},
+	}
+
+	consumerGroupsWithRLAKonnect = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []*int32{int32p(7)},
+						"retry_after_jitter_max": int32p(1),
+						"window_size":            []*int32{int32p(60)},
+						"window_type":            kong.String("sliding"),
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
+					},
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []*int32{int32p(10)},
+						"retry_after_jitter_max": int32p(1),
+						"window_size":            []*int32{int32p(60)},
+						"window_type":            kong.String("sliding"),
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
+					},
+				},
+			},
+		},
+	}
+
+	consumerGroupsWithRLAApp = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(7)},
 						"retry_after_jitter_max": float64(1),
 						"window_size":            []any{float64(60)},
 						"window_type":            string("sliding"),
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("f79972fe-e9a0-40b5-8dc6-f1bf3758b86b"),
+					},
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(10)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            string("sliding"),
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("8eea863e-460c-4019-895a-1e80cb08699d"),
 					},
 				},
 			},
@@ -518,6 +623,66 @@ var (
 			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
 		},
 	}
+
+	consumerGroupAppPlugins = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"consumer_groups":         []any{string("silver"), string("gold")},
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"enforce_consumer_groups": bool(true),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"namespace":               string("dNRC6xKsRL8Koc1uVYA4Nki6DLW7XIdx"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(30),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(0),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
 )
 
 // test scope:
@@ -562,7 +727,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -605,7 +770,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -648,7 +813,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -698,7 +863,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -743,7 +908,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -785,7 +950,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -827,7 +992,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -862,7 +1027,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -897,7 +1062,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -932,7 +1097,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -982,7 +1147,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1017,7 +1182,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1052,7 +1217,7 @@ func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1095,7 +1260,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -1146,7 +1311,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1182,7 +1347,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1218,7 +1383,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1262,7 +1427,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1298,7 +1463,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1334,7 +1499,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1374,7 +1539,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1418,7 +1583,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -1457,7 +1622,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1503,7 +1668,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1544,7 +1709,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1581,7 +1746,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1618,7 +1783,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1724,7 +1889,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1830,7 +1995,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1864,7 +2029,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1898,7 +2063,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1937,7 +2102,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -1975,7 +2140,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2034,7 +2199,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2212,7 +2377,7 @@ func Test_Sync_Vault(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
 			time.Sleep(time.Second * 5)
@@ -2304,7 +2469,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 			sync(tc.kongFileInitial)
 			// update with desired final state
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2349,7 +2514,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 			sync(tc.kongFileInitial)
 			// update with desired final state
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2394,7 +2559,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 			sync(tc.kongFileInitial)
 			// update with desired final state
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2439,7 +2604,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			sync(tc.kongFileInitial)
 			// update with desired final state
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2461,16 +2626,15 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 			kongFile: "testdata/sync/015-consumer-groups/kong.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
-				ConsumerGroups: []*kong.ConsumerGroupObject{},
+				ConsumerGroups: consumerGroups,
 			},
 		},
 		{
-			name:     "creates consumer groups",
+			name:     "creates consumer groups and plugin",
 			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
 				ConsumerGroups: consumerGroupsWithRLA,
-				Plugins:        rlaPlugin,
 			},
 		},
 	}
@@ -2481,14 +2645,14 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
 }
 
 // test scope:
-//   - 3.x
-func Test_Sync_ConsumerGroupsFrom30(t *testing.T) {
+//   - 3.1
+func Test_Sync_ConsumerGroups_31(t *testing.T) {
 	client, err := getTestClient()
 	if err != nil {
 		t.Errorf(err.Error())
@@ -2507,23 +2671,202 @@ func Test_Sync_ConsumerGroupsFrom30(t *testing.T) {
 			},
 		},
 		{
-			name:     "creates consumer groups",
+			name:     "creates consumer groups and plugin",
 			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
 				ConsumerGroups: consumerGroupsWithRLA,
-				Plugins:        rlaPlugin,
 			},
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.0.0")
+			runWhen(t, "enterprise", ">=3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
 			sync(tc.kongFile)
-			testKongState(t, client, tc.expectedState, nil)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// This test has 2 goals:
+//   - make sure consumer groups and their related properties
+//     can be configured correctly in Kong
+//   - the actual consumer groups functionality works once set
+//
+// This is achieved via configuring:
+// - 3 consumers:
+//   - 1 belonging to Gold Consumer Group
+//   - 1 belonging to Silver Consumer Group
+//   - 1 not belonging to any Consumer Group
+//
+// - 3 key-auths, one for each consumer
+// - 1 global key-auth plugin
+// - 1 global RLA plugin
+// - 2 consumer group
+// - 2 RLA override, 1 for each consumer group
+// - 1 service pointing to mockbin.org
+// - 1 route proxying the above service
+//
+// Once the configuration is verified to be matching in Kong,
+// we then check whether the override is correctly applied: consumers
+// not belonging to the consumer group should be limited to 5 requests
+// every 30s, while consumers belonging to the 'gold' and 'silver' consumer groups
+// should be allowed to run respectively 10 and 7 requests in the same timeframe.
+// In order to make sure this is the case, we run requests in a loop
+// for all consumers consumers and then check at what point they start to receive 429.
+func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
+	const (
+		maxGoldRequestsNumber    = 10
+		maxSilverRequestsNumber  = 7
+		maxRegularRequestsNumber = 5
+	)
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups application",
+			kongFile: "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroupsWithRLAApp,
+				Plugins:        consumerGroupAppPlugins,
+				Services:       svc1_207,
+				Routes:         route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", "==3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+
+			// Kong proxy may need a bit to be ready.
+			time.Sleep(time.Second * 10)
+
+			// build simple http client
+			client := &http.Client{}
+
+			// test 'foo' consumer (part of 'gold' group)
+			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-special")
+			n := 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxGoldRequestsNumber, n)
+
+			// test 'bar' consumer (part of 'silver' group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-not-so-special")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxSilverRequestsNumber, n)
+
+			// test 'baz' consumer (not part of any group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-just-average")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxRegularRequestsNumber, n)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups",
+			kongFile: "testdata/sync/015-consumer-groups/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroups,
+			},
+		},
+		{
+			name:     "creates consumer groups and plugin",
+			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroupsWithRLAKonnect,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, true, tc.expectedState, nil)
 		})
 	}
 }

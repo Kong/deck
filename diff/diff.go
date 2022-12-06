@@ -61,6 +61,8 @@ type Syncer struct {
 	entityDiffers map[types.EntityType]types.Differ
 
 	noMaskValues bool
+
+	isKonnect bool
 }
 
 type SyncerOpts struct {
@@ -74,6 +76,8 @@ type SyncerOpts struct {
 	StageDelaySec   int
 
 	NoMaskValues bool
+
+	IsKonnect bool
 
 	CreatePrintln func(a ...interface{})
 	UpdatePrintln func(a ...interface{})
@@ -97,6 +101,7 @@ func NewSyncer(opts SyncerOpts) (*Syncer, error) {
 		createPrintln: opts.CreatePrintln,
 		updatePrintln: opts.UpdatePrintln,
 		deletePrintln: opts.DeletePrintln,
+		isKonnect:     opts.IsKonnect,
 	}
 
 	if s.createPrintln == nil {
@@ -124,6 +129,8 @@ func (sc *Syncer) init() error {
 
 		KongClient:    sc.kongClient,
 		KonnectClient: sc.konnectClient,
+
+		IsKonnect: sc.isKonnect,
 	}
 
 	entities := []types.EntityType{

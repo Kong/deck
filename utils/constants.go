@@ -69,6 +69,11 @@ var (
 		HashFallback:     kong.String("none"),
 		HashOnCookiePath: kong.String("/"),
 	}
+	consumerGroupPluginDefault = kong.ConsumerGroupPlugin{
+		Config: kong.Configuration{
+			"window_type": "sliding",
+		},
+	}
 	defaultsRestrictedFields = map[string][]string{
 		"Service":  {"ID", "Name"},
 		"Route":    {"ID", "Name"},

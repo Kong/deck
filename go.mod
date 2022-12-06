@@ -19,7 +19,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.33.1-0.20221207142151-7df71a93f51e
+	github.com/kong/go-kong v0.33.1-0.20221211141210-ebfea49db967
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.22.11
 	github.com/spf13/cobra v1.6.1
@@ -29,7 +29,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.1.0
-	k8s.io/code-generator v0.25.4
+	k8s.io/code-generator v0.25.5
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -82,9 +82,9 @@ require (
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
-	golang.org/x/sys v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/net v0.3.1-0.20221206200815-1e63c2f08a10 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

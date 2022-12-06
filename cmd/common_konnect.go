@@ -128,6 +128,9 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if dumpConfig.KonnectRuntimeGroup == "" {
+		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
+	}
 	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
 	if err != nil {
 		return err
@@ -136,7 +139,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true)
 	if err != nil {
 		return err
 	}
@@ -150,6 +153,9 @@ func dumpKonnectV2(ctx context.Context) error {
 	}
 	if dumpCmdKongStateFile == "-" {
 		return fmt.Errorf("writing to stdout is not supported in Konnect mode")
+	}
+	if dumpConfig.KonnectRuntimeGroup == "" {
+		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
 	}
 	rawState, err := dump.Get(ctx, client, dumpConfig)
 	if err != nil {

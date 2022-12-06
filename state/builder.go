@@ -89,9 +89,8 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 		if err != nil {
 			return fmt.Errorf("inserting consumer group into state: %w", err)
 		}
-
+		utils.ZeroOutTimestamps(cg.ConsumerGroup)
 		for _, c := range cg.Consumers {
-			utils.ZeroOutTimestamps(cg.ConsumerGroup)
 			err := kongState.ConsumerGroupConsumers.Add(
 				ConsumerGroupConsumer{
 					ConsumerGroupConsumer: kong.ConsumerGroupConsumer{

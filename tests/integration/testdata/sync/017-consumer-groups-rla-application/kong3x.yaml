@@ -1,0 +1,109 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - name: r1
+    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+
+consumer_groups:
+- id: f79972fe-e9a0-40b5-8dc6-f1bf3758b86b
+  name: silver
+  plugins:
+  - config:
+      limit:
+      - 7
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+    name: rate-limiting-advanced
+- id: 8eea863e-460c-4019-895a-1e80cb08699d
+  name: gold
+  plugins:
+  - config:
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+    name: rate-limiting-advanced
+consumers:
+- username: foo
+  keyauth_credentials:
+  - key: i-am-special
+  groups:
+  - name: gold
+- username: bar
+  keyauth_credentials:
+  - key: i-am-not-so-special
+  groups:
+  - name: silver
+- username: baz
+  keyauth_credentials:
+  - key: i-am-just-average
+
+plugins:
+- name: key-auth
+  enabled: true
+  protocols:
+  - http
+  - https
+- config:
+    consumer_groups:
+    - silver
+    - gold
+    dictionary_name: kong_rate_limiting_counters
+    enforce_consumer_groups: true
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 5
+    namespace: dNRC6xKsRL8Koc1uVYA4Nki6DLW7XIdx
+    path: null
+    redis:
+      cluster_addresses: null
+      connect_timeout: null
+      database: 0
+      host: null
+      keepalive_backlog: null
+      keepalive_pool_size: 30
+      password: null
+      port: null
+      read_timeout: null
+      send_timeout: null
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: -1
+    window_size:
+    - 60
+    window_type: sliding
+  enabled: true
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+

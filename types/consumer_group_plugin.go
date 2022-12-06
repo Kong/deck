@@ -5,13 +5,15 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
 
 // consumerGroupPluginCRUD implements crud.Actions interface.
 type consumerGroupPluginCRUD struct {
-	client *kong.Client
+	client    *kong.Client
+	isKonnect bool
 }
 
 func consumerGroupPluginFromStruct(arg crud.Event) *state.ConsumerGroupPlugin {
@@ -32,9 +34,20 @@ func (s *consumerGroupPluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (
 	config := map[string]kong.Configuration{
 		"config": plugin.Config,
 	}
-	res, err := s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(ctx, plugin.ConsumerGroup.ID, config)
-	if err != nil {
-		return nil, err
+	var (
+		res *kong.ConsumerGroupRLA
+		err error
+	)
+	if s.isKonnect {
+		res, err = konnect.CreateRateLimitingAdvancedPlugin(ctx, s.client, plugin.ConsumerGroup.ID, plugin.Config)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		res, err = s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(ctx, plugin.ConsumerGroup.ID, config)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &state.ConsumerGroupPlugin{
 		ConsumerGroupPlugin: kong.ConsumerGroupPlugin{
@@ -57,9 +70,20 @@ func (s *consumerGroupPluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (
 	config := map[string]kong.Configuration{
 		"config": plugin.Config,
 	}
-	res, err := s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(ctx, plugin.ConsumerGroup.ID, config)
-	if err != nil {
-		return nil, err
+	var (
+		res *kong.ConsumerGroupRLA
+		err error
+	)
+	if s.isKonnect {
+		res, err = konnect.UpdateRateLimitingAdvancedPlugin(ctx, s.client, plugin.ConsumerGroup.ID, plugin.Config)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		res, err = s.client.ConsumerGroups.UpdateRateLimitingAdvancedPlugin(ctx, plugin.ConsumerGroup.ID, config)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &state.ConsumerGroupPlugin{
 		ConsumerGroupPlugin: kong.ConsumerGroupPlugin{
@@ -75,6 +99,15 @@ func (s *consumerGroupPluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (
 // Delete is just a placeholder because Admin API doesn't support DELETEs
 // for consumer groups plugins.
 func (s *consumerGroupPluginCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
+	event := crud.EventFromArg(arg[0])
+	plugin := consumerGroupPluginFromStruct(event)
+	if s.isKonnect {
+		err := konnect.DeleteRateLimitingAdvancedPlugin(ctx, s.client, plugin.ConsumerGroup.ID)
+		if err != nil {
+			return nil, err
+		}
+		return plugin, nil
+	}
 	return nil, nil
 }
 
