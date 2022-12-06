@@ -10,9 +10,9 @@ import (
 	"strings"
 	"text/template"
 
-	ghodss "github.com/ghodss/yaml"
 	"github.com/imdario/mergo"
 	"github.com/kong/deck/utils"
+	"sigs.k8s.io/yaml"
 )
 
 // getContent reads all the YAML and JSON files in the directory or the
@@ -127,7 +127,7 @@ func readContent(reader io.Reader) (*Content, error) {
 // If it is present, then it leads to a silent error. See Github Issue #144.
 // The verification for this is done using a test.
 func yamlUnmarshal(bytes []byte, v interface{}) error {
-	return ghodss.Unmarshal(bytes, v)
+	return yaml.Unmarshal(bytes, v)
 }
 
 func getPrefixedEnvVar(key string) (string, error) {
