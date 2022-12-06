@@ -27,10 +27,11 @@ type Defaulter struct {
 	client    *kong.Client
 	isKonnect bool
 
-	service  *kong.Service
-	route    *kong.Route
-	upstream *kong.Upstream
-	target   *kong.Target
+	service             *kong.Service
+	route               *kong.Route
+	upstream            *kong.Upstream
+	target              *kong.Target
+	consumerGroupPlugin *kong.ConsumerGroupPlugin
 }
 
 type DefaulterOpts struct {
@@ -43,10 +44,11 @@ type DefaulterOpts struct {
 // NewDefaulter initializes a Defaulter with empty entities.
 func NewDefaulter() *Defaulter {
 	return &Defaulter{
-		service:  &kong.Service{},
-		route:    &kong.Route{},
-		upstream: &kong.Upstream{},
-		target:   &kong.Target{},
+		service:             &kong.Service{},
+		route:               &kong.Route{},
+		upstream:            &kong.Upstream{},
+		target:              &kong.Target{},
+		consumerGroupPlugin: &kong.ConsumerGroupPlugin{},
 	}
 }
 
@@ -77,6 +79,10 @@ func getKongDefaulter(opts DefaulterOpts) (*Defaulter, error) {
 	err = d.Register(d.target)
 	if err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
+	}
+	err = d.Register(d.consumerGroupPlugin)
+	if err != nil {
+		return nil, fmt.Errorf("registering consumer-group-plugin with defaulter: %w", err)
 	}
 	return d, nil
 }
@@ -190,22 +196,38 @@ func (d *Defaulter) MustSet(arg interface{}) {
 }
 
 func (d *Defaulter) getEntitySchema(entityType string) (map[string]interface{}, error) {
-	var schema map[string]interface{}
+	var (
+		schema map[string]interface{}
+		ok     bool
+	)
 	endpoint := fmt.Sprintf("/schemas/%s", entityType)
 	if d.isKonnect {
-		entityType = kongToKonnectEntitiesMap[entityType]
+		entityType, ok = kongToKonnectEntitiesMap[entityType]
+		// if no mapping is found, then the schema cannot be fetched
+		// from Konnet and we should proceed without defaults.
+		if !ok {
+			return schema, nil
+		}
 		endpoint = fmt.Sprintf("/v1/schemas/json/%s", entityType)
 	}
 	req, err := d.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
 		return schema, err
 	}
-	_, err = d.client.Do(d.ctx, req, &schema)
+	resp, err := d.client.Do(d.ctx, req, &schema)
+	// in case the schema is not found - like in case of EE features,
+	// no error should be returned.
+	if resp.StatusCode == http.StatusNotFound {
+		return schema, nil
+	}
 	return schema, err
 }
 
 func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) error {
 	schema, err := d.getEntitySchema(entityType)
+	if schema == nil && err == nil {
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("retrieve schema for %v from Kong: %v", entityType, err)
 	}
@@ -249,6 +271,26 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 	}
 	if err := d.Register(d.target); err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
+	}
+
+	// since Konnect implements a different consumer-group API than the one from the
+	// Kong Gateway, it's not straight-forward to handle defaults injection the same
+	// way due to schema differences. In order to overcome this limitation, we are
+	// statically loading defaults for the consumer-group plugin override when running
+	// against Konnect, while still relying on the Admin API for Kong Gateway.
+	if d.isKonnect {
+		if err := mergo.Merge(
+			d.consumerGroupPlugin, &consumerGroupPluginDefault, mergo.WithTransformers(kongTransformer{}),
+		); err != nil {
+			return nil, fmt.Errorf("merging consumer-group-plugin static defaults: %w", err)
+		}
+	} else {
+		if err := d.addEntityDefaults("consumer_group_plugins", d.consumerGroupPlugin); err != nil {
+			return nil, fmt.Errorf("get defaults for consumer-group-plugin: %v", err)
+		}
+		if err := d.Register(d.consumerGroupPlugin); err != nil {
+			return nil, fmt.Errorf("registering consumer-group-plugin with defaulter: %w", err)
+		}
 	}
 	return d, nil
 }

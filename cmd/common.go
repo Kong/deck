@@ -226,7 +226,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	totalOps, err := performDiff(ctx, currentState, targetState, dry, parallelism, delay, kongClient)
+	totalOps, err := performDiff(
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
 	if err != nil {
 		return err
 	}
@@ -274,7 +275,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
-	dry bool, parallelism int, delay int, client *kong.Client,
+	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -282,6 +283,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		KongClient:    client,
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
+		IsKonnect:     isKonnect,
 	})
 	if err != nil {
 		return 0, err

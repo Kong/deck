@@ -5,13 +5,15 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
 
 // consumerGroupConsumerCRUD implements crud.Actions interface.
 type consumerGroupConsumerCRUD struct {
-	client *kong.Client
+	client    *kong.Client
+	isKonnect bool
 }
 
 func consumerGroupConsumerFromStruct(arg crud.Event) *state.ConsumerGroupConsumer {
@@ -29,9 +31,18 @@ func consumerGroupConsumerFromStruct(arg crud.Event) *state.ConsumerGroupConsume
 func (s *consumerGroupConsumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumer := consumerGroupConsumerFromStruct(event)
-	_, err := s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
-	if err != nil {
-		return nil, err
+	if s.isKonnect {
+		err := konnect.CreateConsumerGroupMember(
+			ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
+		)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, err := s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &state.ConsumerGroupConsumer{
 		ConsumerGroupConsumer: kong.ConsumerGroupConsumer{
@@ -48,9 +59,16 @@ func (s *consumerGroupConsumerCRUD) Create(ctx context.Context, arg ...crud.Arg)
 func (s *consumerGroupConsumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumer := consumerGroupConsumerFromStruct(event)
-	err := s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
-	if err != nil {
-		return nil, err
+	if s.isKonnect {
+		err := konnect.DeleteConsumerGroupMember(ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return consumer, nil
 }

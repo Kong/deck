@@ -710,7 +710,7 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 		group := FConsumerGroupObject{ConsumerGroup: cg.ConsumerGroup}
 		for _, plugin := range plugins {
 			if plugin.ID != nil && cg.ID != nil {
-				if *plugin.ConsumerGroup.ID == *cg.ID {
+				if plugin.ConsumerGroup != nil && *plugin.ConsumerGroup.ID == *cg.ID {
 					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
 					utils.ZeroOutID(plugin.ConsumerGroup, plugin.ConsumerGroup.Name, config.WithID)
 					utils.ZeroOutTimestamps(plugin.ConsumerGroupPlugin.ConsumerGroup)

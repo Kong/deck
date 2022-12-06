@@ -5,13 +5,15 @@ import (
 	"fmt"
 
 	"github.com/kong/deck/crud"
+	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
 )
 
 // consumerGroupCRUD implements crud.Actions interface.
 type consumerGroupCRUD struct {
-	client *kong.Client
+	client    *kong.Client
+	isKonnect bool
 }
 
 func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroup {
@@ -29,9 +31,18 @@ func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroup {
 func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
-	createdConsumerGroup, err := s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
-	if err != nil {
-		return nil, err
+	var createdConsumerGroup *kong.ConsumerGroup
+	var err error
+	if s.isKonnect {
+		createdConsumerGroup, err = konnect.CreateConsumerGroup(ctx, s.client, &consumerGroup.ConsumerGroup)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		createdConsumerGroup, err = s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &state.ConsumerGroup{ConsumerGroup: *createdConsumerGroup}, nil
 }
@@ -43,9 +54,16 @@ func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.A
 func (s *consumerGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
-	err := s.client.ConsumerGroups.Delete(ctx, consumerGroup.ConsumerGroup.ID)
-	if err != nil {
-		return nil, err
+	if s.isKonnect {
+		err := konnect.DeleteConsumerGroup(ctx, s.client, consumerGroup.ConsumerGroup.ID)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := s.client.ConsumerGroups.Delete(ctx, consumerGroup.ConsumerGroup.ID)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return consumerGroup, nil
 }

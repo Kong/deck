@@ -1322,6 +1322,9 @@
         "client_secret": {
           "type": "string"
         },
+        "client_type": {
+          "type": "string"
+        },
         "consumer": {
           "$ref": "#/definitions/Consumer"
         },

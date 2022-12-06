@@ -99,7 +99,7 @@ By default, this command will ask for confirmation.`,
 				if err != nil {
 					return err
 				}
-				_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient)
+				_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false)
 				if err != nil {
 					return err
 				}
