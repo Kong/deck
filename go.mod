@@ -30,7 +30,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.1.0
 	k8s.io/code-generator v0.25.4
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
