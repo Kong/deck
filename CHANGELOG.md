@@ -52,6 +52,12 @@
 
 > Release date: TBD
 
+### Fixes
+
+- Update go-kong to fix a bug causing misleading diffs with
+  nested plugins configuration fields.
+  [go-kong #244](https://github.com/Kong/go-kong/pull/244)
+
 ### Added
 
 - Add support to defaults injection when running
