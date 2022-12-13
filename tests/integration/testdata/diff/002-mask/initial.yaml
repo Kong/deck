@@ -1,0 +1,5 @@
+_format_version: "1.1"
+services:
+  - name: svc1
+    id: 9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d
+    host: ${{ env "DECK_SVC1_HOSTNAME" }}
