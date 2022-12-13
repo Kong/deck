@@ -1,0 +1,16 @@
+_format_version: "1.1"
+services:
+  - name: svc1
+    id: 9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d
+    host: ${{ env "DECK_SVC1_HOSTNAME" }}
+    tags:
+      - ${{ env "DECK_SVC1_HOSTNAME" }} is an external host. I like mockbin.org!
+      - foo:foo
+      - baz:${{ env "DECK_BAZZ" }}
+      - another:${{ env "DECK_BAZZ" }}
+      - bar:${{ env "DECK_BARR" }}
+plugins:
+  - name: rate-limiting
+    id: a1368a28-cb5c-4eee-86d8-03a6bdf94b5e
+    config:
+      minute: 123

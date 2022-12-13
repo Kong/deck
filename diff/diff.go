@@ -401,11 +401,7 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 		c := e.Obj.(state.ConsoleString)
 		switch e.Op {
 		case crud.Create:
-			diffString, err := generateDiffString(e, false, sc.noMaskValues)
-			if err != nil {
-				return nil, err
-			}
-			sc.createPrintln("creating", e.Kind, c.Console(), diffString)
+			sc.createPrintln("creating", e.Kind, c.Console())
 		case crud.Update:
 			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
@@ -413,11 +409,7 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 			}
 			sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
 		case crud.Delete:
-			diffString, err := generateDiffString(e, true, sc.noMaskValues)
-			if err != nil {
-				return nil, err
-			}
-			sc.deletePrintln("deleting", e.Kind, c.Console(), diffString)
+			sc.deletePrintln("deleting", e.Kind, c.Console())
 		default:
 			panic("unknown operation " + e.Op.String())
 		}
