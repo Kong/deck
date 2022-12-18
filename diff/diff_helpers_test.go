@@ -1,7 +1,6 @@
 package diff
 
 import (
-	"os"
 	"testing"
 
 	"github.com/kong/deck/konnect"
@@ -167,10 +166,7 @@ func Test_MaskEnvVarsValues(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for k, v := range tt.envVars {
-				os.Setenv(k, v)
-				defer func(k string) {
-					os.Unsetenv(k)
-				}(k)
+				t.Setenv(k, v)
 			}
 			if got := maskEnvVarValue(tt.args); got != tt.want {
 				t.Errorf("maskEnvVarValue() = %v\nwant %v", got, tt.want)

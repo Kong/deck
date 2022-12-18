@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"os"
 	"testing"
 
 	"github.com/kong/deck/utils"
@@ -141,10 +140,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for k, v := range tc.envVars {
-				os.Setenv(k, v)
-				defer func(k string) {
-					os.Unsetenv(k)
-				}(k)
+				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
 			teardown := setup(t)
@@ -180,10 +176,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for k, v := range tc.envVars {
-				os.Setenv(k, v)
-				defer func(k string) {
-					os.Unsetenv(k)
-				}(k)
+				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
@@ -219,10 +212,7 @@ func Test_Diff_Unasked_OlderThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for k, v := range tc.envVars {
-				os.Setenv(k, v)
-				defer func(k string) {
-					os.Unsetenv(k)
-				}(k)
+				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
 			teardown := setup(t)
@@ -258,10 +248,7 @@ func Test_Diff_Unasked_NewerThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for k, v := range tc.envVars {
-				os.Setenv(k, v)
-				defer func(k string) {
-					os.Unsetenv(k)
-				}(k)
+				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0")
 			teardown := setup(t)
