@@ -2,8 +2,6 @@ module github.com/kong/deck
 
 go 1.18
 
-replace github.com/imdario/mergo v0.3.12 => github.com/Kong/mergo v0.3.13
-
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 require (
@@ -18,8 +16,8 @@ require (
 	github.com/hashicorp/go-memdb v1.3.4
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hexops/gotextdiff v1.0.3
-	github.com/imdario/mergo v0.3.12
-	github.com/kong/go-kong v0.33.1-0.20221216215022-d8d2d9de7467
+	github.com/imdario/mergo v0.3.13
+	github.com/kong/go-kong v0.34.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.22.11
 	github.com/spf13/cobra v1.6.1
