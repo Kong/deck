@@ -57,6 +57,9 @@
 - Update go-kong to fix a bug causing misleading diffs with
   nested plugins configuration fields.
   [go-kong #244](https://github.com/Kong/go-kong/pull/244)
+- Remove `github.com/imdario/mergo` replace from `go.mod` and bump `go-kong` to
+  `v0.34.0`
+  [#809](https://github.com/Kong/deck/pull/809)
 
 ### Added
 

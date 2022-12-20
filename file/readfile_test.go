@@ -8,6 +8,7 @@ import (
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_configFilesInDir(t *testing.T) {
@@ -373,6 +374,30 @@ func Test_getContent(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "defaults",
+			args: args{[]string{"testdata/defaults"}},
+			want: &Content{
+				FormatVersion: "1.1",
+				Upstreams: []FUpstream{
+					{
+						Upstream: kong.Upstream{
+							Name:      kong.String("upstream1"),
+							Algorithm: kong.String("round-robin"),
+						},
+						Targets: []*FTarget{
+							{
+								Target: kong.Target{
+									Target: kong.String("198.51.100.11:80"),
+									Weight: kong.Int(0),
+								},
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -384,9 +409,7 @@ func Test_getContent(t *testing.T) {
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getContent() = %v, want %v", got, tt.want)
-			}
+			require.Equal(t, tt.want, got)
 		})
 	}
 }
