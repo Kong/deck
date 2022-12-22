@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.17.1](#v1171)
 - [v1.17.0](#v1170)
 - [v1.16.1](#v1161)
 - [v1.16.0](#v1160)
@@ -47,6 +48,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.17.1]
+
+> Release date: 2022/12/22
+
+### Fixes
+
+- Update go-kong to fix a bug causing wrong injection of
+  defaults for arbitrary map fields.
+  [go-kong #258](https://github.com/Kong/go-kong/pull/258)
 
 ## [v1.17.0]
 
@@ -1102,6 +1113,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.17.1]: https://github.com/kong/deck/compare/v1.17.0...v1.17.1
 [v1.17.0]: https://github.com/kong/deck/compare/v1.16.1...v1.17.0
 [v1.16.1]: https://github.com/kong/deck/compare/v1.16.0...v1.16.1
 [v1.16.0]: https://github.com/kong/deck/compare/v1.15.1...v1.16.0
