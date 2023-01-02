@@ -199,8 +199,6 @@ github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHm
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/kong/go-kong v0.34.0 h1:HS6Ak+rtxcXTBKg8kJpVErtnlF0m2V7kpbQSBoRlCs8=
-github.com/kong/go-kong v0.34.0/go.mod h1:G30uJtuJOjJXFL1vulIrz/27KhPdE2g0GtJZlNINU6U=
 github.com/kong/go-kong v0.34.1-0.20221222170410-6c81ce561662 h1:IIIAzs6eNp+lA+E0k9oooAyqmAJyAA/9Ebyb0y19mrU=
 github.com/kong/go-kong v0.34.1-0.20221222170410-6c81ce561662/go.mod h1:G30uJtuJOjJXFL1vulIrz/27KhPdE2g0GtJZlNINU6U=
 github.com/kong/semver/v4 v4.0.1 h1:DIcNR8W3gfx0KabFBADPalxxsp+q/5COwIFkkhrFQ2Y=
@@ -254,8 +252,8 @@ github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.6.1 h1:/FiVV8dS/e+YqF2JvO3yXRFbBLTIuSDkuC7aBOAvL+k=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/shirou/gopsutil/v3 v3.22.11 h1:kxsPKS+Eeo+VnEQ2XCaGJepeP6KY53QoRTETx3+1ndM=
-github.com/shirou/gopsutil/v3 v3.22.11/go.mod h1:xl0EeL4vXJ+hQMAGN8B9VFpxukEMA0XdevQOe5MZ1oY=
+github.com/shirou/gopsutil/v3 v3.22.12 h1:oG0ns6poeUSxf78JtOsfygNWuEHYYz8hnnNg7P04TJs=
+github.com/shirou/gopsutil/v3 v3.22.12/go.mod h1:Xd7P1kwZcp5VW52+9XsirIKd/BROzbb2wdX3Kqlz9uI=
 github.com/spf13/afero v1.9.2 h1:j49Hj62F0n+DaZ1dDCvhABaPNSGNkt32oRFxI33IEMw=
 github.com/spf13/afero v1.9.2/go.mod h1:iUV7ddyEEZPO5gA3zD4fJt6iStLlL+Lg4m2cihcDf8Y=
 github.com/spf13/cast v1.5.0 h1:rj3WzYc11XZaIZMPKmwP96zkFEnnAmV8s6XbB2aY32w=
