@@ -19,7 +19,7 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/kong/go-kong v0.34.1-0.20221222170410-6c81ce561662
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/shirou/gopsutil/v3 v3.22.11
+	github.com/shirou/gopsutil/v3 v3.22.12
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
