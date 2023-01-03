@@ -116,6 +116,7 @@ type KonnectConfig struct {
 	Password string
 	Token    string
 	Debug    bool
+	Dev      bool
 
 	Address string
 
@@ -172,7 +173,7 @@ func retryPolicy(ctx context.Context, resp *http.Response, err error) (bool, err
 	// 429 Too Many Requests is recoverable. Sometimes the server puts
 	// a Retry-After response header to indicate when the server is
 	// available to start processing request from client.
-	if resp.StatusCode == http.StatusTooManyRequests {
+	if resp != nil && resp.StatusCode == http.StatusTooManyRequests {
 		return true, nil
 	}
 	return false, nil
