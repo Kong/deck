@@ -20,10 +20,9 @@ import (
 )
 
 const (
-	exitCodeDiffDetection     = 2
-	defaultFetchedKongVersion = "3.0.0"
-	defaultFormatVersion      = "1.1"
-	formatVersion30           = "3.0"
+	exitCodeDiffDetection = 2
+	defaultFormatVersion  = "1.1"
+	formatVersion30       = "3.0"
 )
 
 var (
@@ -141,9 +140,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
-	kongVersion := defaultFetchedKongVersion
+	var kongVersion string
 	var parsedKongVersion semver.Version
-	if mode == modeKong {
+	if mode == modeKonnect {
+		kongVersion, err = fetchKonnectKongVersion(ctx, kongClient)
+		if err != nil {
+			return fmt.Errorf("reading Konnect Kong version: %w", err)
+		}
+	} else {
 		kongVersion, err = fetchKongVersion(ctx, wsConfig)
 		if err != nil {
 			return fmt.Errorf("reading Kong version: %w", err)
