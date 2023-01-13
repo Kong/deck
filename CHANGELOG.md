@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.17.2](#v1172)
 - [v1.17.1](#v1171)
 - [v1.17.0](#v1170)
 - [v1.16.1](#v1161)
@@ -48,6 +49,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.17.2]
+
+> Release date: 2023/01/13
+
+### Fixes
+
+- Do not error out when EE list endpoints are hit but no
+  license is present in Kong Gateway.
+  [#821](https://github.com/Kong/deck/pull/821)
 
 ## [v1.17.1]
 
@@ -1113,6 +1124,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.17.2]: https://github.com/kong/deck/compare/v1.17.1...v1.17.2
 [v1.17.1]: https://github.com/kong/deck/compare/v1.17.0...v1.17.1
 [v1.17.0]: https://github.com/kong/deck/compare/v1.16.1...v1.17.0
 [v1.16.1]: https://github.com/kong/deck/compare/v1.16.0...v1.16.1

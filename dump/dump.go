@@ -248,7 +248,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 			consumerGroups, err = GetAllConsumerGroups(ctx, client, config.SelectorTags)
 		}
 		if err != nil {
-			if kong.IsNotFoundErr(err) {
+			if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
 				return nil
 			}
 			return fmt.Errorf("consumer_groups: %w", err)
@@ -622,7 +622,7 @@ func GetAllVaults(
 
 	for {
 		s, nextopt, err := client.Vaults.List(ctx, opt)
-		if kong.IsNotFoundErr(err) {
+		if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
 			return vaults, nil
 		}
 		if err != nil {
