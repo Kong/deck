@@ -3,11 +3,9 @@ consumer_groups:
 - name: silver
   tags:
     - tag1
-    - tag3
 - name: gold
   tags:
     - tag1
-    - tag2
 consumers:
 - username: foo
   groups:

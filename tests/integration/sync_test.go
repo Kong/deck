@@ -425,6 +425,34 @@ var (
 		},
 	}
 
+	consumerGroupsWithTags = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+				Tags: kong.StringSlice("tag1", "tag3"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+				{
+					Username: kong.String("baz"),
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+				Tags: kong.StringSlice("tag1", "tag2"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+		},
+	}
+
 	consumerGroupsWithRLA = []*kong.ConsumerGroupObject{
 		{
 			ConsumerGroup: &kong.ConsumerGroup{
@@ -476,10 +504,64 @@ var (
 		},
 	}
 
+	consumerGroupsWithTagsAndRLA = []*kong.ConsumerGroupObject{
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("silver"),
+				Tags: kong.StringSlice("tag1", "tag3"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("bar"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(7)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
+					},
+				},
+			},
+		},
+		{
+			ConsumerGroup: &kong.ConsumerGroup{
+				Name: kong.String("gold"),
+				Tags: kong.StringSlice("tag1", "tag2"),
+			},
+			Consumers: []*kong.Consumer{
+				{
+					Username: kong.String("foo"),
+				},
+			},
+			Plugins: []*kong.ConsumerGroupPlugin{
+				{
+					Name: kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{
+						"limit":                  []any{float64(10)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
+					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
+					},
+				},
+			},
+		},
+	}
+
 	consumerGroupsWithRLAKonnect = []*kong.ConsumerGroupObject{
 		{
 			ConsumerGroup: &kong.ConsumerGroup{
 				Name: kong.String("silver"),
+				Tags: kong.StringSlice("tag1", "tag3"),
 			},
 			Consumers: []*kong.Consumer{
 				{
@@ -504,6 +586,7 @@ var (
 		{
 			ConsumerGroup: &kong.ConsumerGroup{
 				Name: kong.String("gold"),
+				Tags: kong.StringSlice("tag1", "tag2"),
 			},
 			Consumers: []*kong.Consumer{
 				{
@@ -2658,24 +2741,27 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	tests := []struct {
-		name          string
-		kongFile      string
-		expectedState utils.KongRawState
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
 	}{
 		{
-			name:     "creates consumer groups",
-			kongFile: "testdata/sync/015-consumer-groups/kong3x.yaml",
+			name:            "creates consumer groups",
+			kongFile:        "testdata/sync/015-consumer-groups/kong3x.yaml",
+			kongFileInitial: "testdata/sync/015-consumer-groups/kong3x-initial.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
-				ConsumerGroups: consumerGroups,
+				ConsumerGroups: consumerGroupsWithTags,
 			},
 		},
 		{
-			name:     "creates consumer groups and plugin",
-			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			name:            "creates consumer groups and plugin",
+			kongFile:        "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			kongFileInitial: "testdata/sync/016-consumer-groups-and-plugins/kong3x-initial.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
-				ConsumerGroups: consumerGroupsWithRLA,
+				ConsumerGroups: consumerGroupsWithTagsAndRLA,
 			},
 		},
 	}
@@ -2685,7 +2771,11 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 			teardown := setup(t)
 			defer teardown(t)
 
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
 			sync(tc.kongFile)
+
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2716,7 +2806,7 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 // every 30s, while consumers belonging to the 'gold' and 'silver' consumer groups
 // should be allowed to run respectively 10 and 7 requests in the same timeframe.
 // In order to make sure this is the case, we run requests in a loop
-// for all consumers consumers and then check at what point they start to receive 429.
+// for all consumers and then check at what point they start to receive 429.
 func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 	const (
 		maxGoldRequestsNumber    = 10
@@ -2838,21 +2928,24 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 	tests := []struct {
-		name          string
-		kongFile      string
-		expectedState utils.KongRawState
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
 	}{
 		{
-			name:     "creates consumer groups",
-			kongFile: "testdata/sync/015-consumer-groups/kong3x.yaml",
+			name:            "creates consumer groups",
+			kongFile:        "testdata/sync/015-consumer-groups/kong3x.yaml",
+			kongFileInitial: "testdata/sync/015-consumer-groups/kong3x-initial.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
-				ConsumerGroups: consumerGroups,
+				ConsumerGroups: consumerGroupsWithTags,
 			},
 		},
 		{
-			name:     "creates consumer groups and plugin",
-			kongFile: "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			name:            "creates consumer groups and plugin",
+			kongFile:        "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
+			kongFileInitial: "testdata/sync/016-consumer-groups-and-plugins/kong3x-initial.yaml",
 			expectedState: utils.KongRawState{
 				Consumers:      consumerGroupsConsumers,
 				ConsumerGroups: consumerGroupsWithRLAKonnect,
@@ -2865,7 +2958,11 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 			teardown := setup(t)
 			defer teardown(t)
 
+			// set up initial state
+			sync(tc.kongFileInitial)
+			// update with desired final state
 			sync(tc.kongFile)
+
 			testKongState(t, client, true, tc.expectedState, nil)
 		})
 	}

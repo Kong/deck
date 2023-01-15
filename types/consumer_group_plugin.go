@@ -63,7 +63,7 @@ func (s *consumerGroupPluginCRUD) Create(ctx context.Context, arg ...crud.Arg) (
 // Update updates a consumerGroupConsumer in Kong.
 // The arg should be of type crud.Event, containing the consumerGroupConsumer to be updated,
 // else the function will panic.
-// It returns a the updated *state.consumerGroupConsumer.
+// It returns the updated *state.consumerGroupConsumer.
 func (s *consumerGroupPluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	plugin := consumerGroupPluginFromStruct(event)
@@ -87,10 +87,12 @@ func (s *consumerGroupPluginCRUD) Update(ctx context.Context, arg ...crud.Arg) (
 	}
 	return &state.ConsumerGroupPlugin{
 		ConsumerGroupPlugin: kong.ConsumerGroupPlugin{
+			ID:     plugin.ID,
 			Name:   res.Plugin,
 			Config: res.Config,
 			ConsumerGroup: &kong.ConsumerGroup{
-				ID: res.ConsumerGroup,
+				ID:   plugin.ConsumerGroup.ID,
+				Name: res.ConsumerGroup,
 			},
 		},
 	}, nil

@@ -8,27 +8,26 @@ consumer_groups:
   - name: rate-limiting-advanced
     config:
       limit:
-      - 10
+      - 20
       retry_after_jitter_max: 1
       window_size:
-      - 60
+      - 50
       window_type: sliding
 - name: silver
   tags:
     - tag1
-    - tag3
   plugins:
   - name: rate-limiting-advanced
     config:
       limit:
-      - 7
+      - 10
       retry_after_jitter_max: 1
       window_size:
-      - 60
+      - 50
       window_type: sliding
 consumers:
 - groups:
-  - name: silver
+  - name: gold
   username: bar
 - username: baz
 - groups:

@@ -31,18 +31,16 @@ func consumerGroupFromStruct(arg crud.Event) *state.ConsumerGroup {
 func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
+
 	var createdConsumerGroup *kong.ConsumerGroup
 	var err error
 	if s.isKonnect {
 		createdConsumerGroup, err = konnect.CreateConsumerGroup(ctx, s.client, &consumerGroup.ConsumerGroup)
-		if err != nil {
-			return nil, err
-		}
 	} else {
 		createdConsumerGroup, err = s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
-		if err != nil {
-			return nil, err
-		}
+	}
+	if err != nil {
+		return nil, err
 	}
 	return &state.ConsumerGroup{ConsumerGroup: *createdConsumerGroup}, nil
 }
@@ -50,20 +48,19 @@ func (s *consumerGroupCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.A
 // Delete deletes a consumerGroup in Kong.
 // The arg should be of type crud.Event, containing the consumerGroup to be deleted,
 // else the function will panic.
-// It returns a the deleted *state.consumerGroup.
+// It returns the deleted *state.consumerGroup.
 func (s *consumerGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
+
+	var err error
 	if s.isKonnect {
-		err := konnect.DeleteConsumerGroup(ctx, s.client, consumerGroup.ConsumerGroup.ID)
-		if err != nil {
-			return nil, err
-		}
+		err = konnect.DeleteConsumerGroup(ctx, s.client, consumerGroup.ConsumerGroup.ID)
 	} else {
-		err := s.client.ConsumerGroups.Delete(ctx, consumerGroup.ConsumerGroup.ID)
-		if err != nil {
-			return nil, err
-		}
+		err = s.client.ConsumerGroups.Delete(ctx, consumerGroup.ConsumerGroup.ID)
+	}
+	if err != nil {
+		return nil, err
 	}
 	return consumerGroup, nil
 }
@@ -71,16 +68,22 @@ func (s *consumerGroupCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.A
 // Update updates a consumerGroup in Kong.
 // The arg should be of type crud.Event, containing the consumerGroup to be updated,
 // else the function will panic.
-// It returns a the updated *state.consumerGroup.
+// It returns the updated *state.consumerGroup.
 func (s *consumerGroupCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumerGroup := consumerGroupFromStruct(event)
 
-	updatedconsumerGroup, err := s.client.ConsumerGroups.Create(ctx, &consumerGroup.ConsumerGroup)
+	var err error
+	var updatedConsumerGroup *kong.ConsumerGroup
+	if s.isKonnect {
+		updatedConsumerGroup, err = konnect.UpdateConsumerGroup(ctx, s.client, consumerGroup.ID, &consumerGroup.ConsumerGroup)
+	} else {
+		updatedConsumerGroup, err = s.client.ConsumerGroups.Update(ctx, &consumerGroup.ConsumerGroup)
+	}
 	if err != nil {
 		return nil, err
 	}
-	return &state.ConsumerGroup{ConsumerGroup: *updatedconsumerGroup}, nil
+	return &state.ConsumerGroup{ConsumerGroup: *updatedConsumerGroup}, nil
 }
 
 type consumerGroupDiffer struct {
