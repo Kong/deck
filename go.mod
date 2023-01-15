@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.13
-	github.com/kong/go-kong v0.34.1-0.20221222170410-6c81ce561662
+	github.com/kong/go-kong v0.35.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.22.12
 	github.com/spf13/cobra v1.6.1
@@ -27,7 +27,7 @@ require (
 	github.com/stretchr/testify v1.8.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.1.0
-	k8s.io/code-generator v0.26.0
+	k8s.io/code-generator v0.26.1
 	sigs.k8s.io/yaml v1.3.0
 )
 

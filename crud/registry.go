@@ -101,7 +101,7 @@ func (r *Registry) Delete(ctx context.Context, kind Kind, args ...Arg) (Arg, err
 	return res, nil
 }
 
-// Do calls an aciton based on op with args and returns the result and error.
+// Do calls an action based on op with args and returns the result and error.
 func (r *Registry) Do(ctx context.Context, kind Kind, op Op, args ...Arg) (Arg, error) {
 	a, err := r.Get(kind)
 	if err != nil {

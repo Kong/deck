@@ -31,19 +31,19 @@ func consumerGroupConsumerFromStruct(arg crud.Event) *state.ConsumerGroupConsume
 func (s *consumerGroupConsumerCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumer := consumerGroupConsumerFromStruct(event)
+
+	var err error
 	if s.isKonnect {
-		err := konnect.CreateConsumerGroupMember(
+		err = konnect.CreateConsumerGroupMember(
 			ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
 		)
-		if err != nil {
-			return nil, err
-		}
 	} else {
-		_, err := s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
-		if err != nil {
-			return nil, err
-		}
+		_, err = s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
 	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &state.ConsumerGroupConsumer{
 		ConsumerGroupConsumer: kong.ConsumerGroupConsumer{
 			Consumer:      consumer.Consumer,
@@ -55,38 +55,61 @@ func (s *consumerGroupConsumerCRUD) Create(ctx context.Context, arg ...crud.Arg)
 // Delete deletes a consumerGroupConsumer in Kong.
 // The arg should be of type crud.Event, containing the consumerGroupConsumer to be deleted,
 // else the function will panic.
-// It returns a the deleted *state.consumerGroupConsumer.
+// It returns the deleted *state.consumerGroupConsumer.
 func (s *consumerGroupConsumerCRUD) Delete(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumer := consumerGroupConsumerFromStruct(event)
+
+	var err error
 	if s.isKonnect {
-		err := konnect.DeleteConsumerGroupMember(ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
-		if err != nil {
-			return nil, err
-		}
+		err = konnect.DeleteConsumerGroupMember(ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
 	} else {
-		err := s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
-		if err != nil {
-			return nil, err
-		}
+		err = s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
 	}
+	if err != nil {
+		return nil, err
+	}
+
 	return consumer, nil
 }
 
 // Update updates a consumerGroupConsumer in Kong.
 // The arg should be of type crud.Event, containing the consumerGroupConsumer to be updated,
 // else the function will panic.
-// It returns a the updated *state.consumerGroupConsumer.
+// It returns the updated *state.consumerGroupConsumer.
 func (s *consumerGroupConsumerCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	consumer := consumerGroupConsumerFromStruct(event)
 
-	_, err := s.client.ConsumerGroupConsumers.Create(
-		ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username,
-	)
+	var err error
+	// delete the old member
+	if s.isKonnect {
+		err = konnect.DeleteConsumerGroupMember(
+			ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
+		)
+	} else {
+		err = s.client.ConsumerGroupConsumers.Delete(
+			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username,
+		)
+	}
 	if err != nil {
 		return nil, err
 	}
+
+	// recreate it
+	if s.isKonnect {
+		err = konnect.CreateConsumerGroupMember(
+			ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
+		)
+	} else {
+		_, err = s.client.ConsumerGroupConsumers.Create(
+			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username,
+		)
+	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &state.ConsumerGroupConsumer{
 		ConsumerGroupConsumer: kong.ConsumerGroupConsumer{
 			Consumer:      consumer.Consumer,

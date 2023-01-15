@@ -162,8 +162,8 @@ func (k *ConsumerGroupConsumersCollection) Update(consumer ConsumerGroupConsumer
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	res, err := multiIndexLookupUsingTxn(txn, consumerGroupConsumerTableName,
-		[]string{"id", "username"}, *consumer.Consumer)
+	res, err := txn.First(consumerGroupConsumerTableName, "id",
+		*consumer.Consumer.ID, *consumer.ConsumerGroup.ID)
 	if err != nil {
 		return err
 	}

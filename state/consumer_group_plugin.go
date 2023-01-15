@@ -149,12 +149,10 @@ func (k *ConsumerGroupPluginsCollection) Get(
 
 // Update udpates an existing consumerGroupPlugin.
 func (k *ConsumerGroupPluginsCollection) Update(plugin ConsumerGroupPlugin) error {
-	var nameOrID string
-	if plugin.ConsumerGroupPlugin.ID != nil {
-		nameOrID = *plugin.ConsumerGroupPlugin.ID
-	} else {
-		nameOrID = *plugin.ConsumerGroupPlugin.Name
+	if utils.Empty(plugin.ConsumerGroupPlugin.ID) {
+		return errIDRequired
 	}
+
 	if err := validatePluginGroup(&plugin); err != nil {
 		return err
 	}
@@ -162,8 +160,8 @@ func (k *ConsumerGroupPluginsCollection) Update(plugin ConsumerGroupPlugin) erro
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	res, err := multiIndexLookupUsingTxn(txn, consumerGroupPluginTableName,
-		[]string{"id", "name"}, nameOrID)
+	res, err := txn.First(consumerGroupPluginTableName, "id",
+		*plugin.ConsumerGroupPlugin.ID, *plugin.ConsumerGroup.ID)
 	if err != nil {
 		return err
 	}
@@ -186,7 +184,7 @@ func (k *ConsumerGroupPluginsCollection) Update(plugin ConsumerGroupPlugin) erro
 	return nil
 }
 
-func deleteconsumerGroupPlugin(txn *memdb.Txn, nameOrID, consumerGroupID string) error {
+func deleteConsumerGroupPlugin(txn *memdb.Txn, nameOrID, consumerGroupID string) error {
 	consumer, err := getConsumerGroupPlugin(txn, consumerGroupID, nameOrID)
 	if err != nil {
 		return err
@@ -211,7 +209,7 @@ func (k *ConsumerGroupPluginsCollection) Delete(nameOrID, consumerGroupID string
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteconsumerGroupPlugin(txn, nameOrID, consumerGroupID)
+	err := deleteConsumerGroupPlugin(txn, nameOrID, consumerGroupID)
 	if err != nil {
 		return err
 	}

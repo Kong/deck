@@ -69,6 +69,25 @@ func CreateConsumerGroup(ctx context.Context, client *kong.Client, entity interf
 	return &cg.Item, nil
 }
 
+func UpdateConsumerGroup(ctx context.Context, client *kong.Client,
+	cgID *string, entity interface{},
+) (*kong.ConsumerGroup, error) {
+	if isEmptyString(cgID) {
+		return nil, fmt.Errorf("update consumer-group: consumer-group ID cannot be nil")
+	}
+	endpoint := fmt.Sprintf("/v1/consumer-groups/%v", *cgID)
+	req, err := client.NewRequest(http.MethodPut, endpoint, nil, entity)
+	if err != nil {
+		return nil, err
+	}
+	var cg konnectResponseObj
+	_, err = client.Do(ctx, req, &cg)
+	if err != nil {
+		return nil, err
+	}
+	return &cg.Item, nil
+}
+
 // GetConsumerGroup fetches a ConsumerGroup from Konnect.
 func GetConsumerGroup(ctx context.Context,
 	client *kong.Client, nameOrID *string,
@@ -96,7 +115,7 @@ func ListAllConsumerGroupMembers(
 	ctx context.Context, client *kong.Client, cgID *string,
 ) ([]*kong.Consumer, error) {
 	if isEmptyString(cgID) {
-		return nil, fmt.Errorf("list consumer-group members: consumer-group ID cannot be nil")
+		return nil, fmt.Errorf("list consumer-group-members: consumer-group ID cannot be nil")
 	}
 	var members, data []*kong.Consumer
 	var err error
@@ -149,7 +168,7 @@ func CreateRateLimitingAdvancedPlugin(
 	ctx context.Context, client *kong.Client, cgID *string, config kong.Configuration,
 ) (*kong.ConsumerGroupRLA, error) {
 	if isEmptyString(cgID) {
-		return nil, fmt.Errorf("update consumer-group override: consumer-group ID cannot be nil")
+		return nil, fmt.Errorf("create consumer-group override: consumer-group ID cannot be nil")
 	}
 	return upsertRateLimitingAdvancedPlugin(
 		ctx, client, *cgID, config, http.MethodPost,
@@ -214,7 +233,7 @@ func GetConsumerGroupRateLimitingAdvancedPlugin(
 	}, nil
 }
 
-// DeleteConsumerGroup deletes a ConsumerGroup plugin in Kong
+// DeleteRateLimitingAdvancedPlugin deletes a ConsumerGroup plugin in Kong
 func DeleteRateLimitingAdvancedPlugin(
 	ctx context.Context, client *kong.Client, cgID *string,
 ) error {
@@ -259,7 +278,7 @@ func ListConsumerGroupMembers(ctx context.Context,
 	return consumers, next, nil
 }
 
-// Get fetches a ConsumerGroup from Kong.
+// GetConsumerGroupObject Get fetches a ConsumerGroup from Kong.
 func GetConsumerGroupObject(ctx context.Context,
 	client *kong.Client, cgID *string,
 ) (*kong.ConsumerGroupObject, error) {
@@ -299,15 +318,15 @@ func GetConsumerGroupObject(ctx context.Context,
 	return group, nil
 }
 
-// Delete deletes a ConsumerGroup in Kong
+// DeleteConsumerGroup deletes a ConsumerGroup in Kong
 func DeleteConsumerGroup(
-	ctx context.Context, client *kong.Client, nameOrID *string,
+	ctx context.Context, client *kong.Client, cgID *string,
 ) error {
-	if isEmptyString(nameOrID) {
-		return fmt.Errorf("deleting consumer-group: nameOrID cannot be nil")
+	if isEmptyString(cgID) {
+		return fmt.Errorf("delete consumer-group: ID cannot be nil")
 	}
 
-	endpoint := fmt.Sprintf("/v1/consumer-groups/%v", *nameOrID)
+	endpoint := fmt.Sprintf("/v1/consumer-groups/%v", *cgID)
 	req, err := client.NewRequest("DELETE", endpoint, nil, nil)
 	if err != nil {
 		return err
@@ -321,7 +340,7 @@ func DeleteConsumerGroupMember(
 	ctx context.Context, client *kong.Client, cgID, consumer *string,
 ) error {
 	if isEmptyString(cgID) {
-		return fmt.Errorf("deleting consumer-group: nameOrID cannot be nil")
+		return fmt.Errorf("delete consumer-group-member: ID cannot be nil")
 	}
 
 	endpoint := fmt.Sprintf("/v1/consumers/%s/groups/%s/members", *consumer, *cgID)
@@ -337,12 +356,33 @@ func DeleteConsumerGroupMember(
 func CreateConsumerGroupMember(
 	ctx context.Context, client *kong.Client, cgID, consumer *string,
 ) error {
-	if isEmptyString(cgID) {
-		return fmt.Errorf("deleting consumer-group: nameOrID cannot be nil")
+	if isEmptyString(consumer) {
+		return fmt.Errorf("create consumer-group-member: consumer cannot be nil")
+	} else if isEmptyString(cgID) {
+		return fmt.Errorf("create consumer-group-member: consumer group ID cannot be nil")
 	}
 
 	endpoint := fmt.Sprintf("/v1/consumers/%s/groups/%s/members", *consumer, *cgID)
 	req, err := client.NewRequest("POST", endpoint, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.Do(ctx, req, nil)
+	return err
+}
+
+func UpdateConsumerGroupMember(
+	ctx context.Context, client *kong.Client, cgID, consumer *string,
+) error {
+	if isEmptyString(consumer) {
+		return fmt.Errorf("create consumer-group-member: consumer cannot be nil")
+	} else if isEmptyString(cgID) {
+		return fmt.Errorf("create consumer-group-member: consumer group ID cannot be nil")
+	}
+
+	endpoint := fmt.Sprintf("/v1/consumers/%s/groups/%s/members", *consumer, *cgID)
+	req, err := client.NewRequest("PUT", endpoint, nil, nil)
 	if err != nil {
 		return err
 	}

@@ -302,6 +302,12 @@
         },
         "name": {
           "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -515,6 +521,12 @@
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/ConsumerGroupPlugin"
+          },
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
           },
           "type": "array"
         }

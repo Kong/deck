@@ -45,7 +45,7 @@ func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroup) error {
 	if !utils.Empty(consumerGroup.Name) {
 		searchBy = append(searchBy, *consumerGroup.Name)
 	}
-	_, err := getconsumerGroup(txn, searchBy...)
+	_, err := getConsumerGroup(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumerGroup %v: %w", consumerGroup.Console(), ErrAlreadyExists)
 	} else if err != ErrNotFound {
@@ -60,7 +60,7 @@ func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroup) error {
 	return nil
 }
 
-func getconsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroup, error) {
+func getConsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroup, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, consumerGroupTableName,
 			[]string{"name", "id"}, id)
@@ -88,7 +88,7 @@ func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroup, error) 
 
 	txn := k.db.Txn(false)
 	defer txn.Abort()
-	consumerGroup, err := getconsumerGroup(txn, nameOrID)
+	consumerGroup, err := getConsumerGroup(txn, nameOrID)
 	if err != nil {
 		if err == ErrNotFound {
 			return nil, ErrNotFound
@@ -98,7 +98,7 @@ func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroup, error) 
 	return consumerGroup, nil
 }
 
-// Update udpates an existing consumerGroup.
+// Update updates an existing consumerGroup.
 func (k *ConsumerGroupsCollection) Update(consumerGroup ConsumerGroup) error {
 	if utils.Empty(consumerGroup.ID) {
 		return errIDRequired
@@ -107,7 +107,7 @@ func (k *ConsumerGroupsCollection) Update(consumerGroup ConsumerGroup) error {
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteconsumerGroup(txn, *consumerGroup.ID)
+	err := deleteConsumerGroup(txn, *consumerGroup.ID)
 	if err != nil {
 		return err
 	}
@@ -121,8 +121,8 @@ func (k *ConsumerGroupsCollection) Update(consumerGroup ConsumerGroup) error {
 	return nil
 }
 
-func deleteconsumerGroup(txn *memdb.Txn, nameOrID string) error {
-	consumerGroup, err := getconsumerGroup(txn, nameOrID)
+func deleteConsumerGroup(txn *memdb.Txn, nameOrID string) error {
+	consumerGroup, err := getConsumerGroup(txn, nameOrID)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (k *ConsumerGroupsCollection) Delete(nameOrID string) error {
 	txn := k.db.Txn(true)
 	defer txn.Abort()
 
-	err := deleteconsumerGroup(txn, nameOrID)
+	err := deleteConsumerGroup(txn, nameOrID)
 	if err != nil {
 		return err
 	}
