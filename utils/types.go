@@ -83,9 +83,6 @@ func (e ErrArray) Error() string {
 
 func (e ErrArray) ErrorList() []string {
 	errList := []string{}
-	if len(e.Errors) == 0 {
-		return errList
-	}
 
 	for _, err := range e.Errors {
 		errList = append(errList, fmt.Sprintf("%v", err)) 
