@@ -293,11 +293,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		os.Exit(exitCodeDiffDetection)
 	}
 	if(enableJsonOutput){
-		jsonOutStr, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
+		jsonOutputStr, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
 		if jsonErr != nil {
-			return jsonErr
+			return err
 		}
-		cprint.CreatePrintf(string(jsonOutStr)+"\n")
+		cprint.CreatePrintf(string(jsonOutputStr)+"\n")
 	}
 	return nil
 }
