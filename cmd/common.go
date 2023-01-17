@@ -363,16 +363,18 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
 
-	jsonOutput.Changes = diff.EntityChanges{
-		Creating: append(jsonOutput.Changes.Creating, changes.Creating...),
-		Updating: append(jsonOutput.Changes.Updating, changes.Updating...),
-		Deleting: append(jsonOutput.Changes.Deleting, changes.Deleting...),
-	}
-	jsonOutput.Summary = summary{
-		Creating: stats.CreateOps.Count(),
-		Updating: stats.UpdateOps.Count(),
-		Deleting: stats.DeleteOps.Count(),
-		Total: totalOps,
+	if(isJsonOutput) {
+		jsonOutput.Changes = diff.EntityChanges{
+			Creating: append(jsonOutput.Changes.Creating, changes.Creating...),
+			Updating: append(jsonOutput.Changes.Updating, changes.Updating...),
+			Deleting: append(jsonOutput.Changes.Deleting, changes.Deleting...),
+		}
+		jsonOutput.Summary = summary{
+			Creating: stats.CreateOps.Count(),
+			Updating: stats.UpdateOps.Count(),
+			Deleting: stats.DeleteOps.Count(),
+			Total: totalOps,
+		}
 	}
 	return int(totalOps), nil
 }
