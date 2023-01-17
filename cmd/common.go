@@ -48,7 +48,7 @@ type summary struct
 	Total 	 int32 `json:"total"`
 }
 
-type jsonOutput struct 
+type jsonOutputObject struct 
 {
 	Changes diff.EntityChanges `json:"changes"`
 	Summary summary `json:"summary"`
@@ -56,8 +56,8 @@ type jsonOutput struct
 	Errors []string `json:"errors"`
 }
 
-var jsonOut jsonOutput
-var isJsonOut bool
+var jsonOutput jsonOutputObject
+var isJsonOutput bool
 
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {
@@ -95,8 +95,8 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 	if workspaceFlag != targetContent.Workspace && workspaceFlag != "" {
 		warning := fmt.Sprintf("Workspace '%v' specified via --workspace flag is "+
 		"different from workspace '%v' found in state file(s).", workspaceFlag, targetContent.Workspace)
-		if(isJsonOut){
-			jsonOut.Warnings = append(jsonOut.Warnings, warning)
+		if(isJsonOutput){
+			jsonOutput.Warnings = append(jsonOutput.Warnings, warning)
 		}else{
 			cprint.DeletePrintf("Warning: "+warning+"\n")
 		}
@@ -106,14 +106,14 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, isJsonOutput bool,
+	delay int, workspace string, enableJsonOutput bool,
 ) error {
 	// read target file
-	if(isJsonOutput){
-		isJsonOut = true
-		jsonOut.Errors = []string{}
-		jsonOut.Warnings = []string{}
-		jsonOut.Changes = diff.EntityChanges{
+	if(enableJsonOutput){
+		isJsonOutput = true
+		jsonOutput.Errors = []string{}
+		jsonOutput.Warnings = []string{}
+		jsonOutput.Changes = diff.EntityChanges{
 			Creating: []diff.EntityState{},
 			Updating: []diff.EntityState{},
 			Deleting: []diff.EntityState{},
@@ -241,12 +241,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 
-		if(isJsonOutput){
+		if(enableJsonOutput){
 			workspace := diff.EntityState{
 				Name: wsConfig.Workspace,
 				Type: "Workspace",
 			}
-			jsonOut.Changes.Creating = append(jsonOut.Changes.Creating, workspace)
+			jsonOutput.Changes.Creating = append(jsonOutput.Changes.Creating, workspace)
 		}else{
 			cprint.CreatePrintln("Creating workspace", wsConfig.Workspace)
 		}
@@ -278,12 +278,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
 	if err != nil {
 
-		if(isJsonOut){
+		if(isJsonOutput){
 			if errs, ok := err.(utils.ErrArray)
 			ok {
-				jsonOut.Errors = append(jsonOut.Errors, errs.ErrorList()...)
+				jsonOutput.Errors = append(jsonOutput.Errors, errs.ErrorList()...)
 			} else {
-				jsonOut.Errors = append(jsonOut.Errors, fmt.Sprintf("%v", err))
+				jsonOutput.Errors = append(jsonOutput.Errors, fmt.Sprintf("%v", err))
 			}
 		}else{
 			return err
@@ -292,8 +292,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
-	if(isJsonOutput){
-		jsonOutStr, jsonErr := json.MarshalIndent(jsonOut, "", " ")
+	if(enableJsonOutput){
+		jsonOutStr, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
 		if jsonErr != nil {
 			return jsonErr
 		}
@@ -353,9 +353,9 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		return 0, err
 	}
 
-	stats, errs, changes := s.Solve(ctx, parallelism, dry, isJsonOut)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, isJsonOutput)
 	// print stats before error to report completed operations
-	if(!isJsonOut){
+	if(!isJsonOutput){
 		printStats(stats)
 	}
 	if errs != nil {
@@ -363,12 +363,12 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
 
-	jsonOut.Changes = diff.EntityChanges{
-		Creating: append(jsonOut.Changes.Creating, changes.Creating...),
-		Updating: append(jsonOut.Changes.Updating, changes.Updating...),
-		Deleting: append(jsonOut.Changes.Deleting, changes.Deleting...),
+	jsonOutput.Changes = diff.EntityChanges{
+		Creating: append(jsonOutput.Changes.Creating, changes.Creating...),
+		Updating: append(jsonOutput.Changes.Updating, changes.Updating...),
+		Deleting: append(jsonOutput.Changes.Deleting, changes.Deleting...),
 	}
-	jsonOut.Summary = summary{
+	jsonOutput.Summary = summary{
 		Creating: stats.CreateOps.Count(),
 		Updating: stats.UpdateOps.Count(),
 		Deleting: stats.DeleteOps.Count(),
