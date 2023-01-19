@@ -173,7 +173,7 @@ func dumpKonnectV2(ctx context.Context) error {
 	return file.KongStateToFile(ks, file.WriteConfig{
 		SelectTags:       dumpConfig.SelectorTags,
 		Filename:         dumpCmdKongStateFile,
-		FileFormat:       file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
+		FileFormat:       file.Format(strings.ToUpper(dumpCmdStateFormat)),
 		WithID:           dumpWithID,
 		RuntimeGroupName: konnectRuntimeGroup,
 		KongVersion:      kongVersion,
