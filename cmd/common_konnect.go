@@ -152,9 +152,6 @@ func dumpKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if dumpCmdKongStateFile == "-" {
-		return fmt.Errorf("writing to stdout is not supported in Konnect mode")
-	}
 	if dumpConfig.KonnectRuntimeGroup == "" {
 		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
 	}

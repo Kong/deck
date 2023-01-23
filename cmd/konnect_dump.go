@@ -31,10 +31,6 @@ func newKonnectDumpCmd() *cobra.Command {
 			httpClient := utils.HTTPClient()
 			_ = sendAnalytics("konnect-dump", "", modeKonnect)
 
-			if konnectDumpCmdKongStateFile == "-" {
-				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
-			}
-
 			if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 				return err
 			} else if !yes {
