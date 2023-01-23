@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +14,6 @@ func newKonnectSyncCmd() *cobra.Command {
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if konnectDumpCmdKongStateFile == "-" {
-				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
-			}
 			_ = sendAnalytics("konnect-sync", "", modeKonnect)
 			if konnectConfig.Address == defaultKonnectURL {
 				konnectConfig.Address = defaultLegacyKonnectURL

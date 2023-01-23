@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -24,9 +22,6 @@ func newKonnectDiffCmd() *cobra.Command {
 	that will be created, updated, or deleted.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if konnectDumpCmdKongStateFile == "-" {
-				return fmt.Errorf("writing to stdout is not supported in Konnect mode")
-			}
 			_ = sendAnalytics("konnect-diff", "", modeKonnect)
 			if konnectConfig.Address == defaultKonnectURL {
 				konnectConfig.Address = defaultLegacyKonnectURL
