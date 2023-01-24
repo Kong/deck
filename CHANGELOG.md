@@ -52,10 +52,16 @@
 
 ## [v1.17.2]
 
-> Release date: 2023/01/13
+> Release date: 2023/01/24
 
 ### Fixes
 
+- Allow writing execution output to stdout in Konnect mode.
+  [#829](https://github.com/Kong/deck/pull/829)
+- Add `tags` support to Consumer Groups
+  [#823](https://github.com/Kong/deck/pull/823)
+- Add "update" functionality to Consumer Groups
+  [#823](https://github.com/Kong/deck/pull/823)
 - Do not error out when EE list endpoints are hit but no
   license is present in Kong Gateway.
   [#821](https://github.com/Kong/deck/pull/821)
