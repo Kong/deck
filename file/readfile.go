@@ -34,7 +34,9 @@ func getContent(filenames []string) (*Content, error) {
 		if err != nil {
 			return nil, fmt.Errorf("reading file: %w", err)
 		}
-		workspaces = append(workspaces, content.Workspace)
+		if content.Workspace != "" {
+			workspaces = append(workspaces, content.Workspace)
+		}
 		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
 		if err != nil {
 			return nil, fmt.Errorf("merging file contents: %w", err)
