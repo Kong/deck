@@ -39,7 +39,7 @@ can connect to Kong's Admin API.`,
 func pingKonnect(ctx context.Context) error {
 	// get Konnect client
 	httpClient := utils.HTTPClient()
-	_, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+	kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
 	}
@@ -48,19 +48,28 @@ func pingKonnect(ctx context.Context) error {
 		return err
 	}
 	u, _ := url.Parse(konnectConfig.Address)
-	// authenticate with konnect
-	res, err := authenticate(ctx, konnectClient, u.Host, konnectConfig)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
-	}
-	fullName := res.FullName
-	if res.FullName == "" {
-		fullName = fmt.Sprintf("%s %s", res.FirstName, res.LastName)
-	}
-	fmt.Printf("Successfully Konnected as %s (%s)!\n",
-		fullName, res.Organization)
-	if konnectConfig.Debug {
-		fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+	if konnectConfig.Dev {
+		version, err := fetchKonnectKongVersion(ctx, kongClient)
+		if err != nil {
+			return fmt.Errorf("reading Konnect Kong version: %w", err)
+		}
+		fmt.Println("Successfully Konnected to Kong!")
+		fmt.Println("Kong version: ", version)
+	} else {
+		// authenticate with konnect
+		res, err := authenticate(ctx, konnectClient, u.Host, konnectConfig)
+		if err != nil {
+			return fmt.Errorf("authenticating with Konnect: %w", err)
+		}
+		fullName := res.FullName
+		if res.FullName == "" {
+			fullName = fmt.Sprintf("%s %s", res.FirstName, res.LastName)
+		}
+		fmt.Printf("Successfully Konnected as %s (%s)!\n",
+			fullName, res.Organization)
+		if konnectConfig.Debug {
+			fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+		}
 	}
 	_ = sendAnalytics("ping", "", modeKonnect)
 	return nil

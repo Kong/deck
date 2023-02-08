@@ -75,7 +75,7 @@ func (c *Client) SetControlPlaneID(cpID string) {
 	c.common.controlPlaneID = cpID
 }
 
-// SetControlPlaneID sets the konnect runtime-group ID in the client.
+// SetRuntimeGroupID sets the konnect runtime-group ID in the client.
 func (c *Client) SetRuntimeGroupID(rgID string) {
 	c.common.runtimeGroupID = rgID
 }

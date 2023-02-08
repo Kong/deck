@@ -76,23 +76,28 @@ func GetKongClientForKonnectMode(
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s address: %v", address, err)
 		}
-		_, err = authenticate(ctx, konnectClient, parsedAddress.Host, *konnectConfig)
-		if err == nil {
-			break
-		}
-		// Personal Access Token authentication is not supported with the
-		// legacy Konnect, so we don't need to fallback in case of 401s.
-		if konnect.IsUnauthorizedErr(err) && konnectConfig.Token != "" {
-			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
-		}
-		if konnect.IsUnauthorizedErr(err) {
-			continue
+		if !konnectConfig.Dev {
+			_, err = authenticate(ctx, konnectClient, parsedAddress.Host, *konnectConfig)
+			if err == nil {
+				break
+			}
+			// Personal Access Token authentication is not supported with the
+			// legacy Konnect, so we don't need to fallback in case of 401s.
+			if konnect.IsUnauthorizedErr(err) && konnectConfig.Token != "" {
+				return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+			}
+			if konnect.IsUnauthorizedErr(err) {
+				continue
+			}
 		}
 	}
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	if strings.Contains(parsedAddress.Host, konnectWithRuntimeGroupsDomain) {
+	if konnectConfig.Dev {
+		// Local Development mode enabled, use konnect-addr as the CP addr.
+		konnectAddress = konnectConfig.Address
+	} else if strings.Contains(parsedAddress.Host, konnectWithRuntimeGroupsDomain) {
 		// get kong runtime group ID
 		kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
 		if err != nil {
@@ -115,13 +120,22 @@ func GetKongClientForKonnectMode(
 	}
 
 	// initialize kong client
-	return utils.GetKongClient(utils.KongClientConfig{
+	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
 		Headers:    konnectConfig.Headers,
 		Retryable:  true,
 	})
+	if err != nil {
+		return kongClient, err
+	}
+
+	if konnectConfig.Dev {
+		kongClient.QueryParams.Add("cluster.id", konnectRuntimeGroup)
+	}
+
+	return kongClient, nil
 }
 
 func resetKonnectV2(ctx context.Context) error {

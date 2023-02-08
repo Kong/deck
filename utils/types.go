@@ -116,6 +116,7 @@ type KonnectConfig struct {
 	Password string
 	Token    string
 	Debug    bool
+	Dev      bool
 
 	Address string
 
