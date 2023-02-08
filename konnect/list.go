@@ -23,8 +23,13 @@ const (
 func (c *Client) list(ctx context.Context,
 	endpoint string, opt *ListOpt,
 ) ([]json.RawMessage, *ListOpt, error) {
-	if opt != nil && opt.Size > 100 {
-		opt.Size = 100
+	pageSize := 100
+	if opt != nil {
+		if opt.Size > 100 {
+			opt.Size = pageSize
+		} else {
+			pageSize = opt.Size
+		}
 	}
 
 	req, err := c.NewRequest("GET", endpoint, opt, nil)
@@ -47,7 +52,7 @@ func (c *Client) list(ctx context.Context,
 	if len(list.Data) > 0 && list.Page != list.PageCount {
 		next = &ListOpt{
 			Page: list.Page + 1,
-			Size: opt.Size,
+			Size: pageSize,
 		}
 	}
 
