@@ -286,9 +286,18 @@ func fetchKongControlPlaneID(ctx context.Context,
 func fetchKongRuntimeGroupID(ctx context.Context,
 	client *konnect.Client,
 ) (string, error) {
-	runtimeGroups, _, err := client.RuntimeGroups.List(ctx, nil)
-	if err != nil {
-		return "", fmt.Errorf("fetching runtime groups: %w", err)
+	var runtimeGroups []*konnect.RuntimeGroup
+	var listOpt *konnect.ListOpt
+	for {
+		currentRuntimeGroups, next, err := client.RuntimeGroups.List(ctx, listOpt)
+		if err != nil {
+			return "", fmt.Errorf("fetching runtime groups: %w", err)
+		}
+		runtimeGroups = append(runtimeGroups, currentRuntimeGroups...)
+		if next == nil {
+			break
+		}
+		listOpt = next
 	}
 	if konnectRuntimeGroup == "" {
 		konnectRuntimeGroup = defaultRuntimeGroupName
