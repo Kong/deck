@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.17.3](#v1173)
 - [v1.17.2](#v1172)
 - [v1.17.1](#v1171)
 - [v1.17.0](#v1170)
@@ -49,6 +50,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.17.3]
+
+> Release date: 2023/02/08
+
+### Fixes
+
+- Handle konnect runtime groups pagination properly.
+  [#841](https://github.com/Kong/deck/pull/841)
+- Fix workspaces validation with multiple files
+  [#839](https://github.com/Kong/deck/pull/839)
 
 ## [v1.17.2]
 
