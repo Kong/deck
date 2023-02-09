@@ -261,3 +261,13 @@ func dump(opts ...string) (string, error) {
 
 	return string(out), cmdErr
 }
+
+func ping(opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"ping"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(context.Background())
+}

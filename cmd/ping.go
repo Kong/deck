@@ -53,12 +53,8 @@ func pingKonnect(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	fullName := res.FullName
-	if res.FullName == "" {
-		fullName = fmt.Sprintf("%s %s", res.FirstName, res.LastName)
-	}
-	fmt.Printf("Successfully Konnected as %s (%s)!\n",
-		fullName, res.Organization)
+
+	fmt.Printf("Successfully Konnected to the %s organization!\n", res.Name)
 	if konnectConfig.Debug {
 		fmt.Printf("Organization ID: %s\n", res.OrganizationID)
 	}

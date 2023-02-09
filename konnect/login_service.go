@@ -11,20 +11,9 @@ import (
 	"strings"
 )
 
-type user struct {
-	FullName string `json:"full_name,omitempty"`
-}
-
-type org struct {
-	ID   string
-	Name string
-}
-
-type UserInfo struct {
-	Profile user
-	ID      string
-	Email   string
-	Org     org
+type OrgUserInfo struct {
+	Name  string `json:"name,omitempty"`
+	OrgID string `json:"id,omitempty"`
 }
 
 type AuthService service
@@ -128,24 +117,23 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 		)
 	}
 
-	info, err := s.UserInfo(ctx)
+	info, err := s.OrgUserInfo(ctx)
 	if err != nil {
 		return AuthResponse{}, err
 	}
-	authResponse.FullName = info.Profile.FullName
-	authResponse.Organization = info.Org.Name
-	authResponse.OrganizationID = info.Org.ID
+	authResponse.Name = info.Name
+	authResponse.OrganizationID = info.OrgID
 	return authResponse, nil
 }
 
-func (s *AuthService) UserInfo(ctx context.Context) (*UserInfo, error) {
+func (s *AuthService) OrgUserInfo(ctx context.Context) (*OrgUserInfo, error) {
 	method := http.MethodGet
-	req, err := s.client.NewRequest(method, "/konnect-api/api/userinfo/", nil, nil)
+	req, err := s.client.NewRequest(method, "/v2/organizations/me", nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	info := &UserInfo{}
+	info := &OrgUserInfo{}
 	_, err = s.client.Do(ctx, req, info)
 	if err != nil {
 		return nil, err

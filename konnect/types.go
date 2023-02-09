@@ -137,10 +137,12 @@ type ControlPlaneType struct {
 
 // AuthResponse is authentication response wrapper for login.
 type AuthResponse struct {
-	Organization   string `json:"org_name"`
-	FirstName      string `json:"first_name"`
-	LastName       string `json:"last_name"`
+	Name           string `json:"name"`
 	OrganizationID string `json:"org_id"`
 
-	FullName string `json:"full_name"`
+	// deprecated fields
+	Organization string `json:"org_name"`
+	FirstName    string `json:"first_name"`
+	LastName     string `json:"last_name"`
+	FullName     string `json:"full_name"`
 }
