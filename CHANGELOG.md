@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.18.1](#v1181)
 - [v1.18.0](#v1180)
 - [v1.17.3](#v1173)
 - [v1.17.2](#v1172)
@@ -51,6 +52,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.18.1]
+
+> Release date: 2023/02/10
+
+### Fix
+
+- Use global endpoint to retrieve Konnect Organization info.
+  [#844](https://github.com/Kong/deck/pull/844)
 
 ## [v1.18.0]
 
@@ -1153,6 +1163,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.18.1]: https://github.com/kong/deck/compare/v1.18.0...v1.18.1
 [v1.18.0]: https://github.com/kong/deck/compare/v1.17.3...v1.18.0
 [v1.17.3]: https://github.com/kong/deck/compare/v1.17.2...v1.17.3
 [v1.17.2]: https://github.com/kong/deck/compare/v1.17.1...v1.17.2
