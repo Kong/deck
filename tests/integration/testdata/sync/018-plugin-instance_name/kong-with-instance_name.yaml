@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+- id: efead952-0a1d-43ec-9794-0ac6abdc7f55
+  name: request-termination
+  instance_name: my-plugin
+  config:
+    status_code: 200
+  enabled: true
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https

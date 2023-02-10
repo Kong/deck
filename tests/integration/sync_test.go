@@ -2967,3 +2967,84 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - 3.2.0+
+func Test_Sync_PluginInstanceName(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin with instance_name",
+			kongFile: "testdata/sync/018-plugin-instance_name/kong-with-instance_name.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:         kong.String("request-termination"),
+						InstanceName: kong.String("my-plugin"),
+						Protocols: []*string{
+							kong.String("grpc"),
+							kong.String("grpcs"),
+							kong.String("http"),
+							kong.String("https"),
+						},
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"status_code":  float64(200),
+							"echo":         false,
+							"content_type": nil,
+							"body":         nil,
+							"message":      nil,
+							"trigger":      nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "create a plugin without instance_name",
+			kongFile: "testdata/sync/018-plugin-instance_name/kong-without-instance_name.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name: kong.String("request-termination"),
+						Protocols: []*string{
+							kong.String("grpc"),
+							kong.String("grpcs"),
+							kong.String("http"),
+							kong.String("https"),
+						},
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"status_code":  float64(200),
+							"echo":         false,
+							"content_type": nil,
+							"body":         nil,
+							"message":      nil,
+							"trigger":      nil,
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "kong", ">=3.2.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}

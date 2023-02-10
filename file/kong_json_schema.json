@@ -573,6 +573,9 @@
         "id": {
           "type": "string"
         },
+        "instance_name": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
