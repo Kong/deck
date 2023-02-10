@@ -127,8 +127,11 @@ func (s *AuthService) LoginV2(ctx context.Context, email,
 }
 
 func (s *AuthService) OrgUserInfo(ctx context.Context) (*OrgUserInfo, error) {
-	method := http.MethodGet
-	req, err := s.client.NewRequest(method, "/v2/organizations/me", nil, nil)
+	// replace geo-specific endpoint with global one for retrieving org info
+	client := *s.client
+	client.baseURL = strings.Replace(s.client.baseURL, "eu.", "global.", 1)
+
+	req, err := client.NewRequest(http.MethodGet, "/v2/organizations/me", nil, nil)
 	if err != nil {
 		return nil, err
 	}
