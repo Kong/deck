@@ -7,7 +7,6 @@ import (
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
 )
 
 type Format string
@@ -22,9 +21,6 @@ const (
 	// FormatKongGateway3x represents the Kong gateway 3.x format.
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 )
-
-// AllFormats contains all available formats.
-var AllFormats = []Format{FormatKongGateway, FormatKonnect}
 
 func ParseFormat(key string) (Format, error) {
 	format := Format(strings.ToLower(key))
@@ -42,12 +38,24 @@ func ParseFormat(key string) (Format, error) {
 	}
 }
 
-func Convert(inputFilename, outputFilename string, from, to Format) error {
+type Opts struct {
+	InputFilename  string
+	OutputFilename string
+	FromFormat     Format
+	ToFormat       Format
+
+	// konnect-specific
+	RuntimeGroupName string
+}
+
+func Convert(opts Opts) error {
 	var (
 		outputContent *file.Content
 		err           error
 	)
 
+	inputFilename, outputFilename := opts.InputFilename, opts.OutputFilename
+	from, to := opts.FromFormat, opts.ToFormat
 	inputContent, err := file.GetContentFromFiles([]string{inputFilename})
 	if err != nil {
 		return err
@@ -55,7 +63,7 @@ func Convert(inputFilename, outputFilename string, from, to Format) error {
 
 	switch {
 	case from == FormatKongGateway && to == FormatKonnect:
-		outputContent, err = convertKongGatewayToKonnect(inputContent)
+		outputContent, err = convertKongGatewayToKonnect(inputContent, opts.RuntimeGroupName)
 		if err != nil {
 			return err
 		}
@@ -139,59 +147,41 @@ func migrateRoutesPathFieldPre300(route *file.FRoute) (*file.FRoute, bool) {
 	return route, hasChanged
 }
 
-func convertKongGatewayToKonnect(input *file.Content) (*file.Content, error) {
+// convertKongGatewayToKonnect convert a Kong configuration file format to a Konnect
+// configuration file format. The two formats are almost identical, except for a few gotchas:
+// - the `_format_version` option must be set to '3.0'
+// - no `_workspace` must be present in the Konnect format (since no Workspaces exist there)
+//
+// This function makes sure to set the appropriate `_format_version` value and handle
+// the removal of the `_workspace` configuration following this algorithm:
+//  1. if present, remove the `_workspace` entry
+//  2. if `--konnect-runtime-group-name foo` flag is used, then set `_konnect.runtime_group_name: foo`
+//  3. if no `--konnect-runtime-group-name` flag is used, then set `_konnect.runtime_group_name`
+//     to the value `_workspace` was precedently set to
+//  4. if no `_workspace` was present and no `--konnect-runtime-group-name` flag is used,
+//     then leave the whole `_konnect` entry unset
+func convertKongGatewayToKonnect(
+	input *file.Content, runtimeGroupName string,
+) (*file.Content, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input content is nil")
 	}
 	outputContent := input.DeepCopy()
 
-	for _, service := range outputContent.Services {
-		servicePackage, err := kongServiceToKonnectServicePackage(service)
-		if err != nil {
-			return nil, err
+	workspace := outputContent.Workspace
+	outputContent.Workspace = ""
+	// the `--konnect-runtime-group-name` flag takes precedence over the `_workspace` value
+	if runtimeGroupName != "" {
+		if outputContent.Konnect == nil {
+			outputContent.Konnect = &file.Konnect{}
 		}
-		outputContent.ServicePackages = append(outputContent.ServicePackages, servicePackage)
+		outputContent.Konnect.RuntimeGroupName = runtimeGroupName
+	} else if workspace != "" {
+		if outputContent.Konnect == nil {
+			outputContent.Konnect = &file.Konnect{}
+		}
+		outputContent.Konnect.RuntimeGroupName = workspace
 	}
-	// Remove Kong Services from the file because all of them have been converted
-	// into Service packages
-	outputContent.Services = nil
-
-	// all other entities are left as is
-
+	outputContent.FormatVersion = "3.0"
 	return outputContent, nil
-}
-
-func kongServiceToKonnectServicePackage(service file.FService) (file.FServicePackage, error) {
-	if service.Name == nil {
-		return file.FServicePackage{}, fmt.Errorf("kong service with id '%s' doesn't have a name,"+
-			"all services must be named to convert them from %s to %s format",
-			*service.ID, FormatKongGateway, FormatKonnect)
-	}
-
-	serviceName := *service.Name
-	// Kong service MUST contain an ID and no name in Konnect representation
-
-	// convert Kong Service to a Service Package
-	return file.FServicePackage{
-		Name:        &serviceName,
-		Description: kong.String("placeholder description for " + serviceName + " service package"),
-		Versions: []file.FServiceVersion{
-			{
-				Version: kong.String("v1"),
-				Implementation: &file.Implementation{
-					Type: utils.ImplementationTypeKongGateway,
-					Kong: &file.Kong{
-						Service: removeServiceName(&service),
-					},
-				},
-			},
-		},
-	}, nil
-}
-
-func removeServiceName(service *file.FService) *file.FService {
-	serviceCopy := service.DeepCopy()
-	serviceCopy.Name = nil
-	serviceCopy.ID = kong.String(utils.UUID())
-	return serviceCopy
 }

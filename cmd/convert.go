@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/kong/deck/convert"
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
@@ -46,11 +45,18 @@ can be converted into a 'konnect' configuration file.`,
 					return nil
 				}
 
-				err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
+				opts := convert.Opts{
+					InputFilename:    convertCmdInputFile,
+					OutputFilename:   convertCmdOutputFile,
+					FromFormat:       sourceFormat,
+					ToFormat:         destinationFormat,
+					RuntimeGroupName: konnectRuntimeGroup,
+				}
+				err = convert.Convert(opts)
 				if err != nil {
 					return fmt.Errorf("converting file: %v", err)
 				}
-			} else if is2xTo3xConversion() {
+			} else {
 				path, err := os.Getwd()
 				if err != nil {
 					return fmt.Errorf("getting current working directory: %w", err)
@@ -60,16 +66,18 @@ can be converted into a 'konnect' configuration file.`,
 					return fmt.Errorf("getting files from directory: %w", err)
 				}
 				for _, filename := range files {
-					err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
+					opts := convert.Opts{
+						InputFilename:    filename,
+						OutputFilename:   filename,
+						FromFormat:       sourceFormat,
+						ToFormat:         destinationFormat,
+						RuntimeGroupName: konnectRuntimeGroup,
+					}
+					err = convert.Convert(opts)
 					if err != nil {
 						return fmt.Errorf("converting '%s' file: %v", filename, err)
 					}
 				}
-			}
-			if convertCmdDestinationFormat == "konnect" {
-				cprint.UpdatePrintf("Warning: konnect format type was deprecated in v1.12 and it will be removed\n" +
-					"in a future version. Please use your Kong configuration files with deck <cmd>.\n" +
-					"Please see https://docs.konghq.com/konnect/deployment/import.\n")
 			}
 			return nil
 		},
@@ -88,9 +96,4 @@ can be converted into a 'konnect' configuration file.`,
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 	return convertCmd
-}
-
-func is2xTo3xConversion() bool {
-	return convertCmdSourceFormat == string(convert.FormatKongGateway2x) &&
-		convertCmdDestinationFormat == string(convert.FormatKongGateway3x)
 }

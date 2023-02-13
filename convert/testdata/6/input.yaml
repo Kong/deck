@@ -1,6 +1,40 @@
-_format_version: "3.0"
+services:
+- name: svc1
+  host: mockbin.org
+  tags:
+  - team-svc1
+  routes:
+  - name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+- name: svc2
+  host: mockbin.org
+  routes:
+  - name: r2
+    https_redirect_status_code: 301
+    paths:
+    - /r2
+- name: svc3
+  host: mockbin.org
+  port: 80
+  routes:
+  - name: r3
+    https_redirect_status_code: 301
+    paths:
+    - /r3
+    methods:
+    - GET
+upstreams:
+- name: upstream1
+  algorithm: round-robin
+  targets:
+  - target: 198.51.100.11:80
+  - target: 198.51.100.12:80
+  - target: 198.51.100.13:80
 certificates:
-- cert: |
+- id: 13c562a1-191c-4464-9b18-e5222b46035b
+  cert: |
     -----BEGIN CERTIFICATE-----
     MIIC1jCCAb4CCQCt23nwvxSCvjANBgkqhkiG9w0BAQsFADAtMRYwFAYDVQQDDA0q
     LmV4YW1wbGUuY29tMRMwEQYDVQQKDAprb25naHEub3JnMB4XDTE4MTIzMTIwMTkw
@@ -19,7 +53,6 @@ certificates:
     lrijTlXZFR8NIZBrCo/QZ2cNbUAbN3R0n+/kMFubxBL8WEm6Qhi9jBjbJeDMspd8
     C+/TZJQMpx5vyA==
     -----END CERTIFICATE-----
-  id: 13c562a1-191c-4464-9b18-e5222b46035b
   key: |
     -----BEGIN PRIVATE KEY-----
     MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCo/9q9QF6Pcftg
@@ -49,30 +82,41 @@ certificates:
     hJCaXTsiP4IUmBjiwzSp3o1ctP8lWvnyJpAadYdDhaDaAAoaMjCo9cm5OMwc8t8x
     hwAPXV2cgWH8fPcT9NLAcwWk
     -----END PRIVATE KEY-----
+  tags:
+  - cloudops-managed
   snis:
   - name: demo1.example.com
   - name: demo2.example.com
   - name: demo3.example.com
-  tags:
-  - cloudops-managed
+plugins:
+- name: prometheus
+  enabled: true
+  run_on: first
+  protocols:
+  - http
+  - https
 consumers:
-- acls:
-  - group: foo-group
-  basicauth_credentials:
-  - password: this-password-cant-be-changed
-    username: user1
+- username: harry
+  keyauth_credentials:
+  - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
   hmacauth_credentials:
-  - secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
-    username: hmac-user
+  - username: hmac-user
+    secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
   jwt_secrets:
   - algorithm: HS256
     key: MKWeR0nu9OAUR9HrjpUG82Hbfz7ZXsIw
     secret: 6gkrxTKAraykMSpmnLNEGiEE3Yz8XL6U
-  keyauth_credentials:
-  - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
-  username: harry
-- plugins:
-  - config:
+  basicauth_credentials:
+  - username: user1
+    password: this-password-cant-be-changed
+  acls:
+  - group: foo-group
+- username: yolo
+  tags:
+  - internal-user
+  plugins:
+  - name: rate-limiting
+    config:
       day: null
       fault_tolerant: true
       hide_client_headers: false
@@ -89,52 +133,7 @@ consumers:
       second: null
       year: null
     enabled: true
-    name: rate-limiting
+    run_on: first
     protocols:
     - http
     - https
-    run_on: first
-  tags:
-  - internal-user
-  username: yolo
-plugins:
-- enabled: true
-  name: prometheus
-  protocols:
-  - http
-  - https
-  run_on: first
-services:
-- name: svc1
-  host: mockbin.org
-  tags:
-  - team-svc1
-  routes:
-  - name: r1
-    https_redirect_status_code: 301
-    paths:
-    - /r1
-- name: svc2
-  host: mockbin.org
-  routes:
-  - name: r2
-    https_redirect_status_code: 301
-    paths:
-    - /r2
-- name: svc3
-  host: mockbin.org
-  port: 80
-  routes:
-  - name: r3
-    https_redirect_status_code: 301
-    paths:
-    - /r3
-    methods:
-    - GET
-upstreams:
-- algorithm: round-robin
-  name: upstream1
-  targets:
-  - target: 198.51.100.11:80
-  - target: 198.51.100.12:80
-  - target: 198.51.100.13:80
