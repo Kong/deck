@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.13
-	github.com/kong/go-kong v0.36.0
+	github.com/kong/go-kong v0.38.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.22.12
 	github.com/spf13/cobra v1.6.1
