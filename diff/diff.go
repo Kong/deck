@@ -19,19 +19,18 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
-type EntityState struct 
+type entityState struct 
 {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	OldState any `json:"oldState"`
-	NewState any `json:"newState"`
+	Name string
+	OldState any
+	NewState any
 }
 
 type EntityChanges struct 
 {
-	Creating []EntityState `json:"creating"`
-	Updating []EntityState `json:"updating"`
-	Deleting []EntityState `json:"deleting"`
+	Creating []entityState
+	Updating []entityState
+	Deleting []entityState
 }
 
 var errEnqueueFailed = errors.New("failed to queue event")
@@ -477,9 +476,9 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOu
 	}
 	
 	output := EntityChanges{
-			Creating: []EntityState{},
-			Updating: []EntityState{},
-			Deleting: []EntityState{},
+			Creating: []entityState{},
+			Updating: []entityState{},
+			Deleting: []entityState{},
 		}
 	
 	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
@@ -488,11 +487,10 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOu
 
 		c := e.Obj.(state.ConsoleString)
 		
-		item := EntityState{
-			OldState: e.OldObj,
-			NewState: e.Obj,
+		item := entityState{
+			OldState: e.Obj,
+			NewState: e.OldObj,
 			Name: c.Console(),
-			Type: string(e.Kind),
 		}
 		switch e.Op {
 		case crud.Create:

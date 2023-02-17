@@ -11,7 +11,7 @@ var (
 	diffCmdParallelism     int
 	diffCmdNonZeroExitCode bool
 	diffWorkspace          string
-	diffJsonOutput bool
+	diffJSONOutput         bool
 )
 
 // newDiffCmd represents the diff command
@@ -28,7 +28,7 @@ that will be created, updated, or deleted.
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return syncMain(cmd.Context(), diffCmdKongStateFile, true,
-				diffCmdParallelism, 0, diffWorkspace, diffJsonOutput)
+				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput)
 		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(diffCmdKongStateFile) == 0 {
@@ -66,7 +66,7 @@ that will be created, updated, or deleted.
 			"and exit code 1 if an error occurs.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not diff CA certificates.")
-	diffCmd.Flags().BoolVar(&diffJsonOutput, "enable-json-output",
+	diffCmd.Flags().BoolVar(&diffJSONOutput, "enable-json-output",
 		false, "print execution results to stdout in a JSON format")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd

@@ -10,7 +10,7 @@ var (
 	syncCmdParallelism   int
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
-	syncJsonOutput bool
+	syncJSONOutput       bool
 )
 
 // newSyncCmd represents the sync command
@@ -25,7 +25,7 @@ to get Kong's state in sync with the input state.`,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return syncMain(cmd.Context(), syncCmdKongStateFile, false,
-				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJsonOutput)
+				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput)
 		},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(syncCmdKongStateFile) == 0 {
@@ -63,7 +63,7 @@ to get Kong's state in sync with the input state.`,
 			"See `db_update_propagation` in kong.conf.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
-	syncCmd.Flags().BoolVar(&syncJsonOutput, "enable-json-output",
+	syncCmd.Flags().BoolVar(&syncJSONOutput, "enable-json-output",
 		false, "provide JSON output to std out")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
