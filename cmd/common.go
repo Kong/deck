@@ -244,7 +244,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if enableJSONOutput {
 			workspace := diff.EntityState{
 				Name: wsConfig.Workspace,
-				Type: "Workspace",
+				Kind: "workspace",
 			}
 			jsonOutput.Changes.Creating = append(jsonOutput.Changes.Creating, workspace)
 		} else {
