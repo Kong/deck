@@ -19,16 +19,14 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
-type EntityState struct 
-{
-	Name string
-	Kind string
+type EntityState struct {
+	Name     string
+	Kind     string
 	OldState any
 	NewState any
 }
 
-type EntityChanges struct 
-{
+type EntityChanges struct {
 	Creating []EntityState
 	Updating []EntityState
 	Deleting []EntityState
@@ -459,7 +457,9 @@ func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string,
 }
 
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOut bool) (Stats, []error, EntityChanges) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJSONOut bool) (Stats,
+	[]error, EntityChanges,
+) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -475,30 +475,30 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOu
 			stats.DeleteOps.Increment(1)
 		}
 	}
-	
+
 	output := EntityChanges{
-			Creating: []EntityState{},
-			Updating: []EntityState{},
-			Deleting: []EntityState{},
-		}
-	
+		Creating: []EntityState{},
+		Updating: []EntityState{},
+		Deleting: []EntityState{},
+	}
+
 	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
 		var err error
 		var result crud.Arg
 
 		c := e.Obj.(state.ConsoleString)
-		
+
 		item := EntityState{
 			OldState: e.Obj,
 			NewState: e.OldObj,
-			Name: c.Console(),
-			Kind: string(e.Kind),
+			Name:     c.Console(),
+			Kind:     string(e.Kind),
 		}
 		switch e.Op {
 		case crud.Create:
-			if(isJsonOut){
+			if isJSONOut {
 				output.Creating = append(output.Creating, item)
-			}else{
+			} else {
 				sc.createPrintln("creating", e.Kind, c.Console())
 			}
 		case crud.Update:
@@ -506,15 +506,15 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJsonOu
 			if err != nil {
 				return nil, err
 			}
-			if(isJsonOut){
+			if isJSONOut {
 				output.Updating = append(output.Updating, item)
-			}else{
+			} else {
 				sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
 			}
 		case crud.Delete:
-			if(isJsonOut){
+			if isJSONOut {
 				output.Deleting = append(output.Deleting, item)
-			}else{
+			} else {
 				sc.deletePrintln("deleting", e.Kind, c.Console())
 			}
 		default:
