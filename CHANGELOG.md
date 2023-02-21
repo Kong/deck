@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.19.0](#v1190)
 - [v1.18.1](#v1181)
 - [v1.18.0](#v1180)
 - [v1.17.3](#v1173)
@@ -53,6 +54,15 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.19.0]
+
+> Release date: 2023/02/21
+
+### Add
+
+- Add `instance_name` field to plugin schema
+  [#844](https://github.com/Kong/deck/pull/844)
+
 ## [v1.18.1]
 
 > Release date: 2023/02/10
@@ -60,7 +70,7 @@
 ### Fix
 
 - Use global endpoint to retrieve Konnect Organization info.
-  [#844](https://github.com/Kong/deck/pull/844)
+  [#845](https://github.com/Kong/deck/pull/845)
 
 ## [v1.18.0]
 
@@ -1163,6 +1173,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.19.0]: https://github.com/kong/deck/compare/v1.18.1...v1.19.0
 [v1.18.1]: https://github.com/kong/deck/compare/v1.18.0...v1.18.1
 [v1.18.0]: https://github.com/kong/deck/compare/v1.17.3...v1.18.0
 [v1.17.3]: https://github.com/kong/deck/compare/v1.17.2...v1.17.3
