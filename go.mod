@@ -27,7 +27,7 @@ require (
 	github.com/stretchr/testify v1.8.2
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.1.0
-	k8s.io/code-generator v0.26.1
+	k8s.io/code-generator v0.26.2
 	sigs.k8s.io/yaml v1.3.0
 )
 
