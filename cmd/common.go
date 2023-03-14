@@ -90,6 +90,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
+		targetContent.ConsumerGroups = []file.FConsumerGroupObject{}
 	}
 	if dumpConfig.SkipCACerts {
 		targetContent.CACertificates = []file.FCACertificate{}

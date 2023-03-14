@@ -3048,3 +3048,53 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - 3.2.0+
+func Test_Sync_SkipConsumers(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		skipConsumers bool
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "skip-consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+			},
+			skipConsumers: true,
+		},
+		{
+			name:     "do not skip consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services:       svc1_207,
+				Consumers:      consumerGroupsConsumers,
+				ConsumerGroups: consumerGroupsWithTagsAndRLA,
+			},
+			skipConsumers: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.2.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			if tc.skipConsumers {
+				sync(tc.kongFile, "--skip-consumers")
+			} else {
+				sync(tc.kongFile)
+			}
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
