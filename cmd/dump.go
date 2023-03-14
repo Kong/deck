@@ -163,8 +163,8 @@ configure Kong.`,
 	dumpCmd.Flags().BoolVar(&dumpAllWorkspaces, "all-workspaces",
 		false, "dump configuration of all Workspaces (Kong Enterprise only).")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
-		false, "skip exporting consumers and any plugins associated "+
-			"with consumers.")
+		false, "skip exporting consumers, consumer-groups and any plugins associated "+
+			"with them.")
 	dumpCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified with this flag are exported.\n"+

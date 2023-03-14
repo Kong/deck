@@ -44,8 +44,8 @@ to get Kong's state in sync with the input state.`,
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
-		false, "do not sync consumers or "+
-			"any plugins associated with consumers.")
+		false, "do not sync consumers, consumer-groups or "+
+			"any plugins associated with them.")
 	syncCmd.Flags().IntVar(&syncCmdParallelism, "parallelism",
 		10, "Maximum number of concurrent operations.")
 	syncCmd.Flags().BoolVar(&noMaskValues, "no-mask-deck-env-vars-value",

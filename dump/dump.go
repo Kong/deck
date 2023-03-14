@@ -66,6 +66,30 @@ func validateConfig(config Config) error {
 	return nil
 }
 
+func getConsumerGroupsConfiguration(ctx context.Context, group *errgroup.Group,
+	client *kong.Client, config Config, state *utils.KongRawState,
+) {
+	group.Go(func() error {
+		var (
+			err            error
+			consumerGroups []*kong.ConsumerGroupObject
+		)
+		if config.KonnectRuntimeGroup != "" {
+			consumerGroups, err = GetAllKonnectConsumerGroups(ctx, client, config.SelectorTags)
+		} else {
+			consumerGroups, err = GetAllConsumerGroups(ctx, client, config.SelectorTags)
+		}
+		if err != nil {
+			if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
+				return nil
+			}
+			return fmt.Errorf("consumer_groups: %w", err)
+		}
+		state.ConsumerGroups = consumerGroups
+		return nil
+	})
+}
+
 func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 	client *kong.Client, config Config, state *utils.KongRawState,
 ) {
@@ -236,26 +260,6 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		state.Vaults = vaults
 		return nil
 	})
-
-	group.Go(func() error {
-		var (
-			err            error
-			consumerGroups []*kong.ConsumerGroupObject
-		)
-		if config.KonnectRuntimeGroup != "" {
-			consumerGroups, err = GetAllKonnectConsumerGroups(ctx, client, config.SelectorTags)
-		} else {
-			consumerGroups, err = GetAllConsumerGroups(ctx, client, config.SelectorTags)
-		}
-		if err != nil {
-			if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
-				return nil
-			}
-			return fmt.Errorf("consumer_groups: %w", err)
-		}
-		state.ConsumerGroups = consumerGroups
-		return nil
-	})
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,
@@ -298,6 +302,7 @@ func Get(ctx context.Context, client *kong.Client, config Config) (*utils.KongRa
 		// regular case
 		getProxyConfiguration(ctx, group, client, config, &state)
 		if !config.SkipConsumers {
+			getConsumerGroupsConfiguration(ctx, group, client, config, &state)
 			getConsumerConfiguration(ctx, group, client, config, &state)
 		}
 	}

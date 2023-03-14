@@ -1,0 +1,26 @@
+_format_version: "3.0"
+consumer_groups:
+- name: basic
+  plugins:
+  - config:
+      limit:
+      - 30000
+      retry_after_jitter_max: 0
+      window_size:
+      - 2628000
+      window_type: sliding
+    name: rate-limiting-advanced
+consumers:
+- groups:
+  - name: basic
+  username: foo
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
