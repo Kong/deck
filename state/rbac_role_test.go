@@ -157,15 +157,16 @@ func TestRBACRolesCollection_Get(t *testing.T) {
 	k.Add(rbacRole1)
 	k.Add(rbacRole2)
 	for _, tt := range tests {
+		tc := &tt //nolint:gosec
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := k.Get(tt.args.nameOrID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RBACRolesCollection.Get() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := k.Get(tc.args.nameOrID)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("RBACRolesCollection.Get() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("RBACRolesCollection.Get() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("RBACRolesCollection.Get() = %v, want %v", got, tc.want)
 			}
 		})
 	}

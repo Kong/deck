@@ -92,10 +92,11 @@ func TestZeroOutID(t *testing.T) {
 	}
 	t.Parallel()
 	for _, tt := range tests {
+		tc := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			ZeroOutID(tt.args.obj, tt.args.altName, tt.args.withID)
-			assert.Equal(t, tt.expectedObj, tt.args.obj)
+			ZeroOutID(tc.args.obj, tc.args.altName, tc.args.withID)
+			assert.Equal(t, tc.expectedObj, tc.args.obj)
 		})
 	}
 }
@@ -127,10 +128,11 @@ func TestZeroOutTimestamps(t *testing.T) {
 	}
 	t.Parallel()
 	for _, tt := range tests {
+		tc := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			ZeroOutTimestamps(tt.args.obj)
-			assert.Equal(t, tt.expectedObj, tt.args.obj)
+			ZeroOutTimestamps(tc.args.obj)
+			assert.Equal(t, tc.expectedObj, tc.args.obj)
 		})
 	}
 }
