@@ -165,15 +165,16 @@ func TestRoutesCollection_Get(t *testing.T) {
 	k.Add(route1)
 	k.Add(route2)
 	for _, tt := range tests {
+		tc := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := k.Get(tt.args.nameOrID)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RoutesCollection.Get() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := k.Get(tc.args.nameOrID)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("RoutesCollection.Get() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("RoutesCollection.Get() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("RoutesCollection.Get() = %v, want %v", got, tc.want)
 			}
 		})
 	}
