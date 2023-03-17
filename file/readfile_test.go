@@ -451,6 +451,61 @@ func Test_getContent(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "file with env var and parse Int",
+			args: args{[]string{"testdata/parseint/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_WRITE_TIMEOUT": "1337",
+			},
+			want: &Content{
+				Services: []FService{
+					{
+						Service: kong.Service{
+							Name:         kong.String("svc1"),
+							Host:         kong.String("mockbin.org"),
+							WriteTimeout: kong.Int(1337),
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "file with env var and parse Int - err on bad value",
+			args: args{[]string{"testdata/parseint/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_WRITE_TIMEOUT": "RIP",
+			},
+			wantErr: true,
+		},
+		{
+			name: "file with env var and parse Float64",
+			args: args{[]string{"testdata/parsefloat/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_FOO_FLOAT": "1337",
+			},
+			want: &Content{
+				Plugins: []FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("foofloat"),
+							Config: kong.Configuration{
+								"foo": float64(1337),
+							},
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "file with env var and parse Int - err on bad value",
+			args: args{[]string{"testdata/parsefloat/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_FOO_FLOAT": "RIP",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

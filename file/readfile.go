@@ -150,10 +150,20 @@ func toBool(key string) (bool, error) {
 	return strconv.ParseBool(key)
 }
 
+func toInt(key string) (int, error) {
+	return strconv.Atoi(key)
+}
+
+func toFloat(key string) (float64, error) {
+	return strconv.ParseFloat(key, 64)
+}
+
 func renderTemplate(content string) (string, error) {
 	t := template.New("state").Funcs(template.FuncMap{
-		"env":    getPrefixedEnvVar,
-		"toBool": toBool,
+		"env":     getPrefixedEnvVar,
+		"toBool":  toBool,
+		"toInt":   toInt,
+		"toFloat": toFloat,
 	}).Delims("${{", "}}")
 	t, err := t.Parse(content)
 	if err != nil {
