@@ -1,0 +1,4 @@
+plugins:
+- config:
+    foo: ${{ env "DECK_FOO_FLOAT" | toFloat }}
+  name: foofloat
