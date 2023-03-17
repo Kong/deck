@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -145,9 +146,14 @@ func getPrefixedEnvVar(key string) (string, error) {
 	return value, nil
 }
 
+func toBool(key string) (bool, error) {
+	return strconv.ParseBool(key)
+}
+
 func renderTemplate(content string) (string, error) {
 	t := template.New("state").Funcs(template.FuncMap{
-		"env": getPrefixedEnvVar,
+		"env":    getPrefixedEnvVar,
+		"toBool": toBool,
 	}).Delims("${{", "}}")
 	t, err := t.Parse(content)
 	if err != nil {
