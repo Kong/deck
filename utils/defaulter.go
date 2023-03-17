@@ -215,6 +215,9 @@ func (d *Defaulter) getEntitySchema(entityType string) (map[string]interface{}, 
 		return schema, err
 	}
 	resp, err := d.client.Do(d.ctx, req, &schema)
+	if resp == nil {
+		return schema, fmt.Errorf("invalid HTTP response: %w", err)
+	}
 	// in case the schema is not found - like in case of EE features,
 	// no error should be returned.
 	if resp.StatusCode == http.StatusNotFound {
