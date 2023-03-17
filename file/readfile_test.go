@@ -424,6 +424,33 @@ func Test_getContent(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "file with env var and parse bool",
+			args: args{[]string{"testdata/parsebool/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_MOCKBIN_ENABLED": "true",
+			},
+			want: &Content{
+				Services: []FService{
+					{
+						Service: kong.Service{
+							Name:    kong.String("svc1"),
+							Host:    kong.String("mockbin.org"),
+							Enabled: kong.Bool(true),
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "file with env var and parse bool - err on bad value",
+			args: args{[]string{"testdata/parsebool/file.yaml"}},
+			envVars: map[string]string{
+				"DECK_MOCKBIN_ENABLED": "RIP",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
