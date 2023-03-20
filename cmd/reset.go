@@ -111,7 +111,7 @@ By default, this command will ask for confirmation.`,
 	resetCmd.Flags().BoolVarP(&resetCmdForce, "force", "f",
 		false, "Skip interactive confirmation prompt before reset.")
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipConsumers, "skip-consumers",
-		false, "do not reset consumers or "+
+		false, "do not reset consumers, consumer-groups or "+
 			"any plugins associated with consumers.")
 	resetCmd.Flags().StringVarP(&resetWorkspace, "workspace", "w",
 		"", "reset configuration of a specific workspace"+
