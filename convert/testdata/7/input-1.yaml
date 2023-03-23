@@ -1,0 +1,25 @@
+_format_version: "3.0"
+services:
+- name: svc1
+  host: mockbin.org
+  tags:
+  - team-svc1
+  routes:
+  - name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+- name: svc2
+  host: mockbin.org
+  routes:
+  - name: r2
+    https_redirect_status_code: 301
+    paths:
+    - /r2
+plugins:
+- name: prometheus
+  enabled: true
+  run_on: first
+  protocols:
+  - http
+  - https

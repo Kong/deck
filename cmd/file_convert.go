@@ -38,7 +38,7 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			return nil
 		}
 
-		err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
+		err = convert.Convert([]string{convertCmdInputFile}, convertCmdOutputFile, sourceFormat, destinationFormat, false)
 		if err != nil {
 			return fmt.Errorf("converting file: %w", err)
 		}
@@ -52,7 +52,7 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("getting files from directory: %w", err)
 		}
 		for _, filename := range files {
-			err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
+			err = convert.Convert([]string{filename}, filename, sourceFormat, destinationFormat, false)
 			if err != nil {
 				return fmt.Errorf("converting '%s' file: %w", filename, err)
 			}

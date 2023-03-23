@@ -1,0 +1,41 @@
+_format_version: "3.0"
+_info:
+  defaults:
+    service:
+      connect_timeout: 30000
+      write_timeout: 30000
+    route:
+      protocols:
+      - https
+      https_redirect_status_code: 301
+services:
+- name: svc1
+  host: mockbin.org
+  tags:
+  - team-svc1
+  routes:
+  - name: r1
+    paths:
+    - /r1
+- name: svc2
+  host: mockbin.org
+  routes:
+  - name: r2
+    paths:
+    - /r2
+- name: svc3
+  host: mockbin.org
+  port: 80
+  routes:
+  - name: r3
+    paths:
+    - /r3
+    methods:
+    - GET
+plugins:
+- name: prometheus
+  enabled: true
+  run_on: first
+  protocols:
+  - http
+  - https
