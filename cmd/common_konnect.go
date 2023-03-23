@@ -183,7 +183,7 @@ func syncKonnect(ctx context.Context,
 	httpClient := utils.HTTPClient()
 
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}

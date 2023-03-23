@@ -48,7 +48,7 @@ func Convert(inputFilename, outputFilename string, from, to Format) error {
 		err           error
 	)
 
-	inputContent, err := file.GetContentFromFiles([]string{inputFilename})
+	inputContent, err := file.GetContentFromFiles([]string{inputFilename}, false)
 	if err != nil {
 		return err
 	}
