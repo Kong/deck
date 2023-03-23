@@ -42,16 +42,16 @@ func getFormatVersion(kongVersion string) (string, error) {
 	return formatVersion, nil
 }
 
-// KongStateToFile writes a state object to file with filename.
+// KongStateToFile generates a state object to file.Content.
 // It will omit timestamps and IDs while writing.
-func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
+func KongStateToContent(kongState *state.KongState, config WriteConfig) (*Content, error) {
 	file := &Content{}
 	var err error
 
 	file.Workspace = config.Workspace
 	formatVersion, err := getFormatVersion(config.KongVersion)
 	if err != nil {
-		return fmt.Errorf("get format version: %w", err)
+		return nil, fmt.Errorf("get format version: %w", err)
 	}
 	file.FormatVersion = formatVersion
 	if config.RuntimeGroupName != "" {
@@ -69,49 +69,58 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 
 	err = populateServices(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateServicelessRoutes(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populatePlugins(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateUpstreams(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateCertificates(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateCACertificates(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateConsumers(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateVaults(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateConsumerGroups(kongState, file, config)
 	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+// KongStateToFile writes a state object to file with filename.
+// See KongStateToContent for the State generation
+func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
+	file, err := KongStateToContent(kongState, config)
+	if err != nil {
 		return err
 	}
-
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 

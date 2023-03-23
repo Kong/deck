@@ -11,11 +11,12 @@ import (
 )
 
 var (
-	convertCmdSourceFormat      string
-	convertCmdDestinationFormat string
-	convertCmdInputFile         string
-	convertCmdOutputFile        string
-	convertCmdAssumeYes         bool
+	convertCmdSourceFormat       string
+	convertCmdDestinationFormat  string
+	convertCmdInputFile          []string
+	convertCmdOutputFile         string
+	convertCmdAssumeYes          bool
+	convertCmdDisableMockEnvVars bool
 )
 
 // newConvertCmd represents the convert command
@@ -37,7 +38,7 @@ can be converted into a 'konnect' configuration file.`,
 				return err
 			}
 
-			if convertCmdInputFile != "" {
+			if len(convertCmdInputFile) != 0 {
 				if yes, err := utils.ConfirmFileOverwrite(
 					convertCmdOutputFile, "", convertCmdAssumeYes,
 				); err != nil {
@@ -46,7 +47,11 @@ can be converted into a 'konnect' configuration file.`,
 					return nil
 				}
 
-				err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
+				err = convert.Convert(convertCmdInputFile,
+					convertCmdOutputFile,
+					sourceFormat,
+					destinationFormat,
+					!convertCmdDisableMockEnvVars)
 				if err != nil {
 					return fmt.Errorf("converting file: %v", err)
 				}
@@ -60,7 +65,7 @@ can be converted into a 'konnect' configuration file.`,
 					return fmt.Errorf("getting files from directory: %w", err)
 				}
 				for _, filename := range files {
-					err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
+					err = convert.Convert([]string{filename}, filename, sourceFormat, destinationFormat, !convertCmdDisableMockEnvVars)
 					if err != nil {
 						return fmt.Errorf("converting '%s' file: %v", filename, err)
 					}
@@ -75,18 +80,20 @@ can be converted into a 'konnect' configuration file.`,
 		},
 	}
 
-	sourceFormats := []convert.Format{convert.FormatKongGateway, convert.FormatKongGateway2x}
+	sourceFormats := []convert.Format{convert.FormatKongGateway, convert.FormatKongGateway2x, convert.FormatDistributed}
 	destinationFormats := []convert.Format{convert.FormatKonnect, convert.FormatKongGateway3x}
 	convertCmd.Flags().StringVar(&convertCmdSourceFormat, "from", "",
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
-	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
-		"configuration file to be converted. Use `-` to read from stdin.")
+	convertCmd.Flags().StringSliceVar(&convertCmdInputFile, "input-file", []string{},
+		"configuration files to be converted. Use `-` to read from stdin.")
 	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "kong.yaml",
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	convertCmd.Flags().BoolVar(&convertCmdDisableMockEnvVars, "disable-mock-env",
+		false, "disables the mocking of environment variables.")
 	return convertCmd
 }
 

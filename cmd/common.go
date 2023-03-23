@@ -84,7 +84,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string,
 ) error {
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}

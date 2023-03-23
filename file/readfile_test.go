@@ -512,7 +512,7 @@ func Test_getContent(t *testing.T) {
 			for k, v := range tt.envVars {
 				t.Setenv(k, v)
 			}
-			got, err := getContent(tt.args.filenames)
+			got, err := getContent(tt.args.filenames, false)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
