@@ -577,7 +577,7 @@ kong.log.set_serialize_value("span_id", parse_traceid(ngx.ctx.KONG_SPANS[1].span
 			for k, v := range tt.envVars {
 				t.Setenv(k, v)
 			}
-			got, err := getContent(tt.args.filenames)
+			got, err := getContent(tt.args.filenames, false)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -3,19 +3,22 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/kong/deck/convert"
 	"github.com/kong/deck/cprint"
+	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
 var (
 	convertCmdSourceFormat      string
-	convertCmdDestinationFormat string
+	convertCmdDestinationFormat string // konnect/kong-gateway-3.x/etc
 	convertCmdInputFile         string
 	convertCmdOutputFile        string
 	convertCmdAssumeYes         bool
+	convertCmdStateFormat       string // yaml/json output
 )
 
 func executeConvert(_ *cobra.Command, _ []string) error {
@@ -37,7 +40,13 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			return nil
 		}
 
-		err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
+		err = convert.Convert(
+			[]string{convertCmdInputFile},
+			convertCmdOutputFile,
+			file.Format(strings.ToUpper(convertCmdStateFormat)),
+			sourceFormat,
+			destinationFormat,
+			false)
 		if err != nil {
 			return fmt.Errorf("converting file: %w", err)
 		}
@@ -51,7 +60,13 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			return fmt.Errorf("getting files from directory: %w", err)
 		}
 		for _, filename := range files {
-			err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
+			err = convert.Convert(
+				[]string{filename},
+				filename,
+				file.Format(strings.ToUpper(convertCmdStateFormat)),
+				sourceFormat,
+				destinationFormat,
+				false)
 			if err != nil {
 				return fmt.Errorf("converting '%s' file: %w", filename, err)
 			}
@@ -92,6 +107,9 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	convertCmd.Flags().StringVar(&convertCmdStateFormat, "format",
+		"yaml", "output file format: json or yaml.")
+
 	return convertCmd
 }
 

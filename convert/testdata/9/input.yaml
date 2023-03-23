@@ -1,0 +1,9 @@
+services:
+- name: svc1
+  host: ${{ env "DECK_MOCKBIN_HOST" }}
+  enabled: ${{ env "DECK_MOCKBIN_ENABLED" | toBool }}
+  write_timeout: ${{ env "DECK_WRITE_TIMEOUT" | toInt }}
+plugins:
+- config:
+    foo: ${{ env "DECK_FOO_FLOAT" | toFloat }}
+  name: foofloat

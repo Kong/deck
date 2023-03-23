@@ -104,7 +104,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			Deleting: []diff.EntityState{},
 		}
 	}
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}

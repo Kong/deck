@@ -1,11 +1,15 @@
 package convert
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
+	"github.com/blang/semver/v4"
 	"github.com/kong/deck/cprint"
+	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
+	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 )
@@ -13,6 +17,8 @@ import (
 type Format string
 
 const (
+	// FormatDistributed represents the Deck configuration format.
+	FormatDistributed Format = "distributed"
 	// FormatKongGateway represents the Kong gateway format.
 	FormatKongGateway Format = "kong-gateway"
 	// FormatKonnect represents the Konnect format.
@@ -37,42 +43,61 @@ func ParseFormat(key string) (Format, error) {
 		return FormatKongGateway2x, nil
 	case FormatKongGateway3x:
 		return FormatKongGateway3x, nil
+	case FormatDistributed:
+		return FormatDistributed, nil
 	default:
 		return "", fmt.Errorf("invalid format: '%v'", key)
 	}
 }
 
-func Convert(inputFilename, outputFilename string, from, to Format) error {
-	var (
-		outputContent *file.Content
-		err           error
-	)
+func Convert(
+	inputFilenames []string,
+	outputFilename string,
+	outputFormat file.Format,
+	from Format,
+	to Format,
+	mockEnvVars bool,
+) error {
+	var outputContent *file.Content
 
-	inputContent, err := file.GetContentFromFiles([]string{inputFilename})
+	inputContent, err := file.GetContentFromFiles(inputFilenames, mockEnvVars)
 	if err != nil {
 		return err
 	}
 
 	switch {
 	case from == FormatKongGateway && to == FormatKonnect:
+		if len(inputFilenames) > 1 {
+			return fmt.Errorf("only one input file can be provided when converting from Kong to Konnect format")
+		}
 		outputContent, err = convertKongGatewayToKonnect(inputContent)
 		if err != nil {
 			return err
 		}
+
 	case from == FormatKongGateway2x && to == FormatKongGateway3x:
-		outputContent, err = convertKongGateway2xTo3x(inputContent, inputFilename)
+		if len(inputFilenames) > 1 {
+			return fmt.Errorf("only one input file can be provided when converting from Kong 2.x to Kong 3.x format")
+		}
+		outputContent, err = convertKongGateway2xTo3x(inputContent, inputFilenames[0])
 		if err != nil {
 			return err
 		}
+
+	case from == FormatDistributed && to == FormatKongGateway,
+		from == FormatDistributed && to == FormatKongGateway2x,
+		from == FormatDistributed && to == FormatKongGateway3x:
+		outputContent, err = convertDistributedToKong(inputContent, outputFilename, outputFormat, to)
+		if err != nil {
+			return err
+		}
+
 	default:
 		return fmt.Errorf("cannot convert from '%s' to '%s' format", from, to)
 	}
 
-	err = file.WriteContentToFile(outputContent, outputFilename, file.YAML)
-	if err != nil {
-		return err
-	}
-	return nil
+	err = file.WriteContentToFile(outputContent, outputFilename, outputFormat)
+	return err
 }
 
 func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Content, error) {
@@ -194,4 +219,44 @@ func removeServiceName(service *file.FService) *file.FService {
 	serviceCopy.Name = nil
 	serviceCopy.ID = kong.String(utils.UUID())
 	return serviceCopy
+}
+
+// convertDistributedToKong is used to convert one or many distributed format
+// files to create one Kong Gateway declarative config. It also leverages some
+// deck features like the defaults/centralized plugin configurations.
+func convertDistributedToKong(
+	targetContent *file.Content,
+	outputFilename string,
+	format file.Format,
+	kongFormat Format,
+) (*file.Content, error) {
+	var version semver.Version
+
+	switch kongFormat { //nolint:exhaustive
+	case FormatKongGateway,
+		FormatKongGateway3x:
+		version = semver.Version{Major: 3, Minor: 0}
+	case FormatKongGateway2x:
+		version = semver.Version{Major: 2, Minor: 8}
+	}
+
+	s, _ := state.NewKongState()
+	rawState, err := file.Get(context.Background(), targetContent, file.RenderConfig{
+		CurrentState: s,
+		KongVersion:  version,
+	}, dump.Config{}, nil)
+	if err != nil {
+		return nil, err
+	}
+	targetState, err := state.Get(rawState)
+	if err != nil {
+		return nil, err
+	}
+
+	// file.KongStateToContent calls file.WriteContentToFile
+	return file.KongStateToContent(targetState, file.WriteConfig{
+		Filename:    outputFilename,
+		FileFormat:  format,
+		KongVersion: version.String(),
+	})
 }

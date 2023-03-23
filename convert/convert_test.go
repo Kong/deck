@@ -158,9 +158,12 @@ func zeroOutID(sp file.FServicePackage) file.FServicePackage {
 func Test_Convert(t *testing.T) {
 	type args struct {
 		inputFilename          string
+		inputFilenames         []string
 		outputFilename         string
 		fromFormat             Format
 		toFormat               Format
+		disableMocks           bool
+		envVars                map[string]string
 		expectedOutputFilename string
 	}
 	tests := []struct {
@@ -237,21 +240,101 @@ func Test_Convert(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "converts from distributed to kong gateway (no deck specific fields)",
+			args: args{
+				inputFilename:          "testdata/5/input.yaml",
+				outputFilename:         "testdata/5/output.yaml",
+				expectedOutputFilename: "testdata/5/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway,
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from distributed to kong gateway with defaults",
+			args: args{
+				inputFilename:          "testdata/6/input.yaml",
+				outputFilename:         "testdata/6/output.yaml",
+				expectedOutputFilename: "testdata/6/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway,
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from distributed to kong gateway with multiple files",
+			args: args{
+				inputFilenames:         []string{"testdata/7/input-1.yaml", "testdata/7/input-2.yaml"},
+				outputFilename:         "testdata/7/output.yaml",
+				expectedOutputFilename: "testdata/7/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway,
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from distributed to kong gateway with env variables",
+			args: args{
+				inputFilenames:         []string{"testdata/8/input.yaml"},
+				outputFilename:         "testdata/8/output.yaml",
+				expectedOutputFilename: "testdata/8/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway,
+				disableMocks:           true,
+				envVars: map[string]string{
+					"DECK_MOCKBIN_HOST":    "mockbin.org",
+					"DECK_MOCKBIN_ENABLED": "true",
+					"DECK_WRITE_TIMEOUT":   "777",
+					"DECK_FOO_FLOAT":       "666",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "converts from distributed to kong gateway with env variables (mocked)",
+			args: args{
+				inputFilenames:         []string{"testdata/9/input.yaml"},
+				outputFilename:         "testdata/9/output.yaml",
+				expectedOutputFilename: "testdata/9/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway,
+				disableMocks:           false,
+			},
+			wantErr: false,
+		},
+		{
+			name: "errors from distributed to kong gateway with env variables not set",
+			args: args{
+				inputFilenames: []string{"testdata/9/input.yaml"},
+				fromFormat:     FormatDistributed,
+				toFormat:       FormatKongGateway,
+				disableMocks:   true,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := Convert(tt.args.inputFilename, tt.args.outputFilename, tt.args.fromFormat,
-				tt.args.toFormat)
+			inputFiles := tt.args.inputFilenames
+			if tt.args.inputFilename != "" {
+				inputFiles = []string{tt.args.inputFilename}
+			}
+			for k, v := range tt.args.envVars {
+				t.Setenv(k, v)
+			}
+			err := Convert(inputFiles, tt.args.outputFilename, file.YAML, tt.args.fromFormat,
+				tt.args.toFormat, !tt.args.disableMocks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			if err == nil {
-				got, err := file.GetContentFromFiles([]string{tt.args.outputFilename})
+				got, err := file.GetContentFromFiles([]string{tt.args.outputFilename}, !tt.args.disableMocks)
 				if err != nil {
 					t.Errorf("failed to read output file: %v", err)
 				}
-				want, err := file.GetContentFromFiles([]string{tt.args.expectedOutputFilename})
+				want, err := file.GetContentFromFiles([]string{tt.args.expectedOutputFilename}, !tt.args.disableMocks)
 				if err != nil {
 					t.Errorf("failed to read output file: %v", err)
 				}

@@ -44,7 +44,7 @@ this command unless --online flag is used.
 			_ = sendAnalytics("validate", "", mode)
 			// read target file
 			// this does json schema validation as well
-			targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile)
+			targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
 			if err != nil {
 				return err
 			}
