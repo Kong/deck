@@ -119,7 +119,7 @@ type consumerGroupPluginDiffer struct {
 	currentState, targetState *state.KongState
 }
 
-func (d *consumerGroupPluginDiffer) Deletes(handler func(crud.Event) error) error {
+func (d *consumerGroupPluginDiffer) Deletes(_ func(crud.Event) error) error {
 	return nil
 }
 

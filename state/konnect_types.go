@@ -35,7 +35,7 @@ func (d1 *Document) Equal(d2 *Document) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (d1 *Document) EqualWithOpts(d2 *Document,
-	ignoreID, ignoreTS, ignoreForeign bool,
+	ignoreID, _, ignoreForeign bool,
 ) bool {
 	d1Copy := d1.Document.ShallowCopy()
 	d2Copy := d2.Document.ShallowCopy()
@@ -81,7 +81,7 @@ func (s1 *ServicePackage) Equal(s2 *ServicePackage) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (s1 *ServicePackage) EqualWithOpts(s2 *ServicePackage,
-	ignoreID bool, ignoreTS bool,
+	ignoreID bool, _ bool,
 ) bool {
 	s1Copy := s1.ServicePackage.DeepCopy()
 	s2Copy := s2.ServicePackage.DeepCopy()
@@ -124,7 +124,7 @@ func (s1 *ServiceVersion) Equal(s2 *ServiceVersion) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (s1 *ServiceVersion) EqualWithOpts(s2 *ServiceVersion,
-	ignoreID, ignoreTS, ignoreForeign bool,
+	ignoreID, _, ignoreForeign bool,
 ) bool {
 	s1Copy := s1.ServiceVersion.DeepCopy()
 	s2Copy := s2.ServiceVersion.DeepCopy()

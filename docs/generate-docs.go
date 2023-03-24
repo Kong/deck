@@ -43,10 +43,7 @@ func genMarkdownTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHa
 	if _, err := io.WriteString(f, filePrepender(filename)); err != nil {
 		return err
 	}
-	if err := genMarkdownCustom(cmd, f, linkHandler); err != nil {
-		return err
-	}
-	return nil
+	return genMarkdownCustom(cmd, f, linkHandler)
 }
 
 func flagUsagesWrapped(f *pflag.FlagSet) string {
@@ -59,7 +56,7 @@ func flagUsagesWrapped(f *pflag.FlagSet) string {
 		if flag.Hidden {
 			return
 		}
-		line := ""
+		var line string
 		if flag.Shorthand != "" && flag.ShorthandDeprecated == "" {
 			line = fmt.Sprintf("`-%s`, `--%s`\n:", flag.Shorthand, flag.Name)
 		} else {

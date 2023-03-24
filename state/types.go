@@ -1328,7 +1328,7 @@ func (r1 *RBACRole) Equal(r2 *RBACRole) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (r1 *RBACRole) EqualWithOpts(r2 *RBACRole, ignoreID,
-	ignoreTS, ignoreForeign bool,
+	ignoreTS, _ bool,
 ) bool {
 	r1Copy := r1.RBACRole.DeepCopy()
 	r2Copy := r2.RBACRole.DeepCopy()
@@ -1377,7 +1377,7 @@ func (r1 *RBACEndpointPermission) Equal(r2 *RBACEndpointPermission) bool {
 // If ignoreID is set to true, IDs will be ignored while comparison.
 // If ignoreTS is set to true, timestamp fields will be ignored.
 func (r1 *RBACEndpointPermission) EqualWithOpts(r2 *RBACEndpointPermission, ignoreID,
-	ignoreTS, ignoreForeign bool,
+	ignoreTS, _ bool,
 ) bool {
 	r1Copy := r1.RBACEndpointPermission.DeepCopy()
 	r2Copy := r2.RBACEndpointPermission.DeepCopy()
