@@ -200,7 +200,7 @@ func readFile(filepath string) (string, error) {
 	return string(content), nil
 }
 
-func setup(t *testing.T) func(t *testing.T) {
+func setup(_ *testing.T) func(t *testing.T) {
 	// disable analytics for integration tests
 	os.Setenv("DECK_ANALYTICS", "off")
 	return func(t *testing.T) {

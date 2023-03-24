@@ -339,7 +339,7 @@ func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (strin
 	return version, nil
 }
 
-func validateNoArgs(cmd *cobra.Command, args []string) error {
+func validateNoArgs(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		return fmt.Errorf("positional arguments are not valid for this command, " +
 			"please use flags instead")

@@ -163,7 +163,7 @@ func backoffStrategy(min, max time.Duration, attemptNum int, resp *http.Response
 
 // retryPolicy provides a callback for Client.CheckRetry, which
 // will retry on 429s errors.
-func retryPolicy(ctx context.Context, resp *http.Response, err error) (bool, error) {
+func retryPolicy(ctx context.Context, resp *http.Response, _ error) (bool, error) {
 	// do not retry on context.Canceled or context.DeadlineExceeded
 	if ctx.Err() != nil {
 		return false, ctx.Err()

@@ -29,15 +29,15 @@ func (t testActionFixture) invoke(op string, inputs ...Arg) (Arg, error) {
 	return res, nil
 }
 
-func (t testActionFixture) Create(ctx context.Context, input ...Arg) (Arg, error) {
+func (t testActionFixture) Create(_ context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("create", input...)
 }
 
-func (t testActionFixture) Delete(ctx context.Context, input ...Arg) (Arg, error) {
+func (t testActionFixture) Delete(_ context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("delete", input...)
 }
 
-func (t testActionFixture) Update(ctx context.Context, input ...Arg) (Arg, error) {
+func (t testActionFixture) Update(_ context.Context, input ...Arg) (Arg, error) {
 	return t.invoke("update", input...)
 }
 
