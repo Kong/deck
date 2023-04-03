@@ -680,6 +680,20 @@ func (c FVault) sortKey() string {
 	return ""
 }
 
+// FLicense represents a Kong License.
+// +k8s:deepcopy-gen=true
+type FLicense struct {
+	kong.License `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (c FLicense) sortKey() string {
+	if c.ID != nil {
+		return *c.ID
+	}
+	return ""
+}
+
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
@@ -707,4 +721,6 @@ type Content struct {
 	ServicePackages []FServicePackage `json:"service_packages,omitempty" yaml:"service_packages,omitempty"`
 
 	Vaults []FVault `json:"vaults,omitempty" yaml:"vaults,omitempty"`
+
+	Licenses []FLicense `json:"licenses,omitempty" yaml:"licenses,omitempty"`
 }

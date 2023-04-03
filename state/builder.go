@@ -305,6 +305,12 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting vault into state: %w", err)
 		}
 	}
+	for _, l := range raw.Licenses {
+		err := kongState.Licenses.Add(License{License: *l})
+		if err != nil {
+			return fmt.Errorf("inserting license into state: %w", err)
+		}
+	}
 	return nil
 }
 

@@ -1470,3 +1470,48 @@ func (v1 *Vault) EqualWithOpts(v2 *Vault, ignoreID, ignoreTS bool) bool {
 	}
 	return reflect.DeepEqual(v1Copy, v2Copy)
 }
+
+// License represents a license in Kong.
+// It adds some helper methods along with Meta to the original License object.
+type License struct {
+	kong.License `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (l1 *License) Identifier() string {
+	return *l1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (l1 *License) Console() string {
+	return l1.FriendlyName()
+}
+
+// Equal returns true if l1 and l2 are equal.
+// TODO add compare array without position
+func (l1 *License) Equal(l2 *License) bool {
+	return l1.EqualWithOpts(l2, false, false)
+}
+
+// EqualWithOpts returns true if l1 and l2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (l1 *License) EqualWithOpts(l2 *License, ignoreID, ignoreTS bool) bool {
+	l1Copy := l1.License.DeepCopy()
+	l2Copy := l2.License.DeepCopy()
+
+	if ignoreID {
+		l1Copy.ID = nil
+		l2Copy.ID = nil
+	}
+	if ignoreTS {
+		l1Copy.CreatedAt = nil
+		l2Copy.CreatedAt = nil
+
+		l1Copy.UpdatedAt = nil
+		l2Copy.UpdatedAt = nil
+	}
+	return reflect.DeepEqual(l1Copy, l2Copy)
+}

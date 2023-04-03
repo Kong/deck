@@ -55,6 +55,13 @@
       },
       "type": "array"
     },
+    "licenses": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FLicense"
+      },
+      "type": "array"
+    },
     "plugins": {
       "items": {
         "$ref": "#/definitions/FPlugin"
@@ -544,6 +551,24 @@
         },
         "published": {
           "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FLicense": {
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,

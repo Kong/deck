@@ -148,6 +148,8 @@ func (sc *Syncer) init() error {
 
 		types.Vault,
 
+		types.License,
+
 		types.RBACRole, types.RBACEndpointPermission,
 
 		types.ServicePackage, types.ServiceVersion, types.Document,

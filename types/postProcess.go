@@ -416,3 +416,19 @@ func (crud vaultPostAction) Delete(_ context.Context, args ...crud.Arg) (crud.Ar
 func (crud vaultPostAction) Update(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
 	return nil, crud.currentState.Vaults.Update(*args[0].(*state.Vault))
 }
+
+type licensePostAction struct {
+	currentState *state.KongState
+}
+
+func (crud licensePostAction) Create(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Licenses.Add(*args[0].(*state.License))
+}
+
+func (crud licensePostAction) Delete(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Licenses.Delete(*((args[0].(*state.License)).ID))
+}
+
+func (crud licensePostAction) Update(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
+	return nil, crud.currentState.Licenses.Update(*args[0].(*state.License))
+}
