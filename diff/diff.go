@@ -20,16 +20,16 @@ import (
 )
 
 type EntityState struct {
-	Name     string
-	Kind     string
-	OldState any
-	NewState any
+	Name     string `json:"name"`
+	Kind     string `json:"kind"`
+	OldState any `json:"oldState"`
+	NewState any `json:"newState"`
 }
 
 type EntityChanges struct {
-	Creating []EntityState
-	Updating []EntityState
-	Deleting []EntityState
+	Creating []EntityState `json:"creating"`
+	Updating []EntityState `json:"updating"`
+	Deleting []EntityState `json:"deleting"`
 }
 
 var errEnqueueFailed = errors.New("failed to queue event")
