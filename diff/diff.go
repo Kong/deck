@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/konnect"

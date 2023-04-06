@@ -3,8 +3,9 @@ package state
 import (
 	"testing"
 
-	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/kong/go-kong/kong"
 )
 
 func basicAuthsCollection() *BasicAuthsCollection {

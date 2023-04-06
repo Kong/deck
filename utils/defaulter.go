@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/imdario/mergo"
+
 	"github.com/kong/go-kong/kong"
 )
 

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"golang.org/x/sync/errgroup"
 )
 
 // Config can be used to skip exporting certain entities

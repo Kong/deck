@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"github.com/kong/deck/convert"
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/utils"
-	"github.com/spf13/cobra"
 )
 
 var (

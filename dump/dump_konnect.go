@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"sync"
 
+	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
+
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"golang.org/x/sync/errgroup"
-	"golang.org/x/sync/semaphore"
 )
 
 type KonnectConfig struct {

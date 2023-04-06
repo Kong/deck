@@ -16,10 +16,11 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/ssgelm/cookiejarparser"
+
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
 	"github.com/kong/go-kong/kong/custom"
-	"github.com/ssgelm/cookiejarparser"
 )
 
 var clientTimeout time.Duration

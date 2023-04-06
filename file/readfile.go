@@ -12,8 +12,9 @@ import (
 	"text/template"
 
 	"github.com/imdario/mergo"
-	"github.com/kong/deck/utils"
 	"sigs.k8s.io/yaml"
+
+	"github.com/kong/deck/utils"
 )
 
 // getContent reads all the YAML and JSON files in the directory or the

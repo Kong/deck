@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/deck/validate"
 	"github.com/kong/go-kong/kong"
-	"github.com/spf13/cobra"
 )
 
 var (

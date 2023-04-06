@@ -69,6 +69,11 @@ issues:
     path: cmd/root.go
 
 linters-settings:
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/kong)
   gomodguard:
     blocked:
       modules:
@@ -81,3 +86,5 @@ linters-settings:
       - gopkg.in/yaml.v3:
           recommendations:
           - sigs.k8s.io/yaml
+run:
+  timeout: 5m

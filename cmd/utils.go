@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"github.com/fatih/color"
+	"github.com/spf13/pflag"
+
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/diff"
-	"github.com/spf13/pflag"
 )
 
 func printStats(stats diff.Stats) {

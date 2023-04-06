@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
-	"github.com/spf13/cobra"
 )
 
 var (

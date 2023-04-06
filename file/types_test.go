@@ -5,9 +5,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"sigs.k8s.io/yaml"
+
+	"github.com/kong/go-kong/kong"
 )
 
 var (

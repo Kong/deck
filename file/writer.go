@@ -9,10 +9,11 @@ import (
 	"sort"
 	"strings"
 
+	"sigs.k8s.io/yaml"
+
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"sigs.k8s.io/yaml"
 )
 
 // WriteConfig holds settings to use to write the state file.

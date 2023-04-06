@@ -4,10 +4,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestParseFormat(t *testing.T) {

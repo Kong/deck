@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
+
 	"github.com/kong/deck/utils"
 )
 

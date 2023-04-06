@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
-	"github.com/spf13/cobra"
 )
 
 var (

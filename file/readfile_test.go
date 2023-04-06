@@ -6,9 +6,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_configFilesInDir(t *testing.T) {

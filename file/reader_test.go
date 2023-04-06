@@ -8,9 +8,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/kong/deck/dump"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_ensureJSON(t *testing.T) {

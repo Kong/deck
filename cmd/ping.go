@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
+
+	"github.com/kong/deck/utils"
 )
 
 var pingWorkspace string

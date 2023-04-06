@@ -9,6 +9,8 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
+	"github.com/spf13/cobra"
+
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/diff"
 	"github.com/kong/deck/dump"
@@ -16,7 +18,6 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/spf13/cobra"
 )
 
 const (

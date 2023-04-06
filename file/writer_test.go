@@ -8,9 +8,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/kong/deck/state"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 )
 
 func captureOutput(f func()) string {

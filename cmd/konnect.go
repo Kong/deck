@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/kong/deck/cprint"
 	"github.com/spf13/cobra"
+
+	"github.com/kong/deck/cprint"
 )
 
 var konnectAlphaState = `

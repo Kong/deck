@@ -11,9 +11,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/kong/deck/cmd"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"github.com/kong/deck/cmd"
 )
 
 func genMarkdownTree(cmd *cobra.Command, dir string) error {

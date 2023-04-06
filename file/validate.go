@@ -3,9 +3,10 @@ package file
 import (
 	"fmt"
 
-	"github.com/kong/deck/utils"
 	"github.com/xeipuuv/gojsonschema"
 	"sigs.k8s.io/yaml"
+
+	"github.com/kong/deck/utils"
 )
 
 func validate(content []byte) error {

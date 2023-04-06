@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/kong/deck/utils"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/kong/deck/utils"
 )
 
 const (

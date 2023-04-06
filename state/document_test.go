@@ -4,9 +4,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/kong/deck/konnect"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 )
 
 func documentCollection() *DocumentsCollection {

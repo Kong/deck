@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/alecthomas/jsonschema"
+
 	"github.com/kong/deck/file"
 	"github.com/kong/go-kong/kong"
 )
