@@ -4,6 +4,8 @@ go 1.18
 
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
+replace github.com/kong/go-kong v0.39.0 => github.com/nishant95/go-kong v0.0.0-20230407172805-8a4dbd00141a
+
 require (
 	github.com/Kong/gojsondiff v1.3.2
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
