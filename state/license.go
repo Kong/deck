@@ -80,14 +80,7 @@ func (k *LicensesCollection) Get(ID string) (*License, error) {
 
 	txn := k.db.Txn(false)
 	defer txn.Abort()
-	license, err := getLicense(txn, ID)
-	if err != nil {
-		if err == ErrNotFound {
-			return nil, ErrNotFound
-		}
-		return nil, err
-	}
-	return license, nil
+	return getLicense(txn, ID)
 }
 
 // Update udpates an existing license.
