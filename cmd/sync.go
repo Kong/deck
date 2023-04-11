@@ -62,6 +62,8 @@ to get Kong's state in sync with the input state.`,
 			"See `db_update_propagation` in kong.conf.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
+	syncCmd.Flags().BoolVar(&dumpConfig.SkipLicenses, "skip-licenses",
+		true, "do not diff licenses.")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }

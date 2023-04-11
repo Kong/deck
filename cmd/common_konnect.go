@@ -132,6 +132,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if dumpConfig.KonnectRuntimeGroup == "" {
 		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
 	}
+	dumpConfig.SkipLicenses = true
 	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
 	if err != nil {
 		return err
@@ -155,6 +156,7 @@ func dumpKonnectV2(ctx context.Context) error {
 	if dumpConfig.KonnectRuntimeGroup == "" {
 		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
 	}
+	dumpConfig.SkipLicenses = true
 	kongVersion, err := fetchKonnectKongVersion(ctx, client)
 	if err != nil {
 		return fmt.Errorf("reading Konnect Kong version: %w", err)

@@ -175,5 +175,7 @@ configure Kong.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipLicenses, "skip-licenses",
+		true, "do not diff licenses.")
 	return dumpCmd
 }

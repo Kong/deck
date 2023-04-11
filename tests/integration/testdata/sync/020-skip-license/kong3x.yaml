@@ -1,0 +1,14 @@
+_format_version: "3.0"
+licenses:
+- payload: |-
+    This is not a real license and it will fail if you import it.
+  id: b824e7c0-d116-4c03-9e27-de05c5d30083
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5

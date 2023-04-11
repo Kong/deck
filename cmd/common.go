@@ -88,12 +88,19 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err != nil {
 		return err
 	}
+	mode := getMode(targetContent)
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 		targetContent.ConsumerGroups = []file.FConsumerGroupObject{}
 	}
 	if dumpConfig.SkipCACerts {
 		targetContent.CACertificates = []file.FCACertificate{}
+	}
+	if mode == modeKonnect {
+		dumpConfig.SkipLicenses = true
+	}
+	if dumpConfig.SkipLicenses {
+		targetContent.Licenses = []file.FLicense{}
 	}
 
 	cmd := "sync"
@@ -102,7 +109,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	var kongClient *kong.Client
-	mode := getMode(targetContent)
 	if mode == modeKonnect {
 		if targetContent.Workspace != "" {
 			return fmt.Errorf("_workspace set in config file.\n"+

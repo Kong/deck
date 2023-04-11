@@ -65,6 +65,8 @@ that will be created, updated, or deleted.
 			"and exit code 1 if an error occurs.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not diff CA certificates.")
+	diffCmd.Flags().BoolVar(&dumpConfig.SkipLicenses, "skip-licenses",
+		true, "do not diff licenses.")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }

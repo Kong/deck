@@ -24,6 +24,9 @@ type Config struct {
 	// If true, CA certificates are not exported.
 	SkipCACerts bool
 
+	// If true, licenses are not exported.
+	SkipLicenses bool
+
 	// SelectorTags can be used to export entities tagged with only specific
 	// tags.
 	SelectorTags []string
@@ -261,14 +264,16 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		return nil
 	})
 
-	group.Go(func() error {
-		licenses, err := GetAllLicenses(ctx, client, config.SelectorTags)
-		if err != nil {
-			return fmt.Errorf("licenses: %w", err)
-		}
-		state.Licenses = licenses
-		return nil
-	})
+	if !config.SkipLicenses {
+		group.Go(func() error {
+			licenses, err := GetAllLicenses(ctx, client, config.SelectorTags)
+			if err != nil {
+				return fmt.Errorf("licenses: %w", err)
+			}
+			state.Licenses = licenses
+			return nil
+		})
+	}
 }
 
 func getEnterpriseRBACConfiguration(ctx context.Context, group *errgroup.Group,

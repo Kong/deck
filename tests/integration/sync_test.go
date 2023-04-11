@@ -1871,6 +1871,40 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 	}
 }
 
+func Test_Sync_SkipCLicense_3x(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "syncing with --skip-licenses should ignore licenses",
+			kongFile: "testdata/sync/020-skip-license/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+				Licenses: []*kong.License{},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "kong", ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile) // no args here, --skip-licenses is on by default
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
 func Test_Sync_RBAC_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
