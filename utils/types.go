@@ -330,7 +330,7 @@ func CleanAddress(address string) string {
 // HTTPClient returns a new Go stdlib's net/http.Client with
 // sane default timeouts.
 func HTTPClient() *http.Client {
-	res := &http.Client{
+	return &http.Client{
 		Timeout: clientTimeout,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
@@ -339,6 +339,4 @@ func HTTPClient() *http.Client {
 			TLSHandshakeTimeout: clientTimeout,
 		},
 	}
-
-	return res
 }
