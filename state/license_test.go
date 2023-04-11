@@ -135,9 +135,7 @@ func TestLicensesCollection_Get(t *testing.T) {
 				t.Errorf("LicensesCollection.Get() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tc.want) {
-				t.Errorf("LicensesCollection.Get() = %v, want %v", got, tc.want)
-			}
+			assert.Equal(t, tc.want, got)
 		})
 	}
 }
@@ -248,18 +246,18 @@ func TestLicenseDelete(t *testing.T) {
 	license.ID = kong.String("first")
 	license.Payload = kong.String("example")
 	err := collection.Add(license)
-	assert.Nil(err)
+	assert. NoError(err)
 
 	err = collection.Delete("does-not-exist")
-	assert.NotNil(err)
+	assert.Error(err)
 	err = collection.Delete("first")
-	assert.Nil(err)
+	assert. NoError(err)
 
 	err = collection.Delete("first")
-	assert.NotNil(err)
+	assert.Error(err)
 
 	err = collection.Delete("")
-	assert.NotNil(err)
+	assert.Error(err)
 }
 
 func TestLicenseGetAll(t *testing.T) {
@@ -286,6 +284,6 @@ func TestLicenseGetAll(t *testing.T) {
 
 	allLicenses, err := collection.GetAll()
 
-	assert.Nil(err)
-	assert.Equal(len(licenses), len(allLicenses))
+	assert.NoError(err)
+	assert.Len(licenses, allLicenses)
 }
