@@ -39,10 +39,9 @@ func (k *LicensesCollection) Add(license License) error {
 	searchBy = append(searchBy, *license.ID)
 	_, err := getLicense(txn, searchBy...)
 	if err == nil {
-		if err == ErrNotFound {
-			return err
-		}
 		return fmt.Errorf("inserting license %v: %w", license.Console(), ErrAlreadyExists)
+	} else if err != ErrNotFound {
+		return err
 	}
 
 	err = txn.Insert(licenseTableName, &license)
