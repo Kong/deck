@@ -203,6 +203,11 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-runtime-group-name",
 		rootCmd.PersistentFlags().Lookup("konnect-runtime-group-name"))
 
+	rootCmd.PersistentFlags().String("proxy-addr", "",
+		"Address of the Proxy.")
+	viper.BindPFlag("proxy-addr",
+		rootCmd.PersistentFlags().Lookup("proxy-addr"))
+
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newValidateCmd())
@@ -369,6 +374,7 @@ func initKonnectConfig() error {
 	konnectConfig.Token = token
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")
+	konnectConfig.ProxyAddress = viper.GetString("proxy-addr")
 	konnectConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	konnectRuntimeGroup = viper.GetString("konnect-runtime-group-name")
 	return nil

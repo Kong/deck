@@ -117,7 +117,8 @@ type KonnectConfig struct {
 	Token    string
 	Debug    bool
 
-	Address string
+	Address      string
+	ProxyAddress string
 
 	Headers []string
 }
@@ -295,6 +296,13 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 		httpClient = http.DefaultClient
 		httpClient.Transport = defaultTransport
 	}
+	if config.ProxyAddress != "" {
+		proxyURL, err := url.Parse(config.ProxyAddress)
+		if err == nil {
+			transport := httpClient.Transport.(*http.Transport)
+			transport.Proxy = http.ProxyURL(proxyURL)
+		}
+	}
 	headers, err := parseHeaders(config.Headers)
 	if err != nil {
 		return nil, fmt.Errorf("parsing headers: %w", err)
@@ -322,7 +330,7 @@ func CleanAddress(address string) string {
 // HTTPClient returns a new Go stdlib's net/http.Client with
 // sane default timeouts.
 func HTTPClient() *http.Client {
-	return &http.Client{
+	res := &http.Client{
 		Timeout: clientTimeout,
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
@@ -331,4 +339,6 @@ func HTTPClient() *http.Client {
 			TLSHandshakeTimeout: clientTimeout,
 		},
 	}
+
+	return res
 }
