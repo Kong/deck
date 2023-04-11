@@ -246,12 +246,12 @@ func TestLicenseDelete(t *testing.T) {
 	license.ID = kong.String("first")
 	license.Payload = kong.String("example")
 	err := collection.Add(license)
-	assert. NoError(err)
+	assert.NoError(err)
 
 	err = collection.Delete("does-not-exist")
 	assert.Error(err)
 	err = collection.Delete("first")
-	assert. NoError(err)
+	assert.NoError(err)
 
 	err = collection.Delete("first")
 	assert.Error(err)
@@ -285,5 +285,5 @@ func TestLicenseGetAll(t *testing.T) {
 	allLicenses, err := collection.GetAll()
 
 	assert.NoError(err)
-	assert.Len(licenses, allLicenses)
+	assert.Len(allLicenses, len(licenses))
 }
