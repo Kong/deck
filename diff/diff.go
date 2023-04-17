@@ -24,11 +24,23 @@ var errEnqueueFailed = errors.New("failed to queue event")
 func defaultBackOff() backoff.BackOff {
 	// For various reasons, Kong can temporarily fail to process
 	// a valid request (e.g. when the database is under heavy load).
-	// We retry each request up to 5 times on failure, with a 3x
-	// exponential backoff multiplier
+	// We retry each request up to 3 times on failure, after around
+	// 1 second, 3 seconds, and 9 seconds (randomized exponential backoff).
 	exponentialBackoff := backoff.NewExponentialBackOff()
 	exponentialBackoff.InitialInterval = 1 * time.Second
 	exponentialBackoff.Multiplier = 3
+	return backoff.WithMaxRetries(exponentialBackoff, 4)
+}
+
+func konnectBackOff() backoff.BackOff {
+	// For various reasons, Kong can temporarily fail to process
+	// a valid request (e.g. when the database is under heavy load).
+	// We retry each request up to 3 times on failure.
+	// The Konnect backoff uses a higher multiplier than the default,
+	// to deal with higher Konnect lag for some operations.
+	exponentialBackoff := backoff.NewExponentialBackOff()
+	exponentialBackoff.InitialInterval = 1 * time.Second
+	exponentialBackoff.Multiplier = 5
 	return backoff.WithMaxRetries(exponentialBackoff, 4)
 }
 
@@ -321,6 +333,13 @@ func (sc *Syncer) eventLoop(ctx context.Context, d Do) error {
 }
 
 func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error {
+	var retrier backoff.BackOff
+	if sc.konnectClient != nil {
+		retrier = konnectBackOff()
+	} else {
+		retrier = defaultBackOff()
+	}
+
 	err := backoff.Retry(func() error {
 		res, err := d(event)
 		if err != nil {
@@ -356,7 +375,7 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error
 			return backoff.Permanent(fmt.Errorf("while post processing event: %w", err))
 		}
 		return nil
-	}, defaultBackOff())
+	}, retrier)
 
 	return err
 }
