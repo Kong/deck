@@ -55,6 +55,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## Unreleased
+
+### Add
+
+- Retry Konnect delete 404s and increase the Konnect retry backoff multiplier.
+  [#894](https://github.com/Kong/deck/pull/894)
+
 ## [v1.19.1]
 
 > Release date: 2023/03/21
