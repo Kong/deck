@@ -333,6 +333,14 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error
 				return err
 			}
 
+			if errors.As(err, &kongAPIError) &&
+				kongAPIError.Code() == http.StatusNotFound &&
+				sc.konnectClient != nil {
+				// Konnect may take some time to completely persist a resource. When tests rapidly create and then
+				// delete a resource, the delete will encounter a 404 if the resource hasn't fully persisted
+				return err
+			}
+
 			// Do not retry on other status codes
 			return backoff.Permanent(err)
 		}
