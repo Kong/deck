@@ -333,11 +333,13 @@ func (sc *Syncer) handleEvent(ctx context.Context, d Do, event crud.Event) error
 				return err
 			}
 
+			// Konnect may take some time to completely persist a resource. When tests rapidly create and then
+			// delete a resource, the delete will encounter a 404 if the resource hasn't fully persisted.
+			// This only retries deletes, as they're idempotent and the other actions are not.
 			if errors.As(err, &kongAPIError) &&
 				kongAPIError.Code() == http.StatusNotFound &&
+				event.Op == crud.Delete &&
 				sc.konnectClient != nil {
-				// Konnect may take some time to completely persist a resource. When tests rapidly create and then
-				// delete a resource, the delete will encounter a 404 if the resource hasn't fully persisted
 				return err
 			}
 
