@@ -24,8 +24,8 @@ var errEnqueueFailed = errors.New("failed to queue event")
 func defaultBackOff() backoff.BackOff {
 	// For various reasons, Kong can temporarily fail to process
 	// a valid request (e.g. when the database is under heavy load).
-	// We retry each request up to 3 times on failure, after around
-	// 1 second, 3 seconds, and 9 seconds (randomized exponential backoff).
+	// We retry each request up to 5 times on failure, with a 3x
+	// exponential backoff multiplier
 	exponentialBackoff := backoff.NewExponentialBackOff()
 	exponentialBackoff.InitialInterval = 1 * time.Second
 	exponentialBackoff.Multiplier = 3
