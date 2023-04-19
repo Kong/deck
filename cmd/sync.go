@@ -63,7 +63,7 @@ to get Kong's state in sync with the input state.`,
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipLicenses, "skip-licenses",
-		true, "do not diff licenses.")
+		true, "do not sync licenses.")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }

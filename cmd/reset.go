@@ -129,7 +129,7 @@ By default, this command will ask for confirmation.`,
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not reset CA certificates.")
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipLicenses, "skip-licenses",
-		true, "do not diff licenses.")
+		true, "do not reset licenses.")
 
 	return resetCmd
 }
