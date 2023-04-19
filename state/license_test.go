@@ -6,6 +6,7 @@ import (
 
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func licensesCollection() *LicensesCollection {
@@ -219,7 +220,7 @@ func TestLicensesCollection_Update(t *testing.T) {
 }
 
 func TestLicenseUpdate(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 	k := licensesCollection()
 	lic1 := License{
 		License: kong.License{
@@ -227,41 +228,42 @@ func TestLicenseUpdate(t *testing.T) {
 			Payload: kong.String("example"),
 		},
 	}
-	assert.Nil(k.Add(lic1))
+	require.NoError(k.Add(lic1))
 
 	lic1.Payload = kong.String("other")
-	assert.Nil(k.Update(lic1))
+	require.NoError(k.Update(lic1))
 
 	r, err := k.Get("foo-id")
-	assert.Nil(err)
-	assert.NotNil(r)
-	assert.Equal(*r.Payload, "other")
+	require.NoError(err)
+	require.NotNil(r)
+	require.Equal(*r.Payload, "other")
 }
 
 func TestLicenseDelete(t *testing.T) {
-	assert := assert.New(t)
+	require := require.New(t)
 	collection := licensesCollection()
 
 	var license License
 	license.ID = kong.String("first")
 	license.Payload = kong.String("example")
 	err := collection.Add(license)
-	assert.NoError(err)
+	require.NoError(err)
 
 	err = collection.Delete("does-not-exist")
-	assert.Error(err)
+	require.Error(err)
 	err = collection.Delete("first")
-	assert.NoError(err)
+	require.NoError(err)
 
 	err = collection.Delete("first")
-	assert.Error(err)
+	require.Error(err)
 
 	err = collection.Delete("")
-	assert.Error(err)
+	require.Error(err)
 }
 
 func TestLicenseGetAll(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 	collection := licensesCollection()
 
 	licenses := []License{
@@ -284,6 +286,6 @@ func TestLicenseGetAll(t *testing.T) {
 
 	allLicenses, err := collection.GetAll()
 
-	assert.NoError(err)
-	assert.Len(allLicenses, len(licenses))
+	require.NoError(err)
+	require.Len(allLicenses, len(licenses))
 }
