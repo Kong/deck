@@ -97,17 +97,7 @@ func diffObjects(obj1, obj2 interface{}) interface{} {
 		}
 	}
 
-	// Convert the map to a JSON string and then to the desired output type.
-	jsonDiff, err := json.Marshal(diffMap)
-	if err != nil {
-		panic(err)
-	}
-	var result interface{}
-	err = json.Unmarshal(jsonDiff, &result)
-	if err != nil {
-		panic(err)
-	}
-	return result
+	return diffMap
 }
 
 type EntityChanges struct {

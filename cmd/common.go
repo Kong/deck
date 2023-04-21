@@ -295,7 +295,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if jsonErr != nil {
 			return err
 		}
-		cprint.CreatePrintf(string(jsonOutputStr) + "\n")
+		// cannot use cprint.CreatePrintf because the output might contain special chars.
+		fmt.Print(string(jsonOutputStr)+ "\n")
 	}
 	return nil
 }
