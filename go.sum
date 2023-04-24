@@ -200,6 +200,8 @@ github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/X
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/kong/go-kong v0.39.0 h1:fAtZXpM7RVYukBu7Mu6RvRpklZOfXBXUs06NlDY5yXg=
 github.com/kong/go-kong v0.39.0/go.mod h1:QHn1QBxwbtGBR+F2S5y49m/fEMmYeYAHeNCP+iGGBBk=
+github.com/kong/go-kong v0.40.0 h1:6rd70L4GbPz90j3ey+wjHd4aC21uFgbqsoASJhbcbdU=
+github.com/kong/go-kong v0.40.0/go.mod h1:t3siZEEGBB3FA5EQv9CL5EcaiogPTG0A175VQ6KvEHE=
 github.com/kong/semver/v4 v4.0.1 h1:DIcNR8W3gfx0KabFBADPalxxsp+q/5COwIFkkhrFQ2Y=
 github.com/kong/semver/v4 v4.0.1/go.mod h1:LImQ0oT15pJvSns/hs2laLca2zcYoHu5EsSNY0J6/QA=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=
