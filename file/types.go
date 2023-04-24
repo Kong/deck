@@ -680,6 +680,24 @@ func (c FVault) sortKey() string {
 	return ""
 }
 
+// FLicense exists as a file type _only_
+// This is a compatibility layer for KIC library usage. deck cannot interact with the license entity.
+// Ref https://github.com/Kong/deck/pull/882 if we need to support this entity throughout deck.
+
+// FLicense represents a Kong License.
+// +k8s:deepcopy-gen=true
+type FLicense struct {
+	kong.License `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (c FLicense) sortKey() string {
+	if c.ID != nil {
+		return *c.ID
+	}
+	return ""
+}
+
 //go:generate go run ./codegen/main.go
 
 // Content represents a serialized Kong state.
@@ -707,4 +725,6 @@ type Content struct {
 	ServicePackages []FServicePackage `json:"service_packages,omitempty" yaml:"service_packages,omitempty"`
 
 	Vaults []FVault `json:"vaults,omitempty" yaml:"vaults,omitempty"`
+
+	Licenses []FLicense `json:"licenses,omitempty" yaml:"licenses,omitempty"`
 }
