@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.15
-	github.com/kong/go-kong v0.40.0
+	github.com/kong/go-kong v0.41.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.3
 	github.com/spf13/cobra v1.7.0
@@ -33,8 +33,6 @@ require (
 
 require (
 	github.com/Kong/go-diff v1.2.2 // indirect
-	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
@@ -44,7 +42,6 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.1 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
-	github.com/go-task/slim-sprig v2.20.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
@@ -52,7 +49,6 @@ require (
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
