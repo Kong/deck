@@ -117,7 +117,8 @@ type KonnectConfig struct {
 	Token    string
 	Debug    bool
 
-	Address string
+	Address      string
+	ProxyAddress string
 
 	Headers []string
 }
@@ -294,6 +295,13 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 		defaultTransport := http.DefaultTransport.(*http.Transport)
 		httpClient = http.DefaultClient
 		httpClient.Transport = defaultTransport
+	}
+	if config.ProxyAddress != "" {
+		proxyURL, err := url.Parse(config.ProxyAddress)
+		if err == nil {
+			transport := httpClient.Transport.(*http.Transport)
+			transport.Proxy = http.ProxyURL(proxyURL)
+		}
 	}
 	headers, err := parseHeaders(config.Headers)
 	if err != nil {
