@@ -1,6 +1,10 @@
 name: Integration Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - main
+  pull_request: {}
 
 jobs:
   integration:
@@ -16,9 +20,11 @@ jobs:
         - 'kong:2.4.1'
         - 'kong:2.5.1'
         - 'kong:2.6.0'
-        - 'kong:2.7.0'
-        - 'kong:2.8.0'
-        - 'kong:3.0.0'
+        - 'kong:2.7'
+        - 'kong:2.8'
+        - 'kong:3.0'
+        - 'kong:3.1'
+        - 'kong:3.2'
         - 'kong/kong:master-alpine'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
@@ -28,7 +34,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v4
         with:
-          go-version: '^1.18'
+          go-version: '^1.20'
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Kong
