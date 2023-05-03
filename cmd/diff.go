@@ -67,7 +67,7 @@ that will be created, updated, or deleted.
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not diff CA certificates.")
 	diffCmd.Flags().BoolVar(&diffJSONOutput, "enable-json-output",
-		false, "print execution results to stdout in a JSON format")
+		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }
