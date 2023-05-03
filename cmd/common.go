@@ -40,9 +40,7 @@ const (
 	modeKongEnterprise
 )
 
-var (
-	jsonOutput   diff.JsonOutputObject
-)
+var jsonOutput diff.JSONOutputObject
 
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {

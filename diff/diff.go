@@ -2,11 +2,9 @@ package diff
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"reflect"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -34,84 +32,11 @@ type Summary struct {
 	Total    int32 `json:"total"`
 }
 
-type JsonOutputObject struct {
+type JSONOutputObject struct {
 	Changes  EntityChanges `json:"changes"`
 	Summary  Summary       `json:"summary"`
 	Warnings []string      `json:"warnings"`
 	Errors   []string      `json:"errors"`
-}
-
-func diffObjects(obj1, obj2 interface{}) interface{} {
-	// Convert the objects to JSON strings.
-	json1, err := json.Marshal(obj1)
-	if err != nil {
-		panic(err)
-	}
-	json2, err := json.Marshal(obj2)
-	if err != nil {
-		panic(err)
-	}
-
-	// Unmarshal the JSON strings into maps.
-	var map1, map2 map[string]interface{}
-	err = json.Unmarshal(json1, &map1)
-	if err != nil {
-		panic(err)
-	}
-	err = json.Unmarshal(json2, &map2)
-	if err != nil {
-		panic(err)
-	}
-
-	// Create a new map to hold the differences and similarities.
-	diffMap := make(map[string]interface{})
-
-	// Iterate over the properties in obj1 and compare them to obj2.
-	for key1, value1 := range map1 {
-		value2, ok := map2[key1]
-		if !ok {
-			// The property is missing from obj2.
-			if value1 == nil {
-				diffMap[key1] = nil
-			} else {
-				diffMap[key1] = value1
-			}
-			continue
-		}
-
-		// The property is present in both obj1 and obj2.
-		if reflect.DeepEqual(value1, value2) {
-			diffMap[key1] = value1
-		} else {
-			if value1 == nil {
-				diffMap[key1] = map[string]interface{}{
-					"new": value2,
-				}
-			} else if value2 == nil {
-				diffMap[key1] = map[string]interface{}{
-					"old": value1,
-				}
-			} else {
-				diffMap[key1] = map[string]interface{}{
-					"old": value1,
-					"new": value2,
-				}
-			}
-		}
-	}
-
-	// Iterate over the properties in obj2 that are not in obj1.
-	for key2, value2 := range map2 {
-		if _, ok := map1[key2]; !ok {
-			if value2 == nil {
-				diffMap[key2] = nil
-			} else {
-				diffMap[key2] = value2
-			}
-		}
-	}
-
-	return diffMap
 }
 
 type EntityChanges struct {
@@ -575,9 +500,15 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJSONOu
 		var result crud.Arg
 
 		c := e.Obj.(state.ConsoleString)
-
+		objDiff := diffObjects(e.OldObj, e.Obj)
+		if objDiff == nil {
+			objDiff = map[string]interface{}{
+				"old": e.OldObj,
+				"new": e.Obj,
+			}
+		}
 		item := EntityState{
-			Body: diffObjects(e.OldObj, e.Obj),
+			Body: objDiff,
 			Name: c.Console(),
 			Kind: string(e.Kind),
 		}
