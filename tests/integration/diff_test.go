@@ -37,7 +37,7 @@ Summary:
   Deleted: 0
 `
 
- 	expectedOutputMaskedJSON = `{
+	expectedOutputMaskedJSON = `{
 "changes": {
 	"creating": [],
 	"updating": [
@@ -228,7 +228,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			assert.Equal(t, expectedOutputMasked, out)
 		})
 	}
-	
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			for k, v := range tc.envVars {
