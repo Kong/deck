@@ -291,7 +291,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		os.Exit(exitCodeDiffDetection)
 	}
 	if enableJSONOutput {
-		jsonOutputStr, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
+		jsonOutputBytes, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
 		if jsonErr != nil {
 			return err
 		}
