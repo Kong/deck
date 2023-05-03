@@ -27,6 +27,20 @@ type EntityState struct {
 	Body any    `json:"body"`
 }
 
+type Summary struct {
+	Creating int32 `json:"creating"`
+	Updating int32 `json:"updating"`
+	Deleting int32 `json:"deleting"`
+	Total    int32 `json:"total"`
+}
+
+type JsonOutputObject struct {
+	Changes  EntityChanges `json:"changes"`
+	Summary  Summary       `json:"summary"`
+	Warnings []string      `json:"warnings"`
+	Errors   []string      `json:"errors"`
+}
+
 func diffObjects(obj1, obj2 interface{}) interface{} {
 	// Convert the objects to JSON strings.
 	json1, err := json.Marshal(obj1)
