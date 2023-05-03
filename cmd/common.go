@@ -281,7 +281,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			if errs, ok := err.(utils.ErrArray); ok {
 				jsonOutput.Errors = append(jsonOutput.Errors, errs.ErrorList()...)
 			} else {
-				jsonOutput.Errors = append(jsonOutput.Errors, fmt.Sprintf("%v", err))
+				jsonOutput.Errors = append(jsonOutput.Errors, err.Error())
 			}
 		} else {
 			return err
