@@ -37,6 +37,45 @@ Summary:
   Deleted: 0
 `
 
+ 	expectedOutputMaskedJSON = `{
+"changes": {
+	"creating": [],
+	"updating": [
+	{
+		"name": "svc1",
+		"kind": "service",
+		"body": {
+			"connect_timeout": 60000,
+			"enabled": true,
+			"host": "[masked]",
+			"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+			"name": "svc1",
+			"port": 80,
+			"protocol": "http",
+			"read_timeout": 60000,
+			"retries": 5,
+			"write_timeout": 60000,
+			"tags": [
+				"[masked] is an external host. I like [masked]!",
+				"foo:foo",
+				"baz:[masked]",
+				"another:[masked]",
+				"bar:[masked]"
+			]
+		}
+	}
+	],
+	"deleting": []
+},
+"summary": {
+	"creating": 0,
+	"updating": 1,
+	"deleting": 0,
+	"total": 1
+},
+"warnings": [],
+"errors": []
+}`
 	expectedOutputUnMasked = `updating service svc1  {
    "connect_timeout": 60000,
    "enabled": true,
@@ -59,6 +98,41 @@ Summary:
   Updated: 1
   Deleted: 0
 `
+	expectedOutputUnMaskedJSON = `{
+"changes": {
+	"creating": [],
+	"updating": [
+	{
+		"name": "svc1",
+		"kind": "service",
+		"body": {
+			"connect_timeout": 60000,
+			"enabled": true,
+			"host": "mockbin.org",
+			"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+			"name": "svc1",
+			"port": 80,
+			"protocol": "http",
+			"read_timeout": 60000,
+			"retries": 5,
+			"write_timeout": 60000,
+			"tags": [
+				"test"
+			]
+		}
+	}
+	],
+	"deleting": []
+},
+"summary": {
+	"creating": 0,
+	"updating": 1,
+	"deleting": 0,
+	"total": 1
+},
+"warnings": [],
+"errors": []
+}`
 
 	diffEnvVars = map[string]string{
 		"DECK_SVC1_HOSTNAME": "mockbin.org",
@@ -154,6 +228,24 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			assert.Equal(t, expectedOutputMasked, out)
 		})
 	}
+	
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+			runWhen(t, "kong", "==2.8.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// initialize state
+			assert.NoError(t, sync(tc.initialStateFile))
+
+			out, err := diff(tc.stateFile, "--json-output")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedOutputMaskedJSON, out)
+		})
+	}
 }
 
 // test scope:
@@ -188,6 +280,23 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			out, err := diff(tc.stateFile)
 			assert.NoError(t, err)
 			assert.Equal(t, expectedOutputMasked, out)
+		})
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+			runWhen(t, "kong", ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// initialize state
+			assert.NoError(t, sync(tc.initialStateFile))
+
+			out, err := diff(tc.stateFile, "--json-output")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedOutputUnMaskedJSON, out)
 		})
 	}
 }
@@ -226,6 +335,23 @@ func Test_Diff_Unasked_OlderThan3x(t *testing.T) {
 			assert.Equal(t, expectedOutputUnMasked, out)
 		})
 	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+			runWhen(t, "kong", "==2.8.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// initialize state
+			assert.NoError(t, sync(tc.initialStateFile))
+
+			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value --json-output")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedOutputUnMaskedJSON, out)
+		})
+	}
 }
 
 // test scope:
@@ -260,6 +386,24 @@ func Test_Diff_Unasked_NewerThan3x(t *testing.T) {
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value")
 			assert.NoError(t, err)
 			assert.Equal(t, expectedOutputUnMasked, out)
+		})
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+			runWhen(t, "kong", ">=3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			// initialize state
+			assert.NoError(t, sync(tc.initialStateFile))
+
+			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value  --json-output")
+			assert.NoError(t, err)
+			assert.Equal(t, expectedOutputUnMaskedJSON, out)
 		})
 	}
 }
