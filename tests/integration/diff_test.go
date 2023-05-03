@@ -296,7 +296,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 
 			out, err := diff(tc.stateFile, "--json-output")
 			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputUnMaskedJSON, out)
+			assert.Equal(t, expectedOutputMaskedJSON, out)
 		})
 	}
 }
