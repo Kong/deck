@@ -17,6 +17,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
+	github.com/kong/go-apiops v0.1.16
 	github.com/kong/go-kong v0.44.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.6
@@ -38,6 +39,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-openapi/jsonreference v0.20.1 // indirect
