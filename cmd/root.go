@@ -214,6 +214,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newConvertCmd())
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
+	rootCmd.AddCommand(newMergeCmd())
 	return rootCmd
 }
 
