@@ -101,8 +101,18 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 		return err
 	}
 
+	fmt.Println("Kong Environments")
+	fmt.Println("  Total :", len(filenames))
+
+	if long {
+		for _, filename := range filenames {
+			fmt.Println("  -", filename)
+		}
+	}
+
 	// count unique services
 	services := []string{}
+	fmt.Println()
 	fmt.Println("Services")
 	fmt.Println("  Total :", len(targetContent.Services))
 
@@ -125,6 +135,7 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 		}
 	}
 
+	// count unique plugins
 	plugins := []string{}
 	for _, fplugin := range targetContent.Plugins {
 		plugin := fplugin.Plugin
