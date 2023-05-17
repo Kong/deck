@@ -103,14 +103,19 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 
 	// count unique services
 	services := []string{}
+	fmt.Println("Services")
+	fmt.Println("  Total :", len(targetContent.Services))
 
 	for _, fservice := range targetContent.Services {
 		service := fservice.Service
-		services = append(services, fmt.Sprint(*service.Protocol, "://", *service.Host, ":", *service.Port, *service.Path))
+		// make sure the path is not nil. protocol, host, and port are required fields for a service
+		path := ""
+		if service.Path != nil {
+			path = *service.Path
+		}
+		services = append(services, fmt.Sprint(*service.Protocol, "://", *service.Host, ":", *service.Port, path))
 	}
 
-	fmt.Println("Services")
-	fmt.Println("  Total :", len(services))
 	services = deduplicate(services)
 	fmt.Println("  Unique:", len(services))
 
