@@ -103,6 +103,8 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 
 	fmt.Println("Kong Environments")
 	fmt.Println("  Total :", len(filenames))
+	filenames = deduplicate(filenames)
+	fmt.Println("  Unique:", len(filenames))
 
 	if long {
 		for _, filename := range filenames {
