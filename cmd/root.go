@@ -203,6 +203,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-runtime-group-name",
 		rootCmd.PersistentFlags().Lookup("konnect-runtime-group-name"))
 
+	rootCmd.AddCommand(newDebriefCmd())
 	rootCmd.AddCommand(newSyncCmd())
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newValidateCmd())

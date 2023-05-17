@@ -80,6 +80,67 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 	return targetContent.Workspace
 }
 
+func deduplicate(stringSlice []string) []string {
+	existing := map[string]struct{}{}
+	result := []string{}
+
+	for _, s := range stringSlice {
+		if _, exists := existing[s]; !exists {
+			existing[s] = struct{}{}
+			result = append(result, s)
+		}
+	}
+
+	return result
+}
+
+func debriefMain(ctx context.Context, filenames []string, long bool) error {
+	// read target file
+	targetContent, err := file.GetContentFromFiles(filenames)
+	if err != nil {
+		return err
+	}
+
+	// count unique services
+	services := []string{}
+
+	for _, fservice := range targetContent.Services {
+		service := fservice.Service
+		services = append(services, fmt.Sprint(*service.Protocol, "://", *service.Host, ":", *service.Port, *service.Path))
+	}
+
+	fmt.Println("Services")
+	fmt.Println("  Total :", len(services))
+	services = deduplicate(services)
+	fmt.Println("  Unique:", len(services))
+
+	if long {
+		for _, service := range services {
+			fmt.Println("  -", service)
+		}
+	}
+
+	plugins := []string{}
+	for _, fplugin := range targetContent.Plugins {
+		plugin := fplugin.Plugin
+		plugins = append(plugins, *plugin.Name)
+	}
+
+	fmt.Println()
+	fmt.Println("Plugins")
+	fmt.Println("  Total :", len(plugins))
+	plugins = deduplicate(plugins)
+	fmt.Println("  Unique:", len(plugins))
+
+	if long {
+		for _, plugin := range plugins {
+			fmt.Println("  -", plugin)
+		}
+	}
+
+	return nil
+}
+
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string,
 ) error {

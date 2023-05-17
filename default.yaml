@@ -1,0 +1,722 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: default
+consumers:
+- basicauth_credentials:
+  - password: a52b54a457e84a0b8a90fc13524c5c7a01b90075
+    username: pepito.fuentes@example.com
+  keyauth_credentials:
+  - key: kongstrong
+  username: Pepito Fuentes
+plugins:
+- config:
+    bypass_on_err: false
+    cache_control: false
+    cache_ttl: 300
+    content_type:
+    - text/plain
+    - application/json
+    memory:
+      dictionary_name: kong_db_cache
+    redis:
+      cluster_addresses: null
+      connect_timeout: null
+      database: 0
+      host: null
+      keepalive_backlog: null
+      keepalive_pool_size: 30
+      password: null
+      port: null
+      read_timeout: null
+      send_timeout: null
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    request_method:
+    - GET
+    - HEAD
+    response_code:
+    - 200
+    - 301
+    - 404
+    storage_ttl: null
+    strategy: memory
+    vary_headers: null
+    vary_query_params: null
+  enabled: false
+  name: proxy-cache-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+- config:
+    consumer_groups: null
+    dictionary_name: kong_rate_limiting_counters
+    enforce_consumer_groups: false
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 100
+    namespace: zKo0aPvNHFcKesHNNBw0cmNgMBgiwN0X
+    path: null
+    redis:
+      cluster_addresses: null
+      connect_timeout: null
+      database: 0
+      host: null
+      keepalive_backlog: null
+      keepalive_pool_size: 30
+      password: null
+      port: null
+      read_timeout: null
+      send_timeout: null
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: null
+    window_size:
+    - 60
+    window_type: sliding
+  enabled: false
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: catfact.ninja
+  name: catfact-service
+  path: /fact
+  plugins:
+  - config:
+      anonymous: null
+      hide_credentials: false
+    enabled: false
+    name: basic-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      anonymous: null
+      hide_credentials: false
+      key_in_body: false
+      key_in_header: true
+      key_in_query: true
+      key_names:
+      - apikey
+      run_on_preflight: true
+    enabled: false
+    name: key-auth
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      anonymous: null
+      audience: null
+      audience_claim:
+      - aud
+      audience_required: null
+      auth_methods:
+      - authorization_code
+      - bearer
+      authenticated_groups_claim: null
+      authorization_cookie_domain: null
+      authorization_cookie_httponly: true
+      authorization_cookie_lifetime: 600
+      authorization_cookie_name: authorization
+      authorization_cookie_path: /
+      authorization_cookie_samesite: "off"
+      authorization_cookie_secure: null
+      authorization_endpoint: null
+      authorization_query_args_client: null
+      authorization_query_args_names: null
+      authorization_query_args_values: null
+      bearer_token_cookie_name: null
+      bearer_token_param_type:
+      - header
+      - query
+      - body
+      by_username_ignore_case: false
+      cache_introspection: true
+      cache_token_exchange: true
+      cache_tokens: true
+      cache_tokens_salt: bLYmjSWH5kVUiWpYssLsAUrF5UNWHBih
+      cache_ttl: 3600
+      cache_ttl_max: null
+      cache_ttl_min: null
+      cache_ttl_neg: null
+      cache_ttl_resurrect: null
+      cache_user_info: true
+      client_alg: null
+      client_arg: client_id
+      client_auth: null
+      client_credentials_param_type:
+      - header
+      - query
+      - body
+      client_id:
+      - 0oa67ity14PbZPpG75d7
+      client_jwk: null
+      client_secret:
+      - 1XBjobu3lzB6sZEnO1tifcWag4YNrzZ8yfIUZ-E_
+      consumer_by:
+      - username
+      - custom_id
+      consumer_claim: null
+      consumer_optional: false
+      credential_claim:
+      - sub
+      disable_session: null
+      discovery_headers_names: null
+      discovery_headers_values: null
+      display_errors: false
+      domains: null
+      downstream_access_token_header: null
+      downstream_access_token_jwk_header: null
+      downstream_headers_claims: null
+      downstream_headers_names: null
+      downstream_id_token_header: null
+      downstream_id_token_jwk_header: null
+      downstream_introspection_header: null
+      downstream_introspection_jwt_header: null
+      downstream_refresh_token_header: null
+      downstream_session_id_header: null
+      downstream_user_info_header: null
+      downstream_user_info_jwt_header: null
+      enable_hs_signatures: false
+      end_session_endpoint: null
+      extra_jwks_uris: null
+      forbidden_destroy_session: true
+      forbidden_error_message: Forbidden
+      forbidden_redirect_uri: null
+      groups_claim:
+      - groups
+      groups_required: null
+      hide_credentials: false
+      http_proxy: null
+      http_proxy_authorization: null
+      http_version: 1.1
+      https_proxy: null
+      https_proxy_authorization: null
+      id_token_param_name: null
+      id_token_param_type:
+      - header
+      - query
+      - body
+      ignore_signature: []
+      introspect_jwt_tokens: false
+      introspection_accept: application/json
+      introspection_check_active: true
+      introspection_endpoint: null
+      introspection_endpoint_auth_method: null
+      introspection_headers_client: null
+      introspection_headers_names: null
+      introspection_headers_values: null
+      introspection_hint: access_token
+      introspection_post_args_client: null
+      introspection_post_args_names: null
+      introspection_post_args_values: null
+      issuer: https://dev-04152656.okta.com/oauth2/default
+      issuers_allowed: null
+      jwt_session_claim: sid
+      jwt_session_cookie: null
+      keepalive: true
+      leeway: 0
+      login_action: upstream
+      login_methods:
+      - authorization_code
+      login_redirect_mode: fragment
+      login_redirect_uri: null
+      login_tokens:
+      - id_token
+      logout_methods:
+      - POST
+      - DELETE
+      logout_post_arg: null
+      logout_query_arg: null
+      logout_redirect_uri: null
+      logout_revoke: false
+      logout_revoke_access_token: true
+      logout_revoke_refresh_token: true
+      logout_uri_suffix: null
+      max_age: null
+      no_proxy: null
+      password_param_type:
+      - header
+      - query
+      - body
+      preserve_query_args: false
+      redirect_uri:
+      - http://proxy.kongrules.com/cat
+      rediscovery_lifetime: 30
+      refresh_token_param_name: null
+      refresh_token_param_type:
+      - header
+      - query
+      - body
+      refresh_tokens: true
+      resolve_distributed_claims: false
+      response_mode: query
+      response_type:
+      - code
+      reverify: false
+      revocation_endpoint: null
+      revocation_endpoint_auth_method: null
+      roles_claim:
+      - roles
+      roles_required: null
+      run_on_preflight: true
+      scopes:
+      - openid
+      scopes_claim:
+      - scope
+      scopes_required: null
+      search_user_info: false
+      session_compressor: none
+      session_cookie_domain: null
+      session_cookie_httponly: true
+      session_cookie_idletime: null
+      session_cookie_lifetime: 3600
+      session_cookie_maxsize: 4000
+      session_cookie_name: session
+      session_cookie_path: /
+      session_cookie_renew: 600
+      session_cookie_samesite: Lax
+      session_cookie_secure: null
+      session_memcache_host: 127.0.0.1
+      session_memcache_port: 11211
+      session_memcache_prefix: sessions
+      session_memcache_socket: null
+      session_redis_cluster_maxredirections: null
+      session_redis_cluster_nodes: null
+      session_redis_connect_timeout: null
+      session_redis_host: 127.0.0.1
+      session_redis_password: null
+      session_redis_port: 6379
+      session_redis_prefix: sessions
+      session_redis_read_timeout: null
+      session_redis_send_timeout: null
+      session_redis_server_name: null
+      session_redis_socket: null
+      session_redis_ssl: false
+      session_redis_ssl_verify: false
+      session_redis_username: null
+      session_secret: null
+      session_storage: cookie
+      session_strategy: default
+      ssl_verify: false
+      timeout: 10000
+      token_endpoint: null
+      token_endpoint_auth_method: null
+      token_exchange_endpoint: null
+      token_headers_client: null
+      token_headers_grants: null
+      token_headers_names: null
+      token_headers_prefix: null
+      token_headers_replay: null
+      token_headers_values: null
+      token_post_args_client: null
+      token_post_args_names: null
+      token_post_args_values: null
+      unauthorized_error_message: Unauthorized
+      unauthorized_redirect_uri: null
+      unexpected_redirect_uri: null
+      upstream_access_token_header: authorization:bearer
+      upstream_access_token_jwk_header: null
+      upstream_headers_claims: null
+      upstream_headers_names: null
+      upstream_id_token_header: null
+      upstream_id_token_jwk_header: null
+      upstream_introspection_header: null
+      upstream_introspection_jwt_header: null
+      upstream_refresh_token_header: null
+      upstream_session_id_header: null
+      upstream_user_info_header: null
+      upstream_user_info_jwt_header: null
+      userinfo_accept: application/json
+      userinfo_endpoint: null
+      userinfo_headers_client: null
+      userinfo_headers_names: null
+      userinfo_headers_values: null
+      userinfo_query_args_client: null
+      userinfo_query_args_names: null
+      userinfo_query_args_values: null
+      verify_claims: true
+      verify_nonce: true
+      verify_parameters: false
+      verify_signature: true
+    enabled: false
+    name: openid-connect
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: catfact-route
+    path_handling: v0
+    paths:
+    - /cat
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
+  name: hello
+  path: /hello
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: hello-route
+    path_handling: v0
+    paths:
+    - /hello
+    preserve_host: false
+    protocols:
+    - http
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
+  name: hola
+  path: /hola
+  port: 9090
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: hola-route
+    path_handling: v0
+    paths:
+    - /hola
+    preserve_host: false
+    protocols:
+    - http
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.org
+  name: httpbin-service
+  path: /anything
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: httpbin-route
+    path_handling: v0
+    paths:
+    - /echo
+    plugins:
+    - config:
+        anonymous: null
+        audience: null
+        audience_claim:
+        - aud
+        audience_required: null
+        auth_methods:
+        - client_credentials
+        - bearer
+        authenticated_groups_claim: null
+        authorization_cookie_domain: null
+        authorization_cookie_httponly: true
+        authorization_cookie_lifetime: 600
+        authorization_cookie_name: authorization
+        authorization_cookie_path: /
+        authorization_cookie_samesite: "off"
+        authorization_cookie_secure: null
+        authorization_endpoint: null
+        authorization_query_args_client: null
+        authorization_query_args_names: null
+        authorization_query_args_values: null
+        bearer_token_cookie_name: null
+        bearer_token_param_type:
+        - header
+        - query
+        - body
+        by_username_ignore_case: false
+        cache_introspection: true
+        cache_token_exchange: true
+        cache_tokens: true
+        cache_tokens_salt: dVShhvunoYBAScMadZmipzntRwEZ0SiD
+        cache_ttl: 3600
+        cache_ttl_max: null
+        cache_ttl_min: null
+        cache_ttl_neg: null
+        cache_ttl_resurrect: null
+        cache_user_info: true
+        client_alg: null
+        client_arg: client_id
+        client_auth: null
+        client_credentials_param_type:
+        - header
+        - query
+        - body
+        client_id:
+        - 0oa69e5j3iA26jCZm5d7
+        client_jwk: null
+        client_secret:
+        - IKdVMOvacfzKltYFRwYALMegjdV8RMQFDZMMhItV
+        consumer_by:
+        - username
+        - custom_id
+        consumer_claim: null
+        consumer_optional: false
+        credential_claim:
+        - sub
+        disable_session: null
+        discovery_headers_names: null
+        discovery_headers_values: null
+        display_errors: false
+        domains: null
+        downstream_access_token_header: null
+        downstream_access_token_jwk_header: null
+        downstream_headers_claims: null
+        downstream_headers_names: null
+        downstream_id_token_header: null
+        downstream_id_token_jwk_header: null
+        downstream_introspection_header: null
+        downstream_introspection_jwt_header: null
+        downstream_refresh_token_header: null
+        downstream_session_id_header: null
+        downstream_user_info_header: null
+        downstream_user_info_jwt_header: null
+        enable_hs_signatures: false
+        end_session_endpoint: null
+        extra_jwks_uris: null
+        forbidden_destroy_session: true
+        forbidden_error_message: Forbidden
+        forbidden_redirect_uri: null
+        groups_claim:
+        - groups
+        groups_required: null
+        hide_credentials: false
+        http_proxy: null
+        http_proxy_authorization: null
+        http_version: 1.1
+        https_proxy: null
+        https_proxy_authorization: null
+        id_token_param_name: null
+        id_token_param_type:
+        - header
+        - query
+        - body
+        ignore_signature: []
+        introspect_jwt_tokens: false
+        introspection_accept: application/json
+        introspection_check_active: true
+        introspection_endpoint: null
+        introspection_endpoint_auth_method: null
+        introspection_headers_client: null
+        introspection_headers_names: null
+        introspection_headers_values: null
+        introspection_hint: access_token
+        introspection_post_args_client: null
+        introspection_post_args_names: null
+        introspection_post_args_values: null
+        issuer: https://dev-04152656.okta.com/oauth2/default
+        issuers_allowed: null
+        jwt_session_claim: sid
+        jwt_session_cookie: null
+        keepalive: true
+        leeway: 0
+        login_action: upstream
+        login_methods:
+        - authorization_code
+        login_redirect_mode: fragment
+        login_redirect_uri: null
+        login_tokens:
+        - id_token
+        logout_methods:
+        - POST
+        - DELETE
+        logout_post_arg: null
+        logout_query_arg: null
+        logout_redirect_uri: null
+        logout_revoke: false
+        logout_revoke_access_token: true
+        logout_revoke_refresh_token: true
+        logout_uri_suffix: null
+        max_age: null
+        no_proxy: null
+        password_param_type:
+        - header
+        - query
+        - body
+        preserve_query_args: false
+        redirect_uri: null
+        rediscovery_lifetime: 30
+        refresh_token_param_name: null
+        refresh_token_param_type:
+        - header
+        - query
+        - body
+        refresh_tokens: true
+        resolve_distributed_claims: false
+        response_mode: query
+        response_type:
+        - code
+        reverify: false
+        revocation_endpoint: null
+        revocation_endpoint_auth_method: null
+        roles_claim:
+        - roles
+        roles_required: null
+        run_on_preflight: true
+        scopes:
+        - insomnia
+        scopes_claim:
+        - scope
+        scopes_required: null
+        search_user_info: false
+        session_compressor: none
+        session_cookie_domain: null
+        session_cookie_httponly: true
+        session_cookie_idletime: null
+        session_cookie_lifetime: 3600
+        session_cookie_maxsize: 4000
+        session_cookie_name: session
+        session_cookie_path: /
+        session_cookie_renew: 600
+        session_cookie_samesite: Lax
+        session_cookie_secure: null
+        session_memcache_host: 127.0.0.1
+        session_memcache_port: 11211
+        session_memcache_prefix: sessions
+        session_memcache_socket: null
+        session_redis_cluster_maxredirections: null
+        session_redis_cluster_nodes: null
+        session_redis_connect_timeout: null
+        session_redis_host: 127.0.0.1
+        session_redis_password: null
+        session_redis_port: 6379
+        session_redis_prefix: sessions
+        session_redis_read_timeout: null
+        session_redis_send_timeout: null
+        session_redis_server_name: null
+        session_redis_socket: null
+        session_redis_ssl: false
+        session_redis_ssl_verify: false
+        session_redis_username: null
+        session_secret: null
+        session_storage: cookie
+        session_strategy: default
+        ssl_verify: false
+        timeout: 10000
+        token_endpoint: null
+        token_endpoint_auth_method: null
+        token_exchange_endpoint: null
+        token_headers_client: null
+        token_headers_grants: null
+        token_headers_names: null
+        token_headers_prefix: null
+        token_headers_replay: null
+        token_headers_values: null
+        token_post_args_client: null
+        token_post_args_names: null
+        token_post_args_values: null
+        unauthorized_error_message: Unauthorized
+        unauthorized_redirect_uri: null
+        unexpected_redirect_uri: null
+        upstream_access_token_header: authorization:bearer
+        upstream_access_token_jwk_header: null
+        upstream_headers_claims: null
+        upstream_headers_names: null
+        upstream_id_token_header: null
+        upstream_id_token_jwk_header: null
+        upstream_introspection_header: null
+        upstream_introspection_jwt_header: null
+        upstream_refresh_token_header: null
+        upstream_session_id_header: null
+        upstream_user_info_header: null
+        upstream_user_info_jwt_header: null
+        userinfo_accept: application/json
+        userinfo_endpoint: null
+        userinfo_headers_client: null
+        userinfo_headers_names: null
+        userinfo_headers_values: null
+        userinfo_query_args_client: null
+        userinfo_query_args_names: null
+        userinfo_query_args_values: null
+        verify_claims: true
+        verify_nonce: true
+        verify_parameters: false
+        verify_signature: true
+      enabled: false
+      name: openid-connect
+      protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    preserve_host: false
+    protocols:
+    - http
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: host.docker.internal
+  name: transform
+  path: /transform
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: transform-route
+    path_handling: v0
+    paths:
+    - /transform
+    preserve_host: false
+    protocols:
+    - http
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
