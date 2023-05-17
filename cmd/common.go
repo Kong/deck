@@ -94,6 +94,37 @@ func deduplicate(stringSlice []string) []string {
 	return result
 }
 
+// run 'deck debrief' on https://github.com/Kong/koko-wd/blob/main/deck/deck-file-all-ee-plugins.yaml
+// to get the list of enterprise plugins below
+func getEnterprisePlugins() map[string]string {
+	var eePlugins map[string]string = make(map[string]string)
+
+	eePlugins["canary"] = "*"
+	eePlugins["exit-transformer"] = "*"
+	eePlugins["forward-proxy"] = "*"
+	eePlugins["graphql-proxy-cache-advanced"] = "*"
+	eePlugins["jq"] = "*"
+	eePlugins["jwt-signer"] = "*"
+	eePlugins["kafka-log"] = "*"
+	eePlugins["kafka-upstream"] = "*"
+	eePlugins["ldap-auth-advanced"] = "*"
+	eePlugins["mocking"] = "*"
+	eePlugins["mtls-auth"] = "*"
+	eePlugins["oauth2-introspection"] = "*"
+	eePlugins["opa"] = "*"
+	eePlugins["openid-connect"] = "*"
+	eePlugins["proxy-cache-advanced"] = "*"
+	eePlugins["rate-limiting-advanced"] = "*"
+	eePlugins["request-transformer-advanced"] = "*"
+	eePlugins["request-validator"] = "*"
+	eePlugins["response-transformer-advanced"] = "*"
+	eePlugins["route-transformer-advanced"] = "*"
+	eePlugins["statsd-advanced"] = "*"
+	eePlugins["upstream-timeout"] = "*"
+
+	return eePlugins
+}
+
 func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -120,12 +151,24 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 
 	for _, fservice := range targetContent.Services {
 		service := fservice.Service
-		// make sure the path is not nil. protocol, host, and port are required fields for a service
+		// make sure the protocol, port and path are not nil. host is a required fields for a service
+		protocol := ""
+		if service.Protocol != nil {
+			protocol = fmt.Sprint(*service.Protocol, "://")
+		} else {
+			protocol = "http://"
+		}
 		path := ""
 		if service.Path != nil {
 			path = *service.Path
 		}
-		services = append(services, fmt.Sprint(*service.Protocol, "://", *service.Host, ":", *service.Port, path))
+		port := ""
+		if service.Port != nil {
+			port = fmt.Sprint(":", *service.Port)
+		} else {
+			port = ":80"
+		}
+		services = append(services, fmt.Sprint(protocol, *service.Host, port, path))
 	}
 
 	services = deduplicate(services)
@@ -138,22 +181,30 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	}
 
 	// count unique plugins
-	plugins := []string{}
-	for _, fplugin := range targetContent.Plugins {
-		plugin := fplugin.Plugin
-		plugins = append(plugins, *plugin.Name)
-	}
-
 	fmt.Println()
 	fmt.Println("Plugins")
-	fmt.Println("  Total :", len(plugins))
-	plugins = deduplicate(plugins)
-	fmt.Println("  Unique:", len(plugins))
+	fmt.Println("  Total     :", len(targetContent.Plugins))
 
-	if long {
-		for _, plugin := range plugins {
-			fmt.Println("  -", plugin)
+	enterprisePlugins := getEnterprisePlugins()
+	enterprisePluginsUsed := 0
+	allPlugins := []string{}
+
+	for _, fplugin := range targetContent.Plugins {
+		pluginName := *fplugin.Plugin.Name
+		val, ok := enterprisePlugins[pluginName]
+		if ok {
+			pluginName = val + pluginName
+			enterprisePluginsUsed++
 		}
+		allPlugins = append(allPlugins, pluginName)
+	}
+
+	allPlugins = deduplicate(allPlugins)
+	fmt.Println("  Enterprise:", enterprisePluginsUsed)
+	fmt.Println("  Unique    :", len(allPlugins))
+
+	for _, plugin := range allPlugins {
+		fmt.Println("  -", plugin)
 	}
 
 	return nil
