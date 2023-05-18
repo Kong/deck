@@ -12,9 +12,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/kong/deck/utils"
 )
 
 var (
@@ -3097,4 +3099,58 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
+}
+func Test_Sync_Names_vs_IDs(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	runWhen(t, "kong", ">=3.0.0")
+	teardown := setup(t)
+	defer teardown(t)
+
+	err = sync("testdata/sync/020-names-vs-ids/kong.yaml")
+	require.NoError(t, err)
+
+	err = sync("testdata/sync/020-names-vs-ids/kong2.yaml")
+	require.NoError(t, err)
+
+	expectedState := utils.KongRawState{
+		Services: []*kong.Service{
+			{
+				ID:             kong.String("18076db2-28b6-423b-ba39-a797193017f7"),
+				Name:           kong.String("svc1"),
+				ConnectTimeout: kong.Int(60000),
+				Host:           kong.String("mockbin.org"),
+				Port:           kong.Int(80),
+				Protocol:       kong.String("http"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Tags:           nil,
+			},
+		},
+		Routes: []*kong.Route{
+			{
+				ID:                      kong.String("17b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+				Name:                    kong.String("r1"),
+				Paths:                   []*string{kong.String("/r1")},
+				PathHandling:            kong.String("v0"),
+				PreserveHost:            kong.Bool(false),
+				Protocols:               []*string{kong.String("http"), kong.String("https")},
+				RegexPriority:           kong.Int(0),
+				StripPath:               kong.Bool(true),
+				HTTPSRedirectStatusCode: kong.Int(301),
+				RequestBuffering:        kong.Bool(true),
+				ResponseBuffering:       kong.Bool(true),
+				Service: &kong.Service{
+					ID: kong.String("18076db2-28b6-423b-ba39-a797193017f7"),
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, false, expectedState, nil)
 }

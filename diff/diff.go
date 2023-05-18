@@ -10,13 +10,14 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
+	"github.com/kong/go-kong/kong"
+
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/types"
 	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
 )
 
 var errEnqueueFailed = errors.New("failed to queue event")
@@ -167,11 +168,11 @@ func (sc *Syncer) init() error {
 
 func (sc *Syncer) diff() error {
 	var err error
-	err = sc.createUpdate()
+	err = sc.delete()
 	if err != nil {
 		return err
 	}
-	err = sc.delete()
+	err = sc.createUpdate()
 	if err != nil {
 		return err
 	}
