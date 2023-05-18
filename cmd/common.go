@@ -203,8 +203,10 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	fmt.Println("  Enterprise:", enterprisePluginsUsed)
 	fmt.Println("  Unique    :", len(allPlugins))
 
-	for _, plugin := range allPlugins {
-		fmt.Println("  -", plugin)
+	if long {
+		for _, plugin := range allPlugins {
+			fmt.Println("  -", plugin)
+		}
 	}
 
 	return nil
