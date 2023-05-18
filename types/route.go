@@ -165,3 +165,43 @@ func (d *routeDiffer) createUpdateRoute(route *state.Route) (*crud.Event, error)
 	}
 	return nil, nil
 }
+
+func (d *routeDiffer) DuplicatesDeletes() ([]crud.Event, error) {
+	targetRoutes, err := d.targetState.Routes.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching routes from state: %w", err)
+	}
+
+	var events []crud.Event
+	for _, route := range targetRoutes {
+		event, err := d.deleteDuplicateRoute(route)
+		if err != nil {
+			return nil, err
+		}
+		if event != nil {
+			events = append(events, *event)
+		}
+	}
+
+	return events, nil
+}
+
+func (d *routeDiffer) deleteDuplicateRoute(targetRoute *state.Route) (*crud.Event, error) {
+	currentRoute, err := d.currentState.Routes.Get(*targetRoute.Name)
+	if err == state.ErrNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up route %q: %w", *targetRoute.Name, err)
+	}
+
+	if *currentRoute.ID != *targetRoute.ID {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: "route",
+			Obj:  currentRoute,
+		}, nil
+	}
+
+	return nil, nil
+}

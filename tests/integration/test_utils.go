@@ -10,6 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
 	"github.com/kong/deck/cmd"
 	deckDump "github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"

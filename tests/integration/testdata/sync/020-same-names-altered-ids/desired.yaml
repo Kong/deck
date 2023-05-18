@@ -1,0 +1,26 @@
+_format_version: "3.0"
+services:
+  - id: 98076db2-28b6-423b-ba39-a797193017f7
+    name: s1
+    host: "mockbin.org"
+    routes:
+      - id: 97b6a97e-f3f7-4c47-857a-7464cb9e202b
+        name: r1
+        paths:
+          - /r1
+consumers:
+  - id: 9a1e49a8-2536-41fa-a4e9-605bf218a4fa
+    username: c1
+plugins:
+  - name: rate-limiting
+    config:
+      second: 1
+    service: s1
+  - name: rate-limiting
+    config:
+      second: 1
+    route: r1
+  - name: rate-limiting
+    config:
+      second: 1
+    consumer: c1

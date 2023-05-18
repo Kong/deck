@@ -12,9 +12,12 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kong/deck/utils"
-	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/kong/go-kong/kong"
+
+	"github.com/kong/deck/utils"
 )
 
 var (
@@ -3095,6 +3098,143 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 				sync(tc.kongFile)
 			}
 			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
+	// These are the IDs that should be present in Kong after the second sync in all cases.
+	var (
+		expectedServiceID  = kong.String("98076db2-28b6-423b-ba39-a797193017f7")
+		expectedRouteID    = kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b")
+		expectedConsumerID = kong.String("9a1e49a8-2536-41fa-a4e9-605bf218a4fa")
+	)
+
+	// These are the entities that should be present in Kong after the second sync in all cases.
+	var (
+		expectedService = &kong.Service{
+			Name: kong.String("s1"),
+			ID:   expectedServiceID,
+		}
+
+		expectedRoute = &kong.Route{
+			Name: kong.String("r1"),
+			ID:   expectedRouteID,
+			Service: &kong.Service{
+				ID: expectedServiceID,
+			},
+		}
+
+		expectedConsumer = &kong.Consumer{
+			Username: kong.String("c1"),
+			ID:       expectedConsumerID,
+		}
+
+		expectedPlugins = []*kong.Plugin{
+			{
+				Name: kong.String("rate-limiting"),
+				Route: &kong.Route{
+					ID: expectedRouteID,
+				},
+			},
+			{
+				Name: kong.String("rate-limiting"),
+				Service: &kong.Service{
+					ID: expectedServiceID,
+				},
+			},
+			{
+				Name: kong.String("rate-limiting"),
+				Consumer: &kong.Consumer{
+					ID: expectedConsumerID,
+				},
+			},
+		}
+	)
+
+	// In this test we're concerned only with the IDs and names of the entities.
+	ignoreTestIrrelevantFields := []cmp.Option{
+		cmpopts.IgnoreFields(
+			kong.Plugin{},
+			"Config",
+			"Protocols",
+			"Enabled",
+		),
+		cmpopts.IgnoreFields(
+			kong.Service{},
+			"ConnectTimeout",
+			"Enabled",
+			"Host",
+			"Port",
+			"Protocol",
+			"ReadTimeout",
+			"WriteTimeout",
+			"Retries",
+		),
+		cmpopts.IgnoreFields(
+			kong.Route{},
+			"Paths",
+			"PathHandling",
+			"PreserveHost",
+			"Protocols",
+			"RegexPriority",
+			"StripPath",
+			"HTTPSRedirectStatusCode",
+			"Sources",
+			"Destinations",
+			"RequestBuffering",
+			"ResponseBuffering",
+		),
+	}
+
+	testCases := []struct {
+		name         string
+		beforeConfig string
+	}{
+		{
+			name:         "all entities have the same names, but different IDs",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/1-before.yaml",
+		},
+		{
+			name:         "service and consumer changed IDs, route did not",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/2-before.yaml",
+		},
+		{
+			name:         "route and consumer changed IDs, service did not",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/3-before.yaml",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			teardown := setup(t)
+			defer teardown(t)
+
+			// First, create the entities with the original IDs.
+			err = sync(tc.beforeConfig)
+			require.NoError(t, err)
+
+			// Then, sync again with the same names, but different IDs.
+			err = sync("testdata/sync/020-same-names-altered-ids/desired.yaml")
+			require.NoError(t, err)
+
+			// Finally, check that the all entities exist and have the expected IDs.
+			testKongState(t, client, false, utils.KongRawState{
+				Services:  []*kong.Service{expectedService},
+				Routes:    []*kong.Route{expectedRoute},
+				Consumers: []*kong.Consumer{expectedConsumer},
+				Plugins:   expectedPlugins,
+			}, ignoreTestIrrelevantFields)
 		})
 	}
 }
