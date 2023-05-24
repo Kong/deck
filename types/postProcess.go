@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/state"
@@ -16,7 +17,20 @@ func (crud *servicePostAction) Create(_ context.Context, args ...crud.Arg) (crud
 }
 
 func (crud *servicePostAction) Delete(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.Services.Delete(*((args[0].(*state.Service)).ID))
+	serviceID := *args[0].(*state.Service).ID
+
+	// Delete all plugins associated with this service as that's the implicit behavior of Kong (cascade delete).
+	plugins, err := crud.currentState.Plugins.GetAllByServiceID(serviceID)
+	if err != nil {
+		return nil, fmt.Errorf("error looking up plugins for service '%v': %v", serviceID, err)
+	}
+	for _, plugin := range plugins {
+		err = crud.currentState.Plugins.Delete(*plugin.ID)
+		if err != nil {
+			return nil, fmt.Errorf("error deleting plugin '%v' for service '%v': %v", *plugin.ID, serviceID, err)
+		}
+	}
+	return nil, crud.currentState.Services.Delete(serviceID)
 }
 
 func (crud *servicePostAction) Update(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
@@ -32,7 +46,20 @@ func (crud *routePostAction) Create(_ context.Context, args ...crud.Arg) (crud.A
 }
 
 func (crud *routePostAction) Delete(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.Routes.Delete(*((args[0].(*state.Route)).ID))
+	routeID := *args[0].(*state.Route).ID
+
+	// Delete all plugins associated with this route as that's the implicit behavior of Kong (cascade delete).
+	plugins, err := crud.currentState.Plugins.GetAllByRouteID(routeID)
+	if err != nil {
+		return nil, fmt.Errorf("error looking up plugins for route '%v': %v", routeID, err)
+	}
+	for _, plugin := range plugins {
+		err = crud.currentState.Plugins.Delete(*plugin.ID)
+		if err != nil {
+			return nil, fmt.Errorf("error deleting plugin '%v' for route '%v': %v", *plugin.ID, routeID, err)
+		}
+	}
+	return nil, crud.currentState.Routes.Delete(routeID)
 }
 
 func (crud *routePostAction) Update(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
@@ -146,7 +173,19 @@ func (crud *consumerPostAction) Create(_ context.Context, args ...crud.Arg) (cru
 }
 
 func (crud *consumerPostAction) Delete(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
-	return nil, crud.currentState.Consumers.Delete(*((args[0].(*state.Consumer)).ID))
+	consumerID := *args[0].(*state.Consumer).ID
+
+	// Delete all plugins associated with this consumer as that's the implicit behavior of Kong (cascade delete).
+	plugins, err := crud.currentState.Plugins.GetAllByConsumerID(consumerID)
+	if err != nil {
+		return nil, fmt.Errorf("error looking up plugins for consumer '%v': %v", consumerID, err)
+	}
+	for _, plugin := range plugins {
+		if err := crud.currentState.Plugins.Delete(*plugin.ID); err != nil {
+			return nil, fmt.Errorf("error deleting plugin '%v' for consumer '%v': %v", *plugin.ID, consumerID, err)
+		}
+	}
+	return nil, crud.currentState.Consumers.Delete(consumerID)
 }
 
 func (crud *consumerPostAction) Update(_ context.Context, args ...crud.Arg) (crud.Arg, error) {
