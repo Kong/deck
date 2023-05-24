@@ -32,7 +32,7 @@ type Config struct {
 	KonnectRuntimeGroup string
 }
 
-func deduplicate(stringSlice []string) []string {
+func Deduplicate(stringSlice []string) []string {
 	existing := map[string]struct{}{}
 	result := []string{}
 
@@ -49,7 +49,7 @@ func deduplicate(stringSlice []string) []string {
 func newOpt(tags []string) *kong.ListOpt {
 	opt := new(kong.ListOpt)
 	opt.Size = 1000
-	opt.Tags = kong.StringSlice(deduplicate(tags)...)
+	opt.Tags = kong.StringSlice(Deduplicate(tags)...)
 	opt.MatchAllTags = true
 	return opt
 }

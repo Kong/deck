@@ -80,51 +80,6 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string 
 	return targetContent.Workspace
 }
 
-func deduplicate(stringSlice []string) []string {
-	existing := map[string]struct{}{}
-	result := []string{}
-
-	for _, s := range stringSlice {
-		if _, exists := existing[s]; !exists {
-			existing[s] = struct{}{}
-			result = append(result, s)
-		}
-	}
-
-	return result
-}
-
-// run 'deck debrief' on https://github.com/Kong/koko-wd/blob/main/deck/deck-file-all-ee-plugins.yaml
-// to get the list of enterprise plugins below
-func getEnterprisePlugins() map[string]string {
-	var eePlugins map[string]string = make(map[string]string)
-
-	eePlugins["canary"] = "*"
-	eePlugins["exit-transformer"] = "*"
-	eePlugins["forward-proxy"] = "*"
-	eePlugins["graphql-proxy-cache-advanced"] = "*"
-	eePlugins["jq"] = "*"
-	eePlugins["jwt-signer"] = "*"
-	eePlugins["kafka-log"] = "*"
-	eePlugins["kafka-upstream"] = "*"
-	eePlugins["ldap-auth-advanced"] = "*"
-	eePlugins["mocking"] = "*"
-	eePlugins["mtls-auth"] = "*"
-	eePlugins["oauth2-introspection"] = "*"
-	eePlugins["opa"] = "*"
-	eePlugins["openid-connect"] = "*"
-	eePlugins["proxy-cache-advanced"] = "*"
-	eePlugins["rate-limiting-advanced"] = "*"
-	eePlugins["request-transformer-advanced"] = "*"
-	eePlugins["request-validator"] = "*"
-	eePlugins["response-transformer-advanced"] = "*"
-	eePlugins["route-transformer-advanced"] = "*"
-	eePlugins["statsd-advanced"] = "*"
-	eePlugins["upstream-timeout"] = "*"
-
-	return eePlugins
-}
-
 func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames)
@@ -134,13 +89,10 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 
 	fmt.Println("Kong Environments")
 	fmt.Println("  Total :", len(filenames))
-	filenames = deduplicate(filenames)
+	filenames = dump.Deduplicate(filenames)
 	fmt.Println("  Unique:", len(filenames))
-
-	if long {
-		for _, filename := range filenames {
-			fmt.Println("  -", filename)
-		}
+	for _, filename := range filenames {
+		fmt.Println("  -", filename)
 	}
 
 	// count unique services
@@ -151,27 +103,21 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 
 	for _, fservice := range targetContent.Services {
 		service := fservice.Service
-		// make sure the protocol, port and path are not nil. host is a required fields for a service
-		protocol := ""
+		serviceId := ""
 		if service.Protocol != nil {
-			protocol = fmt.Sprint(*service.Protocol, "://")
-		} else {
-			protocol = "http://"
+			serviceId += fmt.Sprint(*service.Protocol, "://")
 		}
-		path := ""
+		serviceId += *service.Host
 		if service.Path != nil {
-			path = *service.Path
+			serviceId += *service.Path
 		}
-		port := ""
 		if service.Port != nil {
-			port = fmt.Sprint(":", *service.Port)
-		} else {
-			port = ":80"
+			serviceId += fmt.Sprint(":", *service.Port)
 		}
-		services = append(services, fmt.Sprint(protocol, *service.Host, port, path))
+		services = append(services, serviceId)
 	}
 
-	services = deduplicate(services)
+	services = dump.Deduplicate(services)
 	fmt.Println("  Unique:", len(services))
 
 	if long {
@@ -185,28 +131,17 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	fmt.Println("Plugins")
 	fmt.Println("  Total     :", len(targetContent.Plugins))
 
-	enterprisePlugins := getEnterprisePlugins()
-	enterprisePluginsUsed := 0
 	allPlugins := []string{}
 
 	for _, fplugin := range targetContent.Plugins {
 		pluginName := *fplugin.Plugin.Name
-		val, ok := enterprisePlugins[pluginName]
-		if ok {
-			pluginName = val + pluginName
-			enterprisePluginsUsed++
-		}
 		allPlugins = append(allPlugins, pluginName)
 	}
 
-	allPlugins = deduplicate(allPlugins)
-	fmt.Println("  Enterprise:", enterprisePluginsUsed)
+	allPlugins = dump.Deduplicate(allPlugins)
 	fmt.Println("  Unique    :", len(allPlugins))
-
-	if long {
-		for _, plugin := range allPlugins {
-			fmt.Println("  -", plugin)
-		}
+	for _, plugin := range allPlugins {
+		fmt.Println("  -", plugin)
 	}
 
 	return nil
