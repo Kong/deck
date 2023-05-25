@@ -58,7 +58,7 @@ func (s *serviceCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg, er
 	event := crud.EventFromArg(arg[0])
 	service := serviceFromStruct(event)
 
-	updatedService, err := s.client.Services.Update(ctx, &service.Service)
+	updatedService, err := s.client.Services.Create(ctx, &service.Service)
 	if err != nil {
 		return nil, err
 	}
@@ -116,12 +116,12 @@ func (d *serviceDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 	}
 
 	for _, service := range targetServices {
-		event, err := d.createUpdateService(service)
+		n, err := d.createUpdateService(service)
 		if err != nil {
 			return err
 		}
-		if event != nil {
-			err = handler(*event)
+		if n != nil {
+			err = handler(*n)
 			if err != nil {
 				return err
 			}

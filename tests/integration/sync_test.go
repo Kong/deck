@@ -3102,16 +3102,51 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 	}
 }
 
+// In the tests we're concerned only with the IDs and names of the entities we'll ignore other fields when comparing states.
+var ignoreFieldsIrrelevantForIDsTests = []cmp.Option{
+	cmpopts.IgnoreFields(
+		kong.Plugin{},
+		"Config",
+		"Protocols",
+		"Enabled",
+	),
+	cmpopts.IgnoreFields(
+		kong.Service{},
+		"ConnectTimeout",
+		"Enabled",
+		"Host",
+		"Port",
+		"Protocol",
+		"ReadTimeout",
+		"WriteTimeout",
+		"Retries",
+	),
+	cmpopts.IgnoreFields(
+		kong.Route{},
+		"Paths",
+		"PathHandling",
+		"PreserveHost",
+		"Protocols",
+		"RegexPriority",
+		"StripPath",
+		"HTTPSRedirectStatusCode",
+		"Sources",
+		"Destinations",
+		"RequestBuffering",
+		"ResponseBuffering",
+	),
+}
+
 // test scope:
 //   - 3.0.0+
 //   - konnect
 func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
 	client, err := getTestClient()
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-
-	runWhenKongOrKonnect(t, ">=3.0.0")
 
 	// These are the IDs that should be present in Kong after the second sync in all cases.
 	var (
@@ -3162,41 +3197,6 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 		}
 	)
 
-	// In this test we're concerned only with the IDs and names of the entities.
-	ignoreTestIrrelevantFields := []cmp.Option{
-		cmpopts.IgnoreFields(
-			kong.Plugin{},
-			"Config",
-			"Protocols",
-			"Enabled",
-		),
-		cmpopts.IgnoreFields(
-			kong.Service{},
-			"ConnectTimeout",
-			"Enabled",
-			"Host",
-			"Port",
-			"Protocol",
-			"ReadTimeout",
-			"WriteTimeout",
-			"Retries",
-		),
-		cmpopts.IgnoreFields(
-			kong.Route{},
-			"Paths",
-			"PathHandling",
-			"PreserveHost",
-			"Protocols",
-			"RegexPriority",
-			"StripPath",
-			"HTTPSRedirectStatusCode",
-			"Sources",
-			"Destinations",
-			"RequestBuffering",
-			"ResponseBuffering",
-		),
-	}
-
 	testCases := []struct {
 		name         string
 		beforeConfig string
@@ -3234,7 +3234,59 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 				Routes:    []*kong.Route{expectedRoute},
 				Consumers: []*kong.Consumer{expectedConsumer},
 				Plugins:   expectedPlugins,
-			}, ignoreTestIrrelevantFields)
+			}, ignoreFieldsIrrelevantForIDsTests)
 		})
 	}
+}
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	const (
+		beforeConfig = "testdata/sync/021-update-with-explicit-ids/before.yaml"
+		afterConfig  = "testdata/sync/021-update-with-explicit-ids/after.yaml"
+	)
+
+	// First, create entities with IDs assigned explicitly.
+	err = sync(beforeConfig)
+	require.NoError(t, err)
+
+	// Then, sync again, adding tags to every entity just to trigger an update.
+	err = sync(afterConfig)
+	require.NoError(t, err)
+
+	// Finally, verify that the update was successful.
+	testKongState(t, client, false, utils.KongRawState{
+		Services: []*kong.Service{
+			{
+				Name: kong.String("s1"),
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"),
+			},
+		},
+		Routes: []*kong.Route{
+			{
+				Name: kong.String("r1"),
+				ID:   kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+				Tags: kong.StringSlice("after"),
+				Service: &kong.Service{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("c1"),
+				Tags:     kong.StringSlice("after"),
+			},
+		},
+	}, ignoreFieldsIrrelevantForIDsTests)
 }
