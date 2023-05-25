@@ -88,9 +88,9 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	}
 
 	fmt.Println("Kong Environments")
-	fmt.Println("  Total :", len(filenames))
+	fmt.Println("  Discrete:", len(filenames))
 	filenames = dump.Deduplicate(filenames)
-	fmt.Println("  Unique:", len(filenames))
+	fmt.Println("  Unique  :", len(filenames))
 	for _, filename := range filenames {
 		fmt.Println("  -", filename)
 	}
@@ -99,7 +99,7 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	services := []string{}
 	fmt.Println()
 	fmt.Println("Services")
-	fmt.Println("  Total :", len(targetContent.Services))
+	fmt.Println("  Discrete:", len(targetContent.Services))
 
 	for _, fservice := range targetContent.Services {
 		service := fservice.Service
@@ -118,7 +118,7 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	}
 
 	services = dump.Deduplicate(services)
-	fmt.Println("  Unique:", len(services))
+	fmt.Println("  Unique  :", len(services))
 
 	if long {
 		for _, service := range services {
@@ -129,7 +129,7 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	// count unique plugins
 	fmt.Println()
 	fmt.Println("Plugins")
-	fmt.Println("  Total     :", len(targetContent.Plugins))
+	fmt.Println("  Discrete:", len(targetContent.Plugins))
 
 	allPlugins := []string{}
 
@@ -139,7 +139,7 @@ func debriefMain(ctx context.Context, filenames []string, long bool) error {
 	}
 
 	allPlugins = dump.Deduplicate(allPlugins)
-	fmt.Println("  Unique    :", len(allPlugins))
+	fmt.Println("  Unique  :", len(allPlugins))
 	for _, plugin := range allPlugins {
 		fmt.Println("  -", plugin)
 	}
