@@ -1028,7 +1028,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1260,7 +1260,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1425,7 +1425,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1541,7 +1541,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1861,7 +1861,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2218,7 +2218,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2634,7 +2634,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -2679,7 +2679,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.0.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -3039,7 +3039,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.2.0")
+			runWhenKongOrKonnect(t, ">=3.2.0")
 			teardown := setup(t)
 			defer teardown(t)
 
