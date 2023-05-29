@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/cenkalti/backoff/v4"
+	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/konnect"
@@ -167,9 +167,8 @@ func (sc *Syncer) init() error {
 
 func (sc *Syncer) diff() error {
 	for _, operation := range []func() error{
-		sc.deleteDuplicates,
-		sc.createUpdate,
 		sc.delete,
+		sc.createUpdate,
 	} {
 		err := operation()
 		if err != nil {
