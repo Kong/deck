@@ -167,8 +167,9 @@ func (sc *Syncer) init() error {
 
 func (sc *Syncer) diff() error {
 	for _, operation := range []func() error{
-		sc.delete,
+		sc.deleteDuplicates,
 		sc.createUpdate,
+		sc.delete,
 	} {
 		err := operation()
 		if err != nil {
