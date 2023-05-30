@@ -101,7 +101,7 @@ func (b *stateBuilder) consumerGroups() {
 		cg := cg
 		if utils.Empty(cg.ID) {
 			current, err := b.currentState.ConsumerGroups.Get(*cg.Name)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cg.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -121,7 +121,7 @@ func (b *stateBuilder) consumerGroups() {
 				current, err := b.currentState.ConsumerGroupPlugins.Get(
 					*plugin.Name, *cg.ConsumerGroup.ID,
 				)
-				if err == state.ErrNotFound {
+				if errors.Is(err, state.ErrNotFound) {
 					plugin.ID = uuid()
 				} else if err != nil {
 					b.err = err
@@ -147,7 +147,7 @@ func (b *stateBuilder) certificates() {
 		if utils.Empty(c.ID) {
 			cert, err := b.currentState.Certificates.GetByCertKey(*c.Cert,
 				*c.Key)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				c.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -187,7 +187,7 @@ func (b *stateBuilder) ingestSNIs(snis []kong.SNI) error {
 		sni := sni
 		if utils.Empty(sni.ID) {
 			currentSNI, err := b.currentState.SNIs.Get(*sni.Name)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				sni.ID = uuid()
 			} else if err != nil {
 				return err
@@ -210,7 +210,7 @@ func (b *stateBuilder) caCertificates() {
 		c := c
 		if utils.Empty(c.ID) {
 			cert, err := b.currentState.CACertificates.Get(*c.Cert)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				c.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -235,7 +235,7 @@ func (b *stateBuilder) consumers() {
 		c := c
 		if utils.Empty(c.ID) {
 			consumer, err := b.currentState.Consumers.Get(*c.Username)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				if c.CustomID != nil {
 					consumer, err = b.currentState.Consumers.Get(*c.CustomID)
 					if err == nil {
@@ -384,7 +384,7 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 		cred := cred
 		if utils.Empty(cred.ID) {
 			existingCred, err := b.currentState.KeyAuths.Get(*cred.Key)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -405,7 +405,7 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 		cred := cred
 		if utils.Empty(cred.ID) {
 			existingCred, err := b.currentState.BasicAuths.Get(*cred.Username)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -426,7 +426,7 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 		cred := cred
 		if utils.Empty(cred.ID) {
 			existingCred, err := b.currentState.HMACAuths.Get(*cred.Username)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -447,7 +447,7 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 		cred := cred
 		if utils.Empty(cred.ID) {
 			existingCred, err := b.currentState.JWTAuths.Get(*cred.Key)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -468,7 +468,7 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 		cred := cred
 		if utils.Empty(cred.ID) {
 			existingCred, err := b.currentState.Oauth2Creds.Get(*cred.ClientID)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -491,7 +491,7 @@ func (b *stateBuilder) ingestACLGroups(creds []kong.ACLGroup) error {
 			existingCred, err := b.currentState.ACLGroups.Get(
 				*cred.Consumer.ID,
 				*cred.Group)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
 				return err
@@ -532,7 +532,7 @@ func (b *stateBuilder) konnect() {
 		targetSP := b.targetContent.ServicePackages[i]
 		if utils.Empty(targetSP.ID) {
 			currentSP, err := b.currentState.ServicePackages.Get(*targetSP.Name)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				targetSP.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -558,7 +558,7 @@ func (b *stateBuilder) konnect() {
 			}
 			if utils.Empty(targetKonnectDoc.ID) {
 				currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSP, *targetKonnectDoc.Path)
-				if err == state.ErrNotFound {
+				if errors.Is(err, state.ErrNotFound) {
 					targetKonnectDoc.ID = uuid()
 				} else if err != nil {
 					b.err = err
@@ -579,7 +579,7 @@ func (b *stateBuilder) konnect() {
 			targetRelationID := ""
 			if utils.Empty(targetKonnectSV.ID) {
 				currentSV, err := b.currentState.ServiceVersions.Get(*targetKonnectSP.ID, *targetKonnectSV.Version)
-				if err == state.ErrNotFound {
+				if errors.Is(err, state.ErrNotFound) {
 					targetKonnectSV.ID = uuid()
 				} else if err != nil {
 					b.err = err
@@ -615,7 +615,7 @@ func (b *stateBuilder) konnect() {
 				}
 				if utils.Empty(targetKonnectDoc.ID) {
 					currentDoc, err := b.currentState.Documents.GetByParent(&targetKonnectSV, *targetKonnectDoc.Path)
-					if err == state.ErrNotFound {
+					if errors.Is(err, state.ErrNotFound) {
 						targetKonnectDoc.ID = uuid()
 					} else if err != nil {
 						b.err = err
@@ -652,7 +652,7 @@ func (b *stateBuilder) services() {
 func (b *stateBuilder) ingestService(s *FService) error {
 	if utils.Empty(s.ID) {
 		svc, err := b.currentState.Services.Get(*s.Name)
-		if err == state.ErrNotFound {
+		if errors.Is(err, state.ErrNotFound) {
 			s.ID = uuid()
 		} else if err != nil {
 			return err
@@ -736,7 +736,7 @@ func (b *stateBuilder) vaults() {
 		v := v
 		if utils.Empty(v.ID) {
 			vault, err := b.currentState.Vaults.Get(*v.Prefix)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				v.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -760,7 +760,7 @@ func (b *stateBuilder) rbacRoles() {
 		r := r
 		if utils.Empty(r.ID) {
 			role, err := b.currentState.RBACRoles.Get(*r.Name)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				r.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -788,7 +788,7 @@ func (b *stateBuilder) upstreams() {
 		u := u
 		if utils.Empty(u.ID) {
 			ups, err := b.currentState.Upstreams.Get(*u.Name)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				u.ID = uuid()
 			} else if err != nil {
 				b.err = err
@@ -820,7 +820,7 @@ func (b *stateBuilder) ingestTargets(targets []kong.Target) error {
 		t := t
 		if utils.Empty(t.ID) {
 			target, err := b.currentState.Targets.Get(*t.Upstream.ID, *t.Target)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				t.ID = uuid()
 			} else if err != nil {
 				return err
@@ -845,7 +845,7 @@ func (b *stateBuilder) plugins() {
 		p := p
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
 					p.Consumer.FriendlyName(), *p.Name, err)
 
@@ -858,7 +858,7 @@ func (b *stateBuilder) plugins() {
 		}
 		if p.Service != nil && !utils.Empty(p.Service.ID) {
 			s, err := b.intermediate.Services.Get(*p.Service.ID)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("service %v for plugin %v: %w",
 					p.Service.FriendlyName(), *p.Name, err)
 
@@ -871,7 +871,7 @@ func (b *stateBuilder) plugins() {
 		}
 		if p.Route != nil && !utils.Empty(p.Route.ID) {
 			r, err := b.intermediate.Routes.Get(*p.Route.ID)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("route %v for plugin %v: %w",
 					p.Route.FriendlyName(), *p.Name, err)
 
@@ -911,7 +911,7 @@ func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
 func (b *stateBuilder) ingestRoute(r FRoute) error {
 	if utils.Empty(r.ID) {
 		route, err := b.currentState.Routes.Get(*r.Name)
-		if err == state.ErrNotFound {
+		if errors.Is(err, state.ErrNotFound) {
 			r.ID = uuid()
 		} else if err != nil {
 			return err
@@ -988,7 +988,7 @@ func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
 		if errors.Is(err, ErrWorkspaceNotFound) {
 			return nil
 		}
-		return fmt.Errorf("retrieve schema for %v from Kong: %v", *plugin.Name, err)
+		return fmt.Errorf("retrieve schema for %v from Kong: %w", *plugin.Name, err)
 	}
 	return kong.FillPluginsDefaults(&plugin.Plugin, schema)
 }
@@ -1000,7 +1000,7 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 			cID, rID, sID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
 				sID, rID, cID)
-			if err == state.ErrNotFound {
+			if errors.Is(err, state.ErrNotFound) {
 				p.ID = uuid()
 			} else if err != nil {
 				return err
@@ -1017,7 +1017,7 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 			return err
 		}
 		if err := b.addPluginDefaults(&p); err != nil {
-			return fmt.Errorf("add defaults to plugin '%v': %v", *p.Name, err)
+			return fmt.Errorf("add defaults to plugin '%v': %w", *p.Name, err)
 		}
 		utils.MustMergeTags(&p, b.selectTags)
 		b.rawState.Plugins = append(b.rawState.Plugins, &p.Plugin)

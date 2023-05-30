@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -48,7 +49,7 @@ func (k *ConsumerGroupsCollection) Add(consumerGroup ConsumerGroup) error {
 	_, err := getConsumerGroup(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumerGroup %v: %w", consumerGroup.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -64,7 +65,7 @@ func getConsumerGroup(txn *memdb.Txn, IDs ...string) (*ConsumerGroup, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, consumerGroupTableName,
 			[]string{"name", "id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {
@@ -90,7 +91,7 @@ func (k *ConsumerGroupsCollection) Get(nameOrID string) (*ConsumerGroup, error) 
 	defer txn.Abort()
 	consumerGroup, err := getConsumerGroup(txn, nameOrID)
 	if err != nil {
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return nil, ErrNotFound
 		}
 		return nil, err

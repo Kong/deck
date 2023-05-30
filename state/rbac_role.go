@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -50,7 +51,7 @@ func (k *RBACRolesCollection) Add(rbacRole RBACRole) error {
 	_, err := getRBACRole(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting rbacRole %v: %w", rbacRole.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -66,7 +67,7 @@ func getRBACRole(txn *memdb.Txn, IDs ...string) (*RBACRole, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, rbacRoleTableName,
 			[]string{"name", "id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {

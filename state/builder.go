@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/utils"
@@ -23,7 +24,7 @@ func Get(raw *utils.KongRawState) (*KongState, error) {
 func ensureService(kongState *KongState, serviceID string) (bool, *kong.Service, error) {
 	s, err := kongState.Services.Get(serviceID)
 	if err != nil {
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return false, nil, nil
 		}
 		return false, nil, fmt.Errorf("looking up service %q: %w", serviceID, err)
@@ -35,7 +36,7 @@ func ensureService(kongState *KongState, serviceID string) (bool, *kong.Service,
 func ensureRoute(kongState *KongState, routeID string) (bool, *kong.Route, error) {
 	r, err := kongState.Routes.Get(routeID)
 	if err != nil {
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return false, nil, nil
 		}
 		return false, nil, fmt.Errorf("looking up route %q: %w", routeID, err)
@@ -47,7 +48,7 @@ func ensureRoute(kongState *KongState, routeID string) (bool, *kong.Route, error
 func ensureConsumer(kongState *KongState, consumerID string) (bool, *kong.Consumer, error) {
 	c, err := kongState.Consumers.Get(consumerID)
 	if err != nil {
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return false, nil, nil
 		}
 		return false, nil, fmt.Errorf("looking up consumer %q: %w", consumerID, err)

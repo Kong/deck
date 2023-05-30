@@ -2,6 +2,7 @@ package konnect
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -49,21 +50,13 @@ func (e *APIError) Code() int {
 // IsNotFoundErr returns true if the error or it's cause is
 // a 404 response from Kong.
 func IsNotFoundErr(e error) bool {
-	switch e := e.(type) {
-	case *APIError:
-		return e.httpCode == http.StatusNotFound
-	default:
-		return false
-	}
+	var apiErr *APIError
+	return errors.As(e, &apiErr) && apiErr.httpCode == http.StatusNotFound
 }
 
 // IsUnauthorizedErr returns true if the error or it's cause is
 // a 401 response from Konnect.
 func IsUnauthorizedErr(e error) bool {
-	switch e := e.(type) {
-	case *APIError:
-		return e.httpCode == http.StatusUnauthorized
-	default:
-		return false
-	}
+	var apiErr *APIError
+	return errors.As(e, &apiErr) && apiErr.httpCode == http.StatusUnauthorized
 }

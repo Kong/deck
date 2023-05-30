@@ -2,6 +2,7 @@ package file
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -651,7 +652,7 @@ func populateConsumers(kongState *state.KongState, file *Content,
 			cg := *cg
 			_, err := kongState.ConsumerGroupConsumers.Get(*c.ID, *cg.ID)
 			if err != nil {
-				if err != state.ErrNotFound {
+				if !errors.Is(err, state.ErrNotFound) {
 					return err
 				}
 				continue

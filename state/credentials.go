@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -52,7 +53,7 @@ func (k *credentialsCollection) getCred(txn *memdb.Txn, IDs ...string) (entity, 
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, k.CredType,
 			[]string{"id", "id2"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {
@@ -80,7 +81,7 @@ func (k *credentialsCollection) Add(cred entity) error {
 	_, err := k.getCred(txn, cred.GetID(), cred.GetID2())
 	if err == nil {
 		return fmt.Errorf("inserting credential %v: %w", cred.GetID(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

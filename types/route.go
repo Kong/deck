@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -102,7 +103,7 @@ func (d *routeDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *routeDiffer) deleteRoute(route *state.Route) (*crud.Event, error) {
 	_, err := d.targetState.Routes.Get(*route.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -140,7 +141,7 @@ func (d *routeDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 func (d *routeDiffer) createUpdateRoute(route *state.Route) (*crud.Event, error) {
 	route = &state.Route{Route: *route.DeepCopy()}
 	currentRoute, err := d.currentState.Routes.Get(*route.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// route not present, create it
 
 		return &crud.Event{
@@ -188,7 +189,7 @@ func (d *routeDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 
 func (d *routeDiffer) deleteDuplicateRoute(targetRoute *state.Route) (*crud.Event, error) {
 	currentRoute, err := d.currentState.Routes.Get(*targetRoute.Name)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return nil, nil
 	}
 	if err != nil {

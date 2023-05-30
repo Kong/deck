@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -115,7 +116,7 @@ func (d *documentDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *documentDiffer) deleteDocument(doc *state.Document) (*crud.Event, error) {
 	_, err := d.targetState.Documents.GetByParent(doc.Parent, *doc.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "document",
@@ -154,7 +155,7 @@ func (d *documentDiffer) createUpdateDocument(doc *state.Document) (*crud.Event,
 	dCopy := &state.Document{Document: *doc.ShallowCopy()}
 	currentDoc, err := d.currentState.Documents.GetByParent(doc.Parent, *doc.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "document",

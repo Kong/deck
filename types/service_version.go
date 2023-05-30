@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -167,7 +168,7 @@ func (d *serviceVersionDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *serviceVersionDiffer) deleteServiceVersion(sv *state.ServiceVersion) (*crud.Event, error) {
 	_, err := d.targetState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -206,7 +207,7 @@ func (d *serviceVersionDiffer) createUpdateServiceVersion(sv *state.ServiceVersi
 	svCopy := &state.ServiceVersion{ServiceVersion: *sv.DeepCopy()}
 	currentSV, err := d.currentState.ServiceVersions.Get(*sv.ServicePackage.ID, *sv.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: d.kind,

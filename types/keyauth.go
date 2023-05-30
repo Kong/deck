@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -105,7 +106,7 @@ func (d *keyAuthDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *keyAuthDiffer) deleteKeyAuth(keyAuth *state.KeyAuth) (*crud.Event, error) {
 	_, err := d.targetState.KeyAuths.Get(*keyAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -142,7 +143,7 @@ func (d *keyAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 func (d *keyAuthDiffer) createUpdateKeyAuth(keyAuth *state.KeyAuth) (*crud.Event, error) {
 	keyAuth = &state.KeyAuth{KeyAuth: *keyAuth.DeepCopy()}
 	currentKeyAuth, err := d.currentState.KeyAuths.Get(*keyAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// keyAuth not present, create it
 
 		return &crud.Event{

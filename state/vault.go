@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -48,7 +49,7 @@ func (k *VaultsCollection) Add(vault Vault) error {
 	_, err := getVault(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting vault %v: %w", vault.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -64,7 +65,7 @@ func getVault(txn *memdb.Txn, IDs ...string) (*Vault, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, vaultTableName,
 			[]string{"prefix", "id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {
@@ -90,7 +91,7 @@ func (k *VaultsCollection) Get(prefixOrID string) (*Vault, error) {
 	defer txn.Abort()
 	vault, err := getVault(txn, prefixOrID)
 	if err != nil {
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			return nil, ErrNotFound
 		}
 		return nil, err

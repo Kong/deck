@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/hashicorp/go-memdb"
@@ -73,7 +74,7 @@ func (k *ServiceVersionsCollection) Add(serviceVersion ServiceVersion) error {
 	_, err := getServiceVersion(txn, *serviceVersion.ServicePackage.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting serviceVersion %v: %w", serviceVersion.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

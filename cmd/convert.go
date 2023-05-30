@@ -48,7 +48,7 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 
 				err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
 				if err != nil {
-					return fmt.Errorf("converting file: %v", err)
+					return fmt.Errorf("converting file: %w", err)
 				}
 			} else if is2xTo3xConversion() {
 				path, err := os.Getwd()
@@ -62,7 +62,7 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 				for _, filename := range files {
 					err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
 					if err != nil {
-						return fmt.Errorf("converting '%s' file: %v", filename, err)
+						return fmt.Errorf("converting '%s' file: %w", filename, err)
 					}
 				}
 			}

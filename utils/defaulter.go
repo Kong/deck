@@ -232,7 +232,7 @@ func (d *Defaulter) addEntityDefaults(entityType string, entity interface{}) err
 		return nil
 	}
 	if err != nil {
-		return fmt.Errorf("retrieve schema for %v from Kong: %v", entityType, err)
+		return fmt.Errorf("retrieve schema for %v from Kong: %w", entityType, err)
 	}
 	return kong.FillEntityDefaults(entity, schema)
 }
@@ -249,28 +249,28 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 
 	// fills defaults from Kong API
 	if err := d.addEntityDefaults("services", d.service); err != nil {
-		return nil, fmt.Errorf("get defaults for services: %v", err)
+		return nil, fmt.Errorf("get defaults for services: %w", err)
 	}
 	if err := d.Register(d.service); err != nil {
 		return nil, fmt.Errorf("registering service with defaulter: %w", err)
 	}
 
 	if err := d.addEntityDefaults("routes", d.route); err != nil {
-		return nil, fmt.Errorf("get defaults for routes: %v", err)
+		return nil, fmt.Errorf("get defaults for routes: %w", err)
 	}
 	if err := d.Register(d.route); err != nil {
 		return nil, fmt.Errorf("registering route with defaulter: %w", err)
 	}
 
 	if err := d.addEntityDefaults("upstreams", d.upstream); err != nil {
-		return nil, fmt.Errorf("get defaults for upstreams: %v", err)
+		return nil, fmt.Errorf("get defaults for upstreams: %w", err)
 	}
 	if err := d.Register(d.upstream); err != nil {
 		return nil, fmt.Errorf("registering upstream with defaulter: %w", err)
 	}
 
 	if err := d.addEntityDefaults("targets", d.target); err != nil {
-		return nil, fmt.Errorf("get defaults for targets: %v", err)
+		return nil, fmt.Errorf("get defaults for targets: %w", err)
 	}
 	if err := d.Register(d.target); err != nil {
 		return nil, fmt.Errorf("registering target with defaulter: %w", err)
@@ -289,7 +289,7 @@ func getKongDefaulterWithClient(ctx context.Context, opts DefaulterOpts) (*Defau
 		}
 	} else {
 		if err := d.addEntityDefaults("consumer_group_plugins", d.consumerGroupPlugin); err != nil {
-			return nil, fmt.Errorf("get defaults for consumer-group-plugin: %v", err)
+			return nil, fmt.Errorf("get defaults for consumer-group-plugin: %w", err)
 		}
 		if err := d.Register(d.consumerGroupPlugin); err != nil {
 			return nil, fmt.Errorf("registering consumer-group-plugin with defaulter: %w", err)
@@ -374,7 +374,7 @@ func validateKongDefaults(defaults interface{}) error {
 		err := checkEntityDefaults(object, restrictedFields)
 		if err != nil {
 			entityErr := fmt.Errorf(
-				"%s defaults %s", strings.ToLower(objectName), err)
+				"%s defaults %w", strings.ToLower(objectName), err)
 			errs.Errors = append(errs.Errors, entityErr)
 		}
 	}
