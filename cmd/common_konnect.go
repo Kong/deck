@@ -74,7 +74,7 @@ func GetKongClientForKonnectMode(
 		}
 		parsedAddress, err = url.Parse(address)
 		if err != nil {
-			return nil, fmt.Errorf("parsing %s address: %v", address, err)
+			return nil, fmt.Errorf("parsing %s address: %w", address, err)
 		}
 		_, err = authenticate(ctx, konnectClient, parsedAddress.Host, *konnectConfig)
 		if err == nil {

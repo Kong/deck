@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -94,7 +95,7 @@ func (k *ConsumerGroupConsumersCollection) Add(consumer ConsumerGroupConsumer) e
 	_, err := getConsumerGroupConsumer(txn, *consumer.ConsumerGroup.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumerGroupConsumer %v: %w", consumer.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

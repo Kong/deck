@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -97,7 +98,7 @@ func (d *vaultDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *vaultDiffer) deleteVault(vault *state.Vault) (*crud.Event, error) {
 	_, err := d.targetState.Vaults.Get(*vault.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "vault",
@@ -140,7 +141,7 @@ func (d *vaultDiffer) createUpdateVault(vault *state.Vault) (*crud.Event,
 	vaultCopy := &state.Vault{Vault: *vault.DeepCopy()}
 	currentVault, err := d.currentState.Vaults.Get(*vault.Prefix)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "vault",

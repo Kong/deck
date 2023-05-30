@@ -2,6 +2,7 @@ package validate
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -47,7 +48,7 @@ func (v ErrorsWrapper) Error() string {
 	var errStr string
 	for _, e := range v.Errors {
 		errStr += e.Error()
-		if e != v.Errors[len(v.Errors)-1] {
+		if !errors.Is(e, v.Errors[len(v.Errors)-1]) {
 			errStr += "\n"
 		}
 	}

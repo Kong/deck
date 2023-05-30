@@ -27,6 +27,7 @@ linters:
   - unconvert
   - unparam
   - wastedassign
+  - errorlint
 issues:
   exclude-rules:
   - linters:

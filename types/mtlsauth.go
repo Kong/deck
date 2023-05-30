@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -105,7 +106,7 @@ func (d *mtlsAuthDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *mtlsAuthDiffer) deleteMTLSAuth(mtlsAuth *state.MTLSAuth) (*crud.Event, error) {
 	_, err := d.targetState.MTLSAuths.Get(*mtlsAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -142,7 +143,7 @@ func (d *mtlsAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error 
 func (d *mtlsAuthDiffer) createUpdateMTLSAuth(mtlsAuth *state.MTLSAuth) (*crud.Event, error) {
 	mtlsAuth = &state.MTLSAuth{MTLSAuth: *mtlsAuth.DeepCopy()}
 	currentMTLSAuth, err := d.currentState.MTLSAuths.Get(*mtlsAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// mtlsAuth not present, create it
 
 		return &crud.Event{

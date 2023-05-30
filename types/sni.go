@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *sniDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *sniDiffer) deleteSNI(sni *state.SNI) (*crud.Event, error) {
 	_, err := d.targetState.SNIs.Get(*sni.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -132,7 +133,7 @@ func (d *sniDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 func (d *sniDiffer) createUpdateSNI(sni *state.SNI) (*crud.Event, error) {
 	sni = &state.SNI{SNI: *sni.DeepCopy()}
 	currentSNI, err := d.currentState.SNIs.Get(*sni.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// sni not present, create it
 
 		return &crud.Event{

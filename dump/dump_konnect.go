@@ -56,7 +56,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 			// the number of parallel requests
 			err := semaphore.Acquire(ctx, 2)
 			if err != nil {
-				return fmt.Errorf("acquire semaphore: %v", err)
+				return fmt.Errorf("acquire semaphore: %w", err)
 			}
 			go func(i int) {
 				defer semaphore.Release(1)
@@ -81,7 +81,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 			for _, version := range servicePackages[i].Versions {
 				err := semaphore.Acquire(ctx, 1)
 				if err != nil {
-					return fmt.Errorf("acquire semaphore: %v", err)
+					return fmt.Errorf("acquire semaphore: %w", err)
 				}
 				go func(version konnect.ServiceVersion) {
 					defer semaphore.Release(1)
@@ -96,7 +96,7 @@ func GetFromKonnect(ctx context.Context, konnectClient *konnect.Client,
 		}
 		err = semaphore.Acquire(ctx, concurrency)
 		if err != nil {
-			return fmt.Errorf("acquire semaphore: %v", err)
+			return fmt.Errorf("acquire semaphore: %w", err)
 		}
 		close(errChan)
 		semaphore.Release(concurrency)

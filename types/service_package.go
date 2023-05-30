@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *servicePackageDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *servicePackageDiffer) deleteServicePackage(sp *state.ServicePackage) (*crud.Event, error) {
 	_, err := d.targetState.ServicePackages.Get(*sp.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "service-package",
@@ -134,7 +135,7 @@ func (d *servicePackageDiffer) createUpdateServicePackage(sp *state.ServicePacka
 	spCopy := &state.ServicePackage{ServicePackage: *sp.DeepCopy()}
 	currentSP, err := d.currentState.ServicePackages.Get(*sp.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service-package",

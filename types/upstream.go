@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *upstreamDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *upstreamDiffer) deleteUpstream(upstream *state.Upstream) (*crud.Event, error) {
 	_, err := d.targetState.Upstreams.Get(*upstream.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "upstream",
@@ -136,7 +137,7 @@ func (d *upstreamDiffer) createUpdateUpstream(upstream *state.Upstream) (*crud.E
 	upstreamCopy := &state.Upstream{Upstream: *upstream.DeepCopy()}
 	currentUpstream, err := d.currentState.Upstreams.Get(*upstream.Name)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "upstream",

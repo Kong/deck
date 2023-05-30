@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -107,7 +108,7 @@ func (d *rbacEndpointPermissionDiffer) deleteRBACEndpointPermission(ep *state.RB
 	*crud.Event, error,
 ) {
 	_, err := d.targetState.RBACEndpointPermissions.Get(ep.FriendlyName())
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -148,7 +149,7 @@ func (d *rbacEndpointPermissionDiffer) createUpdateRBACEndpointPermission(ep *st
 	epCopy := &state.RBACEndpointPermission{RBACEndpointPermission: *ep.DeepCopy()}
 	currentEp, err := d.currentState.RBACEndpointPermissions.Get(ep.FriendlyName())
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: d.kind,

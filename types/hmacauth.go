@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -118,7 +119,7 @@ func (d *hmacAuthDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *hmacAuthDiffer) deleteHMACAuth(hmacAuth *state.HMACAuth) (*crud.Event, error) {
 	_, err := d.targetState.HMACAuths.Get(*hmacAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -156,7 +157,7 @@ func (d *hmacAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error 
 func (d *hmacAuthDiffer) createUpdateHMACAuth(hmacAuth *state.HMACAuth) (*crud.Event, error) {
 	hmacAuth = &state.HMACAuth{HMACAuth: *hmacAuth.DeepCopy()}
 	currentHMACAuth, err := d.currentState.HMACAuths.Get(*hmacAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// hmacAuth not present, create it
 
 		return &crud.Event{

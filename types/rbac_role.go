@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -96,7 +97,7 @@ func (d *rbacRoleDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *rbacRoleDiffer) deleteRBACRole(role *state.RBACRole) (*crud.Event, error) {
 	_, err := d.targetState.RBACRoles.Get(*role.Name)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -135,7 +136,7 @@ func (d *rbacRoleDiffer) createUpdateRBACRole(role *state.RBACRole) (*crud.Event
 	roleCopy := &state.RBACRole{RBACRole: *role.DeepCopy()}
 	currentRole, err := d.currentState.RBACRoles.Get(*role.Name)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: d.kind,

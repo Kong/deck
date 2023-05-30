@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -118,7 +119,7 @@ func (d *jwtAuthDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *jwtAuthDiffer) deleteJWTAuth(jwtAuth *state.JWTAuth) (*crud.Event, error) {
 	_, err := d.targetState.JWTAuths.Get(*jwtAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -155,7 +156,7 @@ func (d *jwtAuthDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 func (d *jwtAuthDiffer) createUpdateJWTAuth(jwtAuth *state.JWTAuth) (*crud.Event, error) {
 	jwtAuth = &state.JWTAuth{JWTAuth: *jwtAuth.DeepCopy()}
 	currentJWTAuth, err := d.currentState.JWTAuths.Get(*jwtAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// jwtAuth not present, create it
 
 		return &crud.Event{

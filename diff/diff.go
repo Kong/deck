@@ -339,7 +339,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 		errs = append(errs, fmt.Errorf("failed to sync all entities: %w", ctx.Err()))
 	case err, ok := <-sc.errChan:
 		if ok && err != nil {
-			if err != errEnqueueFailed {
+			if !errors.Is(err, errEnqueueFailed) {
 				errs = append(errs, err)
 			}
 		}
@@ -350,7 +350,7 @@ func (sc *Syncer) Run(ctx context.Context, parallelism int, d Do) []error {
 
 	// collect errors
 	for err := range sc.errChan {
-		if err != errEnqueueFailed {
+		if !errors.Is(err, errEnqueueFailed) {
 			errs = append(errs, err)
 		}
 	}

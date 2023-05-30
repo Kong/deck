@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -127,7 +128,7 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	_, err := getPluginByID(txn, *plugin.ID)
 	if err == nil {
 		return fmt.Errorf("inserting plugin %v: %w", plugin.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -145,7 +146,7 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	_, err = getPluginBy(txn, *plugin.Name, sID, rID, cID)
 	if err == nil {
 		return fmt.Errorf("inserting plugin %v: %w", plugin.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

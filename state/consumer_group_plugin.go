@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -92,7 +93,7 @@ func (k *ConsumerGroupPluginsCollection) Add(plugin ConsumerGroupPlugin) error {
 	_, err := getConsumerGroupPlugin(txn, *plugin.ConsumerGroup.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumerGroupPlugin %v: %w", plugin.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

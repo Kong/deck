@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *serviceDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *serviceDiffer) deleteService(service *state.Service) (*crud.Event, error) {
 	_, err := d.targetState.Services.Get(*service.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -134,7 +135,7 @@ func (d *serviceDiffer) createUpdateService(service *state.Service) (*crud.Event
 	serviceCopy := &state.Service{Service: *service.DeepCopy()}
 	currentService, err := d.currentState.Services.Get(*service.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service",
@@ -177,7 +178,7 @@ func (d *serviceDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 
 func (d *serviceDiffer) deleteDuplicateService(targetService *state.Service) ([]crud.Event, error) {
 	currentService, err := d.currentState.Services.Get(*targetService.Name)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return nil, nil
 	}
 	if err != nil {

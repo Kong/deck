@@ -2,6 +2,7 @@ package dump
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -829,7 +830,8 @@ func GetAllMTLSAuths(ctx context.Context,
 			// but this is currently necessary for compatibility. We need a better approach
 			// before adding other Enterprise resources that decK handles by default (versus,
 			// for example, RBAC roles, which require the --rbac-resources-only flag).
-			if kongErr, ok := err.(*kong.APIError); ok {
+			var kongErr *kong.APIError
+			if errors.As(err, &kongErr) {
 				if kongErr.Code() == http.StatusForbidden {
 					return mtlsAuths, nil
 				}

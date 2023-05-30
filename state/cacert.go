@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -51,7 +52,7 @@ func (k *CACertificatesCollection) Add(caCert CACertificate) error {
 	_, err := getCACert(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting ca-cert %v: %w", caCert.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -67,7 +68,7 @@ func getCACert(txn *memdb.Txn, IDs ...string) (*CACertificate, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, caCertTableName,
 			[]string{"cert", "id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {

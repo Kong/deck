@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -96,7 +97,7 @@ func (d *certificateDiffer) deleteCertificate(
 	certificate *state.Certificate,
 ) (*crud.Event, error) {
 	_, err := d.targetState.Certificates.Get(*certificate.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -137,7 +138,7 @@ func (d *certificateDiffer) createUpdateCertificate(
 	certificateCopy := &state.Certificate{Certificate: *certificate.DeepCopy()}
 	currentCertificate, err := d.currentState.Certificates.Get(*certificate.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// certificate not present, create it
 		return &crud.Event{
 			Op:   crud.Create,

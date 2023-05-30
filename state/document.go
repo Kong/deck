@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/hashicorp/go-memdb"
@@ -66,7 +67,7 @@ func (k *DocumentsCollection) Add(document Document) error {
 	_, err := getDocument(txn, document.ParentKey(), searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting document %v: %w", document.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
