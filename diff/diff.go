@@ -166,15 +166,74 @@ func (sc *Syncer) init() error {
 }
 
 func (sc *Syncer) diff() error {
-	var err error
-	err = sc.createUpdate()
-	if err != nil {
-		return err
+	for _, operation := range []func() error{
+		sc.deleteDuplicates,
+		sc.createUpdate,
+		sc.delete,
+	} {
+		err := operation()
+		if err != nil {
+			return err
+		}
 	}
-	err = sc.delete()
-	if err != nil {
-		return err
+	return nil
+}
+
+func (sc *Syncer) deleteDuplicates() error {
+	var events []crud.Event
+	for _, ts := range reverseOrder() {
+		for _, entityType := range ts {
+			entityDiffer, ok := sc.entityDiffers[entityType].(types.DuplicatesDeleter)
+			if !ok {
+				continue
+			}
+			entityEvents, err := entityDiffer.DuplicatesDeletes()
+			if err != nil {
+				return err
+			}
+			events = append(events, entityEvents...)
+		}
 	}
+
+	return sc.processDeleteDuplicates(eventsInOrder(events, reverseOrder()))
+}
+
+func (sc *Syncer) processDeleteDuplicates(eventsByLevel [][]crud.Event) error {
+	// All entities implement this interface. We'll use it to index delete events by (kind, identifier) tuple to prevent
+	// deleting a single object twice.
+	type identifier interface {
+		Identifier() string
+	}
+	var (
+		alreadyDeleted = map[string]struct{}{}
+		keyForEvent    = func(event crud.Event) (string, error) {
+			obj, ok := event.Obj.(identifier)
+			if !ok {
+				return "", fmt.Errorf("unexpected type %T in event", event.Obj)
+			}
+			return fmt.Sprintf("%s-%s", event.Kind, obj.Identifier()), nil
+		}
+	)
+
+	for _, events := range eventsByLevel {
+		for _, event := range events {
+			key, err := keyForEvent(event)
+			if err != nil {
+				return err
+			}
+			if _, ok := alreadyDeleted[key]; ok {
+				continue
+			}
+			if err := sc.queueEvent(event); err != nil {
+				return err
+			}
+			alreadyDeleted[key] = struct{}{}
+		}
+
+		// Wait for all the deletes to finish before moving to the next level to avoid conflicts.
+		sc.wait()
+	}
+
 	return nil
 }
 

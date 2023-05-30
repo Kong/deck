@@ -1,0 +1,15 @@
+_format_version: "3.0"
+services:
+  - enabled: true
+    host: mockbin.org
+    id: c75a775b-3a32-4b73-8e05-f68169c23941     # Leaving ID
+    name: s1                                     # and name unchanged.
+    port: 80
+    routes:
+      - id: 97b6a97e-f3f7-4c47-857a-7464cb9e202b # Leaving ID
+        name: r1                                 # and name unchanged.
+        paths:
+          - /r1
+consumers:
+  - id: 9a1e49a8-2536-41fa-a4e9-605bf218a4fa # Leaving ID
+    username: c1                             # and username unchanged.

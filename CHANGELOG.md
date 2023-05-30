@@ -56,6 +56,16 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.21.0]
+
+> Release date: TBD
+
+### Add
+
+- Add support for updating Services, Routes, and Consumers by changing their IDs,
+  but retaining their names.
+  [#918](https://github.com/Kong/deck/pull/918)
+
 ## [v1.20.0]
 
 > Release date: 2023/04/24
@@ -63,7 +73,6 @@
 ### Add
 
 - Add the license type to the file package.
-
 
 ## [v1.19.1]
 

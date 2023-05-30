@@ -14,6 +14,12 @@ type Differ interface {
 	CreateAndUpdates(func(crud.Event) error) error
 }
 
+type DuplicatesDeleter interface {
+	// DuplicatesDeletes returns delete events for entities that have duplicates in the current and target state.
+	// A duplicate is defined as an entity with the same name but different ID.
+	DuplicatesDeletes() ([]crud.Event, error)
+}
+
 type Entity interface {
 	Type() EntityType
 	CRUDActions() crud.Actions

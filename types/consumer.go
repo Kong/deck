@@ -158,3 +158,44 @@ func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.E
 	}
 	return nil, nil
 }
+
+func (d *consumerDiffer) DuplicatesDeletes() ([]crud.Event, error) {
+	targetConsumers, err := d.targetState.Consumers.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching consumers from state: %w", err)
+	}
+
+	var events []crud.Event
+	for _, targetConsumer := range targetConsumers {
+		event, err := d.deleteDuplicateConsumer(targetConsumer)
+		if err != nil {
+			return nil, err
+		}
+		if event != nil {
+			events = append(events, *event)
+		}
+	}
+
+	return events, nil
+}
+
+func (d *consumerDiffer) deleteDuplicateConsumer(targetConsumer *state.Consumer) (*crud.Event, error) {
+	currentConsumer, err := d.currentState.Consumers.Get(*targetConsumer.Username)
+	if err == state.ErrNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up consumer %q: %w",
+			*targetConsumer.Username, err)
+	}
+
+	if *currentConsumer.ID != *targetConsumer.ID {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: "consumer",
+			Obj:  currentConsumer,
+		}, nil
+	}
+
+	return nil, nil
+}
