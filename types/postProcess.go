@@ -22,12 +22,12 @@ func (crud *servicePostAction) Delete(_ context.Context, args ...crud.Arg) (crud
 	// Delete all plugins associated with this service as that's the implicit behavior of Kong (cascade delete).
 	plugins, err := crud.currentState.Plugins.GetAllByServiceID(serviceID)
 	if err != nil {
-		return nil, fmt.Errorf("error looking up plugins for service '%v': %v", serviceID, err)
+		return nil, fmt.Errorf("error looking up plugins for service '%v': %w", serviceID, err)
 	}
 	for _, plugin := range plugins {
 		err = crud.currentState.Plugins.Delete(*plugin.ID)
 		if err != nil {
-			return nil, fmt.Errorf("error deleting plugin '%v' for service '%v': %v", *plugin.ID, serviceID, err)
+			return nil, fmt.Errorf("error deleting plugin '%v' for service '%v': %w", *plugin.ID, serviceID, err)
 		}
 	}
 	return nil, crud.currentState.Services.Delete(serviceID)
@@ -51,12 +51,12 @@ func (crud *routePostAction) Delete(_ context.Context, args ...crud.Arg) (crud.A
 	// Delete all plugins associated with this route as that's the implicit behavior of Kong (cascade delete).
 	plugins, err := crud.currentState.Plugins.GetAllByRouteID(routeID)
 	if err != nil {
-		return nil, fmt.Errorf("error looking up plugins for route '%v': %v", routeID, err)
+		return nil, fmt.Errorf("error looking up plugins for route '%v': %w", routeID, err)
 	}
 	for _, plugin := range plugins {
 		err = crud.currentState.Plugins.Delete(*plugin.ID)
 		if err != nil {
-			return nil, fmt.Errorf("error deleting plugin '%v' for route '%v': %v", *plugin.ID, routeID, err)
+			return nil, fmt.Errorf("error deleting plugin '%v' for route '%v': %w", *plugin.ID, routeID, err)
 		}
 	}
 	return nil, crud.currentState.Routes.Delete(routeID)
@@ -178,11 +178,11 @@ func (crud *consumerPostAction) Delete(_ context.Context, args ...crud.Arg) (cru
 	// Delete all plugins associated with this consumer as that's the implicit behavior of Kong (cascade delete).
 	plugins, err := crud.currentState.Plugins.GetAllByConsumerID(consumerID)
 	if err != nil {
-		return nil, fmt.Errorf("error looking up plugins for consumer '%v': %v", consumerID, err)
+		return nil, fmt.Errorf("error looking up plugins for consumer '%v': %w", consumerID, err)
 	}
 	for _, plugin := range plugins {
 		if err := crud.currentState.Plugins.Delete(*plugin.ID); err != nil {
-			return nil, fmt.Errorf("error deleting plugin '%v' for consumer '%v': %v", *plugin.ID, consumerID, err)
+			return nil, fmt.Errorf("error deleting plugin '%v' for consumer '%v': %w", *plugin.ID, consumerID, err)
 		}
 	}
 	return nil, crud.currentState.Consumers.Delete(consumerID)
