@@ -9,3 +9,7 @@ services:
     - '<' # verifies that the templating engine does not perform character escaping
 plugins:
 - name: prometheus
+- name: pre-function
+  config:
+    log: |
+      ${{ env "DECK_FILE_LOG_FUNCTION" | indent 8 }}

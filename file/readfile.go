@@ -158,12 +158,18 @@ func toFloat(key string) (float64, error) {
 	return strconv.ParseFloat(key, 64)
 }
 
+func indent(spaces int, v string) string {
+	pad := strings.Repeat(" ", spaces)
+	return strings.Replace(v, "\n", "\n"+pad, -1)
+}
+
 func renderTemplate(content string) (string, error) {
 	t := template.New("state").Funcs(template.FuncMap{
 		"env":     getPrefixedEnvVar,
 		"toBool":  toBool,
 		"toInt":   toInt,
 		"toFloat": toFloat,
+		"indent":  indent,
 	}).Delims("${{", "}}")
 	t, err := t.Parse(content)
 	if err != nil {
