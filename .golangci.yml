@@ -1,7 +1,6 @@
 linters:
   enable:
   - asciicheck
-  - depguard
   - dogsled
   - durationcheck
   - exhaustive
@@ -82,3 +81,10 @@ linters-settings:
       - gopkg.in/yaml.v3:
           recommendations:
           - sigs.k8s.io/yaml
+      - github.com/pkg/errors:
+          recommendations:
+          - fmt
+          - errors
+      - golang.org/x/net/context:
+          recommendations:
+          - context
