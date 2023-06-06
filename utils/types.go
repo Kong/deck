@@ -298,10 +298,12 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 	}
 	if config.ProxyAddress != "" {
 		proxyURL, err := url.Parse(config.ProxyAddress)
-		if err == nil {
-			transport := httpClient.Transport.(*http.Transport)
-			transport.Proxy = http.ProxyURL(proxyURL)
+		if err != nil {
+			return nil, fmt.Errorf("parsing proxy address: %w", err)
 		}
+
+		transport := httpClient.Transport.(*http.Transport)
+		transport.Proxy = http.ProxyURL(proxyURL)
 	}
 	headers, err := parseHeaders(config.Headers)
 	if err != nil {
