@@ -145,6 +145,17 @@
         "concurrency": {
           "type": "integer"
         },
+        "headers": {
+          "patternProperties": {
+            ".*": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
         "healthy": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Healthy"
@@ -1071,6 +1082,9 @@
             "$ref": "#/definitions/FTarget"
           },
           "type": "array"
+        },
+        "use_srv_name": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -1775,6 +1789,9 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "use_srv_name": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
