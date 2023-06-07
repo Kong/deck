@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -113,7 +114,7 @@ func (d *pluginDiffer) deletePlugin(plugin *state.Plugin) (*crud.Event, error) {
 	serviceID, routeID, consumerID := foreignNames(plugin)
 	_, err := d.targetState.Plugins.GetByProp(name, serviceID, routeID,
 		consumerID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -153,7 +154,7 @@ func (d *pluginDiffer) createUpdatePlugin(plugin *state.Plugin) (*crud.Event, er
 	serviceID, routeID, consumerID := foreignNames(plugin)
 	currentPlugin, err := d.currentState.Plugins.GetByProp(name,
 		serviceID, routeID, consumerID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// plugin not present, create it
 
 		return &crud.Event{

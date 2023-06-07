@@ -1,6 +1,9 @@
 package diff
 
-import "github.com/kong/deck/types"
+import (
+	"github.com/kong/deck/crud"
+	"github.com/kong/deck/types"
+)
 
 /*
                                        Root
@@ -91,4 +94,38 @@ func deepCopy(src [][]types.EntityType) [][]types.EntityType {
 		copy(res[i], src[i])
 	}
 	return res
+}
+
+func eventsInOrder(events []crud.Event, order [][]types.EntityType) [][]crud.Event {
+	// kindToLevel maps a Kind to its level in the order to avoid repeated lookups.
+	kindToLevel := make(map[crud.Kind]int)
+
+	// eventsByLevel is a slice of slices of events, where each slice of events is at the same level and can be
+	// processed concurrently.
+	eventsByLevel := make([][]crud.Event, len(order))
+
+	for _, event := range events {
+		level, ok := kindToLevel[event.Kind]
+		if !ok {
+			level = levelForEvent(event, order)
+			kindToLevel[event.Kind] = level
+		}
+
+		eventsByLevel[level] = append(eventsByLevel[level], event)
+	}
+
+	return eventsByLevel
+}
+
+func levelForEvent(event crud.Event, order [][]types.EntityType) int {
+	for i, level := range order {
+		for _, entityType := range level {
+			if event.Kind == crud.Kind(entityType) {
+				return i
+			}
+		}
+	}
+
+	// This should never happen.
+	return -1
 }

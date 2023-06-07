@@ -4,7 +4,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/kong/deck/crud"
 	"github.com/kong/deck/types"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_reverse(t *testing.T) {
@@ -47,4 +49,43 @@ func Test_reverse(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestEventsInOrder(t *testing.T) {
+	e := func(entityType types.EntityType) crud.Event {
+		return crud.Event{Kind: crud.Kind(entityType)}
+	}
+
+	eventsOutOfOrder := []crud.Event{
+		e(types.Consumer),
+		e(types.Service),
+		e(types.KeyAuth),
+		e(types.Route),
+		e(types.ServicePackage),
+		e(types.ConsumerGroup),
+		e(types.ServiceVersion),
+		e(types.Plugin),
+	}
+
+	order := reverseOrder()
+	result := eventsInOrder(eventsOutOfOrder, order)
+
+	require.Equal(t, [][]crud.Event{
+		{
+			e(types.Plugin),
+		},
+		{
+			e(types.Route),
+			e(types.ServiceVersion),
+		},
+		{
+			e(types.Service),
+			e(types.KeyAuth),
+			e(types.ConsumerGroup),
+		},
+		{
+			e(types.Consumer),
+			e(types.ServicePackage),
+		},
+	}, result)
 }

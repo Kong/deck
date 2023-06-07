@@ -1,7 +1,6 @@
 linters:
   enable:
   - asciicheck
-  - depguard
   - dogsled
   - durationcheck
   - exhaustive
@@ -27,6 +26,7 @@ linters:
   - unconvert
   - unparam
   - wastedassign
+  - errorlint
 issues:
   exclude-rules:
   - linters:
@@ -86,5 +86,13 @@ linters-settings:
       - gopkg.in/yaml.v3:
           recommendations:
           - sigs.k8s.io/yaml
+      - github.com/pkg/errors:
+          recommendations:
+          - fmt
+          - errors
+      - golang.org/x/net/context:
+          recommendations:
+          - context
 run:
   timeout: 5m
+ 

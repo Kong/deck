@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -132,7 +133,7 @@ func (d *basicAuthDiffer) Deletes(handler func(crud.Event) error) error {
 func (d *basicAuthDiffer) deleteBasicAuth(basicAuth *state.BasicAuth) (*crud.Event, error) {
 	d.warnBasicAuth()
 	_, err := d.targetState.BasicAuths.Get(*basicAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -171,7 +172,7 @@ func (d *basicAuthDiffer) createUpdateBasicAuth(basicAuth *state.BasicAuth) (*cr
 	d.warnBasicAuth()
 	basicAuth = &state.BasicAuth{BasicAuth: *basicAuth.DeepCopy()}
 	currentBasicAuth, err := d.currentState.BasicAuths.Get(*basicAuth.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// basicAuth not present, create it
 
 		return &crud.Event{

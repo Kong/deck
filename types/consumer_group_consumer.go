@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -152,7 +153,7 @@ func (d *consumerGroupConsumerDiffer) deleteConsumerGroupConsumer(
 	_, err := d.targetState.ConsumerGroupConsumers.Get(
 		*consumer.Consumer.Username, *consumer.ConsumerGroup.ID,
 	)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: "consumer-group-consumer",
@@ -194,7 +195,7 @@ func (d *consumerGroupConsumerDiffer) createUpdateConsumerGroupConsumer(
 	currentConsumer, err := d.currentState.ConsumerGroupConsumers.Get(
 		*consumer.Consumer.Username, *consumer.ConsumerGroup.ID,
 	)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "consumer-group-consumer",

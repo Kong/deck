@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -119,7 +120,7 @@ func (d *aclGroupDiffer) Deletes(handler func(crud.Event) error) error {
 func (d *aclGroupDiffer) deleteACLGroup(aclGroup *state.ACLGroup) (*crud.Event, error) {
 	// lookup by consumerID and Group
 	_, err := d.targetState.ACLGroups.Get(*aclGroup.Consumer.ID, *aclGroup.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -157,7 +158,7 @@ func (d *aclGroupDiffer) createUpdateACLGroup(aclGroup *state.ACLGroup) (*crud.E
 	aclGroup = &state.ACLGroup{ACLGroup: *aclGroup.DeepCopy()}
 	currentACLGroup, err := d.currentState.ACLGroups.Get(
 		*aclGroup.Consumer.ID, *aclGroup.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// aclGroup not present, create it
 
 		return &crud.Event{

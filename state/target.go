@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -74,7 +75,7 @@ func (k *TargetsCollection) Add(target Target) error {
 	_, err := getTarget(txn, *target.Upstream.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting target %v: %w", target.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

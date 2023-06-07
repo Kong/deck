@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *consumerDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *consumerDiffer) deleteConsumer(consumer *state.Consumer) (*crud.Event, error) {
 	_, err := d.targetState.Consumers.Get(*consumer.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -134,7 +135,7 @@ func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.E
 	consumerCopy := &state.Consumer{Consumer: *consumer.DeepCopy()}
 	currentConsumer, err := d.currentState.Consumers.Get(*consumer.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// consumer not present, create it
 		return &crud.Event{
 			Op:   crud.Create,
@@ -156,5 +157,46 @@ func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.E
 			OldObj: currentConsumer,
 		}, nil
 	}
+	return nil, nil
+}
+
+func (d *consumerDiffer) DuplicatesDeletes() ([]crud.Event, error) {
+	targetConsumers, err := d.targetState.Consumers.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching consumers from state: %w", err)
+	}
+
+	var events []crud.Event
+	for _, targetConsumer := range targetConsumers {
+		event, err := d.deleteDuplicateConsumer(targetConsumer)
+		if err != nil {
+			return nil, err
+		}
+		if event != nil {
+			events = append(events, *event)
+		}
+	}
+
+	return events, nil
+}
+
+func (d *consumerDiffer) deleteDuplicateConsumer(targetConsumer *state.Consumer) (*crud.Event, error) {
+	currentConsumer, err := d.currentState.Consumers.Get(*targetConsumer.Username)
+	if errors.Is(err, state.ErrNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up consumer %q: %w",
+			*targetConsumer.Username, err)
+	}
+
+	if *currentConsumer.ID != *targetConsumer.ID {
+		return &crud.Event{
+			Op:   crud.Delete,
+			Kind: "consumer",
+			Obj:  currentConsumer,
+		}, nil
+	}
+
 	return nil, nil
 }

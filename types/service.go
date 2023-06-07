@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -95,7 +96,7 @@ func (d *serviceDiffer) Deletes(handler func(crud.Event) error) error {
 
 func (d *serviceDiffer) deleteService(service *state.Service) (*crud.Event, error) {
 	_, err := d.targetState.Services.Get(*service.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -134,7 +135,7 @@ func (d *serviceDiffer) createUpdateService(service *state.Service) (*crud.Event
 	serviceCopy := &state.Service{Service: *service.DeepCopy()}
 	currentService, err := d.currentState.Services.Get(*service.ID)
 
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Create,
 			Kind: "service",
@@ -155,5 +156,62 @@ func (d *serviceDiffer) createUpdateService(service *state.Service) (*crud.Event
 			OldObj: currentService,
 		}, nil
 	}
+	return nil, nil
+}
+
+func (d *serviceDiffer) DuplicatesDeletes() ([]crud.Event, error) {
+	targetServices, err := d.targetState.Services.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching services from state: %w", err)
+	}
+	var events []crud.Event
+	for _, service := range targetServices {
+		serviceEvents, err := d.deleteDuplicateService(service)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, serviceEvents...)
+	}
+
+	return events, nil
+}
+
+func (d *serviceDiffer) deleteDuplicateService(targetService *state.Service) ([]crud.Event, error) {
+	currentService, err := d.currentState.Services.Get(*targetService.Name)
+	if errors.Is(err, state.ErrNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("error looking up service %q: %w",
+			*targetService.Name, err)
+	}
+
+	if *currentService.ID != *targetService.ID {
+		var events []crud.Event
+
+		// We have to delete all routes beforehand as otherwise we will get a foreign key error when deleting the service
+		// as routes are not deleted by the cascading delete of the service.
+		// See https://github.com/Kong/kong/discussions/7314 for more details.
+		routesToDelete, err := d.currentState.Routes.GetAllByServiceID(*currentService.ID)
+		if err != nil {
+			return nil, fmt.Errorf("error looking up routes for service %q: %w",
+				*currentService.Name, err)
+		}
+
+		for _, route := range routesToDelete {
+			events = append(events, crud.Event{
+				Op:   crud.Delete,
+				Kind: "route",
+				Obj:  route,
+			})
+		}
+
+		return append(events, crud.Event{
+			Op:   crud.Delete,
+			Kind: "service",
+			Obj:  currentService,
+		}), nil
+	}
+
 	return nil, nil
 }

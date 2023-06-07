@@ -1,5 +1,7 @@
 # Table of Contents
 
+- [v1.21.0](#v1210)
+- [v1.20.0](#v1200)
 - [v1.19.1](#v1191)
 - [v1.19.0](#v1190)
 - [v1.18.1](#v1181)
@@ -54,6 +56,36 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.21.0]
+
+> Release date: 2023/05/31
+
+### Add
+
+- Add support for updating Services, Routes, and Consumers by changing their IDs,
+  but retaining their names.
+  [#918](https://github.com/Kong/deck/pull/918)
+
+### Fix
+
+- Return proper error when HTTP calls fail on validate.
+  [#869](https://github.com/Kong/deck/pull/869)
+- Replace old docs link in `convert` and fix its docstring.
+  [#905](https://github.com/Kong/deck/pull/905)
+
+### Misc
+
+- Bump Go toolchain to 1.20.
+  [#898](https://github.com/Kong/deck/pull/898)
+
+## [v1.20.0]
+
+> Release date: 2023/04/24
+
+### Add
+
+- Add the license type to the file package.
 
 ## [v1.19.1]
 
@@ -1192,6 +1224,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.21.0]: https://github.com/kong/deck/compare/v1.20.0...v1.21.0
+[v1.20.0]: https://github.com/kong/deck/compare/v1.19.1...v1.20.0
 [v1.19.1]: https://github.com/kong/deck/compare/v1.19.0...v1.19.1
 [v1.19.0]: https://github.com/kong/deck/compare/v1.18.1...v1.19.0
 [v1.18.1]: https://github.com/kong/deck/compare/v1.18.0...v1.18.1

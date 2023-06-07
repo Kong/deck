@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/crud"
@@ -121,7 +122,7 @@ func (d *oauth2CredDiffer) deleteOauth2Cred(oauth2Cred *state.Oauth2Credential) 
 	*crud.Event, error,
 ) {
 	_, err := d.targetState.Oauth2Creds.Get(*oauth2Cred.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
 			Kind: d.kind,
@@ -158,7 +159,7 @@ func (d *oauth2CredDiffer) CreateAndUpdates(handler func(crud.Event) error) erro
 func (d *oauth2CredDiffer) createUpdateOauth2Cred(oauth2Cred *state.Oauth2Credential) (*crud.Event, error) {
 	oauth2Cred = &state.Oauth2Credential{Oauth2Credential: *oauth2Cred.DeepCopy()}
 	currentOauth2Cred, err := d.currentState.Oauth2Creds.Get(*oauth2Cred.ID)
-	if err == state.ErrNotFound {
+	if errors.Is(err, state.ErrNotFound) {
 		// oauth2Cred not present, create it
 
 		return &crud.Event{

@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -80,7 +81,7 @@ func (k *SNIsCollection) Add(sni SNI) error {
 	_, err := getSNI(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting sni %v: %w", sni.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -96,7 +97,7 @@ func getSNI(txn *memdb.Txn, IDs ...string) (*SNI, error) {
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, sniTableName,
 			[]string{"name", "id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {

@@ -25,8 +25,8 @@ func newConvertCmd() *cobra.Command {
 		Use:   "convert",
 		Short: "Convert files from one format into another format",
 		Long: `The convert command changes configuration files from one format
-into another compatible format. For example, a configuration for 'kong-gateway'
-can be converted into a 'konnect' configuration file.`,
+into another compatible format. For example, a configuration for 'kong-gateway-2.x'
+can be converted into a 'kong-gateway-3.x' configuration file.`,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sourceFormat, err := convert.ParseFormat(convertCmdSourceFormat)
@@ -49,7 +49,7 @@ can be converted into a 'konnect' configuration file.`,
 
 				err = convert.Convert(convertCmdInputFile, convertCmdOutputFile, sourceFormat, destinationFormat)
 				if err != nil {
-					return fmt.Errorf("converting file: %v", err)
+					return fmt.Errorf("converting file: %w", err)
 				}
 			} else if is2xTo3xConversion() {
 				path, err := os.Getwd()
@@ -63,14 +63,14 @@ can be converted into a 'konnect' configuration file.`,
 				for _, filename := range files {
 					err = convert.Convert(filename, filename, sourceFormat, destinationFormat)
 					if err != nil {
-						return fmt.Errorf("converting '%s' file: %v", filename, err)
+						return fmt.Errorf("converting '%s' file: %w", filename, err)
 					}
 				}
 			}
 			if convertCmdDestinationFormat == "konnect" {
 				cprint.UpdatePrintf("Warning: konnect format type was deprecated in v1.12 and it will be removed\n" +
 					"in a future version. Please use your Kong configuration files with deck <cmd>.\n" +
-					"Please see https://docs.konghq.com/konnect/deployment/import.\n")
+					"Please see https://docs.konghq.com/konnect/getting-started/import/.\n")
 			}
 			return nil
 		},

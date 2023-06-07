@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -61,7 +62,7 @@ func (k *CertificatesCollection) Add(certificate Certificate) error {
 	_, err := getCertificate(txn, *certificate.ID)
 	if err == nil {
 		return fmt.Errorf("inserting certificate %v: %w", certificate.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

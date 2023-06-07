@@ -173,6 +173,17 @@ func Test_getContent(t *testing.T) {
 			args: args{[]string{"testdata/file.yaml"}},
 			envVars: map[string]string{
 				"DECK_SVC2_HOST": "2.example.com",
+				"DECK_FILE_LOG_FUNCTION": `
+function parse_traceid(str)str = string.sub(str,1,8)
+  local uint = 0
+  for i = 1, #str do
+    uint = uint + str:byte(i) * 0x100^(i-1)
+  end
+  return string.format("%.0f", uint)
+end
+
+kong.log.set_serialize_value("trace_id", parse_traceid(ngx.ctx.KONG_SPANS[1].trace_id))
+kong.log.set_serialize_value("span_id", parse_traceid(ngx.ctx.KONG_SPANS[1].span_id))`,
 			},
 			want: &Content{
 				Services: []FService{
@@ -196,6 +207,25 @@ func Test_getContent(t *testing.T) {
 					{
 						Plugin: kong.Plugin{
 							Name: kong.String("prometheus"),
+						},
+					},
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"log": `
+function parse_traceid(str)str = string.sub(str,1,8)
+  local uint = 0
+  for i = 1, #str do
+    uint = uint + str:byte(i) * 0x100^(i-1)
+  end
+  return string.format("%.0f", uint)
+end
+
+kong.log.set_serialize_value("trace_id", parse_traceid(ngx.ctx.KONG_SPANS[1].trace_id))
+kong.log.set_serialize_value("span_id", parse_traceid(ngx.ctx.KONG_SPANS[1].span_id))
+`,
+							},
 						},
 					},
 				},
@@ -221,7 +251,8 @@ func Test_getContent(t *testing.T) {
 			name: "multiple files",
 			args: args{[]string{"testdata/file.yaml", "testdata/file.json"}},
 			envVars: map[string]string{
-				"DECK_SVC2_HOST": "2.example.com",
+				"DECK_SVC2_HOST":         "2.example.com",
+				"DECK_FILE_LOG_FUNCTION": "kong.log.set_serialize_value('trace_id', 1))",
 			},
 			want: &Content{
 				Services: []FService{
@@ -245,6 +276,14 @@ func Test_getContent(t *testing.T) {
 					{
 						Plugin: kong.Plugin{
 							Name: kong.String("prometheus"),
+						},
+					},
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"log": "kong.log.set_serialize_value('trace_id', 1))\n",
+							},
 						},
 					},
 				},

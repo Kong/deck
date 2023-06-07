@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -69,7 +70,7 @@ func (k *RBACEndpointPermissionsCollection) Add(rbacEndpointPermission RBACEndpo
 	_, err := getRBACEndpointPermission(txn, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting rbacEndpointPermission %v: %w", rbacEndpointPermission.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 	rbacEndpointPermission.ID = rbacEndpointPermission.FriendlyName()
@@ -85,7 +86,7 @@ func getRBACEndpointPermission(txn *memdb.Txn, IDs ...string) (*RBACEndpointPerm
 	for _, id := range IDs {
 		res, err := multiIndexLookupUsingTxn(txn, rbacEndpointPermissionTableName,
 			[]string{"id"}, id)
-		if err == ErrNotFound {
+		if errors.Is(err, ErrNotFound) {
 			continue
 		}
 		if err != nil {

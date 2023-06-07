@@ -1,6 +1,7 @@
 package state
 
 import (
+	"errors"
 	"fmt"
 
 	memdb "github.com/hashicorp/go-memdb"
@@ -78,7 +79,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	_, err := getACLGroupByID(txn, *aclGroup.ID)
 	if err == nil {
 		return fmt.Errorf("inserting acl-group %v: %w", aclGroup.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
@@ -92,7 +93,7 @@ func insertACLGroup(txn *memdb.Txn, aclGroup ACLGroup) error {
 	_, err = getACLGroup(txn, *aclGroup.Consumer.ID, *aclGroup.Group)
 	if err == nil {
 		return fmt.Errorf("inserting acl-group %v: %w", aclGroup.Console(), ErrAlreadyExists)
-	} else if err != ErrNotFound {
+	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 

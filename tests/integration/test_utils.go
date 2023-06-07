@@ -59,6 +59,13 @@ func skipWhenKonnect(t *testing.T) {
 	}
 }
 
+func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
+	if os.Getenv("DECK_KONNECT_EMAIL") != "" && os.Getenv("DECK_KONNECT_PASSWORD") != "" {
+		return
+	}
+	kong.RunWhenKong(t, kongSemverRange)
+}
+
 func runWhen(t *testing.T, mode string, semverRange string) {
 	switch mode {
 	case "kong":
