@@ -1782,7 +1782,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 				Routes:    route1_151,
 				Plugins:   plugin,
 				Targets:   target,
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 			},
 		},
 	}
@@ -1819,7 +1819,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 			expectedState: utils.KongRawState{
 				Services:  svc1,
 				Routes:    route1_205_214,
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   target,
 				Plugins:   plugin,
 			},
@@ -1865,7 +1865,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 			expectedState: utils.KongRawState{
 				Services:  svc1,
 				Routes:    route1_20x,
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   target,
 				Plugins:   plugin,
 			},
@@ -1908,7 +1908,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 				Routes:    route1_20x,
 				Plugins:   plugin,
 				Targets:   target,
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 			},
 		},
 	}
