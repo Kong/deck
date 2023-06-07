@@ -2,8 +2,6 @@ module github.com/kong/deck
 
 go 1.20
 
-replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
-
 require (
 	github.com/Kong/gojsondiff v1.3.2
 	github.com/alecthomas/jsonschema v0.0.0-20191017121752-4bb6e3fae4f2
@@ -17,7 +15,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
-	github.com/kong/go-kong v0.42.0
+	github.com/kong/go-kong v0.43.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.4
 	github.com/spf13/cobra v1.7.0
