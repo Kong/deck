@@ -1480,7 +1480,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0 <3.1.0")
+			kong.RunWhenKong(t, ">=3.0.0 <3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1632,7 +1632,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0 <3.1.0")
+			kong.RunWhenKong(t, ">=3.0.0 <3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
