@@ -1544,7 +1544,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			name:     "creates an upstream and target",
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Upstreams: upstream_pre31,
+				Upstreams: upstream,
 				Targets:   target,
 			},
 		},
