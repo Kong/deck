@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.22.0](#v1220)
 - [v1.21.0](#v1210)
 - [v1.20.0](#v1200)
 - [v1.19.1](#v1191)
@@ -56,6 +57,22 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.22.0]
+
+> Release date: 2023/06/07
+
+### Add
+
+- Add indent function to support multi-line content
+  [#929](https://github.com/Kong/deck/pull/929)
+
+### Fixes
+
+- Update go-kong to fix a bug causing wrong injection of
+  defaults for non-required fields and set of record.
+  [go-kong #333](https://github.com/Kong/go-kong/pull/333)
+  [go-kong #336](https://github.com/Kong/go-kong/pull/336)
 
 ## [v1.21.0]
 
@@ -1224,6 +1241,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.22.0]: https://github.com/kong/deck/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/kong/deck/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/kong/deck/compare/v1.19.1...v1.20.0
 [v1.19.1]: https://github.com/kong/deck/compare/v1.19.0...v1.19.1
