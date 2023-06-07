@@ -233,4 +233,3 @@ upstreams:
     weight: 100
   - target: 198.51.100.13:80
     weight: 100
-  use_srv_name: false
