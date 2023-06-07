@@ -4,9 +4,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/kong/deck/crud"
 	"github.com/kong/deck/types"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_reverse(t *testing.T) {
