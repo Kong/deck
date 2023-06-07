@@ -276,6 +276,57 @@ var (
 		},
 	}
 
+	upstream_pre31 = []*kong.Upstream{
+		{
+			Name:      kong.String("upstream1"),
+			Algorithm: kong.String("round-robin"),
+			Slots:     kong.Int(10000),
+			Healthchecks: &kong.Healthcheck{
+				Threshold: kong.Float64(0),
+				Active: &kong.ActiveHealthcheck{
+					Concurrency: kong.Int(10),
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{200, 302},
+						Interval:     kong.Int(0),
+						Successes:    kong.Int(0),
+					},
+					HTTPPath:               kong.String("/"),
+					Type:                   kong.String("http"),
+					Timeout:                kong.Int(1),
+					HTTPSVerifyCertificate: kong.Bool(true),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						Interval:     kong.Int(0),
+						HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+					},
+				},
+				Passive: &kong.PassiveHealthcheck{
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{
+							200, 201, 202, 203, 204, 205,
+							206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+							306, 307, 308,
+						},
+						Successes: kong.Int(0),
+					},
+					Type: kong.String("http"),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						HTTPStatuses: []int{429, 500, 503},
+					},
+				},
+			},
+			HashOn:           kong.String("none"),
+			HashFallback:     kong.String("none"),
+			HashOnCookiePath: kong.String("/"),
+		},
+	}
+
+	// latest
 	upstream = []*kong.Upstream{
 		{
 			Name:      kong.String("upstream1"),
@@ -323,6 +374,7 @@ var (
 			HashOn:           kong.String("none"),
 			HashFallback:     kong.String("none"),
 			HashOnCookiePath: kong.String("/"),
+			UseSrvName:       kong.Bool(false),
 		},
 	}
 
@@ -1333,7 +1385,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 			name:     "creates an upstream and target",
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong.yaml",
 			expectedState: utils.KongRawState{
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   target,
 			},
 		},
@@ -1384,7 +1436,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 			name:     "creates an upstream and target",
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong.yaml",
 			expectedState: utils.KongRawState{
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   target,
 			},
 		},
@@ -1393,6 +1445,42 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.1.0 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0
+func Test_Sync_Upstream_Target_From_30(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream_pre31,
+				Targets:   target,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKongOrKonnect(t, ">=3.0.0 <3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1428,7 +1516,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1456,7 +1544,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			name:     "creates an upstream and target",
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   target,
 			},
 		},
@@ -1500,7 +1588,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 			name:     "creates an upstream and target with weight equals to zero",
 			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong.yaml",
 			expectedState: utils.KongRawState{
-				Upstreams: upstream,
+				Upstreams: upstream_pre31,
 				Targets:   targetZeroWeight,
 			},
 		},
@@ -1509,6 +1597,42 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.4.1 <3.0.0")
+			teardown := setup(t)
+			defer teardown(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0
+func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates an upstream and target with weight equals to zero",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream_pre31,
+				Targets:   targetZeroWeight,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKongOrKonnect(t, ">=3.0.0 <3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -1544,7 +1668,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhenKongOrKonnect(t, ">=3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
