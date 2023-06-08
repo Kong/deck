@@ -1,42 +1,47 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/kong/go-apiops/deckformat"
 	"github.com/kong/go-apiops/filebasics"
+	"github.com/kong/go-apiops/logbasics"
 	"github.com/kong/go-apiops/merge"
 	"github.com/spf13/cobra"
 )
 
 // Executes the CLI command "merge"
-func executeMerge(cmd *cobra.Command, args []string) {
+func executeMerge(cmd *cobra.Command, args []string) error {
+	verbosity, _ := cmd.Flags().GetInt("verbose")
+	logbasics.Initialize(log.LstdFlags, verbosity)
+
 	outputFilename, err := cmd.Flags().GetString("output-file")
 	if err != nil {
-		log.Fatalf("failed getting cli argument 'output-file'; %s", err)
+		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
 	}
 
 	var asYaml bool
 	{
 		outputFormat, err := cmd.Flags().GetString("format")
 		if err != nil {
-			log.Fatalf("failed getting cli argument 'format'; %s", err)
+			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
 		}
 		if outputFormat == "yaml" {
 			asYaml = true
 		} else if outputFormat == "json" {
 			asYaml = false
 		} else {
-			log.Fatalf("expected '--format' to be either 'yaml'"+
-				" or 'json', got: '%s'", outputFormat)
+			return fmt.Errorf("expected '--format' to be either 'yaml' or 'json', got: '%s'",
+				outputFormat)
 		}
 	}
 
 	// do the work: read/merge
-	merged, info := merge.MustFiles(args)
+	merged, info, err := merge.Files(args)
+	if err != nil {
+		return err
+	}
 
 	historyEntry := deckformat.HistoryNewEntry("merge")
 	historyEntry["output"] = outputFilename
@@ -44,7 +49,7 @@ func executeMerge(cmd *cobra.Command, args []string) {
 	deckformat.HistoryClear(merged)
 	deckformat.HistoryAppend(merged, historyEntry)
 
-	filebasics.MustWriteSerializedFile(outputFilename, merged, asYaml)
+	return filebasics.WriteSerializedFile(outputFilename, merged, asYaml)
 }
 
 //
@@ -65,7 +70,7 @@ provided. No checks on content will be done, eg. duplicates, nor any validations
 
 If the input files are not compatible an error will be returned. Compatibility is
 determined by the '_transform' and '_format_version' fields.`,
-		Run:  executeMerge,
+		RunE: executeMerge,
 		Args: cobra.MinimumNArgs(1),
 	}
 
