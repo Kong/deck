@@ -11,6 +11,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-apiops/deckformat"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -102,8 +103,7 @@ It can be used to export, import, or sync entities to Kong.`,
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
 		"Enable verbose logging levels\n"+
-			"Setting this value to 2 outputs all HTTP requests/responses\n"+
-			"between decK and Kong.")
+			"Sets the verbosity level of log output (higher is more verbose).")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))
 
@@ -214,7 +214,10 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newConvertCmd())
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
+	// commands from go-apiops library:
 	rootCmd.AddCommand(newMergeCmd())
+	rootCmd.AddCommand(newPatchCmd())
+	rootCmd.AddCommand(newOpenapi2KongCmd())
 	return rootCmd
 }
 
@@ -380,4 +383,9 @@ func extendHeaders(headers []string) []string {
 	userAgentHeader := fmt.Sprintf("User-Agent:decK/%s", VERSION)
 	headers = append(headers, userAgentHeader)
 	return headers
+}
+
+func init() {
+	// set version and commit hash to report in the go-apiops library
+	deckformat.ToolVersionSet("decK", VERSION, COMMIT)
 }
