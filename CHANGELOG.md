@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.24.0](#v1240)
 - [v1.23.0](#v1230)
 - [v1.22.1](#v1221)
 - [v1.22.0](#v1220)
@@ -59,6 +60,41 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.24.0]
+
+> Release date: to-be-set
+
+### Added
+
+- Added a new command `file openapi2kong` that will generate a deck file from an OpenAPI
+  3.0 spec. This is the replacement for the similar `inso` functionality.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file merge` that will merge multiple deck files. The files will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file patch` for applying patches on top of a decK file. The patches can be
+  provided on the commandline, or via patch files. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new commands `file add-tags/list-tags/remove-tags` to manage tags in a decK file. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file add-plugins` for adding plugins to a decK file. The plugins can be
+  provided on the commandline, or via config files. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+
+### Fixes
+
+
+### Misc
+
 
 ## [v1.23.0]
 
@@ -1264,6 +1300,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.24.0]: https://github.com/kong/deck/compare/v1.23.0...v1.24.0
 [v1.23.0]: https://github.com/kong/deck/compare/v1.22.1...v1.23.0
 [v1.22.1]: https://github.com/kong/deck/compare/v1.22.0...v1.22.1
 [v1.22.0]: https://github.com/kong/deck/compare/v1.21.0...v1.22.0
