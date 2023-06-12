@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/kong/go-apiops/deckformat"
 	"github.com/kong/go-apiops/filebasics"
@@ -21,20 +22,13 @@ func executeMerge(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
 	}
 
-	var asYaml bool
+	var outputFormat string
 	{
-		outputFormat, err := cmd.Flags().GetString("format")
+		outputFormat, err = cmd.Flags().GetString("format")
 		if err != nil {
 			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
 		}
-		if outputFormat == "yaml" {
-			asYaml = true
-		} else if outputFormat == "json" {
-			asYaml = false
-		} else {
-			return fmt.Errorf("expected '--format' to be either 'yaml' or 'json', got: '%s'",
-				outputFormat)
-		}
+		outputFormat = strings.ToUpper(outputFormat)
 	}
 
 	// do the work: read/merge
@@ -49,7 +43,7 @@ func executeMerge(cmd *cobra.Command, args []string) error {
 	deckformat.HistoryClear(merged)
 	deckformat.HistoryAppend(merged, historyEntry)
 
-	return filebasics.WriteSerializedFile(outputFilename, merged, asYaml)
+	return filebasics.WriteSerializedFile(outputFilename, merged, outputFormat)
 }
 
 //

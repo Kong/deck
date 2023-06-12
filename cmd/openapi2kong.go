@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/kong/go-apiops/deckformat"
 	"github.com/kong/go-apiops/filebasics"
@@ -43,20 +44,13 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	var asYaml bool
+	var outputFormat string
 	{
-		outputFormat, err := cmd.Flags().GetString("format")
+		outputFormat, err = cmd.Flags().GetString("format")
 		if err != nil {
 			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
 		}
-		if outputFormat == "yaml" {
-			asYaml = true
-		} else if outputFormat == "json" {
-			asYaml = false
-		} else {
-			return fmt.Errorf("expected '--format' to be either 'yaml' or 'json', got: '%s'",
-				outputFormat)
-		}
+		outputFormat = strings.ToUpper(outputFormat)
 	}
 
 	options := openapi2kong.O2kOptions{
@@ -79,7 +73,7 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed converting OpenAPI spec '%s'; %w", inputFilename, err)
 	}
 	deckformat.HistoryAppend(result, trackInfo)
-	return filebasics.WriteSerializedFile(outputFilename, result, asYaml)
+	return filebasics.WriteSerializedFile(outputFilename, result, outputFormat)
 }
 
 //
