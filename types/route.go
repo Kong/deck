@@ -188,6 +188,11 @@ func (d *routeDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 }
 
 func (d *routeDiffer) deleteDuplicateRoute(targetRoute *state.Route) (*crud.Event, error) {
+	if targetRoute == nil || targetRoute.Name == nil {
+		// Nothing to do, cannot be a duplicate with no name.
+		return nil, nil
+	}
+
 	currentRoute, err := d.currentState.Routes.Get(*targetRoute.Name)
 	if errors.Is(err, state.ErrNotFound) {
 		return nil, nil

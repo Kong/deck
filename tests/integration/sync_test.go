@@ -3414,3 +3414,47 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 		},
 	}, ignoreFieldsIrrelevantForIDsTests)
 }
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	const (
+		beforeConfig = "testdata/sync/022-update-with-explicit-ids-with-no-names/before.yaml"
+		afterConfig  = "testdata/sync/022-update-with-explicit-ids-with-no-names/after.yaml"
+	)
+
+	// First, create entities with IDs assigned explicitly.
+	err = sync(beforeConfig)
+	require.NoError(t, err)
+
+	// Then, sync again, adding tags to every entity just to trigger an update.
+	err = sync(afterConfig)
+	require.NoError(t, err)
+
+	// Finally, verify that the update was successful.
+	testKongState(t, client, false, utils.KongRawState{
+		Services: []*kong.Service{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"),
+			},
+		},
+		Routes: []*kong.Route{
+			{
+				ID:   kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+				Tags: kong.StringSlice("after"),
+				Service: &kong.Service{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoreFieldsIrrelevantForIDsTests)
+}
