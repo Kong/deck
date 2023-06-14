@@ -177,6 +177,11 @@ func (d *serviceDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 }
 
 func (d *serviceDiffer) deleteDuplicateService(targetService *state.Service) ([]crud.Event, error) {
+	if targetService == nil || targetService.Name == nil {
+		// Nothing to do, cannot be a duplicate with no name.
+		return nil, nil
+	}
+
 	currentService, err := d.currentState.Services.Get(*targetService.Name)
 	if errors.Is(err, state.ErrNotFound) {
 		return nil, nil
