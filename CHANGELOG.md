@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.22.1](#v1221)
 - [v1.22.0](#v1220)
 - [v1.21.0](#v1210)
 - [v1.20.0](#v1200)
@@ -57,6 +58,18 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.22.1]
+
+> Release date: 2023/06/22
+
+### Fixes
+
+- Handle missing service and route names detecting duplicates
+  [#945](https://github.com/Kong/deck/pull/945)
+- Update go-kong to fix a bug causing a panic when
+  filling record defaults of an empty array.
+  [#345](https://github.com/Kong/go-kong/pull/345)
 
 ## [v1.22.0]
 
