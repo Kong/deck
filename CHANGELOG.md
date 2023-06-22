@@ -1254,7 +1254,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[v1.22.1]: https://github.com/kong/deck/compare/v1.21.0...v1.22.1
+[v1.22.1]: https://github.com/kong/deck/compare/v1.22.0...v1.22.1
 [v1.22.0]: https://github.com/kong/deck/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/kong/deck/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/kong/deck/compare/v1.19.1...v1.20.0
