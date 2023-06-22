@@ -14,7 +14,7 @@ require (
 	github.com/google/go-querystring v1.1.0
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-memdb v1.3.4
-	github.com/hashicorp/go-retryablehttp v0.7.2
+	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
 	github.com/kong/go-kong v0.44.0
