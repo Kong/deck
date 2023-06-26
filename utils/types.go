@@ -292,6 +292,7 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 
 	if httpClient == nil {
 		defaultTransport := http.DefaultTransport.(*http.Transport)
+		defaultTransport.Proxy = http.ProxyFromEnvironment
 		httpClient = http.DefaultClient
 		httpClient.Transport = defaultTransport
 	}
