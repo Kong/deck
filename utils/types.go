@@ -330,6 +330,7 @@ func HTTPClient() *http.Client {
 				Timeout: clientTimeout,
 			}).DialContext,
 			TLSHandshakeTimeout: clientTimeout,
+			Proxy:               http.ProxyFromEnvironment,
 		},
 	}
 }
