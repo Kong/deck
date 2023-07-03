@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.23.0](#v1230)
 - [v1.22.1](#v1221)
 - [v1.22.0](#v1220)
 - [v1.21.0](#v1210)
@@ -58,6 +59,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.23.0]
+
+> Release date: 2023/07/03
+
+### Add
+
+- Honor HTTPS_PROXY and HTTP_PROXY proxy environment variables
+  [#952](https://github.com/Kong/deck/pull/952)
 
 ## [v1.22.1]
 
@@ -1254,6 +1264,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.23.0]: https://github.com/kong/deck/compare/v1.22.1...v1.23.0
 [v1.22.1]: https://github.com/kong/deck/compare/v1.22.0...v1.22.1
 [v1.22.0]: https://github.com/kong/deck/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/kong/deck/compare/v1.20.0...v1.21.0
