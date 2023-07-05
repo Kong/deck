@@ -14,10 +14,11 @@ on:
         default: 'main'
 jobs:
   integration:
-    name: "Validating Kong Gateway ${{ inputs.kong_image }} against decK branch ${{ inputs.branch }}"
+    name: "${{ inputs.kong_image }} against ${{ inputs.branch }}"
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ inputs.kong_image }}
+      KONG_LICENSE_DATA: ${{ secrets.KONG_LICENSE_DATA }}
     runs-on: ubuntu-latest
     steps:
       - name: Execution Information
