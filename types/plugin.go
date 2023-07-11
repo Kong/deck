@@ -26,6 +26,9 @@ func stripPluginReferencesName(plugin *state.Plugin) {
 	if plugin.Plugin.Consumer != nil && plugin.Plugin.Consumer.Username != nil {
 		plugin.Plugin.Consumer.Username = nil
 	}
+	if plugin.Plugin.ConsumerGroup != nil && plugin.Plugin.ConsumerGroup.Name != nil {
+		plugin.Plugin.ConsumerGroup.Name = nil
+	}
 }
 
 func pluginFromStruct(arg crud.Event) *state.Plugin {
@@ -111,9 +114,10 @@ func (d *pluginDiffer) Deletes(handler func(crud.Event) error) error {
 func (d *pluginDiffer) deletePlugin(plugin *state.Plugin) (*crud.Event, error) {
 	plugin = &state.Plugin{Plugin: *plugin.DeepCopy()}
 	name := *plugin.Name
-	serviceID, routeID, consumerID := foreignNames(plugin)
-	_, err := d.targetState.Plugins.GetByProp(name, serviceID, routeID,
-		consumerID)
+	serviceID, routeID, consumerID, consumerGroupID := foreignNames(plugin)
+	_, err := d.targetState.Plugins.GetByProp(
+		name, serviceID, routeID, consumerID, consumerGroupID,
+	)
 	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
@@ -151,9 +155,10 @@ func (d *pluginDiffer) CreateAndUpdates(handler func(crud.Event) error) error {
 func (d *pluginDiffer) createUpdatePlugin(plugin *state.Plugin) (*crud.Event, error) {
 	plugin = &state.Plugin{Plugin: *plugin.DeepCopy()}
 	name := *plugin.Name
-	serviceID, routeID, consumerID := foreignNames(plugin)
-	currentPlugin, err := d.currentState.Plugins.GetByProp(name,
-		serviceID, routeID, consumerID)
+	serviceID, routeID, consumerID, consumerGroupID := foreignNames(plugin)
+	currentPlugin, err := d.currentState.Plugins.GetByProp(
+		name, serviceID, routeID, consumerID, consumerGroupID,
+	)
 	if errors.Is(err, state.ErrNotFound) {
 		// plugin not present, create it
 
@@ -181,7 +186,7 @@ func (d *pluginDiffer) createUpdatePlugin(plugin *state.Plugin) (*crud.Event, er
 	return nil, nil
 }
 
-func foreignNames(p *state.Plugin) (serviceID, routeID, consumerID string) {
+func foreignNames(p *state.Plugin) (serviceID, routeID, consumerID, consumerGroupID string) {
 	if p == nil {
 		return
 	}
@@ -193,6 +198,9 @@ func foreignNames(p *state.Plugin) (serviceID, routeID, consumerID string) {
 	}
 	if p.Consumer != nil && p.Consumer.ID != nil {
 		consumerID = *p.Consumer.ID
+	}
+	if p.ConsumerGroup != nil && p.ConsumerGroup.ID != nil {
+		consumerGroupID = *p.ConsumerGroup.ID
 	}
 	return
 }

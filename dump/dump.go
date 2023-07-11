@@ -30,6 +30,9 @@ type Config struct {
 
 	// KonnectRuntimeGroup
 	KonnectRuntimeGroup string
+
+	// IsConsumerGroupScopedPluginSupported
+	IsConsumerGroupScopedPluginSupported bool
 }
 
 func deduplicate(stringSlice []string) []string {
@@ -196,6 +199,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		plugins = excludeKonnectManagedPlugins(plugins)
 		if config.SkipConsumers {
 			plugins = excludeConsumersPlugins(plugins)
+			plugins = excludeConsumerGroupsPlugins(plugins)
 		}
 		state.Plugins = plugins
 		return nil
@@ -864,6 +868,18 @@ func excludeConsumersPlugins(plugins []*kong.Plugin) []*kong.Plugin {
 	var filtered []*kong.Plugin
 	for _, p := range plugins {
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
+			continue
+		}
+		filtered = append(filtered, p)
+	}
+	return filtered
+}
+
+// excludeConsumerGroupsPlugins filter out consumer-groups plugins
+func excludeConsumerGroupsPlugins(plugins []*kong.Plugin) []*kong.Plugin {
+	var filtered []*kong.Plugin
+	for _, p := range plugins {
+		if p.ConsumerGroup != nil && !utils.Empty(p.ConsumerGroup.ID) {
 			continue
 		}
 		filtered = append(filtered, p)

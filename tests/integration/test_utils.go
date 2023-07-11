@@ -126,8 +126,8 @@ func sortSlices(x, y interface{}) bool {
 		if xEntity.Consumer != nil {
 			xName += *xEntity.Consumer.ID
 		}
-		if xEntity.Consumer != nil {
-			xName += *xEntity.Consumer.ID
+		if xEntity.ConsumerGroup != nil {
+			xName += *xEntity.ConsumerGroup.ID
 		}
 		if yEntity.Route != nil {
 			yName += *yEntity.Route.ID
@@ -137,6 +137,9 @@ func sortSlices(x, y interface{}) bool {
 		}
 		if yEntity.Consumer != nil {
 			yName += *yEntity.Consumer.ID
+		}
+		if yEntity.ConsumerGroup != nil {
+			yName += *yEntity.ConsumerGroup.ID
 		}
 	}
 	return xName < yName

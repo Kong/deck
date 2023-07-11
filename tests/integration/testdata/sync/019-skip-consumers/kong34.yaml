@@ -1,0 +1,49 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 77e6691d-67c0-446a-9401-27be2b141aae
+  name: gold
+  tags:
+    - tag1
+    - tag2
+  plugins:
+  - name: rate-limiting-advanced
+    config:
+      namespace: gold
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+- id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
+  name: silver
+  tags:
+    - tag1
+    - tag3
+  plugins:
+  - name: rate-limiting-advanced
+    config:
+      namespace: silver
+      limit:
+      - 7
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+consumers:
+- groups:
+  - name: silver
+  username: bar
+- username: baz
+- groups:
+  - name: gold
+  username: foo
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5

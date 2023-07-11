@@ -57,6 +57,18 @@ func ensureConsumer(kongState *KongState, consumerID string) (bool, *kong.Consum
 	return true, utils.GetConsumerReference(c.Consumer), nil
 }
 
+func ensureConsumerGroup(kongState *KongState, consumerGroupID string) (bool, *kong.ConsumerGroup, error) {
+	c, err := kongState.ConsumerGroups.Get(consumerGroupID)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return false, nil, nil
+		}
+		return false, nil, fmt.Errorf("looking up consumer-group %q: %w", consumerGroupID, err)
+
+	}
+	return true, utils.GetConsumerGroupReference(c.ConsumerGroup), nil
+}
+
 func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 	for _, s := range raw.Services {
 		err := kongState.Services.Add(Service{Service: *s})
@@ -280,6 +292,15 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			}
 			if ok {
 				p.Consumer = c
+			}
+		}
+		if p.ConsumerGroup != nil && !utils.Empty(p.ConsumerGroup.ID) {
+			ok, cg, err := ensureConsumerGroup(kongState, *p.ConsumerGroup.ID)
+			if err != nil {
+				return err
+			}
+			if ok {
+				p.ConsumerGroup = cg
 			}
 		}
 		err := kongState.Plugins.Add(Plugin{Plugin: *p})

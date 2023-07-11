@@ -97,6 +97,7 @@ func main() {
 	schema.Definitions["FPlugin"].Properties["consumer"] = stringType
 	schema.Definitions["FPlugin"].Properties["service"] = stringType
 	schema.Definitions["FPlugin"].Properties["route"] = stringType
+	schema.Definitions["FPlugin"].Properties["consumer_group"] = stringType
 
 	schema.Definitions["FService"].Properties["client_certificate"] = stringType
 

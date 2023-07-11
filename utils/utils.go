@@ -21,6 +21,7 @@ var (
 
 	Kong140Version = semver.MustParse("1.4.0")
 	Kong300Version = semver.MustParse("3.0.0")
+	Kong340Version = semver.MustParse("3.4.0")
 )
 
 var UpgradeMessage = "Please upgrade your configuration to account for 3.0\n" +
@@ -146,6 +147,16 @@ func GetConsumerReference(c kong.Consumer) *kong.Consumer {
 		consumer.Username = kong.String(*c.Username)
 	}
 	return consumer
+}
+
+// GetConsumerGroupReference returns a name+ID only copy of the input consumer-group,
+// for use in references from other objects
+func GetConsumerGroupReference(c kong.ConsumerGroup) *kong.ConsumerGroup {
+	consumerGroup := &kong.ConsumerGroup{ID: kong.String(*c.ID)}
+	if c.Name != nil {
+		consumerGroup.Name = kong.String(*c.Name)
+	}
+	return consumerGroup
 }
 
 // GetServiceReference returns a name+ID only copy of the input service,

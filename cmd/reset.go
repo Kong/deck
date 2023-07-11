@@ -60,7 +60,15 @@ By default, this command will ask for confirmation.`,
 			if err != nil {
 				return fmt.Errorf("reading Kong version: %w", err)
 			}
+			parsedKongVersion, err := utils.ParseKongVersion(kongVersion)
+			if err != nil {
+				return fmt.Errorf("parsing Kong version: %w", err)
+			}
 			_ = sendAnalytics("reset", kongVersion, mode)
+
+			if utils.Kong340Version.LTE(parsedKongVersion) {
+				dumpConfig.IsConsumerGroupScopedPluginSupported = true
+			}
 
 			var workspaces []string
 			// Kong OSS or default workspace

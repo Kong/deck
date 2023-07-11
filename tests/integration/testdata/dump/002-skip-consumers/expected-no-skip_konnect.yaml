@@ -1,0 +1,62 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: default
+consumer_groups:
+- name: basic
+  plugins:
+  - config:
+      consumer_groups: null
+      dictionary_name: kong_rate_limiting_counters
+      disable_penalty: false
+      enforce_consumer_groups: false
+      error_code: 429
+      error_message: API rate limit exceeded
+      header_name: null
+      hide_client_headers: false
+      identifier: consumer
+      limit:
+      - 30000
+      namespace: basic
+      path: null
+      redis:
+        cluster_addresses: null
+        connect_timeout: null
+        database: 0
+        host: null
+        keepalive_backlog: null
+        keepalive_pool_size: 30
+        password: null
+        port: null
+        read_timeout: null
+        send_timeout: null
+        sentinel_addresses: null
+        sentinel_master: null
+        sentinel_password: null
+        sentinel_role: null
+        sentinel_username: null
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      retry_after_jitter_max: 0
+      strategy: local
+      sync_rate: null
+      window_size:
+      - 2628000
+      window_type: sliding
+    name: rate-limiting-advanced
+consumers:
+- groups:
+  - name: basic
+  username: foo
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
