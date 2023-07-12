@@ -32,14 +32,14 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed getting cli argument 'uuid-base'; %w", err)
 	}
 
-	var entityTags *[]string
+	var entityTags []string
 	{
 		tags, err := cmd.Flags().GetStringSlice("select-tag")
 		if err != nil {
 			return fmt.Errorf("failed getting cli argument 'select-tag'; %w", err)
 		}
-		entityTags = &tags
-		if len(*entityTags) == 0 {
+		entityTags = tags
+		if len(entityTags) == 0 {
 			entityTags = nil
 		}
 	}

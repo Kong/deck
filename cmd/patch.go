@@ -50,11 +50,11 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	}
 
 	{
-		s, err := cmd.Flags().GetString("selector")
+		s, err := cmd.Flags().GetStringArray("selector")
 		if err != nil {
 			return fmt.Errorf("failed to retrieve '--selector' entry; %w", err)
 		}
-		valuesPatch.SelectorSource = s
+		valuesPatch.SelectorSources = s
 	}
 
 	patchFiles := make([]patch.DeckPatchFile, 0)
@@ -73,7 +73,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	trackInfo["input"] = inputFilename
 	trackInfo["output"] = outputFilename
 	if len(valuesPatch.Values) != 0 || len(valuesPatch.Remove) != 0 {
-		trackInfo["selector"] = valuesPatch.SelectorSource
+		trackInfo["selector"] = valuesPatch.SelectorSources
 	}
 	if len(valuesPatch.Values) != 0 {
 		trackInfo["values"] = valuesPatch.Values
