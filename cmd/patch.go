@@ -152,7 +152,9 @@ patches that will be applied in order;
 
   { "_format_version": "1.0",
     "patches": [
-      { "selector": "$..services[*]",
+      { "selectors": [
+					"$..services[*]"
+				],
         "values": {
           "read_timeout": 10000,
           "_comment": "comment injected by patching"
