@@ -72,12 +72,8 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-<<<<<<< HEAD
-	github.com/shoenig/go-m1cpu v0.1.6 // indirect
-=======
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/shoenig/go-m1cpu v0.1.5 // indirect
->>>>>>> 3500864 (chore(deps): bump go-apiops to 0.1.15)
+	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
