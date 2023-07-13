@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/kong/deck/cprint"
 	"github.com/spf13/cobra"
 )
 
@@ -14,35 +15,63 @@ var (
 	diffJSONOutput         bool
 )
 
-// newDiffCmd represents the diff command
-func newDiffCmd() *cobra.Command {
-	diffCmd := &cobra.Command{
-		Use:   "diff",
-		Short: "Diff the current entities in Kong with the one on disks",
-		Long: `The diff command is similar to a dry run of the 'decK sync' command.
+func executeDiff(cmd *cobra.Command, _ []string) error {
+	return syncMain(cmd.Context(), diffCmdKongStateFile, true,
+		diffCmdParallelism, 0, diffWorkspace, diffJSONOutput)
+}
 
-It loads entities from Kong and performs a diff with
-the entities in local files. This allows you to see the entities
-that will be created, updated, or deleted.
-`,
-		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return syncMain(cmd.Context(), diffCmdKongStateFile, true,
-				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput)
-		},
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+// newDiffCmd represents the diff command
+func newDiffCmd(deprecated bool) *cobra.Command {
+	use := "diff [flags] [kong-state-files...]"
+	short := "Diff the current entities in Kong with the one on disks"
+	execute := executeDiff
+	argsValidator := cobra.MinimumNArgs(0)
+	preRun := func(cmd *cobra.Command, args []string) error {
+		diffCmdKongStateFile = args
+		if len(diffCmdKongStateFile) == 0 {
+			diffCmdKongStateFile = []string{"-"}
+		}
+		return preRunSilenceEventsFlag()
+	}
+
+	if deprecated {
+		use = "diff"
+		short = "[deprecated] use 'gateway diff' instead"
+		execute = func(cmd *cobra.Command, args []string) error {
+			cprint.UpdatePrintf("Warning: 'deck diff' is DEPRECATED and will be removed in a future version. " +
+				"Use 'deck gateway diff' instead.\n")
+			return executeDiff(cmd, args)
+		}
+		argsValidator = validateNoArgs
+		preRun = func(cmd *cobra.Command, args []string) error {
 			if len(diffCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
 			}
 			return preRunSilenceEventsFlag()
-		},
+		}
 	}
 
-	diffCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
-		"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
-			"This flag can be specified multiple times for multiple files.\n"+
-			"Use `-` to read from stdin.")
+	diffCmd := &cobra.Command{
+		Use:   use,
+		Short: short,
+		Long: `The diff command is similar to a dry run of the 'decK kong sync' command.
+
+It loads entities from Kong and performs a diff with
+the entities in local files. This allows you to see the entities
+that will be created, updated, or deleted.
+`,
+		Args:    argsValidator,
+		RunE:    execute,
+		PreRunE: preRun,
+	}
+
+	if deprecated {
+		diffCmd.Flags().StringSliceVarP(&diffCmdKongStateFile,
+			"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
+				"This flag can be specified multiple times for multiple files.\n"+
+				"Use `-` to read from stdin.")
+	}
 	diffCmd.Flags().StringVarP(&diffWorkspace, "workspace", "w",
 		"", "Diff configuration with a specific workspace "+
 			"(Kong Enterprise only).\n"+

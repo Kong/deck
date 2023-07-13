@@ -83,9 +83,21 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 }
 
 // newConvertCmd represents the convert command
-func newConvertCmd() *cobra.Command {
+func newConvertCmd(deprecated bool) *cobra.Command {
 	short := "Convert files from one format into another format"
 	execute := executeConvert
+	fileInDefault := "-"
+	fileOutDefault := "-"
+	if deprecated {
+		short = "[deprecated] use 'file convert' instead"
+		execute = func(cmd *cobra.Command, args []string) error {
+			cprint.UpdatePrintf("Warning: 'deck convert' is DEPRECATED and will be removed in a future version. " +
+				"Use 'deck file convert' instead.\n")
+			return executeConvert(cmd, args)
+		}
+		fileInDefault = ""
+		fileOutDefault = "kong.yaml"
+	}
 
 	convertCmd := &cobra.Command{
 		Use:   "convert",
@@ -103,9 +115,9 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
-	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
+	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", fileInDefault,
 		"configuration file to be converted. Use `-` to read from stdin.")
-	convertCmd.Flags().StringVar(&convertCmdOutputFile, "output-file", "kong.yaml",
+	convertCmd.Flags().StringVarP(&convertCmdOutputFile, "output-file", "o", fileOutDefault,
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
