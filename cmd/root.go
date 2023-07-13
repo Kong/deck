@@ -211,12 +211,11 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newPingCmd())
 	rootCmd.AddCommand(newDumpCmd())
 	rootCmd.AddCommand(newDiffCmd())
-	rootCmd.AddCommand(newConvertCmd())
+	rootCmd.AddCommand(newConvertCmd(true)) // deprecated, to be removed
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
-	// commands from go-apiops library:
-	fileCmd := newAddFileCmd()
 	{
+		fileCmd := newAddFileCmd()
 		rootCmd.AddCommand(fileCmd)
 		fileCmd.AddCommand(newAddPluginsCmd())
 		fileCmd.AddCommand(newAddTagsCmd())
@@ -225,6 +224,8 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newMergeCmd())
 		fileCmd.AddCommand(newPatchCmd())
 		fileCmd.AddCommand(newOpenapi2KongCmd())
+		fileCmd.AddCommand(newConvertCmd(false))
+		fileCmd.AddCommand(newValidateCmd()) // alias; since this does both file+online
 	}
 	return rootCmd
 }
