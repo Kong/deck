@@ -215,13 +215,17 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
 	// commands from go-apiops library:
-	rootCmd.AddCommand(newAddPluginsCmd())
-	rootCmd.AddCommand(newAddTagsCmd())
-	rootCmd.AddCommand(newListTagsCmd())
-	rootCmd.AddCommand(newRemoveTagsCmd())
-	rootCmd.AddCommand(newMergeCmd())
-	rootCmd.AddCommand(newPatchCmd())
-	rootCmd.AddCommand(newOpenapi2KongCmd())
+	fileCmd := newAddFileCmd()
+	{
+		rootCmd.AddCommand(fileCmd)
+		fileCmd.AddCommand(newAddPluginsCmd())
+		fileCmd.AddCommand(newAddTagsCmd())
+		fileCmd.AddCommand(newListTagsCmd())
+		fileCmd.AddCommand(newRemoveTagsCmd())
+		fileCmd.AddCommand(newMergeCmd())
+		fileCmd.AddCommand(newPatchCmd())
+		fileCmd.AddCommand(newOpenapi2KongCmd())
+	}
 	return rootCmd
 }
 
