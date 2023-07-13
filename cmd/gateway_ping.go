@@ -4,28 +4,42 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
 
 var pingWorkspace string
 
+func executePing(cmd *cobra.Command, _ []string) error {
+	ctx := cmd.Context()
+	mode := getMode(nil)
+	if mode == modeKonnect {
+		return pingKonnect(ctx)
+	}
+	return pingKong(ctx)
+}
+
 // newPingCmd represents the ping command
-func newPingCmd() *cobra.Command {
+func newPingCmd(deprecated bool) *cobra.Command {
+	short := "Verify connectivity with Kong"
+	execute := executePing
+	if deprecated {
+		short = "[deprecated] use 'gateway ping' instead"
+		execute = func(cmd *cobra.Command, args []string) error {
+			cprint.UpdatePrintf("Warning: 'deck ping' is DEPRECATED and will be removed in a future version. " +
+				"Use 'deck gateway ping' instead.\n")
+			return executePing(cmd, args)
+		}
+	}
+
 	pingCmd := &cobra.Command{
 		Use:   "ping",
-		Short: "Verify connectivity with Kong",
+		Short: short,
 		Long: `The ping command can be used to verify if decK
 can connect to Kong's Admin API.`,
 		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
-			mode := getMode(nil)
-			if mode == modeKonnect {
-				return pingKonnect(ctx)
-			}
-			return pingKong(ctx)
-		},
+		RunE: execute,
 	}
 
 	pingCmd.Flags().StringVarP(&pingWorkspace, "workspace", "w",

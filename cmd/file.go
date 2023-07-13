@@ -4,12 +4,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAddFileCmd() *cobra.Command {
-	addFileCmd := &cobra.Command{
+func newFileSubCmd() *cobra.Command {
+	fileCmd := &cobra.Command{
 		Use:   "file [sub-command]...",
-		Short: "Subcommand to host the decK file manipulation operations",
-		Long:  `Subcommand to host the decK file manipulation operations.`,
+		Short: "Subcommand to host the decK file operations",
+		Long:  `Subcommand to host the decK file operations.`,
 	}
 
-	return addFileCmd
+	return fileCmd
 }

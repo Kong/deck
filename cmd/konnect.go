@@ -7,14 +7,14 @@ import (
 
 var konnectAlphaState = `
 
-WARNING: This command is currently in alpha state. This command
-might have breaking changes in future releases.`
+WARNING: This command was in alpha state and has been deprecated.
+This command will be removed in a future release.`
 
 // newKonnectCmd represents the konnect command
 func newKonnectCmd() *cobra.Command {
 	konnectCmd := &cobra.Command{
 		Use:   "konnect",
-		Short: "Configuration tool for Konnect (in alpha)",
+		Short: "[deprecated] Configuration tool for Konnect",
 		Long: `The konnect command prints subcommands that can be used to
 configure Konnect.` + konnectAlphaState,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
