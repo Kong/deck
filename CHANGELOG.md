@@ -95,6 +95,10 @@
 
 ### Misc
 
+- Moved the `convert` command under the `file` sub-command, to be used as `deck file convert ...`. The 
+  top level command `deck convert ...` is marked as deprecated and will be removed in a future version. 
+  [#939](https://github.com/Kong/deck/pull/939)
+
 
 ## [v1.23.0]
 
