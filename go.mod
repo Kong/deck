@@ -18,7 +18,7 @@ require (
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
 	github.com/kong/go-apiops v0.1.17
-	github.com/kong/go-kong v0.44.0
+	github.com/kong/go-kong v0.45.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.6
 	github.com/spf13/cobra v1.7.0
