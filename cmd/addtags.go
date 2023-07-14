@@ -15,47 +15,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	cmdAddTagsInputFilename  string
+	cmdAddTagsOutputFilename string
+	cmdAddTagsOutputFormat   string
+	cmdAddTagsSelectors      []string
+)
+
 // Executes the CLI command "add-tags"
 func executeAddTags(cmd *cobra.Command, tagsToAdd []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
-	inputFilename, err := cmd.Flags().GetString("state")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'state'; %w", err)
-	}
-
-	outputFilename, err := cmd.Flags().GetString("output-file")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
-	}
-
-	var outputFormat string
-	{
-		outputFormat, err = cmd.Flags().GetString("format")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
-		}
-		outputFormat = strings.ToUpper(outputFormat)
-	}
-
-	var selectors []string
-	{
-		selectors, err = cmd.Flags().GetStringArray("selector")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'selector'; %w", err)
-		}
-	}
+	cmdAddTagsOutputFormat = strings.ToUpper(cmdAddTagsOutputFormat)
 
 	// do the work: read/add-tags/write
-	data, err := filebasics.DeserializeFile(inputFilename)
+	data, err := filebasics.DeserializeFile(cmdAddTagsInputFilename)
 	if err != nil {
-		return fmt.Errorf("failed to read input file '%s'; %w", inputFilename, err)
+		return fmt.Errorf("failed to read input file '%s'; %w", cmdAddTagsInputFilename, err)
 	}
 
 	tagger := tags.Tagger{}
 	tagger.SetData(data)
-	err = tagger.SetSelectors(selectors)
+	err = tagger.SetSelectors(cmdAddTagsSelectors)
 	if err != nil {
 		return fmt.Errorf("failed to set selectors; %w", err)
 	}
@@ -66,13 +48,13 @@ func executeAddTags(cmd *cobra.Command, tagsToAdd []string) error {
 	data = tagger.GetData()
 
 	trackInfo := deckformat.HistoryNewEntry("add-tags")
-	trackInfo["input"] = inputFilename
-	trackInfo["output"] = outputFilename
+	trackInfo["input"] = cmdAddTagsInputFilename
+	trackInfo["output"] = cmdAddTagsOutputFilename
 	trackInfo["tags"] = tagsToAdd
-	trackInfo["selectors"] = selectors
+	trackInfo["selectors"] = cmdAddTagsSelectors
 	deckformat.HistoryAppend(data, trackInfo)
 
-	return filebasics.WriteSerializedFile(outputFilename, data, outputFormat)
+	return filebasics.WriteSerializedFile(cmdAddTagsOutputFilename, data, cmdAddTagsOutputFormat)
 }
 
 //
@@ -93,12 +75,15 @@ selectors are given, all Kong entities are tagged.`,
 		Args: cobra.MinimumNArgs(1),
 	}
 
-	addTagsCmd.Flags().StringP("state", "s", "-", "decK file to process. Use - to read from stdin")
-	addTagsCmd.Flags().StringArray("selector", []string{}, "JSON path expression to select "+
-		"objects to add tags to,\ndefaults to all Kong entities (repeat for multiple selectors)")
-	addTagsCmd.Flags().StringP("output-file", "o", "-", "output file to write. Use - to write to stdout")
-	addTagsCmd.Flags().StringP("format", "", filebasics.OutputFormatYaml, "output format: "+
-		filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+	addTagsCmd.Flags().StringVarP(&cmdAddTagsInputFilename, "state", "s", "-",
+		"decK file to process. Use - to read from stdin")
+	addTagsCmd.Flags().StringArrayVar(&cmdAddTagsSelectors, "selector", []string{},
+		"JSON path expression to select objects to add tags to,\n"+
+			"defaults to all Kong entities (repeat for multiple selectors)")
+	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFilename, "output-file", "o", "-",
+		"output file to write. Use - to write to stdout")
+	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFormat, "format", "", filebasics.OutputFormatYaml,
+		"output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
 
 	return addTagsCmd
 }

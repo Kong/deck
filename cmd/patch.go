@@ -13,48 +13,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	cmdPatchInputFilename  string
+	cmdPatchOutputFilename string
+	cmdPatchOutputFormat   string
+	cmdPatchValues         []string
+	cmdPatchSelectors      []string
+)
+
 // Executes the CLI command "patch"
 func executePatch(cmd *cobra.Command, args []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
-	inputFilename, err := cmd.Flags().GetString("state")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'state'; %w", err)
-	}
-
-	outputFilename, err := cmd.Flags().GetString("output-file")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
-	}
-
-	var outputFormat string
-	{
-		outputFormat, err = cmd.Flags().GetString("format")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
-		}
-		outputFormat = strings.ToUpper(outputFormat)
-	}
+	cmdPatchOutputFormat = strings.ToUpper(cmdPatchOutputFormat)
 
 	var valuesPatch patch.DeckPatch
 	{
-		values, err := cmd.Flags().GetStringArray("value")
-		if err != nil {
-			return fmt.Errorf("failed to retrieve '--value' entries; %w", err)
-		}
-		valuesPatch.Values, valuesPatch.Remove, err = patch.ValidateValuesFlags(values)
+		var err error
+		valuesPatch.SelectorSources = cmdPatchSelectors
+		valuesPatch.Values, valuesPatch.Remove, err = patch.ValidateValuesFlags(cmdPatchValues)
 		if err != nil {
 			return fmt.Errorf("failed parsing '--value' entry; %w", err)
 		}
-	}
-
-	{
-		s, err := cmd.Flags().GetStringArray("selector")
-		if err != nil {
-			return fmt.Errorf("failed to retrieve '--selector' entry; %w", err)
-		}
-		valuesPatch.SelectorSources = s
 	}
 
 	patchFiles := make([]patch.DeckPatchFile, 0)
@@ -70,8 +51,8 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("patch")
-	trackInfo["input"] = inputFilename
-	trackInfo["output"] = outputFilename
+	trackInfo["input"] = cmdPatchInputFilename
+	trackInfo["output"] = cmdPatchOutputFilename
 	if len(valuesPatch.Values) != 0 || len(valuesPatch.Remove) != 0 {
 		trackInfo["selector"] = valuesPatch.SelectorSources
 	}
@@ -86,9 +67,9 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	}
 
 	// do the work; read/patch/write
-	data, err := filebasics.DeserializeFile(inputFilename)
+	data, err := filebasics.DeserializeFile(cmdPatchInputFilename)
 	if err != nil {
-		return fmt.Errorf("failed to read input file '%s'; %w", inputFilename, err)
+		return fmt.Errorf("failed to read input file '%s'; %w", cmdPatchInputFilename, err)
 	}
 	deckformat.HistoryAppend(data, trackInfo) // add before patching, so patch can operate on it
 
@@ -116,7 +97,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 
 	data = jsonbasics.ConvertToJSONobject(yamlNode)
 
-	return filebasics.WriteSerializedFile(outputFilename, data, outputFormat)
+	return filebasics.WriteSerializedFile(cmdPatchOutputFilename, data, cmdPatchOutputFormat)
 }
 
 //
@@ -167,12 +148,16 @@ patches that will be applied in order;
 		RunE: executePatch,
 	}
 
-	patchCmd.Flags().StringP("state", "s", "-", "decK file to process. Use - to read from stdin")
-	patchCmd.Flags().StringP("output-file", "o", "-", "output file to write. Use - to write to stdout")
-	patchCmd.Flags().StringP("format", "", "yaml", "output format: yaml or json")
-	patchCmd.Flags().StringP("selector", "", "", "json-pointer identifying element to patch")
-	patchCmd.Flags().StringArrayP("value", "", []string{}, "a value to set in the selected entry in "+
-		"format <key:value> (can be specified more than once)")
+	patchCmd.Flags().StringVarP(&cmdPatchInputFilename, "state", "s", "-",
+		"decK file to process. Use - to read from stdin")
+	patchCmd.Flags().StringVarP(&cmdPatchOutputFilename, "output-file", "o", "-",
+		"output file to write. Use - to write to stdout")
+	patchCmd.Flags().StringVarP(&cmdPatchOutputFormat, "format", "", "yaml",
+		"output format: yaml or json")
+	patchCmd.Flags().StringArrayVarP(&cmdPatchSelectors, "selector", "", []string{},
+		"json-pointer identifying element to patch (can be specified more than once)")
+	patchCmd.Flags().StringArrayVarP(&cmdPatchValues, "value", "", []string{},
+		"a value to set in the selected entry in format <key:value> (can be specified more than once)")
 	patchCmd.MarkFlagsRequiredTogether("selector", "value")
 
 	return patchCmd

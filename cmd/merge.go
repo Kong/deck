@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/kong/go-apiops/deckformat"
 	"github.com/kong/go-apiops/filebasics"
@@ -12,24 +10,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	cmdMergeOutputFilename string
+	cmdMergeOutputFormat   string
+)
+
 // Executes the CLI command "merge"
 func executeMerge(cmd *cobra.Command, args []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
-
-	outputFilename, err := cmd.Flags().GetString("output-file")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
-	}
-
-	var outputFormat string
-	{
-		outputFormat, err = cmd.Flags().GetString("format")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
-		}
-		outputFormat = strings.ToUpper(outputFormat)
-	}
 
 	// do the work: read/merge
 	merged, info, err := merge.Files(args)
@@ -38,12 +27,12 @@ func executeMerge(cmd *cobra.Command, args []string) error {
 	}
 
 	historyEntry := deckformat.HistoryNewEntry("merge")
-	historyEntry["output"] = outputFilename
+	historyEntry["output"] = cmdMergeOutputFilename
 	historyEntry["files"] = info
 	deckformat.HistoryClear(merged)
 	deckformat.HistoryAppend(merged, historyEntry)
 
-	return filebasics.WriteSerializedFile(outputFilename, merged, outputFormat)
+	return filebasics.WriteSerializedFile(cmdMergeOutputFilename, merged, cmdMergeOutputFormat)
 }
 
 //
@@ -68,8 +57,9 @@ determined by the '_transform' and '_format_version' fields.`,
 		Args: cobra.MinimumNArgs(1),
 	}
 
-	mergeCmd.Flags().StringP("output-file", "o", "-", "output file to write. Use - to write to stdout")
-	mergeCmd.Flags().StringP("format", "", "yaml", "output format: yaml or json")
+	mergeCmd.Flags().StringVarP(&cmdMergeOutputFilename, "output-file", "o", "-",
+		"output file to write. Use - to write to stdout")
+	mergeCmd.Flags().StringVarP(&cmdMergeOutputFormat, "format", "", "yaml", "output format: yaml or json")
 
 	return mergeCmd
 }

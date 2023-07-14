@@ -12,68 +12,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	cmdO2KinputFilename  string
+	cmdO2KoutputFilename string
+	cmdO2KdocName        string
+	cmdO2KoutputFormat   string
+	cmdO2KentityTags     []string
+)
+
 // Executes the CLI command "openapi2kong"
 func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
-	inputFilename, err := cmd.Flags().GetString("spec")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'spec'; %w", err)
+	if len(cmdO2KentityTags) == 0 {
+		cmdO2KentityTags = nil
 	}
 
-	outputFilename, err := cmd.Flags().GetString("output-file")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
-	}
-
-	docName, err := cmd.Flags().GetString("uuid-base")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'uuid-base'; %w", err)
-	}
-
-	var entityTags []string
-	{
-		tags, err := cmd.Flags().GetStringSlice("select-tag")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'select-tag'; %w", err)
-		}
-		entityTags = tags
-		if len(entityTags) == 0 {
-			entityTags = nil
-		}
-	}
-
-	var outputFormat string
-	{
-		outputFormat, err = cmd.Flags().GetString("format")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
-		}
-		outputFormat = strings.ToUpper(outputFormat)
-	}
+	cmdO2KoutputFormat = strings.ToUpper(cmdO2KoutputFormat)
 
 	options := openapi2kong.O2kOptions{
-		Tags:    entityTags,
-		DocName: docName,
+		Tags:    cmdO2KentityTags,
+		DocName: cmdO2KdocName,
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
-	trackInfo["input"] = inputFilename
-	trackInfo["output"] = outputFilename
-	trackInfo["uuid-base"] = docName
+	trackInfo["input"] = cmdO2KinputFilename
+	trackInfo["output"] = cmdO2KoutputFilename
+	trackInfo["uuid-base"] = cmdO2KdocName
 
 	// do the work: read/convert/write
-	content, err := filebasics.ReadFile(inputFilename)
+	content, err := filebasics.ReadFile(cmdO2KinputFilename)
 	if err != nil {
 		return err
 	}
 	result, err := openapi2kong.Convert(content, options)
 	if err != nil {
-		return fmt.Errorf("failed converting OpenAPI spec '%s'; %w", inputFilename, err)
+		return fmt.Errorf("failed converting OpenAPI spec '%s'; %w", cmdO2KinputFilename, err)
 	}
 	deckformat.HistoryAppend(result, trackInfo)
-	return filebasics.WriteSerializedFile(outputFilename, result, outputFormat)
+	return filebasics.WriteSerializedFile(cmdO2KoutputFilename, result, cmdO2KoutputFormat)
 }
 
 //
@@ -95,15 +73,17 @@ See: https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml`,
 		Args: cobra.NoArgs,
 	}
 
-	openapi2kongCmd.Flags().StringP("spec", "s", "-", "OpenAPI spec file to process. Use - to read from stdin")
-	openapi2kongCmd.Flags().StringP("output-file", "o", "-", "output file to write. Use - to write to stdout")
+	openapi2kongCmd.Flags().StringVarP(&cmdO2KinputFilename, "spec", "s", "-",
+		"OpenAPI spec file to process. Use - to read from stdin")
+	openapi2kongCmd.Flags().StringVarP(&cmdO2KoutputFilename, "output-file", "o", "-",
+		"output file to write. Use - to write to stdout")
 	openapi2kongCmd.Flags().StringP("format", "", "yaml", "output format: yaml or json")
-	openapi2kongCmd.Flags().StringP("uuid-base", "", "",
-		`the unique base-string for uuid-v5 generation of enity id's (if omitted
-will use the root-level "x-kong-name" directive, or fall back to 'info.title')`)
-	openapi2kongCmd.Flags().StringSlice("select-tag", nil,
-		`select tags to apply to all entities (if omitted will use the "x-kong-tags"
-directive from the file)`)
+	openapi2kongCmd.Flags().StringVarP(&cmdO2KdocName, "uuid-base", "", "",
+		"the unique base-string for uuid-v5 generation of entity id's (if omitted\n"+
+			"will use the root-level \"x-kong-name\" directive, or fall back to 'info.title')")
+	openapi2kongCmd.Flags().StringSliceVar(&cmdO2KentityTags, "select-tag", nil,
+		"select tags to apply to all entities (if omitted will use the \"x-kong-tags\"\n"+
+			"directive from the file)")
 
 	return openapi2kongCmd
 }

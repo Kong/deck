@@ -14,47 +14,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	cmdListTagsInputFilename  string
+	cmdListTagsOutputFilename string
+	cmdListTagsOutputFormat   string
+	cmdListTagsSelectors      []string
+)
+
 // Executes the CLI command "list-tags"
 func executeListTags(cmd *cobra.Command, _ []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
-	inputFilename, err := cmd.Flags().GetString("state")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'state'; %w", err)
-	}
-
-	outputFilename, err := cmd.Flags().GetString("output-file")
-	if err != nil {
-		return fmt.Errorf("failed getting cli argument 'output-file'; %w", err)
-	}
-
-	var outputFormat string
-	{
-		outputFormat, err = cmd.Flags().GetString("format")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'format'; %w", err)
-		}
-		outputFormat = strings.ToUpper(outputFormat)
-	}
-
-	var selectors []string
-	{
-		selectors, err = cmd.Flags().GetStringArray("selector")
-		if err != nil {
-			return fmt.Errorf("failed getting cli argument 'selector'; %w", err)
-		}
-	}
+	cmdListTagsOutputFormat = strings.ToUpper(cmdListTagsOutputFormat)
 
 	// do the work: read/list-tags/write
-	data, err := filebasics.DeserializeFile(inputFilename)
+	data, err := filebasics.DeserializeFile(cmdListTagsInputFilename)
 	if err != nil {
-		return fmt.Errorf("failed to read input file '%s'; %w", inputFilename, err)
+		return fmt.Errorf("failed to read input file '%s'; %w", cmdListTagsInputFilename, err)
 	}
 
 	tagger := tags.Tagger{}
 	tagger.SetData(data)
-	err = tagger.SetSelectors(selectors)
+	err = tagger.SetSelectors(cmdListTagsSelectors)
 	if err != nil {
 		return fmt.Errorf("failed to set selectors; %w", err)
 	}
@@ -63,15 +45,15 @@ func executeListTags(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to list tags; %w", err)
 	}
 
-	if outputFormat == "PLAIN" {
+	if cmdListTagsOutputFormat == "PLAIN" {
 		// return as a plain text format, unix style; line separated
 		result := []byte(strings.Join(list, "\n"))
-		return filebasics.WriteFile(outputFilename, result)
+		return filebasics.WriteFile(cmdListTagsOutputFilename, result)
 	}
 	// return as yaml/json, create an object containing only a tags-array
 	result := make(map[string]interface{})
 	result["tags"] = list
-	return filebasics.WriteSerializedFile(outputFilename, result, outputFormat)
+	return filebasics.WriteSerializedFile(cmdListTagsOutputFilename, result, cmdListTagsOutputFormat)
 }
 
 //
@@ -92,12 +74,15 @@ selectors are given, all Kong entities will be scanned.`,
 		Args: cobra.NoArgs,
 	}
 
-	ListTagsCmd.Flags().StringP("state", "s", "-", "decK file to process. Use - to read from stdin")
-	ListTagsCmd.Flags().StringArray("selector", []string{}, "JSON path expression to select "+
-		"objects to scan for tags,\ndefaults to all Kong entities (repeat for multiple selectors)")
-	ListTagsCmd.Flags().StringP("output-file", "o", "-", "output file to write. Use - to write to stdout")
-	ListTagsCmd.Flags().StringP("format", "", "PLAIN", "output format: "+
-		filebasics.OutputFormatJSON+", "+filebasics.OutputFormatYaml+", or PLAIN")
+	ListTagsCmd.Flags().StringVarP(&cmdListTagsInputFilename, "state", "s", "-",
+		"decK file to process. Use - to read from stdin")
+	ListTagsCmd.Flags().StringArrayVar(&cmdListTagsSelectors, "selector", []string{},
+		"JSON path expression to select objects to scan for tags,\n"+
+			"defaults to all Kong entities (repeat for multiple selectors)")
+	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFilename, "output-file", "o", "-",
+		"output file to write. Use - to write to stdout")
+	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFormat, "format", "", "PLAIN",
+		"output format: "+filebasics.OutputFormatJSON+", "+filebasics.OutputFormatYaml+", or PLAIN")
 
 	return ListTagsCmd
 }
