@@ -85,12 +85,14 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 func newConvertCmd(deprecated bool) *cobra.Command {
 	short := "Convert files from one format into another format"
 	execute := executeConvert
+	args := cobra.ArbitraryArgs
 	if deprecated {
 		short = "[deprecated] use 'file convert' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
 			log.Println("Warning: the 'deck convert' command was deprecated and moved to 'deck file convert'")
 			return executeConvert(cmd, args)
 		}
+		args = validateNoArgs
 	}
 
 	convertCmd := &cobra.Command{
@@ -99,8 +101,23 @@ func newConvertCmd(deprecated bool) *cobra.Command {
 		Long: `The convert command changes configuration files from one format
 into another compatible format. For example, a configuration for 'kong-gateway-2.x'
 can be converted into a 'kong-gateway-3.x' configuration file.`,
-		Args: validateNoArgs,
+		Args: args,
 		RunE: execute,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if deprecated {
+				if len(fileRenderCmdKongStateFile) == 0 {
+					return fmt.Errorf("a file containing the Kong configuration " +
+						"must be specified using `--input-file` flag")
+				}
+				return preRunSilenceEventsFlag()
+			}
+
+			fileRenderCmdKongStateFile = args
+			if len(fileRenderCmdKongStateFile) == 0 {
+				fileRenderCmdKongStateFile = []string{"-"} // default to stdin
+			}
+			return preRunSilenceEventsFlag()
+		},
 	}
 
 	sourceFormats := []convert.Format{convert.FormatKongGateway, convert.FormatKongGateway2x}
@@ -109,8 +126,10 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
-	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
-		"configuration file to be converted. Use `-` to read from stdin.")
+	if deprecated {
+		convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", "",
+			"configuration file to be converted. Use `-` to read from stdin.")
+	}
 	convertCmd.Flags().StringVarP(&convertCmdOutputFile, "output-file", "o", "kong.yaml",
 		"file to write configuration to after conversion. Use `-` to write to stdout.")
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
