@@ -68,7 +68,7 @@ func newOpenapi2KongCmd() *cobra.Command {
 
 The example file at https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml
 has extensive annotations explaining the conversion process, as well as all supported 
-custom annotations (`x-kong-...` directives).`,
+custom annotations (x-kong-... directives).`,
 		RunE: executeOpenapi2Kong,
 		Args: cobra.NoArgs,
 	}
