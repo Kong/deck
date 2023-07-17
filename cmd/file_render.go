@@ -1,13 +1,9 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
-	"strings"
 
-	"github.com/blang/semver/v4"
-	"github.com/kong/deck/file"
-	"github.com/kong/deck/state"
+	"github.com/kong/deck/convert"
 	"github.com/spf13/cobra"
 )
 
@@ -17,15 +13,23 @@ var (
 	fileRenderCmdStateFormat    string
 )
 
+func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
+	destinationFormat, err := convert.ParseFormat(fileRenderCmdStateFormat)
+	if err != nil {
+		return err
+	}
+
+	return convert.Convert(fileRenderCmdKongStateFile, fileRenderCmdKongFileOutput,
+		convert.FormatDistributed, destinationFormat, true)
+}
+
 func newFileRenderCmd() *cobra.Command {
 	renderCmd := &cobra.Command{
 		Use:   "render",
 		Short: "Render the configuration as Kong declarative config",
 		Long:  ``,
 		Args:  validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return render(cmd.Context(), fileRenderCmdKongStateFile, fileRenderCmdStateFormat)
-		},
+		RunE:  executeFileRenderCmd,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(fileRenderCmdStateFormat) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
@@ -46,29 +50,4 @@ func newFileRenderCmd() *cobra.Command {
 		"yaml", "output file format: json or yaml.")
 
 	return renderCmd
-}
-
-func render(ctx context.Context, filenames []string, format string) error {
-	targetContent, err := file.GetContentFromFiles(filenames, true)
-	if err != nil {
-		return err
-	}
-	s, _ := state.NewKongState()
-	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
-		CurrentState: s,
-		KongVersion:  semver.Version{Major: 3, Minor: 0},
-	}, dumpConfig, nil)
-	if err != nil {
-		return err
-	}
-	targetState, err := state.Get(rawState)
-	if err != nil {
-		return err
-	}
-
-	return file.KongStateToFile(targetState, file.WriteConfig{
-		Filename:    fileRenderCmdKongFileOutput,
-		FileFormat:  file.Format(strings.ToUpper(format)),
-		KongVersion: "3.0.0",
-	})
 }
