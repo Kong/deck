@@ -50,3 +50,7 @@ test-integration:
 	go test -v -tags=integration \
 		-race \
 		./tests/integration/...
+
+.PHONY: test-cli
+test-cli: build
+	tests/cli/test.sh --suite "decK-cli test suite"

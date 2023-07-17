@@ -1,0 +1,41 @@
+---
+openapi: 3.1.0
+
+info:
+  description: Mock service for a popular song in the 90s
+  version: 0.0.1
+  title: Mock-a-rena
+  contact:
+    name: Los del Rio
+
+servers:
+- url: https://mockbin.org/requests
+  description: Mock-a-rena service
+
+tags:
+- name: mock
+  description: Hey.... mock-a-rena!
+- name: a-rena
+  description: tag-arena
+
+paths:
+  "/mock":
+    get:
+      summary: Mock, mock, mock, mock-a-rena
+      description: yeah yeah
+      operationId: mock
+      tags:
+        - mock
+      responses:
+        '200':
+          description: Success
+  "/a-rena":
+    get:
+      summary: hey hey
+      description: a-rena-description
+      operationId: a-rena
+      tags:
+        - marena
+      responses:
+        '200':
+          description: success
