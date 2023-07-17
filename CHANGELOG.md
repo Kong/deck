@@ -91,7 +91,7 @@
   [#939](https://github.com/Kong/deck/pull/939)
 - Added a new command `file render` to render a final decK file. This will result in a file representing
   the state as it would be synced online.
-  [#939](https://github.com/Kong/deck/pull/939)
+  [#963](https://github.com/Kong/deck/pull/963)
 
 ### Fixes
 
