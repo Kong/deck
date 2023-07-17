@@ -77,7 +77,7 @@ See: https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml`,
 		"OpenAPI spec file to process. Use - to read from stdin")
 	openapi2kongCmd.Flags().StringVarP(&cmdO2KoutputFilename, "output-file", "o", "-",
 		"output file to write. Use - to write to stdout")
-	openapi2kongCmd.Flags().StringP("format", "", "yaml", "output format: yaml or json")
+	openapi2kongCmd.Flags().StringVarP(&cmdO2KoutputFormat, "format", "", "yaml", "output format: yaml or json")
 	openapi2kongCmd.Flags().StringVarP(&cmdO2KdocName, "uuid-base", "", "",
 		"the unique base-string for uuid-v5 generation of entity id's (if omitted\n"+
 			"will use the root-level \"x-kong-name\" directive, or fall back to 'info.title')")
