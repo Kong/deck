@@ -323,7 +323,7 @@ func Test_Convert(t *testing.T) {
 			for k, v := range tt.args.envVars {
 				t.Setenv(k, v)
 			}
-			err := Convert(inputFiles, tt.args.outputFilename, tt.args.fromFormat,
+			err := Convert(inputFiles, tt.args.outputFilename, file.YAML, tt.args.fromFormat,
 				tt.args.toFormat, !tt.args.disableMocks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)

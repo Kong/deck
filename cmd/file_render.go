@@ -1,18 +1,27 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/kong/deck/convert"
+	"github.com/kong/deck/file"
 	"github.com/spf13/cobra"
 )
 
 var (
 	fileRenderCmdKongStateFile  []string
 	fileRenderCmdKongFileOutput string
+	fileRenderCmdStateFormat    string
 )
 
 func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
-	return convert.Convert(fileRenderCmdKongStateFile, fileRenderCmdKongFileOutput,
-		convert.FormatDistributed, convert.FormatKongGateway3x, true)
+	return convert.Convert(
+		fileRenderCmdKongStateFile,
+		fileRenderCmdKongFileOutput,
+		file.Format(strings.ToUpper(fileRenderCmdStateFormat)),
+		convert.FormatDistributed,
+		convert.FormatKongGateway3x,
+		true)
 }
 
 func newFileRenderCmd() *cobra.Command {
@@ -34,10 +43,8 @@ func newFileRenderCmd() *cobra.Command {
 	renderCmd.Flags().StringVarP(&fileRenderCmdKongFileOutput, "output-file", "o",
 		"-", "file to which to write Kong's configuration."+
 			"Use `-` to write to stdout.")
-
-	// TODO: support json output
-	// renderCmd.Flags().StringVar(&fileRenderCmdStateFormat, "format",
-	// 	"yaml", "output file format: json or yaml.")
+	renderCmd.Flags().StringVar(&fileRenderCmdStateFormat, "format",
+		"yaml", "output file format: json or yaml.")
 
 	return renderCmd
 }

@@ -50,8 +50,14 @@ func ParseFormat(key string) (Format, error) {
 	}
 }
 
-func Convert(inputFilenames []string, outputFilename string, from, to Format, mockEnvVars bool) error {
-	const outputFormat = file.YAML
+func Convert(
+	inputFilenames []string,
+	outputFilename string,
+	outputFormat file.Format,
+	from Format,
+	to Format,
+	mockEnvVars bool,
+) error {
 	var (
 		outputContent *file.Content
 		err           error
