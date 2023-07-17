@@ -81,29 +81,29 @@ func newRemoveTagsCmd() *cobra.Command {
 		Long: `Remove tags from objects in a decK file.
 
 The listed tags are removed from all objects that match the selector expressions.
-If no selectors are given, all Kong entities will be selected.`,
+If no selectors are given, all Kong entities are selected.`,
 		RunE: executeRemoveTags,
-		Example: "  # clear tags 'tag1' and 'tag2' from all services in file 'kong.yml'\n" +
-			"  cat kong.yml | go-apiops remove-tags --selector='services[*]' tag1 tag2\n" +
+		Example: "# clear tags 'tag1' and 'tag2' from all services in file 'kong.yml'\n" +
+			"cat kong.yml | go-apiops remove-tags --selector='services[*]' tag1 tag2\n" +
 			"\n" +
-			"  # clear all tags except 'tag1' and 'tag2' from the file 'kong.yml'\n" +
-			"  cat kong.yml | go-apiops remove-tags --keep-only tag1 tag2",
+			"# clear all tags except 'tag1' and 'tag2' from the file 'kong.yml'\n" +
+			"cat kong.yml | go-apiops remove-tags --keep-only tag1 tag2",
 	}
 
 	removeTagsCmd.Flags().BoolVar(&cmdRemoveTagsKeepEmptyArrays, "keep-empty-array", false,
-		"keep empty tag-arrays in output")
+		"Keep empty tag arrays in output.")
 	removeTagsCmd.Flags().BoolVar(&cmdRemoveTagsKeepOnlyTags, "keep-only", false,
-		"setting this flag will remove all tags except the ones listed\n"+
-			"(if none are listed, all tags will be removed)")
+		"Setting this flag will remove all tags except the ones listed.\n"+
+			"If none are listed, all tags will be removed.")
 	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsInputFilename, "state", "s", "-",
-		"decK file to process. Use - to read from stdin")
+		"decK file to process. Use - to read from stdin.")
 	removeTagsCmd.Flags().StringArrayVar(&cmdRemoveTagsSelectors, "selector", []string{},
-		"JSON path expression to select objects to remove tags from,\n"+
-			"defaults to all Kong entities (repeat for multiple selectors)")
+		"JSON path expression to select objects to remove tags from.\n"+
+			"Defaults to all Kong entities. Repeat for multiple selectors.")
 	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsOutputFilename, "output-file", "o", "-",
-		"output file to write. Use - to write to stdout")
+		"Output file to write. Use - to write to stdout.")
 	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
 
 	return removeTagsCmd
 }

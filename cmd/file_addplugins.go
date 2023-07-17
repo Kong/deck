@@ -112,10 +112,10 @@ func newAddPluginsCmd() *cobra.Command {
 		Long: `Add plugins to objects in a decK file.
 
 The plugins are added to all objects that match the selector expressions. If no
-selectors are given, they will be added to the top-level 'plugins' array.
+selectors are given, the plugins are added to the top-level 'plugins' array.
 
-The plugin-files have the following format (JSON or YAML) and are applied in the
-order they are given;
+The plugin files have the following format (JSON or YAML) and are applied in the
+order they are given:
 
 	{ "_format_version": "1.0",
 		"add-plugins": [
@@ -139,20 +139,20 @@ order they are given;
 	}
 
 	addPluginsCmd.Flags().StringVarP(&cmdAddPluginsInputFilename, "state", "s", "-",
-		"decK file to process. Use - to read from stdin")
+		"decK file to process. Use - to read from stdin.")
 	addPluginsCmd.Flags().StringArrayVar(&cmdAddPluginsSelectors, "selector", []string{},
-		"JSON path expression to select plugin-owning objects to add plugins to,\n"+
-			"defaults to the top-level (selector '$'). Repeat for multiple selectors.")
+		"JSON path expression to select plugin-owning objects to add plugins to.\n"+
+			"Defaults to the top-level (selector '$'). Repeat for multiple selectors.")
 	addPluginsCmd.Flags().StringArrayVar(&cmdAddPluginsStrConfigs, "config", []string{},
 		"JSON snippet containing the plugin configuration to add. Repeat to add\n"+
 			"multiple plugins.")
 	addPluginsCmd.Flags().BoolVar(&cmdAddPluginsOverwrite, "overwrite", false,
-		"specifying this flag will overwrite plugins by the same name if they already\n"+
-			"exist in an array. The default is to skip existing plugins.")
+		"Specify this flag to overwrite plugins by the same name if they already\n"+
+			"exist in an array. The default behavior is to skip existing plugins.")
 	addPluginsCmd.Flags().StringVarP(&cmdAddPluginOutputFilename, "output-file", "o", "-",
-		"output file to write. Use - to write to stdout")
+		"Output file to write to. Use - to write to stdout.")
 	addPluginsCmd.Flags().StringVarP(&cmdAddPluginOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
 
 	return addPluginsCmd
 }
