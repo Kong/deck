@@ -94,6 +94,8 @@
   [#963](https://github.com/Kong/deck/pull/963)
 - Added a new flag `--format` to `file convert` to enable JSON output.
   [#963](https://github.com/Kong/deck/pull/963)
+- Added shorthand flag `-o` to `convert` to align with other commands
+  [#965](https://github.com/Kong/deck/pull/965)
 
 ### Fixes
 
