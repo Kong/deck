@@ -65,7 +65,10 @@ func executeRemoveTags(cmd *cobra.Command, tagsToRemove []string) error {
 	trackInfo["selectors"] = cmdRemoveTagsSelectors
 	deckformat.HistoryAppend(data, trackInfo)
 
-	return filebasics.WriteSerializedFile(cmdRemoveTagsOutputFilename, data, cmdRemoveTagsOutputFormat)
+	return filebasics.WriteSerializedFile(
+		cmdRemoveTagsOutputFilename,
+		data,
+		filebasics.OutputFormat(cmdRemoveTagsOutputFormat))
 }
 
 //
@@ -102,8 +105,8 @@ If no selectors are given, all Kong entities are selected.`,
 			"Defaults to all Kong entities. Repeat for multiple selectors.")
 	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
-	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+	removeTagsCmd.Flags().StringVarP(&cmdRemoveTagsOutputFormat, "format", "", string(filebasics.OutputFormatYaml),
+		"Output format: "+string(filebasics.OutputFormatJSON)+" or "+string(filebasics.OutputFormatYaml))
 
 	return removeTagsCmd
 }

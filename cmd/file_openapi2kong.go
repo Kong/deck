@@ -51,7 +51,7 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed converting OpenAPI spec '%s'; %w", cmdO2KinputFilename, err)
 	}
 	deckformat.HistoryAppend(result, trackInfo)
-	return filebasics.WriteSerializedFile(cmdO2KoutputFilename, result, cmdO2KoutputFormat)
+	return filebasics.WriteSerializedFile(cmdO2KoutputFilename, result, filebasics.OutputFormat(cmdO2KoutputFormat))
 }
 
 //

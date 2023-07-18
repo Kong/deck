@@ -96,7 +96,10 @@ func executeAddPlugins(cmd *cobra.Command, cfgFiles []string) error {
 	trackInfo["selectors"] = cmdAddPluginsSelectors
 	deckformat.HistoryAppend(jsondata, trackInfo)
 
-	return filebasics.WriteSerializedFile(cmdAddPluginOutputFilename, jsondata, cmdAddPluginOutputFormat)
+	return filebasics.WriteSerializedFile(
+		cmdAddPluginOutputFilename,
+		jsondata,
+		filebasics.OutputFormat(cmdAddPluginOutputFormat))
 }
 
 //
@@ -151,8 +154,8 @@ order they are given:
 			"exist in an array. The default behavior is to skip existing plugins.")
 	addPluginsCmd.Flags().StringVarP(&cmdAddPluginOutputFilename, "output-file", "o", "-",
 		"Output file to write to. Use - to write to stdout.")
-	addPluginsCmd.Flags().StringVarP(&cmdAddPluginOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+	addPluginsCmd.Flags().StringVarP(&cmdAddPluginOutputFormat, "format", "", string(filebasics.OutputFormatYaml),
+		"Output format: "+string(filebasics.OutputFormatJSON)+" or "+string(filebasics.OutputFormatYaml))
 
 	return addPluginsCmd
 }

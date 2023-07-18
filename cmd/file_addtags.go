@@ -54,7 +54,7 @@ func executeAddTags(cmd *cobra.Command, tagsToAdd []string) error {
 	trackInfo["selectors"] = cmdAddTagsSelectors
 	deckformat.HistoryAppend(data, trackInfo)
 
-	return filebasics.WriteSerializedFile(cmdAddTagsOutputFilename, data, cmdAddTagsOutputFormat)
+	return filebasics.WriteSerializedFile(cmdAddTagsOutputFilename, data, filebasics.OutputFormat(cmdAddTagsOutputFormat))
 }
 
 //
@@ -82,8 +82,8 @@ selectors are given, all Kong entities are tagged.`,
 			"Defaults to all Kong entities. Repeat for multiple selectors.")
 	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFilename, "output-file", "o", "-",
 		"Output file to write to. Use - to write to stdout.")
-	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFormat, "format", "", string(filebasics.OutputFormatYaml),
+		"Output format: "+string(filebasics.OutputFormatJSON)+" or "+string(filebasics.OutputFormatYaml))
 
 	return addTagsCmd
 }
