@@ -97,7 +97,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 
 	data = jsonbasics.ConvertToJSONobject(yamlNode)
 
-	return filebasics.WriteSerializedFile(cmdPatchOutputFilename, data, cmdPatchOutputFormat)
+	return filebasics.WriteSerializedFile(cmdPatchOutputFilename, data, filebasics.OutputFormat(cmdPatchOutputFormat))
 }
 
 //

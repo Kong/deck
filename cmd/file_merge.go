@@ -32,7 +32,10 @@ func executeMerge(cmd *cobra.Command, args []string) error {
 	deckformat.HistoryClear(merged)
 	deckformat.HistoryAppend(merged, historyEntry)
 
-	return filebasics.WriteSerializedFile(cmdMergeOutputFilename, merged, cmdMergeOutputFormat)
+	return filebasics.WriteSerializedFile(
+		cmdMergeOutputFilename,
+		merged,
+		filebasics.OutputFormat(cmdMergeOutputFormat))
 }
 
 //

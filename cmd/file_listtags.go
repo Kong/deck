@@ -55,7 +55,10 @@ func executeListTags(cmd *cobra.Command, _ []string) error {
 	// return as yaml/json, create an object containing only a tags-array
 	result := make(map[string]interface{})
 	result["tags"] = list
-	return filebasics.WriteSerializedFile(cmdListTagsOutputFilename, result, cmdListTagsOutputFormat)
+	return filebasics.WriteSerializedFile(
+		cmdListTagsOutputFilename,
+		result,
+		filebasics.OutputFormat(cmdListTagsOutputFormat))
 }
 
 //
@@ -84,7 +87,8 @@ selectors are given, all Kong entities will be scanned.`,
 	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFilename, "output-file", "o", "-",
 		"Output file to write to. Use - to write to stdout.")
 	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFormat, "format", "", PlainOutputFormat,
-		"Output format: "+filebasics.OutputFormatJSON+", "+filebasics.OutputFormatYaml+", or "+PlainOutputFormat)
+		"Output format: "+string(filebasics.OutputFormatJSON)+", "+string(filebasics.OutputFormatYaml)+
+			", or "+string(PlainOutputFormat))
 
 	return ListTagsCmd
 }
