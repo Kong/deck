@@ -211,7 +211,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newPingCmd())
 	rootCmd.AddCommand(newDumpCmd())
 	rootCmd.AddCommand(newDiffCmd())
-	rootCmd.AddCommand(newConvertCmd(true)) // deprecated, to exist under the `file` subcommand only
+	rootCmd.AddCommand(newConvertCmd())
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
 	{
@@ -224,7 +224,6 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newMergeCmd())
 		fileCmd.AddCommand(newPatchCmd())
 		fileCmd.AddCommand(newOpenapi2KongCmd())
-		fileCmd.AddCommand(newConvertCmd(false))
 	}
 	return rootCmd
 }

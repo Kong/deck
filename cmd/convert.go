@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/kong/deck/convert"
@@ -67,16 +66,9 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 }
 
 // newConvertCmd represents the convert command
-func newConvertCmd(deprecated bool) *cobra.Command {
+func newConvertCmd() *cobra.Command {
 	short := "Convert files from one format into another format"
 	execute := executeConvert
-	if deprecated {
-		short = "[deprecated] use 'file convert' instead"
-		execute = func(cmd *cobra.Command, args []string) error {
-			log.Println("Warning: the 'deck convert' command was deprecated and moved to 'deck file convert'")
-			return executeConvert(cmd, args)
-		}
-	}
 
 	convertCmd := &cobra.Command{
 		Use:   "convert",
