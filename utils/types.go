@@ -209,7 +209,7 @@ func getRetryableClient(client *http.Client) *http.Client {
 func GetKongClient(opt KongClientConfig) (*kong.Client, error) {
 	var tlsConfig tls.Config
 	if opt.TLSSkipVerify {
-		tlsConfig.InsecureSkipVerify = true
+		tlsConfig.InsecureSkipVerify = true //nolint:gosec
 	}
 	if opt.TLSServerName != "" {
 		tlsConfig.ServerName = opt.TLSServerName
