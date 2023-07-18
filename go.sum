@@ -217,8 +217,8 @@ github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHm
 github.com/jstemmer/go-junit-report v0.0.0-20190106144839-af01ea7f8024/go.mod h1:6v2b51hI/fHJwM22ozAgKL4VKDeJcHhJFhtBdhmNjmU=
 github.com/jstemmer/go-junit-report v0.9.1/go.mod h1:Brl9GWCQeLvo8nXZwPNNblvFj/XSXhF0NWZEnDohbsk=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
-github.com/kong/go-apiops v0.1.18 h1:Bk6m3B9m8R0iykEyzpQa5rCHkhFGUpaXixFmaw/W3PM=
-github.com/kong/go-apiops v0.1.18/go.mod h1:3P9DBGLcU6Gp4wo8z4xohcg8PMutBAknc54pLZoQtDs=
+github.com/kong/go-apiops v0.1.19 h1:mm1XO7tKh5f71dcdXZZWSSh0bpHMd6KOZ6qCNGZ/ftU=
+github.com/kong/go-apiops v0.1.19/go.mod h1:3P9DBGLcU6Gp4wo8z4xohcg8PMutBAknc54pLZoQtDs=
 github.com/kong/go-kong v0.44.0 h1:1x3w/TYdJjIZ6c1j9HiYP8755c923XN2O6j3kEaUkTA=
 github.com/kong/go-kong v0.44.0/go.mod h1:41Sot1N/n8UHBp+gE/6nOw3vuzoHbhMSyU/zOS7VzPE=
 github.com/kong/semver/v4 v4.0.1 h1:DIcNR8W3gfx0KabFBADPalxxsp+q/5COwIFkkhrFQ2Y=

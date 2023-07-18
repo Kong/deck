@@ -32,7 +32,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	{
 		var err error
 		valuesPatch.SelectorSources = cmdPatchSelectors
-		valuesPatch.Values, valuesPatch.Remove, err = patch.ValidateValuesFlags(cmdPatchValues)
+		valuesPatch.ObjValues, valuesPatch.Remove, err = patch.ValidateValuesFlags(cmdPatchValues)
 		if err != nil {
 			return fmt.Errorf("failed parsing '--value' entry; %w", err)
 		}
@@ -53,11 +53,14 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	trackInfo := deckformat.HistoryNewEntry("patch")
 	trackInfo["input"] = cmdPatchInputFilename
 	trackInfo["output"] = cmdPatchOutputFilename
-	if len(valuesPatch.Values) != 0 || len(valuesPatch.Remove) != 0 {
+	if (len(valuesPatch.ObjValues) + len(valuesPatch.Remove) + len(valuesPatch.ArrValues)) > 0 {
 		trackInfo["selector"] = valuesPatch.SelectorSources
 	}
-	if len(valuesPatch.Values) != 0 {
-		trackInfo["values"] = valuesPatch.Values
+	if len(valuesPatch.ObjValues) != 0 {
+		trackInfo["values"] = valuesPatch.ObjValues
+	}
+	if len(valuesPatch.ArrValues) != 0 {
+		trackInfo["values"] = valuesPatch.ArrValues
 	}
 	if len(valuesPatch.Remove) != 0 {
 		trackInfo["remove"] = valuesPatch.Remove
@@ -75,7 +78,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 
 	yamlNode := jsonbasics.ConvertToYamlNode(data)
 
-	if (len(valuesPatch.Values) + len(valuesPatch.Remove)) > 0 {
+	if (len(valuesPatch.ObjValues) + len(valuesPatch.Remove) + len(valuesPatch.ArrValues)) > 0 {
 		// apply selector + value flags
 		logbasics.Debug("applying value-flags")
 		err = valuesPatch.ApplyToNodes(yamlNode)
@@ -120,6 +123,8 @@ When using '--selector' and '--values', the items are selected by the 'selector'
 which is a JSONpath query. From the array of nodes found, only the objects are updated.
 The 'values' are applied on each of the JSONObjects returned by the 'selector'.
 
+Objects:
+
 The value must be a valid JSON snippet, so use single/double quotes
 appropriately. If the value is empty, the field is removed from the object.
 
@@ -147,6 +152,11 @@ patches that are applied in order:
 	    }
 	  ]
 	}
+
+Arrays:
+
+If the 'values' object instead is an array, then any arrays returned by the selectors
+will get the 'values' appended to them.
 `,
 		RunE: executePatch,
 	}
