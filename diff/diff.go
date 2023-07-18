@@ -464,7 +464,7 @@ func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string,
 		return "", err
 	}
 	if !noMaskValues {
-		diffString = maskEnvVarValue(diffString)
+		diffString = MaskEnvVarValue(diffString)
 	}
 	return diffString, err
 }

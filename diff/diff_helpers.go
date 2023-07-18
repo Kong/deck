@@ -112,7 +112,7 @@ func parseDeckEnvVars() []EnvVar {
 	return parsedEnvVars
 }
 
-func maskEnvVarValue(diffString string) string {
+func MaskEnvVarValue(diffString string) string {
 	for _, envVar := range parseDeckEnvVars() {
 		diffString = strings.Replace(diffString, envVar.Value, "[masked]", -1)
 	}

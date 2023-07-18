@@ -3,10 +3,9 @@
 package integration
 
 import (
-	"testing"
-
 	"github.com/kong/deck/utils"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 var (
@@ -37,45 +36,6 @@ Summary:
   Deleted: 0
 `
 
-	expectedOutputMaskedJSON = `{
-"changes": {
-	"creating": [],
-	"updating": [
-	{
-		"name": "svc1",
-		"kind": "service",
-		"body": {
-			"connect_timeout": 60000,
-			"enabled": true,
-			"host": "[masked]",
-			"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
-			"name": "svc1",
-			"port": 80,
-			"protocol": "http",
-			"read_timeout": 60000,
-			"retries": 5,
-			"write_timeout": 60000,
-			"tags": [
-				"[masked] is an external host. I like [masked]!",
-				"foo:foo",
-				"baz:[masked]",
-				"another:[masked]",
-				"bar:[masked]"
-			]
-		}
-	}
-	],
-	"deleting": []
-},
-"summary": {
-	"creating": 0,
-	"updating": 1,
-	"deleting": 0,
-	"total": 1
-},
-"warnings": [],
-"errors": []
-}`
 	expectedOutputUnMasked = `updating service svc1  {
    "connect_timeout": 60000,
    "enabled": true,
@@ -98,41 +58,6 @@ Summary:
   Updated: 1
   Deleted: 0
 `
-	expectedOutputUnMaskedJSON = `{
-"changes": {
-	"creating": [],
-	"updating": [
-	{
-		"name": "svc1",
-		"kind": "service",
-		"body": {
-			"connect_timeout": 60000,
-			"enabled": true,
-			"host": "mockbin.org",
-			"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
-			"name": "svc1",
-			"port": 80,
-			"protocol": "http",
-			"read_timeout": 60000,
-			"retries": 5,
-			"write_timeout": 60000,
-			"tags": [
-				"test"
-			]
-		}
-	}
-	],
-	"deleting": []
-},
-"summary": {
-	"creating": 0,
-	"updating": 1,
-	"deleting": 0,
-	"total": 1
-},
-"warnings": [],
-"errors": []
-}`
 
 	diffEnvVars = map[string]string{
 		"DECK_SVC1_HOSTNAME": "mockbin.org",
@@ -141,6 +66,202 @@ Summary:
 		"DECK_FUB":           "fubfub",   // unused
 		"DECK_FOO":           "foo_test", // unused, partial match
 	}
+
+	expectedOutputUnMaskedJSON = `{
+	"changes": {
+		"creating": [
+			{
+				"name": "rate-limiting (global)",
+				"kind": "plugin",
+				"body": {
+					"new": {
+						"id": "a1368a28-cb5c-4eee-86d8-03a6bdf94b5e",
+						"name": "rate-limiting",
+						"config": {
+							"day": null,
+							"error_code": 429,
+							"error_message": "API rate limit exceeded",
+							"fault_tolerant": true,
+							"header_name": null,
+							"hide_client_headers": false,
+							"hour": null,
+							"limit_by": "consumer",
+							"minute": 123,
+							"month": null,
+							"path": null,
+							"policy": "local",
+							"redis_database": 0,
+							"redis_host": null,
+							"redis_password": null,
+							"redis_port": 6379,
+							"redis_server_name": null,
+							"redis_ssl": false,
+							"redis_ssl_verify": false,
+							"redis_timeout": 2000,
+							"redis_username": null,
+							"second": null,
+							"year": null
+						},
+						"enabled": true,
+						"protocols": [
+							"grpc",
+							"grpcs",
+							"http",
+							"https"
+						]
+					},
+					"old": null
+				}
+			}
+		],
+		"updating": [
+			{
+				"name": "svc1",
+				"kind": "service",
+				"body": {
+					"new": {
+						"connect_timeout": 60000,
+						"enabled": true,
+						"host": "mockbin.org",
+						"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+						"name": "svc1",
+						"port": 80,
+						"protocol": "http",
+						"read_timeout": 60000,
+						"retries": 5,
+						"write_timeout": 60000,
+						"tags": [
+							"test"
+						]
+					},
+					"old": {
+						"connect_timeout": 60000,
+						"enabled": true,
+						"host": "mockbin.org",
+						"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+						"name": "svc1",
+						"port": 80,
+						"protocol": "http",
+						"read_timeout": 60000,
+						"retries": 5,
+						"write_timeout": 60000
+					}
+				}
+			}
+		],
+		"deleting": []
+	},
+	"summary": {
+		"creating": 1,
+		"updating": 1,
+		"deleting": 0,
+		"total": 2
+	},
+	"warnings": [],
+	"errors": []
+}
+
+`
+
+	expectedOutputMaskedJSON = `{
+	"changes": {
+		"creating": [
+			{
+				"name": "rate-limiting (global)",
+				"kind": "plugin",
+				"body": {
+					"new": {
+						"id": "a1368a28-cb5c-4eee-86d8-03a6bdf94b5e",
+						"name": "rate-limiting",
+						"config": {
+							"day": null,
+							"error_code": 429,
+							"error_message": "API rate limit exceeded",
+							"fault_tolerant": true,
+							"header_name": null,
+							"hide_client_headers": false,
+							"hour": null,
+							"limit_by": "consumer",
+							"minute": 123,
+							"month": null,
+							"path": null,
+							"policy": "local",
+							"redis_database": 0,
+							"redis_host": null,
+							"redis_password": null,
+							"redis_port": 6379,
+							"redis_server_name": null,
+							"redis_ssl": false,
+							"redis_ssl_verify": false,
+							"redis_timeout": 2000,
+							"redis_username": null,
+							"second": null,
+							"year": null
+						},
+						"enabled": true,
+						"protocols": [
+							"grpc",
+							"grpcs",
+							"http",
+							"https"
+						]
+					},
+					"old": null
+				}
+			}
+		],
+		"updating": [
+			{
+				"name": "svc1",
+				"kind": "service",
+				"body": {
+					"new": {
+						"connect_timeout": 60000,
+						"enabled": true,
+						"host": "[masked]",
+						"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+						"name": "svc1",
+						"port": 80,
+						"protocol": "http",
+						"read_timeout": 60000,
+						"retries": 5,
+						"write_timeout": 60000,
+						"tags": [
+							"[masked] is an external host. I like [masked]!",
+							"foo:foo",
+							"baz:[masked]",
+							"another:[masked]",
+							"bar:[masked]"
+						]
+					},
+					"old": {
+						"connect_timeout": 60000,
+						"enabled": true,
+						"host": "[masked]",
+						"id": "9ecf5708-f2f4-444e-a4c7-fcd3a57f9a6d",
+						"name": "svc1",
+						"port": 80,
+						"protocol": "http",
+						"read_timeout": 60000,
+						"retries": 5,
+						"write_timeout": 60000
+					}
+				}
+			}
+		],
+		"deleting": []
+	},
+	"summary": {
+		"creating": 1,
+		"updating": 1,
+		"deleting": 0,
+		"total": 2
+	},
+	"warnings": [],
+	"errors": []
+}
+
+`
 )
 
 // test scope:
@@ -347,7 +468,7 @@ func Test_Diff_Unasked_OlderThan3x(t *testing.T) {
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
 
-			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value --json-output")
+			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
 			assert.NoError(t, err)
 			assert.Equal(t, expectedOutputUnMaskedJSON, out)
 		})
@@ -401,7 +522,7 @@ func Test_Diff_Unasked_NewerThan3x(t *testing.T) {
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
 
-			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value  --json-output")
+			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
 			assert.NoError(t, err)
 			assert.Equal(t, expectedOutputUnMaskedJSON, out)
 		})

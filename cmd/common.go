@@ -275,12 +275,16 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		os.Exit(exitCodeDiffDetection)
 	}
 	if enableJSONOutput {
-		jsonOutputBytes, jsonErr := json.MarshalIndent(jsonOutput, "", " ")
+		jsonOutputBytes, jsonErr := json.MarshalIndent(jsonOutput, "", "\t")
 		if jsonErr != nil {
 			return err
 		}
-		// cannot use cprint.CreatePrintf because the output might contain special chars.
-		fmt.Print(string(jsonOutputBytes) + "\n")
+		jsonOutputString := string(jsonOutputBytes)
+		if !noMaskValues {
+			jsonOutputString = diff.MaskEnvVarValue(jsonOutputString)
+		}
+
+		cprint.BluePrintLn(string(jsonOutputString) + "\n")
 	}
 	return nil
 }
