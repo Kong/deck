@@ -6,9 +6,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_configFilesInDir(t *testing.T) {
@@ -66,15 +67,17 @@ func Test_getReaders(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []io.Reader
+		want map[string]io.Reader
 		// length of returned array
 		wantLen int
 		wantErr bool
 	}{
 		{
-			name:    "read from standard input",
-			args:    args{"-"},
-			want:    []io.Reader{os.Stdin},
+			name: "read from standard input",
+			args: args{"-"},
+			want: map[string]io.Reader{
+				"STDIN": os.Stdin,
+			},
 			wantLen: 1,
 			wantErr: false,
 		},
@@ -124,6 +127,29 @@ func Test_getReaders(t *testing.T) {
 			}
 		})
 	}
+}
+
+func sortSlices(x, y interface{}) bool {
+	var xName, yName string
+	switch xEntity := x.(type) {
+	case FService:
+		yEntity := y.(FService)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case FRoute:
+		yEntity := y.(FRoute)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case FConsumer:
+		yEntity := y.(FConsumer)
+		xName = *xEntity.Username
+		yName = *yEntity.Username
+	case FPlugin:
+		yEntity := y.(FPlugin)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	}
+	return xName < yName
 }
 
 func Test_getContent(t *testing.T) {
@@ -556,7 +582,15 @@ kong.log.set_serialize_value("span_id", parse_traceid(ngx.ctx.KONG_SPANS[1].span
 				t.Errorf("getContent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			require.Equal(t, tt.want, got)
+
+			opt := []cmp.Option{
+				cmpopts.SortSlices(sortSlices),
+				cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
+				cmpopts.EquateEmpty(),
+			}
+			if diff := cmp.Diff(got, tt.want, opt...); diff != "" {
+				t.Errorf(diff)
+			}
 		})
 	}
 }
