@@ -1,12 +1,23 @@
 package file
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/kong/deck/utils"
 	"github.com/xeipuuv/gojsonschema"
 	"sigs.k8s.io/yaml"
 )
+
+type ValidationError struct {
+	Object string `json:"object"`
+	Err    error  `json:"error"`
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("validation error: object=%s, err=%v", e.Object, e.Err)
+}
 
 func validate(content []byte) error {
 	var c map[string]interface{}
@@ -24,10 +35,14 @@ func validate(content []byte) error {
 	if result.Valid() {
 		return nil
 	}
+
 	var errs utils.ErrArray
 	for _, desc := range result.Errors() {
-		err := fmt.Errorf(desc.String())
-		errs.Errors = append(errs.Errors, err)
+		jsonString, err := json.Marshal(desc.Value())
+		if err != nil {
+			return err
+		}
+		errs.Errors = append(errs.Errors, &ValidationError{Object: string(jsonString), Err: errors.New(desc.String())})
 	}
 	return errs
 }

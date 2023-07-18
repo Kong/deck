@@ -20,28 +20,32 @@ import (
 // file, depending on the type of each item in filenames, merges the content of
 // these files and renders a Content.
 func getContent(filenames []string) (*Content, error) {
-	var allReaders []io.Reader
 	var workspaces []string
+	var res Content
+	var errs []error
 	for _, fileOrDir := range filenames {
 		readers, err := getReaders(fileOrDir)
 		if err != nil {
 			return nil, err
 		}
-		allReaders = append(allReaders, readers...)
+
+		for filename, r := range readers {
+			content, err := readContent(r)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("reading file %s: %w", filename, err))
+				continue
+			}
+			if content.Workspace != "" {
+				workspaces = append(workspaces, content.Workspace)
+			}
+			err = mergo.Merge(&res, content, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, fmt.Errorf("merging file contents: %w", err)
+			}
+		}
 	}
-	var res Content
-	for _, r := range allReaders {
-		content, err := readContent(r)
-		if err != nil {
-			return nil, fmt.Errorf("reading file: %w", err)
-		}
-		if content.Workspace != "" {
-			workspaces = append(workspaces, content.Workspace)
-		}
-		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
-		if err != nil {
-			return nil, fmt.Errorf("merging file contents: %w", err)
-		}
+	if len(errs) > 0 {
+		return nil, utils.ErrArray{Errors: errs}
 	}
 	if err := validateWorkspaces(workspaces); err != nil {
 		return nil, err
@@ -49,15 +53,15 @@ func getContent(filenames []string) (*Content, error) {
 	return &res, nil
 }
 
-// getReaders returns back io.Readers representing all the YAML and JSON
-// files in a directory. If fileOrDir is a single file, then it
+// getReaders returns back a map of filename:io.Reader representing all the
+// YAML and JSON files in a directory. If fileOrDir is a single file, then it
 // returns back the reader for the file.
 // If fileOrDir is equal to "-" string, then it returns back a io.Reader
 // for the os.Stdin file descriptor.
-func getReaders(fileOrDir string) ([]io.Reader, error) {
+func getReaders(fileOrDir string) (map[string]io.Reader, error) {
 	// special case where `-` means stdin
 	if fileOrDir == "-" {
-		return []io.Reader{os.Stdin}, nil
+		return map[string]io.Reader{"STDIN": os.Stdin}, nil
 	}
 
 	finfo, err := os.Stat(fileOrDir)
@@ -75,13 +79,13 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 		files = append(files, fileOrDir)
 	}
 
-	var res []io.Reader
+	res := make(map[string]io.Reader, len(files))
 	for _, file := range files {
 		f, err := os.Open(file)
 		if err != nil {
 			return nil, fmt.Errorf("opening file: %w", err)
 		}
-		res = append(res, bufio.NewReader(f))
+		res[file] = bufio.NewReader(f)
 	}
 	return res, nil
 }
