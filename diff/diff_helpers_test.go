@@ -1,7 +1,6 @@
 package diff
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/kong/deck/konnect"
