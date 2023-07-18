@@ -76,14 +76,14 @@ selectors are given, all Kong entities are tagged.`,
 	}
 
 	addTagsCmd.Flags().StringVarP(&cmdAddTagsInputFilename, "state", "s", "-",
-		"decK file to process. Use - to read from stdin")
+		"decK file to process. Use - to read from stdin.")
 	addTagsCmd.Flags().StringArrayVar(&cmdAddTagsSelectors, "selector", []string{},
-		"JSON path expression to select objects to add tags to,\n"+
-			"defaults to all Kong entities (repeat for multiple selectors)")
+		"JSON path expression to select objects to add tags to.\n"+
+			"Defaults to all Kong entities. Repeat for multiple selectors.")
 	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFilename, "output-file", "o", "-",
-		"output file to write. Use - to write to stdout")
+		"Output file to write to. Use - to write to stdout.")
 	addTagsCmd.Flags().StringVarP(&cmdAddTagsOutputFormat, "format", "", filebasics.OutputFormatYaml,
-		"output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
+		"Output format: "+filebasics.OutputFormatJSON+" or "+filebasics.OutputFormatYaml)
 
 	return addTagsCmd
 }

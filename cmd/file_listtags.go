@@ -70,21 +70,21 @@ func newListTagsCmd() *cobra.Command {
 		Short: "List current tags from objects in a decK file",
 		Long: `List current tags from objects in a decK file.
 
-The tags will be collected from all objects that match the selector expressions. If no
+The tags are collected from all objects that match the selector expressions. If no
 selectors are given, all Kong entities will be scanned.`,
 		RunE: executeListTags,
 		Args: cobra.NoArgs,
 	}
 
 	ListTagsCmd.Flags().StringVarP(&cmdListTagsInputFilename, "state", "s", "-",
-		"decK file to process. Use - to read from stdin")
+		"decK file to process. Use - to read from stdin.")
 	ListTagsCmd.Flags().StringArrayVar(&cmdListTagsSelectors, "selector", []string{},
-		"JSON path expression to select objects to scan for tags,\n"+
-			"defaults to all Kong entities (repeat for multiple selectors)")
+		"JSON path expression to select objects to scan for tags.\n"+
+			"Defaults to all Kong entities. Repeat for multiple selectors.")
 	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFilename, "output-file", "o", "-",
-		"output file to write. Use - to write to stdout")
+		"Output file to write to. Use - to write to stdout.")
 	ListTagsCmd.Flags().StringVarP(&cmdListTagsOutputFormat, "format", "", PlainOutputFormat,
-		"output format: "+filebasics.OutputFormatJSON+", "+filebasics.OutputFormatYaml+", or "+PlainOutputFormat)
+		"Output format: "+filebasics.OutputFormatJSON+", "+filebasics.OutputFormatYaml+", or "+PlainOutputFormat)
 
 	return ListTagsCmd
 }

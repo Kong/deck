@@ -16,8 +16,8 @@ import (
 func newAddFileCmd() *cobra.Command {
 	addFileCmd := &cobra.Command{
 		Use:   "file [sub-command]...",
-		Short: "Sub-command to host the decK file manipulation operations",
-		Long:  `Sub-command to host the decK file manipulation operations`,
+		Short: "Subcommand to host the decK file manipulation operations",
+		Long:  `Subcommand to host the decK file manipulation operations.`,
 	}
 
 	return addFileCmd
