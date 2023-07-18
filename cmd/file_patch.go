@@ -115,7 +115,7 @@ func newPatchCmd() *cobra.Command {
 The input file is read, the patches are applied, and if successful, written
 to the output file. The patches can be specified by a '--selector' and one or more
 '--value' tags, or via patch files.
-		
+
 When using '--selector' and '--values', the items are selected by the 'selector', 
 which is a JSONpath query. From the array of nodes found, only the objects are updated.
 The 'values' are applied on each of the JSONObjects returned by the 'selector'.
@@ -135,17 +135,17 @@ Patch files have the following format (JSON or YAML) and can contain multiple
 patches that are applied in order:
 
 	{ "_format_version": "1.0",
-		"patches": [
-		{ "selectors": [
-			"$..services[*]"
-			],
-			"values": {
-			"read_timeout": 10000,
-			"_comment": "comment injected by patching"
-			},
-			"remove": [ "_ignore" ]
-		}
-		]
+	  "patches": [
+	    { "selectors": [
+	        "$..services[*]"
+	      ],
+	      "values": {
+	        "read_timeout": 10000,
+	        "_comment": "comment injected by patching"
+	      },
+	      "remove": [ "_ignore" ]
+	    }
+	  ]
 	}
 `,
 		RunE: executePatch,

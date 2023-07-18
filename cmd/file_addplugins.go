@@ -121,20 +121,20 @@ The plugin files have the following format (JSON or YAML) and are applied in the
 order they are given:
 
 	{ "_format_version": "1.0",
-		"add-plugins": [
-			{ "selectors": [
-					"$..services[*]"
-				],
-				"overwrite": false,
-				"plugins": [
-					{ "name": "my-plugin",
-						"config": {
-							"my-property": "value"
-				 		}
-					}
-				],
-			}
-		]
+	  "add-plugins": [
+	    { "selectors": [
+	        "$..services[*]"
+	      ],
+	      "overwrite": false,
+	      "plugins": [
+	        { "name": "my-plugin",
+	          "config": {
+	            "my-property": "value"
+	          }
+	        }
+	      ],
+	    }
+	  ]
 	}
 `,
 		RunE: executeAddPlugins,
