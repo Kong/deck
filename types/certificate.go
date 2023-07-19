@@ -12,7 +12,8 @@ import (
 
 // certificateCRUD implements crud.Actions interface.
 type certificateCRUD struct {
-	client *kong.Client
+	client    *kong.Client
+	isKonnect bool
 }
 
 func certificateFromStruct(arg crud.Event) *state.Certificate {
@@ -30,6 +31,9 @@ func certificateFromStruct(arg crud.Event) *state.Certificate {
 func (s *certificateCRUD) Create(ctx context.Context, arg ...crud.Arg) (crud.Arg, error) {
 	event := crud.EventFromArg(arg[0])
 	certificate := certificateFromStruct(event)
+	if s.isKonnect {
+		certificate.SNIs = nil
+	}
 	createdCertificate, err := s.client.Certificates.Create(ctx, &certificate.Certificate)
 	if err != nil {
 		return nil, err
@@ -59,6 +63,9 @@ func (s *certificateCRUD) Update(ctx context.Context, arg ...crud.Arg) (crud.Arg
 	event := crud.EventFromArg(arg[0])
 	certificate := certificateFromStruct(event)
 
+	if s.isKonnect {
+		certificate.SNIs = nil
+	}
 	updatedCertificate, err := s.client.Certificates.Create(ctx, &certificate.Certificate)
 	if err != nil {
 		return nil, err
@@ -70,6 +77,8 @@ type certificateDiffer struct {
 	kind crud.Kind
 
 	currentState, targetState *state.KongState
+
+	isKonnect bool
 }
 
 func (d *certificateDiffer) Deletes(handler func(crud.Event) error) error {
@@ -138,6 +147,13 @@ func (d *certificateDiffer) createUpdateCertificate(
 	certificateCopy := &state.Certificate{Certificate: *certificate.DeepCopy()}
 	currentCertificate, err := d.currentState.Certificates.Get(*certificate.ID)
 
+	if d.isKonnect {
+		certificateCopy.SNIs = nil
+		if currentCertificate != nil {
+			currentCertificate.SNIs = nil
+		}
+	}
+
 	if errors.Is(err, state.ErrNotFound) {
 		// certificate not present, create it
 		return &crud.Event{
@@ -161,18 +177,20 @@ func (d *certificateDiffer) createUpdateCertificate(
 		// To work around this issues, we set SNIs on certificates here using the
 		// current certificate's SNI list. If there are changes to the SNIs,
 		// subsequent actions on the SNI objects will handle those.
-		currentSNIs, err := d.currentState.SNIs.GetAllByCertID(*currentCertificate.ID)
-		if err != nil {
-			return nil, fmt.Errorf("error looking up current certificate SNIs %q: %w",
-				certificate.FriendlyName(), err)
-		}
-		sniNames := make([]*string, 0)
-		for _, s := range currentSNIs {
-			sniNames = append(sniNames, s.Name)
-		}
+		if !d.isKonnect {
+			currentSNIs, err := d.currentState.SNIs.GetAllByCertID(*currentCertificate.ID)
+			if err != nil {
+				return nil, fmt.Errorf("error looking up current certificate SNIs %q: %w",
+					certificate.FriendlyName(), err)
+			}
+			sniNames := make([]*string, 0)
+			for _, s := range currentSNIs {
+				sniNames = append(sniNames, s.Name)
+			}
 
-		certificateCopy.SNIs = sniNames
-		currentCertificate.SNIs = sniNames
+			certificateCopy.SNIs = sniNames
+			currentCertificate.SNIs = sniNames
+		}
 		return &crud.Event{
 			Op:     crud.Update,
 			Kind:   d.kind,
