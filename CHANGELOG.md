@@ -63,10 +63,12 @@
 
 ## [v1.24.0]
 
-> Release date: 2023/07/19
+> Release date: to-be-set
 
 ### Added
 
+- Add a new flag (`--json-output`) to enable JSON output when using `sync` and `diff` commands
+  [#798](https://github.com/Kong/deck/pull/798)
 - Improved error logs coming from files validation against Kong's schemas.
   [#976](https://github.com/Kong/deck/pull/976)
 - Added a new command `file openapi2kong` that will generate a deck file from an OpenAPI
@@ -94,12 +96,8 @@
 
 ### Fixes
 
-
-### Misc
-
-- Moved the `convert` command under the `file` sub-command, to be used as `deck file convert ...`. The
-  top level command `deck convert ...` is marked as deprecated and will be removed in a future version.
-  [#939](https://github.com/Kong/deck/pull/939)
+- Fix Certificates & SNIs handling when running against Konnect.
+  [#978](https://github.com/Kong/deck/pull/978)
 
 
 ## [v1.23.0]
