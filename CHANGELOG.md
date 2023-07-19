@@ -63,10 +63,12 @@
 
 ## [v1.24.0]
 
-> Release date: to-be-set
+> Release date: 2023/07/19
 
 ### Added
 
+- Improved error logs coming from files validation against Kong's schemas.
+  [#976](https://github.com/Kong/deck/pull/976)
 - Added a new command `file openapi2kong` that will generate a deck file from an OpenAPI
   3.0 spec. This is the replacement for the similar `inso` functionality.
   The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
@@ -95,8 +97,8 @@
 
 ### Misc
 
-- Moved the `convert` command under the `file` sub-command, to be used as `deck file convert ...`. The 
-  top level command `deck convert ...` is marked as deprecated and will be removed in a future version. 
+- Moved the `convert` command under the `file` sub-command, to be used as `deck file convert ...`. The
+  top level command `deck convert ...` is marked as deprecated and will be removed in a future version.
   [#939](https://github.com/Kong/deck/pull/939)
 
 
