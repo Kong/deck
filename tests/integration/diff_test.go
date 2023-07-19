@@ -424,7 +424,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 
 // test scope:
 //   - 2.8.0
-func Test_Diff_Unasked_OlderThan3x(t *testing.T) {
+func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 	tests := []struct {
 		name             string
 		initialStateFile string
@@ -477,7 +477,7 @@ func Test_Diff_Unasked_OlderThan3x(t *testing.T) {
 
 // test scope:
 //   - 3.x
-func Test_Diff_Unasked_NewerThan3x(t *testing.T) {
+func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 	tests := []struct {
 		name             string
 		initialStateFile string
