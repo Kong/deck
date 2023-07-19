@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -262,7 +263,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
 	if err != nil {
 		if enableJSONOutput {
-			if errs, ok := err.(utils.ErrArray); ok {
+			var errs utils.ErrArray
+			if errors.As(err, &errs) {
 				jsonOutput.Errors = append(jsonOutput.Errors, errs.ErrorList()...)
 			} else {
 				jsonOutput.Errors = append(jsonOutput.Errors, err.Error())
@@ -284,7 +286,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			jsonOutputString = diff.MaskEnvVarValue(jsonOutputString)
 		}
 
-		cprint.BluePrintLn(string(jsonOutputString) + "\n")
+		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
 }

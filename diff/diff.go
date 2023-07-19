@@ -500,7 +500,7 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJSONOu
 		var result crud.Arg
 
 		c := e.Obj.(state.ConsoleString)
-		var objDiff = map[string]interface{}{
+		objDiff := map[string]interface{}{
 			"old": e.OldObj,
 			"new": e.Obj,
 		}
