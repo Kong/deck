@@ -275,7 +275,7 @@ Summary:
 						"name": "rate-limiting",
 						"config": {
 							"day": null,
-							"error_code": 429,
+							"fault_tolerant": true,
 							"header_name": null,
 							"hide_client_headers": false,
 							"hour": null,
@@ -369,7 +369,7 @@ Summary:
 						"name": "rate-limiting",
 						"config": {
 							"day": null,
-							"error_code": 429,
+							"fault_tolerant": true,
 							"header_name": null,
 							"hide_client_headers": false,
 							"hour": null,
