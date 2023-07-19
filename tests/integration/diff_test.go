@@ -515,7 +515,7 @@ func Test_Diff_Unmasked_NewerThan31(t *testing.T) {
 			for k, v := range tc.envVars {
 				t.Setenv(k, v)
 			}
-			runWhen(t, "kong", ">=3.0.0")
+			runWhen(t, "kong", ">=3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
