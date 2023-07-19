@@ -19,6 +19,7 @@ var (
 	validateOnline               bool
 	validateWorkspace            string
 	validateParallelism          int
+	validateJSONOutput           bool
 )
 
 // newValidateCmd represents the diff command
@@ -107,6 +108,8 @@ this command unless --online flag is used.
 			"This takes precedence over _workspace fields in state files.")
 	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
 		10, "Maximum number of concurrent requests to Kong.")
+	validateCmd.Flags().BoolVar(&validateJSONOutput, "json-output",
+		false, "generate command execution report in a JSON format")
 
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
@@ -139,7 +142,7 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 	workspaceName := validateWorkspace
 	if validateWorkspace != "" {
 		// check if workspace exists
-		workspaceName := getWorkspaceName(validateWorkspace, targetContent)
+		workspaceName := getWorkspaceName(validateWorkspace, targetContent, validateJSONOutput)
 		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 		if err != nil {
 			return nil, err

@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -39,6 +41,8 @@ const (
 	modeKongEnterprise
 )
 
+var jsonOutput diff.JSONOutputObject
+
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {
 		return modeKonnect
@@ -71,19 +75,35 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 	return exists, nil
 }
 
-func getWorkspaceName(workspaceFlag string, targetContent *file.Content) string {
+func getWorkspaceName(workspaceFlag string, targetContent *file.Content,
+	enableJSONOutput bool,
+) string {
 	if workspaceFlag != targetContent.Workspace && workspaceFlag != "" {
-		cprint.DeletePrintf("Warning: Workspace '%v' specified via --workspace flag is "+
-			"different from workspace '%v' found in state file(s).\n", workspaceFlag, targetContent.Workspace)
+		warning := fmt.Sprintf("Workspace '%v' specified via --workspace flag is "+
+			"different from workspace '%v' found in state file(s).", workspaceFlag, targetContent.Workspace)
+		if enableJSONOutput {
+			jsonOutput.Warnings = append(jsonOutput.Warnings, warning)
+		} else {
+			cprint.DeletePrintf("Warning: " + warning + "\n")
+		}
 		return workspaceFlag
 	}
 	return targetContent.Workspace
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string,
+	delay int, workspace string, enableJSONOutput bool,
 ) error {
 	// read target file
+	if enableJSONOutput {
+		jsonOutput.Errors = []string{}
+		jsonOutput.Warnings = []string{}
+		jsonOutput.Changes = diff.EntityChanges{
+			Creating: []diff.EntityState{},
+			Updating: []diff.EntityState{},
+			Deleting: []diff.EntityState{},
+		}
+	}
 	targetContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
@@ -137,7 +157,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	// prepare to read the current state from Kong
 	var wsConfig utils.KongClientConfig
-	workspaceName := getWorkspaceName(workspace, targetContent)
+	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
@@ -206,7 +226,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 
-		cprint.CreatePrintln("creating workspace", wsConfig.Workspace)
+		if enableJSONOutput {
+			workspace := diff.EntityState{
+				Name: wsConfig.Workspace,
+				Kind: "workspace",
+			}
+			jsonOutput.Changes.Creating = append(jsonOutput.Changes.Creating, workspace)
+		} else {
+			cprint.CreatePrintln("Creating workspace", wsConfig.Workspace)
+		}
 		if !dry {
 			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
 			if err != nil {
@@ -232,13 +260,33 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
 	if err != nil {
-		return err
+		if enableJSONOutput {
+			var errs utils.ErrArray
+			if errors.As(err, &errs) {
+				jsonOutput.Errors = append(jsonOutput.Errors, errs.ErrorList()...)
+			} else {
+				jsonOutput.Errors = append(jsonOutput.Errors, err.Error())
+			}
+		} else {
+			return err
+		}
 	}
-
 	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
+	}
+	if enableJSONOutput {
+		jsonOutputBytes, jsonErr := json.MarshalIndent(jsonOutput, "", "\t")
+		if jsonErr != nil {
+			return err
+		}
+		jsonOutputString := string(jsonOutputBytes)
+		if !noMaskValues {
+			jsonOutputString = diff.MaskEnvVarValue(jsonOutputString)
+		}
+
+		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
 }
@@ -281,6 +329,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
+	enableJSONOutput bool,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -294,13 +343,29 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		return 0, err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
 	// print stats before error to report completed operations
-	printStats(stats)
+	if !enableJSONOutput {
+		printStats(stats)
+	}
 	if errs != nil {
 		return 0, utils.ErrArray{Errors: errs}
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
+
+	if enableJSONOutput {
+		jsonOutput.Changes = diff.EntityChanges{
+			Creating: append(jsonOutput.Changes.Creating, changes.Creating...),
+			Updating: append(jsonOutput.Changes.Updating, changes.Updating...),
+			Deleting: append(jsonOutput.Changes.Deleting, changes.Deleting...),
+		}
+		jsonOutput.Summary = diff.Summary{
+			Creating: stats.CreateOps.Count(),
+			Updating: stats.UpdateOps.Count(),
+			Deleting: stats.DeleteOps.Count(),
+			Total:    totalOps,
+		}
+	}
 	return int(totalOps), nil
 }
 
