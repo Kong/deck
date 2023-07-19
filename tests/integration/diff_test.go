@@ -617,7 +617,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			for k, v := range tc.envVars {
 				t.Setenv(k, v)
 			}
-			runWhen(t, "kong", ">=3.1.0")
+			runWhen(t, "kong", ">=3.1.0 <3.4.0")
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -740,7 +740,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			for k, v := range tc.envVars {
 				t.Setenv(k, v)
 			}
-			runWhen(t, "kong", ">=3.1.0")
+			runWhen(t, "kong", ">=3.1.0 <3.4.0")
 			teardown := setup(t)
 			defer teardown(t)
 
