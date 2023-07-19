@@ -3458,3 +3458,64 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 		},
 	}, ignoreFieldsIrrelevantForIDsTests)
 }
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
+	require.NoError(t, err)
+
+	// To ignore noise, we ignore the Key and Cert fields because they are not relevant for this test.
+	ignoredFields := []cmp.Option{
+		cmpopts.IgnoreFields(
+			kong.Certificate{},
+			"Key",
+			"Cert",
+		),
+	}
+
+	testKongState(t, client, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("before"),
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+
+	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"), // Tag should be updated.
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+}
