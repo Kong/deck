@@ -3,7 +3,7 @@ package integration
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -226,7 +226,7 @@ func reset(t *testing.T, opts ...string) {
 }
 
 func readFile(filepath string) (string, error) {
-	content, err := ioutil.ReadFile(filepath)
+	content, err := os.ReadFile(filepath)
 	if err != nil {
 		return "", err
 	}
@@ -273,7 +273,7 @@ func diff(kongFile string, opts ...string) (string, error) {
 
 	// read command output
 	w.Close()
-	out, _ := ioutil.ReadAll(r)
+	out, _ := io.ReadAll(r)
 
 	return string(out), cmdErr
 }
@@ -294,7 +294,29 @@ func dump(opts ...string) (string, error) {
 	cmdErr := deckCmd.ExecuteContext(context.Background())
 
 	w.Close()
-	out, _ := ioutil.ReadAll(r)
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return string(out), cmdErr
+}
+
+func lint(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"file", "lint"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := io.ReadAll(r)
 	os.Stdout = rescueStdout
 
 	return string(out), cmdErr
