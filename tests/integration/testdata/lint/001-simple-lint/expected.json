@@ -1,0 +1,22 @@
+{
+    "fail_count": 1,
+    "results": [
+      {
+        "Message": "Check the version is correct: `3.0` does not match the expression `^1.1$`",
+        "Severity": "error",
+        "Line": 1,
+        "Column": 18,
+        "Character": 0,
+        "Path": "$._format_version"
+      },
+      {
+        "Message": "Must use HTTPS protocol: `http` does not match the expression `^https`",
+        "Severity": "warn",
+        "Line": 5,
+        "Column": 13,
+        "Character": 0,
+        "Path": "$.services[*].protocol"
+      }
+    ],
+    "total_count": 2
+  }

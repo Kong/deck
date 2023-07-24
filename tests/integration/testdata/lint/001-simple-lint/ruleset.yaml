@@ -1,0 +1,17 @@
+rules:
+  version-30:
+    description: "Check the version is correct"
+    given: $._format_version
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^1.1$"
+  https-only:
+    description: "Must use HTTPS protocol"
+    given: $.services[*].protocol
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^https"

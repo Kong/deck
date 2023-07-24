@@ -1,0 +1,9 @@
+fail_count: 1
+results:
+- Character: 0
+  Column: 18
+  Line: 1
+  Message: 'Check the version is correct: `3.0` does not match the expression `^1.1$`'
+  Path: $._format_version
+  Severity: error
+total_count: 1
