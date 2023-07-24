@@ -63,7 +63,7 @@
 
 ## [v1.24.0]
 
-> Release date: to-be-set
+> Release date: 2023/07/24
 
 ### Added
 
