@@ -26,6 +26,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           name: codecov-deck
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
       - name: Build
         run: make build
