@@ -627,10 +627,10 @@ var (
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []*int32{int32p(7)},
-						"retry_after_jitter_max": int32p(1),
-						"window_size":            []*int32{int32p(60)},
-						"window_type":            kong.String("sliding"),
+						"limit":                  []any{float64(7)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
 					},
 					ConsumerGroup: &kong.ConsumerGroup{
 						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
@@ -652,10 +652,10 @@ var (
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []*int32{int32p(10)},
-						"retry_after_jitter_max": int32p(1),
-						"window_size":            []*int32{int32p(60)},
-						"window_type":            kong.String("sliding"),
+						"limit":                  []any{float64(10)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
 					},
 					ConsumerGroup: &kong.ConsumerGroup{
 						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
@@ -2894,7 +2894,7 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.1.0")
+			runWhen(t, "enterprise", "==3.1.0")
 			teardown := setup(t)
 			defer teardown(t)
 
