@@ -29,7 +29,7 @@ func newFileRenderCmd() *cobra.Command {
 		Use:   "render",
 		Short: "Render the configuration as Kong declarative config",
 		Long:  ``,
-		Args:  validateNoArgs,
+		Args:  cobra.ArbitraryArgs,
 		RunE:  executeFileRenderCmd,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			fileRenderCmdKongStateFile = args
