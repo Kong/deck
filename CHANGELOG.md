@@ -75,9 +75,10 @@
 
 ### Fixes
 
+- Fix Consumers handling when a consumer's `custom_id` is equal to the `username` of another consumer.
+  [#986](https://github.com/Kong/deck/pull/986)
 - Avoid misleading diffs when configuration file has empty tags.
   [#985](https://github.com/Kong/deck/pull/985)
-
 
 ## [v1.24.0]
 

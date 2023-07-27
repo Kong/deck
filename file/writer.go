@@ -391,7 +391,7 @@ func populatePlugins(kongState *state.KongState, file *Content,
 		if p.Consumer != nil {
 			associations++
 			cID := *p.Consumer.ID
-			consumer, err := kongState.Consumers.Get(cID)
+			consumer, err := kongState.Consumers.GetByIDOrUsername(cID)
 			if err != nil {
 				return fmt.Errorf("unable to get consumer %s for plugin %s [%s]: %w", cID, *p.Name, *p.ID, err)
 			}

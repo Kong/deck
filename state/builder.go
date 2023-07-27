@@ -46,7 +46,7 @@ func ensureRoute(kongState *KongState, routeID string) (bool, *kong.Route, error
 }
 
 func ensureConsumer(kongState *KongState, consumerID string) (bool, *kong.Consumer, error) {
-	c, err := kongState.Consumers.Get(consumerID)
+	c, err := kongState.Consumers.GetByIDOrUsername(consumerID)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			return false, nil, nil

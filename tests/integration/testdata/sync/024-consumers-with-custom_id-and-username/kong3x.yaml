@@ -1,0 +1,8 @@
+_format_version: "3.0"
+consumers:
+- custom_id: foo
+  id: ce49186d-7670-445d-a218-897631b29ada
+  username: Foo
+- custom_id: bar
+  id: 7820f383-7b77-4fcc-af7f-14ff3e256693
+  username: foo
