@@ -95,7 +95,7 @@ func (d *consumerDiffer) Deletes(handler func(crud.Event) error) error {
 }
 
 func (d *consumerDiffer) deleteConsumer(consumer *state.Consumer) (*crud.Event, error) {
-	_, err := d.targetState.Consumers.Get(*consumer.ID)
+	_, err := d.targetState.Consumers.GetByIDOrUsername(*consumer.ID)
 	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
 			Op:   crud.Delete,
@@ -133,7 +133,7 @@ func (d *consumerDiffer) CreateAndUpdates(handler func(crud.Event) error) error 
 
 func (d *consumerDiffer) createUpdateConsumer(consumer *state.Consumer) (*crud.Event, error) {
 	consumerCopy := &state.Consumer{Consumer: *consumer.DeepCopy()}
-	currentConsumer, err := d.currentState.Consumers.Get(*consumer.ID)
+	currentConsumer, err := d.currentState.Consumers.GetByIDOrUsername(*consumer.ID)
 
 	if errors.Is(err, state.ErrNotFound) {
 		// consumer not present, create it
@@ -181,7 +181,7 @@ func (d *consumerDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 }
 
 func (d *consumerDiffer) deleteDuplicateConsumer(targetConsumer *state.Consumer) (*crud.Event, error) {
-	currentConsumer, err := d.currentState.Consumers.Get(*targetConsumer.Username)
+	currentConsumer, err := d.currentState.Consumers.GetByIDOrUsername(*targetConsumer.Username)
 	if errors.Is(err, state.ErrNotFound) {
 		return nil, nil
 	}

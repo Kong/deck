@@ -3519,3 +3519,33 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 		},
 	}, ignoredFields)
 }
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_ConsumersWithCustomIDAndUsername(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, false, utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("ce49186d-7670-445d-a218-897631b29ada"),
+				Username: kong.String("Foo"),
+				CustomID: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("7820f383-7b77-4fcc-af7f-14ff3e256693"),
+				Username: kong.String("foo"),
+				CustomID: kong.String("bar"),
+			},
+		},
+	}, nil)
+}

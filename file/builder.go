@@ -234,10 +234,10 @@ func (b *stateBuilder) consumers() {
 	for _, c := range b.targetContent.Consumers {
 		c := c
 		if utils.Empty(c.ID) {
-			consumer, err := b.currentState.Consumers.Get(*c.Username)
+			consumer, err := b.currentState.Consumers.GetByIDOrUsername(*c.Username)
 			if errors.Is(err, state.ErrNotFound) {
 				if c.CustomID != nil {
-					consumer, err = b.currentState.Consumers.Get(*c.CustomID)
+					consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
 					if err == nil {
 						c.ID = kong.String(*consumer.ID)
 					}
@@ -844,7 +844,7 @@ func (b *stateBuilder) plugins() {
 	for _, p := range b.targetContent.Plugins {
 		p := p
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
-			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
+			c, err := b.intermediate.Consumers.GetByIDOrUsername(*p.Consumer.ID)
 			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
 					p.Consumer.FriendlyName(), *p.Name, err)
