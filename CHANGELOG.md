@@ -61,6 +61,16 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## Unreleased
+
+> Release date: TBD
+
+### Fixes
+
+- Avoid misleading diffs when configuration file has empty tags.
+  [#985](https://github.com/Kong/deck/pull/985)
+
+
 ## [v1.24.0]
 
 > Release date: 2023/07/24
