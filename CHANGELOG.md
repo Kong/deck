@@ -65,6 +65,14 @@
 
 > Release date: TBD
 
+### Added
+
+- Added a new command `file render` to render a final decK file. This will result in a file representing
+  the state as it would be synced online.
+  [#963](https://github.com/Kong/deck/pull/963)
+- Added a new flag `--format` to `file convert` to enable JSON output.
+  [#963](https://github.com/Kong/deck/pull/963)
+
 ### Fixes
 
 - Avoid misleading diffs when configuration file has empty tags.

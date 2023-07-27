@@ -68,7 +68,7 @@ func TestReadKongStateFromStdinFailsToParseText(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	c, err := GetContentFromFiles(filenames)
+	c, err := GetContentFromFiles(filenames, false)
 	assert.NotNil(err)
 	assert.Nil(c)
 }
@@ -97,7 +97,7 @@ func TestTransformNotFalse(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	c, err := GetContentFromFiles(filenames)
+	c, err := GetContentFromFiles(filenames, false)
 	if err != nil {
 		panic(err)
 	}
@@ -139,7 +139,7 @@ func TestReadKongStateFromStdin(t *testing.T) {
 
 	os.Stdin = tmpfile
 
-	c, err := GetContentFromFiles(filenames)
+	c, err := GetContentFromFiles(filenames, false)
 	assert.NotNil(c)
 	assert.Nil(err)
 
@@ -155,7 +155,7 @@ func TestReadKongStateFromFile(t *testing.T) {
 	assert := assert.New(t)
 	assert.Equal("testdata/config.yaml", filenames[0])
 
-	c, err := GetContentFromFiles(filenames)
+	c, err := GetContentFromFiles(filenames, false)
 	assert.NotNil(c)
 	assert.Nil(err)
 

@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+- config:
+    foo: 666
+  name: foofloat
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  protocol: http
+  read_timeout: 60000
+  write_timeout: 777
