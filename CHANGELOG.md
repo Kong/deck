@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.25.0](#v1250)
 - [v1.24.0](#v1240)
 - [v1.23.0](#v1230)
 - [v1.22.1](#v1221)
@@ -61,9 +62,9 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## Unreleased
+## [v1.25.0]
 
-> Release date: TBD
+> Release date: 2023/07/28
 
 ### Added
 
@@ -75,6 +76,9 @@
 
 ### Fixes
 
+- Use same interface to pull Consumer Groups with Kong Gateway and Konnect.
+  This will help solving the issue of using tags with Consumer Groups when running against Konnect.
+  [#984](https://github.com/Kong/deck/pull/984)
 - Fix Consumers handling when a consumer's `custom_id` is equal to the `username` of another consumer.
   [#986](https://github.com/Kong/deck/pull/986)
 - Avoid misleading diffs when configuration file has empty tags.
@@ -1323,6 +1327,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.25.0]: https://github.com/kong/deck/compare/v1.24.0...v1.25.0
 [v1.24.0]: https://github.com/kong/deck/compare/v1.23.0...v1.24.0
 [v1.23.0]: https://github.com/kong/deck/compare/v1.22.1...v1.23.0
 [v1.22.1]: https://github.com/kong/deck/compare/v1.22.0...v1.22.1
