@@ -25,6 +25,12 @@ services:
     - /r3
     methods:
     - GET
+filter_chains:
+- name: filter_chain1
+  service: svc1
+  filters:
+  - name: example-filter
+    config: "{ \"my_greeting\": \"Hello, decK!\" }"
 upstreams:
 - name: upstream1
   algorithm: round-robin
