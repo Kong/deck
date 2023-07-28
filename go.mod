@@ -2,6 +2,8 @@ module github.com/kong/deck
 
 go 1.21.6
 
+replace github.com/kong/go-kong v0.44.0 => github.com/kong/go-kong v0.46.1-0.20230728150635-982daa2d26b3
+
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 require (
