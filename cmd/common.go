@@ -231,6 +231,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
+	dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, kongClient)
+	if err != nil {
+		return err
+	}
+
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
 		return err
@@ -316,6 +321,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
+		return err
+	}
+	if err := checkFilterChainsAllowed(*rawState, dumpConfig, parsedKongVersion); err != nil {
 		return err
 	}
 	targetState, err := state.Get(rawState)
@@ -406,6 +414,63 @@ func determineSelectorTag(targetContent file.Content, config dump.Config) ([]str
 	}
 	// Either targetContent.Info or targetContent.Info.SelectorTags is empty, return config tags
 	return config.SelectorTags, nil
+}
+
+func determineFilterChainSupport(ctx context.Context, client *kong.Client) (bool, error) {
+	workspace := client.Workspace()
+	client.SetWorkspace("")
+	defer client.SetWorkspace(workspace)
+
+	data, err := client.Root(ctx)
+	if err != nil {
+		return false, fmt.Errorf("fetching gateway configuration: %w", err)
+	}
+
+	conf, ok := data["configuration"]
+	if !ok {
+		return false, errors.New("failed to extract gateway configuration")
+	}
+
+	confmap, ok := conf.(map[string]interface{})
+	if !ok {
+		return false, errors.New("failed to extract gateway configuration")
+	}
+
+	wasm, ok := confmap["wasm"]
+	// probably just an old version of Kong
+	if !ok {
+		return false, nil
+	}
+
+	var supported bool
+	supported, ok = wasm.(bool)
+	if !ok {
+		return false, errors.New("could not determine if wasm is enabled on this gateway node")
+	}
+
+	return supported, nil
+}
+
+func checkFilterChainsAllowed(
+	content reconcilerUtils.KongRawState,
+	dumpConfig dump.Config,
+	version semver.Version,
+) error {
+	if len(content.FilterChains) < 1 {
+		return nil
+	} else if reconcilerUtils.Kong340Version.GT(version) {
+		return errors.New(
+			"one or more Wasm Filter Chain entities were found, but the target " +
+				"Kong Gateway node does not support Wasm.\n" +
+				"Wasm Filter Chain support requires Kong >= 3.4",
+		)
+	} else if !dumpConfig.IsFilterChainsSupported {
+		return errors.New("one or more Wasm Filter Chain entities were found, " +
+			"but Wasm is not enabled on the target Kong Gateway node",
+		)
+	}
+
+	return nil
 }
 
 func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump.Config) (*state.KongState, error) {
@@ -528,6 +593,7 @@ func containsProxyConfiguration(content reconcilerUtils.KongRawState) bool {
 	return len(content.Services) != 0 ||
 		len(content.Routes) != 0 ||
 		len(content.Plugins) != 0 ||
+		len(content.FilterChains) != 0 ||
 		len(content.Upstreams) != 0 ||
 		len(content.Certificates) != 0 ||
 		len(content.CACertificates) != 0 ||
