@@ -210,12 +210,17 @@ func readFile(filepath string) (string, error) {
 	return string(content), nil
 }
 
-func setup(_ *testing.T) func(t *testing.T) {
+// setup sets deck env variable to prevent analytics in tests and registers reset
+// command with t.Cleanup().
+//
+// NOTE: Can't be called with tests running t.Parallel() because of the usage
+// of t.Setenv().
+func setup(t *testing.T) {
 	// disable analytics for integration tests
-	os.Setenv("DECK_ANALYTICS", "off")
-	return func(t *testing.T) {
+	t.Setenv("DECK_ANALYTICS", "off")
+	t.Cleanup(func() {
 		reset(t)
-	}
+	})
 }
 
 func sync(kongFile string, opts ...string) error {

@@ -3,9 +3,10 @@
 package integration
 
 import (
+	"testing"
+
 	"github.com/kong/deck/utils"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var (
@@ -473,8 +474,7 @@ func Test_Diff_Workspace_OlderThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			_, err := diff(tc.stateFile)
 			assert.NoError(t, err)
@@ -498,8 +498,7 @@ func Test_Diff_Workspace_NewerThan3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			_, err := diff(tc.stateFile)
 			assert.NoError(t, err)
@@ -530,8 +529,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -548,8 +546,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -584,8 +581,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -601,8 +597,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -618,8 +613,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.1.0 <3.4.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -654,8 +648,7 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -671,8 +664,7 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", "==2.8.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -707,8 +699,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -724,8 +715,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))
@@ -741,8 +731,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 				t.Setenv(k, v)
 			}
 			runWhen(t, "kong", ">=3.1.0 <3.4.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// initialize state
 			assert.NoError(t, sync(tc.initialStateFile))

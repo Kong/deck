@@ -1184,8 +1184,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<=1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -1227,8 +1226,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">1.4.3 <=1.5.1")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1270,8 +1268,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1320,8 +1317,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1365,8 +1361,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1407,8 +1402,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1449,8 +1443,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1484,8 +1477,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1519,8 +1511,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1554,8 +1545,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==1.5.1")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1604,8 +1594,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1639,8 +1628,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1674,8 +1662,7 @@ func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1717,8 +1704,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<=1.5.2")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -1768,8 +1754,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.1.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1804,8 +1789,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1840,8 +1824,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1876,8 +1859,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1920,8 +1902,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.4.1 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1956,8 +1937,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1992,8 +1972,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2028,8 +2007,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2068,8 +2046,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==2.7.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2112,8 +2089,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -2151,8 +2127,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2197,8 +2172,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2238,8 +2212,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2275,8 +2248,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2312,8 +2284,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2418,8 +2389,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2524,8 +2494,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2558,8 +2527,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2592,8 +2560,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2631,8 +2598,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2669,8 +2635,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2728,8 +2693,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2756,8 +2720,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			err := sync(tc.kongFile)
 			assert.Equal(t, err, tc.expectedError)
@@ -2906,8 +2869,7 @@ func Test_Sync_Vault(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2995,8 +2957,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3040,8 +3001,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3085,8 +3045,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3130,8 +3089,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3174,8 +3132,7 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -3218,8 +3175,7 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", "==3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3307,8 +3263,7 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -3396,8 +3351,7 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3481,8 +3435,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.2.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -3528,8 +3481,7 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.2.0 <3.4.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			if tc.skipConsumers {
 				sync(tc.kongFile, "--skip-consumers")
@@ -3701,8 +3653,7 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			if tc.skipConsumers {
 				sync(tc.kongFile, "--skip-consumers")
@@ -3875,8 +3826,8 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			teardown := setup(t)
-			defer teardown(t)
+			runWhen(t, "enterprise", ">=3.2.0")
+			setup(t)
 
 			if tc.skipConsumers {
 				sync(tc.kongFile, "--skip-consumers")
@@ -4003,8 +3954,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// First, create the entities with the original IDs.
 			err = sync(tc.beforeConfig)
@@ -4030,8 +3980,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
-	teardown := setup(t)
-	defer teardown(t)
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -4084,8 +4033,7 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
-	teardown := setup(t)
-	defer teardown(t)
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -4130,8 +4078,7 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 //   - konnect
 func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
-	teardown := setup(t)
-	defer teardown(t)
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -4193,8 +4140,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 //   - konnect
 func Test_Sync_ConsumersWithCustomIDAndUsername(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
-	teardown := setup(t)
-	defer teardown(t)
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -4316,8 +4262,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -4450,8 +4395,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After350(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.5.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -4534,8 +4478,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.4.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			err := sync(tc.kongFile)
 			if tc.expectedError == nil {
@@ -4615,8 +4558,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKonnect(t)
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
