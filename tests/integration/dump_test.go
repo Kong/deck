@@ -230,8 +230,7 @@ func Test_Dump_SkipConsumers_35x(t *testing.T) {
 }
 
 func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
-	// TODO: remove skip once Konnect support is enabled.
-	t.Skip()
+	t.Skip("remove skip once Konnect support is enabled.")
 
 	tests := []struct {
 		name          string

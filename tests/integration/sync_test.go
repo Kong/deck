@@ -3716,8 +3716,7 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
-	// TODO: remove skip once Konnect support is enabled.
-	t.Skip()
+	t.Skip("remove skip once Konnect support is enabled.")
 	runWhenKonnect(t)
 	// setup stage
 	client, err := getTestClient()
@@ -4544,8 +4543,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 }
 
 func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
-	// TODO: remove skip once Konnect support is enabled.
-	t.Skip()
+	t.Skip("remove skip once Konnect support is enabled.")
 
 	client, err := getTestClient()
 	if err != nil {

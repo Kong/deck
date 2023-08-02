@@ -129,9 +129,9 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	if dumpConfig.KonnectRuntimeGroup == "" {
 		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
-		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
 	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
 	if err != nil {
