@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -22,6 +23,13 @@ var (
 	Kong140Version = semver.MustParse("1.4.0")
 	Kong300Version = semver.MustParse("3.0.0")
 	Kong340Version = semver.MustParse("3.4.0")
+)
+
+var ErrorConsumerGroupUpgrade = errors.New(
+	"a rate-limiting-advanced plugin with config.consumer_groups\n" +
+		"and/or config.enforce_consumer_groups was found. Please use Consumer Groups scoped\n" +
+		"Plugins when running against Kong Enterprise 3.4.0 and above.\n\n" +
+		"Check DOC_LINK for more information",
 )
 
 var UpgradeMessage = "Please upgrade your configuration to account for 3.0\n" +

@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -4521,13 +4522,9 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 		expectedError error
 	}{
 		{
-			name:     "attempt to createe consumer groups scoped plugins with older Kong version",
-			kongFile: "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
-			expectedError: errors.New(
-				"building state: a rate-limiting-advanced plugin with config.consumer_groups\n" +
-					"and/or config.enforce_consumer_groups was found. Please use Consumer Groups scoped\n" +
-					"Plugins when running against Kong Enterprise 3.4.0 and above.\n\n" +
-					"Check DOC_LINK for more information"),
+			name:          "attempt to createe consumer groups scoped plugins with older Kong version",
+			kongFile:      "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
+			expectedError: fmt.Errorf("building state: %v", utils.ErrorConsumerGroupUpgrade),
 		},
 	}
 	for _, tc := range tests {

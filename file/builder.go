@@ -974,10 +974,7 @@ func (b *stateBuilder) validatePlugin(p FPlugin) error {
 		}
 		_, enforceConsumerGroupsFound := p.Config["enforce_consumer_groups"]
 		if consumerGroupsFound || enforceConsumerGroupsFound {
-			return errors.New("a rate-limiting-advanced plugin with config.consumer_groups\n" +
-				"and/or config.enforce_consumer_groups was found. Please use Consumer Groups scoped\n" +
-				"Plugins when running against Kong Enterprise 3.4.0 and above.\n\n" +
-				"Check DOC_LINK for more information")
+			return utils.ErrorConsumerGroupUpgrade
 		}
 	}
 	return nil
