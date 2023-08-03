@@ -4522,9 +4522,13 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 		expectedError error
 	}{
 		{
-			name:          "attempt to createe consumer groups scoped plugins with older Kong version",
+			name:          "attempt to create deprecated consumer groups configuration with Kong version >= 3.4.0 fails",
 			kongFile:      "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
 			expectedError: fmt.Errorf("building state: %v", utils.ErrorConsumerGroupUpgrade),
+		},
+		{
+			name:     "empty deprecated consumer groups configuration fields do not fail with Kong version >= 3.4.0",
+			kongFile: "testdata/sync/017-consumer-groups-rla-application/kong3x-empty-application.yaml",
 		},
 	}
 	for _, tc := range tests {
@@ -4534,7 +4538,11 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 			defer teardown(t)
 
 			err := sync(tc.kongFile)
-			assert.EqualError(t, err, tc.expectedError.Error())
+			if tc.expectedError == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tc.expectedError.Error())
+			}
 		})
 	}
 }

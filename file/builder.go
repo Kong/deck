@@ -972,7 +972,12 @@ func (b *stateBuilder) validatePlugin(p FPlugin) error {
 				consumerGroupsFound = true
 			}
 		}
-		_, enforceConsumerGroupsFound := p.Config["enforce_consumer_groups"]
+		var enforceConsumerGroupsFound bool
+		if enforceConsumerGroups, ok := p.Config["enforce_consumer_groups"]; ok {
+			if enforceConsumerGroupsBool, ok := enforceConsumerGroups.(bool); ok && enforceConsumerGroupsBool {
+				enforceConsumerGroupsFound = true
+			}
+		}
 		if consumerGroupsFound || enforceConsumerGroupsFound {
 			return utils.ErrorConsumerGroupUpgrade
 		}
