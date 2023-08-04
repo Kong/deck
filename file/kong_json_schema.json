@@ -444,7 +444,6 @@
         },
         "groups": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/ConsumerGroup"
           },
           "type": "array"
@@ -598,6 +597,9 @@
           "type": "object"
         },
         "consumer": {
+          "type": "string"
+        },
+        "consumer_group": {
           "type": "string"
         },
         "created_at": {

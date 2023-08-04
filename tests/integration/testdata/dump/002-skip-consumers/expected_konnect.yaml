@@ -1,0 +1,13 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: default
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000

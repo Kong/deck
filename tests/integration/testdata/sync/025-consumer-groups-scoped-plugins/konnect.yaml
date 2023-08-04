@@ -1,0 +1,79 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - name: r1
+    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+
+consumer_groups:
+- id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
+  name: silver
+  consumers:
+  - username: bar
+  - username: baz
+  plugins:
+  - name: rate-limiting-advanced
+    config:
+      namespace: silver
+      limit:
+      - 7
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+      sync_rate: -1
+- id: 77e6691d-67c0-446a-9401-27be2b141aae
+  name: gold
+  consumers:
+  - username: foo
+  plugins:
+  - name: rate-limiting-advanced
+    config:
+      namespace: gold
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+      sync_rate: -1
+consumers:
+- username: foo
+  keyauth_credentials:
+  - key: i-am-special
+  groups:
+  - name: gold
+- username: bar
+  keyauth_credentials:
+  - key: i-am-not-so-special
+  groups:
+  - name: silver
+- username: baz
+  keyauth_credentials:
+  - key: i-am-just-average
+plugins:
+- name: key-auth
+  enabled: true
+  protocols:
+  - http
+  - https
+- name: rate-limiting-advanced
+  config:
+    namespace: silver
+    limit:
+    - 5
+    retry_after_jitter_max: 1
+    window_size:
+    - 60
+    window_type: sliding
+    sync_rate: -1

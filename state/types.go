@@ -467,6 +467,9 @@ func (p1 *Plugin) Console() string {
 	if p1.Consumer != nil {
 		associations = append(associations, "consumer "+p1.Consumer.FriendlyName())
 	}
+	if p1.ConsumerGroup != nil {
+		associations = append(associations, "consumer-group "+p1.ConsumerGroup.FriendlyName())
+	}
 	if len(associations) > 0 {
 		res += "for "
 	}
@@ -519,6 +522,7 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 		p2Copy.Service = nil
 		p2Copy.Route = nil
 		p2Copy.Consumer = nil
+		p2Copy.ConsumerGroup = nil
 	}
 
 	if p1Copy.Service != nil {
@@ -538,6 +542,12 @@ func (p1 *Plugin) EqualWithOpts(p2 *Plugin, ignoreID,
 	}
 	if p2Copy.Consumer != nil {
 		p2Copy.Consumer.Username = nil
+	}
+	if p1Copy.ConsumerGroup != nil {
+		p1Copy.ConsumerGroup.Name = nil
+	}
+	if p2Copy.ConsumerGroup != nil {
+		p2Copy.ConsumerGroup.Name = nil
 	}
 	return reflect.DeepEqual(p1Copy, p2Copy)
 }

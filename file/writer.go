@@ -424,6 +424,18 @@ func populatePlugins(kongState *state.KongState, file *Content,
 			}
 			p.Route.ID = &rID
 		}
+		if p.ConsumerGroup != nil {
+			associations++
+			cgID := *p.ConsumerGroup.ID
+			cg, err := kongState.ConsumerGroups.Get(cgID)
+			if err != nil {
+				return fmt.Errorf("unable to get consumer-group %s for plugin %s [%s]: %w", cgID, *p.Name, *p.ID, err)
+			}
+			if !utils.Empty(cg.Name) {
+				cgID = *cg.Name
+			}
+			p.ConsumerGroup.ID = &cgID
+		}
 		if associations == 0 || associations > 1 {
 			utils.ZeroOutID(p, p.Name, config.WithID)
 			utils.ZeroOutTimestamps(p)
@@ -712,13 +724,13 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 	if err != nil {
 		return err
 	}
-	plugins, err := kongState.ConsumerGroupPlugins.GetAll()
+	cgPlugins, err := kongState.ConsumerGroupPlugins.GetAll()
 	if err != nil {
 		return err
 	}
 	for _, cg := range consumerGroups {
 		group := FConsumerGroupObject{ConsumerGroup: cg.ConsumerGroup}
-		for _, plugin := range plugins {
+		for _, plugin := range cgPlugins {
 			if plugin.ID != nil && cg.ID != nil {
 				if plugin.ConsumerGroup != nil && *plugin.ConsumerGroup.ID == *cg.ID {
 					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
@@ -729,6 +741,25 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 				}
 			}
 		}
+
+		plugins, err := kongState.Plugins.GetAllByConsumerGroupID(*cg.ID)
+		if err != nil {
+			return err
+		}
+		for _, plugin := range plugins {
+			if plugin.ID != nil && cg.ID != nil {
+				if plugin.ConsumerGroup != nil && *plugin.ConsumerGroup.ID == *cg.ID {
+					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
+					utils.ZeroOutID(plugin.ConsumerGroup, plugin.ConsumerGroup.Name, config.WithID)
+					group.Plugins = append(group.Plugins, &kong.ConsumerGroupPlugin{
+						ID:     plugin.ID,
+						Name:   plugin.Name,
+						Config: plugin.Config,
+					})
+				}
+			}
+		}
+
 		utils.ZeroOutID(&group, group.Name, config.WithID)
 		utils.ZeroOutTimestamps(&group)
 		file.ConsumerGroups = append(file.ConsumerGroups, group)

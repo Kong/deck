@@ -293,6 +293,9 @@ func existingPluginState() *state.KongState {
 			Route: &kong.Route{
 				ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
 			},
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("69ed4618-a653-4b54-8bb6-dc33bd6fe048"),
+			},
 		},
 	})
 	return s
@@ -751,6 +754,9 @@ func Test_stateBuilder_ingestPlugins(t *testing.T) {
 							Route: &kong.Route{
 								ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
 							},
+							ConsumerGroup: &kong.ConsumerGroup{
+								ID: kong.String("69ed4618-a653-4b54-8bb6-dc33bd6fe048"),
+							},
 						},
 					},
 				},
@@ -780,6 +786,9 @@ func Test_stateBuilder_ingestPlugins(t *testing.T) {
 						Route: &kong.Route{
 							ID: kong.String("700bc504-b2b1-4abd-bd38-cec92779659e"),
 						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("69ed4618-a653-4b54-8bb6-dc33bd6fe048"),
+						},
 						Config: kong.Configuration{},
 					},
 				},
@@ -805,11 +814,12 @@ func Test_pluginRelations(t *testing.T) {
 		plugin *kong.Plugin
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantCID string
-		wantRID string
-		wantSID string
+		name     string
+		args     args
+		wantCID  string
+		wantRID  string
+		wantSID  string
+		wantCGID string
 	}{
 		{
 			args: args{
@@ -817,9 +827,10 @@ func Test_pluginRelations(t *testing.T) {
 					Name: kong.String("foo"),
 				},
 			},
-			wantCID: "",
-			wantRID: "",
-			wantSID: "",
+			wantCID:  "",
+			wantRID:  "",
+			wantSID:  "",
+			wantCGID: "",
 		},
 		{
 			args: args{
@@ -834,16 +845,20 @@ func Test_pluginRelations(t *testing.T) {
 					Service: &kong.Service{
 						ID: kong.String("sID"),
 					},
+					ConsumerGroup: &kong.ConsumerGroup{
+						ID: kong.String("cgID"),
+					},
 				},
 			},
-			wantCID: "cID",
-			wantRID: "rID",
-			wantSID: "sID",
+			wantCID:  "cID",
+			wantRID:  "rID",
+			wantSID:  "sID",
+			wantCGID: "cgID",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotCID, gotRID, gotSID := pluginRelations(tt.args.plugin)
+			gotCID, gotRID, gotSID, gotCGID := pluginRelations(tt.args.plugin)
 			if gotCID != tt.wantCID {
 				t.Errorf("pluginRelations() gotCID = %v, want %v", gotCID, tt.wantCID)
 			}
@@ -852,6 +867,9 @@ func Test_pluginRelations(t *testing.T) {
 			}
 			if gotSID != tt.wantSID {
 				t.Errorf("pluginRelations() gotSID = %v, want %v", gotSID, tt.wantSID)
+			}
+			if gotCGID != tt.wantCGID {
+				t.Errorf("pluginRelations() gotCGID = %v, want %v", gotCGID, tt.wantCGID)
 			}
 		})
 	}

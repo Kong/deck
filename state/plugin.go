@@ -12,10 +12,11 @@ import (
 var errPluginNameRequired = fmt.Errorf("name of plugin required")
 
 const (
-	pluginTableName     = "plugin"
-	pluginsByServiceID  = "pluginsByServiceID"
-	pluginsByRouteID    = "pluginsByRouteID"
-	pluginsByConsumerID = "pluginsByConsumerID"
+	pluginTableName          = "plugin"
+	pluginsByServiceID       = "pluginsByServiceID"
+	pluginsByRouteID         = "pluginsByRouteID"
+	pluginsByConsumerID      = "pluginsByConsumerID"
+	pluginsByConsumerGroupID = "pluginsByConsumerGroupID"
 )
 
 var pluginTableSchema = &memdb.TableSchema{
@@ -68,6 +69,18 @@ var pluginTableSchema = &memdb.TableSchema{
 			},
 			AllowMissing: true,
 		},
+		pluginsByConsumerGroupID: {
+			Name: pluginsByConsumerGroupID,
+			Indexer: &indexers.SubFieldIndexer{
+				Fields: []indexers.Field{
+					{
+						Struct: "ConsumerGroup",
+						Sub:    "ID",
+					},
+				},
+			},
+			AllowMissing: true,
+		},
 		// combined foreign fields
 		// FIXME bug: collision if svc/route/consumer has the same ID
 		// and same type of plugin is created. Consider the case when only
@@ -90,6 +103,10 @@ var pluginTableSchema = &memdb.TableSchema{
 					},
 					{
 						Struct: "Consumer",
+						Sub:    "ID",
+					},
+					{
+						Struct: "ConsumerGroup",
 						Sub:    "ID",
 					},
 				},
@@ -133,7 +150,7 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	}
 
 	// err out if another plugin with exact same combination is present
-	sID, rID, cID := "", "", ""
+	sID, rID, cID, cgID := "", "", "", ""
 	if plugin.Service != nil && !utils.Empty(plugin.Service.ID) {
 		sID = *plugin.Service.ID
 	}
@@ -143,7 +160,10 @@ func insertPlugin(txn *memdb.Txn, plugin Plugin) error {
 	if plugin.Consumer != nil && !utils.Empty(plugin.Consumer.ID) {
 		cID = *plugin.Consumer.ID
 	}
-	_, err = getPluginBy(txn, *plugin.Name, sID, rID, cID)
+	if plugin.ConsumerGroup != nil && !utils.Empty(plugin.ConsumerGroup.ID) {
+		cgID = *plugin.ConsumerGroup.ID
+	}
+	_, err = getPluginBy(txn, *plugin.Name, sID, rID, cID, cgID)
 	if err == nil {
 		return fmt.Errorf("inserting plugin %v: %w", plugin.Console(), ErrAlreadyExists)
 	} else if !errors.Is(err, ErrNotFound) {
@@ -194,7 +214,7 @@ func (k *PluginsCollection) GetAllByName(name string) ([]*Plugin, error) {
 	return k.getAllPluginsBy("name", name)
 }
 
-func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
+func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID, consumerGroupID string) (
 	*Plugin, error,
 ) {
 	if name == "" {
@@ -202,7 +222,7 @@ func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
 	}
 
 	res, err := txn.First(pluginTableName, "fields",
-		name, svcID, routeID, consumerID)
+		name, svcID, routeID, consumerID, consumerGroupID)
 	if err != nil {
 		return nil, err
 	}
@@ -217,18 +237,18 @@ func getPluginBy(txn *memdb.Txn, name, svcID, routeID, consumerID string) (
 }
 
 // GetByProp returns a plugin which matches all the properties passed in
-// the arguments. If serviceID, routeID and consumerID are empty strings, then
-// a global plugin is searched.
+// the arguments. If serviceID, routeID, consumerID and consumerGroupID
+// are empty strings, then a global plugin is searched.
 // Otherwise, a plugin with name and the supplied foreign references is
 // searched.
 // name is required.
-func (k *PluginsCollection) GetByProp(name, serviceID,
-	routeID string, consumerID string,
+func (k *PluginsCollection) GetByProp(
+	name, serviceID, routeID, consumerID, consumerGroupID string,
 ) (*Plugin, error) {
 	txn := k.db.Txn(false)
 	defer txn.Abort()
 
-	return getPluginBy(txn, name, serviceID, routeID, consumerID)
+	return getPluginBy(txn, name, serviceID, routeID, consumerID, consumerGroupID)
 }
 
 func (k *PluginsCollection) getAllPluginsBy(index, identifier string) (
@@ -264,7 +284,7 @@ func (k *PluginsCollection) GetAllByServiceID(id string) ([]*Plugin,
 	return k.getAllPluginsBy(pluginsByServiceID, id)
 }
 
-// GetAllByRouteID returns all plugins referencing a service
+// GetAllByRouteID returns all plugins referencing a route
 // by its id.
 func (k *PluginsCollection) GetAllByRouteID(id string) ([]*Plugin,
 	error,
@@ -278,6 +298,14 @@ func (k *PluginsCollection) GetAllByConsumerID(id string) ([]*Plugin,
 	error,
 ) {
 	return k.getAllPluginsBy(pluginsByConsumerID, id)
+}
+
+// GetAllByConsumerGroupID returns all plugins referencing a consumer-group
+// by its id.
+func (k *PluginsCollection) GetAllByConsumerGroupID(id string) ([]*Plugin,
+	error,
+) {
+	return k.getAllPluginsBy(pluginsByConsumerGroupID, id)
 }
 
 // Update updates a plugin

@@ -271,9 +271,25 @@ func TestPluginsCollection_Update(t *testing.T) {
 			},
 		},
 	}
+	plugin4 := Plugin{
+		Plugin: kong.Plugin{
+			ID:   kong.String("id4"),
+			Name: kong.String("key-auth"),
+			Route: &kong.Route{
+				ID: kong.String("route1"),
+			},
+			Service: &kong.Service{
+				ID: kong.String("svc1"),
+			},
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("cg1"),
+			},
+		},
+	}
 	k.Add(plugin1)
 	k.Add(plugin2)
 	k.Add(plugin3)
+	k.Add(plugin4)
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -362,6 +378,18 @@ func TestGetPluginByProp(t *testing.T) {
 				},
 			},
 		},
+		{
+			Plugin: kong.Plugin{
+				ID:   kong.String("5"),
+				Name: kong.String("key-auth"),
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID: kong.String("cg1"),
+				},
+				Config: map[string]interface{}{
+					"key5": "value5",
+				},
+			},
+		},
 	}
 	assert := assert.New(t)
 	collection := pluginsCollection()
@@ -370,33 +398,38 @@ func TestGetPluginByProp(t *testing.T) {
 		assert.Nil(collection.Add(p))
 	}
 
-	plugin, err := collection.GetByProp("", "", "", "")
+	plugin, err := collection.GetByProp("", "", "", "", "")
 	assert.Nil(plugin)
-	assert.NotNil(err)
+	assert.Error(err)
 
-	plugin, err = collection.GetByProp("foo", "", "", "")
+	plugin, err = collection.GetByProp("foo", "", "", "", "")
 	assert.Nil(plugin)
 	assert.Equal(ErrNotFound, err)
 
-	plugin, err = collection.GetByProp("key-auth", "", "", "")
-	assert.Nil(err)
+	plugin, err = collection.GetByProp("key-auth", "", "", "", "")
+	assert.NoError(err)
 	assert.NotNil(plugin)
 	assert.Equal("value1", plugin.Config["key1"])
 
-	plugin, err = collection.GetByProp("key-auth", "svc1", "", "")
-	assert.Nil(err)
+	plugin, err = collection.GetByProp("key-auth", "svc1", "", "", "")
+	assert.NoError(err)
 	assert.NotNil(plugin)
 	assert.Equal("value2", plugin.Config["key2"])
 
-	plugin, err = collection.GetByProp("key-auth", "", "route1", "")
-	assert.Nil(err)
+	plugin, err = collection.GetByProp("key-auth", "", "route1", "", "")
+	assert.NoError(err)
 	assert.NotNil(plugin)
 	assert.Equal("value3", plugin.Config["key3"])
 
-	plugin, err = collection.GetByProp("key-auth", "", "", "consumer1")
-	assert.Nil(err)
+	plugin, err = collection.GetByProp("key-auth", "", "", "consumer1", "")
+	assert.NoError(err)
 	assert.NotNil(plugin)
 	assert.Equal("value4", plugin.Config["key4"])
+
+	plugin, err = collection.GetByProp("key-auth", "", "", "", "cg1")
+	assert.NoError(err)
+	assert.NotNil(plugin)
+	assert.Equal("value5", plugin.Config["key5"])
 }
 
 func TestPluginsInvalidType(t *testing.T) {

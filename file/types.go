@@ -321,19 +321,20 @@ type FPlugin struct {
 // foo is a shadow type of Plugin.
 // It is used for custom marshalling of plugin.
 type foo struct {
-	CreatedAt    *int                 `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	ID           *string              `json:"id,omitempty" yaml:"id,omitempty"`
-	Name         *string              `json:"name,omitempty" yaml:"name,omitempty"`
-	InstanceName *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
-	Config       kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
-	Service      string               `json:"service,omitempty" yaml:",omitempty"`
-	Consumer     string               `json:"consumer,omitempty" yaml:",omitempty"`
-	Route        string               `json:"route,omitempty" yaml:",omitempty"`
-	Enabled      *bool                `json:"enabled,omitempty" yaml:"enabled,omitempty"`
-	RunOn        *string              `json:"run_on,omitempty" yaml:"run_on,omitempty"`
-	Ordering     *kong.PluginOrdering `json:"ordering,omitempty" yaml:"ordering,omitempty"`
-	Protocols    []*string            `json:"protocols,omitempty" yaml:"protocols,omitempty"`
-	Tags         []*string            `json:"tags,omitempty" yaml:"tags,omitempty"`
+	CreatedAt     *int                 `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID            *string              `json:"id,omitempty" yaml:"id,omitempty"`
+	Name          *string              `json:"name,omitempty" yaml:"name,omitempty"`
+	InstanceName  *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
+	Config        kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
+	Service       string               `json:"service,omitempty" yaml:",omitempty"`
+	Consumer      string               `json:"consumer,omitempty" yaml:",omitempty"`
+	ConsumerGroup string               `json:"consumer_group,omitempty" yaml:",omitempty"`
+	Route         string               `json:"route,omitempty" yaml:",omitempty"`
+	Enabled       *bool                `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	RunOn         *string              `json:"run_on,omitempty" yaml:"run_on,omitempty"`
+	Ordering      *kong.PluginOrdering `json:"ordering,omitempty" yaml:"ordering,omitempty"`
+	Protocols     []*string            `json:"protocols,omitempty" yaml:"protocols,omitempty"`
+	Tags          []*string            `json:"tags,omitempty" yaml:"tags,omitempty"`
 
 	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
 }
@@ -378,6 +379,9 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.Plugin.Service != nil {
 		f.Service = *p.Plugin.Service.ID
+	}
+	if p.Plugin.ConsumerGroup != nil {
+		f.ConsumerGroup = *p.Plugin.ConsumerGroup.ID
 	}
 	return f
 }
@@ -426,6 +430,11 @@ func copyFromFoo(f foo, p *FPlugin) {
 	if f.Service != "" {
 		p.Service = &kong.Service{
 			ID: kong.String(f.Service),
+		}
+	}
+	if f.ConsumerGroup != "" {
+		p.ConsumerGroup = &kong.ConsumerGroup{
+			ID: kong.String(f.ConsumerGroup),
 		}
 	}
 }
@@ -479,6 +488,9 @@ func (p FPlugin) sortKey() string {
 		}
 		if p.Service != nil {
 			key += *p.Service.ID
+		}
+		if p.ConsumerGroup != nil {
+			key += *p.ConsumerGroup.ID
 		}
 		return key
 	}

@@ -212,6 +212,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
+	if utils.Kong340Version.LTE(parsedKongVersion) {
+		dumpConfig.IsConsumerGroupScopedPluginSupported = true
+	}
+
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {

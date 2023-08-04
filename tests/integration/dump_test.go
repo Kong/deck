@@ -82,23 +82,54 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 		stateFile     string
 		expectedFile  string
 		skipConsumers bool
+		runWhen       func(t *testing.T)
 	}{
 		{
-			name:          "dump with skip-consumers",
+			name:          "3.2 & 3.3 dump with skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected.yaml",
 			skipConsumers: true,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.2.0 <3.4.0") },
 		},
 		{
-			name:          "dump with no skip-consumers",
+			name:          "3.2 & 3.3 dump with no skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip.yaml",
 			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.2.0 <3.4.0") },
+		},
+		{
+			name:          "3.4 dump with skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected.yaml",
+			skipConsumers: true,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:          "3.4 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-34.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:          "3.5 dump with skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected.yaml",
+			skipConsumers: true,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
+		},
+		{
+			name:          "3.5 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-35.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.2.0")
+			tc.runWhen(t)
 			teardown := setup(t)
 			defer teardown(t)
 
@@ -122,7 +153,60 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 
 			expected, err := readFile(tc.expectedFile)
 			assert.NoError(t, err)
-			assert.Equal(t, output, expected)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
+	t.Skip("remove skip once Konnect support is enabled.")
+
+	tests := []struct {
+		name          string
+		stateFile     string
+		expectedFile  string
+		skipConsumers bool
+	}{
+		{
+			name:          "dump with skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected_konnect.yaml",
+			skipConsumers: true,
+		},
+		{
+			name:          "dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip_konnect.yaml",
+			skipConsumers: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKonnect(t)
+			teardown := setup(t)
+			defer teardown(t)
+
+			assert.NoError(t, sync(tc.stateFile))
+
+			var (
+				output string
+				err    error
+			)
+			if tc.skipConsumers {
+				output, err = dump(
+					"--skip-consumers",
+					"-o", "-",
+				)
+			} else {
+				output, err = dump(
+					"-o", "-",
+				)
+			}
+			assert.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }
