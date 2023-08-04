@@ -23,8 +23,7 @@ func Test_Dump_SelectTags_30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			assert.NoError(t, sync(tc.stateFile))
 
@@ -57,8 +56,7 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			assert.NoError(t, sync(tc.stateFile))
 
@@ -130,8 +128,7 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.runWhen(t)
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			assert.NoError(t, sync(tc.stateFile))
 
@@ -183,8 +180,7 @@ func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKonnect(t)
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			assert.NoError(t, sync(tc.stateFile))
 

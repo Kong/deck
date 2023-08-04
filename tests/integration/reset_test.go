@@ -62,8 +62,7 @@ func Test_Reset_SkipCACert_2x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			reset(t, "--skip-ca-certificates")
@@ -99,8 +98,7 @@ func Test_Reset_SkipCACert_3x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			reset(t, "--skip-ca-certificates")
