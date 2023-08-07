@@ -73,7 +73,7 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		b.checkRoutePaths = true
 	}
 
-	if utils.Kong340Version.LTE(b.kongVersion) {
+	if utils.Kong340Version.LTE(b.kongVersion) || b.isKonnect {
 		b.isConsumerGroupScopedPluginSupported = true
 	}
 
@@ -963,7 +963,7 @@ func (b *stateBuilder) plugins() {
 }
 
 func (b *stateBuilder) validatePlugin(p FPlugin) error {
-	if (b.isConsumerGroupScopedPluginSupported && !b.isKonnect) && *p.Name == ratelimitingAdvancedPluginName {
+	if b.isConsumerGroupScopedPluginSupported && *p.Name == ratelimitingAdvancedPluginName {
 		// check if deprecated consumer-groups configuration is present in the config
 		var consumerGroupsFound bool
 		if groups, ok := p.Config["consumer_groups"]; ok {
