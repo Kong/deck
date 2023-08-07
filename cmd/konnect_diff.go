@@ -23,9 +23,6 @@ func newKonnectDiffCmd() *cobra.Command {
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_ = sendAnalytics("konnect-diff", "", modeKonnect)
-			if konnectConfig.Address == defaultKonnectURL {
-				konnectConfig.Address = defaultLegacyKonnectURL
-			}
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 				konnectDiffCmdParallelism)
 		},

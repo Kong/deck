@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/url"
 
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
@@ -47,9 +46,8 @@ func pingKonnect(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	u, _ := url.Parse(konnectConfig.Address)
 	// authenticate with konnect
-	res, err := authenticate(ctx, konnectClient, u.Host, konnectConfig)
+	res, err := authenticate(ctx, konnectClient, konnectConfig)
 	if err != nil {
 		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
