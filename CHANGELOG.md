@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.26.0](#v1260)
 - [v1.25.0](#v1250)
 - [v1.24.0](#v1240)
 - [v1.23.0](#v1230)
@@ -61,6 +62,21 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.26.0]
+
+> Release date: 2023/08/09
+
+### Added
+
+- Added support for scoping plugins to Consumer Groups for both Kong Gateway and Konnect.
+  [#963](https://github.com/Kong/deck/pull/963)
+  [#959](https://github.com/Kong/deck/pull/959)
+
+### Fixes
+
+- Remove fallback mechanism formely used to authenticate with either "old" or "new" Konnect.
+  [#995](https://github.com/Kong/deck/pull/995)
 
 ## [v1.25.0]
 
@@ -1327,6 +1343,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.26.0]: https://github.com/kong/deck/compare/v1.25.0...v1.26.0
 [v1.25.0]: https://github.com/kong/deck/compare/v1.24.0...v1.25.0
 [v1.24.0]: https://github.com/kong/deck/compare/v1.23.0...v1.24.0
 [v1.23.0]: https://github.com/kong/deck/compare/v1.22.1...v1.23.0
