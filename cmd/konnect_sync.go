@@ -15,9 +15,6 @@ to get Konnect's state in sync with the input state.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_ = sendAnalytics("konnect-sync", "", modeKonnect)
-			if konnectConfig.Address == defaultKonnectURL {
-				konnectConfig.Address = defaultLegacyKonnectURL
-			}
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 				konnectDiffCmdParallelism)
 		},
