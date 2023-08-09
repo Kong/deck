@@ -156,8 +156,6 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 }
 
 func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
-	t.Skip("remove skip once Konnect support is enabled.")
-
 	tests := []struct {
 		name          string
 		stateFile     string

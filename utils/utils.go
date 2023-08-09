@@ -29,7 +29,7 @@ var ErrorConsumerGroupUpgrade = errors.New(
 	"a rate-limiting-advanced plugin with config.consumer_groups\n" +
 		"and/or config.enforce_consumer_groups was found. Please use Consumer Groups scoped\n" +
 		"Plugins when running against Kong Enterprise 3.4.0 and above.\n\n" +
-		"Check DOC_LINK for more information",
+		"Check https://docs.konghq.com/gateway/latest/kong-enterprise/consumer-groups/ for more information",
 )
 
 var UpgradeMessage = "Please upgrade your configuration to account for 3.0\n" +
