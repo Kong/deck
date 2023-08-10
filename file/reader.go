@@ -78,7 +78,7 @@ func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig
 	builder.client = wsClient
 	builder.ctx = ctx
 	builder.skipCACerts = dumpConfig.SkipCACerts
-	builder.isKonnect = dumpConfig.KonnectRuntimeGroup != ""
+	builder.isKonnect = dumpConfig.KonnectControlPlane != ""
 
 	if len(dumpConfig.SelectorTags) > 0 {
 		builder.selectTags = dumpConfig.SelectorTags

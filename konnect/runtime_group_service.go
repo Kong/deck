@@ -12,6 +12,10 @@ func (s *RuntimeGroupService) List(ctx context.Context,
 	opt *ListOpt,
 ) ([]*RuntimeGroup, *ListOpt, error) {
 	data, next, err := s.client.list(ctx, "/konnect-api/api/runtime_groups", opt)
+	// TODO: replace the above with the following once the Konnect API is updated.
+	//
+	// Note: pagination logic will need to be fixed too.
+	// data, next, err := s.client.list(ctx, "/v2/control-planes", opt)
 	if err != nil {
 		return nil, nil, err
 	}

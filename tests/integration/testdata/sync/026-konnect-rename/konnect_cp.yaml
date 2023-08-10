@@ -3,11 +3,10 @@ _konnect:
   control_plane_name: default
 services:
 - connect_timeout: 60000
-  enabled: true
+  id: 58076db2-28b6-423b-ba39-a797193017f7
   host: mockbin.org
   name: svc1
   port: 80
   protocol: http
   read_timeout: 60000
   retries: 5
-  write_timeout: 60000

@@ -17,7 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const defaultRuntimeGroupName = "default"
+const defaultControlPlaneName = "default"
 
 func authenticate(
 	ctx context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
@@ -41,6 +41,10 @@ func GetKongClientForKonnectMode(
 		)
 	}
 
+	if konnectConfig.Address == "" {
+		konnectConfig.Address = defaultKonnectURL
+	}
+
 	// authenticate with konnect
 	var err error
 	var konnectClient *konnect.Client
@@ -54,14 +58,16 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
+	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient)
 	if err != nil {
 		return nil, err
 	}
 
-	// set the kong runtime group ID in the client
-	konnectClient.SetRuntimeGroupID(kongRGID)
-	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID
+	// set the kong control plane ID in the client
+	konnectClient.SetRuntimeGroupID(cpID)
+	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + cpID
+	// TODO: replace the above with the following once the Konnect API is updated
+	// konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID
 
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
@@ -78,8 +84,8 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if dumpConfig.KonnectRuntimeGroup == "" {
-		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
+	if dumpConfig.KonnectControlPlane == "" {
+		dumpConfig.KonnectControlPlane = defaultControlPlaneName
 	}
 	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
 	if err != nil {
@@ -101,8 +107,8 @@ func dumpKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if dumpConfig.KonnectRuntimeGroup == "" {
-		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
+	if dumpConfig.KonnectControlPlane == "" {
+		dumpConfig.KonnectControlPlane = defaultControlPlaneName
 	}
 	kongVersion, err := fetchKonnectKongVersion(ctx, client)
 	if err != nil {
@@ -121,7 +127,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		Filename:         dumpCmdKongStateFile,
 		FileFormat:       file.Format(strings.ToUpper(dumpCmdStateFormat)),
 		WithID:           dumpWithID,
-		RuntimeGroupName: konnectRuntimeGroup,
+		ControlPlaneName: konnectControlPlane,
 		KongVersion:      kongVersion,
 	})
 }
@@ -232,7 +238,7 @@ func fetchKongControlPlaneID(ctx context.Context,
 	return singleOutKongCP(controlPlanes)
 }
 
-func fetchKongRuntimeGroupID(ctx context.Context,
+func fetchKonnectControlPlaneID(ctx context.Context,
 	client *konnect.Client,
 ) (string, error) {
 	var runtimeGroups []*konnect.RuntimeGroup
@@ -248,15 +254,15 @@ func fetchKongRuntimeGroupID(ctx context.Context,
 		}
 		listOpt = next
 	}
-	if konnectRuntimeGroup == "" {
-		konnectRuntimeGroup = defaultRuntimeGroupName
+	if konnectControlPlane == "" {
+		konnectControlPlane = defaultControlPlaneName
 	}
 	for _, rg := range runtimeGroups {
-		if *rg.Name == konnectRuntimeGroup {
+		if *rg.Name == konnectControlPlane {
 			return *rg.ID, nil
 		}
 	}
-	return "", fmt.Errorf("runtime groups not found: %s", konnectRuntimeGroup)
+	return "", fmt.Errorf("runtime groups not found: %s", konnectControlPlane)
 }
 
 func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
