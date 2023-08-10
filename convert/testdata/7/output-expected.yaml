@@ -22,7 +22,7 @@ services:
     - http
     - https
     regex_priority: 0
-    strip_path: false
+    strip_path: true
   tags:
   - team-svc1
   write_timeout: 60000
@@ -41,7 +41,7 @@ services:
     - http
     - https
     regex_priority: 0
-    strip_path: false
+    strip_path: true
   write_timeout: 60000
 - connect_timeout: 60000
   host: mockbin.org
@@ -61,5 +61,5 @@ services:
     - http
     - https
     regex_priority: 0
-    strip_path: false
+    strip_path: true
   write_timeout: 60000

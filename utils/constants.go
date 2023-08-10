@@ -21,7 +21,7 @@ var (
 	routeDefaults = kong.Route{
 		PreserveHost:  kong.Bool(false),
 		RegexPriority: kong.Int(0),
-		StripPath:     kong.Bool(false),
+		StripPath:     kong.Bool(true),
 		Protocols:     kong.StringSlice("http", "https"),
 	}
 	targetDefaults = kong.Target{
