@@ -27,8 +27,19 @@ func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
 func newFileRenderCmd() *cobra.Command {
 	renderCmd := &cobra.Command{
 		Use:   "render",
-		Short: "Render the configuration as Kong declarative config",
-		Long:  ``,
+		Short: "Combines multiple complete configuration files into one Kong declarative config file.",
+		Long:  `Combines multiple complete configuration files into one Kong
+	declarative config file.
+
+ This command can render the output in JSON or YAML format. Unlike 
+ "deck file merge", the render command accepts complete configuration files, 
+ while "deck file merge" only combines partial file snippets.
+
+ For example, the following command takes two input files and renders them as one 
+ combined JSON file:
+
+   deck file render kong1.yml kong2.yml -o kong3 --format json
+	`,
 		Args:  cobra.ArbitraryArgs,
 		RunE:  executeFileRenderCmd,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
