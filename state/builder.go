@@ -327,6 +327,18 @@ func buildKong(kongState *KongState, raw *utils.KongRawState) error {
 			return fmt.Errorf("inserting vault into state: %w", err)
 		}
 	}
+	for _, k := range raw.Keys {
+		err := kongState.Keys.Add(Key{Key: *k})
+		if err != nil {
+			return fmt.Errorf("inserting key into state: %w", err)
+		}
+	}
+	for _, s := range raw.KeySets {
+		err := kongState.KeySets.Add(KeySet{KeySet: *s})
+		if err != nil {
+			return fmt.Errorf("inserting key-set into state: %w", err)
+		}
+	}
 	return nil
 }
 

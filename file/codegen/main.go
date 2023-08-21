@@ -59,6 +59,8 @@ func main() {
 	schema.Definitions["FTarget"].Required = []string{"target"}
 	schema.Definitions["FCACertificate"].Required = []string{"cert"}
 	schema.Definitions["FPlugin"].Required = []string{"name"}
+	schema.Definitions["FKey"].AnyOf = anyOfNameOrID
+	schema.Definitions["FKeySet"].AnyOf = anyOfNameOrID
 
 	schema.Definitions["FCertificate"].Required = []string{"id", "cert", "key"}
 	schema.Definitions["FCertificate"].Properties["snis"] = &jsonschema.Type{

@@ -55,6 +55,20 @@
       },
       "type": "array"
     },
+    "key_sets": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FKeySet"
+      },
+      "type": "array"
+    },
+    "keys": {
+      "items": {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "$ref": "#/definitions/FKey"
+      },
+      "type": "array"
+    },
     "licenses": {
       "items": {
         "$schema": "http://json-schema.org/draft-04/schema#",
@@ -565,6 +579,92 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "FKey": {
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "jwk": {
+          "type": "string"
+        },
+        "kid": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "pem": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/PEM"
+        },
+        "set": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/KeySet"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updated_at": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "FKeySet": {
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updated_at": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "id"
+          ]
+        }
+      ]
     },
     "FLicense": {
       "properties": {
@@ -1293,6 +1393,30 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "KeySet": {
+      "properties": {
+        "created_at": {
+          "type": "integer"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "updated_at": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Kong": {
       "properties": {
         "service": {
@@ -1407,6 +1531,18 @@
             "type": "string"
           },
           "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PEM": {
+      "properties": {
+        "private_key": {
+          "type": "string"
+        },
+        "public_key": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

@@ -38,6 +38,9 @@ type KongState struct {
 	RBACRoles               *RBACRolesCollection
 	RBACEndpointPermissions *RBACEndpointPermissionsCollection
 
+	Keys    *KeysCollection
+	KeySets *KeySetsCollection
+
 	// konnect-specific entities
 	ServicePackages *ServicePackagesCollection
 	ServiceVersions *ServiceVersionsCollection
@@ -81,6 +84,9 @@ func NewKongState() (*KongState, error) {
 
 			aclGroupTableName: aclGroupTableSchema,
 
+			keyTableName:    keyTableSchema,
+			keySetTableName: keySetTableSchema,
+
 			// konnect-specific entities
 			servicePackageTableName: servicePackageTableSchema,
 			serviceVersionTableName: serviceVersionTableSchema,
@@ -121,6 +127,9 @@ func NewKongState() (*KongState, error) {
 	state.MTLSAuths = newMTLSAuthsCollection(state.common)
 
 	state.ACLGroups = (*ACLGroupsCollection)(&state.common)
+
+	state.Keys = (*KeysCollection)(&state.common)
+	state.KeySets = (*KeySetsCollection)(&state.common)
 
 	// konnect-specific entities
 	state.ServicePackages = (*ServicePackagesCollection)(&state.common)

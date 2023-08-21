@@ -39,6 +39,7 @@ var dependencyOrder = [][]types.EntityType{
 		types.CACertificate,
 		types.Consumer,
 		types.Vault,
+		types.KeySet,
 	},
 	{
 		types.ConsumerGroup,
@@ -46,6 +47,7 @@ var dependencyOrder = [][]types.EntityType{
 		types.SNI,
 		types.Service,
 		types.Upstream,
+		types.Key,
 
 		types.KeyAuth, types.HMACAuth, types.JWTAuth,
 		types.BasicAuth, types.OAuth2Cred, types.ACLGroup,
