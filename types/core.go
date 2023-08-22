@@ -108,7 +108,7 @@ const (
 	// RBACRole identifies a RBACRole in Kong Enterprise.
 	RBACRole EntityType = "rbac-role"
 	// RBACEndpointPermission identifies a RBACEndpointPermission in Kong Enterprise.
-	RBACEndpointPermission EntityType = "rbac-endpoint-permission"
+	RBACEndpointPermission EntityType = "rbac-endpoint-permission" //nolint:gosec
 
 	// ServicePackage identifies a ServicePackage in Konnect.
 	ServicePackage EntityType = "service-package"
