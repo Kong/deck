@@ -6,3 +6,7 @@ consumers:
 - custom_id: bar
   id: 7820f383-7b77-4fcc-af7f-14ff3e256693
   username: foo
+- custom_id: custom_id_only
+  id: 18c62c3c-12cc-429a-8e5a-57f2c3691a6b
+- id: 8ef278c9-48c1-43e1-b665-e9bc18fab4c8
+  username: username_only
