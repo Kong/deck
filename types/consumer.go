@@ -181,14 +181,23 @@ func (d *consumerDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 }
 
 func (d *consumerDiffer) deleteDuplicateConsumer(targetConsumer *state.Consumer) (*crud.Event, error) {
-	var idOrUsername string
-	if targetConsumer.ID != nil {
-		idOrUsername = *targetConsumer.ID
-	} else {
+	var (
+		idOrUsername string
+
+		currentConsumer *state.Consumer
+		err             error
+	)
+
+	if targetConsumer.Username != nil {
 		idOrUsername = *targetConsumer.Username
+	} else if targetConsumer.ID != nil {
+		idOrUsername = *targetConsumer.ID
 	}
-	currentConsumer, err := d.currentState.Consumers.GetByIDOrUsername(idOrUsername)
-	if errors.Is(err, state.ErrNotFound) {
+
+	if idOrUsername != "" {
+		currentConsumer, err = d.currentState.Consumers.GetByIDOrUsername(idOrUsername)
+	}
+	if errors.Is(err, state.ErrNotFound) || idOrUsername == "" {
 		if targetConsumer.CustomID != nil {
 			currentConsumer, err = d.currentState.Consumers.GetByCustomID(*targetConsumer.CustomID)
 			if errors.Is(err, state.ErrNotFound) {
