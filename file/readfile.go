@@ -20,7 +20,7 @@ import (
 // file, depending on the type of each item in filenames, merges the content of
 // these files and renders a Content.
 func getContent(filenames []string, mockEnvVars bool) (*Content, error) {
-	var workspaces []string
+	var workspaces, runtimeGroups []string
 	var res Content
 	var errs []error
 	for _, fileOrDir := range filenames {
@@ -38,6 +38,9 @@ func getContent(filenames []string, mockEnvVars bool) (*Content, error) {
 			if content.Workspace != "" {
 				workspaces = append(workspaces, content.Workspace)
 			}
+			if content.Konnect != nil && len(content.Konnect.RuntimeGroupName) > 0 {
+				runtimeGroups = append(runtimeGroups, content.Konnect.RuntimeGroupName)
+			}
 			err = mergo.Merge(&res, content, mergo.WithAppendSlice)
 			if err != nil {
 				return nil, fmt.Errorf("merging file contents: %w", err)
@@ -48,6 +51,9 @@ func getContent(filenames []string, mockEnvVars bool) (*Content, error) {
 		return nil, utils.ErrArray{Errors: errs}
 	}
 	if err := validateWorkspaces(workspaces); err != nil {
+		return nil, err
+	}
+	if err := validateRuntimeGroups(runtimeGroups); err != nil {
 		return nil, err
 	}
 	return &res, nil

@@ -1,0 +1,6 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: bar
+services:
+- name: svc2
+  host: 2.example.com

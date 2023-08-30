@@ -399,6 +399,12 @@ kong.log.set_serialize_value("span_id", parse_traceid(ngx.ctx.KONG_SPANS[1].span
 			wantErr: true,
 		},
 		{
+			name:    "different runtime groups",
+			args:    args{[]string{"testdata/differentruntimegroup"}},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "same workspaces",
 			args: args{[]string{"testdata/sameworkspace"}},
 			want: &Content{

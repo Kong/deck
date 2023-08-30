@@ -56,3 +56,13 @@ func validateWorkspaces(workspaces []string) error {
 	}
 	return nil
 }
+
+func validateRuntimeGroups(names []string) error {
+	utils.RemoveDuplicates(&names)
+	if len(names) > 1 {
+		return fmt.Errorf("it seems like you are trying to sync multiple Konnect Runtime Groups "+
+			"at the same time (%v).\ndecK doesn't support syncing multiple Runtime Groups at the same time, "+
+			"please sync one Runtime Group at a time", names)
+	}
+	return nil
+}
