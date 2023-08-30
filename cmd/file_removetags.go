@@ -87,10 +87,10 @@ The listed tags are removed from all objects that match the selector expressions
 If no selectors are given, all Kong entities are selected.`,
 		RunE: executeRemoveTags,
 		Example: "# clear tags 'tag1' and 'tag2' from all services in file 'kong.yml'\n" +
-			"cat kong.yml | go-apiops remove-tags --selector='services[*]' tag1 tag2\n" +
+			"cat kong.yml | deck file remove-tags --selector='services[*]' tag1 tag2\n" +
 			"\n" +
 			"# clear all tags except 'tag1' and 'tag2' from the file 'kong.yml'\n" +
-			"cat kong.yml | go-apiops remove-tags --keep-only tag1 tag2",
+			"cat kong.yml | deck file remove-tags --keep-only tag1 tag2",
 	}
 
 	removeTagsCmd.Flags().BoolVar(&cmdRemoveTagsKeepEmptyArrays, "keep-empty-array", false,
