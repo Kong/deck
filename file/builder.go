@@ -289,8 +289,14 @@ func (b *stateBuilder) consumers() {
 	for _, c := range b.targetContent.Consumers {
 		c := c
 		if utils.Empty(c.ID) {
-			consumer, err := b.currentState.Consumers.GetByIDOrUsername(*c.Username)
-			if errors.Is(err, state.ErrNotFound) {
+			var (
+				consumer *state.Consumer
+				err      error
+			)
+			if c.Username != nil {
+				consumer, err = b.currentState.Consumers.GetByIDOrUsername(*c.Username)
+			}
+			if errors.Is(err, state.ErrNotFound) || consumer == nil {
 				if c.CustomID != nil {
 					consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
 					if err == nil {

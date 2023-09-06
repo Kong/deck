@@ -4137,7 +4137,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 // test scope:
 //   - 3.0.0+
 //   - konnect
-func Test_Sync_ConsumersWithCustomIDAndUsername(t *testing.T) {
+func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
 	setup(t)
 
@@ -4160,6 +4160,14 @@ func Test_Sync_ConsumersWithCustomIDAndUsername(t *testing.T) {
 				ID:       kong.String("7820f383-7b77-4fcc-af7f-14ff3e256693"),
 				Username: kong.String("foo"),
 				CustomID: kong.String("bar"),
+			},
+			{
+				ID:       kong.String("18c62c3c-12cc-429a-8e5a-57f2c3691a6b"),
+				CustomID: kong.String("custom_id_only"),
+			},
+			{
+				ID:       kong.String("8ef278c9-48c1-43e1-b665-e9bc18fab4c8"),
+				Username: kong.String("username_only"),
 			},
 		},
 	}, nil)

@@ -95,8 +95,16 @@ func sortSlices(x, y interface{}) bool {
 		yName = *yEntity.Prefix
 	case *kong.Consumer:
 		yEntity := y.(*kong.Consumer)
-		xName = *xEntity.Username
-		yName = *yEntity.Username
+		if xEntity.Username != nil {
+			xName = *xEntity.Username
+		} else {
+			xName = *xEntity.ID
+		}
+		if yEntity.Username != nil {
+			yName = *yEntity.Username
+		} else {
+			yName = *yEntity.ID
+		}
 	case *kong.ConsumerGroup:
 		yEntity := y.(*kong.ConsumerGroup)
 		xName = *xEntity.Name

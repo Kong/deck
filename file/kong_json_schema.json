@@ -508,12 +508,14 @@
         {
           "required": [
             "username"
-          ]
+          ],
+          "description": "at least one of custom_id or username must be set"
         },
         {
           "required": [
-            "id"
-          ]
+            "custom_id"
+          ],
+          "description": "at least one of custom_id or username must be set"
         }
       ]
     },

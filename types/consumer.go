@@ -181,12 +181,38 @@ func (d *consumerDiffer) DuplicatesDeletes() ([]crud.Event, error) {
 }
 
 func (d *consumerDiffer) deleteDuplicateConsumer(targetConsumer *state.Consumer) (*crud.Event, error) {
-	currentConsumer, err := d.currentState.Consumers.GetByIDOrUsername(*targetConsumer.Username)
-	if errors.Is(err, state.ErrNotFound) {
-		return nil, nil
+	var (
+		idOrUsername string
+
+		currentConsumer *state.Consumer
+		err             error
+	)
+
+	if targetConsumer.Username != nil {
+		idOrUsername = *targetConsumer.Username
+	} else if targetConsumer.ID != nil {
+		idOrUsername = *targetConsumer.ID
+	}
+
+	if idOrUsername != "" {
+		currentConsumer, err = d.currentState.Consumers.GetByIDOrUsername(idOrUsername)
+	}
+	if errors.Is(err, state.ErrNotFound) || idOrUsername == "" {
+		if targetConsumer.CustomID != nil {
+			currentConsumer, err = d.currentState.Consumers.GetByCustomID(*targetConsumer.CustomID)
+			if errors.Is(err, state.ErrNotFound) {
+				return nil, nil
+			}
+			if err != nil {
+				return nil, fmt.Errorf("error looking up consumer by custom_id %q: %w",
+					*targetConsumer.Username, err)
+			}
+		} else {
+			return nil, nil
+		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("error looking up consumer %q: %w",
+		return nil, fmt.Errorf("error looking up consumer by username or id %q: %w",
 			*targetConsumer.Username, err)
 	}
 
