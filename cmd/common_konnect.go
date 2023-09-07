@@ -246,7 +246,7 @@ func fetchKonnectControlPlaneID(ctx context.Context,
 	for {
 		currentRuntimeGroups, next, err := client.RuntimeGroups.List(ctx, listOpt)
 		if err != nil {
-			return "", fmt.Errorf("fetching runtime groups: %w", err)
+			return "", fmt.Errorf("fetching control planes: %w", err)
 		}
 		runtimeGroups = append(runtimeGroups, currentRuntimeGroups...)
 		if next == nil {
@@ -262,7 +262,7 @@ func fetchKonnectControlPlaneID(ctx context.Context,
 			return *rg.ID, nil
 		}
 	}
-	return "", fmt.Errorf("runtime groups not found: %s", konnectControlPlane)
+	return "", fmt.Errorf("control planes not found: %s", konnectControlPlane)
 }
 
 func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
