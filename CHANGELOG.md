@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.26.1](#v1261)
 - [v1.26.0](#v1260)
 - [v1.25.0](#v1250)
 - [v1.24.0](#v1240)
@@ -62,6 +63,20 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.26.1]
+
+> Release date: 2023/09/07
+
+### Fixes
+
+- Raise an error if state files have different Runtime Groups
+  [#1014](https://github.com/Kong/deck/pull/1014)
+- Correct consumers validation when `custom_id` is used
+  [#1012](https://github.com/Kong/deck/pull/1012)
+- Remove hardcoded default value for Routes' `strip_path` field. Defaults are pulled via
+  API anyway.
+  [#999](https://github.com/Kong/deck/pull/999)
 
 ## [v1.26.0]
 
@@ -1343,6 +1358,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.26.1]: https://github.com/kong/deck/compare/v1.26.0...v1.26.1
 [v1.26.0]: https://github.com/kong/deck/compare/v1.25.0...v1.26.0
 [v1.25.0]: https://github.com/kong/deck/compare/v1.24.0...v1.25.0
 [v1.24.0]: https://github.com/kong/deck/compare/v1.23.0...v1.24.0
