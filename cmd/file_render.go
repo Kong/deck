@@ -31,9 +31,10 @@ func newFileRenderCmd() *cobra.Command {
 		Long:  `Combines multiple complete configuration files into one Kong
 	declarative config file.
 
- This command can render the output in JSON or YAML format. Unlike 
- "deck file merge", the render command accepts complete configuration files, 
- while "deck file merge" only combines partial file snippets.
+ This command renders a full declarative configuration in JSON or YAML format by assembling multiple files and populating defaults and environment substitutions. This command is useful to observe what configuration would be sent prior to synchronizing to the gateway.
+ 
+In comparison to the "deck file merge" command, the render command accepts complete configuration files, 
+ while "deck file merge" can operate on partial files.
 
  For example, the following command takes two input files and renders them as one 
  combined JSON file:
