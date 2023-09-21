@@ -12,12 +12,12 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-querystring v1.1.0
-	github.com/google/uuid v1.3.0
+	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-memdb v1.3.4
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
-	github.com/kong/go-apiops v0.1.20
+	github.com/kong/go-apiops v0.1.21
 	github.com/kong/go-kong v0.46.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.7
@@ -72,7 +72,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.1 // indirect
