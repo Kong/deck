@@ -54,6 +54,9 @@ type KongRawState struct {
 
 	RBACRoles               []*kong.RBACRole
 	RBACEndpointPermissions []*kong.RBACEndpointPermission
+
+	Keys    []*kong.Key
+	KeySets []*kong.KeySet
 }
 
 // KonnectRawState contains all of Konnect resources.

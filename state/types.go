@@ -1599,3 +1599,122 @@ func (v1 *Vault) EqualWithOpts(v2 *Vault, ignoreID, ignoreTS bool) bool {
 	}
 	return reflect.DeepEqual(v1Copy, v2Copy)
 }
+
+// Key represents a key in Kong.
+// It adds some helper methods along with Meta to the original Key object.
+type Key struct {
+	kong.Key `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (v1 *Key) Identifier() string {
+	if v1.Name != nil {
+		return *v1.Name
+	}
+	return *v1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (v1 *Key) Console() string {
+	return *v1.Name
+}
+
+// Equal returns true if v1 and v2 are equal.
+// TODO add compare array without position
+func (v1 *Key) Equal(v2 *Key) bool {
+	return v1.EqualWithOpts(v2, false, false)
+}
+
+// EqualWithOpts returns true if v1 and v2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (v1 *Key) EqualWithOpts(v2 *Key, ignoreID, ignoreTS bool) bool {
+	v1Copy := v1.Key.DeepCopy()
+	v2Copy := v2.Key.DeepCopy()
+
+	if len(v1Copy.Tags) == 0 {
+		v1Copy.Tags = nil
+	}
+	if len(v2Copy.Tags) == 0 {
+		v2Copy.Tags = nil
+	}
+
+	sort.Slice(v1Copy.Tags, func(i, j int) bool { return *(v1Copy.Tags[i]) < *(v1Copy.Tags[j]) })
+	sort.Slice(v2Copy.Tags, func(i, j int) bool { return *(v2Copy.Tags[i]) < *(v2Copy.Tags[j]) })
+
+	if ignoreID {
+		v1Copy.ID = nil
+		v2Copy.ID = nil
+	}
+	if ignoreTS {
+		v1Copy.CreatedAt = nil
+		v2Copy.CreatedAt = nil
+
+		v1Copy.UpdatedAt = nil
+		v2Copy.UpdatedAt = nil
+	}
+	return reflect.DeepEqual(v1Copy, v2Copy)
+}
+
+// KeySet represents a key-set in Kong.
+// It adds some helper methods along with Meta to the original KeySet object.
+type KeySet struct {
+	kong.KeySet `yaml:",inline"`
+	Meta
+}
+
+// Identifier returns the endpoint key name or ID.
+func (v1 *KeySet) Identifier() string {
+	if v1.Name != nil {
+		return *v1.Name
+	}
+	return *v1.ID
+}
+
+// Console returns an entity's identity in a human
+// readable string.
+func (v1 *KeySet) Console() string {
+	if v1.Name != nil {
+		return *v1.Name
+	}
+	return *v1.ID
+}
+
+// Equal returns true if v1 and v2 are equal.
+// TODO add compare array without position
+func (v1 *KeySet) Equal(v2 *KeySet) bool {
+	return v1.EqualWithOpts(v2, false, false)
+}
+
+// EqualWithOpts returns true if v1 and v2 are equal.
+// If ignoreID is set to true, IDs will be ignored while comparison.
+// If ignoreTS is set to true, timestamp fields will be ignored.
+func (v1 *KeySet) EqualWithOpts(v2 *KeySet, ignoreID, ignoreTS bool) bool {
+	v1Copy := v1.KeySet.DeepCopy()
+	v2Copy := v2.KeySet.DeepCopy()
+
+	if len(v1Copy.Tags) == 0 {
+		v1Copy.Tags = nil
+	}
+	if len(v2Copy.Tags) == 0 {
+		v2Copy.Tags = nil
+	}
+
+	sort.Slice(v1Copy.Tags, func(i, j int) bool { return *(v1Copy.Tags[i]) < *(v1Copy.Tags[j]) })
+	sort.Slice(v2Copy.Tags, func(i, j int) bool { return *(v2Copy.Tags[i]) < *(v2Copy.Tags[j]) })
+
+	if ignoreID {
+		v1Copy.ID = nil
+		v2Copy.ID = nil
+	}
+	if ignoreTS {
+		v1Copy.CreatedAt = nil
+		v2Copy.CreatedAt = nil
+
+		v1Copy.UpdatedAt = nil
+		v2Copy.UpdatedAt = nil
+	}
+	return reflect.DeepEqual(v1Copy, v2Copy)
+}

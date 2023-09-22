@@ -692,6 +692,40 @@ func (c FVault) sortKey() string {
 	return ""
 }
 
+// FKey represents a key in Kong.
+// +k8s:deepcopy-gen=true
+type FKey struct {
+	kong.Key `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (k FKey) sortKey() string {
+	if k.Name != nil {
+		return *k.Name
+	}
+	if k.ID != nil {
+		return *k.ID
+	}
+	return ""
+}
+
+// FKeySet represents a key-set in Kong.
+// +k8s:deepcopy-gen=true
+type FKeySet struct {
+	kong.KeySet `yaml:",inline,omitempty"`
+}
+
+// sortKey is used for sorting.
+func (k FKeySet) sortKey() string {
+	if k.Name != nil {
+		return *k.Name
+	}
+	if k.ID != nil {
+		return *k.ID
+	}
+	return ""
+}
+
 // FLicense exists as a file type _only_
 // This is a compatibility layer for KIC library usage. deck cannot interact with the license entity.
 // Ref https://github.com/Kong/deck/pull/882 if we need to support this entity throughout deck.
@@ -737,6 +771,9 @@ type Content struct {
 	ServicePackages []FServicePackage `json:"service_packages,omitempty" yaml:"service_packages,omitempty"`
 
 	Vaults []FVault `json:"vaults,omitempty" yaml:"vaults,omitempty"`
+
+	Keys    []FKey    `json:"keys,omitempty" yaml:"keys,omitempty"`
+	KeySets []FKeySet `json:"key_sets,omitempty" yaml:"key_sets,omitempty"`
 
 	Licenses []FLicense `json:"licenses,omitempty" yaml:"licenses,omitempty"`
 }
