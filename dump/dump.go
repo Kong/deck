@@ -28,8 +28,8 @@ type Config struct {
 	// tags.
 	SelectorTags []string
 
-	// KonnectRuntimeGroup
-	KonnectRuntimeGroup string
+	// KonnectControlPlane
+	KonnectControlPlane string
 
 	// IsConsumerGroupScopedPluginSupported
 	IsConsumerGroupScopedPluginSupported bool

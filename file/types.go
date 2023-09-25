@@ -605,6 +605,7 @@ type Info struct {
 // +k8s:deepcopy-gen=true
 type Konnect struct {
 	RuntimeGroupName string `json:"runtime_group_name,omitempty" yaml:"runtime_group_name,omitempty"`
+	ControlPlaneName string `json:"control_plane_name,omitempty" yaml:"control_plane_name,omitempty"`
 }
 
 // Kong represents Kong implementation of a Service in Konnect.

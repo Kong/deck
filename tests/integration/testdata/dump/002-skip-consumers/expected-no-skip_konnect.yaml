@@ -1,6 +1,6 @@
 _format_version: "3.0"
 _konnect:
-  runtime_group_name: default
+  control_plane_name: default
 consumer_groups:
 - name: basic
   plugins:

@@ -23,7 +23,7 @@ type WriteConfig struct {
 	Filename         string
 	FileFormat       Format
 	WithID           bool
-	RuntimeGroupName string
+	ControlPlaneName string
 	KongVersion      string
 }
 
@@ -55,9 +55,9 @@ func KongStateToContent(kongState *state.KongState, config WriteConfig) (*Conten
 		return nil, fmt.Errorf("get format version: %w", err)
 	}
 	file.FormatVersion = formatVersion
-	if config.RuntimeGroupName != "" {
+	if config.ControlPlaneName != "" {
 		file.Konnect = &Konnect{
-			RuntimeGroupName: config.RuntimeGroupName,
+			ControlPlaneName: config.ControlPlaneName,
 		}
 	}
 

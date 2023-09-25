@@ -1328,6 +1328,9 @@
     },
     "Konnect": {
       "properties": {
+        "control_plane_name": {
+          "type": "string"
+        },
         "runtime_group_name": {
           "type": "string"
         }
