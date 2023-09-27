@@ -98,19 +98,19 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 		return errors.New(`cannot set both runtime_group_name and control_plane_name. ` +
 			`Please use only control_plane_name`)
 	}
-	if konnectControlPlane != "" &&
-		targetControlPlane != konnectControlPlane {
-		return fmt.Errorf("warning: control plane '%v' specified via "+
-			"--konnect-control-plane-name flag is "+
-			"different from '%v' found in state file(s)",
-			konnectControlPlane, targetControlPlane)
+	targetFromFile := targetControlPlane
+	if targetFromFile == "" {
+		targetFromFile = targetRuntimeGroup
 	}
-	if konnectRuntimeGroup != "" &&
-		targetRuntimeGroup != konnectRuntimeGroup {
-		return fmt.Errorf("warning: runtime group '%v' specified via "+
-			"--konnect-runtime-group-name flag is "+
+	targetFromCLI := konnectControlPlane
+	if targetFromCLI == "" {
+		targetFromCLI = konnectRuntimeGroup
+	}
+	if targetFromCLI != "" && targetFromFile != targetFromCLI {
+		return fmt.Errorf("warning: control plane '%v' specified via "+
+			"--konnect-[control-plane|runtime-group]-name flag is "+
 			"different from '%v' found in state file(s)",
-			konnectRuntimeGroup, targetContent.Konnect.RuntimeGroupName)
+			targetFromCLI, targetFromFile)
 	}
 	if targetControlPlane != "" {
 		konnectControlPlane = targetControlPlane
