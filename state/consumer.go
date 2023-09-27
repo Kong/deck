@@ -62,19 +62,19 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	// custom_id, we may get a false positive.
 	_, err := getConsumer(txn, []string{"Username", "id"}, searchBy...)
 	if err == nil {
-		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
+		return fmt.Errorf("inserting consumer by username %v: %w", consumer.Console(), ErrAlreadyExists)
 	} else if !errors.Is(err, ErrNotFound) {
 		return err
 	}
 
 	if !utils.Empty(consumer.CustomID) {
 		searchBy = []string{*consumer.CustomID}
-	}
-	_, err = getConsumer(txn, []string{"CustomID"}, searchBy...)
-	if err == nil {
-		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
-	} else if !errors.Is(err, ErrNotFound) {
-		return err
+		_, err = getConsumer(txn, []string{"CustomID"}, searchBy...)
+		if err == nil {
+			return fmt.Errorf("inserting consumer by custom_id %v: %w", consumer.Console(), ErrAlreadyExists)
+		} else if !errors.Is(err, ErrNotFound) {
+			return err
+		}
 	}
 
 	err = txn.Insert(consumerTableName, &consumer)

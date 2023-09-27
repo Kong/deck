@@ -4171,6 +4171,21 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 			},
 		},
 	}, nil)
+
+	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x-reverse-order.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, false, utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("TestUser"),
+			},
+			{
+				Username: kong.String("OtherUser"),
+				CustomID: kong.String("TestUser"),
+			},
+		},
+	}, nil)
 }
 
 // This test has 2 goals:
