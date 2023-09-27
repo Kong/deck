@@ -31,11 +31,16 @@ func getKongAddress() string {
 
 func getTestClient() (*kong.Client, error) {
 	ctx := context.Background()
+	controlPlaneName := os.Getenv("DECK_KONNECT_RUNTIME_GROUP_NAME")
+	if controlPlaneName == "" {
+		controlPlaneName = os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+	}
 	konnectConfig := utils.KonnectConfig{
-		Address:  os.Getenv("DECK_KONNECT_ADDR"),
-		Email:    os.Getenv("DECK_KONNECT_EMAIL"),
-		Password: os.Getenv("DECK_KONNECT_PASSWORD"),
-		Token:    os.Getenv("DECK_KONNECT_TOKEN"),
+		Address:          os.Getenv("DECK_KONNECT_ADDR"),
+		Email:            os.Getenv("DECK_KONNECT_EMAIL"),
+		Password:         os.Getenv("DECK_KONNECT_PASSWORD"),
+		Token:            os.Getenv("DECK_KONNECT_TOKEN"),
+		ControlPlaneName: controlPlaneName,
 	}
 	if (konnectConfig.Email != "" && konnectConfig.Password != "") || konnectConfig.Token != "" {
 		return cmd.GetKongClientForKonnectMode(ctx, &konnectConfig)
@@ -166,8 +171,15 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		dumpConfig.RBACResourcesOnly = true
 	}
 	if isKonnect {
-		// use default RG for testing
-		dumpConfig.KonnectControlPlane = "default"
+		controlPlaneName := os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+		if controlPlaneName == "" {
+			controlPlaneName = os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+		}
+		if controlPlaneName != "" {
+			dumpConfig.KonnectControlPlane = controlPlaneName
+		} else {
+			dumpConfig.KonnectControlPlane = "default"
+		}
 	}
 	kongState, err := deckDump.Get(ctx, client, dumpConfig)
 	if err != nil {

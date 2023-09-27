@@ -1,0 +1,12 @@
+_format_version: "3.0"
+_konnect:
+  runtime_group_name: default
+services:
+- connect_timeout: 60000
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: mockbin-default.org
+  name: default
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5

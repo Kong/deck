@@ -58,7 +58,7 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient)
+	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +80,16 @@ func GetKongClientForKonnectMode(
 }
 
 func resetKonnectV2(ctx context.Context) error {
+	if konnectRuntimeGroup != "" {
+		konnectControlPlane = konnectRuntimeGroup
+	}
+	if konnectControlPlane == "" {
+		konnectControlPlane = defaultControlPlaneName
+	}
+	dumpConfig.KonnectControlPlane = konnectControlPlane
 	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
-	}
-	if dumpConfig.KonnectControlPlane == "" {
-		dumpConfig.KonnectControlPlane = defaultControlPlaneName
 	}
 	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
 	if err != nil {
@@ -103,12 +107,16 @@ func resetKonnectV2(ctx context.Context) error {
 }
 
 func dumpKonnectV2(ctx context.Context) error {
+	if konnectRuntimeGroup != "" {
+		konnectControlPlane = konnectRuntimeGroup
+	}
+	if konnectControlPlane == "" {
+		konnectControlPlane = defaultControlPlaneName
+	}
+	dumpConfig.KonnectControlPlane = konnectControlPlane
 	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
-	}
-	if dumpConfig.KonnectControlPlane == "" {
-		dumpConfig.KonnectControlPlane = defaultControlPlaneName
 	}
 	kongVersion, err := fetchKonnectKongVersion(ctx, client)
 	if err != nil {
@@ -238,8 +246,10 @@ func fetchKongControlPlaneID(ctx context.Context,
 	return singleOutKongCP(controlPlanes)
 }
 
-func fetchKonnectControlPlaneID(ctx context.Context,
+func fetchKonnectControlPlaneID(
+	ctx context.Context,
 	client *konnect.Client,
+	konnectControlPlaneName string,
 ) (string, error) {
 	var runtimeGroups []*konnect.RuntimeGroup
 	var listOpt *konnect.ListOpt
@@ -254,6 +264,9 @@ func fetchKonnectControlPlaneID(ctx context.Context,
 		}
 		listOpt = next
 	}
+	if konnectControlPlaneName != "" {
+		konnectControlPlane = konnectControlPlaneName
+	}
 	if konnectControlPlane == "" {
 		konnectControlPlane = defaultControlPlaneName
 	}
@@ -262,7 +275,7 @@ func fetchKonnectControlPlaneID(ctx context.Context,
 			return *rg.ID, nil
 		}
 	}
-	return "", fmt.Errorf("control planes not found: %s", konnectControlPlane)
+	return "", fmt.Errorf("control plane not found: %s", konnectControlPlane)
 }
 
 func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
