@@ -129,6 +129,8 @@ type KonnectConfig struct {
 	Address string
 
 	Headers []string
+
+	ControlPlaneName string
 }
 
 // ForWorkspace returns a copy of KongClientConfig that produces a KongClient for the workspace specified by argument.

@@ -91,6 +91,36 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content,
 	return targetContent.Workspace
 }
 
+func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) error {
+	targetControlPlane := targetContent.Konnect.ControlPlaneName
+	targetRuntimeGroup := targetContent.Konnect.RuntimeGroupName
+	if targetControlPlane != "" && targetRuntimeGroup != "" {
+		return errors.New(`cannot set both runtime_group_name and control_plane_name. ` +
+			`Please use only control_plane_name`)
+	}
+	if konnectControlPlane != "" &&
+		targetControlPlane != konnectControlPlane {
+		return fmt.Errorf("warning: control plane '%v' specified via "+
+			"--konnect-control-plane-name flag is "+
+			"different from '%v' found in state file(s)",
+			konnectControlPlane, targetControlPlane)
+	}
+	if konnectRuntimeGroup != "" &&
+		targetRuntimeGroup != konnectRuntimeGroup {
+		return fmt.Errorf("warning: runtime group '%v' specified via "+
+			"--konnect-runtime-group-name flag is "+
+			"different from '%v' found in state file(s)",
+			konnectRuntimeGroup, targetContent.Konnect.RuntimeGroupName)
+	}
+	if targetControlPlane != "" {
+		konnectControlPlane = targetControlPlane
+	}
+	if targetRuntimeGroup != "" {
+		konnectControlPlane = targetRuntimeGroup
+	}
+	return nil
+}
+
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string, enableJSONOutput bool,
 ) error {
@@ -134,29 +164,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return fmt.Errorf("--workspace flag is not supported when running against Konnect")
 		}
 		if targetContent.Konnect != nil {
-			targetControlPlane := targetContent.Konnect.ControlPlaneName
-			targetRuntimeGroup := targetContent.Konnect.RuntimeGroupName
-			if targetControlPlane != "" && targetRuntimeGroup != "" {
-				return errors.New(`cannot set both runtime_group_name and control_plane_name. ` +
-					`Please use only control_plane_name`)
+			if err := evaluateTargetRuntimeGroupOrControlPlaneName(targetContent); err != nil {
+				return err
 			}
-			if konnectControlPlane != "" &&
-				targetControlPlane != konnectControlPlane {
-				return fmt.Errorf("warning: control plane '%v' specified via "+
-					"--konnect-control-plane-name flag is "+
-					"different from '%v' found in state file(s)",
-					konnectControlPlane, targetControlPlane)
-			}
-			if konnectRuntimeGroup != "" &&
-				targetRuntimeGroup != konnectRuntimeGroup {
-				return fmt.Errorf("warning: runtime group '%v' specified via "+
-					"--konnect-runtime-group-name flag is "+
-					"different from '%v' found in state file(s)",
-					konnectRuntimeGroup, targetContent.Konnect.RuntimeGroupName)
-			}
-			if konnectRuntimeGroup != "" {
-				konnectControlPlane = konnectRuntimeGroup
-			}
+		}
+		if konnectRuntimeGroup != "" {
+			konnectControlPlane = konnectRuntimeGroup
 		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {

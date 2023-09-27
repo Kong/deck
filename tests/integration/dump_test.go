@@ -204,3 +204,50 @@ func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_KonnectRename(t *testing.T) {
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		flags        []string
+	}{
+		{
+			name:         "dump with konnect-control-plane-name",
+			stateFile:    "testdata/sync/026-konnect-rename/konnect_test_cp.yaml",
+			expectedFile: "testdata/sync/026-konnect-rename/konnect_test_cp.yaml",
+			flags:        []string{"--konnect-control-plane-name", "test"},
+		},
+		{
+			name:         "dump with konnect-runtime-group-name",
+			stateFile:    "testdata/sync/026-konnect-rename/konnect_test_rg.yaml",
+			expectedFile: "testdata/sync/026-konnect-rename/konnect_test_cp.yaml",
+			flags:        []string{"--konnect-runtime-group-name", "test"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t, tc.flags...)
+			})
+			runWhenKonnect(t)
+			setup(t)
+
+			assert.NoError(t, sync(tc.stateFile))
+
+			var (
+				output string
+				err    error
+			)
+			flags := []string{"-o", "-", "--with-id"}
+			flags = append(flags, tc.flags...)
+			output, err = dump(flags...)
+
+			assert.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
