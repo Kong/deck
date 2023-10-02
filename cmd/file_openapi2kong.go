@@ -18,7 +18,6 @@ var (
 	cmdO2KdocName        string
 	cmdO2KoutputFormat   string
 	cmdO2KentityTags     []string
-	cmdO2KskipID         bool
 )
 
 // Executes the CLI command "openapi2kong"
@@ -35,7 +34,6 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 	options := openapi2kong.O2kOptions{
 		Tags:    cmdO2KentityTags,
 		DocName: cmdO2KdocName,
-		SkipID:  cmdO2KskipID,
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
@@ -86,9 +84,6 @@ custom annotations (x-kong-... directives).`,
 	openapi2kongCmd.Flags().StringSliceVar(&cmdO2KentityTags, "select-tag", nil,
 		"Select tags to apply to all entities. If omitted, uses the \"x-kong-tags\"\n"+
 			"directive from the file.")
-	openapi2kongCmd.Flags().BoolVar(&cmdO2KskipID, "no-id", false,
-		"Setting this flag will skip UUID generation for entities (no 'id' fields\n"+
-			"will be added).")
 
 	return openapi2kongCmd
 }
