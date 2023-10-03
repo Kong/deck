@@ -1,0 +1,22 @@
+apiVersion: configuration.konghq.com/v1
+consumerGroups:
+- example-consumer-group
+custom_id: "1234567890"
+kind: KongConsumer
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-user
+status: {}
+username: example-user
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumerGroup
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-consumer-group
+status: {}
+---

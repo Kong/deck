@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/headers.x-another-header: bla
+    konghq.com/headers.x-my-header: foo,bar
+    konghq.com/https-redirect-status-code: "302"
+    konghq.com/methods: GET,POST
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: http,https
+    konghq.com/regex-priority: "1"
+    konghq.com/snis: example.com
+    konghq.com/strip-path: "false"
+  creationTimestamp: null
+  name: example-route
+spec:
+  ingressClassName: kong
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: example-service
+            port:
+              number: 80
+        path: /v1/example
+        pathType: ImplementationSpecific
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/connect-timeout: "5000"
+    konghq.com/path: /v1
+    konghq.com/protocol: http
+    konghq.com/read-timeout: "60000"
+    konghq.com/retries: "5"
+    konghq.com/write-timeout: "60000"
+  creationTimestamp: null
+  name: example-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: example-service
+status:
+  loadBalancer: {}
+---
