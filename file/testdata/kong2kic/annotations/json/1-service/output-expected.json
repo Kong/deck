@@ -1,0 +1,31 @@
+{
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "example-service",
+        "creationTimestamp": null,
+        "annotations": {
+            "konghq.com/connect-timeout": "5000",
+            "konghq.com/path": "/v1",
+            "konghq.com/protocol": "http",
+            "konghq.com/read-timeout": "60000",
+            "konghq.com/retries": "5",
+            "konghq.com/write-timeout": "60000"
+        }
+    },
+    "spec": {
+        "ports": [
+            {
+                "protocol": "TCP",
+                "port": 80,
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "example-service"
+        }
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

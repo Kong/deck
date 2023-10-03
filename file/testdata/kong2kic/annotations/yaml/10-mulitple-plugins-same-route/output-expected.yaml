@@ -1,0 +1,292 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-service
+upstream:
+  algorithm: round-robin
+  hash_fallback: none
+  hash_on: none
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      headers:
+        x-another-header:
+        - bla
+        x-my-header:
+        - foo
+        - bar
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_sni: example.com
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 0
+  host_header: example.com
+  slots: 10000
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  aws_key: my_key
+  aws_region: us-west-2
+  aws_secret: my_secret
+  function_name: my_function
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: aws-lambda
+plugin: aws-lambda
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  credentials: true
+  exposed_headers:
+  - X-My-Header
+  headers:
+  - Authorization
+  max_age: 3600
+  methods:
+  - GET
+  - POST
+  origins:
+  - example.com
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: cors
+plugin: cors
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  path: /var/log/kong/kong.log
+  reopen: true
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: file-log
+plugin: file-log
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  content_type: application/json
+  http_endpoint: http://example.com/logs
+  keepalive: 60000
+  method: POST
+  queue_size: 1000
+  retry_count: 10
+  timeout: 10000
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: http-log
+plugin: http-log
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  allow:
+  - 192.168.0.1/24
+  deny:
+  - 192.168.0.2/32
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: ip-restriction
+plugin: ip-restriction
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  hide_client_headers: false
+  identifier: consumer
+  limit:
+  - 5
+  namespace: example_namespace
+  strategy: local
+  sync_rate: -1
+  window_size:
+  - 30
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: rate-limiting-advanced
+plugin: rate-limiting-advanced
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  message: Forbidden
+  status_code: 403
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: request-termination
+plugin: request-termination
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  limits:
+    limit_name:
+      minute: 10
+  policy: local
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: response-ratelimiting
+plugin: response-ratelimiting
+status: {}
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  host: example.com
+  port: 1234
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: tcp-log
+plugin: tcp-log
+status: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/headers.x-another-header: bla
+    konghq.com/headers.x-my-header: foo,bar
+    konghq.com/https-redirect-status-code: "302"
+    konghq.com/methods: GET,POST
+    konghq.com/plugins: aws-lambda,cors,file-log,http-log,ip-restriction,rate-limiting-advanced,request-termination,response-ratelimiting,tcp-log
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: http,https
+    konghq.com/regex-priority: "1"
+    konghq.com/snis: example.com
+    konghq.com/strip-path: "false"
+  creationTimestamp: null
+  name: example-route
+spec:
+  ingressClassName: kong
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: example-service
+            port:
+              number: 80
+        path: /v1/example
+        pathType: ImplementationSpecific
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/connect-timeout: "5000"
+    konghq.com/override: example-service
+    konghq.com/path: /v1
+    konghq.com/protocol: http
+    konghq.com/read-timeout: "60000"
+    konghq.com/retries: "5"
+    konghq.com/write-timeout: "60000"
+  creationTimestamp: null
+  name: example-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: example-service
+status:
+  loadBalancer: {}
+---
+apiVersion: configuration.konghq.com/v1
+custom_id: "1234567890"
+kind: KongConsumer
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-user
+status: {}
+username: example-user
+---

@@ -1,0 +1,28 @@
+{
+    "kind": "KongConsumer",
+    "apiVersion": "configuration.konghq.com/v1",
+    "metadata": {
+        "name": "example-user",
+        "creationTimestamp": null,
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        }
+    },
+    "username": "example-user",
+    "custom_id": "1234567890",
+    "consumerGroups": [
+        "example-consumer-group"
+    ],
+    "status": {}
+}{
+    "kind": "KongConsumerGroup",
+    "apiVersion": "configuration.konghq.com/v1",
+    "metadata": {
+        "name": "example-consumer-group",
+        "creationTimestamp": null,
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        }
+    },
+    "status": {}
+}
