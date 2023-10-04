@@ -60,7 +60,6 @@ func TestParseFormat(t *testing.T) {
 			want:    "",
 			wantErr: true,
 		},
-		
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
