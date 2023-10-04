@@ -13,14 +13,13 @@ import (
 var (
 	cmdKong2KicInputFilename  string
 	cmdKong2KicOutputFilename string
-	//cmdKong2KicApi            string
-	cmdKong2KicOutputFormat   string
-	cmdKong2KicManifestStyle  string
+	// cmdKong2KicApi           string
+	cmdKong2KicOutputFormat  string
+	cmdKong2KicManifestStyle string
 )
 
 // Executes the CLI command "kong2kic"
 func executeKong2Kic(cmd *cobra.Command, _ []string) error {
-
 	var (
 		outputContent    *file.Content
 		err              error
@@ -36,14 +35,18 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 	}
 
 	outputContent = inputContent.DeepCopy()
-	if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" && strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
-		outputFileFormat = file.KIC_JSON_CRD
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" && strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
-		outputFileFormat = file.KIC_JSON_ANNOTATION
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" && strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
-		outputFileFormat = file.KIC_YAML_CRD
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" && strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
-		outputFileFormat = file.KIC_YAML_ANNOTATION
+	if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
+		outputFileFormat = file.KICJSONCrd
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
+		outputFileFormat = file.KICJSONAnnotation
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
+		outputFileFormat = file.KICYAMLCrd
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
+		outputFileFormat = file.KICYAMLAnnotation
 	} else {
 		return fmt.Errorf("invalid combination of output format and manifest style")
 	}
@@ -71,7 +74,7 @@ func newKong2KicCmd() *cobra.Command {
 		
 Manifests can be generated using annotations in Ingress and Service objects (recommended) or
 using the KongIngress CRD. Output in YAML or JSON format.`,
-		RunE: executeKong2Kic, 
+		RunE: executeKong2Kic,
 		Args: cobra.NoArgs,
 	}
 
@@ -83,7 +86,7 @@ using the KongIngress CRD. Output in YAML or JSON format.`,
 		"Generate manifests with annotations in Service and Ingress, or using the KongIngress CRD: annotation or crd.")
 	kong2KicCmd.Flags().StringVarP(&cmdKong2KicOutputFormat, "format", "f", "yaml",
 		"output file format: json or yaml.")
-	//kong2KicCmd.Flags().StringVarP(&cmdKong2KicApi, "api", "a", "ingress", "[ingress|gateway]")
+	// kong2KicCmd.Flags().StringVarP(&cmdKong2KicApi, "api", "a", "ingress", "[ingress|gateway]")
 
 	return kong2KicCmd
 }
