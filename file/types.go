@@ -29,10 +29,10 @@ const (
 	// YAML if YAML file format.
 	YAML = "YAML"
 	// KIC YAML and JSON file format for ingress controller.
-	KIC_YAML_CRD  = "KIC_YAML_CRD"
-	KIC_JSON_CRD  = "KIC_JSON_CRD"
-	KIC_YAML_ANNOTATION = "KIC_YAML_ANNOTATION"
-	KIC_JSON_ANNOTATION = "KIC_JSON_ANNOTATION"
+	KICYAMLCrd        = "KIC_YAML_CRD"
+	KICJSONCrd        = "KIC_JSON_CRD"
+	KICYAMLAnnotation = "KIC_YAML_ANNOTATION"
+	KICJSONAnnotation = "KIC_JSON_ANNOTATION"
 )
 
 const (
@@ -755,18 +755,17 @@ type Content struct {
 // KICContent represents a serialized Kong state for KIC.
 // +k8s:deepcopy-gen=true
 type KICContent struct {
-	KongIngresses      []kicv1.KongIngress       		`json:"kongIngresses,omitempty" yaml:",omitempty"`
-	KongPlugins        []kicv1.KongPlugin        		`json:"kongPlugins,omitempty" yaml:",omitempty"`
-	KongClusterPlugins []kicv1.KongClusterPlugin 		`json:"clusterPlugins,omitempty" yaml:",omitempty"`
-	Ingresses          []k8snetv1.Ingress        		`json:"ingresses,omitempty" yaml:",omitempty"`
-	Services           []k8scorev1.Service       		`json:"services,omitempty" yaml:",omitempty"`
-	Secrets            []k8scorev1.Secret        		`json:"secrets,omitempty" yaml:",omitempty"`
-	KongConsumers      []kicv1.KongConsumer      		`json:"consumers,omitempty" yaml:",omitempty"`
-	KongConsumerGroups []kicv1beta1.KongConsumerGroup 	`json:"consumerGroups,omitempty" yaml:",omitempty"`
+	KongIngresses      []kicv1.KongIngress            `json:"kongIngresses,omitempty" yaml:",omitempty"`
+	KongPlugins        []kicv1.KongPlugin             `json:"kongPlugins,omitempty" yaml:",omitempty"`
+	KongClusterPlugins []kicv1.KongClusterPlugin      `json:"clusterPlugins,omitempty" yaml:",omitempty"`
+	Ingresses          []k8snetv1.Ingress             `json:"ingresses,omitempty" yaml:",omitempty"`
+	Services           []k8scorev1.Service            `json:"services,omitempty" yaml:",omitempty"`
+	Secrets            []k8scorev1.Secret             `json:"secrets,omitempty" yaml:",omitempty"`
+	KongConsumers      []kicv1.KongConsumer           `json:"consumers,omitempty" yaml:",omitempty"`
+	KongConsumerGroups []kicv1beta1.KongConsumerGroup `json:"consumerGroups,omitempty" yaml:",omitempty"`
 }
 
 func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
-
 	var kongIngresses []byte
 	var kongPlugins []byte
 	var kongClusterPlugins []byte
@@ -864,8 +863,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	return output, nil
 }
 
-func (k KICContent) marshalKICContentToJson() ([]byte, error) {
-
+func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	var kongIngresses []byte
 	var kongPlugins []byte
 	var kongClusterPlugins []byte
@@ -948,4 +946,3 @@ func (k KICContent) marshalKICContentToJson() ([]byte, error) {
 
 	return output, nil
 }
-
