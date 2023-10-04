@@ -24,6 +24,9 @@ _testmain.go
 *.test
 *.prof
 
+# Apple cruft
+.DS_Store
+
 # for this repo only
 deck
 dist/
