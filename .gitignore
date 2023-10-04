@@ -24,13 +24,11 @@ _testmain.go
 *.test
 *.prof
 
+# Apple cruft
+.DS_Store
+
 # for this repo only
 deck
 dist/
 docs/cli-docs/
-.idea/deck.iml
-.idea/misc.xml
-.gitignore
-.idea/vcs.xml
-.gitignore
-.idea/modules.xml
+.idea/
