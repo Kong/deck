@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -627,10 +628,10 @@ var (
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []*int32{int32p(7)},
-						"retry_after_jitter_max": int32p(1),
-						"window_size":            []*int32{int32p(60)},
-						"window_type":            kong.String("sliding"),
+						"limit":                  []any{float64(7)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
 					},
 					ConsumerGroup: &kong.ConsumerGroup{
 						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
@@ -652,10 +653,10 @@ var (
 				{
 					Name: kong.String("rate-limiting-advanced"),
 					Config: kong.Configuration{
-						"limit":                  []*int32{int32p(10)},
-						"retry_after_jitter_max": int32p(1),
-						"window_size":            []*int32{int32p(60)},
-						"window_type":            kong.String("sliding"),
+						"limit":                  []any{float64(10)},
+						"retry_after_jitter_max": float64(1),
+						"window_size":            []any{float64(60)},
+						"window_type":            "sliding",
 					},
 					ConsumerGroup: &kong.ConsumerGroup{
 						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
@@ -821,6 +822,328 @@ var (
 			Protocols: []*string{kong.String("http"), kong.String("https")},
 		},
 	}
+
+	consumerGroupScopedPlugins = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(30),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(30),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(30),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
+
+	consumerGroupScopedPlugins35x = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(256),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(256),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":   nil,
+					"connect_timeout":     nil,
+					"database":            float64(0),
+					"host":                nil,
+					"keepalive_backlog":   nil,
+					"keepalive_pool_size": float64(256),
+					"password":            nil,
+					"port":                nil,
+					"read_timeout":        nil,
+					"send_timeout":        nil,
+					"sentinel_addresses":  nil,
+					"sentinel_master":     nil,
+					"sentinel_password":   nil,
+					"sentinel_role":       nil,
+					"sentinel_username":   nil,
+					"server_name":         nil,
+					"ssl":                 false,
+					"ssl_verify":          false,
+					"timeout":             float64(2000),
+					"username":            nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
 )
 
 // test scope:
@@ -861,8 +1184,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<=1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -904,8 +1226,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">1.4.3 <=1.5.1")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -947,8 +1268,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -997,8 +1317,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1042,8 +1361,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1084,8 +1402,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1126,8 +1443,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1161,8 +1477,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1196,8 +1511,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1231,8 +1545,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==1.5.1")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1281,8 +1594,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1316,8 +1628,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1351,8 +1662,7 @@ func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1394,8 +1704,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<=1.5.2")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -1445,8 +1754,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.1.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1481,8 +1789,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1517,8 +1824,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1553,8 +1859,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1597,8 +1902,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.4.1 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1633,8 +1937,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1669,8 +1972,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1705,8 +2007,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1745,8 +2046,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "==2.7.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1789,8 +2089,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
@@ -1828,8 +2127,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1874,8 +2172,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1915,8 +2212,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1952,8 +2248,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -1989,8 +2284,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--skip-ca-certificates")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2095,8 +2389,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2201,8 +2494,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile, "--rbac-resources-only")
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2235,8 +2527,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2269,8 +2560,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2308,8 +2598,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2346,8 +2635,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2405,8 +2693,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2433,8 +2720,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			err := sync(tc.kongFile)
 			assert.Equal(t, err, tc.expectedError)
@@ -2583,8 +2869,7 @@ func Test_Sync_Vault(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2672,8 +2957,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -2717,8 +3001,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -2762,8 +3045,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -2807,8 +3089,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -2851,8 +3132,7 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -2894,9 +3174,8 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.1.0")
-			teardown := setup(t)
-			defer teardown(t)
+			runWhen(t, "enterprise", "==3.1.0")
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -2983,9 +3262,8 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", "==3.0.0")
-			teardown := setup(t)
-			defer teardown(t)
+			runWhen(t, "enterprise", ">=3.0.0 <3.1.0")
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -3069,21 +3347,11 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 				ConsumerGroups: consumerGroupsWithTags,
 			},
 		},
-		{
-			name:            "creates consumer groups and plugin",
-			kongFile:        "testdata/sync/016-consumer-groups-and-plugins/kong3x.yaml",
-			kongFileInitial: "testdata/sync/016-consumer-groups-and-plugins/kong3x-initial.yaml",
-			expectedState: utils.KongRawState{
-				Consumers:      consumerGroupsConsumers,
-				ConsumerGroups: consumerGroupsWithRLAKonnect,
-			},
-		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "konnect", "")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// set up initial state
 			sync(tc.kongFileInitial)
@@ -3167,8 +3435,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.2.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			sync(tc.kongFile)
 			testKongState(t, client, false, tc.expectedState, nil)
@@ -3177,7 +3444,8 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 }
 
 // test scope:
-//   - 3.2.0+
+//   - 3.2.x
+//   - 3.3.x
 func Test_Sync_SkipConsumers(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -3212,9 +3480,353 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.2.0 <3.4.0")
+			setup(t)
+
+			if tc.skipConsumers {
+				sync(tc.kongFile, "--skip-consumers")
+			} else {
+				sync(tc.kongFile)
+			}
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.4.x
+func Test_Sync_SkipConsumers_34x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		skipConsumers bool
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "skip-consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong34.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+			},
+			skipConsumers: true,
+		},
+		{
+			name:     "do not skip consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong34.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+							Tags: kong.StringSlice("tag1", "tag3"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+						},
+						Config: kong.Configuration{
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(10)},
+							"namespace":               string("gold"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cluster_addresses":   nil,
+								"connect_timeout":     nil,
+								"database":            float64(0),
+								"host":                nil,
+								"keepalive_backlog":   nil,
+								"keepalive_pool_size": float64(30),
+								"password":            nil,
+								"port":                nil,
+								"read_timeout":        nil,
+								"send_timeout":        nil,
+								"sentinel_addresses":  nil,
+								"sentinel_master":     nil,
+								"sentinel_password":   nil,
+								"sentinel_role":       nil,
+								"sentinel_username":   nil,
+								"server_name":         nil,
+								"ssl":                 false,
+								"ssl_verify":          false,
+								"timeout":             float64(2000),
+								"username":            nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              float64(-1),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+						},
+						Config: kong.Configuration{
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(7)},
+							"namespace":               string("silver"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cluster_addresses":   nil,
+								"connect_timeout":     nil,
+								"database":            float64(0),
+								"host":                nil,
+								"keepalive_backlog":   nil,
+								"keepalive_pool_size": float64(30),
+								"password":            nil,
+								"port":                nil,
+								"read_timeout":        nil,
+								"send_timeout":        nil,
+								"sentinel_addresses":  nil,
+								"sentinel_master":     nil,
+								"sentinel_password":   nil,
+								"sentinel_role":       nil,
+								"sentinel_username":   nil,
+								"server_name":         nil,
+								"ssl":                 false,
+								"ssl_verify":          false,
+								"timeout":             float64(2000),
+								"username":            nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              float64(-1),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
+				},
+			},
+			skipConsumers: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			setup(t)
+
+			if tc.skipConsumers {
+				sync(tc.kongFile, "--skip-consumers")
+			} else {
+				sync(tc.kongFile)
+			}
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	// setup stage
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		skipConsumers bool
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "skip-consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong34.yaml",
+			expectedState: utils.KongRawState{
+				Services: svc1_207,
+			},
+			skipConsumers: true,
+		},
+		{
+			name:     "do not skip consumers successfully",
+			kongFile: "testdata/sync/019-skip-consumers/kong34.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+							Tags: kong.StringSlice("tag1", "tag3"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+						},
+						Config: kong.Configuration{
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(10)},
+							"namespace":               string("gold"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cluster_addresses":   nil,
+								"connect_timeout":     nil,
+								"database":            float64(0),
+								"host":                nil,
+								"keepalive_backlog":   nil,
+								"keepalive_pool_size": float64(30),
+								"password":            nil,
+								"port":                nil,
+								"read_timeout":        nil,
+								"send_timeout":        nil,
+								"sentinel_addresses":  nil,
+								"sentinel_master":     nil,
+								"sentinel_password":   nil,
+								"sentinel_role":       nil,
+								"sentinel_username":   nil,
+								"server_name":         nil,
+								"ssl":                 false,
+								"ssl_verify":          false,
+								"timeout":             float64(2000),
+								"username":            nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              nil,
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+						},
+						Config: kong.Configuration{
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(7)},
+							"namespace":               string("silver"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cluster_addresses":   nil,
+								"connect_timeout":     nil,
+								"database":            float64(0),
+								"host":                nil,
+								"keepalive_backlog":   nil,
+								"keepalive_pool_size": float64(30),
+								"password":            nil,
+								"port":                nil,
+								"read_timeout":        nil,
+								"send_timeout":        nil,
+								"sentinel_addresses":  nil,
+								"sentinel_master":     nil,
+								"sentinel_password":   nil,
+								"sentinel_role":       nil,
+								"sentinel_username":   nil,
+								"server_name":         nil,
+								"ssl":                 false,
+								"ssl_verify":          false,
+								"timeout":             float64(2000),
+								"username":            nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              nil,
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
+				},
+			},
+			skipConsumers: false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.2.0")
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			if tc.skipConsumers {
 				sync(tc.kongFile, "--skip-consumers")
@@ -3341,8 +3953,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			teardown := setup(t)
-			defer teardown(t)
+			setup(t)
 
 			// First, create the entities with the original IDs.
 			err = sync(tc.beforeConfig)
@@ -3368,6 +3979,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -3420,6 +4032,7 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
 
 	client, err := getTestClient()
 	if err != nil {
@@ -3457,4 +4070,503 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 			},
 		},
 	}, ignoreFieldsIrrelevantForIDsTests)
+}
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
+	require.NoError(t, err)
+
+	// To ignore noise, we ignore the Key and Cert fields because they are not relevant for this test.
+	ignoredFields := []cmp.Option{
+		cmpopts.IgnoreFields(
+			kong.Certificate{},
+			"Key",
+			"Cert",
+		),
+	}
+
+	testKongState(t, client, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("before"),
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+
+	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"), // Tag should be updated.
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+}
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, false, utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("ce49186d-7670-445d-a218-897631b29ada"),
+				Username: kong.String("Foo"),
+				CustomID: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("7820f383-7b77-4fcc-af7f-14ff3e256693"),
+				Username: kong.String("foo"),
+				CustomID: kong.String("bar"),
+			},
+			{
+				ID:       kong.String("18c62c3c-12cc-429a-8e5a-57f2c3691a6b"),
+				CustomID: kong.String("custom_id_only"),
+			},
+			{
+				ID:       kong.String("8ef278c9-48c1-43e1-b665-e9bc18fab4c8"),
+				Username: kong.String("username_only"),
+			},
+		},
+	}, nil)
+}
+
+// This test has 2 goals:
+//   - make sure consumer groups scoped plugins can be configured correctly in Kong
+//   - the actual consumer groups functionality works once set
+//
+// This is achieved via configuring:
+// - 3 consumers:
+//   - 1 belonging to Gold Consumer Group
+//   - 1 belonging to Silver Consumer Group
+//   - 1 not belonging to any Consumer Group
+//
+// - 3 key-auths, one for each consumer
+// - 1 global key-auth plugin
+// - 2 consumer group
+// - 1 global RLA plugin
+// - 2 RLA plugins, scoped to the related consumer groups
+// - 1 service pointing to mockbin.org
+// - 1 route proxying the above service
+//
+// Once the configuration is verified to be matching in Kong,
+// we then check whether the specific RLA configuration is correctly applied: consumers
+// not belonging to the consumer group should be limited to 5 requests
+// every 30s, while consumers belonging to the 'gold' and 'silver' consumer groups
+// should be allowed to run respectively 10 and 7 requests in the same timeframe.
+// In order to make sure this is the case, we run requests in a loop
+// for all consumers and then check at what point they start to receive 429.
+func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
+	const (
+		maxGoldRequestsNumber    = 10
+		maxSilverRequestsNumber  = 7
+		maxRegularRequestsNumber = 5
+	)
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups scoped plugins",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
+			setup(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+
+			// Kong proxy may need a bit to be ready.
+			time.Sleep(time.Second * 10)
+
+			// build simple http client
+			client := &http.Client{}
+
+			// test 'foo' consumer (part of 'gold' group)
+			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-special")
+			n := 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxGoldRequestsNumber, n)
+
+			// test 'bar' consumer (part of 'silver' group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-not-so-special")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxSilverRequestsNumber, n)
+
+			// test 'baz' consumer (not part of any group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-just-average")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxRegularRequestsNumber, n)
+		})
+	}
+}
+
+func Test_Sync_ConsumerGroupsScopedPlugins_After350(t *testing.T) {
+	const (
+		maxGoldRequestsNumber    = 10
+		maxSilverRequestsNumber  = 7
+		maxRegularRequestsNumber = 5
+	)
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups scoped plugins",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins35x,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.5.0")
+			setup(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+
+			// Kong proxy may need a bit to be ready.
+			time.Sleep(time.Second * 10)
+
+			// build simple http client
+			client := &http.Client{}
+
+			// test 'foo' consumer (part of 'gold' group)
+			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-special")
+			n := 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxGoldRequestsNumber, n)
+
+			// test 'bar' consumer (part of 'silver' group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-not-so-special")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxSilverRequestsNumber, n)
+
+			// test 'baz' consumer (not part of any group)
+			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
+			assert.NoError(t, err)
+			req.Header.Add("apikey", "i-am-just-average")
+			n = 0
+			for n < 11 {
+				resp, err := client.Do(req)
+				assert.NoError(t, err)
+				defer resp.Body.Close()
+				if resp.StatusCode == http.StatusTooManyRequests {
+					break
+				}
+				n++
+			}
+			assert.Equal(t, maxRegularRequestsNumber, n)
+		})
+	}
+}
+
+// test scope:
+//   - > 3.4.0
+func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedError error
+	}{
+		{
+			name:          "attempt to create deprecated consumer groups configuration with Kong version >= 3.4.0 fails",
+			kongFile:      "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
+			expectedError: fmt.Errorf("building state: %v", utils.ErrorConsumerGroupUpgrade),
+		},
+		{
+			name:     "empty deprecated consumer groups configuration fields do not fail with Kong version >= 3.4.0",
+			kongFile: "testdata/sync/017-consumer-groups-rla-application/kong3x-empty-application.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.4.0")
+			setup(t)
+
+			err := sync(tc.kongFile)
+			if tc.expectedError == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tc.expectedError.Error())
+			}
+		})
+	}
+}
+
+func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
+	client, err := getTestClient()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates consumer groups scoped plugins",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKonnect(t)
+			setup(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
 }

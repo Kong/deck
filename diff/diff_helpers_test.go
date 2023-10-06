@@ -168,7 +168,7 @@ func Test_MaskEnvVarsValues(t *testing.T) {
 			for k, v := range tt.envVars {
 				t.Setenv(k, v)
 			}
-			if got := maskEnvVarValue(tt.args); got != tt.want {
+			if got := MaskEnvVarValue(tt.args); got != tt.want {
 				t.Errorf("maskEnvVarValue() = %v\nwant %v", got, tt.want)
 			}
 		})

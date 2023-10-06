@@ -1,0 +1,19 @@
+_format_version: "3.0"
+consumer_groups:
+- name: basic
+  plugins:
+  - config:
+      limit:
+      - 30000
+      window_size:
+      - 2628000
+      window_type: sliding
+      namespace: basic
+    name: rate-limiting-advanced
+consumers:
+  - username: foo
+    groups:
+    - name: basic
+services:
+- name: svc1
+  host: mockbin.org

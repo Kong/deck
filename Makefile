@@ -6,7 +6,7 @@ test-all: lint test
 
 .PHONY: test
 test:
-	go test -race ./...
+	go test -race -count=1 ./...
 
 .PHONY: lint
 lint:
@@ -47,6 +47,6 @@ setup-kong-ee:
 
 .PHONY: test-integration
 test-integration:
-	go test -v -tags=integration \
+	go test -v -count=1 -tags=integration \
 		-race \
 		./tests/integration/...

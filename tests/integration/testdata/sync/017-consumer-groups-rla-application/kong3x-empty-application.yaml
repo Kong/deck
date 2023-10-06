@@ -1,0 +1,48 @@
+_format_version: "3.0"
+plugins:
+- config:
+    consumer_groups: null
+    dictionary_name: kong_rate_limiting_counters
+    enforce_consumer_groups: false
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 5
+    namespace: dNRC6xKsRL8Koc1uVYA4Nki6DLW7XIdx
+    path: null
+    redis:
+      cluster_addresses: null
+      connect_timeout: null
+      database: 0
+      host: null
+      keepalive_backlog: null
+      keepalive_pool_size: 30
+      password: null
+      port: null
+      read_timeout: null
+      send_timeout: null
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: -1
+    window_size:
+    - 60
+    window_type: sliding
+  enabled: true
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+

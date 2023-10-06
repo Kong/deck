@@ -12,6 +12,8 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+const ratelimitingAdvancedPluginName = "rate-limiting-advanced"
+
 type stateBuilder struct {
 	targetContent   *Content
 	rawState        *utils.KongRawState
@@ -34,6 +36,8 @@ type stateBuilder struct {
 	isKonnect bool
 
 	checkRoutePaths bool
+
+	isConsumerGroupScopedPluginSupported bool
 
 	err error
 }
@@ -69,6 +73,10 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		b.checkRoutePaths = true
 	}
 
+	if utils.Kong340Version.LTE(b.kongVersion) || b.isKonnect {
+		b.isConsumerGroupScopedPluginSupported = true
+	}
+
 	// build
 	b.certificates()
 	if !b.skipCACerts {
@@ -90,6 +98,46 @@ func (b *stateBuilder) build() (*utils.KongRawState, *utils.KonnectRawState, err
 		return nil, nil, b.err
 	}
 	return b.rawState, b.konnectRawState, nil
+}
+
+func (b *stateBuilder) ingestConsumerGroupScopedPlugins(cg FConsumerGroupObject) error {
+	var plugins []FPlugin
+	for _, plugin := range cg.Plugins {
+		plugin.ConsumerGroup = utils.GetConsumerGroupReference(cg.ConsumerGroup)
+		plugins = append(plugins, FPlugin{
+			Plugin: kong.Plugin{
+				ID:     plugin.ID,
+				Name:   plugin.Name,
+				Config: plugin.Config,
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID: cg.ID,
+				},
+			},
+		})
+	}
+	return b.ingestPlugins(plugins)
+}
+
+func (b *stateBuilder) addConsumerGroupPlugins(
+	cg FConsumerGroupObject, cgo *kong.ConsumerGroupObject,
+) error {
+	for _, plugin := range cg.Plugins {
+		if utils.Empty(plugin.ID) {
+			current, err := b.currentState.ConsumerGroupPlugins.Get(
+				*plugin.Name, *cg.ConsumerGroup.ID,
+			)
+			if errors.Is(err, state.ErrNotFound) {
+				plugin.ID = uuid()
+			} else if err != nil {
+				return err
+			} else {
+				plugin.ID = kong.String(*current.ID)
+			}
+		}
+		b.defaulter.MustSet(plugin)
+		cgo.Plugins = append(cgo.Plugins, plugin)
+	}
+	return nil
 }
 
 func (b *stateBuilder) consumerGroups() {
@@ -116,22 +164,29 @@ func (b *stateBuilder) consumerGroups() {
 			ConsumerGroup: &cg.ConsumerGroup,
 		}
 
-		for _, plugin := range cg.Plugins {
-			if utils.Empty(plugin.ID) {
-				current, err := b.currentState.ConsumerGroupPlugins.Get(
-					*plugin.Name, *cg.ConsumerGroup.ID,
-				)
-				if errors.Is(err, state.ErrNotFound) {
-					plugin.ID = uuid()
-				} else if err != nil {
-					b.err = err
-					return
-				} else {
-					plugin.ID = kong.String(*current.ID)
-				}
+		err := b.intermediate.ConsumerGroups.Add(state.ConsumerGroup{ConsumerGroup: cg.ConsumerGroup})
+		if err != nil {
+			b.err = err
+			return
+		}
+
+		// Plugins and Consumer Groups can be handled in two ways:
+		//   1. directly in the ConsumerGroup object
+		//   2. by scoping the plugin to the ConsumerGroup (Kong >= 3.4.0)
+		//
+		// The first method is deprecated and will be removed in the future, but
+		// we still need to support it for now. The isConsumerGroupScopedPluginSupported
+		// flag is used to determine which method to use based on the Kong version.
+		if b.isConsumerGroupScopedPluginSupported {
+			if err := b.ingestConsumerGroupScopedPlugins(cg); err != nil {
+				b.err = err
+				return
 			}
-			b.defaulter.MustSet(plugin)
-			cgo.Plugins = append(cgo.Plugins, plugin)
+		} else {
+			if err := b.addConsumerGroupPlugins(cg, &cgo); err != nil {
+				b.err = err
+				return
+			}
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
 	}
@@ -234,10 +289,16 @@ func (b *stateBuilder) consumers() {
 	for _, c := range b.targetContent.Consumers {
 		c := c
 		if utils.Empty(c.ID) {
-			consumer, err := b.currentState.Consumers.Get(*c.Username)
-			if errors.Is(err, state.ErrNotFound) {
+			var (
+				consumer *state.Consumer
+				err      error
+			)
+			if c.Username != nil {
+				consumer, err = b.currentState.Consumers.GetByIDOrUsername(*c.Username)
+			}
+			if errors.Is(err, state.ErrNotFound) || consumer == nil {
 				if c.CustomID != nil {
-					consumer, err = b.currentState.Consumers.Get(*c.CustomID)
+					consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
 					if err == nil {
 						c.ID = kong.String(*consumer.ID)
 					}
@@ -844,7 +905,7 @@ func (b *stateBuilder) plugins() {
 	for _, p := range b.targetContent.Plugins {
 		p := p
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
-			c, err := b.intermediate.Consumers.Get(*p.Consumer.ID)
+			c, err := b.intermediate.Consumers.GetByIDOrUsername(*p.Consumer.ID)
 			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
 					p.Consumer.FriendlyName(), *p.Name, err)
@@ -882,12 +943,52 @@ func (b *stateBuilder) plugins() {
 			}
 			p.Route = utils.GetRouteReference(r.Route)
 		}
+		if p.ConsumerGroup != nil && !utils.Empty(p.ConsumerGroup.ID) {
+			cg, err := b.intermediate.ConsumerGroups.Get(*p.ConsumerGroup.ID)
+			if errors.Is(err, state.ErrNotFound) {
+				b.err = fmt.Errorf("consumer-group %v for plugin %v: %w",
+					p.ConsumerGroup.FriendlyName(), *p.Name, err)
+				return
+			} else if err != nil {
+				b.err = err
+				return
+			}
+			p.ConsumerGroup = utils.GetConsumerGroupReference(cg.ConsumerGroup)
+		}
+
+		if err := b.validatePlugin(p); err != nil {
+			b.err = err
+			return
+		}
 		plugins = append(plugins, p)
 	}
 	if err := b.ingestPlugins(plugins); err != nil {
 		b.err = err
 		return
 	}
+}
+
+func (b *stateBuilder) validatePlugin(p FPlugin) error {
+	if b.isConsumerGroupScopedPluginSupported && *p.Name == ratelimitingAdvancedPluginName {
+		// check if deprecated consumer-groups configuration is present in the config
+		var consumerGroupsFound bool
+		if groups, ok := p.Config["consumer_groups"]; ok {
+			// if groups is an array of length > 0, then consumer_groups is set
+			if groupsArray, ok := groups.([]interface{}); ok && len(groupsArray) > 0 {
+				consumerGroupsFound = true
+			}
+		}
+		var enforceConsumerGroupsFound bool
+		if enforceConsumerGroups, ok := p.Config["enforce_consumer_groups"]; ok {
+			if enforceConsumerGroupsBool, ok := enforceConsumerGroups.(bool); ok && enforceConsumerGroupsBool {
+				enforceConsumerGroupsFound = true
+			}
+		}
+		if consumerGroupsFound || enforceConsumerGroupsFound {
+			return utils.ErrorConsumerGroupUpgrade
+		}
+	}
+	return nil
 }
 
 // strip_path schema default value is 'true', but it cannot be set when
@@ -997,9 +1098,9 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
 		if utils.Empty(p.ID) {
-			cID, rID, sID := pluginRelations(&p.Plugin)
+			cID, rID, sID, cgID := pluginRelations(&p.Plugin)
 			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
-				sID, rID, cID)
+				sID, rID, cID, cgID)
 			if errors.Is(err, state.ErrNotFound) {
 				p.ID = uuid()
 			} else if err != nil {
@@ -1044,7 +1145,7 @@ func (b *stateBuilder) fillPluginConfig(plugin *FPlugin) error {
 	return nil
 }
 
-func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
+func pluginRelations(plugin *kong.Plugin) (cID, rID, sID, cgID string) {
 	if plugin.Consumer != nil && !utils.Empty(plugin.Consumer.ID) {
 		cID = *plugin.Consumer.ID
 	}
@@ -1053,6 +1154,9 @@ func pluginRelations(plugin *kong.Plugin) (cID, rID, sID string) {
 	}
 	if plugin.Service != nil && !utils.Empty(plugin.Service.ID) {
 		sID = *plugin.Service.ID
+	}
+	if plugin.ConsumerGroup != nil && !utils.Empty(plugin.ConsumerGroup.ID) {
+		cgID = *plugin.ConsumerGroup.ID
 	}
 	return
 }

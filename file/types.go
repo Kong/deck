@@ -9,6 +9,11 @@ import (
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	kicv1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1"
+	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1beta1"
+	k8scorev1 "k8s.io/api/core/v1"
+	k8snetv1 "k8s.io/api/networking/v1"
+	"sigs.k8s.io/yaml"
 )
 
 // Format is a file format for Kong's configuration.
@@ -23,6 +28,11 @@ const (
 	JSON = "JSON"
 	// YAML if YAML file format.
 	YAML = "YAML"
+	// KIC YAML and JSON file format for ingress controller.
+	KIC_YAML_CRD  = "KIC_YAML_CRD"
+	KIC_JSON_CRD  = "KIC_JSON_CRD"
+	KIC_YAML_ANNOTATION = "KIC_YAML_ANNOTATION"
+	KIC_JSON_ANNOTATION = "KIC_JSON_ANNOTATION"
 )
 
 const (
@@ -321,19 +331,20 @@ type FPlugin struct {
 // foo is a shadow type of Plugin.
 // It is used for custom marshalling of plugin.
 type foo struct {
-	CreatedAt    *int                 `json:"created_at,omitempty" yaml:"created_at,omitempty"`
-	ID           *string              `json:"id,omitempty" yaml:"id,omitempty"`
-	Name         *string              `json:"name,omitempty" yaml:"name,omitempty"`
-	InstanceName *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
-	Config       kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
-	Service      string               `json:"service,omitempty" yaml:",omitempty"`
-	Consumer     string               `json:"consumer,omitempty" yaml:",omitempty"`
-	Route        string               `json:"route,omitempty" yaml:",omitempty"`
-	Enabled      *bool                `json:"enabled,omitempty" yaml:"enabled,omitempty"`
-	RunOn        *string              `json:"run_on,omitempty" yaml:"run_on,omitempty"`
-	Ordering     *kong.PluginOrdering `json:"ordering,omitempty" yaml:"ordering,omitempty"`
-	Protocols    []*string            `json:"protocols,omitempty" yaml:"protocols,omitempty"`
-	Tags         []*string            `json:"tags,omitempty" yaml:"tags,omitempty"`
+	CreatedAt     *int                 `json:"created_at,omitempty" yaml:"created_at,omitempty"`
+	ID            *string              `json:"id,omitempty" yaml:"id,omitempty"`
+	Name          *string              `json:"name,omitempty" yaml:"name,omitempty"`
+	InstanceName  *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
+	Config        kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
+	Service       string               `json:"service,omitempty" yaml:",omitempty"`
+	Consumer      string               `json:"consumer,omitempty" yaml:",omitempty"`
+	ConsumerGroup string               `json:"consumer_group,omitempty" yaml:",omitempty"`
+	Route         string               `json:"route,omitempty" yaml:",omitempty"`
+	Enabled       *bool                `json:"enabled,omitempty" yaml:"enabled,omitempty"`
+	RunOn         *string              `json:"run_on,omitempty" yaml:"run_on,omitempty"`
+	Ordering      *kong.PluginOrdering `json:"ordering,omitempty" yaml:"ordering,omitempty"`
+	Protocols     []*string            `json:"protocols,omitempty" yaml:"protocols,omitempty"`
+	Tags          []*string            `json:"tags,omitempty" yaml:"tags,omitempty"`
 
 	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
 }
@@ -378,6 +389,9 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.Plugin.Service != nil {
 		f.Service = *p.Plugin.Service.ID
+	}
+	if p.Plugin.ConsumerGroup != nil {
+		f.ConsumerGroup = *p.Plugin.ConsumerGroup.ID
 	}
 	return f
 }
@@ -426,6 +440,11 @@ func copyFromFoo(f foo, p *FPlugin) {
 	if f.Service != "" {
 		p.Service = &kong.Service{
 			ID: kong.String(f.Service),
+		}
+	}
+	if f.ConsumerGroup != "" {
+		p.ConsumerGroup = &kong.ConsumerGroup{
+			ID: kong.String(f.ConsumerGroup),
 		}
 	}
 }
@@ -479,6 +498,9 @@ func (p FPlugin) sortKey() string {
 		}
 		if p.Service != nil {
 			key += *p.Service.ID
+		}
+		if p.ConsumerGroup != nil {
+			key += *p.ConsumerGroup.ID
 		}
 		return key
 	}
@@ -728,3 +750,201 @@ type Content struct {
 
 	Licenses []FLicense `json:"licenses,omitempty" yaml:"licenses,omitempty"`
 }
+
+// KICContent represents a serialized Kong state for KIC.
+// +k8s:deepcopy-gen=true
+type KICContent struct {
+	KongIngresses      []kicv1.KongIngress       		`json:"kongIngresses,omitempty" yaml:",omitempty"`
+	KongPlugins        []kicv1.KongPlugin        		`json:"kongPlugins,omitempty" yaml:",omitempty"`
+	KongClusterPlugins []kicv1.KongClusterPlugin 		`json:"clusterPlugins,omitempty" yaml:",omitempty"`
+	Ingresses          []k8snetv1.Ingress        		`json:"ingresses,omitempty" yaml:",omitempty"`
+	Services           []k8scorev1.Service       		`json:"services,omitempty" yaml:",omitempty"`
+	Secrets            []k8scorev1.Secret        		`json:"secrets,omitempty" yaml:",omitempty"`
+	KongConsumers      []kicv1.KongConsumer      		`json:"consumers,omitempty" yaml:",omitempty"`
+	KongConsumerGroups []kicv1beta1.KongConsumerGroup 	`json:"consumerGroups,omitempty" yaml:",omitempty"`
+}
+
+func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
+
+	var kongIngresses []byte
+	var kongPlugins []byte
+	var kongClusterPlugins []byte
+	var ingresses []byte
+	var services []byte
+	var secrets []byte
+	var kongConsumers []byte
+	var kongConsumerGroups []byte
+	var err error
+	var output []byte
+
+	// iterate over the slices of kongIngresses, kongPlugins,
+	// kongClusterPlugins, ingresses, services, secrets, kongConsumers
+	// and marshal each one in yaml format
+	// and append it to the output slice
+	// then return the output slice
+	for _, kongIngress := range k.KongIngresses {
+		kongIngresses, err = yaml.Marshal(kongIngress)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongIngresses...)
+		output = append(output, []byte("---\n")...)
+	}
+
+	for _, kongPlugin := range k.KongPlugins {
+		kongPlugins, err = yaml.Marshal(kongPlugin)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongPlugins...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, kongClusterPlugin := range k.KongClusterPlugins {
+		kongClusterPlugins, err = yaml.Marshal(kongClusterPlugin)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongClusterPlugins...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, ingress := range k.Ingresses {
+		ingresses, err = yaml.Marshal(ingress)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, ingresses...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, service := range k.Services {
+		services, err = yaml.Marshal(service)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, services...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, secret := range k.Secrets {
+		secrets, err = yaml.Marshal(secret)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, secrets...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, kongConsumer := range k.KongConsumers {
+		kongConsumers, err = yaml.Marshal(kongConsumer)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongConsumers...)
+		output = append(output, []byte("---\n")...)
+
+	}
+
+	for _, kongConsumerGroup := range k.KongConsumerGroups {
+		kongConsumerGroups, err = yaml.Marshal(kongConsumerGroup)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongConsumerGroups...)
+		output = append(output, []byte("---\n")...)
+	}
+
+	return output, nil
+}
+
+func (k KICContent) marshalKICContentToJson() ([]byte, error) {
+
+	var kongIngresses []byte
+	var kongPlugins []byte
+	var kongClusterPlugins []byte
+	var ingresses []byte
+	var services []byte
+	var secrets []byte
+	var kongConsumers []byte
+	var kongConsumerGroups []byte
+	var err error
+	var output []byte
+
+	// iterate over the slices of kongIngresses, kongPlugins,
+	// kongClusterPlugins, ingresses, services, secrets, kongConsumers
+	// and marshal each one in json format
+	// and append it to the output slice
+	// then return the output slice
+	for _, kongIngress := range k.KongIngresses {
+		kongIngresses, err = json.MarshalIndent(kongIngress, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongIngresses...)
+	}
+
+	for _, kongPlugin := range k.KongPlugins {
+		kongPlugins, err = json.MarshalIndent(kongPlugin, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongPlugins...)
+	}
+
+	for _, kongClusterPlugin := range k.KongClusterPlugins {
+		kongClusterPlugins, err = json.MarshalIndent(kongClusterPlugin, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongClusterPlugins...)
+	}
+
+	for _, ingress := range k.Ingresses {
+		ingresses, err = json.MarshalIndent(ingress, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, ingresses...)
+	}
+
+	for _, service := range k.Services {
+		services, err = json.MarshalIndent(service, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, services...)
+	}
+
+	for _, secret := range k.Secrets {
+		secrets, err = json.MarshalIndent(secret, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, secrets...)
+	}
+
+	for _, kongConsumer := range k.KongConsumers {
+		kongConsumers, err = json.MarshalIndent(kongConsumer, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongConsumers...)
+	}
+
+	for _, kongConsumerGroup := range k.KongConsumerGroups {
+		kongConsumerGroups, err = json.MarshalIndent(kongConsumerGroup, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongConsumerGroups...)
+	}
+
+	return output, nil
+}
+

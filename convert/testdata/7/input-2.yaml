@@ -1,0 +1,12 @@
+_format_version: "3.0"
+services:
+- name: svc3
+  host: mockbin.org
+  port: 80
+  routes:
+  - name: r3
+    https_redirect_status_code: 301
+    paths:
+    - /r3
+    methods:
+    - GET

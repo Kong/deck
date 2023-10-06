@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/connect-timeout: "5000"
+    konghq.com/path: /v1
+    konghq.com/protocol: http
+    konghq.com/read-timeout: "60000"
+    konghq.com/retries: "5"
+    konghq.com/write-timeout: "60000"
+  creationTimestamp: null
+  name: example-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: example-service
+status:
+  loadBalancer: {}
+---

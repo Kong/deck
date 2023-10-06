@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 
@@ -18,27 +17,12 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const (
-	defaultLegacyKonnectURL = "https://konnect.konghq.com"
-
-	defaultRuntimeGroupName        = "default"
-	konnectWithRuntimeGroupsDomain = "api.konghq"
-)
-
-var addresses = []string{
-	defaultKonnectURL,
-	defaultLegacyKonnectURL,
-}
+const defaultRuntimeGroupName = "default"
 
 func authenticate(
-	ctx context.Context, client *konnect.Client, host string, konnectConfig utils.KonnectConfig,
+	ctx context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
 ) (konnect.AuthResponse, error) {
-	if strings.Contains(host, konnectWithRuntimeGroupsDomain) {
-		return client.Auth.LoginV2(ctx, konnectConfig.Email,
-			konnectConfig.Password, konnectConfig.Token)
-	}
-	return client.Auth.Login(ctx, konnectConfig.Email,
-		konnectConfig.Password)
+	return client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
 }
 
 // GetKongClientForKonnectMode abstracts the different cloud environments users
@@ -50,9 +34,6 @@ func GetKongClientForKonnectMode(
 	ctx context.Context, konnectConfig *utils.KonnectConfig,
 ) (*kong.Client, error) {
 	httpClient := utils.HTTPClient()
-	if konnectConfig.Address != defaultKonnectURL {
-		addresses = []string{konnectConfig.Address}
-	}
 
 	if konnectConfig.Token != "" {
 		konnectConfig.Headers = append(
@@ -63,56 +44,24 @@ func GetKongClientForKonnectMode(
 	// authenticate with konnect
 	var err error
 	var konnectClient *konnect.Client
-	var parsedAddress *url.URL
 	var konnectAddress string
-	for _, address := range addresses {
-		// get Konnect client
-		konnectConfig.Address = address
-		konnectClient, err = utils.GetKonnectClient(httpClient, *konnectConfig)
-		if err != nil {
-			return nil, err
-		}
-		parsedAddress, err = url.Parse(address)
-		if err != nil {
-			return nil, fmt.Errorf("parsing %s address: %w", address, err)
-		}
-		_, err = authenticate(ctx, konnectClient, parsedAddress.Host, *konnectConfig)
-		if err == nil {
-			break
-		}
-		// Personal Access Token authentication is not supported with the
-		// legacy Konnect, so we don't need to fallback in case of 401s.
-		if konnect.IsUnauthorizedErr(err) && konnectConfig.Token != "" {
-			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
-		}
-		if konnect.IsUnauthorizedErr(err) {
-			continue
-		}
+	// get Konnect client
+	konnectClient, err = utils.GetKonnectClient(httpClient, *konnectConfig)
+	if err != nil {
+		return nil, err
 	}
+	_, err = authenticate(ctx, konnectClient, *konnectConfig)
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	if strings.Contains(parsedAddress.Host, konnectWithRuntimeGroupsDomain) {
-		// get kong runtime group ID
-		kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
-		if err != nil {
-			return nil, err
-		}
-
-		// set the kong runtime group ID in the client
-		konnectClient.SetRuntimeGroupID(kongRGID)
-		konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID
-	} else {
-		// get kong control plane ID
-		kongCPID, err := fetchKongControlPlaneID(ctx, konnectClient)
-		if err != nil {
-			return nil, err
-		}
-
-		// set the kong control plane ID in the client
-		konnectClient.SetControlPlaneID(kongCPID)
-		konnectAddress = konnectConfig.Address + "/api/control_planes/" + kongCPID
+	kongRGID, err := fetchKongRuntimeGroupID(ctx, konnectClient)
+	if err != nil {
+		return nil, err
 	}
+
+	// set the kong runtime group ID in the client
+	konnectClient.SetRuntimeGroupID(kongRGID)
+	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + kongRGID
 
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
@@ -140,7 +89,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput)
 	if err != nil {
 		return err
 	}
@@ -183,7 +132,7 @@ func syncKonnect(ctx context.Context,
 	httpClient := utils.HTTPClient()
 
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}
@@ -258,7 +207,7 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	stats, errs := s.Solve(ctx, parallelism, dry)
+	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

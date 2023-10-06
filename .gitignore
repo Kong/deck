@@ -28,3 +28,9 @@ _testmain.go
 deck
 dist/
 docs/cli-docs/
+.idea/deck.iml
+.idea/misc.xml
+.gitignore
+.idea/vcs.xml
+.gitignore
+.idea/modules.xml

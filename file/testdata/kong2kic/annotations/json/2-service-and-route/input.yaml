@@ -1,0 +1,44 @@
+services:
+  - name: example-service
+    url: http://example-api.com
+    protocol: http
+    host: example-api.com
+    port: 80
+    path: /v1
+    retries: 5
+    connect_timeout: 5000
+    write_timeout: 60000
+    read_timeout: 60000
+    enabled: true
+    client_certificate: 4e3ad2e4-0bc4-4638-8e34-c84a417ba39b
+    tags:
+      - example
+      - api
+    routes:
+      - name: example-route
+        methods:
+          - GET
+          - POST
+        hosts:
+          - example.com
+        paths:
+          - /v1/example
+        protocols:
+          - http
+          - https
+        headers:
+          x-my-header:
+            - foo
+            - bar
+          x-another-header:
+            - bla
+        regex_priority: 1
+        strip_path: false
+        preserve_host: true
+        tags:
+          - version:v1
+        https_redirect_status_code: 302
+        snis:
+          - example.com
+        sources:
+          - ip: 192.168.0.1

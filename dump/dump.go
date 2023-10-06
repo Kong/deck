@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
 	"golang.org/x/sync/errgroup"
@@ -31,6 +30,9 @@ type Config struct {
 
 	// KonnectRuntimeGroup
 	KonnectRuntimeGroup string
+
+	// IsConsumerGroupScopedPluginSupported
+	IsConsumerGroupScopedPluginSupported bool
 }
 
 func deduplicate(stringSlice []string) []string {
@@ -71,15 +73,7 @@ func getConsumerGroupsConfiguration(ctx context.Context, group *errgroup.Group,
 	client *kong.Client, config Config, state *utils.KongRawState,
 ) {
 	group.Go(func() error {
-		var (
-			err            error
-			consumerGroups []*kong.ConsumerGroupObject
-		)
-		if config.KonnectRuntimeGroup != "" {
-			consumerGroups, err = GetAllKonnectConsumerGroups(ctx, client, config.SelectorTags)
-		} else {
-			consumerGroups, err = GetAllConsumerGroups(ctx, client, config.SelectorTags)
-		}
+		consumerGroups, err := GetAllConsumerGroups(ctx, client, config.SelectorTags)
 		if err != nil {
 			if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
 				return nil
@@ -205,6 +199,7 @@ func getProxyConfiguration(ctx context.Context, group *errgroup.Group,
 		plugins = excludeKonnectManagedPlugins(plugins)
 		if config.SkipConsumers {
 			plugins = excludeConsumersPlugins(plugins)
+			plugins = excludeConsumerGroupsPlugins(plugins)
 		}
 		state.Plugins = plugins
 		return nil
@@ -526,29 +521,6 @@ func GetAllUpstreams(ctx context.Context,
 		opt = nextopt
 	}
 	return upstreams, nil
-}
-
-// GetAllConsumerGroups queries Konnect for all the ConsumerGroups using client.
-func GetAllKonnectConsumerGroups(ctx context.Context,
-	client *kong.Client, tags []string,
-) ([]*kong.ConsumerGroupObject, error) {
-	var consumerGroupObjects []*kong.ConsumerGroupObject
-	opt := newOpt(tags)
-	cgs, err := konnect.ListAllConsumerGroups(ctx, client, opt.Tags)
-	if err != nil {
-		return nil, err
-	}
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-	for _, cg := range cgs {
-		r, err := konnect.GetConsumerGroupObject(ctx, client, cg.ID)
-		if err != nil {
-			return nil, err
-		}
-		consumerGroupObjects = append(consumerGroupObjects, r)
-	}
-	return consumerGroupObjects, nil
 }
 
 // GetAllConsumerGroups queries Kong for all the ConsumerGroups using client.
@@ -896,6 +868,18 @@ func excludeConsumersPlugins(plugins []*kong.Plugin) []*kong.Plugin {
 	var filtered []*kong.Plugin
 	for _, p := range plugins {
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
+			continue
+		}
+		filtered = append(filtered, p)
+	}
+	return filtered
+}
+
+// excludeConsumerGroupsPlugins filter out consumer-groups plugins
+func excludeConsumerGroupsPlugins(plugins []*kong.Plugin) []*kong.Plugin {
+	var filtered []*kong.Plugin
+	for _, p := range plugins {
+		if p.ConsumerGroup != nil && !utils.Empty(p.ConsumerGroup.ID) {
 			continue
 		}
 		filtered = append(filtered, p)

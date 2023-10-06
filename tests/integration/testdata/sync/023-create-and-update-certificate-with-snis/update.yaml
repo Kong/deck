@@ -1,0 +1,55 @@
+_format_version: "3.0"
+certificates:
+  - id: 13c562a1-191c-4464-9b18-e5222b46035b
+    cert: |
+      -----BEGIN CERTIFICATE-----
+      MIIC1jCCAb4CCQCt23nwvxSCvjANBgkqhkiG9w0BAQsFADAtMRYwFAYDVQQDDA0q
+      LmV4YW1wbGUuY29tMRMwEQYDVQQKDAprb25naHEub3JnMB4XDTE4MTIzMTIwMTkw
+      MVoXDTE5MTIzMTIwMTkwMVowLTEWMBQGA1UEAwwNKi5leGFtcGxlLmNvbTETMBEG
+      A1UECgwKa29uZ2hxLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+      AKj/2r1AXo9x+2Csrd0SHbpnzuW+xYqgsd+YA9ZrZNV7SZGSbaZymsRMz8wg5OIU
+      iUik2GM1749/lYvojLFStBPy9UY/gd++5f3wLp4xHiI+IU2XQ97otXKGfyh36RmN
+      dKDqPLN8BG3R346s/y1GOulFvLthYmZVYF9ufHiqimfEDSbTt79P5C3X0Rw/afK1
+      GjHEJPCB/XkZ6lkcEyL6LqZI5oBigDqa9hI/nWLxEzfm8pgosiS38p9TAijlOkpm
+      tX2p2b1pktlNIy3rxsqj6IynN9Wc7FpV1N4HoPKV7vQQ08hjwW6WfanVthaaJosj
+      Vr2TBCJ1ltAmsb+5B2VPYVkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAnByTyQfV
+      3LkwuoWS57CWcqbNw/cHnv/ChzmIv+6mIXvDBSvCgrPZIWCpaCfYRG6R51E44fr/
+      8V1AKT0Zt15DjrXEEcIGQgsIDO91/wlL091fTAUzSbL0yt7HTlm8sX6xndPNAZrq
+      cfcIPVMxknfqPy2VqS4IrNC03pHkDKtokphBjVUlkiWsdcq+fHYbS2xL2d1Da/uN
+      hX/iwgo+v5gOF5xtaXx7D7L3Cf+MHb/MOXWPfYXNiTpSBVX8/Kx5RP+QLI16nWvw
+      lrijTlXZFR8NIZBrCo/QZ2cNbUAbN3R0n+/kMFubxBL8WEm6Qhi9jBjbJeDMspd8
+      C+/TZJQMpx5vyA==
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCo/9q9QF6Pcftg
+      rK3dEh26Z87lvsWKoLHfmAPWa2TVe0mRkm2mcprETM/MIOTiFIlIpNhjNe+Pf5WL
+      6IyxUrQT8vVGP4HfvuX98C6eMR4iPiFNl0Pe6LVyhn8od+kZjXSg6jyzfARt0d+O
+      rP8tRjrpRby7YWJmVWBfbnx4qopnxA0m07e/T+Qt19EcP2nytRoxxCTwgf15GepZ
+      HBMi+i6mSOaAYoA6mvYSP51i8RM35vKYKLIkt/KfUwIo5TpKZrV9qdm9aZLZTSMt
+      68bKo+iMpzfVnOxaVdTeB6Dyle70ENPIY8Fuln2p1bYWmiaLI1a9kwQidZbQJrG/
+      uQdlT2FZAgMBAAECggEAVnyRcda2Tcy0K7ZTR9aUlie370VhDN/OB7JhDGNreAEf
+      FjuMl+kAoUL5+OpAmB6QXzfVcXhRv+s4GiCJl9nORINK2Id5rIqiYwF+qgBS/o0z
+      N+UYm8QVz6Va/9fV1/jXXd5h8Cygi58jPH32HTJaxbSlsHNXCy3YIx6E3q/QIueR
+      6ZdSXPqMEqxEU19M9jW8UeiRFrpmcyYxVpfxYIY/+O9lYjSpaeLs7hZeCP9PqWXA
+      Sxz2CnHZ8BcsDxAyuoHoVw+kjMpUMvA3sD4lwkV8BAYzfLmQf6PR83SFNsrE8XYu
+      /8WnQuCuytcl8Zg55R6tGCvf6Wyyf+MDRPwv/43QMQKBgQDbqK9Dq54k+EHgSNnP
+      K6AhNjFd6aqcNC1kom/sSlWBnuA/BEqJMECr8S2dYvzONUPPfX5NNUjB4Vw3Qw7a
+      pUgKuCQoVpzpZs5m1bk78itWDtA84LjkXfdejnUXVw/aVxLCM5QV9aEkm/dEWWMI
+      P1WTYVoWoZCLlEE08q0AvZQcdQKBgQDE9ZCmc6ncmhnQftuRj5PnXG2a79MLCT61
+      sCEBDVvkcUJVqbzwGRLwRkdIzLgvmiuP+SukHgyfr8/RXG99xEW/q7NDrtEcqfXP
+      19QXwOIp5NwDnOXyAlXiyZ50fCE2tSo2wP485+NIhmKj5Zt6y/DL6Qbc5k73XmK4
+      KX5Ej15k1QKBgQCc6KeiIFLMt+Ze78tfORue/dZP7p3oDUGr1Hk9AnCIMlSfz1Hr
+      I+Per17VQaOzLcttyYhSYNDDZld4RlezCkQnHBkAE7bs53pjbSJv1vLr+5L3GdQZ
+      laIiEoNEE/YIExEcVrne4eKlgyAj2/JpLszThcRTzD+z5UibKQs6LzJBDQKBgDVa
+      dAGzCUt57w48nwvyQdWFgydaWef+bB9Zg8c+MCtUxuxfm4/Kqwetcff1hNtYPv60
+      N68weKj1Pi1vhcAi3+YJA/mMrJbAL5dK1uhMVreUiEjuQpfpLAzQIv1Y9sJUFwhY
+      BUbIZhgqVyQguZptDmCeUj6aoL9/sOxESTEXSTG1AoGBAMQ5iJZMsdLCERv0+6Y1
+      F/t/YSW8cugB3vdV9jHZuosoprz48p92pYP8OdQc70H5hZt53hoYNgYFSd+MU6H1
+      hJCaXTsiP4IUmBjiwzSp3o1ctP8lWvnyJpAadYdDhaDaAAoaMjCo9cm5OMwc8t8x
+      hwAPXV2cgWH8fPcT9NLAcwWk
+      -----END PRIVATE KEY-----
+    tags:
+      - after # Only this changes between initial and updated config.
+    snis:
+      - name: example.com

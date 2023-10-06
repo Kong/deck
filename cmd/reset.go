@@ -12,6 +12,7 @@ var (
 	resetCmdForce      bool
 	resetWorkspace     string
 	resetAllWorkspaces bool
+	resetJSONOutput    bool
 )
 
 // newResetCmd represents the reset command
@@ -59,7 +60,15 @@ By default, this command will ask for confirmation.`,
 			if err != nil {
 				return fmt.Errorf("reading Kong version: %w", err)
 			}
+			parsedKongVersion, err := utils.ParseKongVersion(kongVersion)
+			if err != nil {
+				return fmt.Errorf("parsing Kong version: %w", err)
+			}
 			_ = sendAnalytics("reset", kongVersion, mode)
+
+			if utils.Kong340Version.LTE(parsedKongVersion) {
+				dumpConfig.IsConsumerGroupScopedPluginSupported = true
+			}
 
 			var workspaces []string
 			// Kong OSS or default workspace
@@ -99,7 +108,7 @@ By default, this command will ask for confirmation.`,
 				if err != nil {
 					return err
 				}
-				_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false)
+				_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false, resetJSONOutput)
 				if err != nil {
 					return err
 				}
@@ -128,6 +137,8 @@ By default, this command will ask for confirmation.`,
 		false, "reset only the RBAC resources (Kong Enterprise only).")
 	resetCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not reset CA certificates.")
+	resetCmd.Flags().BoolVar(&resetJSONOutput, "json-output",
+		false, "generate command execution report in a JSON format")
 
 	return resetCmd
 }

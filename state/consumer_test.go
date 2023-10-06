@@ -37,11 +37,11 @@ func TestConsumerGetUpdate(t *testing.T) {
 	err := collection.Add(consumer)
 	assert.Nil(err)
 
-	c, err := collection.Get("")
+	c, err := collection.GetByIDOrUsername("")
 	assert.NotNil(err)
 	assert.Nil(c)
 
-	c, err = collection.Get("first")
+	c, err = collection.GetByIDOrUsername("first")
 	assert.Nil(err)
 	assert.NotNil(c)
 
@@ -56,11 +56,11 @@ func TestConsumerGetUpdate(t *testing.T) {
 	c.ID = kong.String("first")
 	assert.Nil(collection.Update(*c))
 
-	c, err = collection.Get("my-name")
+	c, err = collection.GetByIDOrUsername("my-name")
 	assert.NotNil(err)
 	assert.Nil(c)
 
-	c, err = collection.Get("my-updated-name")
+	c, err = collection.GetByIDOrUsername("my-updated-name")
 	assert.Nil(err)
 	assert.NotNil(c)
 }
@@ -77,12 +77,12 @@ func TestConsumerGetMemoryReference(t *testing.T) {
 	err := collection.Add(consumer)
 	assert.Nil(err)
 
-	c, err := collection.Get("first")
+	c, err := collection.GetByIDOrUsername("first")
 	assert.Nil(err)
 	assert.NotNil(c)
 	c.Username = kong.String("update-should-not-reflect")
 
-	c, err = collection.Get("first")
+	c, err = collection.GetByIDOrUsername("first")
 	assert.Nil(err)
 	assert.Equal("my-name", *c.Username)
 }
@@ -100,7 +100,7 @@ func TestConsumersInvalidType(t *testing.T) {
 	txn.Commit()
 
 	assert.Panics(func() {
-		collection.Get("my-name")
+		collection.GetByIDOrUsername("my-name")
 	})
 	assert.Panics(func() {
 		collection.GetAll()
@@ -117,7 +117,7 @@ func TestConsumerDelete(t *testing.T) {
 	err := collection.Add(consumer)
 	assert.Nil(err)
 
-	c, err := collection.Get("my-consumer")
+	c, err := collection.GetByIDOrUsername("my-consumer")
 	assert.Nil(err)
 	assert.NotNil(c)
 	assert.Equal("first", *c.ID)

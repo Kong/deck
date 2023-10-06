@@ -19,6 +19,32 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+type EntityState struct {
+	Name string `json:"name"`
+	Kind string `json:"kind"`
+	Body any    `json:"body"`
+}
+
+type Summary struct {
+	Creating int32 `json:"creating"`
+	Updating int32 `json:"updating"`
+	Deleting int32 `json:"deleting"`
+	Total    int32 `json:"total"`
+}
+
+type JSONOutputObject struct {
+	Changes  EntityChanges `json:"changes"`
+	Summary  Summary       `json:"summary"`
+	Warnings []string      `json:"warnings"`
+	Errors   []string      `json:"errors"`
+}
+
+type EntityChanges struct {
+	Creating []EntityState `json:"creating"`
+	Updating []EntityState `json:"updating"`
+	Deleting []EntityState `json:"deleting"`
+}
+
 var errEnqueueFailed = errors.New("failed to queue event")
 
 func defaultBackOff() backoff.BackOff {
@@ -438,13 +464,15 @@ func generateDiffString(e crud.Event, isDelete bool, noMaskValues bool) (string,
 		return "", err
 	}
 	if !noMaskValues {
-		diffString = maskEnvVarValue(diffString)
+		diffString = MaskEnvVarValue(diffString)
 	}
 	return diffString, err
 }
 
 // Solve generates a diff and walks the graph.
-func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, []error) {
+func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJSONOut bool) (Stats,
+	[]error, EntityChanges,
+) {
 	stats := Stats{
 		CreateOps: &utils.AtomicInt32Counter{},
 		UpdateOps: &utils.AtomicInt32Counter{},
@@ -461,22 +489,49 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 		}
 	}
 
+	output := EntityChanges{
+		Creating: []EntityState{},
+		Updating: []EntityState{},
+		Deleting: []EntityState{},
+	}
+
 	errs := sc.Run(ctx, parallelism, func(e crud.Event) (crud.Arg, error) {
 		var err error
 		var result crud.Arg
 
 		c := e.Obj.(state.ConsoleString)
+		objDiff := map[string]interface{}{
+			"old": e.OldObj,
+			"new": e.Obj,
+		}
+		item := EntityState{
+			Body: objDiff,
+			Name: c.Console(),
+			Kind: string(e.Kind),
+		}
 		switch e.Op {
 		case crud.Create:
-			sc.createPrintln("creating", e.Kind, c.Console())
+			if isJSONOut {
+				output.Creating = append(output.Creating, item)
+			} else {
+				sc.createPrintln("creating", e.Kind, c.Console())
+			}
 		case crud.Update:
 			diffString, err := generateDiffString(e, false, sc.noMaskValues)
 			if err != nil {
 				return nil, err
 			}
-			sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
+			if isJSONOut {
+				output.Updating = append(output.Updating, item)
+			} else {
+				sc.updatePrintln("updating", e.Kind, c.Console(), diffString)
+			}
 		case crud.Delete:
-			sc.deletePrintln("deleting", e.Kind, c.Console())
+			if isJSONOut {
+				output.Deleting = append(output.Deleting, item)
+			} else {
+				sc.deletePrintln("deleting", e.Kind, c.Console())
+			}
 		default:
 			panic("unknown operation " + e.Op.String())
 		}
@@ -498,5 +553,5 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool) (Stats, 
 
 		return result, nil
 	})
-	return stats, errs
+	return stats, errs, output
 }

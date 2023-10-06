@@ -19,45 +19,55 @@ import (
 // getContent reads all the YAML and JSON files in the directory or the
 // file, depending on the type of each item in filenames, merges the content of
 // these files and renders a Content.
-func getContent(filenames []string) (*Content, error) {
-	var allReaders []io.Reader
-	var workspaces []string
+func getContent(filenames []string, mockEnvVars bool) (*Content, error) {
+	var workspaces, runtimeGroups []string
+	var res Content
+	var errs []error
 	for _, fileOrDir := range filenames {
 		readers, err := getReaders(fileOrDir)
 		if err != nil {
 			return nil, err
 		}
-		allReaders = append(allReaders, readers...)
+
+		for filename, r := range readers {
+			content, err := readContent(r, mockEnvVars)
+			if err != nil {
+				errs = append(errs, fmt.Errorf("reading file %s: %w", filename, err))
+				continue
+			}
+			if content.Workspace != "" {
+				workspaces = append(workspaces, content.Workspace)
+			}
+			if content.Konnect != nil && len(content.Konnect.RuntimeGroupName) > 0 {
+				runtimeGroups = append(runtimeGroups, content.Konnect.RuntimeGroupName)
+			}
+			err = mergo.Merge(&res, content, mergo.WithAppendSlice)
+			if err != nil {
+				return nil, fmt.Errorf("merging file contents: %w", err)
+			}
+		}
 	}
-	var res Content
-	for _, r := range allReaders {
-		content, err := readContent(r)
-		if err != nil {
-			return nil, fmt.Errorf("reading file: %w", err)
-		}
-		if content.Workspace != "" {
-			workspaces = append(workspaces, content.Workspace)
-		}
-		err = mergo.Merge(&res, content, mergo.WithAppendSlice)
-		if err != nil {
-			return nil, fmt.Errorf("merging file contents: %w", err)
-		}
+	if len(errs) > 0 {
+		return nil, utils.ErrArray{Errors: errs}
 	}
 	if err := validateWorkspaces(workspaces); err != nil {
+		return nil, err
+	}
+	if err := validateRuntimeGroups(runtimeGroups); err != nil {
 		return nil, err
 	}
 	return &res, nil
 }
 
-// getReaders returns back io.Readers representing all the YAML and JSON
-// files in a directory. If fileOrDir is a single file, then it
+// getReaders returns back a map of filename:io.Reader representing all the
+// YAML and JSON files in a directory. If fileOrDir is a single file, then it
 // returns back the reader for the file.
 // If fileOrDir is equal to "-" string, then it returns back a io.Reader
 // for the os.Stdin file descriptor.
-func getReaders(fileOrDir string) ([]io.Reader, error) {
+func getReaders(fileOrDir string) (map[string]io.Reader, error) {
 	// special case where `-` means stdin
 	if fileOrDir == "-" {
-		return []io.Reader{os.Stdin}, nil
+		return map[string]io.Reader{"STDIN": os.Stdin}, nil
 	}
 
 	finfo, err := os.Stat(fileOrDir)
@@ -75,13 +85,13 @@ func getReaders(fileOrDir string) ([]io.Reader, error) {
 		files = append(files, fileOrDir)
 	}
 
-	var res []io.Reader
+	res := make(map[string]io.Reader, len(files))
 	for _, file := range files {
 		f, err := os.Open(file)
 		if err != nil {
 			return nil, fmt.Errorf("opening file: %w", err)
 		}
-		res = append(res, bufio.NewReader(f))
+		res[file] = bufio.NewReader(f)
 	}
 	return res, nil
 }
@@ -95,13 +105,13 @@ func hasLeadingSpace(fileContent string) bool {
 
 // readContent reads all the byes until io.EOF and unmarshals the read
 // bytes into Content.
-func readContent(reader io.Reader) (*Content, error) {
+func readContent(reader io.Reader, mockEnvVars bool) (*Content, error) {
 	var err error
 	contentBytes, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
-	renderedContent, err := renderTemplate(string(contentBytes))
+	renderedContent, err := renderTemplate(string(contentBytes), mockEnvVars)
 	if err != nil {
 		return nil, fmt.Errorf("parsing file: %w", err)
 	}
@@ -146,16 +156,45 @@ func getPrefixedEnvVar(key string) (string, error) {
 	return value, nil
 }
 
+// getPrefixedEnvVarMocked is used when we mock the env variables while rendering a template.
+// It will always return the name of the environment variable in this case.
+func getPrefixedEnvVarMocked(key string) (string, error) {
+	const envVarPrefix = "DECK_"
+	if !strings.HasPrefix(key, envVarPrefix) {
+		return "", fmt.Errorf("environment variables in the state file must "+
+			"be prefixed with 'DECK_', found: '%s'", key)
+	}
+	return key, nil
+}
+
 func toBool(key string) (bool, error) {
 	return strconv.ParseBool(key)
+}
+
+// toBoolMocked is used when we mock the env variables while rendering a template.
+// It will always return false in this case.
+func toBoolMocked(_ string) (bool, error) {
+	return false, nil
 }
 
 func toInt(key string) (int, error) {
 	return strconv.Atoi(key)
 }
 
+// toIntMocked is used when we mock the env variables while rendering a template.
+// It will always return 42 in this case.
+func toIntMocked(_ string) (int, error) {
+	return 42, nil
+}
+
 func toFloat(key string) (float64, error) {
 	return strconv.ParseFloat(key, 64)
+}
+
+// toFloatMocked is used when we mock the env variables while rendering a template.
+// It will always return 42 in this case.
+func toFloatMocked(_ string) (float64, error) {
+	return 42, nil
 }
 
 func indent(spaces int, v string) string {
@@ -163,14 +202,27 @@ func indent(spaces int, v string) string {
 	return strings.Replace(v, "\n", "\n"+pad, -1)
 }
 
-func renderTemplate(content string) (string, error) {
-	t := template.New("state").Funcs(template.FuncMap{
-		"env":     getPrefixedEnvVar,
-		"toBool":  toBool,
-		"toInt":   toInt,
-		"toFloat": toFloat,
-		"indent":  indent,
-	}).Delims("${{", "}}")
+func renderTemplate(content string, mockEnvVars bool) (string, error) {
+	var templateFuncs template.FuncMap
+	if mockEnvVars {
+		templateFuncs = template.FuncMap{
+			"env":     getPrefixedEnvVarMocked,
+			"toBool":  toBoolMocked,
+			"toInt":   toIntMocked,
+			"toFloat": toFloatMocked,
+			"indent":  indent,
+		}
+	} else {
+		templateFuncs = template.FuncMap{
+			"env":     getPrefixedEnvVar,
+			"toBool":  toBool,
+			"toInt":   toInt,
+			"toFloat": toFloat,
+			"indent":  indent,
+		}
+	}
+	t := template.New("state").Funcs(templateFuncs).Delims("${{", "}}")
+
 	t, err := t.Parse(content)
 	if err != nil {
 		return "", err

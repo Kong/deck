@@ -11,6 +11,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-apiops/deckformat"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -102,8 +103,7 @@ It can be used to export, import, or sync entities to Kong.`,
 
 	rootCmd.PersistentFlags().Int("verbose", 0,
 		"Enable verbose logging levels\n"+
-			"Setting this value to 2 outputs all HTTP requests/responses\n"+
-			"between decK and Kong.")
+			"Sets the verbosity level of log output (higher is more verbose).")
 	viper.BindPFlag("verbose",
 		rootCmd.PersistentFlags().Lookup("verbose"))
 
@@ -187,7 +187,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		rootCmd.PersistentFlags().Lookup("konnect-token"))
 
 	rootCmd.PersistentFlags().String("konnect-token-file", "",
-		"File containing the Peronsal Access Token to your Konnect account.")
+		"File containing the Personal Access Token to your Konnect account.")
 	viper.BindPFlag("konnect-token-file",
 		rootCmd.PersistentFlags().Lookup("konnect-token-file"))
 
@@ -214,6 +214,19 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newConvertCmd())
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newKonnectCmd())
+	{
+		fileCmd := newAddFileCmd()
+		rootCmd.AddCommand(fileCmd)
+		fileCmd.AddCommand(newAddPluginsCmd())
+		fileCmd.AddCommand(newAddTagsCmd())
+		fileCmd.AddCommand(newListTagsCmd())
+		fileCmd.AddCommand(newRemoveTagsCmd())
+		fileCmd.AddCommand(newMergeCmd())
+		fileCmd.AddCommand(newPatchCmd())
+		fileCmd.AddCommand(newOpenapi2KongCmd())
+		fileCmd.AddCommand(newFileRenderCmd())
+		fileCmd.AddCommand(newKong2KicCmd())
+	}
 	return rootCmd
 }
 
@@ -379,4 +392,9 @@ func extendHeaders(headers []string) []string {
 	userAgentHeader := fmt.Sprintf("User-Agent:decK/%s", VERSION)
 	headers = append(headers, userAgentHeader)
 	return headers
+}
+
+func init() {
+	// set version and commit hash to report in the go-apiops library
+	deckformat.ToolVersionSet("decK", VERSION, COMMIT)
 }

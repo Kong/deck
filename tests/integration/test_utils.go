@@ -95,8 +95,16 @@ func sortSlices(x, y interface{}) bool {
 		yName = *yEntity.Prefix
 	case *kong.Consumer:
 		yEntity := y.(*kong.Consumer)
-		xName = *xEntity.Username
-		yName = *yEntity.Username
+		if xEntity.Username != nil {
+			xName = *xEntity.Username
+		} else {
+			xName = *xEntity.ID
+		}
+		if yEntity.Username != nil {
+			yName = *yEntity.Username
+		} else {
+			yName = *yEntity.ID
+		}
 	case *kong.ConsumerGroup:
 		yEntity := y.(*kong.ConsumerGroup)
 		xName = *xEntity.Name
@@ -126,8 +134,8 @@ func sortSlices(x, y interface{}) bool {
 		if xEntity.Consumer != nil {
 			xName += *xEntity.Consumer.ID
 		}
-		if xEntity.Consumer != nil {
-			xName += *xEntity.Consumer.ID
+		if xEntity.ConsumerGroup != nil {
+			xName += *xEntity.ConsumerGroup.ID
 		}
 		if yEntity.Route != nil {
 			yName += *yEntity.Route.ID
@@ -137,6 +145,9 @@ func sortSlices(x, y interface{}) bool {
 		}
 		if yEntity.Consumer != nil {
 			yName += *yEntity.Consumer.ID
+		}
+		if yEntity.ConsumerGroup != nil {
+			yName += *yEntity.ConsumerGroup.ID
 		}
 	}
 	return xName < yName
@@ -207,12 +218,17 @@ func readFile(filepath string) (string, error) {
 	return string(content), nil
 }
 
-func setup(_ *testing.T) func(t *testing.T) {
+// setup sets deck env variable to prevent analytics in tests and registers reset
+// command with t.Cleanup().
+//
+// NOTE: Can't be called with tests running t.Parallel() because of the usage
+// of t.Setenv().
+func setup(t *testing.T) {
 	// disable analytics for integration tests
-	os.Setenv("DECK_ANALYTICS", "off")
-	return func(t *testing.T) {
+	t.Setenv("DECK_ANALYTICS", "off")
+	t.Cleanup(func() {
 		reset(t)
-	}
+	})
 }
 
 func sync(kongFile string, opts ...string) error {

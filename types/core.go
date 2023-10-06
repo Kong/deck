@@ -336,7 +336,8 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 		return entityImpl{
 			typ: Certificate,
 			crudActions: &certificateCRUD{
-				client: opts.KongClient,
+				client:    opts.KongClient,
+				isKonnect: opts.IsKonnect,
 			},
 			postProcessActions: &certificatePostAction{
 				currentState: opts.CurrentState,
@@ -345,6 +346,7 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
 				kind:         entityTypeToKind(Certificate),
 				currentState: opts.CurrentState,
 				targetState:  opts.TargetState,
+				isKonnect:    opts.IsKonnect,
 			},
 		}, nil
 	case CACertificate:

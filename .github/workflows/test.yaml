@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v3.4.0
+        uses: golangci/golangci-lint-action@v3.6.0
       - name: Verify Codegen
         run: make verify-codegen
       - name: Run tests with Coverage
@@ -26,6 +26,7 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           name: codecov-deck
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
       - name: Build
         run: make build

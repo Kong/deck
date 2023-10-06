@@ -54,10 +54,23 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	if !utils.Empty(consumer.Username) {
 		searchBy = append(searchBy, *consumer.Username)
 	}
-	if !utils.Empty(consumer.CustomID) {
-		searchBy = append(searchBy, *consumer.CustomID)
+
+	// search separately by id+username and by custom_id.
+	//
+	// This is because the custom_id is unique, but it may be equal to
+	// the username of another consumer. If we search by both id+username and
+	// custom_id, we may get a false positive.
+	_, err := getConsumer(txn, []string{"Username", "id"}, searchBy...)
+	if err == nil {
+		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
+	} else if !errors.Is(err, ErrNotFound) {
+		return err
 	}
-	_, err := getConsumer(txn, searchBy...)
+
+	if !utils.Empty(consumer.CustomID) {
+		searchBy = []string{*consumer.CustomID}
+	}
+	_, err = getConsumer(txn, []string{"CustomID"}, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumer %v: %w", consumer.Console(), ErrAlreadyExists)
 	} else if !errors.Is(err, ErrNotFound) {
@@ -72,10 +85,9 @@ func (k *ConsumersCollection) Add(consumer Consumer) error {
 	return nil
 }
 
-func getConsumer(txn *memdb.Txn, IDs ...string) (*Consumer, error) {
+func getConsumer(txn *memdb.Txn, indexes []string, IDs ...string) (*Consumer, error) {
 	for _, id := range IDs {
-		res, err := multiIndexLookupUsingTxn(txn, consumerTableName,
-			[]string{"Username", "id", "CustomID"}, id)
+		res, err := multiIndexLookupUsingTxn(txn, consumerTableName, indexes, id)
 		if errors.Is(err, ErrNotFound) {
 			continue
 		}
@@ -91,15 +103,26 @@ func getConsumer(txn *memdb.Txn, IDs ...string) (*Consumer, error) {
 	return nil, ErrNotFound
 }
 
-// Get gets a consumer by name or ID.
-func (k *ConsumersCollection) Get(userNameOrID string) (*Consumer, error) {
+// GetByIDOrUsername gets a consumer by name or ID.
+func (k *ConsumersCollection) GetByIDOrUsername(userNameOrID string) (*Consumer, error) {
 	if userNameOrID == "" {
 		return nil, errIDRequired
 	}
 
 	txn := k.db.Txn(false)
 	defer txn.Abort()
-	return getConsumer(txn, userNameOrID)
+	return getConsumer(txn, []string{"Username", "id"}, userNameOrID)
+}
+
+// GetByCustomID gets a consumer by customID.
+func (k *ConsumersCollection) GetByCustomID(customID string) (*Consumer, error) {
+	if customID == "" {
+		return nil, errIDRequired
+	}
+
+	txn := k.db.Txn(false)
+	defer txn.Abort()
+	return getConsumer(txn, []string{"CustomID"}, customID)
 }
 
 // Update udpates an existing consumer.
@@ -128,7 +151,7 @@ func (k *ConsumersCollection) Update(consumer Consumer) error {
 }
 
 func deleteConsumer(txn *memdb.Txn, userNameOrID string) error {
-	consumer, err := getConsumer(txn, userNameOrID)
+	consumer, err := getConsumer(txn, []string{"Username", "id"}, userNameOrID)
 	if err != nil {
 		return err
 	}

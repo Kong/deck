@@ -1,0 +1,39 @@
+name: Validate Kong Gateway Release
+concurrency:
+  group: ${{ github.workflow }}
+on:
+  workflow_dispatch:
+    inputs:
+      kong_image:
+        description: 'Kong Gateway Docker Image'
+        required: true
+        default: 'kong/kong-gateway-dev:latest'
+      branch:
+        description: 'decK Branch'
+        required: true
+        default: 'main'
+jobs:
+  integration:
+    name: "${{ inputs.kong_image }} against ${{ inputs.branch }}"
+    env:
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_IMAGE: ${{ inputs.kong_image }}
+      KONG_LICENSE_DATA: ${{ secrets.KONG_LICENSE_DATA }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execution Information
+        run: |
+          echo "Kong Gateway Image = ${{ inputs.kong_image }}"
+          echo "decK Branch = ${{ inputs.branch }}"
+      - name: Setup go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20'
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
+      - name: Setup Kong
+        run: make setup-kong-ee
+      - name: Run integration tests
+        run: make test-integration

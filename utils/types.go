@@ -81,6 +81,15 @@ func (e ErrArray) Error() string {
 	return res
 }
 
+func (e ErrArray) ErrorList() []string {
+	errList := []string{}
+
+	for _, err := range e.Errors {
+		errList = append(errList, err.Error())
+	}
+	return errList
+}
+
 // KongClientConfig holds config details to use to talk to a Kong server.
 type KongClientConfig struct {
 	Address   string
@@ -292,6 +301,7 @@ func GetKonnectClient(httpClient *http.Client, config KonnectConfig) (*konnect.C
 
 	if httpClient == nil {
 		defaultTransport := http.DefaultTransport.(*http.Transport)
+		defaultTransport.Proxy = http.ProxyFromEnvironment
 		httpClient = http.DefaultClient
 		httpClient.Transport = defaultTransport
 	}
@@ -329,6 +339,7 @@ func HTTPClient() *http.Client {
 				Timeout: clientTimeout,
 			}).DialContext,
 			TLSHandshakeTimeout: clientTimeout,
+			Proxy:               http.ProxyFromEnvironment,
 		},
 	}
 }

@@ -18,9 +18,6 @@ credentials.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			_ = sendAnalytics("konnect-ping", "", modeKonnect)
-			if konnectConfig.Address == defaultKonnectURL {
-				konnectConfig.Address = defaultLegacyKonnectURL
-			}
 			client, err := utils.GetKonnectClient(nil, konnectConfig)
 			if err != nil {
 				return err

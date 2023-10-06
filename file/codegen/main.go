@@ -22,12 +22,15 @@ var (
 		},
 	}
 
-	anyOfUsernameOrID = []*jsonschema.Type{
+	// consumers
+	anyOfUsernameOrCustomID = []*jsonschema.Type{
 		{
-			Required: []string{"username"},
+			Description: "at least one of custom_id or username must be set",
+			Required:    []string{"username"},
 		},
 		{
-			Required: []string{"id"},
+			Description: "at least one of custom_id or username must be set",
+			Required:    []string{"custom_id"},
 		},
 	}
 )
@@ -52,7 +55,7 @@ func main() {
 
 	schema.Definitions["FRoute"].AnyOf = anyOfNameOrID
 
-	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrID
+	schema.Definitions["FConsumer"].AnyOf = anyOfUsernameOrCustomID
 
 	schema.Definitions["FUpstream"].Required = []string{"name"}
 
@@ -97,6 +100,7 @@ func main() {
 	schema.Definitions["FPlugin"].Properties["consumer"] = stringType
 	schema.Definitions["FPlugin"].Properties["service"] = stringType
 	schema.Definitions["FPlugin"].Properties["route"] = stringType
+	schema.Definitions["FPlugin"].Properties["consumer_group"] = stringType
 
 	schema.Definitions["FService"].Properties["client_certificate"] = stringType
 

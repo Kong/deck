@@ -54,6 +54,7 @@ var (
 	createPrintln = color.New(color.FgGreen).PrintlnFunc()
 	deletePrintln = color.New(color.FgRed).PrintlnFunc()
 	updatePrintln = color.New(color.FgYellow).PrintlnFunc()
+	bluePrintln   = color.New(color.BgBlue).PrintlnFunc()
 
 	// CreatePrintln is fmt.Println with red as foreground color.
 	CreatePrintln = func(a ...interface{}) {
@@ -68,5 +69,9 @@ var (
 	// UpdatePrintln is fmt.Println with yellow as foreground color.
 	UpdatePrintln = func(a ...interface{}) {
 		conditionalPrintln(updatePrintln, a...)
+	}
+
+	BluePrintLn = func(a ...interface{}) {
+		conditionalPrintln(bluePrintln, a...)
 	}
 )

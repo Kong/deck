@@ -1,5 +1,10 @@
 # Table of Contents
 
+- [v1.26.1](#v1261)
+- [v1.26.0](#v1260)
+- [v1.25.0](#v1250)
+- [v1.24.0](#v1240)
+- [v1.23.0](#v1230)
 - [v1.22.1](#v1221)
 - [v1.22.0](#v1220)
 - [v1.21.0](#v1210)
@@ -58,6 +63,105 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.26.1]
+
+> Release date: 2023/09/07
+
+### Fixes
+
+- Raise an error if state files have different Runtime Groups
+  [#1014](https://github.com/Kong/deck/pull/1014)
+- Correct consumers validation when `custom_id` is used
+  [#1012](https://github.com/Kong/deck/pull/1012)
+- Remove hardcoded default value for Routes' `strip_path` field. Defaults are pulled via
+  API anyway.
+  [#999](https://github.com/Kong/deck/pull/999)
+
+## [v1.26.0]
+
+> Release date: 2023/08/09
+
+### Added
+
+- Added support for scoping plugins to Consumer Groups for both Kong Gateway and Konnect.
+  [#963](https://github.com/Kong/deck/pull/963)
+  [#959](https://github.com/Kong/deck/pull/959)
+
+### Fixes
+
+- Remove fallback mechanism formely used to authenticate with either "old" or "new" Konnect.
+  [#995](https://github.com/Kong/deck/pull/995)
+
+## [v1.25.0]
+
+> Release date: 2023/07/28
+
+### Added
+
+- Added a new command `file render` to render a final decK file. This will result in a file representing
+  the state as it would be synced online.
+  [#963](https://github.com/Kong/deck/pull/963)
+- Added a new flag `--format` to `file convert` to enable JSON output.
+  [#963](https://github.com/Kong/deck/pull/963)
+
+### Fixes
+
+- Use same interface to pull Consumer Groups with Kong Gateway and Konnect.
+  This will help solving the issue of using tags with Consumer Groups when running against Konnect.
+  [#984](https://github.com/Kong/deck/pull/984)
+- Fix Consumers handling when a consumer's `custom_id` is equal to the `username` of another consumer.
+  [#986](https://github.com/Kong/deck/pull/986)
+- Avoid misleading diffs when configuration file has empty tags.
+  [#985](https://github.com/Kong/deck/pull/985)
+
+## [v1.24.0]
+
+> Release date: 2023/07/24
+
+### Added
+
+- Add a new flag (`--json-output`) to enable JSON output when using `sync` and `diff` commands
+  [#798](https://github.com/Kong/deck/pull/798)
+- Improved error logs coming from files validation against Kong's schemas.
+  [#976](https://github.com/Kong/deck/pull/976)
+- Added a new command `file openapi2kong` that will generate a deck file from an OpenAPI
+  3.0 spec. This is the replacement for the similar `inso` functionality.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file merge` that will merge multiple deck files. The files will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file patch` for applying patches on top of a decK file. The patches can be
+  provided on the commandline, or via patch files. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new commands `file add-tags/list-tags/remove-tags` to manage tags in a decK file. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+- Added a new command `file add-plugins` for adding plugins to a decK file. The plugins can be
+  provided on the commandline, or via config files. The deck file will not be
+  validated, which allows for working with incomplete or even invalid files in a pipeline.
+  The functionality is imported from the [go-apiops library](https://github.com/Kong/go-apiops).
+  [#939](https://github.com/Kong/deck/pull/939)
+
+### Fixes
+
+- Fix Certificates & SNIs handling when running against Konnect.
+  [#978](https://github.com/Kong/deck/pull/978)
+
+
+## [v1.23.0]
+
+> Release date: 2023/07/03
+
+### Add
+
+- Honor HTTPS_PROXY and HTTP_PROXY proxy environment variables
+  [#952](https://github.com/Kong/deck/pull/952)
 
 ## [v1.22.1]
 
@@ -1254,6 +1358,11 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.26.1]: https://github.com/kong/deck/compare/v1.26.0...v1.26.1
+[v1.26.0]: https://github.com/kong/deck/compare/v1.25.0...v1.26.0
+[v1.25.0]: https://github.com/kong/deck/compare/v1.24.0...v1.25.0
+[v1.24.0]: https://github.com/kong/deck/compare/v1.23.0...v1.24.0
+[v1.23.0]: https://github.com/kong/deck/compare/v1.22.1...v1.23.0
 [v1.22.1]: https://github.com/kong/deck/compare/v1.22.0...v1.22.1
 [v1.22.0]: https://github.com/kong/deck/compare/v1.21.0...v1.22.0
 [v1.21.0]: https://github.com/kong/deck/compare/v1.20.0...v1.21.0

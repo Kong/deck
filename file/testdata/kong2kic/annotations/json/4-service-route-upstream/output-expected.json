@@ -1,0 +1,176 @@
+{
+    "kind": "KongIngress",
+    "apiVersion": "configuration.konghq.com/v1",
+    "metadata": {
+        "name": "example-service",
+        "creationTimestamp": null,
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        }
+    },
+    "upstream": {
+        "host_header": "example.com",
+        "algorithm": "round-robin",
+        "slots": 10000,
+        "healthchecks": {
+            "active": {
+                "concurrency": 10,
+                "healthy": {
+                    "http_statuses": [
+                        200,
+                        302
+                    ],
+                    "interval": 0,
+                    "successes": 0
+                },
+                "http_path": "/",
+                "https_sni": "example.com",
+                "https_verify_certificate": true,
+                "type": "http",
+                "timeout": 1,
+                "unhealthy": {
+                    "http_failures": 0,
+                    "http_statuses": [
+                        429,
+                        404,
+                        500,
+                        501,
+                        502,
+                        503,
+                        504,
+                        505
+                    ],
+                    "tcp_failures": 0,
+                    "timeouts": 0,
+                    "interval": 0
+                },
+                "headers": {
+                    "x-another-header": [
+                        "bla"
+                    ],
+                    "x-my-header": [
+                        "foo",
+                        "bar"
+                    ]
+                }
+            },
+            "passive": {
+                "healthy": {
+                    "http_statuses": [
+                        200,
+                        201,
+                        202,
+                        203,
+                        204,
+                        205,
+                        206,
+                        207,
+                        208,
+                        226,
+                        300,
+                        301,
+                        302,
+                        303,
+                        304,
+                        305,
+                        306,
+                        307,
+                        308
+                    ],
+                    "successes": 0
+                },
+                "type": "http",
+                "unhealthy": {
+                    "http_failures": 0,
+                    "http_statuses": [
+                        429,
+                        500,
+                        503
+                    ],
+                    "tcp_failures": 0,
+                    "timeouts": 0
+                }
+            },
+            "threshold": 0
+        },
+        "hash_on": "none",
+        "hash_fallback": "none",
+        "hash_on_cookie_path": "/"
+    }
+}{
+    "kind": "Ingress",
+    "apiVersion": "networking.k8s.io/v1",
+    "metadata": {
+        "name": "example-route",
+        "creationTimestamp": null,
+        "annotations": {
+            "konghq.com/headers.x-another-header": "bla",
+            "konghq.com/headers.x-my-header": "foo,bar",
+            "konghq.com/https-redirect-status-code": "302",
+            "konghq.com/methods": "GET,POST",
+            "konghq.com/preserve-host": "true",
+            "konghq.com/protocols": "http,https",
+            "konghq.com/regex-priority": "1",
+            "konghq.com/snis": "example.com",
+            "konghq.com/strip-path": "false"
+        }
+    },
+    "spec": {
+        "ingressClassName": "kong",
+        "rules": [
+            {
+                "host": "example.com",
+                "http": {
+                    "paths": [
+                        {
+                            "path": "/v1/example",
+                            "pathType": "ImplementationSpecific",
+                            "backend": {
+                                "service": {
+                                    "name": "example-service",
+                                    "port": {
+                                        "number": 80
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}{
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "example-service",
+        "creationTimestamp": null,
+        "annotations": {
+            "konghq.com/connect-timeout": "5000",
+            "konghq.com/override": "example-service",
+            "konghq.com/path": "/v1",
+            "konghq.com/protocol": "http",
+            "konghq.com/read-timeout": "60000",
+            "konghq.com/retries": "5",
+            "konghq.com/write-timeout": "60000"
+        }
+    },
+    "spec": {
+        "ports": [
+            {
+                "protocol": "TCP",
+                "port": 80,
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "example-service"
+        }
+    },
+    "status": {
+        "loadBalancer": {}
+    }
+}

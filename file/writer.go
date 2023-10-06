@@ -43,16 +43,16 @@ func getFormatVersion(kongVersion string) (string, error) {
 	return formatVersion, nil
 }
 
-// KongStateToFile writes a state object to file with filename.
+// KongStateToFile generates a state object to file.Content.
 // It will omit timestamps and IDs while writing.
-func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
+func KongStateToContent(kongState *state.KongState, config WriteConfig) (*Content, error) {
 	file := &Content{}
 	var err error
 
 	file.Workspace = config.Workspace
 	formatVersion, err := getFormatVersion(config.KongVersion)
 	if err != nil {
-		return fmt.Errorf("get format version: %w", err)
+		return nil, fmt.Errorf("get format version: %w", err)
 	}
 	file.FormatVersion = formatVersion
 	if config.RuntimeGroupName != "" {
@@ -70,49 +70,58 @@ func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
 
 	err = populateServices(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateServicelessRoutes(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populatePlugins(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateUpstreams(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateCertificates(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateCACertificates(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateConsumers(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateVaults(kongState, file, config)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = populateConsumerGroups(kongState, file, config)
 	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
+
+// KongStateToFile writes a state object to file with filename.
+// See KongStateToContent for the State generation
+func KongStateToFile(kongState *state.KongState, config WriteConfig) error {
+	file, err := KongStateToContent(kongState, config)
+	if err != nil {
 		return err
 	}
-
 	return WriteContentToFile(file, config.Filename, config.FileFormat)
 }
 
@@ -382,7 +391,7 @@ func populatePlugins(kongState *state.KongState, file *Content,
 		if p.Consumer != nil {
 			associations++
 			cID := *p.Consumer.ID
-			consumer, err := kongState.Consumers.Get(cID)
+			consumer, err := kongState.Consumers.GetByIDOrUsername(cID)
 			if err != nil {
 				return fmt.Errorf("unable to get consumer %s for plugin %s [%s]: %w", cID, *p.Name, *p.ID, err)
 			}
@@ -414,6 +423,18 @@ func populatePlugins(kongState *state.KongState, file *Content,
 				rID = *route.Name
 			}
 			p.Route.ID = &rID
+		}
+		if p.ConsumerGroup != nil {
+			associations++
+			cgID := *p.ConsumerGroup.ID
+			cg, err := kongState.ConsumerGroups.Get(cgID)
+			if err != nil {
+				return fmt.Errorf("unable to get consumer-group %s for plugin %s [%s]: %w", cgID, *p.Name, *p.ID, err)
+			}
+			if !utils.Empty(cg.Name) {
+				cgID = *cg.Name
+			}
+			p.ConsumerGroup.ID = &cgID
 		}
 		if associations == 0 || associations > 1 {
 			utils.ZeroOutID(p, p.Name, config.WithID)
@@ -703,13 +724,13 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 	if err != nil {
 		return err
 	}
-	plugins, err := kongState.ConsumerGroupPlugins.GetAll()
+	cgPlugins, err := kongState.ConsumerGroupPlugins.GetAll()
 	if err != nil {
 		return err
 	}
 	for _, cg := range consumerGroups {
 		group := FConsumerGroupObject{ConsumerGroup: cg.ConsumerGroup}
-		for _, plugin := range plugins {
+		for _, plugin := range cgPlugins {
 			if plugin.ID != nil && cg.ID != nil {
 				if plugin.ConsumerGroup != nil && *plugin.ConsumerGroup.ID == *cg.ID {
 					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
@@ -720,6 +741,25 @@ func populateConsumerGroups(kongState *state.KongState, file *Content,
 				}
 			}
 		}
+
+		plugins, err := kongState.Plugins.GetAllByConsumerGroupID(*cg.ID)
+		if err != nil {
+			return err
+		}
+		for _, plugin := range plugins {
+			if plugin.ID != nil && cg.ID != nil {
+				if plugin.ConsumerGroup != nil && *plugin.ConsumerGroup.ID == *cg.ID {
+					utils.ZeroOutID(plugin, plugin.Name, config.WithID)
+					utils.ZeroOutID(plugin.ConsumerGroup, plugin.ConsumerGroup.Name, config.WithID)
+					group.Plugins = append(group.Plugins, &kong.ConsumerGroupPlugin{
+						ID:     plugin.ID,
+						Name:   plugin.Name,
+						Config: plugin.Config,
+					})
+				}
+			}
+		}
+
 		utils.ZeroOutID(&group, group.Name, config.WithID)
 		utils.ZeroOutTimestamps(&group)
 		file.ConsumerGroups = append(file.ConsumerGroups, group)
@@ -741,6 +781,26 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 		}
 	case JSON:
 		c, err = json.MarshalIndent(content, "", "  ")
+		if err != nil {
+			return err
+		}
+	case KIC_JSON_CRD:
+		c, err = MarshalKongToKICJson(content, CUSTOM_RESOURCE)
+		if err != nil {
+			return err
+		}
+	case KIC_YAML_CRD:
+		c, err = MarshalKongToKICYaml(content, CUSTOM_RESOURCE)
+		if err != nil {
+			return err
+		}
+	case KIC_JSON_ANNOTATION:
+		c, err = MarshalKongToKICJson(content, ANNOTATIONS)
+		if err != nil {
+			return err
+		}
+	case KIC_YAML_ANNOTATION:
+		c, err = MarshalKongToKICYaml(content, ANNOTATIONS)
 		if err != nil {
 			return err
 		}
