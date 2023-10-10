@@ -27,6 +27,7 @@ var (
 func executeListTags(cmd *cobra.Command, _ []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-list-tags", "", modeLocal)
 
 	cmdListTagsOutputFormat = strings.ToUpper(cmdListTagsOutputFormat)
 

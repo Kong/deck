@@ -19,6 +19,7 @@ var (
 func executeMerge(cmd *cobra.Command, args []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-merge", "", modeLocal)
 
 	// do the work: read/merge
 	merged, info, err := merge.Files(args)

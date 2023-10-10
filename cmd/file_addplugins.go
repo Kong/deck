@@ -29,6 +29,7 @@ var (
 func executeAddPlugins(cmd *cobra.Command, cfgFiles []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-add-plugins", "", modeLocal)
 
 	cmdAddPluginOutputFormat = strings.ToUpper(cmdAddPluginOutputFormat)
 
