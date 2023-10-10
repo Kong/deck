@@ -76,6 +76,8 @@ func newListTagsCmd() *cobra.Command {
 The tags are collected from all objects that match the selector expressions. If no
 selectors are given, all Kong entities will be scanned.`,
 		RunE: executeListTags,
+		Example: "# list all tags used on services\n" +
+			"cat kong.yml | deck file list-tags --selector='services[*]'",
 		Args: cobra.NoArgs,
 	}
 

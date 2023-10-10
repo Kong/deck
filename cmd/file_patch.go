@@ -159,6 +159,8 @@ If the 'values' object instead is an array, then any arrays returned by the sele
 will get the 'values' appended to them.
 `,
 		RunE: executePatch,
+		Example: "# update the read-timeout on all services\n" +
+			"cat kong.yml | deck file patch --selector=\"$..services[*]\" --value=\"read_timeout:10000\"",
 	}
 
 	patchCmd.Flags().StringVarP(&cmdPatchInputFilename, "state", "s", "-",

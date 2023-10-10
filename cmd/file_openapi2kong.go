@@ -70,6 +70,8 @@ The example file at https://github.com/Kong/go-apiops/blob/main/docs/learnservic
 has extensive annotations explaining the conversion process, as well as all supported 
 custom annotations (x-kong-... directives).`,
 		RunE: executeOpenapi2Kong,
+		Example: "# Convert an OAS file, adding 2 tags, and namespacing the UUIDs to a unique name\n" +
+			"cat service_oas.yml | deck file openapi2kong --select-tag=serviceA,teamB --uuid-base=unique-service-name",
 		Args: cobra.NoArgs,
 	}
 

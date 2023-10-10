@@ -59,6 +59,8 @@ Doesn't perform any checks on content, e.g. duplicates, or any validations.
 If the input files are not compatible, returns an error. Compatibility is
 determined by the '_transform' and '_format_version' fields.`,
 		RunE: executeMerge,
+		Example: "# Merge 3 files\n" +
+			"deck file patch -o merged.yaml file1.yaml file2.yaml file3.yaml",
 		Args: cobra.MinimumNArgs(1),
 	}
 

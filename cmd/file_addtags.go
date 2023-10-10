@@ -72,6 +72,8 @@ func newAddTagsCmd() *cobra.Command {
 The tags are added to all objects that match the selector expressions. If no
 selectors are given, all Kong entities are tagged.`,
 		RunE: executeAddTags,
+		Example: "# adds tags 'tag1' and 'tag2' to all services in file 'kong.yml'\n" +
+			"cat kong.yml | deck file add-tags --selector='services[*]' tag1 tag2",
 		Args: cobra.MinimumNArgs(1),
 	}
 
