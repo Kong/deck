@@ -29,5 +29,6 @@ deck
 dist/
 docs/cli-docs/
 
-# vscode editor files
+# editor files
 .vscode/
+.idea/

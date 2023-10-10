@@ -1,0 +1,9 @@
+consumer_groups:
+  - name: example-consumer-group
+    consumers:
+      - username: example-user
+consumers:
+  - username: example-user
+    custom_id: "1234567890"
+    tags:
+      - internal

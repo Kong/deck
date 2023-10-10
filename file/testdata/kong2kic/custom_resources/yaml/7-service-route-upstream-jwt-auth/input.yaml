@@ -1,0 +1,151 @@
+services:
+  - name: example-service
+    url: http://example-api.com
+    protocol: http
+    host: example-api.com
+    port: 80
+    path: /v1
+    retries: 5
+    connect_timeout: 5000
+    write_timeout: 60000
+    read_timeout: 60000
+    enabled: true
+    client_certificate: 4e3ad2e4-0bc4-4638-8e34-c84a417ba39b
+    tags:
+      - example
+      - api
+    routes:
+      - name: example-route
+        methods:
+          - GET
+          - POST
+        hosts:
+          - example.com
+        paths:
+          - /v1/example
+        protocols:
+          - http
+          - https
+        headers:
+          x-my-header:
+            - foo
+            - bar
+          x-another-header:
+            - bla
+        regex_priority: 1
+        strip_path: false
+        preserve_host: true
+        tags:
+          - version:v1
+        https_redirect_status_code: 302
+        snis:
+          - example.com
+        sources:
+          - ip: 192.168.0.1
+        plugins:
+          - name: jwt
+            config:
+              uri_param_names:
+                - token
+              claims_to_verify:
+                - exp
+                - nbf
+              key_claim_name: kid
+              secret_is_base64: false
+              anonymous: null
+              run_on_preflight: true
+              maximum_expiration: 3600
+              header_names:
+                - Authorization
+upstreams:
+  - name: example-api.com
+    algorithm: round-robin
+    hash_on: none
+    hash_fallback: none
+    hash_on_cookie_path: "/"
+    slots: 10000
+    healthchecks:
+      passive:
+        type: http
+        healthy:
+          http_statuses:
+          - 200
+          - 201
+          - 202
+          - 203
+          - 204
+          - 205
+          - 206
+          - 207
+          - 208
+          - 226
+          - 300
+          - 301
+          - 302
+          - 303
+          - 304
+          - 305
+          - 306
+          - 307
+          - 308
+          successes: 0
+        unhealthy:
+          http_statuses:
+          - 429
+          - 500
+          - 503
+          timeouts: 0
+          http_failures: 0
+          tcp_failures: 0
+      active:
+        https_verify_certificate: true
+        healthy:
+          http_statuses:
+          - 200
+          - 302
+          successes: 0
+          interval: 0
+        unhealthy:
+          http_failures: 0
+          http_statuses:
+          - 429
+          - 404
+          - 500
+          - 501
+          - 502
+          - 503
+          - 504
+          - 505
+          timeouts: 0
+          tcp_failures: 0
+          interval: 0
+        type: http
+        concurrency: 10
+        headers:
+          x-my-header:
+            - foo
+            - bar
+          x-another-header:
+            - bla
+        timeout: 1
+        http_path: "/"
+        https_sni: example.com
+      threshold: 0
+    tags:
+    - user-level
+    - low-priority
+    host_header: example.com
+    client_certificate:
+      id: ea29aaa3-3b2d-488c-b90c-56df8e0dd8c6
+    use_srv_name: false
+consumers:
+  - username: example-user
+    custom_id: "1234567890"
+    tags:
+      - internal
+    jwt_secrets:
+      - key: my_jwt_secret
+        algorithm: HS256
+        secret: my_secret_key
+        tags:
+          - internal

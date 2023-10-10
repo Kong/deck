@@ -1,0 +1,32 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-service
+proxy:
+  connect_timeout: 5000
+  path: /v1
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/override: example-service
+  creationTimestamp: null
+  name: example-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: example-service
+status:
+  loadBalancer: {}
+---

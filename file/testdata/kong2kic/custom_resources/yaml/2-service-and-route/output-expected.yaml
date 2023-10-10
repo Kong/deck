@@ -1,0 +1,82 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-service
+proxy:
+  connect_timeout: 5000
+  path: /v1
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  creationTimestamp: null
+  name: example-route
+route:
+  headers:
+    x-another-header:
+    - bla
+    x-my-header:
+    - foo
+    - bar
+  https_redirect_status_code: 302
+  methods:
+  - GET
+  - POST
+  preserve_host: true
+  protocols:
+  - http
+  - https
+  regex_priority: 1
+  snis:
+  - example.com
+  strip_path: false
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/override: example-route
+  creationTimestamp: null
+  name: example-route
+spec:
+  ingressClassName: kong
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: example-service
+            port:
+              number: 80
+        path: /v1/example
+        pathType: ImplementationSpecific
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/override: example-service
+  creationTimestamp: null
+  name: example-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: example-service
+status:
+  loadBalancer: {}
+---
