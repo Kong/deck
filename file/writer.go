@@ -801,6 +801,36 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 		if err != nil {
 			return err
 		}
+	case KICJSONCrdIngressAPI:
+		c, err = MarshalKongToKICJson(content, CUSTOMRESOURCE)
+		if err != nil {
+			return err
+		}
+	case KICYAMLCrdIngressAPI:
+		c, err = MarshalKongToKICYaml(content, CUSTOMRESOURCE)
+		if err != nil {
+			return err
+		}
+	case KICJSONAnnotationIngressAPI:
+		c, err = MarshalKongToKICJson(content, ANNOTATIONS)
+		if err != nil {
+			return err
+		}
+	case KICYAMLAnnotationIngressAPI:
+		c, err = MarshalKongToKICYaml(content, ANNOTATIONS)
+		if err != nil {
+			return err
+		}
+	case KICJSONGatewayAPI:
+		c, err = MarshalKongToKICJson(content, GATEWAY)
+		if err != nil {
+			return err
+		}
+	case KICYAMLGatewayAPI:
+		c, err = MarshalKongToKICYaml(content, GATEWAY)
+		if err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("unknown file format: " + string(format))
 	}
