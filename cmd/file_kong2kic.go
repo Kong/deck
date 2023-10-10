@@ -78,8 +78,8 @@ using the KongIngress CRD. Output in YAML or JSON format.`,
 		Args: cobra.NoArgs,
 	}
 
-	kong2KicCmd.Flags().StringVarP(&cmdKong2KicInputFilename, "input-file", "i", "-",
-		"Kong spec file to process. Use - to read from stdin.")
+	kong2KicCmd.Flags().StringVarP(&cmdKong2KicInputFilename, "state", "s", "-",
+		"decK file to process. Use - to read from stdin.")
 	kong2KicCmd.Flags().StringVarP(&cmdKong2KicOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
 	kong2KicCmd.Flags().StringVar(&cmdKong2KicManifestStyle, "style", "annotation",
