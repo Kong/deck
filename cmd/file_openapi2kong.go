@@ -69,7 +69,10 @@ func newOpenapi2KongCmd() *cobra.Command {
 
 The example file at https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml
 has extensive annotations explaining the conversion process, as well as all supported 
-custom annotations (x-kong-... directives).`,
+custom annotations (x-kong-... directives).
+
+The output will be targeted at Kong version 3.x.
+`,
 		RunE: executeOpenapi2Kong,
 		Example: "# Convert an OAS file, adding 2 tags, and namespacing the UUIDs to a unique name\n" +
 			"cat service_oas.yml | deck file openapi2kong --select-tag=serviceA,teamB --uuid-base=unique-service-name",
