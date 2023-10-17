@@ -30,7 +30,7 @@ func Test_LintPlain(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			output, err := lint(
 				"-s", tc.stateFile,
-				"--ruleset", tc.rulesetFile,
+				tc.rulesetFile,
 			)
 			assert.Error(t, err)
 
@@ -95,8 +95,8 @@ func Test_LintStructured(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			lintOpts := []string{
 				"-s", tc.stateFile,
-				"--ruleset", tc.rulesetFile,
 				"--format", tc.format,
+				tc.rulesetFile,
 			}
 			if tc.displayOnlyFailrues {
 				lintOpts = append(lintOpts, "--display-only-failures")
