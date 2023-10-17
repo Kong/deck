@@ -3,9 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/daveshanley/vacuum/motor"
@@ -16,11 +14,11 @@ import (
 )
 
 var (
-	cmdLintInputFilename string
-	cmdLintInputRuleset  string
-	cmdLintFormat        string
-	cmdLintFailSeverity  string
-	cmdLintOnlyFailures  bool
+	cmdLintInputFilename  string
+	cmdLintFormat         string
+	cmdLintFailSeverity   string
+	cmdLintOutputFilename string
+	cmdLintOnlyFailures   bool
 )
 
 const plainTextFormat = "plain"
@@ -59,8 +57,9 @@ func ParseSeverity(s string) Severity {
 	return SeverityWarn
 }
 
+// getRuleSet reads the ruleset file by the provided name and returns a RuleSet object.
 func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
-	ruleSetBytes, err := os.ReadFile(ruleSetFile)
+	ruleSetBytes, err := filebasics.ReadFile(ruleSetFile)
 	if err != nil {
 		return nil, fmt.Errorf("error reading ruleset file: %w", err)
 	}
@@ -71,29 +70,19 @@ func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
 	return customRuleSet, nil
 }
 
-func executeLint(cmd *cobra.Command, _ []string) error {
+// Executes the CLI command "lint"
+func executeLint(cmd *cobra.Command, args []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
-	if cmdLintInputRuleset == "" {
-		return errors.New("missing required option: --ruleset")
-	}
-	customRuleSet, err := getRuleSet(cmdLintInputRuleset)
+	customRuleSet, err := getRuleSet(args[0])
 	if err != nil {
 		return err
 	}
 
-	var stateFileBytes []byte
-	if cmdLintInputFilename == "-" {
-		stateFileBytes, err = io.ReadAll(os.Stdin)
-		if err != nil {
-			return fmt.Errorf("error reading state from STDIN: %w", err)
-		}
-	} else {
-		stateFileBytes, err = os.ReadFile(cmdLintInputFilename)
-		if err != nil {
-			return fmt.Errorf("error reading state file: %w", err)
-		}
+	stateFileBytes, err := filebasics.ReadFile(cmdLintInputFilename)
+	if err != nil {
+		return fmt.Errorf("failed to read input file '%s'; %w", cmdLintInputFilename, err)
 	}
 
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
@@ -141,7 +130,7 @@ func executeLint(cmd *cobra.Command, _ []string) error {
 		fallthrough
 	case strings.ToUpper(string(filebasics.OutputFormatYaml)):
 		if err = filebasics.WriteSerializedFile(
-			"-", lintErrs, filebasics.OutputFormat(outputFormat),
+			cmdLintOutputFilename, lintErrs, filebasics.OutputFormat(outputFormat),
 		); err != nil {
 			return fmt.Errorf("error writing lint results: %w", err)
 		}
@@ -177,18 +166,19 @@ func executeLint(cmd *cobra.Command, _ []string) error {
 
 func newLintCmd() *cobra.Command {
 	lintCmd := &cobra.Command{
-		Use:   "lint",
+		Use:   "lint [flags] ruleset-file",
 		Short: "Lint a file against a ruleset",
 		Long: "Validate a decK state file against a linting ruleset, reporting any violations or failures.\n" +
 			"Report output can be returned in JSON, YAML, or human readable format (see --format).\n" +
 			"Ruleset Docs: https://quobix.com/vacuum/rulesets/",
 		RunE: executeLint,
+		Args: cobra.ExactArgs(1),
 	}
 
 	lintCmd.Flags().StringVarP(&cmdLintInputFilename, "state", "s", "-",
 		"decK file to process. Use - to read from stdin.")
-	lintCmd.Flags().StringVarP(&cmdLintInputRuleset, "ruleset", "r", "",
-		"Ruleset to apply to the state file.")
+	lintCmd.Flags().StringVarP(&cmdLintOutputFilename, "output-file", "o", "-",
+		"Output file to write to. Use - to write to stdout.")
 	lintCmd.Flags().StringVar(
 		&cmdLintFormat, "format", plainTextFormat,
 		fmt.Sprintf(`output format [choices: "%s", "%s", "%s"]`,
@@ -199,7 +189,7 @@ func newLintCmd() *cobra.Command {
 	)
 	lintCmd.Flags().StringVarP(
 		&cmdLintFailSeverity, "fail-severity", "F", "error",
-		"results of this level or above will trigger a failure exit code "+
+		"results of this level or above will trigger a failure exit code\n"+
 			"[choices: \"error\", \"warn\", \"info\", \"hint\"]")
 	lintCmd.Flags().BoolVarP(&cmdLintOnlyFailures,
 		"display-only-failures", "D", false,
