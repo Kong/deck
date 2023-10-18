@@ -24,7 +24,7 @@ consumer_groups:
         database: 0
         host: null
         keepalive_backlog: null
-        keepalive_pool_size: 30
+        keepalive_pool_size: 256
         password: null
         port: null
         read_timeout: null
