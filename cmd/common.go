@@ -39,6 +39,7 @@ const (
 	modeKonnect = iota
 	modeKong
 	modeKongEnterprise
+	modeLocal
 )
 
 var jsonOutput diff.JSONOutputObject
@@ -488,6 +489,8 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 		modeStr = "konnect"
 	case modeKongEnterprise:
 		modeStr = "enterprise"
+	case modeLocal:
+		modeStr = "local"
 	}
 	return utils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
 }

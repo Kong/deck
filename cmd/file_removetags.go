@@ -28,6 +28,7 @@ var (
 func executeRemoveTags(cmd *cobra.Command, tagsToRemove []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-remove-tags", "", modeLocal)
 
 	cmdRemoveTagsOutputFormat = strings.ToUpper(cmdRemoveTagsOutputFormat)
 

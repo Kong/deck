@@ -15,6 +15,7 @@ var (
 )
 
 func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
+	_ = sendAnalytics("file-render", "", modeLocal)
 	return convert.Convert(
 		fileRenderCmdKongStateFile,
 		fileRenderCmdKongFileOutput,

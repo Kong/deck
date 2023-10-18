@@ -24,6 +24,7 @@ var (
 func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-openapi2kong", "", modeLocal)
 
 	if len(cmdO2KentityTags) == 0 {
 		cmdO2KentityTags = nil

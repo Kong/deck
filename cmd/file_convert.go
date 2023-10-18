@@ -22,6 +22,8 @@ var (
 )
 
 func executeConvert(_ *cobra.Command, _ []string) error {
+	_ = sendAnalytics("file-convert", "", modeLocal)
+
 	sourceFormat, err := convert.ParseFormat(convertCmdSourceFormat)
 	if err != nil {
 		return err
