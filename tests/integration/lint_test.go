@@ -55,7 +55,7 @@ func Test_LintStructured(t *testing.T) {
 		rulesetFile         string
 		expectedFile        string
 		format              string
-		displayOnlyFailrues bool
+		displayOnlyFailures bool
 		failSeverity        string
 	}{
 		{
@@ -71,7 +71,7 @@ func Test_LintStructured(t *testing.T) {
 			rulesetFile:         "testdata/lint/001-simple-lint/ruleset.yaml",
 			expectedFile:        "testdata/lint/001-simple-lint/expected-fail-severity-error.yaml",
 			format:              "yaml",
-			displayOnlyFailrues: true,
+			displayOnlyFailures: true,
 			failSeverity:        "error",
 		},
 		{
@@ -87,7 +87,7 @@ func Test_LintStructured(t *testing.T) {
 			rulesetFile:         "testdata/lint/001-simple-lint/ruleset.yaml",
 			expectedFile:        "testdata/lint/001-simple-lint/expected-fail-severity-error.json",
 			format:              "json",
-			displayOnlyFailrues: true,
+			displayOnlyFailures: true,
 			failSeverity:        "error",
 		},
 	}
@@ -98,7 +98,7 @@ func Test_LintStructured(t *testing.T) {
 				"--format", tc.format,
 				tc.rulesetFile,
 			}
-			if tc.displayOnlyFailrues {
+			if tc.displayOnlyFailures {
 				lintOpts = append(lintOpts, "--display-only-failures")
 			}
 			if tc.failSeverity != "" {
