@@ -11,7 +11,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/daveshanley/vacuum v0.2.7
 	github.com/fatih/color v1.15.0
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/go-querystring v1.1.0
 	github.com/google/uuid v1.3.1
 	github.com/hashicorp/go-memdb v1.3.4
@@ -19,7 +19,7 @@ require (
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
 	github.com/kong/go-apiops v0.1.21
-	github.com/kong/go-kong v0.46.0
+	github.com/kong/go-kong v0.47.1-0.20231017161145-6881f5b9fb4d
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.7
 	github.com/spf13/cobra v1.7.0
@@ -92,7 +92,7 @@ require (
 	github.com/spf13/cast v1.5.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/gjson v1.17.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.11 // indirect
