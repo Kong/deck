@@ -1,0 +1,9 @@
+_format_version: "3.0"
+services:
+- name: svc1
+  host: mockbin.org
+  protocol: http
+  routes:
+  - name: r1
+    paths:
+    - /r1
