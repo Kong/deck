@@ -215,7 +215,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 
 func reset(t *testing.T, opts ...string) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"gateway", "reset", "--force"}
+	args := []string{"reset", "--force"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -248,7 +248,7 @@ func setup(t *testing.T) {
 
 func sync(kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"gateway", "sync", kongFile}
+	args := []string{"sync", "-s", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -258,7 +258,7 @@ func sync(kongFile string, opts ...string) error {
 
 func diff(kongFile string, opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"gateway", "diff", kongFile}
+	args := []string{"diff", "-s", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -280,7 +280,7 @@ func diff(kongFile string, opts ...string) (string, error) {
 
 func dump(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"gateway", "dump", "-o=kong"}
+	args := []string{"dump"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -324,7 +324,7 @@ func lint(opts ...string) (string, error) {
 
 func ping(opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"gateway", "ping"}
+	args := []string{"ping"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
