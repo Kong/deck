@@ -69,6 +69,8 @@ issues:
     path: cmd/root.go
 
 linters-settings:
+  goconst:
+    min-occurrences: 10
   gomodguard:
     blocked:
       modules:
