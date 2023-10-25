@@ -13,7 +13,6 @@ import (
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
 	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
 )
 
 var differ = gojsondiff.New()
@@ -61,8 +60,6 @@ func prettyPrintJSONString(JSONString string) (string, error) {
 }
 
 func getDiff(a, b interface{}) (string, error) {
-	utils.ZeroOutTimestamps(a)
-	utils.ZeroOutTimestamps(b)
 	aJSON, err := json.Marshal(a)
 	if err != nil {
 		return "", err
@@ -71,6 +68,11 @@ func getDiff(a, b interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// remove timestamps from JSON data without modifying the original data
+	aJSON = removeTimestamps(aJSON)
+	bJSON = removeTimestamps(bJSON)
+
 	d, err := differ.Compare(aJSON, bJSON)
 	if err != nil {
 		return "", err
@@ -85,6 +87,20 @@ func getDiff(a, b interface{}) (string, error) {
 		formatter.AsciiFormatterConfig{})
 	diffString, err := formatter.Format(d)
 	return diffString, err
+}
+
+func removeTimestamps(jsonData []byte) []byte {
+	var dataMap map[string]interface{}
+	if err := json.Unmarshal(jsonData, &dataMap); err != nil {
+		return jsonData
+	}
+	delete(dataMap, "created_at")
+	delete(dataMap, "updated_at")
+	modifiedJSON, err := json.Marshal(dataMap)
+	if err != nil {
+		return jsonData
+	}
+	return modifiedJSON
 }
 
 type EnvVar struct {

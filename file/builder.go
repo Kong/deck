@@ -147,8 +147,8 @@ func (b *stateBuilder) consumerGroups() {
 
 	for _, cg := range b.targetContent.ConsumerGroups {
 		cg := cg
+		current, err := b.currentState.ConsumerGroups.Get(*cg.Name)
 		if utils.Empty(cg.ID) {
-			current, err := b.currentState.ConsumerGroups.Get(*cg.Name)
 			if errors.Is(err, state.ErrNotFound) {
 				cg.ID = uuid()
 			} else if err != nil {
@@ -164,7 +164,7 @@ func (b *stateBuilder) consumerGroups() {
 			ConsumerGroup: &cg.ConsumerGroup,
 		}
 
-		err := b.intermediate.ConsumerGroups.Add(state.ConsumerGroup{ConsumerGroup: cg.ConsumerGroup})
+		err = b.intermediate.ConsumerGroups.Add(state.ConsumerGroup{ConsumerGroup: cg.ConsumerGroup})
 		if err != nil {
 			b.err = err
 			return
@@ -187,6 +187,9 @@ func (b *stateBuilder) consumerGroups() {
 				b.err = err
 				return
 			}
+		}
+		if current != nil && current.CreatedAt != nil {
+			cgo.ConsumerGroup.CreatedAt = current.CreatedAt
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
 	}
@@ -240,8 +243,8 @@ func (b *stateBuilder) certificates() {
 func (b *stateBuilder) ingestSNIs(snis []kong.SNI) error {
 	for _, sni := range snis {
 		sni := sni
+		currentSNI, err := b.currentState.SNIs.Get(*sni.Name)
 		if utils.Empty(sni.ID) {
-			currentSNI, err := b.currentState.SNIs.Get(*sni.Name)
 			if errors.Is(err, state.ErrNotFound) {
 				sni.ID = uuid()
 			} else if err != nil {
@@ -251,6 +254,9 @@ func (b *stateBuilder) ingestSNIs(snis []kong.SNI) error {
 			}
 		}
 		utils.MustMergeTags(&sni, b.selectTags)
+		if currentSNI != nil && currentSNI.CreatedAt != nil {
+			sni.CreatedAt = currentSNI.CreatedAt
+		}
 		b.rawState.SNIs = append(b.rawState.SNIs, &sni)
 	}
 	return nil
@@ -263,8 +269,8 @@ func (b *stateBuilder) caCertificates() {
 
 	for _, c := range b.targetContent.CACertificates {
 		c := c
+		cert, err := b.currentState.CACertificates.Get(*c.Cert)
 		if utils.Empty(c.ID) {
-			cert, err := b.currentState.CACertificates.Get(*c.Cert)
 			if errors.Is(err, state.ErrNotFound) {
 				c.ID = uuid()
 			} else if err != nil {
@@ -275,6 +281,9 @@ func (b *stateBuilder) caCertificates() {
 			}
 		}
 		utils.MustMergeTags(&c.CACertificate, b.selectTags)
+		if cert != nil && cert.CreatedAt != nil {
+			c.CACertificate.CreatedAt = cert.CreatedAt
+		}
 
 		b.rawState.CACertificates = append(b.rawState.CACertificates,
 			&c.CACertificate)
@@ -288,24 +297,23 @@ func (b *stateBuilder) consumers() {
 
 	for _, c := range b.targetContent.Consumers {
 		c := c
-		if utils.Empty(c.ID) {
-			var (
-				consumer *state.Consumer
-				err      error
-			)
-			if c.Username != nil {
-				consumer, err = b.currentState.Consumers.GetByIDOrUsername(*c.Username)
+
+		var (
+			consumer *state.Consumer
+			err      error
+		)
+		if c.Username != nil {
+			consumer, err = b.currentState.Consumers.GetByIDOrUsername(*c.Username)
+		}
+		if errors.Is(err, state.ErrNotFound) || consumer == nil {
+			if c.CustomID != nil {
+				consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
 			}
-			if errors.Is(err, state.ErrNotFound) || consumer == nil {
-				if c.CustomID != nil {
-					consumer, err = b.currentState.Consumers.GetByCustomID(*c.CustomID)
-					if err == nil {
-						c.ID = kong.String(*consumer.ID)
-					}
-				}
-				if c.ID == nil {
-					c.ID = uuid()
-				}
+		}
+
+		if utils.Empty(c.ID) {
+			if errors.Is(err, state.ErrNotFound) {
+				c.ID = uuid()
 			} else if err != nil {
 				b.err = err
 				return
@@ -314,9 +322,11 @@ func (b *stateBuilder) consumers() {
 			}
 		}
 		utils.MustMergeTags(&c.Consumer, b.selectTags)
-
+		if consumer != nil && consumer.CreatedAt != nil {
+			c.Consumer.CreatedAt = consumer.CreatedAt
+		}
 		b.rawState.Consumers = append(b.rawState.Consumers, &c.Consumer)
-		err := b.intermediate.Consumers.Add(state.Consumer{Consumer: c.Consumer})
+		err = b.intermediate.Consumers.Add(state.Consumer{Consumer: c.Consumer})
 		if err != nil {
 			b.err = err
 			return
@@ -443,8 +453,8 @@ func (b *stateBuilder) ingestIntoConsumerGroup(consumer FConsumer) error {
 func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 	for _, cred := range creds {
 		cred := cred
+		existingCred, err := b.currentState.KeyAuths.Get(*cred.Key)
 		if utils.Empty(cred.ID) {
-			existingCred, err := b.currentState.KeyAuths.Get(*cred.Key)
 			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
@@ -455,6 +465,9 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 		}
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		if existingCred != nil && existingCred.CreatedAt != nil {
+			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
 	}
@@ -464,8 +477,8 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 	for _, cred := range creds {
 		cred := cred
+		existingCred, err := b.currentState.BasicAuths.Get(*cred.Username)
 		if utils.Empty(cred.ID) {
-			existingCred, err := b.currentState.BasicAuths.Get(*cred.Username)
 			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
@@ -476,6 +489,9 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 		}
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		if existingCred != nil && existingCred.CreatedAt != nil {
+			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
 	}
@@ -485,8 +501,8 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 	for _, cred := range creds {
 		cred := cred
+		existingCred, err := b.currentState.HMACAuths.Get(*cred.Username)
 		if utils.Empty(cred.ID) {
-			existingCred, err := b.currentState.HMACAuths.Get(*cred.Username)
 			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
@@ -497,6 +513,9 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 		}
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		if existingCred != nil && existingCred.CreatedAt != nil {
+			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
 	}
@@ -506,8 +525,8 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 	for _, cred := range creds {
 		cred := cred
+		existingCred, err := b.currentState.JWTAuths.Get(*cred.Key)
 		if utils.Empty(cred.ID) {
-			existingCred, err := b.currentState.JWTAuths.Get(*cred.Key)
 			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
@@ -518,6 +537,9 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 		}
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		if existingCred != nil && existingCred.CreatedAt != nil {
+			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
 	}
@@ -527,8 +549,8 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 	for _, cred := range creds {
 		cred := cred
+		existingCred, err := b.currentState.Oauth2Creds.Get(*cred.ClientID)
 		if utils.Empty(cred.ID) {
-			existingCred, err := b.currentState.Oauth2Creds.Get(*cred.ClientID)
 			if errors.Is(err, state.ErrNotFound) {
 				cred.ID = uuid()
 			} else if err != nil {
@@ -539,6 +561,9 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 		}
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
+		}
+		if existingCred != nil && existingCred.CreatedAt != nil {
+			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
 	}
@@ -711,8 +736,14 @@ func (b *stateBuilder) services() {
 }
 
 func (b *stateBuilder) ingestService(s *FService) error {
+	var (
+		svc *state.Service
+		err error
+	)
+	if !utils.Empty(s.Name) {
+		svc, err = b.currentState.Services.Get(*s.Name)
+	}
 	if utils.Empty(s.ID) {
-		svc, err := b.currentState.Services.Get(*s.Name)
 		if errors.Is(err, state.ErrNotFound) {
 			s.ID = uuid()
 		} else if err != nil {
@@ -723,9 +754,11 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	}
 	utils.MustMergeTags(&s.Service, b.selectTags)
 	b.defaulter.MustSet(&s.Service)
-
+	if svc != nil && svc.CreatedAt != nil {
+		s.Service.CreatedAt = svc.CreatedAt
+	}
 	b.rawState.Services = append(b.rawState.Services, &s.Service)
-	err := b.intermediate.Services.Add(state.Service{Service: s.Service})
+	err = b.intermediate.Services.Add(state.Service{Service: s.Service})
 	if err != nil {
 		return err
 	}
@@ -795,8 +828,8 @@ func (b *stateBuilder) vaults() {
 
 	for _, v := range b.targetContent.Vaults {
 		v := v
+		vault, err := b.currentState.Vaults.Get(*v.Prefix)
 		if utils.Empty(v.ID) {
-			vault, err := b.currentState.Vaults.Get(*v.Prefix)
 			if errors.Is(err, state.ErrNotFound) {
 				v.ID = uuid()
 			} else if err != nil {
@@ -807,6 +840,9 @@ func (b *stateBuilder) vaults() {
 			}
 		}
 		utils.MustMergeTags(&v.Vault, b.selectTags)
+		if vault != nil && vault.CreatedAt != nil {
+			v.Vault.CreatedAt = vault.CreatedAt
+		}
 
 		b.rawState.Vaults = append(b.rawState.Vaults, &v.Vault)
 	}
@@ -819,8 +855,8 @@ func (b *stateBuilder) rbacRoles() {
 
 	for _, r := range b.targetContent.RBACRoles {
 		r := r
+		role, err := b.currentState.RBACRoles.Get(*r.Name)
 		if utils.Empty(r.ID) {
-			role, err := b.currentState.RBACRoles.Get(*r.Name)
 			if errors.Is(err, state.ErrNotFound) {
 				r.ID = uuid()
 			} else if err != nil {
@@ -829,6 +865,9 @@ func (b *stateBuilder) rbacRoles() {
 			} else {
 				r.ID = kong.String(*role.ID)
 			}
+		}
+		if role != nil && role.CreatedAt != nil {
+			r.RBACRole.CreatedAt = role.CreatedAt
 		}
 		b.rawState.RBACRoles = append(b.rawState.RBACRoles, &r.RBACRole)
 		// rbac endpoint permissions for the role
@@ -847,8 +886,8 @@ func (b *stateBuilder) upstreams() {
 
 	for _, u := range b.targetContent.Upstreams {
 		u := u
+		ups, err := b.currentState.Upstreams.Get(*u.Name)
 		if utils.Empty(u.ID) {
-			ups, err := b.currentState.Upstreams.Get(*u.Name)
 			if errors.Is(err, state.ErrNotFound) {
 				u.ID = uuid()
 			} else if err != nil {
@@ -860,6 +899,9 @@ func (b *stateBuilder) upstreams() {
 		}
 		utils.MustMergeTags(&u.Upstream, b.selectTags)
 		b.defaulter.MustSet(&u.Upstream)
+		if ups != nil && ups.CreatedAt != nil {
+			u.Upstream.CreatedAt = ups.CreatedAt
+		}
 
 		b.rawState.Upstreams = append(b.rawState.Upstreams, &u.Upstream)
 
@@ -1010,8 +1052,14 @@ func getStripPathBasedOnProtocols(route kong.Route) (*bool, error) {
 }
 
 func (b *stateBuilder) ingestRoute(r FRoute) error {
+	var (
+		route *state.Route
+		err   error
+	)
+	if !utils.Empty(r.Name) {
+		route, err = b.currentState.Routes.Get(*r.Name)
+	}
 	if utils.Empty(r.ID) {
-		route, err := b.currentState.Routes.Get(*r.Name)
 		if errors.Is(err, state.ErrNotFound) {
 			r.ID = uuid()
 		} else if err != nil {
@@ -1022,13 +1070,15 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 
 	utils.MustMergeTags(&r, b.selectTags)
-
 	stripPath, err := getStripPathBasedOnProtocols(r.Route)
 	if err != nil {
 		return err
 	}
 	r.Route.StripPath = stripPath
 	b.defaulter.MustSet(&r.Route)
+	if route != nil && route.CreatedAt != nil {
+		r.Route.CreatedAt = route.CreatedAt
+	}
 
 	b.rawState.Routes = append(b.rawState.Routes, &r.Route)
 	err = b.intermediate.Routes.Add(state.Route{Route: r.Route})
@@ -1097,10 +1147,10 @@ func (b *stateBuilder) addPluginDefaults(plugin *FPlugin) error {
 func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 	for _, p := range plugins {
 		p := p
+		cID, rID, sID, cgID := pluginRelations(&p.Plugin)
+		plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
+			sID, rID, cID, cgID)
 		if utils.Empty(p.ID) {
-			cID, rID, sID, cgID := pluginRelations(&p.Plugin)
-			plugin, err := b.currentState.Plugins.GetByProp(*p.Name,
-				sID, rID, cID, cgID)
 			if errors.Is(err, state.ErrNotFound) {
 				p.ID = uuid()
 			} else if err != nil {
@@ -1113,7 +1163,7 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 			p.Config = make(map[string]interface{})
 		}
 		p.Config = ensureJSON(p.Config)
-		err := b.fillPluginConfig(&p)
+		err = b.fillPluginConfig(&p)
 		if err != nil {
 			return err
 		}
@@ -1121,6 +1171,9 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 			return fmt.Errorf("add defaults to plugin '%v': %w", *p.Name, err)
 		}
 		utils.MustMergeTags(&p, b.selectTags)
+		if plugin != nil && plugin.CreatedAt != nil {
+			p.Plugin.CreatedAt = plugin.CreatedAt
+		}
 		b.rawState.Plugins = append(b.rawState.Plugins, &p.Plugin)
 	}
 	return nil
