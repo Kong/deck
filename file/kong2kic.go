@@ -602,6 +602,12 @@ func fillIngressHostAndPortSection(
 	path *string,
 	pathTypeImplSpecific k8snetv1.PathType,
 ) {
+	// if path starts with ~ then add / to the beginning of the path
+	// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
+	if strings.HasPrefix(*path, "~") {
+		*path = "/" + *path
+	}
+
 	if host != nil && service.Port != nil {
 		k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, k8snetv1.IngressRule{
 			Host: *host,
