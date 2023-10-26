@@ -207,6 +207,7 @@ func populateKICKongClusterPlugins(content *Content, file *KICContent) error {
 		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 		if plugin.Name != nil {
 			kongPlugin.PluginName = *plugin.Name
+			kongPlugin.ObjectMeta.Name = *plugin.Name
 		}
 
 		// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
@@ -257,6 +258,7 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 			kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 			if plugin.Name != nil {
 				kongPlugin.PluginName = *plugin.Name
+				kongPlugin.ObjectMeta.Name = *plugin.Name
 			}
 
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
