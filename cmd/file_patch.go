@@ -33,7 +33,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	{
 		var err error
 		valuesPatch.SelectorSources = cmdPatchSelectors
-		valuesPatch.ObjValues, valuesPatch.Remove, err = patch.ValidateValuesFlags(cmdPatchValues)
+		valuesPatch.ObjValues, valuesPatch.Remove, valuesPatch.ArrValues, err = patch.ValidateValuesFlags(cmdPatchValues)
 		if err != nil {
 			return fmt.Errorf("failed parsing '--value' entry; %w", err)
 		}
