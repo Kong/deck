@@ -18,6 +18,8 @@ var (
 	cmdO2KdocName        string
 	cmdO2KoutputFormat   string
 	cmdO2KentityTags     []string
+	cmdO2KskipID         bool
+	cmdO2KinsoCompat     bool
 )
 
 // Executes the CLI command "openapi2kong"
@@ -32,9 +34,14 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 
 	cmdO2KoutputFormat = strings.ToUpper(cmdO2KoutputFormat)
 
+	if cmdO2KinsoCompat {
+		cmdO2KskipID = true // this is implicit in inso compatibility mode
+	}
 	options := openapi2kong.O2kOptions{
-		Tags:    cmdO2KentityTags,
-		DocName: cmdO2KdocName,
+		Tags:       cmdO2KentityTags,
+		DocName:    cmdO2KdocName,
+		SkipID:     cmdO2KskipID,
+		InsoCompat: cmdO2KinsoCompat,
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
@@ -90,6 +97,12 @@ The output will be targeted at Kong version 3.x.
 	openapi2kongCmd.Flags().StringSliceVar(&cmdO2KentityTags, "select-tag", nil,
 		"Select tags to apply to all entities. If omitted, uses the \"x-kong-tags\"\n"+
 			"directive from the file.")
+	openapi2kongCmd.Flags().BoolVar(&cmdO2KskipID, "no-id", false,
+		"Setting this flag will skip UUID generation for entities (no 'id' fields\n"+
+			"will be added, implicit if '--inso-compatible' is set).")
+	openapi2kongCmd.Flags().BoolVarP(&cmdO2KinsoCompat, "inso-compatible", "i", false,
+		"This flag will enable Inso compatibility. The generated entity names will be\n"+
+			"the same, and no 'id' fields will be gnerated.")
 
 	return openapi2kongCmd
 }
