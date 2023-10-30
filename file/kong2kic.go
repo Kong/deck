@@ -1,7 +1,9 @@
 package file
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -24,6 +26,8 @@ type IBuilder interface {
 	buildGlobalPlugins(*Content)
 	buildConsumers(*Content)
 	buildConsumerGroups(*Content)
+	buildCACertificates(*Content)
+	buildCertificates(*Content)
 	getContent() *KICContent
 }
 
@@ -97,6 +101,20 @@ func (b *CustomResourceBuilder) buildConsumerGroups(content *Content) {
 	}
 }
 
+func (b *CustomResourceBuilder) buildCACertificates(content *Content) {
+	err := populateKICCACertificate(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *CustomResourceBuilder) buildCertificates(content *Content) {
+	err := populateKICCertificates(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (b *CustomResourceBuilder) getContent() *KICContent {
 	return b.kicContent
 }
@@ -146,6 +164,20 @@ func (b *AnnotationsBuilder) buildConsumerGroups(content *Content) {
 	}
 }
 
+func (b *AnnotationsBuilder) buildCACertificates(content *Content) {
+	err := populateKICCACertificate(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *AnnotationsBuilder) buildCertificates(content *Content) {
+	err := populateKICCertificates(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func (b *AnnotationsBuilder) getContent() *KICContent {
 	return b.kicContent
 }
@@ -166,6 +198,8 @@ func (d *Director) buildManifests(content *Content) *KICContent {
 	d.builder.buildGlobalPlugins(content)
 	d.builder.buildConsumers(content)
 	d.builder.buildConsumerGroups(content)
+	d.builder.buildCACertificates(content)
+	d.builder.buildCertificates(content)
 	return d.builder.getContent()
 }
 
@@ -192,6 +226,46 @@ func convertKongToKIC(content *Content, builderType string) *KICContent {
 /////
 // Functions valid for both custom resources and annotations based manifests
 /////
+
+func populateKICCACertificate(content *Content, file *KICContent) error {
+	// iterate content.CACertificates and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
+	for _, caCert := range content.CACertificates {
+		var secret k8scorev1.Secret
+		digest := sha256.Sum256([]byte(*caCert.Cert))
+		var secretName = "ca-cert-" + fmt.Sprintf("%x", digest)
+		secret.TypeMeta.APIVersion = "v1"
+		secret.TypeMeta.Kind = SecretKind
+		secret.Type = "kubernetes.io/tls"
+		secret.ObjectMeta.Name = strings.ToLower(secretName)
+		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.Data = make(map[string][]byte)
+		secret.Data["tls.crt"] = []byte(*caCert.Cert)
+
+		file.Secrets = append(file.Secrets, secret)
+	}
+	return nil
+}
+
+func populateKICCertificates(content *Content, file *KICContent) error {
+	// iterate content.Certificates and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
+	for _, cert := range content.Certificates {
+		var secret k8scorev1.Secret
+		digest := sha256.Sum256([]byte(*cert.Cert))
+		var secretName = "cert-" + fmt.Sprintf("%x", digest)
+		secret.TypeMeta.APIVersion = "v1"
+		secret.TypeMeta.Kind = SecretKind
+		secret.Type = "kubernetes.io/tls"
+		secret.ObjectMeta.Name = strings.ToLower(secretName)
+		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.Data = make(map[string][]byte)
+		secret.Data["tls.crt"] = []byte(*cert.Cert)
+		secret.Data["tls.key"] = []byte(*cert.Key)
+		// what to do with SNIs?
+
+		file.Secrets = append(file.Secrets, secret)
+	}
+	return nil
+}
 
 func populateKICKongClusterPlugins(content *Content, file *KICContent) error {
 	// Global Plugins map to KongClusterPlugins
@@ -258,7 +332,7 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 			kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 			if plugin.Name != nil {
 				kongPlugin.PluginName = *plugin.Name
-				kongPlugin.ObjectMeta.Name = *plugin.Name
+				kongPlugin.ObjectMeta.Name = *consumer.Username + "-" + *plugin.Name
 			}
 
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
@@ -499,7 +573,9 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 		var kongIngress kicv1.KongIngress
 		kongIngress.APIVersion = KICAPIVersion
 		kongIngress.Kind = IngressKind
-		kongIngress.ObjectMeta.Name = *service.Name
+		if service.Name != nil {
+			kongIngress.ObjectMeta.Name = *service.Name + "-upstream"
+		}
 		kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 
 		// add an annotation to the k8sservice to link this kongIngress to it
@@ -536,8 +612,8 @@ func addPluginsToService(service FService, k8sService k8scorev1.Service, kicCont
 		var kongPlugin kicv1.KongPlugin
 		kongPlugin.APIVersion = KICAPIVersion
 		kongPlugin.Kind = KongPluginKind
-		if plugin.Name != nil {
-			kongPlugin.ObjectMeta.Name = *plugin.Name
+		if plugin.Name != nil && service.Name != nil {
+			kongPlugin.ObjectMeta.Name = *service.Name + "-" + *plugin.Name
 		}
 		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 		kongPlugin.PluginName = *plugin.Name
@@ -562,13 +638,13 @@ func addPluginsToService(service FService, k8sService k8scorev1.Service, kicCont
 	return nil
 }
 
-func addPluginsToRoute(route *FRoute, routeIngresses []k8snetv1.Ingress, kicContent *KICContent) error {
+func addPluginsToRoute(service FService, route *FRoute, ingress k8snetv1.Ingress, kicContent *KICContent) error {
 	for _, plugin := range route.Plugins {
 		var kongPlugin kicv1.KongPlugin
 		kongPlugin.APIVersion = KICAPIVersion
 		kongPlugin.Kind = KongPluginKind
-		if plugin.Name != nil {
-			kongPlugin.ObjectMeta.Name = *plugin.Name
+		if plugin.Name != nil && route.Name != nil && service.Name != nil {
+			kongPlugin.ObjectMeta.Name = *service.Name + "-" + *route.Name + "-" + *plugin.Name
 		}
 		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 		kongPlugin.PluginName = *plugin.Name
@@ -581,114 +657,16 @@ func addPluginsToRoute(route *FRoute, routeIngresses []k8snetv1.Ingress, kicCont
 		}
 		kongPlugin.Config = configJSON
 
-		for _, k8sIngress := range routeIngresses {
-			if k8sIngress.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-				k8sIngress.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
-			} else {
-				annotations := k8sIngress.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
-				k8sIngress.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
-			}
+		if ingress.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
+			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
+		} else {
+			annotations := ingress.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
+			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
 		}
 
 		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 	}
 	return nil
-}
-
-func fillIngressHostAndPortSection(
-	host *string,
-	service FService,
-	k8sIngress *k8snetv1.Ingress,
-	path *string,
-	pathTypeImplSpecific k8snetv1.PathType,
-) {
-	// if path starts with ~ then add / to the beginning of the path
-	// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
-	if strings.HasPrefix(*path, "~") {
-		*path = "/" + *path
-	}
-
-	if host != nil && service.Port != nil {
-		k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, k8snetv1.IngressRule{
-			Host: *host,
-			IngressRuleValue: k8snetv1.IngressRuleValue{
-				HTTP: &k8snetv1.HTTPIngressRuleValue{
-					Paths: []k8snetv1.HTTPIngressPath{
-						{
-							Path:     *path,
-							PathType: &pathTypeImplSpecific,
-							Backend: k8snetv1.IngressBackend{
-								Service: &k8snetv1.IngressServiceBackend{
-									Name: *service.Name,
-									Port: k8snetv1.ServiceBackendPort{
-										Number: int32(*service.Port),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-	} else if host == nil && service.Port != nil {
-		k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, k8snetv1.IngressRule{
-			IngressRuleValue: k8snetv1.IngressRuleValue{
-				HTTP: &k8snetv1.HTTPIngressRuleValue{
-					Paths: []k8snetv1.HTTPIngressPath{
-						{
-							Path:     *path,
-							PathType: &pathTypeImplSpecific,
-							Backend: k8snetv1.IngressBackend{
-								Service: &k8snetv1.IngressServiceBackend{
-									Name: *service.Name,
-									Port: k8snetv1.ServiceBackendPort{
-										Number: int32(*service.Port),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-	} else if host != nil && service.Port == nil {
-		k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, k8snetv1.IngressRule{
-			Host: *host,
-			IngressRuleValue: k8snetv1.IngressRuleValue{
-				HTTP: &k8snetv1.HTTPIngressRuleValue{
-					Paths: []k8snetv1.HTTPIngressPath{
-						{
-							Path:     *path,
-							PathType: &pathTypeImplSpecific,
-							Backend: k8snetv1.IngressBackend{
-								Service: &k8snetv1.IngressServiceBackend{
-									Name: *service.Name,
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-	} else {
-		k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, k8snetv1.IngressRule{
-			IngressRuleValue: k8snetv1.IngressRuleValue{
-				HTTP: &k8snetv1.HTTPIngressRuleValue{
-					Paths: []k8snetv1.HTTPIngressPath{
-						{
-							Path:     *path,
-							PathType: &pathTypeImplSpecific,
-							Backend: k8snetv1.IngressBackend{
-								Service: &k8snetv1.IngressServiceBackend{
-									Name: *service.Name,
-								},
-							},
-						},
-					},
-				},
-			},
-		})
-	}
 }
 
 func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
@@ -697,7 +675,9 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 		var kongConsumerGroup kicv1beta1.KongConsumerGroup
 		kongConsumerGroup.APIVersion = KICAPIVersion
 		kongConsumerGroup.Kind = "KongConsumerGroup"
-		kongConsumerGroup.ObjectMeta.Name = *consumerGroup.Name
+		if consumerGroup.Name != nil {
+			kongConsumerGroup.ObjectMeta.Name = *consumerGroup.Name
+		}
 		kongConsumerGroup.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 		kongConsumerGroup.Name = *consumerGroup.Name
 
@@ -710,9 +690,8 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 					if kicContent.KongConsumers[idx].ConsumerGroups == nil {
 						kicContent.KongConsumers[idx].ConsumerGroups = make([]string, 0)
 					}
-					consumergroups := append(kicContent.KongConsumers[idx].ConsumerGroups, *consumerGroup.Name)
-					kicContent.KongConsumers[idx].ConsumerGroups = consumergroups
-
+					consumerGroups := append(kicContent.KongConsumers[idx].ConsumerGroups, *consumerGroup.Name)
+					kicContent.KongConsumers[idx].ConsumerGroups = consumerGroups
 				}
 			}
 		}
@@ -725,7 +704,7 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 			kongPlugin.Kind = KongPluginKind
 			kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 			if plugin.Name != nil {
-				kongPlugin.PluginName = *plugin.Name
+				kongPlugin.PluginName = *consumerGroup.Name + "-" + *plugin.Name
 			}
 
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
@@ -767,7 +746,9 @@ func populateKICServiceProxyAndUpstreamCustomResources(
 	var kongIngress kicv1.KongIngress
 	kongIngress.APIVersion = KICAPIVersion
 	kongIngress.Kind = IngressKind
-	kongIngress.ObjectMeta.Name = *service.Name
+	if service.Name != nil {
+		kongIngress.ObjectMeta.Name = *service.Name + "-proxy-upstream"
+	}
 	kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 
 	// add an annotation to the k8sservice to link this kongIngress to it
@@ -867,94 +848,150 @@ func populateKICServicesWithCustomResources(content *Content, kicContent *KICCon
 }
 
 func populateKICIngressesWithCustomResources(content *Content, kicContent *KICContent) error {
-	// Transform routes into k8s Ingress and KongIngress resources
-	// Assume each pair host/path will get its own ingress manifest
+
+	// For each route under each service create one ingress.
+	// If the route has multiple hosts, create the relevant host declarations in the ingress
+	// and under each hosts create a declaration for each path in the route.
+	// If the route has no hosts, create a declaration in the ingress for each path in the route.
+	// Map additional fields in the route to annotations in the ingress.
+	// If the route has plugins, create a KongPlugin for each one and add an annotation to the ingress
+	// to link the plugin to it.
 	for _, service := range content.Services {
 		for _, route := range service.Routes {
 			// save all ingresses we create for this route so we can then
 			// assign them the plugins defined for the route
-			var routeIngresses []k8snetv1.Ingress
+			var k8sIngress k8snetv1.Ingress
+			var pathTypeImplSpecific k8snetv1.PathType = k8snetv1.PathTypeImplementationSpecific
 
-			// if there are no hosts just use the paths
+			k8sIngress.TypeMeta.APIVersion = "networking.k8s.io/v1"
+			k8sIngress.TypeMeta.Kind = "Ingress"
+			if service.Name != nil && route.Name != nil {
+				k8sIngress.ObjectMeta.Name = *service.Name + "-" + *route.Name
+			}
+			ingressClassName := "kong"
+			k8sIngress.Spec.IngressClassName = &ingressClassName
+			k8sIngress.ObjectMeta.Annotations = make(map[string]string)
+
+			// Create a KongIngress resource and copy Kong specific route data into it
+			var kongIngress kicv1.KongIngress
+			kongIngress.APIVersion = KICAPIVersion
+			kongIngress.Kind = IngressKind
+			kongIngress.ObjectMeta.Name = *service.Name + "-" + *route.Name
+			kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+
+			var kongProtocols []*kicv1.KongProtocol
+			for _, protocol := range route.Protocols {
+				p := kicv1.KongProtocol(*protocol)
+				kongProtocols = append(kongProtocols, &p)
+			}
+
+			kongIngress.Route = &kicv1.KongIngressRoute{
+				Methods:                 route.Methods,
+				Protocols:               kongProtocols,
+				StripPath:               route.StripPath,
+				PreserveHost:            route.PreserveHost,
+				RegexPriority:           route.RegexPriority,
+				HTTPSRedirectStatusCode: route.HTTPSRedirectStatusCode,
+				Headers:                 route.Headers,
+				PathHandling:            route.PathHandling,
+				SNIs:                    route.SNIs,
+				RequestBuffering:        route.RequestBuffering,
+				ResponseBuffering:       route.ResponseBuffering,
+			}
+
+			// add an annotation to the k8sIngress to link it to the kongIngress
+			k8sIngress.ObjectMeta.Annotations = map[string]string{"konghq.com/override": kongIngress.ObjectMeta.Name}
+
 			if len(route.Hosts) == 0 {
-				routeIngresses = KongRoutePathToIngressPathCustomResources(route, nil, routeIngresses, kicContent, service)
+				// iterate route.Paths and create a k8sIngress.Spec.Rules for each one.
+				// If service.Port is not nil, add it to the k8sIngress.Spec.Rules
+				ingressRule := k8snetv1.IngressRule{
+					IngressRuleValue: k8snetv1.IngressRuleValue{
+						HTTP: &k8snetv1.HTTPIngressRuleValue{
+							Paths: []k8snetv1.HTTPIngressPath{},
+						},
+					}}
+				for _, path := range route.Paths {
+					if service.Port != nil {
+						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+							Path:     *path,
+							PathType: &pathTypeImplSpecific,
+							Backend: k8snetv1.IngressBackend{
+								Service: &k8snetv1.IngressServiceBackend{
+									Name: *service.Name,
+									Port: k8snetv1.ServiceBackendPort{
+										Number: int32(*service.Port),
+									},
+								},
+							},
+						})
+					} else {
+						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+							Path:     *path,
+							PathType: &pathTypeImplSpecific,
+							Backend: k8snetv1.IngressBackend{
+								Service: &k8snetv1.IngressServiceBackend{
+									Name: *service.Name,
+								},
+							},
+						})
+					}
+				}
+				k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, ingressRule)
 			} else {
-				// iterate over the hosts and paths and create an ingress for each
-
+				// Iterate route.Hosts and create a k8sIngress.Spec.Rules for each one.
+				// For each host, iterate route.Paths and add a k8snetv1.HTTPIngressPath to the k8sIngress.Spec.Rules.
+				// If service.Port is not nil, add it to the k8sIngress.Spec.Rules
 				for _, host := range route.Hosts {
-					//  create a KongIngress resource and copy route data into it
-					// add annotation to the ingress to link it to the kongIngress
-					routeIngresses = KongRoutePathToIngressPathCustomResources(route, host, routeIngresses, kicContent, service)
+					ingressRule := k8snetv1.IngressRule{
+						Host: *host,
+						IngressRuleValue: k8snetv1.IngressRuleValue{
+							HTTP: &k8snetv1.HTTPIngressRuleValue{
+								Paths: []k8snetv1.HTTPIngressPath{},
+							},
+						}}
+					for _, path := range route.Paths {
+						if service.Port != nil {
+							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+								Path:     *path,
+								PathType: &pathTypeImplSpecific,
+								Backend: k8snetv1.IngressBackend{
+									Service: &k8snetv1.IngressServiceBackend{
+										Name: *service.Name,
+										Port: k8snetv1.ServiceBackendPort{
+											Number: int32(*service.Port),
+										},
+									},
+								},
+							})
+						} else {
+							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+								Path:     *path,
+								PathType: &pathTypeImplSpecific,
+								Backend: k8snetv1.IngressBackend{
+									Service: &k8snetv1.IngressServiceBackend{
+										Name: *service.Name,
+									},
+								},
+							})
+						}
+					}
+					k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, ingressRule)
 				}
 			}
+
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
 			// create a plugins annotation in the routeIngresses to link them to this plugin.
 			// separate plugins with commas
-			err := addPluginsToRoute(route, routeIngresses, kicContent)
+			err := addPluginsToRoute(service, route, k8sIngress, kicContent)
 			if err != nil {
 				return err
 			}
+			kicContent.Ingresses = append(kicContent.Ingresses, k8sIngress)
+			kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
 		}
 	}
 	return nil
-}
-
-func KongRoutePathToIngressPathCustomResources(
-	route *FRoute,
-	host *string,
-	routeIngresses []k8snetv1.Ingress,
-	kicContent *KICContent,
-	service FService,
-) []k8snetv1.Ingress {
-	for _, path := range route.Paths {
-		var k8sIngress k8snetv1.Ingress
-		pathTypeImplSpecific := k8snetv1.PathTypeImplementationSpecific
-		k8sIngress.TypeMeta.APIVersion = "networking.k8s.io/v1"
-		k8sIngress.TypeMeta.Kind = "Ingress"
-		k8sIngress.ObjectMeta.Name = *route.Name
-		ingressClassName := "kong"
-		k8sIngress.Spec.IngressClassName = &ingressClassName
-
-		// Host and/or Service.Port can be nil. There are 4 possible combinations.
-		// host == nil && service.Port == nil
-		fillIngressHostAndPortSection(host, service, &k8sIngress, path, pathTypeImplSpecific)
-
-		// Create a KongIngress resource and copy Kong specific route data into it
-		var kongIngress kicv1.KongIngress
-		kongIngress.APIVersion = KICAPIVersion
-		kongIngress.Kind = IngressKind
-		kongIngress.ObjectMeta.Name = *route.Name
-		kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
-
-		var kongProtocols []*kicv1.KongProtocol
-		for _, protocol := range route.Protocols {
-			p := kicv1.KongProtocol(*protocol)
-			kongProtocols = append(kongProtocols, &p)
-		}
-
-		kongIngress.Route = &kicv1.KongIngressRoute{
-			Methods:                 route.Methods,
-			Protocols:               kongProtocols,
-			StripPath:               route.StripPath,
-			PreserveHost:            route.PreserveHost,
-			RegexPriority:           route.RegexPriority,
-			HTTPSRedirectStatusCode: route.HTTPSRedirectStatusCode,
-			Headers:                 route.Headers,
-			PathHandling:            route.PathHandling,
-			SNIs:                    route.SNIs,
-			RequestBuffering:        route.RequestBuffering,
-			ResponseBuffering:       route.ResponseBuffering,
-		}
-
-		// add an annotation to the k8sIngress to link it to the kongIngress
-		k8sIngress.ObjectMeta.Annotations = map[string]string{"konghq.com/override": kongIngress.ObjectMeta.Name}
-
-		routeIngresses = append(routeIngresses, k8sIngress)
-
-		kicContent.Ingresses = append(kicContent.Ingresses, k8sIngress)
-		kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
-	}
-	return routeIngresses
 }
 
 /////
@@ -1050,144 +1087,208 @@ func populateKICServicesWithAnnotations(content *Content, kicContent *KICContent
 }
 
 func populateKICIngressesWithAnnotations(content *Content, kicContent *KICContent) error {
-	// Transform routes into k8s Ingress and KongIngress resources
-	// Assume each pair host/path will get its own ingress manifest
+
+	// For each route under each service create one ingress.
+	// If the route has multiple hosts, create the relevant host declarations in the ingress
+	// and under each hosts create a declaration for each path in the route.
+	// If the route has no hosts, create a declaration in the ingress for each path in the route.
+	// Map additional fields in the route to annotations in the ingress.
+	// If the route has plugins, create a KongPlugin for each one and add an annotation to the ingress
+	// to link the plugin to it.
 	for _, service := range content.Services {
 		for _, route := range service.Routes {
 			// save all ingresses we create for this route so we can then
 			// assign them the plugins defined for the route
-			var routeIngresses []k8snetv1.Ingress
+			var k8sIngress k8snetv1.Ingress
+			var pathTypeImplSpecific k8snetv1.PathType = k8snetv1.PathTypeImplementationSpecific
 
-			// if there are no hosts just use the paths
-			if len(route.Hosts) == 0 {
-				routeIngresses = KongRoutePathToIngressPathAnnotations(route, nil, routeIngresses, kicContent, service)
-			} else {
-				// iterate over the hosts and paths and create an ingress for each
+			k8sIngress.TypeMeta.APIVersion = "networking.k8s.io/v1"
+			k8sIngress.TypeMeta.Kind = "Ingress"
+			if service.Name != nil && route.Name != nil {
+				k8sIngress.ObjectMeta.Name = *service.Name + "-" + *route.Name
+			}
+			ingressClassName := "kong"
+			k8sIngress.Spec.IngressClassName = &ingressClassName
+			k8sIngress.ObjectMeta.Annotations = make(map[string]string)
 
-				for _, host := range route.Hosts {
-					//  create a KongIngress resource and copy route data into it
-					// add annotation to the ingress to link it to the kongIngress
-					routeIngresses = KongRoutePathToIngressPathAnnotations(route, host, routeIngresses, kicContent, service)
+			// add konghq.com/protocols annotation if route.Protocols is not nil
+			if route.Protocols != nil {
+				var protocols string
+				for _, protocol := range route.Protocols {
+					if protocols == "" {
+						protocols = *protocol
+					} else {
+						protocols = protocols + "," + *protocol
+					}
+				}
+				k8sIngress.ObjectMeta.Annotations["konghq.com/protocols"] = protocols
+			}
+
+			// add konghq.com/strip-path annotation if route.StripPath is not nil
+			if route.StripPath != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/strip-path"] = strconv.FormatBool(*route.StripPath)
+			}
+
+			// add konghq.com/preserve-host annotation if route.PreserveHost is not nil
+			if route.PreserveHost != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/preserve-host"] = strconv.FormatBool(*route.PreserveHost)
+			}
+
+			// add konghq.com/regex-priority annotation if route.RegexPriority is not nil
+			if route.RegexPriority != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/regex-priority"] = strconv.Itoa(*route.RegexPriority)
+			}
+
+			// add konghq.com/https-redirect-status-code annotation if route.HTTPSRedirectStatusCode is not nil
+			if route.HTTPSRedirectStatusCode != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/https-redirect-status-code"] = strconv.Itoa(*route.HTTPSRedirectStatusCode)
+			}
+
+			// add konghq.com/headers.* annotation if route.Headers is not nil
+			if route.Headers != nil {
+				for key, value := range route.Headers {
+					k8sIngress.ObjectMeta.Annotations["konghq.com/headers."+key] = strings.Join(value, ",")
 				}
 			}
+
+			// add konghq.com/path-handling annotation if route.PathHandling is not nil
+			if route.PathHandling != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/path-handling"] = *route.PathHandling
+			}
+
+			// add konghq.com/snis annotation if route.SNIs is not nil
+			if route.SNIs != nil {
+				var snis string
+				for _, sni := range route.SNIs {
+					if snis == "" {
+						snis = *sni
+					} else {
+						snis = snis + "," + *sni
+					}
+				}
+				k8sIngress.ObjectMeta.Annotations["konghq.com/snis"] = snis
+			}
+
+			// add konghq.com/request-buffering annotation if route.RequestBuffering is not nil
+			if route.RequestBuffering != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/request-buffering"] = strconv.FormatBool(*route.RequestBuffering)
+			}
+
+			// add konghq.com/response-buffering annotation if route.ResponseBuffering is not nil
+			if route.ResponseBuffering != nil {
+				k8sIngress.ObjectMeta.Annotations["konghq.com/response-buffering"] = strconv.FormatBool(*route.ResponseBuffering)
+			}
+
+			// add konghq.com/methods annotation if route.Methods is not nil
+			if route.Methods != nil {
+				var methods string
+				for _, method := range route.Methods {
+					if methods == "" {
+						methods = *method
+					} else {
+						methods = methods + "," + *method
+					}
+				}
+				k8sIngress.ObjectMeta.Annotations["konghq.com/methods"] = methods
+			}
+
+			if len(route.Hosts) == 0 {
+				// iterate route.Paths and create a k8sIngress.Spec.Rules for each one.
+				// If service.Port is not nil, add it to the k8sIngress.Spec.Rules
+				ingressRule := k8snetv1.IngressRule{
+					IngressRuleValue: k8snetv1.IngressRuleValue{
+						HTTP: &k8snetv1.HTTPIngressRuleValue{
+							Paths: []k8snetv1.HTTPIngressPath{},
+						},
+					}}
+				for _, path := range route.Paths {
+					// if path starts with ~ then add / to the beginning of the path
+					// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
+					if strings.HasPrefix(*path, "~") {
+						*path = "/" + *path
+					}
+					if service.Port != nil {
+						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+							Path:     *path,
+							PathType: &pathTypeImplSpecific,
+							Backend: k8snetv1.IngressBackend{
+								Service: &k8snetv1.IngressServiceBackend{
+									Name: *service.Name,
+									Port: k8snetv1.ServiceBackendPort{
+										Number: int32(*service.Port),
+									},
+								},
+							},
+						})
+					} else {
+						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+							Path:     *path,
+							PathType: &pathTypeImplSpecific,
+							Backend: k8snetv1.IngressBackend{
+								Service: &k8snetv1.IngressServiceBackend{
+									Name: *service.Name,
+								},
+							},
+						})
+					}
+				}
+				k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, ingressRule)
+			} else {
+				// Iterate route.Hosts and create a k8sIngress.Spec.Rules for each one.
+				// For each host, iterate route.Paths and add a k8snetv1.HTTPIngressPath to the k8sIngress.Spec.Rules.
+				// If service.Port is not nil, add it to the k8sIngress.Spec.Rules
+				for _, host := range route.Hosts {
+					ingressRule := k8snetv1.IngressRule{
+						Host: *host,
+						IngressRuleValue: k8snetv1.IngressRuleValue{
+							HTTP: &k8snetv1.HTTPIngressRuleValue{
+								Paths: []k8snetv1.HTTPIngressPath{},
+							},
+						}}
+					for _, path := range route.Paths {
+						// if path starts with ~ then add / to the beginning of the path
+						// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
+						if strings.HasPrefix(*path, "~") {
+							*path = "/" + *path
+						}
+						if service.Port != nil {
+							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+								Path:     *path,
+								PathType: &pathTypeImplSpecific,
+								Backend: k8snetv1.IngressBackend{
+									Service: &k8snetv1.IngressServiceBackend{
+										Name: *service.Name,
+										Port: k8snetv1.ServiceBackendPort{
+											Number: int32(*service.Port),
+										},
+									},
+								},
+							})
+						} else {
+							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
+								Path:     *path,
+								PathType: &pathTypeImplSpecific,
+								Backend: k8snetv1.IngressBackend{
+									Service: &k8snetv1.IngressServiceBackend{
+										Name: *service.Name,
+									},
+								},
+							})
+						}
+					}
+					k8sIngress.Spec.Rules = append(k8sIngress.Spec.Rules, ingressRule)
+				}
+			}
+
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
 			// create a plugins annotation in the routeIngresses to link them to this plugin.
 			// separate plugins with commas
-			err := addPluginsToRoute(route, routeIngresses, kicContent)
+			err := addPluginsToRoute(service, route, k8sIngress, kicContent)
 			if err != nil {
 				return err
 			}
+			kicContent.Ingresses = append(kicContent.Ingresses, k8sIngress)
 		}
 	}
 	return nil
-}
-
-func KongRoutePathToIngressPathAnnotations(
-	route *FRoute,
-	host *string,
-	routeIngresses []k8snetv1.Ingress,
-	file *KICContent,
-	service FService,
-) []k8snetv1.Ingress {
-	for _, path := range route.Paths {
-		var k8sIngress k8snetv1.Ingress
-		pathTypeImplSpecific := k8snetv1.PathTypeImplementationSpecific
-		k8sIngress.TypeMeta.APIVersion = "networking.k8s.io/v1"
-		k8sIngress.TypeMeta.Kind = "Ingress"
-		k8sIngress.ObjectMeta.Name = *route.Name
-		ingressClassName := "kong"
-		k8sIngress.Spec.IngressClassName = &ingressClassName
-		k8sIngress.ObjectMeta.Annotations = make(map[string]string)
-
-		// Host and/or Service.Port can be nil. There are 4 possible combinations.
-		// host == nil && service.Port == nil
-		fillIngressHostAndPortSection(host, service, &k8sIngress, path, pathTypeImplSpecific)
-
-		// add konghq.com/protocols annotation if route.Protocols is not nil
-		if route.Protocols != nil {
-			var protocols string
-			for _, protocol := range route.Protocols {
-				if protocols == "" {
-					protocols = *protocol
-				} else {
-					protocols = protocols + "," + *protocol
-				}
-			}
-			k8sIngress.ObjectMeta.Annotations["konghq.com/protocols"] = protocols
-		}
-
-		// add konghq.com/strip-path annotation if route.StripPath is not nil
-		if route.StripPath != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/strip-path"] = strconv.FormatBool(*route.StripPath)
-		}
-
-		// add konghq.com/preserve-host annotation if route.PreserveHost is not nil
-		if route.PreserveHost != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/preserve-host"] = strconv.FormatBool(*route.PreserveHost)
-		}
-
-		// add konghq.com/regex-priority annotation if route.RegexPriority is not nil
-		if route.RegexPriority != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/regex-priority"] = strconv.Itoa(*route.RegexPriority)
-		}
-
-		// add konghq.com/https-redirect-status-code annotation if route.HTTPSRedirectStatusCode is not nil
-		if route.HTTPSRedirectStatusCode != nil {
-			value := strconv.Itoa(*route.HTTPSRedirectStatusCode)
-			k8sIngress.ObjectMeta.Annotations["konghq.com/https-redirect-status-code"] = value
-		}
-
-		// add konghq.com/headers.* annotation if route.Headers is not nil
-		if route.Headers != nil {
-			for key, value := range route.Headers {
-				k8sIngress.ObjectMeta.Annotations["konghq.com/headers."+key] = strings.Join(value, ",")
-			}
-		}
-
-		// add konghq.com/path-handling annotation if route.PathHandling is not nil
-		if route.PathHandling != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/path-handling"] = *route.PathHandling
-		}
-
-		// add konghq.com/snis annotation if route.SNIs is not nil
-		if route.SNIs != nil {
-			var snis string
-			for _, sni := range route.SNIs {
-				if snis == "" {
-					snis = *sni
-				} else {
-					snis = snis + "," + *sni
-				}
-			}
-			k8sIngress.ObjectMeta.Annotations["konghq.com/snis"] = snis
-		}
-
-		// add konghq.com/request-buffering annotation if route.RequestBuffering is not nil
-		if route.RequestBuffering != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/request-buffering"] = strconv.FormatBool(*route.RequestBuffering)
-		}
-
-		// add konghq.com/response-buffering annotation if route.ResponseBuffering is not nil
-		if route.ResponseBuffering != nil {
-			k8sIngress.ObjectMeta.Annotations["konghq.com/response-buffering"] = strconv.FormatBool(*route.ResponseBuffering)
-		}
-
-		// add konghq.com/methods annotation if route.Methods is not nil
-		if route.Methods != nil {
-			var methods string
-			for _, method := range route.Methods {
-				if methods == "" {
-					methods = *method
-				} else {
-					methods = methods + "," + *method
-				}
-			}
-			k8sIngress.ObjectMeta.Annotations["konghq.com/methods"] = methods
-		}
-
-		routeIngresses = append(routeIngresses, k8sIngress)
-
-		file.Ingresses = append(file.Ingresses, k8sIngress)
-	}
-	return routeIngresses
 }
