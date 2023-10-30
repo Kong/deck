@@ -346,9 +346,9 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 			file.KongPlugins = append(file.KongPlugins, kongPlugin)
 
 			if kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-				kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
+				kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
 			} else {
-				annotations := kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
+				annotations := kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.ObjectMeta.Name
 				kongConsumer.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
 			}
 		}
@@ -627,9 +627,9 @@ func addPluginsToService(service FService, k8sService k8scorev1.Service, kicCont
 		kongPlugin.Config = configJSON
 
 		if k8sService.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-			k8sService.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
+			k8sService.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
 		} else {
-			annotations := k8sService.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
+			annotations := k8sService.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.ObjectMeta.Name
 			k8sService.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
 		}
 
@@ -658,9 +658,9 @@ func addPluginsToRoute(service FService, route *FRoute, ingress k8snetv1.Ingress
 		kongPlugin.Config = configJSON
 
 		if ingress.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
+			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
 		} else {
-			annotations := ingress.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
+			annotations := ingress.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.ObjectMeta.Name
 			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
 		}
 
@@ -705,6 +705,7 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 			kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
 			if plugin.Name != nil {
 				kongPlugin.PluginName = *consumerGroup.Name + "-" + *plugin.Name
+				kongPlugin.ObjectMeta.Name = *consumerGroup.Name + "-" + *plugin.Name
 			}
 
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
@@ -718,9 +719,9 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 			kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 
 			if kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-				kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.PluginName
+				kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
 			} else {
-				annotations := kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.PluginName
+				annotations := kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.ObjectMeta.Name
 				kongConsumerGroup.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
 			}
 		}
