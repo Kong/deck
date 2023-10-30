@@ -912,6 +912,11 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 						},
 					}}
 				for _, path := range route.Paths {
+					// if path starts with ~ then add / to the beginning of the path
+					// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
+					if strings.HasPrefix(*path, "~") {
+						*path = "/" + *path
+					}
 					if service.Port != nil {
 						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
 							Path:     *path,
@@ -951,6 +956,11 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 							},
 						}}
 					for _, path := range route.Paths {
+						// if path starts with ~ then add / to the beginning of the path
+						// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingress-regular-expression-paths-for-kong-3x-compatibility
+						if strings.HasPrefix(*path, "~") {
+							*path = "/" + *path
+						}
 						if service.Port != nil {
 							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths, k8snetv1.HTTPIngressPath{
 								Path:     *path,
