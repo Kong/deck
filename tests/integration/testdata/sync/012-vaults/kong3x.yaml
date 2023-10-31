@@ -7,7 +7,7 @@ vaults:
   prefix: my-env-vault
 services:
 - id: 58076db2-28b6-423b-ba39-a797193017f7
-  host: mockbin.org
+  host: httpbin.org
   name: svc1
   path: /status/200
   routes:
