@@ -188,7 +188,7 @@ func (b *stateBuilder) consumerGroups() {
 				return
 			}
 		}
-		if current != nil && current.CreatedAt != nil {
+		if current != nil {
 			cgo.ConsumerGroup.CreatedAt = current.CreatedAt
 		}
 		b.rawState.ConsumerGroups = append(b.rawState.ConsumerGroups, &cgo)
@@ -254,7 +254,7 @@ func (b *stateBuilder) ingestSNIs(snis []kong.SNI) error {
 			}
 		}
 		utils.MustMergeTags(&sni, b.selectTags)
-		if currentSNI != nil && currentSNI.CreatedAt != nil {
+		if currentSNI != nil {
 			sni.CreatedAt = currentSNI.CreatedAt
 		}
 		b.rawState.SNIs = append(b.rawState.SNIs, &sni)
@@ -281,7 +281,7 @@ func (b *stateBuilder) caCertificates() {
 			}
 		}
 		utils.MustMergeTags(&c.CACertificate, b.selectTags)
-		if cert != nil && cert.CreatedAt != nil {
+		if cert != nil {
 			c.CACertificate.CreatedAt = cert.CreatedAt
 		}
 
@@ -322,7 +322,7 @@ func (b *stateBuilder) consumers() {
 			}
 		}
 		utils.MustMergeTags(&c.Consumer, b.selectTags)
-		if consumer != nil && consumer.CreatedAt != nil {
+		if consumer != nil {
 			c.Consumer.CreatedAt = consumer.CreatedAt
 		}
 		b.rawState.Consumers = append(b.rawState.Consumers, &c.Consumer)
@@ -466,7 +466,7 @@ func (b *stateBuilder) ingestKeyAuths(creds []kong.KeyAuth) error {
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
-		if existingCred != nil && existingCred.CreatedAt != nil {
+		if existingCred != nil {
 			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.KeyAuths = append(b.rawState.KeyAuths, &cred)
@@ -490,7 +490,7 @@ func (b *stateBuilder) ingestBasicAuths(creds []kong.BasicAuth) error {
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
-		if existingCred != nil && existingCred.CreatedAt != nil {
+		if existingCred != nil {
 			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.BasicAuths = append(b.rawState.BasicAuths, &cred)
@@ -514,7 +514,7 @@ func (b *stateBuilder) ingestHMACAuths(creds []kong.HMACAuth) error {
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
-		if existingCred != nil && existingCred.CreatedAt != nil {
+		if existingCred != nil {
 			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.HMACAuths = append(b.rawState.HMACAuths, &cred)
@@ -538,7 +538,7 @@ func (b *stateBuilder) ingestJWTAuths(creds []kong.JWTAuth) error {
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
-		if existingCred != nil && existingCred.CreatedAt != nil {
+		if existingCred != nil {
 			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.JWTAuths = append(b.rawState.JWTAuths, &cred)
@@ -562,7 +562,7 @@ func (b *stateBuilder) ingestOauth2Creds(creds []kong.Oauth2Credential) error {
 		if b.kongVersion.GTE(utils.Kong140Version) {
 			utils.MustMergeTags(&cred, b.selectTags)
 		}
-		if existingCred != nil && existingCred.CreatedAt != nil {
+		if existingCred != nil {
 			cred.CreatedAt = existingCred.CreatedAt
 		}
 		b.rawState.Oauth2Creds = append(b.rawState.Oauth2Creds, &cred)
@@ -754,7 +754,7 @@ func (b *stateBuilder) ingestService(s *FService) error {
 	}
 	utils.MustMergeTags(&s.Service, b.selectTags)
 	b.defaulter.MustSet(&s.Service)
-	if svc != nil && svc.CreatedAt != nil {
+	if svc != nil {
 		s.Service.CreatedAt = svc.CreatedAt
 	}
 	b.rawState.Services = append(b.rawState.Services, &s.Service)
@@ -840,7 +840,7 @@ func (b *stateBuilder) vaults() {
 			}
 		}
 		utils.MustMergeTags(&v.Vault, b.selectTags)
-		if vault != nil && vault.CreatedAt != nil {
+		if vault != nil {
 			v.Vault.CreatedAt = vault.CreatedAt
 		}
 
@@ -866,7 +866,7 @@ func (b *stateBuilder) rbacRoles() {
 				r.ID = kong.String(*role.ID)
 			}
 		}
-		if role != nil && role.CreatedAt != nil {
+		if role != nil {
 			r.RBACRole.CreatedAt = role.CreatedAt
 		}
 		b.rawState.RBACRoles = append(b.rawState.RBACRoles, &r.RBACRole)
@@ -899,7 +899,7 @@ func (b *stateBuilder) upstreams() {
 		}
 		utils.MustMergeTags(&u.Upstream, b.selectTags)
 		b.defaulter.MustSet(&u.Upstream)
-		if ups != nil && ups.CreatedAt != nil {
+		if ups != nil {
 			u.Upstream.CreatedAt = ups.CreatedAt
 		}
 
@@ -1076,7 +1076,7 @@ func (b *stateBuilder) ingestRoute(r FRoute) error {
 	}
 	r.Route.StripPath = stripPath
 	b.defaulter.MustSet(&r.Route)
-	if route != nil && route.CreatedAt != nil {
+	if route != nil {
 		r.Route.CreatedAt = route.CreatedAt
 	}
 
@@ -1171,7 +1171,7 @@ func (b *stateBuilder) ingestPlugins(plugins []FPlugin) error {
 			return fmt.Errorf("add defaults to plugin '%v': %w", *p.Name, err)
 		}
 		utils.MustMergeTags(&p, b.selectTags)
-		if plugin != nil && plugin.CreatedAt != nil {
+		if plugin != nil {
 			p.Plugin.CreatedAt = plugin.CreatedAt
 		}
 		b.rawState.Plugins = append(b.rawState.Plugins, &p.Plugin)
