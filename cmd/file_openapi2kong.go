@@ -74,6 +74,9 @@ func newOpenapi2KongCmd() *cobra.Command {
 		Short: "Convert OpenAPI files to Kong's decK format",
 		Long: `Convert OpenAPI files to Kong's decK format.
 
+IMPORTANT: due to comatibility issues with the older 'inso' tool, it is strongly recommended
+to use the '--inso-compatible' flag when converting OpenAPI files.
+
 The example file at https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml
 has extensive annotations explaining the conversion process, as well as all supported 
 custom annotations (x-kong-... directives).
@@ -81,8 +84,8 @@ custom annotations (x-kong-... directives).
 The output will be targeted at Kong version 3.x.
 `,
 		RunE: executeOpenapi2Kong,
-		Example: "# Convert an OAS file, adding 2 tags, and namespacing the UUIDs to a unique name\n" +
-			"cat service_oas.yml | deck file openapi2kong --select-tag=serviceA,teamB --uuid-base=unique-service-name",
+		Example: "# Convert an OAS file, adding 2 tags, with inso compatibility enabled\n" +
+			"cat service_oas.yml | deck file openapi2kong --inso-compatible --select-tag=serviceA,teamB",
 		Args: cobra.NoArgs,
 	}
 
