@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.28.0](#v1280)
 - [v1.27.1](#v1271)
 - [v1.27.0](#v1270)
 - [v1.26.1](#v1261)
@@ -65,6 +66,27 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.28.0]
+
+> Release date: 2023/10/31
+
+### Added
+
+- Allow arrays to be specified on the `file patch` CLI command.
+  [#1056](https://github.com/Kong/deck/pull/1056)
+
+### Fixes
+
+- Do not overwrite `created_at` for existing resources when running `sync` command.
+  [#1061](https://github.com/Kong/deck/pull/1061)
+
+### Chores
+
+- Add analytics for local operations
+  [#1051](https://github.com/Kong/deck/pull/1051)
+- Add `gateway` subcommand for network commands.
+  [#962](https://github.com/Kong/deck/pull/962)
 
 ## [v1.27.1]
 
@@ -1386,6 +1408,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.28.0]: https://github.com/kong/deck/compare/v1.27.1...v1.28.0
 [v1.27.1]: https://github.com/kong/deck/compare/v1.27.0...v1.27.1
 [v1.27.0]: https://github.com/kong/deck/compare/v1.26.1...v1.27.0
 [v1.26.1]: https://github.com/kong/deck/compare/v1.26.0...v1.26.1
