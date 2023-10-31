@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.28.0](#v1280)
 - [v1.27.1](#v1271)
 - [v1.27.0](#v1270)
 - [v1.26.1](#v1261)
@@ -65,6 +66,43 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.28.0]
+
+> Release date: 2023/10/31
+
+> __IMPORTANT__: _The top-level CLI commands have been restructured. There is backward
+compatibility, but in the future that will be removed. Please update to the new structure
+(see 'changes')._
+
+> __IMPORTANT__: _Command `deck file openapi2kong` generates different names than the older `inso`
+tool, which caused issues with a.o. developer portals. It is strongly recommended to use the new `--inso-compatible` flag and use the old naming scheme._
+
+### Added
+
+- Allow arrays to be specified on the `file patch` CLI command.
+  [#1056](https://github.com/Kong/deck/pull/1056)
+
+### Fixes
+
+- Do not overwrite `created_at` for existing resources when running `sync` command.
+  [#1061](https://github.com/Kong/deck/pull/1061)
+- `deck file openapi2kong` creates names for entities that differ from the older `inso`
+  tool. This has been fixed, but requires the new `--inso-compatible` flag to not be breaking.
+  Adding that flag will also skip id generation.
+  [#962](https://github.com/Kong/deck/pull/962)
+
+### Changes
+
+- Add analytics for local operations
+  [#1051](https://github.com/Kong/deck/pull/1051)
+- The top-level CLI commands have been restructured. All commands now live under 2
+  subcommands (`gateway` and `file`) to clarify their use and (in the future) reduce the clutter of
+  the many global flags only relevant to a few commands. 
+  The new commands are more unix-like, and preferably default to stdin/stdout and no longer to "`kong.yaml`".
+  Using the old commands will still work but
+  will print a deprecation notice. Please update your usage to the new commands.
+  [#962](https://github.com/Kong/deck/pull/962)
 
 ## [v1.27.1]
 
@@ -1386,6 +1424,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.28.0]: https://github.com/kong/deck/compare/v1.27.1...v1.28.0
 [v1.27.1]: https://github.com/kong/deck/compare/v1.27.0...v1.27.1
 [v1.27.0]: https://github.com/kong/deck/compare/v1.26.1...v1.27.0
 [v1.26.1]: https://github.com/kong/deck/compare/v1.26.0...v1.26.1
