@@ -1,0 +1,22 @@
+_format_version: "3.0"
+services:
+- name: svc1
+  host: mockbin.org
+  port: 80
+  protocol: http
+  routes:
+  - name: r1
+    paths:
+      - /
+consumers:
+- username: foo
+  custom_id: old
+upstreams:
+- name: upstream1
+  algorithm: round-robin
+plugins:
+- name: prometheus
+  enabled: true
+  protocols:
+  - http
+  - https

@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/kong/go-kong/kong"
 
+	deckDump "github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 )
 
@@ -4762,4 +4764,53 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 			assert.Equal(t, err, tc.expectedError)
 		})
 	}
+}
+
+// test scope:
+//   - 3.0.0+
+func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	const (
+		oldConfig = "testdata/sync/027-created-at/old.yaml"
+		newConfig = "testdata/sync/027-created-at/new.yaml"
+	)
+
+	// provision entities
+	require.NoError(t, sync(oldConfig))
+
+	// get the current state
+	ctx := context.Background()
+	oldKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// update entities
+	time.Sleep(time.Second)
+	require.NoError(t, sync(newConfig))
+
+	// get the new state
+	newKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// verify that the created_at have not changed across deployments
+	require.Equal(t, oldKongState.Services[0].CreatedAt, newKongState.Services[0].CreatedAt)
+	require.Equal(t, oldKongState.Routes[0].CreatedAt, newKongState.Routes[0].CreatedAt)
+	require.Equal(t, oldKongState.Plugins[0].CreatedAt, newKongState.Plugins[0].CreatedAt)
+	require.Equal(t, oldKongState.Consumers[0].CreatedAt, newKongState.Consumers[0].CreatedAt)
+
+	// verify that the updated_at have changed across deployments
+	require.NotEqual(t, oldKongState.Services[0].UpdatedAt, newKongState.Services[0].UpdatedAt)
+	require.NotEqual(t, oldKongState.Routes[0].UpdatedAt, newKongState.Routes[0].UpdatedAt)
+	// plugins do not have an updated_at field
+	// consumers do not have an updated_at field
 }

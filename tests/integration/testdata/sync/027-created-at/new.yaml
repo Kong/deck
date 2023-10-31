@@ -1,0 +1,22 @@
+_format_version: "3.0"
+services:
+- name: svc1
+  host: mockbin.org
+  port: 8080
+  protocol: http
+  routes:
+  - name: r1
+    paths:
+      - /r1
+consumers:
+- username: foo
+  custom_id: new
+upstreams:
+- name: upstream1
+  algorithm: consistent-hashing
+plugins:
+- name: prometheus
+  enabled: false
+  protocols:
+  - http
+  - https

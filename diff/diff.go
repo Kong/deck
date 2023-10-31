@@ -545,7 +545,9 @@ func (sc *Syncer) Solve(ctx context.Context, parallelism int, dry bool, isJSONOu
 			}
 		} else {
 			// diff mode
-			// return the new obj as is
+			// return the new obj as is but with timestamps zeroed out
+			utils.ZeroOutTimestamps(e.Obj)
+			utils.ZeroOutTimestamps(e.OldObj)
 			result = e.Obj
 		}
 		// record operation in both: diff and sync commands
