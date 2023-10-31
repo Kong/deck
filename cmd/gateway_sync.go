@@ -83,7 +83,8 @@ to get Kong's state in sync with the input state.`,
 	syncCmd.Flags().StringSliceVar(&dumpConfig.SelectorTags,
 		"select-tag", []string{},
 		"only entities matching tags specified via this flag are synced.\n"+
-			"When this setting has multiple tag values, entities must match every tag.")
+			"When this setting has multiple tag values, entities must match every tag.\n"+
+			"All entities in the state file will get the select-tags assigned if not present already.")
 	syncCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
 		false, "diff only the RBAC resources (Kong Enterprise only).")
 	syncCmd.Flags().IntVar(&syncCmdDBUpdateDelay, "db-update-propagation-delay",
