@@ -13,13 +13,13 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-querystring v1.1.0
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/hashicorp/go-memdb v1.3.4
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hexops/gotextdiff v1.0.3
 	github.com/imdario/mergo v0.3.16
 	github.com/kong/go-apiops v0.1.23
-	github.com/kong/go-kong v0.47.1-0.20231017161145-6881f5b9fb4d
+	github.com/kong/go-kong v0.48.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/shirou/gopsutil/v3 v3.23.7
 	github.com/spf13/cobra v1.7.0
@@ -30,8 +30,8 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/code-generator v0.28.2
-	sigs.k8s.io/yaml v1.3.0
+	k8s.io/code-generator v0.28.3
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
