@@ -2868,7 +2868,7 @@ func Test_Sync_Vault(t *testing.T) {
 						ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
 						Name:           kong.String("svc1"),
 						ConnectTimeout: kong.Int(60000),
-						Host:           kong.String("mockbin.org"),
+						Host:           kong.String("httpbin.org"),
 						Port:           kong.Int(80),
 						Path:           kong.String("/status/200"),
 						Protocol:       kong.String("http"),
