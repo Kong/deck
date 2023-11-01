@@ -13,12 +13,14 @@ import (
 )
 
 var (
-	convertCmdSourceFormat      string
-	convertCmdDestinationFormat string // konnect/kong-gateway-3.x/etc
-	convertCmdInputFile         string
-	convertCmdOutputFile        string
-	convertCmdAssumeYes         bool
-	convertCmdStateFormat       string // yaml/json output
+	convertCmdSourceFormat         string
+	convertCmdDestinationFormat    string // konnect/kong-gateway-3.x/etc
+	convertCmdInputFile            string
+	convertCmdOutputFile           string
+	convertCmdInputFileDeprecated  string
+	convertCmdOutputFileDeprecated string
+	convertCmdAssumeYes            bool
+	convertCmdStateFormat          string // yaml/json output
 )
 
 func executeConvert(_ *cobra.Command, _ []string) error {
@@ -91,6 +93,8 @@ func newConvertCmd(deprecated bool) *cobra.Command {
 	if deprecated {
 		short = "[deprecated] use 'file convert' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
+			convertCmdInputFile = convertCmdInputFileDeprecated
+			convertCmdOutputFile = convertCmdOutputFileDeprecated
 			cprint.UpdatePrintf("Warning: 'deck convert' is DEPRECATED and will be removed in a future version. " +
 				"Use 'deck file convert' instead.\n")
 			return executeConvert(cmd, args)
@@ -115,10 +119,17 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
 	convertCmd.Flags().StringVar(&convertCmdDestinationFormat, "to", "",
 		fmt.Sprintf("desired format of the output, allowed formats: %v", destinationFormats))
-	convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", fileInDefault,
-		"configuration file to be converted. Use `-` to read from stdin.")
-	convertCmd.Flags().StringVarP(&convertCmdOutputFile, "output-file", "o", fileOutDefault,
-		"file to write configuration to after conversion. Use `-` to write to stdout.")
+	if deprecated {
+		convertCmd.Flags().StringVar(&convertCmdInputFileDeprecated, "input-file", fileInDefault,
+			"configuration file to be converted. Use `-` to read from stdin.")
+		convertCmd.Flags().StringVarP(&convertCmdOutputFileDeprecated, "output-file", "o", fileOutDefault,
+			"file to write configuration to after conversion. Use `-` to write to stdout.")
+	} else {
+		convertCmd.Flags().StringVar(&convertCmdInputFile, "input-file", fileInDefault,
+			"configuration file to be converted. Use `-` to read from stdin.")
+		convertCmd.Flags().StringVarP(&convertCmdOutputFile, "output-file", "o", fileOutDefault,
+			"file to write configuration to after conversion. Use `-` to write to stdout.")
+	}
 	convertCmd.Flags().BoolVar(&convertCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 	convertCmd.Flags().StringVar(&convertCmdStateFormat, "format",
