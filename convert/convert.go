@@ -3,6 +3,7 @@ package convert
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/blang/semver/v4"
@@ -129,7 +130,7 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 		if changedRoutesLen > 10 {
 			changedRoutes = changedRoutes[:10]
 		}
-		cprint.UpdatePrintf(
+		cprint.UpdatePrintf(os.Stderr,
 			"From the '%s' config file,\n"+
 				"%d unsupported routes' paths format with Kong version 3.0\n"+
 				"or above were detected. Some of these routes are (not an exhaustive list):\n\n"+
@@ -140,7 +141,7 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 			filename, changedRoutesLen, strings.Join(changedRoutes, "\n"))
 	}
 
-	cprint.UpdatePrintf(
+	cprint.UpdatePrintf(os.Stderr,
 		"From the '%s' config file,\n"+
 			"the _format_version field has been migrated from '%s' to '%s'.\n"+
 			"These automatic changes may not be correct or exhaustive enough, please\n"+

@@ -42,9 +42,9 @@ func TestPrint(t *testing.T) {
 			name:          "println prints colored output",
 			DisableOutput: false,
 			Run: func() {
-				CreatePrintln("foo")
-				UpdatePrintln("bar")
-				DeletePrintln("fubaz")
+				CreatePrintln(os.Stdout, "foo")
+				UpdatePrintln(os.Stdout, "bar")
+				DeletePrintln(os.Stdout, "fubaz")
 			},
 			Expected: "\x1b[32mfoo\n\x1b[0m\x1b[33mbar\n\x1b[0m\x1b[31mfubaz\n\x1b[0m",
 		},
@@ -52,9 +52,9 @@ func TestPrint(t *testing.T) {
 			name:          "println doesn't output anything when disabled",
 			DisableOutput: true,
 			Run: func() {
-				CreatePrintln("foo")
-				UpdatePrintln("bar")
-				DeletePrintln("fubaz")
+				CreatePrintln(os.Stdout, "foo")
+				UpdatePrintln(os.Stdout, "bar")
+				DeletePrintln(os.Stdout, "fubaz")
 			},
 			Expected: "",
 		},
@@ -62,9 +62,9 @@ func TestPrint(t *testing.T) {
 			name:          "printf prints colored output",
 			DisableOutput: false,
 			Run: func() {
-				CreatePrintf("%s", "foo")
-				UpdatePrintf("%s", "bar")
-				DeletePrintf("%s", "fubaz")
+				CreatePrintf(os.Stdout, "%s", "foo")
+				UpdatePrintf(os.Stdout, "%s", "bar")
+				DeletePrintf(os.Stdout, "%s", "fubaz")
 			},
 			Expected: "\x1b[32mfoo\x1b[0m\x1b[33mbar\x1b[0m\x1b[31mfubaz\x1b[0m",
 		},
@@ -72,9 +72,9 @@ func TestPrint(t *testing.T) {
 			name:          "printf doesn't output anything when disabled",
 			DisableOutput: true,
 			Run: func() {
-				CreatePrintln("foo")
-				UpdatePrintln("bar")
-				DeletePrintln("fubaz")
+				CreatePrintln(os.Stdout, "foo")
+				UpdatePrintln(os.Stdout, "bar")
+				DeletePrintln(os.Stdout, "fubaz")
 			},
 			Expected: "",
 		},

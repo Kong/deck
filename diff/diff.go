@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -131,13 +132,19 @@ func NewSyncer(opts SyncerOpts) (*Syncer, error) {
 	}
 
 	if s.createPrintln == nil {
-		s.createPrintln = cprint.CreatePrintln
+		s.createPrintln = func(a ...interface{}) {
+			cprint.CreatePrintln(os.Stdout, a...) // TODO: fix to stderr, but would be breaking now
+		}
 	}
 	if s.updatePrintln == nil {
-		s.updatePrintln = cprint.UpdatePrintln
+		s.updatePrintln = func(a ...interface{}) {
+			cprint.UpdatePrintln(os.Stdout, a...) // TODO: fix to stderr, but would be breaking now
+		}
 	}
 	if s.deletePrintln == nil {
-		s.deletePrintln = cprint.DeletePrintln
+		s.deletePrintln = func(a ...interface{}) {
+			cprint.DeletePrintln(os.Stdout, a...) // TODO: fix to stderr, but would be breaking now
+		}
 	}
 
 	err := s.init()

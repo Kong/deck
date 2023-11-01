@@ -85,7 +85,7 @@ func getWorkspaceName(workspaceFlag string, targetContent *file.Content,
 		if enableJSONOutput {
 			jsonOutput.Warnings = append(jsonOutput.Warnings, warning)
 		} else {
-			cprint.DeletePrintf("Warning: " + warning + "\n")
+			cprint.DeletePrintf(os.Stderr, "Warning: "+warning+"\n")
 		}
 		return workspaceFlag
 	}
@@ -266,7 +266,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			}
 			jsonOutput.Changes.Creating = append(jsonOutput.Changes.Creating, workspace)
 		} else {
-			cprint.CreatePrintln("Creating workspace", wsConfig.Workspace)
+			cprint.CreatePrintln(os.Stdout, "Creating workspace", wsConfig.Workspace)
 		}
 		if !dry {
 			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
@@ -319,7 +319,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			jsonOutputString = diff.MaskEnvVarValue(jsonOutputString)
 		}
 
-		cprint.BluePrintLn(jsonOutputString + "\n")
+		cprint.BluePrintLn(os.Stdout, jsonOutputString+"\n")
 	}
 	return nil
 }

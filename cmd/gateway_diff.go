@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/kong/deck/cprint"
 	"github.com/spf13/cobra"
@@ -38,7 +39,7 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 		use = "diff"
 		short = "[deprecated] use 'gateway diff' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
-			cprint.UpdatePrintf("Warning: 'deck diff' is DEPRECATED and will be removed in a future version. " +
+			cprint.UpdatePrintf(os.Stderr, "Warning: 'deck diff' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway diff' instead.\n")
 			return executeDiff(cmd, args)
 		}

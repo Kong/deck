@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/dump"
@@ -105,7 +106,7 @@ this command unless --online flag is used.
 `
 
 		execute = func(cmd *cobra.Command, args []string) error {
-			cprint.UpdatePrintf("Warning: 'deck validate' is DEPRECATED and will be removed in a future version. " +
+			cprint.UpdatePrintf(os.Stderr, "Warning: 'deck validate' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway validate' instead.\n")
 			return executeValidate(cmd, args)
 		}

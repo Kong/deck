@@ -243,7 +243,7 @@ func PrintRouteRegexWarning(unsupportedRoutes []string) {
 	if unsupportedRoutesLen > 10 {
 		unsupportedRoutes = unsupportedRoutes[:10]
 	}
-	cprint.UpdatePrintf(
+	cprint.UpdatePrintf(os.Stderr,
 		"%d unsupported routes' paths format with Kong version 3.0\n"+
 			"or above were detected. Some of these routes are (not an exhaustive list):\n\n"+
 			"%s\n\n"+UpgradeMessage,

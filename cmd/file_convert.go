@@ -77,8 +77,8 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 		}
 	}
 	if convertCmdDestinationFormat == "konnect" {
-		cprint.UpdatePrintf("Warning: konnect format type was deprecated in v1.12 and it will be removed\n" +
-			"in a future version. Please use your Kong configuration files with deck <cmd>.\n" +
+		cprint.UpdatePrintf(os.Stderr, "Warning: konnect format type was deprecated in v1.12 and it will be removed\n"+
+			"in a future version. Please use your Kong configuration files with deck <cmd>.\n"+
 			"Please see https://docs.konghq.com/konnect/getting-started/import/.\n")
 	}
 	return nil
@@ -95,7 +95,7 @@ func newConvertCmd(deprecated bool) *cobra.Command {
 		execute = func(cmd *cobra.Command, args []string) error {
 			convertCmdInputFile = convertCmdInputFileDeprecated
 			convertCmdOutputFile = convertCmdOutputFileDeprecated
-			cprint.UpdatePrintf("Warning: 'deck convert' is DEPRECATED and will be removed in a future version. " +
+			cprint.UpdatePrintf(os.Stderr, "Warning: 'deck convert' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck file convert' instead.\n")
 			return executeConvert(cmd, args)
 		}

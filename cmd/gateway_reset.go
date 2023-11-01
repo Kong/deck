@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/state"
@@ -112,7 +113,7 @@ func newResetCmd(deprecated bool) *cobra.Command {
 	if deprecated {
 		short = "[deprecated] use 'gateway reset' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
-			cprint.UpdatePrintf("Warning: 'deck reset' is DEPRECATED and will be removed in a future version. " +
+			cprint.UpdatePrintf(os.Stderr, "Warning: 'deck reset' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway reset' instead.\n")
 			return executeReset(cmd, args)
 		}

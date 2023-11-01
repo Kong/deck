@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/kong/deck/cprint"
 	"github.com/spf13/cobra"
 )
@@ -18,8 +20,8 @@ func newKonnectCmd() *cobra.Command {
 		Long: `The konnect command prints subcommands that can be used to
 configure Konnect.` + konnectAlphaState,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			cprint.UpdatePrintf("Notice: The 'deck konnect' command has been deprecated as of v1.12. \n" +
-				"Please use deck <cmd> instead if you would like to declaratively manage your \n" +
+			cprint.UpdatePrintf(os.Stderr, "Notice: The 'deck konnect' command has been deprecated as of v1.12. \n"+
+				"Please use deck <cmd> instead if you would like to declaratively manage your \n"+
 				"Kong gateway config with Konnect.\n")
 		},
 	}

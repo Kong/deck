@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/kong/deck/cprint"
@@ -105,7 +106,7 @@ func (d *basicAuthDiffer) warnBasicAuth() {
 			"credentials using decK doesn't work due to hashing of passwords in Kong."
 	)
 	d.once.Do(func() {
-		cprint.UpdatePrintln(basicAuthPasswordWarning)
+		cprint.UpdatePrintln(os.Stderr, basicAuthPasswordWarning)
 	})
 }
 
