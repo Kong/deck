@@ -1,7 +1,6 @@
 package cprint
 
 import (
-	"bytes"
 	"os"
 	"testing"
 
@@ -13,14 +12,25 @@ import (
 // f runs.
 // It is not thread-safe.
 func captureOutput(f func()) string {
-	backupOutput := color.Output
-	defer func() {
-		color.Output = backupOutput
-	}()
-	var out bytes.Buffer
-	color.Output = &out
+	// Create a buffer to capture stdout
+	var stdoutBuffer string
+
+	// Redirect stdout to the buffer
+	oldStdout := os.Stdout
+	defer func() { os.Stdout = oldStdout }()
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	// write the output
 	f()
-	return out.String()
+
+	// Close the write end of the pipe and read stdout into the buffer
+	w.Close()
+	buf := make([]byte, 1024)
+	n, _ := r.Read(buf)
+	stdoutBuffer = string(buf[:n])
+
+	return stdoutBuffer
 }
 
 func TestMain(m *testing.M) {
