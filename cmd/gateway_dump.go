@@ -17,11 +17,12 @@ import (
 const defaultFileOutName = "kong"
 
 var (
-	dumpCmdKongStateFile string
-	dumpCmdStateFormat   string
-	dumpWorkspace        string
-	dumpAllWorkspaces    bool
-	dumpWithID           bool
+	dumpCmdKongStateFileDeprecated string
+	dumpCmdKongStateFile           string
+	dumpCmdStateFormat             string
+	dumpWorkspace                  string
+	dumpAllWorkspaces              bool
+	dumpWithID                     bool
 )
 
 func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) {
@@ -149,6 +150,7 @@ func newDumpCmd(deprecated bool) *cobra.Command {
 	if deprecated {
 		short = "[deprecated] use 'gateway dump' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
+			dumpCmdKongStateFile = dumpCmdKongStateFileDeprecated
 			cprint.UpdatePrintf("Warning: 'deck dump' is DEPRECATED and will be removed in a future version. " +
 				"Use 'deck gateway dump' instead.\n")
 			return executeDump(cmd, args)
@@ -168,9 +170,15 @@ configure Kong.`,
 		RunE: execute,
 	}
 
-	dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
-		fileOutDefault, "file to which to write Kong's configuration."+
-			"Use `-` to write to stdout.")
+	if deprecated {
+		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
+			fileOutDefault, "file to which to write Kong's configuration."+
+				"Use `-` to write to stdout.")
+	} else {
+		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
+			fileOutDefault, "file to which to write Kong's configuration."+
+				"Use `-` to write to stdout.")
+	}
 	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml.")
 	dumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
