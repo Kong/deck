@@ -7,7 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
@@ -264,18 +263,25 @@ func diff(kongFile string, opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// overwrite default standard output
+	// Create a buffer to capture stdout
+	var stdoutBuffer string
+
+	// Redirect stdout to the buffer
+	oldStdout := os.Stdout
+	defer func() { os.Stdout = oldStdout }()
 	r, w, _ := os.Pipe()
-	color.Output = w
+	os.Stdout = w
 
 	// execute decK command
 	cmdErr := deckCmd.ExecuteContext(context.Background())
 
-	// read command output
+	// Close the write end of the pipe and read stdout into the buffer
 	w.Close()
-	out, _ := io.ReadAll(r)
+	buf := make([]byte, 1024)
+	n, _ := r.Read(buf)
+	stdoutBuffer = string(buf[:n])
 
-	return string(out), cmdErr
+	return stdoutBuffer, cmdErr
 }
 
 func dump(opts ...string) (string, error) {
