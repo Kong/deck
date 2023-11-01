@@ -75,8 +75,13 @@
 compatibility, but in the future that will be removed. Please update to the new structure
 (see 'changes')._
 
-> __IMPORTANT__: _Command `deck file openapi2kong` generates different names than the older `inso`
-tool, which caused issues with a.o. developer portals. It is strongly recommended to use the new `--inso-compatible` flag and use the old naming scheme._
+> __IMPORTANT__: _The recently added decK command `deck file openapi2kong` implemented different techniques for 
+generating decK configuration from OpenAPI spec files then the legacy `inso` tool. In particular, entity names and identifiers 
+were generated differently in the more recent implementation. For existing `inso` users, this may cause issues with migrating
+to the new tool as names and IDs are used by Kong Gateway to identify entities. In response we have added a 
+`--inso-compatible` flag to the `deck file openapi2kong` command to support a smoother migration for these users. For more
+information on this and other APIOps commands, see the 
+[go-apiops documentation page](https://github.com/Kong/go-apiops/tree/main/docs).
 
 ### Added
 
