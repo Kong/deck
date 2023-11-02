@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.28.1](#v1281)
 - [v1.28.0](#v1280)
 - [v1.27.1](#v1271)
 - [v1.27.0](#v1270)
@@ -66,6 +67,19 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+
+## [v1.28.1]
+
+> Release date: 2023/11/02
+
+### Fixes
+
+- Old cli commands would also output to stdout by default. Now back to default "kong.yaml".
+  [#1073](https://github.com/Kong/deck/pull/1073)
+- Deprecation warnings were send to stdout, mixing warnings with intended output. Now going to stderr.
+  [#1075](https://github.com/Kong/deck/pull/1075)
+
 
 ## [v1.28.0]
 
@@ -1424,6 +1438,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.28.1]: https://github.com/kong/deck/compare/v1.28.0...v1.28.1
 [v1.28.0]: https://github.com/kong/deck/compare/v1.27.1...v1.28.0
 [v1.27.1]: https://github.com/kong/deck/compare/v1.27.0...v1.27.1
 [v1.27.0]: https://github.com/kong/deck/compare/v1.26.1...v1.27.0
