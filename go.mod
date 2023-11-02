@@ -40,6 +40,8 @@ require (
 	k8s.io/code-generator v0.28.3
 )
 
+require github.com/gosimple/unidecode v1.0.1 // indirect
+
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
@@ -65,6 +67,7 @@ require (
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/gookit/color v1.5.3 // indirect
+	github.com/gosimple/slug v1.13.1
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
