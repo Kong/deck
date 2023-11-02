@@ -1438,6 +1438,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.28.1]: https://github.com/kong/deck/compare/v1.28.0...v1.28.1
 [v1.28.0]: https://github.com/kong/deck/compare/v1.27.1...v1.28.0
 [v1.27.1]: https://github.com/kong/deck/compare/v1.27.0...v1.27.1
 [v1.27.0]: https://github.com/kong/deck/compare/v1.26.1...v1.27.0
