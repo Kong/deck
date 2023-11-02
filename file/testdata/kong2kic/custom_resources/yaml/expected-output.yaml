@@ -93,7 +93,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route
+  name: example-service--thisisaveryvery-long-examp458db225e7
 route:
   headers:
     x-another-header:
@@ -145,7 +145,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-aws-lambda
+  name: example-service--thisisaveryvery-long-examp74c5dc2067
 plugin: aws-lambda
 status: {}
 ---
@@ -167,7 +167,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-cors
+  name: example-service--thisisaveryvery-long-exampb74d1356ad
 plugin: cors
 status: {}
 ---
@@ -180,7 +180,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-file-log
+  name: example-service--thisisaveryvery-long-examp6f248cccf4
 plugin: file-log
 status: {}
 ---
@@ -198,7 +198,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-http-log
+  name: example-service--thisisaveryvery-long-exampd4db3da64d
 plugin: http-log
 status: {}
 ---
@@ -213,7 +213,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-ip-restriction
+  name: example-service--thisisaveryvery-long-examp197b8a3d26
 plugin: ip-restriction
 status: {}
 ---
@@ -233,7 +233,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-rate-limiting-advanced
+  name: example-service--thisisaveryvery-long-examp414691f96c
 plugin: rate-limiting-advanced
 status: {}
 ---
@@ -246,7 +246,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-request-termination
+  name: example-service--thisisaveryvery-long-examp5734a64044
 plugin: request-termination
 status: {}
 ---
@@ -261,7 +261,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-response-ratelimiting
+  name: example-service--thisisaveryvery-long-examp7acb4e5480
 plugin: response-ratelimiting
 status: {}
 ---
@@ -274,7 +274,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-tcp-log
+  name: example-service--thisisaveryvery-long-exampfab4d85783
 plugin: tcp-log
 status: {}
 ---
@@ -286,7 +286,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-basic-auth
+  name: example-service--thisisaveryvery-long-exampcb3ded9d5d
 plugin: basic-auth
 status: {}
 ---
@@ -309,7 +309,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-jwt
+  name: example-service--thisisaveryvery-long-exampf7403f01c9
 plugin: jwt
 status: {}
 ---
@@ -325,7 +325,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-key-auth
+  name: example-service--thisisaveryvery-long-examp404e065618
 plugin: key-auth
 status: {}
 ---
@@ -340,7 +340,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-mtls-auth
+  name: example-service--thisisaveryvery-long-examp1b46e36834
 plugin: mtls-auth
 status: {}
 ---
@@ -353,7 +353,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: example-service-example-route-acl
+  name: example-service--thisisaveryvery-long-exampbdb13cbef5
 plugin: acl
 status: {}
 ---
@@ -401,10 +401,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    konghq.com/override: example-service-example-route
-    konghq.com/plugins: example-service-example-route-aws-lambda,example-service-example-route-cors,example-service-example-route-file-log,example-service-example-route-http-log,example-service-example-route-ip-restriction,example-service-example-route-rate-limiting-advanced,example-service-example-route-request-termination,example-service-example-route-response-ratelimiting,example-service-example-route-tcp-log,example-service-example-route-basic-auth,example-service-example-route-jwt,example-service-example-route-key-auth,example-service-example-route-mtls-auth,example-service-example-route-acl
+    konghq.com/override: example-service--thisisaveryvery-long-examp458db225e7
+    konghq.com/plugins: example-service--thisisaveryvery-long-examp74c5dc2067,example-service--thisisaveryvery-long-exampb74d1356ad,example-service--thisisaveryvery-long-examp6f248cccf4,example-service--thisisaveryvery-long-exampd4db3da64d,example-service--thisisaveryvery-long-examp197b8a3d26,example-service--thisisaveryvery-long-examp414691f96c,example-service--thisisaveryvery-long-examp5734a64044,example-service--thisisaveryvery-long-examp7acb4e5480,example-service--thisisaveryvery-long-exampfab4d85783,example-service--thisisaveryvery-long-exampcb3ded9d5d,example-service--thisisaveryvery-long-exampf7403f01c9,example-service--thisisaveryvery-long-examp404e065618,example-service--thisisaveryvery-long-examp1b46e36834,example-service--thisisaveryvery-long-exampbdb13cbef5
   creationTimestamp: null
-  name: example-service-example-route
+  name: example-service--thisisaveryvery-long-examp458db225e7
 spec:
   ingressClassName: kong
   rules:
@@ -562,37 +562,73 @@ stringData:
 type: Opaque
 ---
 apiVersion: v1
-data:
-  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJmRENDQVNLZ0F3SUJBZ0lSQUpxY1pDMVZTdlNRTE1OMSs3eUFlc3d3Q2dZSUtvWkl6ajBFQXdJd0hERWEKTUJnR0ExVUVBeE1SUkdWdGJ5QkxiMjVuSUZKdmIzUWdRMEV3SGhjTk1qSXdOakV6TVRNek56TXpXaGNOTWpjdwpOakV6TVRrek56TXpXakFjTVJvd0dBWURWUVFERXhGRVpXMXZJRXR2Ym1jZ1VtOXZkQ0JEUVRCWk1CTUdCeXFHClNNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJPR1I4OUl5aHJlU0hSQWk2d3A5YTVEQklEcDRZWVNkV3p1RWRsTngKN3BYMUc0VDd4Njh4VVhKWlhSVVBGeVQ4WHpuNUt3Q0ptOFJWVCtuQWhyc1V4NlNqUlRCRE1BNEdBMVVkRHdFQgovd1FFQXdJQkJqQVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUNNQjBHQTFVZERnUVdCQlE5Q1VpT1BoanA3S0QyClNjUkR4WDRJekRPck56QUtCZ2dxaGtqT1BRUURBZ05JQURCRkFpRUF3NkRvdjBjMEwrKzFXOVZ1ZkFmU01kTlIKUFNEZlBVME1pVWlHNTkvVklCSUNJRUZuLzZjNWVRYzNoVVVCTDc0L1JtTlQyYjF6eEJtcDdSaVBYSkFuQUF3SgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: ca-cert-a672ab52d2341203bd70116b456413d7ac38354f0548e3dc4755b57e185a2c6f
-type: kubernetes.io/tls
+  name: ca-cert-a672ab52d2341203bd70116b456413d7ac3ffc162abbf
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+    NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+    7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+    ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+    PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
+    -----END CERTIFICATE-----
+  ca.digest: f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5
+type: generic
 ---
 apiVersion: v1
-data:
-  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJxVENDQVZDZ0F3SUJBZ0lRYjVMcUdhOWdTMytNYzJudFdmU29KakFLQmdncWhrak9QUVFEQWpBY01Sb3cKR0FZRFZRUURFeEZFWlcxdklFdHZibWNnVW05dmRDQkRRVEFlRncweU1qQTJNVE14TXpNNU1UVmFGdzB5TXpBMgpNVE14T1RNNU1UVmFNQ294S0RBbUJnTlZCQU1USDBSbGJXOGdTMjl1WnlCU2IyOTBJRWx1ZEdWeWJXVmthV0YwClpURWdRMEV3V1RBVEJnY3Foa2pPUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVFJbXZuU3V2WGtHeTg4bHZ4OGE3b2YKZTBNRU1SSTJzaVZ2eWJ2V1hOcGVYWGxpeGdhcTd3ZUo3cGV3ZjNIeXdmTzY4VmE2a244ZWhXaDdzMEQ3U0xITQpvMll3WkRBT0JnTlZIUThCQWY4RUJBTUNBUVl3RWdZRFZSMFRBUUgvQkFnd0JnRUIvd0lCQVRBZEJnTlZIUTRFCkZnUVVodXhDS21DU3ZaV2Y5NStpWitXc3o5REpKVk13SHdZRFZSMGpCQmd3Rm9BVVBRbElqajRZNmV5ZzlrbkUKUThWK0NNd3pxemN3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnTlorSlBBMU9xRjVEc1BhcEFaMllzVU9nSXBuMwpaYlF1WUtDQVYwU0Q0RWNDSUZuZkE1cldyYzFBZ3RVdzVpbkpRcUpRUk5nb1B1QzE0dkFDcUk0OEJpUmwKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e23aaf4180166abcf236bd87f9c82d
-type: kubernetes.io/tls
+  name: ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e6e08e84471
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBqTCCAVCgAwIBAgIQb5LqGa9gS3+Mc2ntWfSoJjAKBggqhkjOPQQDAjAcMRow
+    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMjA2MTMxMzM5MTVaFw0yMzA2
+    MTMxOTM5MTVaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
+    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQImvnSuvXkGy88lvx8a7of
+    e0MEMRI2siVvybvWXNpeXXlixgaq7weJ7pewf3HywfO68Va6kn8ehWh7s0D7SLHM
+    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
+    FgQUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
+    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDRwAwRAIgNZ+JPA1OqF5DsPapAZ2YsUOgIpn3
+    ZbQuYKCAV0SD4EcCIFnfA5rWrc1AgtUw5inJQqJQRNgoPuC14vACqI48BiRl
+    -----END CERTIFICATE-----
+  ca.digest: dbef7ed285fb292e24f84ffba93c48d92fa322387d85469c460c655abedd5308
+type: generic
 ---
 apiVersion: v1
-data:
-  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ1akNDQVYrZ0F3SUJBZ0lSQU1rR3BqN1daZisyUkZFL3E3WmhlakV3Q2dZSUtvWkl6ajBFQXdJd0tqRW8KTUNZR0ExVUVBeE1mUkdWdGJ5QkxiMjVuSUZKdmIzUWdTVzUwWlhKdFpXUnBZWFJsTVNCRFFUQWVGdzB5TWpBMgpNVE14TXpRd05URmFGdzB5TWpFeU1UTXdORFF3TlRGYU1Db3hLREFtQmdOVkJBTVRIMFJsYlc4Z1MyOXVaeUJTCmIyOTBJRWx1ZEdWeWJXVmthV0YwWlRJZ1EwRXdXVEFUQmdjcWhrak9QUUlCQmdncWhrak9QUU1CQndOQ0FBUUIKbXkvemhaM0YySHZIRnF0UXp1RDNsWFg4U2VZYWt4aUJRdmFHa0dTTEtENjdOM3ZoN2lDMnJUU2RqL3ZBczh3cwpZOVgrbVh6UzZHREtDOFBiU1g2eG8yWXdaREFPQmdOVkhROEJBZjhFQkFNQ0FRWXdFZ1lEVlIwVEFRSC9CQWd3CkJnRUIvd0lCQURBZEJnTlZIUTRFRmdRVVJ3Q201M1lQU3Rab0FNZm5WeWtuSDRJZ1phNHdId1lEVlIwakJCZ3cKRm9BVWh1eENLbUNTdlpXZjk1K2laK1dzejlESkpWTXdDZ1lJS29aSXpqMEVBd0lEU1FBd1JnSWhBTjFwa1VLYwphek00UGlYT25rSUxCMktCRElGNFhwSGYrNFRoRE1PRHpYUDhBaUVBNDVLWEEzcU1yUlBRVjFvQmZXWjNoTGdYCmd4VWh2ZXVIQlhNV256VWJuNlU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: ca-cert-6b095c7ff377b01252a4dfec59c582fe329857d19f6b33208a6272b5db39f430
-type: kubernetes.io/tls
+  name: ca-cert-6b095c7ff377b01252a4dfec59c582fe32934fa7ed0cf
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBujCCAV+gAwIBAgIRAMkGpj7WZf+2RFE/q7ZhejEwCgYIKoZIzj0EAwIwKjEo
+    MCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjA2
+    MTMxMzQwNTFaFw0yMjEyMTMwNDQwNTFaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS
+    b290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQB
+    my/zhZ3F2HvHFqtQzuD3lXX8SeYakxiBQvaGkGSLKD67N3vh7iC2rTSdj/vAs8ws
+    Y9X+mXzS6GDKC8PbSX6xo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw
+    BgEB/wIBADAdBgNVHQ4EFgQURwCm53YPStZoAMfnVyknH4IgZa4wHwYDVR0jBBgw
+    FoAUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwCgYIKoZIzj0EAwIDSQAwRgIhAN1pkUKc
+    azM4PiXOnkILB2KBDIF4XpHf+4ThDMODzXP8AiEA45KXA3qMrRPQV1oBfWZ3hLgX
+    gxUhveuHBXMWnzUbn6U=
+    -----END CERTIFICATE-----
+  ca.digest: 45b2b6dd9d4102955b1b1e4b540e677f140521462ed4f22fa5a713863ca84600
+type: generic
 ---
 apiVersion: v1
 data:
@@ -603,7 +639,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: cert-0ee0e1584c8637facac95bd5fce315367dee123c8280cb577437aed60fcdd889
+  name: cert-0ee0e1584c8637facac95bd5fce315367dee124c0086d41e
 type: kubernetes.io/tls
 ---
 apiVersion: v1
@@ -615,7 +651,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: kong
   creationTimestamp: null
-  name: cert-b12464ec431576239dd9cc2545d528f6cbdbd9c5e2032e861c95fbfc4a3ae75f
+  name: cert-b12464ec431576239dd9cc2545d528f6cbdbd988cf076323
 type: kubernetes.io/tls
 ---
 apiVersion: configuration.konghq.com/v1
@@ -638,7 +674,7 @@ metadata:
 status: {}
 username: example-user
 ---
-apiVersion: configuration.konghq.com/v1
+apiVersion: configuration.konghq.com/v1beta1
 kind: KongConsumerGroup
 metadata:
   annotations:

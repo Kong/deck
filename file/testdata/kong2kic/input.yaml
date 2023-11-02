@@ -222,7 +222,7 @@ services:
       - example
       - api
     routes:
-      - name: example-route
+      - name: _thisISAveryvery_long_example-route+name_toVALIDATEthat(the slugify functionality w0rks4s3xp3ct3d)_
         methods:
           - GET
           - POST
@@ -475,18 +475,19 @@ consumer_groups:
   - name: example-consumer-group
     consumers:
       - username: example-user
-    plugins:
-      - name: rate-limiting-advanced
-        config:
-          limit:
-          - 5
-          window_size:
-          - 30
-          identifier: consumer
-          sync_rate: -1
-          namespace: example_namespace
-          strategy: local
-          hide_client_headers: false
+plugins:
+- name: rate-limiting-advanced
+  consumer_group: example-consumer-group
+  config:
+    limit:
+    - 5
+    window_size:
+    - 30
+    identifier: consumer
+    sync_rate: -1
+    namespace: example_namespace
+    strategy: local
+    hide_client_headers: false
     
     
     
