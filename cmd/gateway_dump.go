@@ -3,9 +3,9 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/dump"
 	"github.com/kong/deck/file"
 	"github.com/kong/deck/state"
@@ -151,7 +151,7 @@ func newDumpCmd(deprecated bool) *cobra.Command {
 		short = "[deprecated] use 'gateway dump' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
 			dumpCmdKongStateFile = dumpCmdKongStateFileDeprecated
-			cprint.UpdatePrintf("Warning: 'deck dump' is DEPRECATED and will be removed in a future version. " +
+			fmt.Fprintf(os.Stderr, "Warning: 'deck dump' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway dump' instead.\n")
 			return executeDump(cmd, args)
 		}

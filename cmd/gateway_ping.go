@@ -3,8 +3,8 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
-	"github.com/kong/deck/cprint"
 	"github.com/kong/deck/utils"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +27,7 @@ func newPingCmd(deprecated bool) *cobra.Command {
 	if deprecated {
 		short = "[deprecated] use 'gateway ping' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
-			cprint.UpdatePrintf("Warning: 'deck ping' is DEPRECATED and will be removed in a future version. " +
+			fmt.Fprintf(os.Stderr, "Warning: 'deck ping' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway ping' instead.\n")
 			return executePing(cmd, args)
 		}
