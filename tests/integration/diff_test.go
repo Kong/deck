@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	expectedOutputMasked = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-updating service svc1  {
+	expectedOutputMasked = `updating service svc1  {
    "connect_timeout": 60000,
    "enabled": true,
    "host": "[masked]",
@@ -38,8 +37,7 @@ Summary:
   Deleted: 0
 `
 
-	expectedOutputUnMasked = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-updating service svc1  {
+	expectedOutputUnMasked = `updating service svc1  {
    "connect_timeout": 60000,
    "enabled": true,
    "host": "mockbin.org",
@@ -70,8 +68,7 @@ Summary:
 		"DECK_FOO":           "foo_test", // unused, partial match
 	}
 
-	expectedOutputUnMaskedJSON = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-{
+	expectedOutputUnMaskedJSON = `{
 	"changes": {
 		"creating": [
 			{
@@ -167,8 +164,7 @@ Summary:
 
 `
 
-	expectedOutputMaskedJSON = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-{
+	expectedOutputMaskedJSON = `{
 	"changes": {
 		"creating": [
 			{
@@ -268,8 +264,7 @@ Summary:
 
 `
 
-	expectedOutputUnMaskedJSON30x = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-{
+	expectedOutputUnMaskedJSON30x = `{
 	"changes": {
 		"creating": [
 			{
@@ -363,8 +358,7 @@ Summary:
 
 `
 
-	expectedOutputMaskedJSON30x = `Warning: 'deck diff' is DEPRECATED and will be removed in a future version. Use 'deck gateway diff' instead.
-{
+	expectedOutputMaskedJSON30x = `{
 	"changes": {
 		"creating": [
 			{
