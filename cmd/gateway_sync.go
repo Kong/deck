@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/kong/deck/cprint"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +39,7 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 		use = "sync"
 		short = "[deprecated] use 'gateway sync' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
-			cprint.UpdatePrintf("Warning: 'deck sync' is DEPRECATED and will be removed in a future version. " +
+			fmt.Fprintf(os.Stderr, "Warning: 'deck sync' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway sync' instead.\n")
 			return executeSync(cmd, args)
 		}
