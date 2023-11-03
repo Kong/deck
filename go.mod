@@ -1,8 +1,6 @@
 module github.com/kong/deck
 
-go 1.21
-
-toolchain go1.21.0
+go 1.20
 
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
@@ -33,11 +31,11 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
-	sigs.k8s.io/yaml v1.4.0
 	k8s.io/api v0.28.3
 	k8s.io/apiextensions-apiserver v0.28.3
 	k8s.io/apimachinery v0.28.3
 	k8s.io/code-generator v0.28.3
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require github.com/gosimple/unidecode v1.0.1 // indirect
@@ -114,16 +112,14 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
+	go.uber.org/zap v1.25.0 // indirect
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/crypto v0.14.0
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
