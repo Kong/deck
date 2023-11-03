@@ -81,7 +81,7 @@
 
 ### Fixes
 
-- Fix validate command setting the wrong filelist (and effectively do nothing)
+- Resolved an issue in the `deck file validate` and `deck gateway validate` commands that prevented them from properly processing the provided file arguments.
   [#1084](https://github.com/Kong/deck/pull/1084)
 
 
