@@ -24,6 +24,10 @@ func TestGetGlobalAuthEndpoint(t *testing.T) {
 			expected: "https://global.api.konghq.com/kauth/api/v1/authenticate",
 		},
 		{
+			baseURL:  "https://au.api.konghq.com",
+			expected: "https://global.api.konghq.com/kauth/api/v1/authenticate",
+		},
+		{
 			baseURL:  "https://api.konghq.com",
 			expected: "https://global.api.konghq.com/kauth/api/v1/authenticate",
 		},

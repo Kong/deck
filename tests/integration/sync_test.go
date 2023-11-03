@@ -3112,8 +3112,8 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			expectedState: utils.KongRawState{
 				Consumers: []*kong.Consumer{
 					{
-						Username: kong.String("test"),
-						CustomID: kong.String("new_custom_test"),
+						Username: kong.String("test_consumer_3x"),
+						CustomID: kong.String("test_consumer_3x_custom_test"),
 					},
 				},
 			},
