@@ -79,6 +79,12 @@
 - Add support for konnect AU region.
   [#1082](https://github.com/Kong/deck/pull/1082)
 
+### Fixes
+
+- Fix validate command setting the wrong filelist (and effectively do nothing)
+  [#1084](https://github.com/Kong/deck/pull/1084)
+
+
 ## [v1.28.1]
 
 > Release date: 2023/11/02
