@@ -118,10 +118,15 @@ information on this and other APIOps commands, see the
 - The top-level CLI commands have been restructured. All commands now live under 2
   subcommands (`gateway` and `file`) to clarify their use and (in the future) reduce the clutter of
   the many global flags only relevant to a few commands. 
-  The new commands are more unix-like, and preferably default to stdin/stdout and no longer to "`kong.yaml`".
   Using the old commands will still work but
   will print a deprecation notice. Please update your usage to the new commands.
-  [#962](https://github.com/Kong/deck/pull/962)
+  The new commands are more unix-like;
+  
+  - default to `stdin`/`stdout` and no longer to "`kong.yaml`"
+  - the `-s` / `--state` flag is gone, files can be listed without the flag
+  - the `--online` flag for `validate` is gone; use `gateway validate` for online, `file validate` for local.
+  
+  PR [#962](https://github.com/Kong/deck/pull/962)
 
 ## [v1.27.1]
 
