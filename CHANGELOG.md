@@ -79,6 +79,12 @@
 - Add support for konnect AU region.
   [#1082](https://github.com/Kong/deck/pull/1082)
 
+### Fixes
+
+- Resolved an issue in the `deck file validate` and `deck gateway validate` commands that prevented them from properly processing the provided file arguments.
+  [#1084](https://github.com/Kong/deck/pull/1084)
+
+
 ## [v1.28.1]
 
 > Release date: 2023/11/02

@@ -84,13 +84,7 @@ and alerts if there are broken relationships, or missing links present.
 `
 	execute := executeValidate
 	argsValidator := cobra.MinimumNArgs(0)
-	preRun := func(cmd *cobra.Command, args []string) error {
-		diffCmdKongStateFile = args
-		if len(diffCmdKongStateFile) == 0 {
-			diffCmdKongStateFile = []string{"-"}
-		}
-		return preRunSilenceEventsFlag()
-	}
+	var preRun func(cmd *cobra.Command, args []string) error
 
 	if deprecated {
 		use = "validate"
@@ -118,7 +112,15 @@ this command unless --online flag is used.
 			return preRunSilenceEventsFlag()
 		}
 	} else {
-		validateOnline = online
+		preRun = func(cmd *cobra.Command, args []string) error {
+			validateOnline = online
+			validateCmdKongStateFile = args
+			if len(validateCmdKongStateFile) == 0 {
+				validateCmdKongStateFile = []string{"-"}
+			}
+			return preRunSilenceEventsFlag()
+		}
+
 		if validateOnline {
 			short = short + " (online)"
 			long = long + "Validates against the Kong API, via communication with Kong. This increases the\n" +
