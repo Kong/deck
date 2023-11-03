@@ -22,7 +22,7 @@ As of 1.9.0, the remaining steps are automated on tag pushes to Github. They are
 ## Homebrew release
 
 1. Clone the [Kong/homebrew-deck](https://github.com/Kong/homebrew-deck) repo.
-2. Download and unpack dist.zip from the release job artifacts.
+2. Download and unpack `dist.zip` from the [release job artifacts](https://github.com/Kong/deck/actions/workflows/release.yaml).
 3. `cp <unpack directory>/deck.rb <homebrew-deck directory>/Formula/`. Make sure only version and checksum is changed and rest all is left as is.
 4. Commit and push to master.
 
