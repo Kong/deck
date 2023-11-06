@@ -3496,7 +3496,7 @@ func Test_Sync_PluginSharedTag(t *testing.T) {
 			name:     "create a plugin with shared_tag",
 			kongFile: "testdata/sync/028-plugin-shared_tag/kong-with-shared_tag.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: []FPlugin{
+				Plugins: []*kong.Plugin{
 					{
 						Name:         kong.String("request-termination"),
 						SharedTag:    kong.String("shared-tag-example"),
