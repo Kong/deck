@@ -616,6 +616,9 @@
         "instance_name": {
           "type": "string"
         },
+        "shared_tag": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
