@@ -948,13 +948,17 @@ func (b *stateBuilder) plugins() {
 	for _, p := range b.targetContent.Plugins {
 		p := p
 		var sharedEntities bool
-		if p.SharedTag != nil && sharedEntities != true {
+		if p.SharedTag != nil && !sharedEntities {
 			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{*p.SharedTag})
 			for _, c := range consumersGlobal {
-				b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+				err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+				if err != nil {
+					fmt.Errorf("Error adding global consumer %v: %w",
+						*c.Username, err)
+				}
 			}
 			if err != nil {
-				fmt.Printf("Error retrieving global consumers: %w", err)
+				fmt.Errorf("Error retrieving global consumers: %w", err)
 			}
 			// add future logic for global entities
 			sharedEntities = true
