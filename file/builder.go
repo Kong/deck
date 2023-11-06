@@ -10,6 +10,7 @@ import (
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/kong/deck/dump"
 )
 
 const ratelimitingAdvancedPluginName = "rate-limiting-advanced"
@@ -946,6 +947,18 @@ func (b *stateBuilder) plugins() {
 	var plugins []FPlugin
 	for _, p := range b.targetContent.Plugins {
 		p := p
+		var sharedEntities bool
+		if p.SharedTag != nil && sharedEntities != true {
+			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{*p.SharedTag})
+			for _, c := range consumersGlobal {
+				b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+			}
+			if err != nil {
+				fmt.Printf("Error retrieving global consumers: %w", err)
+			}
+			// add future logic for global entities
+			sharedEntities = true
+		}
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			c, err := b.intermediate.Consumers.GetByIDOrUsername(*p.Consumer.ID)
 			if errors.Is(err, state.ErrNotFound) {
