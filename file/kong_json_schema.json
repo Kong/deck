@@ -638,6 +638,9 @@
         "service": {
           "type": "string"
         },
+        "shared_tag": {
+          "type": "string"
+        },
         "tags": {
           "items": {
             "type": "string"
