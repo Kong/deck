@@ -28,6 +28,8 @@ type Config struct {
 	// tags.
 	SelectorTags []string
 
+	LookUpSelectorTagsConsumers []string
+
 	// KonnectControlPlane
 	KonnectControlPlane string
 
@@ -92,6 +94,17 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 		consumers, err := GetAllConsumers(ctx, client, config.SelectorTags)
 		if err != nil {
 			return fmt.Errorf("consumers: %w", err)
+		}
+
+		if config.LookUpSelectorTagsConsumers!= nil {
+			updatedConsumers, err := GetAllGlobalConsumers(ctx, client, config.LookUpSelectorTagsConsumers, consumers)
+			if err != nil {
+				fmt.Errorf("error retrieving global consumers: %w", err)
+			}
+			consumers = updatedConsumers
+		}
+		for _, c := range consumers {
+			fmt.Printf("Tags: %v\n", *c.Username)
 		}
 		state.Consumers = consumers
 		return nil
@@ -477,6 +490,34 @@ func GetAllConsumers(ctx context.Context,
 	client *kong.Client, tags []string,
 ) ([]*kong.Consumer, error) {
 	var consumers []*kong.Consumer
+	opt := newOpt(tags)
+
+	for {
+		s, nextopt, err := client.Consumers.List(ctx, opt)
+		if err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		consumers = append(consumers, s...)
+		if nextopt == nil {
+			break
+		}
+		opt = nextopt
+	}
+	return consumers, nil
+}
+
+// GetAllGlobalConsumers queries Kong for all the globlal consumers using client.
+// Please use this method with caution if you have a lot of consumers.
+func GetAllGlobalConsumers(ctx context.Context,
+	client *kong.Client, tags []string, 
+	consumers []*kong.Consumer,
+) ([]*kong.Consumer, error) {
 	opt := newOpt(tags)
 
 	for {

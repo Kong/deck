@@ -84,6 +84,10 @@ func Get(ctx context.Context, fileContent *Content, opt RenderConfig, dumpConfig
 		builder.selectTags = dumpConfig.SelectorTags
 	}
 
+	if len(dumpConfig.LookUpSelectorTagsConsumers) > 0 {
+		builder.lookupTagsConsumers = dumpConfig.LookUpSelectorTagsConsumers
+	}
+
 	if fileContent.Transform != nil && !*fileContent.Transform {
 		return nil, ErrorTransformFalseNotSupported
 	}

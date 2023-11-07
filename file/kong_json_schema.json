@@ -638,9 +638,6 @@
         "service": {
           "type": "string"
         },
-        "shared_tag": {
-          "type": "string"
-        },
         "tags": {
           "items": {
             "type": "string"
@@ -1225,6 +1222,14 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "lookup_tags": {
+          "consumers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
         }
       },
       "additionalProperties": false,

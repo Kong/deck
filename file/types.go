@@ -316,7 +316,6 @@ type FPlugin struct {
 	kong.Plugin `yaml:",inline,omitempty"`
 
 	ConfigSource *string `json:"_config,omitempty" yaml:"_config,omitempty"`
-	SharedTag    *string `json:"shared_tag,omitempty" yaml:"shared_tag,omitempty"`
 }
 
 // foo is a shadow type of Plugin.
@@ -326,7 +325,6 @@ type foo struct {
 	ID            *string              `json:"id,omitempty" yaml:"id,omitempty"`
 	Name          *string              `json:"name,omitempty" yaml:"name,omitempty"`
 	InstanceName  *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
-	SharedTag     *string              `json:"shared_tag,omitempty" yaml:"shared_tag,omitempty"`
 	Config        kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
 	Service       string               `json:"service,omitempty" yaml:",omitempty"`
 	Consumer      string               `json:"consumer,omitempty" yaml:",omitempty"`
@@ -351,9 +349,6 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.InstanceName != nil {
 		f.InstanceName = p.InstanceName
-	}
-	if p.SharedTag != nil {
-		f.SharedTag = p.SharedTag
 	}
 	if p.Enabled != nil {
 		f.Enabled = p.Enabled
@@ -400,9 +395,6 @@ func copyFromFoo(f foo, p *FPlugin) {
 	}
 	if f.InstanceName != nil {
 		p.InstanceName = f.InstanceName
-	}
-	if f.SharedTag != nil {
-		p.SharedTag = f.SharedTag
 	}
 	if f.Enabled != nil {
 		p.Enabled = f.Enabled
@@ -605,8 +597,13 @@ type KongDefaults struct {
 // Info contains meta-data of the file.
 // +k8s:deepcopy-gen=true
 type Info struct {
-	SelectorTags []string     `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
-	Defaults     KongDefaults `json:"defaults,omitempty" yaml:"defaults,omitempty"`
+	SelectorTags       []string                `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
+	LookUpSelectorTags *LookUpSelectorTags     `json:"lookup_tags,omitempty" yaml:"lookup_tags,omitempty"`
+	Defaults           KongDefaults            `json:"defaults,omitempty" yaml:"defaults,omitempty"`
+}
+
+type LookUpSelectorTags struct {
+    Consumers []string `json:"consumers,omitempty" yaml:"consumers,omitempty"`
 }
 
 // Konnect contains configuration specific to Konnect.
