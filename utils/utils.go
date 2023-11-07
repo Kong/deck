@@ -22,8 +22,25 @@ var (
 
 	Kong140Version = semver.MustParse("1.4.0")
 	Kong300Version = semver.MustParse("3.0.0")
+	Kong320Version = semver.MustParse("3.2.0")
 	Kong340Version = semver.MustParse("3.4.0")
 )
+
+type ContextKey int
+
+const (
+	// KongVersionContextKey is the context key used to store the Kong version
+	// in the context.
+	KongVersionContextKey ContextKey = iota
+)
+
+func GetKongVersionFromContext(ctx context.Context) semver.Version {
+	v, ok := ctx.Value(KongVersionContextKey).(semver.Version)
+	if !ok {
+		return semver.Version{}
+	}
+	return v
+}
 
 var ErrorConsumerGroupUpgrade = errors.New(
 	"a rate-limiting-advanced plugin with config.consumer_groups\n" +

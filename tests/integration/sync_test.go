@@ -4814,3 +4814,50 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	// plugins do not have an updated_at field
 	// consumers do not have an updated_at field
 }
+
+// test scope:
+//   - 2.8.0+
+func Test_Sync_ConsumerGroupsWithTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=2.8.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	const (
+		noTags   = "testdata/sync/028-consumer-groups-tags/no_tags.yaml"
+		withTags = "testdata/sync/028-consumer-groups-tags/with_tags.yaml"
+	)
+
+	// create a consumer-group and a plugin with no tags
+	require.NoError(t, sync(noTags))
+
+	// get the current state
+	ctx := context.Background()
+	oldKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// create entities with select_tags
+	time.Sleep(time.Second)
+	require.NoError(t, sync(withTags))
+
+	// get the new state
+	newKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	// verify that entities with no tags were not wiped out by the sync with select_tags
+	require.Equal(t, len(oldKongState.ConsumerGroups), len(newKongState.ConsumerGroups))
+	require.Equal(
+		t,
+		oldKongState.ConsumerGroups[0].ConsumerGroup.CreatedAt,
+		newKongState.ConsumerGroups[0].ConsumerGroup.CreatedAt,
+	)
+	require.Equal(t, len(oldKongState.Plugins), len(newKongState.Plugins))
+	require.Equal(t, oldKongState.Plugins[0].CreatedAt, newKongState.Plugins[0].CreatedAt)
+}

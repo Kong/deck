@@ -248,6 +248,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
+		ctx = context.WithValue(ctx, utils.KongVersionContextKey, parsedKongVersion)
 		currentState, err = fetchCurrentState(ctx, kongClient, dumpConfig)
 		if err != nil {
 			return err

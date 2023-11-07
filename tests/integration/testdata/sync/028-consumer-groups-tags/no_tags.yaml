@@ -1,0 +1,9 @@
+_format_version: "3.0"
+consumer_groups:
+- name: my-cg
+  consumers:
+  - username: foo
+plugins:
+- name: prometheus
+consumers:
+- username: foo

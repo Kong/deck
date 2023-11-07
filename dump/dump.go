@@ -73,7 +73,14 @@ func getConsumerGroupsConfiguration(ctx context.Context, group *errgroup.Group,
 	client *kong.Client, config Config, state *utils.KongRawState,
 ) {
 	group.Go(func() error {
-		consumerGroups, err := GetAllConsumerGroups(ctx, client, config.SelectorTags)
+		var handleTags bool
+		kongVersionFromContext := utils.GetKongVersionFromContext(ctx)
+		if kongVersionFromContext.LT(utils.Kong320Version) {
+			handleTags = true
+		}
+		consumerGroups, err := GetAllConsumerGroups(
+			ctx, client, config.SelectorTags, handleTags,
+		)
 		if err != nil {
 			if kong.IsNotFoundErr(err) || kong.IsForbiddenErr(err) {
 				return nil
@@ -523,12 +530,35 @@ func GetAllUpstreams(ctx context.Context,
 	return upstreams, nil
 }
 
+func containsTags(inputTagsMap map[string]bool, tags []*string) bool {
+	if len(inputTagsMap) == 0 {
+		// no tags are present in input, so no filtering is expected.
+		return true
+	}
+	if len(tags) == 0 {
+		// entity is not tagged, but tags were present in the request.
+		return false
+	}
+	for _, cgTag := range tags {
+		if inputTagsMap[*cgTag] {
+			return true
+		}
+	}
+	return false
+}
+
 // GetAllConsumerGroups queries Kong for all the ConsumerGroups using client.
 func GetAllConsumerGroups(ctx context.Context,
-	client *kong.Client, tags []string,
+	client *kong.Client, tags []string, handleTags bool,
 ) ([]*kong.ConsumerGroupObject, error) {
 	var consumerGroupObjects []*kong.ConsumerGroupObject
 	opt := newOpt(tags)
+	tagsLen := len(tags)
+
+	tagsMap := make(map[string]bool, tagsLen)
+	for _, tag := range tags {
+		tagsMap[tag] = true
+	}
 
 	for {
 		cgs, nextopt, err := client.ConsumerGroups.List(ctx, opt)
@@ -540,6 +570,10 @@ func GetAllConsumerGroups(ctx context.Context,
 		}
 
 		for _, cg := range cgs {
+			if handleTags && !containsTags(tagsMap, cg.Tags) {
+				continue
+			}
+
 			r, err := client.ConsumerGroups.Get(ctx, cg.Name)
 			if err != nil {
 				return nil, err
