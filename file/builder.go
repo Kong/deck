@@ -6,11 +6,11 @@ import (
 	"fmt"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/dump"
 	"github.com/kong/deck/konnect"
 	"github.com/kong/deck/state"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
-	"github.com/kong/deck/dump"
 )
 
 const ratelimitingAdvancedPluginName = "rate-limiting-advanced"
