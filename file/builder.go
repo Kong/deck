@@ -945,9 +945,9 @@ func (b *stateBuilder) plugins() {
 	}
 
 	var plugins []FPlugin
+	sharedEntities := make(map[string]bool)
 	for _, p := range b.targetContent.Plugins {
 		p := p
-		sharedEntities := make(map[string]bool)
 		if p.SharedTag != nil && !sharedEntities[*p.SharedTag] {
 			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{*p.SharedTag})
 			for _, c := range consumersGlobal {
