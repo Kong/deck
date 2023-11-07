@@ -326,7 +326,6 @@ type foo struct {
 	ID            *string              `json:"id,omitempty" yaml:"id,omitempty"`
 	Name          *string              `json:"name,omitempty" yaml:"name,omitempty"`
 	InstanceName  *string              `json:"instance_name,omitempty" yaml:"instance_name,omitempty"`
-	SharedTag     *string              `json:"shared_tag,omitempty" yaml:"shared_tag,omitempty"`
 	Config        kong.Configuration   `json:"config,omitempty" yaml:"config,omitempty"`
 	Service       string               `json:"service,omitempty" yaml:",omitempty"`
 	Consumer      string               `json:"consumer,omitempty" yaml:",omitempty"`
@@ -351,9 +350,6 @@ func copyToFoo(p FPlugin) foo {
 	}
 	if p.InstanceName != nil {
 		f.InstanceName = p.InstanceName
-	}
-	if p.SharedTag != nil {
-		f.SharedTag = p.SharedTag
 	}
 	if p.Enabled != nil {
 		f.Enabled = p.Enabled
@@ -400,9 +396,6 @@ func copyFromFoo(f foo, p *FPlugin) {
 	}
 	if f.InstanceName != nil {
 		p.InstanceName = f.InstanceName
-	}
-	if f.SharedTag != nil {
-		p.SharedTag = f.SharedTag
 	}
 	if f.Enabled != nil {
 		p.Enabled = f.Enabled
