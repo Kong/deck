@@ -241,6 +241,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
+	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent, dumpConfig)
+	if err != nil {
+		fmt.Printf("Error adding global entities: %v\n", err)
+	}
+
 	if utils.Kong340Version.LTE(parsedKongVersion) {
 		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
@@ -322,6 +327,17 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
+}
+
+func determineLookUpSelectorTagsConsumers(targetContent file.Content, config dump.Config) ([]string, error) {
+	if targetContent.Info != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Consumers) > 0 {
+			utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
+			sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
+			return targetContent.Info.LookUpSelectorTags.Consumers, nil
+		}
+	}
+	return nil, fmt.Errorf("global tags empty")
 }
 
 func determineSelectorTag(targetContent file.Content, config dump.Config) ([]string, error) {

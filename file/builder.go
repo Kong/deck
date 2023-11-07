@@ -24,6 +24,7 @@ type stateBuilder struct {
 	kongVersion     semver.Version
 
 	selectTags   []string
+	lookupTagsConsumers   []string
 	skipCACerts  bool
 	intermediate *state.KongState
 
@@ -331,6 +332,19 @@ func (b *stateBuilder) consumers() {
 		if err != nil {
 			b.err = err
 			return
+		}
+
+		if b.lookupTagsConsumers != nil {
+			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, b.lookupTagsConsumers)
+			for _, c := range consumersGlobal {
+				err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+				if err != nil {
+					fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+				}
+			}
+			if err != nil {
+				fmt.Printf("Error retrieving global consumers: %v\n", err)
+			}
 		}
 
 		// ingest consumer into consumer group
@@ -947,18 +961,6 @@ func (b *stateBuilder) plugins() {
 	var plugins []FPlugin
 	for _, p := range b.targetContent.Plugins {
 		p := p
-		var sharedEntities bool
-		if p.SharedTag != nil && sharedEntities != true {
-			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{*p.SharedTag})
-			for _, c := range consumersGlobal {
-				b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
-			}
-			if err != nil {
-				fmt.Printf("Error retrieving global consumers: %w", err)
-			}
-			// add future logic for global entities
-			sharedEntities = true
-		}
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
 			c, err := b.intermediate.Consumers.GetByIDOrUsername(*p.Consumer.ID)
 			if errors.Is(err, state.ErrNotFound) {
