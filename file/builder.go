@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+	"sort"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/dump"
@@ -297,6 +299,19 @@ func (b *stateBuilder) consumers() {
 		return
 	}
 
+	if b.lookupTagsConsumers != nil {
+		consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, b.lookupTagsConsumers)
+		if err != nil {
+			fmt.Printf("Error retrieving global consumers: %v\n", err)
+		}
+		for _, c := range consumersGlobal {
+			b.targetContent.Consumers = append(b.targetContent.Consumers, FConsumer{Consumer: *c})
+			if err != nil {
+				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+			}
+		}
+	}
+
 	for _, c := range b.targetContent.Consumers {
 		c := c
 
@@ -323,7 +338,21 @@ func (b *stateBuilder) consumers() {
 				c.ID = kong.String(*consumer.ID)
 			}
 		}
-		utils.MustMergeTags(&c.Consumer, b.selectTags)
+
+		// Convert c.Tags from []*string to []string
+		stringTags := make([]string, len(c.Tags))
+		for i, tag := range c.Tags {
+			if tag != nil {
+				stringTags[i] = *tag
+			}
+		}
+		sort.Strings(stringTags)
+		sort.Strings(b.lookupTagsConsumers)
+		// Now compare the two []string slices
+		if !reflect.DeepEqual(stringTags, b.lookupTagsConsumers) {
+			utils.MustMergeTags(&c.Consumer, b.selectTags)
+		}
+
 		if consumer != nil {
 			c.Consumer.CreatedAt = consumer.CreatedAt
 		}
@@ -943,19 +972,6 @@ func (b *stateBuilder) ingestTargets(targets []kong.Target) error {
 func (b *stateBuilder) plugins() {
 	if b.err != nil {
 		return
-	}
-
-	if b.lookupTagsConsumers != nil {
-		consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, b.lookupTagsConsumers)
-		if err != nil {
-			fmt.Printf("Error retrieving global consumers: %v\n", err)
-		}
-		for _, c := range consumersGlobal {
-			err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
-			if err != nil {
-				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
-			}
-		}
 	}
 
 	var plugins []FPlugin
