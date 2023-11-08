@@ -3,8 +3,9 @@ package file
 import (
 	"context"
 	"errors"
-	"regexp"
 	"fmt"
+	"fmt"
+	"regexp"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/dump"
