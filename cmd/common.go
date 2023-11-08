@@ -193,10 +193,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var kongVersion string
 	var parsedKongVersion semver.Version
 	if mode == modeKonnect {
-		kongVersion, err = fetchKonnectKongVersion(ctx, kongClient)
-		if err != nil {
-			return fmt.Errorf("reading Konnect Kong version: %w", err)
-		}
+		kongVersion = fetchKonnectKongVersion()
 	} else {
 		kongVersion, err = fetchKongVersion(ctx, wsConfig)
 		if err != nil {
