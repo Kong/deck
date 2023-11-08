@@ -238,7 +238,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent, dumpConfig)
+	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
 	if err != nil {
 		fmt.Printf("Error adding global entities: %v\n", err)
 	}
@@ -326,7 +326,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
-func determineLookUpSelectorTagsConsumers(targetContent file.Content, config dump.Config) ([]string, error) {
+func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string, error) {
 	if targetContent.Info != nil {
 		if len(targetContent.Info.LookUpSelectorTags.Consumers) > 0 {
 			utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
