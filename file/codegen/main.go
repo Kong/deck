@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
+	"os"
 	"reflect"
 
 	"github.com/alecthomas/jsonschema"
@@ -114,7 +114,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	err = ioutil.WriteFile("kong_json_schema.json", jsonSchema, 0o644)
+	err = os.WriteFile("kong_json_schema.json", jsonSchema, 0o644)
 	if err != nil {
 		log.Fatalln(err)
 	}

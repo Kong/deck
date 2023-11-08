@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -812,7 +811,7 @@ func WriteContentToFile(content *Content, filename string, format Format) error 
 	} else {
 		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))
 		prefix, _ := filepath.Split(filename)
-		if err := ioutil.WriteFile(filename, c, 0o600); err != nil {
+		if err := os.WriteFile(filename, c, 0o600); err != nil {
 			return fmt.Errorf("writing file: %w", err)
 		}
 		for _, sp := range content.ServicePackages {
