@@ -28,6 +28,8 @@ type Config struct {
 	// tags.
 	SelectorTags []string
 
+	// LookUpSelectorTagsConsumers can be used to lookup entities using other
+	// tags.
 	LookUpSelectorTagsConsumers []string
 
 	// KonnectControlPlane
@@ -95,16 +97,12 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 		if err != nil {
 			return fmt.Errorf("consumers: %w", err)
 		}
-
 		if config.LookUpSelectorTagsConsumers!= nil {
 			updatedConsumers, err := GetAllGlobalConsumers(ctx, client, config.LookUpSelectorTagsConsumers, consumers)
 			if err != nil {
 				fmt.Errorf("error retrieving global consumers: %w", err)
 			}
 			consumers = updatedConsumers
-		}
-		for _, c := range consumers {
-			fmt.Printf("Tags: %v\n", *c.Username)
 		}
 		state.Consumers = consumers
 		return nil
