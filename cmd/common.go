@@ -247,6 +247,19 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
 
+	if dumpConfig.LookUpSelectorTagsConsumers != nil {
+		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
+		if err != nil {
+			fmt.Printf("Error retrieving global consumers: %v\n", err)
+		}
+		for _, c := range consumersGlobal {
+			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
+			if err != nil {
+				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+			}
+		}
+	}
+
 	// read the current state
 	var currentState *state.KongState
 	if workspaceExists {
