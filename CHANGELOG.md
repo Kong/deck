@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.29.2](#v1292)
 - [v1.29.1](#v1291)
 - [v1.29.0](#v1290)
 - [v1.28.1](#v1281)
@@ -69,6 +70,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.29.2]
+
+> Release date: 2023/11/08
+
+### Fixes
+
+- Avoid unnecessary Konnect API call to retrieve its version.
+  [#1095](https://github.com/Kong/deck/pull/1095)
+- Correct default values when using `gateway dump`.
+  [#1094](https://github.com/Kong/deck/pull/1094)
 
 ## [v1.29.1]
 
@@ -1473,6 +1485,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.29.2]: https://github.com/kong/deck/compare/v1.29.1...v1.29.2
 [v1.29.1]: https://github.com/kong/deck/compare/v1.29.0...v1.29.1
 [v1.29.0]: https://github.com/kong/deck/compare/v1.28.1...v1.29.0
 [v1.28.1]: https://github.com/kong/deck/compare/v1.28.0...v1.28.1
