@@ -97,10 +97,10 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 		if err != nil {
 			return fmt.Errorf("consumers: %w", err)
 		}
-		if config.LookUpSelectorTagsConsumers!= nil {
+		if config.LookUpSelectorTagsConsumers != nil {
 			updatedConsumers, err := GetAllGlobalConsumers(ctx, client, config.LookUpSelectorTagsConsumers, consumers)
 			if err != nil {
-				fmt.Errorf("error retrieving global consumers: %w", err)
+				return fmt.Errorf("error retrieving global consumers: %w", err)
 			}
 			consumers = updatedConsumers
 		}
@@ -513,7 +513,7 @@ func GetAllConsumers(ctx context.Context,
 // GetAllGlobalConsumers queries Kong for all the globlal consumers using client.
 // Please use this method with caution if you have a lot of consumers.
 func GetAllGlobalConsumers(ctx context.Context,
-	client *kong.Client, tags []string, 
+	client *kong.Client, tags []string,
 	consumers []*kong.Consumer,
 ) ([]*kong.Consumer, error) {
 	opt := newOpt(tags)
