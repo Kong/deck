@@ -331,10 +331,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string, error) {
 	if targetContent.Info != nil {
-		if len(targetContent.Info.LookUpSelectorTags.Consumers) > 0 {
-			utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
-			sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
-			return targetContent.Info.LookUpSelectorTags.Consumers, nil
+		if targetContent.Info.LookUpSelectorTags.Consumers != nil {
+			if len(targetContent.Info.LookUpSelectorTags.Consumers) == 0 {
+				return nil, fmt.Errorf("global consumers specify but no global tags")
+			}
+			if len(targetContent.Info.LookUpSelectorTags.Consumers) > 0 {
+				utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
+				sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
+				return targetContent.Info.LookUpSelectorTags.Consumers, nil
+			}
 		}
 	}
 	return nil, nil
