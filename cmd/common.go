@@ -246,10 +246,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		fmt.Printf("Error adding global entities: %v\n", err)
 	}
 
-	if utils.Kong340Version.LTE(parsedKongVersion) {
-		dumpConfig.IsConsumerGroupScopedPluginSupported = true
-	}
-
 	if dumpConfig.LookUpSelectorTagsConsumers != nil {
 		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
 		if err != nil {
@@ -261,6 +257,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
 			}
 		}
+	}
+
+	if utils.Kong340Version.LTE(parsedKongVersion) {
+		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
 
 	// read the current state
