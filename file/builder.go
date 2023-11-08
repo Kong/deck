@@ -334,19 +334,6 @@ func (b *stateBuilder) consumers() {
 			return
 		}
 
-		if b.lookupTagsConsumers != nil {
-			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, b.lookupTagsConsumers)
-			for _, c := range consumersGlobal {
-				err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
-				if err != nil {
-					fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
-				}
-			}
-			if err != nil {
-				fmt.Printf("Error retrieving global consumers: %v\n", err)
-			}
-		}
-
 		// ingest consumer into consumer group
 		if err := b.ingestIntoConsumerGroup(c); err != nil {
 			b.err = err
@@ -956,6 +943,19 @@ func (b *stateBuilder) ingestTargets(targets []kong.Target) error {
 func (b *stateBuilder) plugins() {
 	if b.err != nil {
 		return
+	}
+
+	if b.lookupTagsConsumers != nil {
+		consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, b.lookupTagsConsumers)
+		if err != nil {
+			fmt.Printf("Error retrieving global consumers: %v\n", err)
+		}
+		for _, c := range consumersGlobal {
+			err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+			if err != nil {
+				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+			}
+		}
 	}
 
 	var plugins []FPlugin

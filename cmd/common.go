@@ -334,7 +334,7 @@ func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string,
 			return targetContent.Info.LookUpSelectorTags.Consumers, nil
 		}
 	}
-	return nil, fmt.Errorf("global tags empty")
+	return nil, nil
 }
 
 func determineSelectorTag(targetContent file.Content, config dump.Config) ([]string, error) {
