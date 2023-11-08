@@ -3,6 +3,7 @@ package file
 import (
 	"context"
 	"errors"
+	"regexp"
 	"fmt"
 
 	"github.com/blang/semver/v4"
@@ -945,24 +946,31 @@ func (b *stateBuilder) plugins() {
 	}
 
 	var plugins []FPlugin
+	var SharedUser, SharedTag string
 	sharedEntities := make(map[string]bool)
 	for _, p := range b.targetContent.Plugins {
 		p := p
-		if p.SharedTag != nil && !sharedEntities[*p.SharedTag] {
-			consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{*p.SharedTag})
-			for _, c := range consumersGlobal {
-				err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
-				if err != nil {
-					fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
-				}
-			}
-			if err != nil {
-				fmt.Printf("Error retrieving global consumers: %v\n", err)
-			}
-			// add future logic for global entities
-			sharedEntities[*p.SharedTag] = true
-		}
 		if p.Consumer != nil && !utils.Empty(p.Consumer.ID) {
+			shareTagRegex := regexp.MustCompile(`\/\/([^/]+)/(.+)$`)
+			matches := shareTagRegex.FindStringSubmatch(*p.Consumer.ID)
+			if len(matches) >= 2 {
+				SharedTag, SharedUser = matches[1], matches[2]
+				*p.Consumer.ID = SharedUser
+			}
+			if SharedTag != "" && !sharedEntities[SharedTag] {
+				consumersGlobal, err := dump.GetAllConsumers(b.ctx, b.client, []string{SharedTag})
+				if err != nil {
+					fmt.Printf("Error retrieving global consumers: %v\n", err)
+				}
+				for _, c := range consumersGlobal {
+					err = b.intermediate.Consumers.Add(state.Consumer{Consumer: *c})
+					if err != nil {
+						fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+					}
+				}
+				// add future logic for global entities
+				sharedEntities[SharedTag] = true
+			}
 			c, err := b.intermediate.Consumers.GetByIDOrUsername(*p.Consumer.ID)
 			if errors.Is(err, state.ErrNotFound) {
 				b.err = fmt.Errorf("consumer %v for plugin %v: %w",
