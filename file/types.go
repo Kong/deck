@@ -602,8 +602,8 @@ type Info struct {
 	Defaults           KongDefaults        `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
-// LookUpSelectorTags contains share tag to lookup
-// for corresponding entities.
+// LookUpSelectorTags contains tags to lookup
+// for corresponding entities already in Kong.
 // +k8s:deepcopy-gen=true
 type LookUpSelectorTags struct {
 	Consumers []string `json:"consumers,omitempty" yaml:"consumers,omitempty"`
