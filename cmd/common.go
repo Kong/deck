@@ -240,18 +240,18 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
 	if err != nil {
-		fmt.Printf("Error adding global entities: %v\n", err)
+		return fmt.Errorf("error determining lookup selector tags: %w", err)
 	}
 
 	if dumpConfig.LookUpSelectorTagsConsumers != nil {
 		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
 		if err != nil {
-			fmt.Printf("Error retrieving global consumers: %v\n", err)
+			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
 		}
 		for _, c := range consumersGlobal {
 			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
 			if err != nil {
-				fmt.Printf("Error adding global consumer %v: %v\n", *c.Username, err)
+				return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
 			}
 		}
 	}
@@ -340,17 +340,16 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 }
 
 func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string, error) {
-	if targetContent.Info != nil {
-		if targetContent.Info.LookUpSelectorTags.Consumers != nil {
-			if len(targetContent.Info.LookUpSelectorTags.Consumers) == 0 {
-				return nil, fmt.Errorf("global consumers specify but no global tags")
-			}
-			if len(targetContent.Info.LookUpSelectorTags.Consumers) > 0 {
-				utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
-				sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
-				return targetContent.Info.LookUpSelectorTags.Consumers, nil
-			}
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.Consumers != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Consumers) == 0 {
+			return nil, fmt.Errorf("global consumers specified but no global tags")
 		}
+		utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
+		return targetContent.Info.LookUpSelectorTags.Consumers, nil
+
 	}
 	return nil, nil
 }
