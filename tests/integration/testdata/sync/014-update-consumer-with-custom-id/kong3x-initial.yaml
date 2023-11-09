@@ -1,4 +1,4 @@
 _format_version: "3.0"
 consumers:
-- custom_id: custom_test
-  username: test
+- custom_id: test_consumer_3x_custom_intial_test
+  username: test_consumer_3x

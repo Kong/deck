@@ -1,5 +1,8 @@
 # Table of Contents
 
+- [v1.29.2](#v1292)
+- [v1.29.1](#v1291)
+- [v1.29.0](#v1290)
 - [v1.28.1](#v1281)
 - [v1.28.0](#v1280)
 - [v1.27.1](#v1271)
@@ -68,6 +71,40 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.29.2]
+
+> Release date: 2023/11/08
+
+### Fixes
+
+- Avoid unnecessary Konnect API call to retrieve its version.
+  [#1095](https://github.com/Kong/deck/pull/1095)
+- Correct default values when using `gateway dump`.
+  [#1094](https://github.com/Kong/deck/pull/1094)
+
+## [v1.29.1]
+
+> Release date: 2023/11/07
+
+### Fixes
+
+- Correct a bug preventing logins with Konnect in the EU region.
+  [#1089](https://github.com/Kong/deck/pull/1089)
+
+## [v1.29.0]
+
+> Release date: 2023/11/03
+
+### Added
+
+- Add support for konnect AU region.
+  [#1082](https://github.com/Kong/deck/pull/1082)
+
+### Fixes
+
+- Resolved an issue in the `deck file validate` and `deck gateway validate` commands that prevented them from properly processing the provided file arguments.
+  [#1084](https://github.com/Kong/deck/pull/1084)
+
 
 ## [v1.28.1]
 
@@ -89,12 +126,12 @@
 compatibility, but in the future that will be removed. Please update to the new structure
 (see 'changes')._
 
-> __IMPORTANT__: _The recently added decK command `deck file openapi2kong` implemented different techniques for 
-generating decK configuration from OpenAPI spec files then the legacy `inso` tool. In particular, entity names and identifiers 
+> __IMPORTANT__: _The recently added decK command `deck file openapi2kong` implemented different techniques for
+generating decK configuration from OpenAPI spec files then the legacy `inso` tool. In particular, entity names and identifiers
 were generated differently in the more recent implementation. For existing `inso` users, this may cause issues with migrating
-to the new tool as names and IDs are used by Kong Gateway to identify entities. In response we have added a 
+to the new tool as names and IDs are used by Kong Gateway to identify entities. In response we have added a
 `--inso-compatible` flag to the `deck file openapi2kong` command to support a smoother migration for these users. For more
-information on this and other APIOps commands, see the 
+information on this and other APIOps commands, see the
 [go-apiops documentation page](https://github.com/Kong/go-apiops/tree/main/docs).
 
 ### Added
@@ -117,11 +154,16 @@ information on this and other APIOps commands, see the
   [#1051](https://github.com/Kong/deck/pull/1051)
 - The top-level CLI commands have been restructured. All commands now live under 2
   subcommands (`gateway` and `file`) to clarify their use and (in the future) reduce the clutter of
-  the many global flags only relevant to a few commands. 
-  The new commands are more unix-like, and preferably default to stdin/stdout and no longer to "`kong.yaml`".
+  the many global flags only relevant to a few commands.
   Using the old commands will still work but
   will print a deprecation notice. Please update your usage to the new commands.
-  [#962](https://github.com/Kong/deck/pull/962)
+  The new commands are more unix-like;
+
+  - default to `stdin`/`stdout` and no longer to "`kong.yaml`"
+  - the `-s` / `--state` flag is gone, files can be listed without the flag
+  - the `--online` flag for `validate` is gone; use `gateway validate` for online, `file validate` for local.
+
+  PR [#962](https://github.com/Kong/deck/pull/962)
 
 ## [v1.27.1]
 
@@ -1443,6 +1485,9 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.29.2]: https://github.com/kong/deck/compare/v1.29.1...v1.29.2
+[v1.29.1]: https://github.com/kong/deck/compare/v1.29.0...v1.29.1
+[v1.29.0]: https://github.com/kong/deck/compare/v1.28.1...v1.29.0
 [v1.28.1]: https://github.com/kong/deck/compare/v1.28.0...v1.28.1
 [v1.28.0]: https://github.com/kong/deck/compare/v1.27.1...v1.28.0
 [v1.27.1]: https://github.com/kong/deck/compare/v1.27.0...v1.27.1

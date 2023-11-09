@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -106,8 +105,7 @@ func hasLeadingSpace(fileContent string) bool {
 // readContent reads all the byes until io.EOF and unmarshals the read
 // bytes into Content.
 func readContent(reader io.Reader, mockEnvVars bool) (*Content, error) {
-	var err error
-	contentBytes, err := ioutil.ReadAll(reader)
+	contentBytes, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}

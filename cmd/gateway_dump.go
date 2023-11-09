@@ -67,12 +67,6 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 
 	// Kong Enterprise dump all workspace
 	if dumpAllWorkspaces {
-		if dumpWorkspace != "" {
-			return fmt.Errorf("workspace cannot be specified with --all-workspace flag")
-		}
-		if dumpCmdKongStateFile != defaultFileOutName {
-			return fmt.Errorf("output-file cannot be specified with --all-workspace flag")
-		}
 		workspaces, err := listWorkspaces(ctx, wsClient)
 		if err != nil {
 			return err
@@ -170,15 +164,6 @@ configure Kong.`,
 		RunE: execute,
 	}
 
-	if deprecated {
-		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
-			fileOutDefault, "file to which to write Kong's configuration."+
-				"Use `-` to write to stdout.")
-	} else {
-		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
-			fileOutDefault, "file to which to write Kong's configuration."+
-				"Use `-` to write to stdout.")
-	}
 	dumpCmd.Flags().StringVar(&dumpCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml.")
 	dumpCmd.Flags().BoolVar(&dumpWithID, "with-id",
@@ -201,5 +186,17 @@ configure Kong.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
+	if deprecated {
+		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
+			fileOutDefault, "file to which to write Kong's configuration."+
+				"Use `-` to write to stdout.")
+	} else {
+		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFile, "output-file", "o",
+			fileOutDefault, "file to which to write Kong's configuration."+
+				"Use `-` to write to stdout.")
+	}
+	dumpCmd.MarkFlagsMutuallyExclusive("output-file", "all-workspaces")
+	dumpCmd.MarkFlagsMutuallyExclusive("workspace", "all-workspaces")
+
 	return dumpCmd
 }

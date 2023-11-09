@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -13,7 +13,13 @@ func hasError(res *http.Response) error {
 		return nil
 	}
 
-	body, _ := ioutil.ReadAll(res.Body) // TODO error in error?
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return &APIError{
+			httpCode: res.StatusCode,
+			message:  fmt.Sprintf("<failed to read response body: %v>", err),
+		}
+	}
 	return &APIError{
 		httpCode: res.StatusCode,
 		message:  messageFromBody(body),
