@@ -29,10 +29,11 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/sync v0.3.0
-	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/code-generator v0.28.3
 	sigs.k8s.io/yaml v1.4.0
 )
+
+require gopkg.in/yaml.v2 v2.4.0 // indirect
 
 require (
 	atomicgo.dev/cursor v0.1.1 // indirect
