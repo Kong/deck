@@ -14,13 +14,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	"github.com/kong/go-kong/kong"
-
 	deckDump "github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
+	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -161,7 +159,7 @@ var (
 	}
 
 	// has run-on set to 'first'
-	plugin_143_151 = []*kong.Plugin{
+	plugin_143_151 = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("basic-auth"),
 			Protocols: []*string{
@@ -197,7 +195,7 @@ var (
 		},
 	}
 
-	plugin_on_entities = []*kong.Plugin{
+	plugin_on_entities = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -248,7 +246,7 @@ var (
 		},
 	}
 
-	plugin_on_entities3x = []*kong.Plugin{
+	plugin_on_entities3x = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -311,7 +309,7 @@ var (
 		},
 	}
 
-	upstream_pre31 = []*kong.Upstream{
+	upstream_pre31 = []*kong.Upstream{ //nolint:revive,stylecheck
 		{
 			Name:      kong.String("upstream1"),
 			Algorithm: kong.String("round-robin"),
@@ -647,59 +645,6 @@ var (
 		},
 	}
 
-	consumerGroupsWithRLAKonnect = []*kong.ConsumerGroupObject{
-		{
-			ConsumerGroup: &kong.ConsumerGroup{
-				Name: kong.String("silver"),
-				Tags: kong.StringSlice("tag1", "tag3"),
-			},
-			Consumers: []*kong.Consumer{
-				{
-					Username: kong.String("bar"),
-				},
-			},
-			Plugins: []*kong.ConsumerGroupPlugin{
-				{
-					Name: kong.String("rate-limiting-advanced"),
-					Config: kong.Configuration{
-						"limit":                  []any{float64(7)},
-						"retry_after_jitter_max": float64(1),
-						"window_size":            []any{float64(60)},
-						"window_type":            "sliding",
-					},
-					ConsumerGroup: &kong.ConsumerGroup{
-						ID: kong.String("521a90ad-36cb-4e31-a5db-1d979aee40d1"),
-					},
-				},
-			},
-		},
-		{
-			ConsumerGroup: &kong.ConsumerGroup{
-				Name: kong.String("gold"),
-				Tags: kong.StringSlice("tag1", "tag2"),
-			},
-			Consumers: []*kong.Consumer{
-				{
-					Username: kong.String("foo"),
-				},
-			},
-			Plugins: []*kong.ConsumerGroupPlugin{
-				{
-					Name: kong.String("rate-limiting-advanced"),
-					Config: kong.Configuration{
-						"limit":                  []any{float64(10)},
-						"retry_after_jitter_max": float64(1),
-						"window_size":            []any{float64(60)},
-						"window_type":            "sliding",
-					},
-					ConsumerGroup: &kong.ConsumerGroup{
-						ID: kong.String("92177268-b134-42f9-909a-36f9d2d3d5e7"),
-					},
-				},
-			},
-		},
-	}
-
 	consumerGroupsWithRLAApp = []*kong.ConsumerGroupObject{
 		{
 			ConsumerGroup: &kong.ConsumerGroup{
@@ -748,52 +693,6 @@ var (
 					},
 				},
 			},
-		},
-	}
-
-	rlaPlugin = []*kong.Plugin{
-		{
-			Name: kong.String("rate-limiting-advanced"),
-			Config: kong.Configuration{
-				"consumer_groups":         []any{string("silver"), string("gold")},
-				"dictionary_name":         string("kong_rate_limiting_counters"),
-				"enforce_consumer_groups": bool(true),
-				"header_name":             nil,
-				"hide_client_headers":     bool(false),
-				"identifier":              string("consumer"),
-				"limit":                   []any{float64(10)},
-				"namespace":               string("dNRC6xKsRL8Koc1uVYA4Nki6DLW7XIdx"),
-				"path":                    nil,
-				"redis": map[string]any{
-					"cluster_addresses":   nil,
-					"connect_timeout":     nil,
-					"database":            float64(0),
-					"host":                nil,
-					"keepalive_backlog":   nil,
-					"keepalive_pool_size": float64(30),
-					"password":            nil,
-					"port":                nil,
-					"read_timeout":        nil,
-					"send_timeout":        nil,
-					"sentinel_addresses":  nil,
-					"sentinel_master":     nil,
-					"sentinel_password":   nil,
-					"sentinel_role":       nil,
-					"sentinel_username":   nil,
-					"server_name":         nil,
-					"ssl":                 false,
-					"ssl_verify":          false,
-					"timeout":             float64(2000),
-					"username":            nil,
-				},
-				"retry_after_jitter_max": float64(0),
-				"strategy":               string("local"),
-				"sync_rate":              float64(-1),
-				"window_size":            []any{float64(60)},
-				"window_type":            string("sliding"),
-			},
-			Enabled:   kong.Bool(true),
-			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
 		},
 	}
 
@@ -3872,7 +3771,8 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 	}
 }
 
-// In the tests we're concerned only with the IDs and names of the entities we'll ignore other fields when comparing states.
+// In the tests we're concerned only with the IDs and names of the entities
+// we'll ignore other fields when comparing states.
 var ignoreFieldsIrrelevantForIDsTests = []cmp.Option{
 	cmpopts.IgnoreFields(
 		kong.Plugin{},
@@ -4524,7 +4424,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 		{
 			name:          "attempt to create deprecated consumer groups configuration with Kong version >= 3.4.0 fails",
 			kongFile:      "testdata/sync/017-consumer-groups-rla-application/kong3x.yaml",
-			expectedError: fmt.Errorf("building state: %v", utils.ErrorConsumerGroupUpgrade),
+			expectedError: fmt.Errorf("building state: %w", utils.ErrorConsumerGroupUpgrade),
 		},
 		{
 			name:     "empty deprecated consumer groups configuration fields do not fail with Kong version >= 3.4.0",
