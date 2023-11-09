@@ -4698,25 +4698,29 @@ func Test_Sync_KonnectRename(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
+
 			if tc.controlPlaneName != "" {
+				t.Logf("running test against DECK_KONNECT_CONTROL_PLANE_NAME %s", tc.controlPlaneName)
 				t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", tc.controlPlaneName)
 				t.Cleanup(func() {
 					reset(t, "--konnect-control-plane-name", tc.controlPlaneName)
 				})
 			} else if tc.runtimeGroupName != "" {
+				t.Logf("running test against DECK_KONNECT_RUNTIME_GROUP_NAME %s", tc.runtimeGroupName)
 				t.Setenv("DECK_KONNECT_RUNTIME_GROUP_NAME", tc.runtimeGroupName)
 				t.Cleanup(func() {
 					reset(t, "--konnect-runtime-group-name", tc.runtimeGroupName)
 				})
 			}
+
 			client, err := getTestClient()
-			if err != nil {
-				t.Fatalf(err.Error())
-			}
-			sync(tc.kongFile, tc.flags...)
+			require.NoError(t, err)
+
+			require.NoError(t, sync(tc.kongFile, tc.flags...))
 			testKongState(t, client, true, tc.expectedState, nil)
 		})
 	}

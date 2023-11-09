@@ -14,6 +14,7 @@ import (
 	deckDump "github.com/kong/deck/dump"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert"
 )
 
 func int32p(i int) *int32 {
@@ -174,6 +175,8 @@ func sortSlices(x, y interface{}) bool {
 func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	expectedState utils.KongRawState, ignoreFields []cmp.Option,
 ) {
+	t.Helper()
+
 	// Get entities from Kong
 	ctx := context.Background()
 	dumpConfig := deckDump.Config{}
@@ -181,7 +184,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		dumpConfig.RBACResourcesOnly = true
 	}
 	if isKonnect {
-		controlPlaneName := os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+		controlPlaneName := os.Getenv("DECK_KONNECT_RUNTIME_GROUP_NAME")
 		if controlPlaneName == "" {
 			controlPlaneName = os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
 		}
@@ -219,20 +222,20 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	opt = append(opt, ignoreFields...)
 
 	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
-		t.Errorf(diff)
+		t.Errorf("Not expecting diff in kong state but got:\n%s", diff)
 	}
 }
 
 func reset(t *testing.T, opts ...string) {
+	t.Helper()
+
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"reset", "--force"}
+	args := []string{"gateway", "reset", "--force"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	if err := deckCmd.Execute(); err != nil {
-		t.Fatalf(err.Error(), "failed to reset Kong's state")
-	}
+	assert.NoError(t, deckCmd.Execute(), "failed to reset Kong's state")
 }
 
 func readFile(filepath string) (string, error) {
@@ -258,7 +261,7 @@ func setup(t *testing.T) {
 
 func sync(kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"sync", "-s", kongFile}
+	args := []string{"gateway", "sync", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
