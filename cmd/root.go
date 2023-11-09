@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -301,7 +300,7 @@ func initConfig() {
 	if caCertContent == "" {
 		caCertFileContent := viper.GetString("ca-cert-file")
 		if caCertFileContent != "" {
-			fileContent, err := ioutil.ReadFile(caCertFileContent)
+			fileContent, err := os.ReadFile(caCertFileContent)
 			if err != nil {
 				fmt.Printf("read file %q: %s", caCertFileContent, err)
 				os.Exit(1)
@@ -325,7 +324,7 @@ func initConfig() {
 	if clientCertContent == "" {
 		clientCertFileContent := viper.GetString("tls-client-cert-file")
 		if clientCertFileContent != "" {
-			fileContent, err := ioutil.ReadFile(clientCertFileContent)
+			fileContent, err := os.ReadFile(clientCertFileContent)
 			if err != nil {
 				fmt.Printf("read file %q: %s", clientCertFileContent, err)
 				os.Exit(1)
@@ -341,7 +340,7 @@ func initConfig() {
 	if clientKeyContent == "" {
 		clientKeyFileContent := viper.GetString("tls-client-key-file")
 		if clientKeyFileContent != "" {
-			fileContent, err := ioutil.ReadFile(clientKeyFileContent)
+			fileContent, err := os.ReadFile(clientKeyFileContent)
 			if err != nil {
 				fmt.Printf("read file %q: %s", clientKeyFileContent, err)
 				os.Exit(1)
@@ -376,7 +375,7 @@ func initKonnectConfig() error {
 	// read from password file only if password is not supplied using an
 	// environment variable or flag
 	if password == "" && passwordFile != "" {
-		fileContent, err := ioutil.ReadFile(passwordFile)
+		fileContent, err := os.ReadFile(passwordFile)
 		if err != nil {
 			return fmt.Errorf("read file %q: %w", passwordFile, err)
 		}
@@ -392,7 +391,7 @@ func initKonnectConfig() error {
 	// read from token file only if token is not supplied using an
 	// environment variable or flag
 	if token == "" && tokenFile != "" {
-		fileContent, err := ioutil.ReadFile(tokenFile)
+		fileContent, err := os.ReadFile(tokenFile)
 		if err != nil {
 			return fmt.Errorf("read file %q: %w", tokenFile, err)
 		}
