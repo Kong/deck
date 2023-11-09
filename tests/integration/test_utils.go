@@ -51,29 +51,39 @@ func getTestClient() (*kong.Client, error) {
 }
 
 func runWhenKonnect(t *testing.T) {
+	t.Helper()
+
 	if os.Getenv("DECK_KONNECT_EMAIL") == "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") == "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") == "" {
-		t.Log("non-Konnect test instance, skipping")
-		t.Skip()
+		t.Skip("non-Konnect test instance, skipping")
 	}
 }
 
 func skipWhenKonnect(t *testing.T) {
-	if os.Getenv("DECK_KONNECT_EMAIL") != "" || os.Getenv("DECK_KONNECT_PASSWORD") != "" {
-		t.Log("non-Kong test instance, skipping")
-		t.Skip()
+	t.Helper()
+
+	if os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		t.Skip("non-Kong test instance, skipping")
 	}
 }
 
 func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
-	if os.Getenv("DECK_KONNECT_EMAIL") != "" && os.Getenv("DECK_KONNECT_PASSWORD") != "" {
+	t.Helper()
+
+	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
+		os.Getenv("DECK_KONNECT_TOKEN") != "" {
 		return
 	}
 	kong.RunWhenKong(t, kongSemverRange)
 }
 
 func runWhen(t *testing.T, mode string, semverRange string) {
+	t.Helper()
+
 	switch mode {
 	case "kong":
 		skipWhenKonnect(t)
@@ -324,7 +334,7 @@ func lint(opts ...string) (string, error) {
 
 func ping(opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"ping"}
+	args := []string{"gateway", "ping"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
