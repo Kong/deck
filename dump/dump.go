@@ -102,7 +102,19 @@ func getConsumerConfiguration(ctx context.Context, group *errgroup.Group,
 			if err != nil {
 				return fmt.Errorf("error retrieving global consumers: %w", err)
 			}
-			consumers = append(consumers, globalConsumers...)
+			// if globalConsumers are not present, add them.
+			for _, globalConsumer := range globalConsumers {
+				found := false
+				for _, consumer := range consumers {
+					if *globalConsumer.ID == *consumer.ID {
+						found = true
+						break
+					}
+				}
+				if !found {
+					consumers = append(consumers, globalConsumer)
+				}
+			}
 		}
 		state.Consumers = consumers
 		return nil
