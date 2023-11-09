@@ -9,6 +9,7 @@ jobs:
       DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
       DECK_KONNECT_PASSWORD : ${{ secrets.DECK_KONNECT_PASSWORD }}
       DECK_KONNECT_ADDR : ${{ secrets.DECK_KONNECT_ADDR }}
+      DECK_KONNECT_TOKEN : ${{ secrets.DECK_KONNECT_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup go
