@@ -4814,3 +4814,41 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	// plugins do not have an updated_at field
 	// consumers do not have an updated_at field
 }
+
+// Test_Sync_LookupConsumerTags tests that existing behavior when referencing
+// consumers from plugins is preserved:
+// - if a referenced consumer is not present in the state file, the sync fails
+// - if a referenced consumer is present in the state file, the sync succeeds
+//
+// This test also tests that the new behavior is implemented correctly:
+//   - if a referenced consumer is not present in the state file, but is present
+//     in Kong when using the new lookup selector tags, the sync succeeds
+//   - if a referenced consumer is not present in the state file and neither in
+//     Kong when using the new lookup selector tags, the sync fails
+func Test_Sync_LookupConsumerTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	// test that reference to non-existing consumer fails.
+	pluginsNoLookupStateFile := "testdata/sync/028-lookup-tags/plugins_no_lookup.yaml"
+	err := sync(pluginsNoLookupStateFile)
+	require.Error(t, err)
+	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to existing local consumer succeeds.
+	pluginsAndConsumersStateFile := "testdata/sync/028-lookup-tags/plugins_and_consumers.yaml"
+	require.NoError(t, sync(pluginsAndConsumersStateFile))
+	reset(t)
+
+	// test that reference to existing global consumer succeeds via lookup tags.
+	globalConsumersStateFile := "testdata/sync/028-lookup-tags/global_consumers.yaml"
+	require.NoError(t, sync(globalConsumersStateFile))
+	// sync plugins with lookup reference to global consumers.
+	pluginsLookupStateFile := "testdata/sync/028-lookup-tags/plugins_lookup.yaml"
+	require.NoError(t, sync(pluginsLookupStateFile))
+	reset(t)
+
+	// test that reference to non-existing global consumer fails via lookup tags.
+	require.Error(t, sync(pluginsLookupStateFile))
+	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
+}
