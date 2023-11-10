@@ -23,9 +23,9 @@ builds:
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ .Tag }}"
+  name_template: "{{ .Tag }}_CMA"
 nfpms:
-- file_name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Arch }}'
+- file_name_template: '{{ .ProjectName }}_{{ .Tag }}_CMA_{{ .Arch }}'
   homepage: https://github.com/kong/deck
   description: Declarative configuration for Kong
   maintainer: Harry Bagdi <harrybagdi@gmail.com>
