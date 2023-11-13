@@ -16,16 +16,6 @@ lint:
 build:
 	CGO_ENABLED=0 go build -o deck main.go
 
-.PHONY: verify-codegen
-verify-codegen:
-	./scripts/verify-codegen.sh
-	./scripts/verify-deepcopy-gen.sh
-
-.PHONY: update-codegen
-update-codegen:
-	./scripts/update-deepcopy-gen.sh
-	go generate ./...
-
 .PHONY: coverage
 coverage:
 	go test -race -v -count=1 -coverprofile=coverage.out.tmp ./...
