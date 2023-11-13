@@ -5,19 +5,19 @@ TMP_DIR=$(mktemp -d)
 trap "rm -rf $TMP_DIR" EXIT
 
 # konnect package
-deepcopy-gen --input-dirs github.com/kong/deck/konnect \
+deepcopy-gen --input-dirs github.com/kong/go-database-reconciler/pkg/konnect \
   -O zz_generated.deepcopy \
   --go-header-file scripts/header-template.go.tmpl \
   --output-base $TMP_DIR
 
 diff -Naur konnect/zz_generated.deepcopy.go \
-  $TMP_DIR/github.com/kong/deck/konnect/zz_generated.deepcopy.go
+  $TMP_DIR/github.com/kong/go-database-reconciler/pkg/konnect/zz_generated.deepcopy.go
 
 # file package
-deepcopy-gen --input-dirs github.com/kong/deck/file \
+deepcopy-gen --input-dirs github.com/kong/go-database-reconciler/pkg/file \
   -O zz_generated.deepcopy \
   --go-header-file scripts/header-template.go.tmpl \
   --output-base $TMP_DIR
 
 diff -Naur file/zz_generated.deepcopy.go \
-  $TMP_DIR/github.com/kong/deck/file/zz_generated.deepcopy.go
+  $TMP_DIR/github.com/kong/go-database-reconciler/pkg/file/zz_generated.deepcopy.go

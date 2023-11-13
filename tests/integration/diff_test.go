@@ -5,7 +5,7 @@ package integration
 import (
 	"testing"
 
-	"github.com/kong/deck/utils"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 

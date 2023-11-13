@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/kong/deck/cprint"
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/spf13/cobra"
 )
 

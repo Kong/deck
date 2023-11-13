@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"github.com/fatih/color"
-	"github.com/kong/deck/cprint"
-	"github.com/kong/deck/diff"
+	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/spf13/pflag"
 )
 

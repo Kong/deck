@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/kong/deck/utils"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-apiops/deckformat"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"

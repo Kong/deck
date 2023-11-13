@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/kong/deck/convert"
-	"github.com/kong/deck/file"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/spf13/cobra"
 )
 

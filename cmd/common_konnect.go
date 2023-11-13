@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kong/deck/diff"
-	"github.com/kong/deck/dump"
-	"github.com/kong/deck/file"
-	"github.com/kong/deck/konnect"
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
+	"github.com/kong/go-database-reconciler/pkg/diff"
+	"github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/konnect"
+	"github.com/kong/go-database-reconciler/pkg/state"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"golang.org/x/sync/errgroup"
 )

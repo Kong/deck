@@ -11,12 +11,12 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
-	"github.com/kong/deck/cprint"
-	"github.com/kong/deck/diff"
-	"github.com/kong/deck/dump"
-	"github.com/kong/deck/file"
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
+	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"github.com/kong/go-database-reconciler/pkg/diff"
+	"github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/state"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
