@@ -1,4 +1,0 @@
-services:
-- name: svc1
-  host: mockbin.org
-  write_timeout: ${{ env "DECK_WRITE_TIMEOUT" | toInt }}
