@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kong/deck/validate"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
-	"github.com/kong/deck/validate"
 	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
