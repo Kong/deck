@@ -46,7 +46,7 @@ func TestPrint(t *testing.T) {
 				UpdatePrintln("bar")
 				DeletePrintln("fubaz")
 			},
-			Expected: "\x1b[32mfoo\n\x1b[0m\x1b[33mbar\n\x1b[0m\x1b[31mfubaz\n\x1b[0m",
+			Expected: "\x1b[32mfoo\x1b[0m\n\x1b[33mbar\x1b[0m\n\x1b[31mfubaz\x1b[0m\n",
 		},
 		{
 			name:          "println doesn't output anything when disabled",
