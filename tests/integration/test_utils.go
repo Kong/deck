@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -285,7 +286,7 @@ func diff(kongFile string, opts ...string) (string, error) {
 	w.Close()
 	out, _ := io.ReadAll(r)
 
-	return string(out), cmdErr
+	return stripansi.Strip(string(out)), cmdErr
 }
 
 func dump(opts ...string) (string, error) {
@@ -307,7 +308,7 @@ func dump(opts ...string) (string, error) {
 	out, _ := io.ReadAll(r)
 	os.Stdout = rescueStdout
 
-	return string(out), cmdErr
+	return stripansi.Strip(string(out)), cmdErr
 }
 
 func lint(opts ...string) (string, error) {
@@ -329,7 +330,7 @@ func lint(opts ...string) (string, error) {
 	out, _ := io.ReadAll(r)
 	os.Stdout = rescueStdout
 
-	return string(out), cmdErr
+	return stripansi.Strip(string(out)), cmdErr
 }
 
 func ping(opts ...string) error {

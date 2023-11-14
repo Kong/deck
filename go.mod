@@ -5,12 +5,13 @@ go 1.21.1
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 require (
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.2.7
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.23
-	github.com/kong/go-database-reconciler v0.0.0-20231113164115-13ad8e3cdfbd
+	github.com/kong/go-database-reconciler v0.0.0-20231113234924-84300ccdeb15
 	github.com/kong/go-kong v0.48.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
