@@ -7,6 +7,7 @@ import (
 
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/require"
 )
 
 var caCert = &kong.CACertificate{
@@ -105,4 +106,18 @@ func Test_Reset_SkipCACert_3x(t *testing.T) {
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
+}
+
+func Test_Reset_ConsumerGroupConsumersWithCustomID(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	reset(t)
+	testKongState(t, client, false, utils.KongRawState{}, nil)
 }

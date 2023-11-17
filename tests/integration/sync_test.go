@@ -4714,3 +4714,76 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	// plugins do not have an updated_at field
 	// consumers do not have an updated_at field
 }
+
+// test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	expectedState := utils.KongRawState{
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("48df7cd3-1cd0-4e53-af73-8f57f257be18"),
+					Name: kong.String("cg1"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("bcb296c3-22bb-46f6-99c8-4828af750b77"),
+						CustomID: kong.String("foo"),
+					},
+				},
+			},
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("1a81dc83-5329-4666-8ae7-8a966e62d076"),
+					Name: kong.String("cg2"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("562bf5c7-a7d9-4338-84dd-2c1064fb7f67"),
+						Username: kong.String("foo"),
+					},
+				},
+			},
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("d140f9cc-227e-4872-8b0b-639f6922dfb0"),
+					Name: kong.String("cg3"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("7906968b-cd89-4a87-8dda-94678e7106b2"),
+						Username: kong.String("bar"),
+						CustomID: kong.String("custom_bar"),
+					},
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("bcb296c3-22bb-46f6-99c8-4828af750b77"),
+				CustomID: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("562bf5c7-a7d9-4338-84dd-2c1064fb7f67"),
+				Username: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("7906968b-cd89-4a87-8dda-94678e7106b2"),
+				Username: kong.String("bar"),
+				CustomID: kong.String("custom_bar"),
+			},
+		},
+	}
+	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	testKongState(t, client, false, expectedState, nil)
+}

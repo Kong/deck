@@ -81,6 +81,17 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 	kong.RunWhenKong(t, kongSemverRange)
 }
 
+func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
+	t.Helper()
+
+	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
+		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		return
+	}
+	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
+}
+
 func runWhen(t *testing.T, mode string, semverRange string) {
 	t.Helper()
 

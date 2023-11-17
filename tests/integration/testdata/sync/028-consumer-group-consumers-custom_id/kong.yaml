@@ -1,0 +1,25 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 48df7cd3-1cd0-4e53-af73-8f57f257be18
+  name: cg1
+- id: 1a81dc83-5329-4666-8ae7-8a966e62d076
+  name: cg2
+- id: d140f9cc-227e-4872-8b0b-639f6922dfb0
+  name: cg3
+consumers:
+- custom_id: custom_bar
+  groups:
+  - id: d140f9cc-227e-4872-8b0b-639f6922dfb0
+    name: cg3
+  id: 7906968b-cd89-4a87-8dda-94678e7106b2
+  username: bar
+- custom_id: foo
+  groups:
+  - id: 48df7cd3-1cd0-4e53-af73-8f57f257be18
+    name: cg1
+  id: bcb296c3-22bb-46f6-99c8-4828af750b77
+- groups:
+  - id: 1a81dc83-5329-4666-8ae7-8a966e62d076
+    name: cg2
+  id: 562bf5c7-a7d9-4338-84dd-2c1064fb7f67
+  username: foo

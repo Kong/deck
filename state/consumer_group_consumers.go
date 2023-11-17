@@ -92,6 +92,9 @@ func (k *ConsumerGroupConsumersCollection) Add(consumer ConsumerGroupConsumer) e
 	if !utils.Empty(consumer.Consumer.Username) {
 		searchBy = append(searchBy, *consumer.Consumer.Username)
 	}
+	if !utils.Empty(consumer.Consumer.CustomID) {
+		searchBy = append(searchBy, *consumer.Consumer.CustomID)
+	}
 	_, err := getConsumerGroupConsumer(txn, *consumer.ConsumerGroup.ID, searchBy...)
 	if err == nil {
 		return fmt.Errorf("inserting consumerGroupConsumer %v: %w", consumer.Console(), ErrAlreadyExists)
@@ -132,7 +135,13 @@ func getConsumerGroupConsumer(txn *memdb.Txn, consumerGroupID string, IDs ...str
 
 	for _, id := range IDs {
 		for _, consumer := range consumers {
-			if id == *consumer.Consumer.ID || id == *consumer.Consumer.Username {
+			var username string
+			if consumer.Consumer.Username != nil {
+				username = *consumer.Consumer.Username
+			} else {
+				username = *consumer.Consumer.CustomID
+			}
+			if id == *consumer.Consumer.ID || id == username {
 				return &ConsumerGroupConsumer{ConsumerGroupConsumer: *consumer.DeepCopy()}, nil
 			}
 		}
