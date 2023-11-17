@@ -39,7 +39,7 @@ func (s *consumerGroupConsumerCRUD) Create(ctx context.Context, arg ...crud.Arg)
 			ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
 		)
 	} else {
-		_, err = s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
+		_, err = s.client.ConsumerGroupConsumers.Create(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
 	}
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (s *consumerGroupConsumerCRUD) Delete(ctx context.Context, arg ...crud.Arg)
 	if s.isKonnect {
 		err = konnect.DeleteConsumerGroupMember(ctx, s.client, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
 	} else {
-		err = s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username)
+		err = s.client.ConsumerGroupConsumers.Delete(ctx, consumer.ConsumerGroup.ID, consumer.Consumer.ID)
 	}
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (s *consumerGroupConsumerCRUD) Update(ctx context.Context, arg ...crud.Arg)
 		)
 	} else {
 		err = s.client.ConsumerGroupConsumers.Delete(
-			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username,
+			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
 		)
 	}
 	if err != nil {
@@ -104,7 +104,7 @@ func (s *consumerGroupConsumerCRUD) Update(ctx context.Context, arg ...crud.Arg)
 		)
 	} else {
 		_, err = s.client.ConsumerGroupConsumers.Create(
-			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.Username,
+			ctx, consumer.ConsumerGroup.ID, consumer.Consumer.ID,
 		)
 	}
 	if err != nil {
@@ -150,8 +150,16 @@ func (d *consumerGroupConsumerDiffer) Deletes(handler func(crud.Event) error) er
 func (d *consumerGroupConsumerDiffer) deleteConsumerGroupConsumer(
 	consumer *state.ConsumerGroupConsumer,
 ) (*crud.Event, error) {
+	var nameOrID string
+	if consumer.Consumer.ID != nil {
+		nameOrID = *consumer.Consumer.ID
+	} else if consumer.Consumer.Username != nil {
+		nameOrID = *consumer.Consumer.Username
+	} else {
+		nameOrID = *consumer.Consumer.CustomID
+	}
 	_, err := d.targetState.ConsumerGroupConsumers.Get(
-		*consumer.Consumer.Username, *consumer.ConsumerGroup.ID,
+		nameOrID, *consumer.ConsumerGroup.ID,
 	)
 	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
@@ -162,7 +170,7 @@ func (d *consumerGroupConsumerDiffer) deleteConsumerGroupConsumer(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("looking up consumerGroupConsumer %q: %w",
-			*consumer.Consumer.Username, err)
+			nameOrID, err)
 	}
 	return nil, nil
 }
@@ -192,8 +200,16 @@ func (d *consumerGroupConsumerDiffer) createUpdateConsumerGroupConsumer(
 	consumer *state.ConsumerGroupConsumer,
 ) (*crud.Event, error) {
 	consumerCopy := &state.ConsumerGroupConsumer{ConsumerGroupConsumer: *consumer.DeepCopy()}
+	var nameOrID string
+	if consumer.Consumer.ID != nil {
+		nameOrID = *consumer.Consumer.ID
+	} else if consumer.Consumer.Username != nil {
+		nameOrID = *consumer.Consumer.Username
+	} else {
+		nameOrID = *consumer.Consumer.CustomID
+	}
 	currentConsumer, err := d.currentState.ConsumerGroupConsumers.Get(
-		*consumer.Consumer.Username, *consumer.ConsumerGroup.ID,
+		nameOrID, *consumer.ConsumerGroup.ID,
 	)
 	if errors.Is(err, state.ErrNotFound) {
 		return &crud.Event{
@@ -204,7 +220,7 @@ func (d *consumerGroupConsumerDiffer) createUpdateConsumerGroupConsumer(
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error looking up consumerGroupConsumer %v: %w",
-			*currentConsumer.Consumer.Username, err)
+			nameOrID, err)
 	}
 
 	// found, check if update needed

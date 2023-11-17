@@ -729,7 +729,10 @@ func (c1 *ConsumerGroupConsumer) Identifier() string {
 // Console returns an entity's identity in a human
 // readable string.
 func (c1 *ConsumerGroupConsumer) Console() string {
-	return *c1.ConsumerGroupConsumer.Consumer.Username
+	if c1.ConsumerGroupConsumer.Consumer.Username != nil {
+		return *c1.ConsumerGroupConsumer.Consumer.Username
+	}
+	return *c1.ConsumerGroupConsumer.Consumer.CustomID
 }
 
 // Equal returns true if c1 and c2 are equal.
