@@ -25,7 +25,7 @@ func newPingCmd(deprecated bool) *cobra.Command {
 	short := "Verify connectivity with Kong"
 	execute := executePing
 	if deprecated {
-		short = "[deprecated] use 'gateway ping' instead"
+		short = "[deprecated] use 'deck gateway ping' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
 			fmt.Fprintf(os.Stderr, "Warning: 'deck ping' is DEPRECATED and will be removed in a future version. "+
 				"Use 'deck gateway ping' instead.\n")

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/kong/deck/convert"
-	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/spf13/cobra"
@@ -91,12 +90,15 @@ func newConvertCmd(deprecated bool) *cobra.Command {
 	fileInDefault := "-"
 	fileOutDefault := "-"
 	if deprecated {
-		short = "[deprecated] use 'file convert' instead"
+		short = "[deprecated] see 'deck file convert --help' for changes to the command"
 		execute = func(cmd *cobra.Command, args []string) error {
 			convertCmdInputFile = convertCmdInputFileDeprecated
 			convertCmdOutputFile = convertCmdOutputFileDeprecated
-			cprint.UpdatePrintf("Warning: 'deck convert' is DEPRECATED and will be removed in a future version. " +
-				"Use 'deck file convert' instead.\n")
+			fmt.Fprintf(os.Stderr, "Warning: 'deck convert' is DEPRECATED and will be removed in a "+
+				"future version. Use 'deck file convert' instead.\n"+
+				"   Note: - see 'deck file convert --help' for changes to the command\n"+
+				"         - files changed to positional arguments without the '-s/--state' flag\n"+
+				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")
 			return executeConvert(cmd, args)
 		}
 		fileInDefault = ""
