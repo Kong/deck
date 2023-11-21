@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Dump_SelectTags_30(t *testing.T) {
@@ -250,4 +251,36 @@ func Test_Dump_KonnectRename(t *testing.T) {
 			assert.Equal(t, expected, output)
 		})
 	}
+}
+
+func Test_Dump_ConsumerGroupConsumersWithCustomID(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+
+	var output string
+	flags := []string{"-o", "-", "--with-id"}
+	output, err := dump(flags...)
+	assert.NoError(t, err)
+
+	expected, err := readFile("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml")
+	assert.NoError(t, err)
+	assert.Equal(t, expected, output)
+}
+
+func Test_Dump_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+
+	var output string
+	flags := []string{"-o", "-", "--with-id"}
+	output, err := dump(flags...)
+	assert.NoError(t, err)
+
+	expected, err := readFile("testdata/dump/003-consumer-group-consumers-custom_id/konnect.yaml")
+	assert.NoError(t, err)
+	assert.Equal(t, expected, output)
 }
