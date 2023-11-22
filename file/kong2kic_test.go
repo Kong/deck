@@ -14,6 +14,8 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 		outputFilenameYAMLAnnotation string
 		outputFilenameJSONCRD        string
 		outputFilenameJSONAnnotation string
+		outputFilenameYAMLGateway    string
+		outputFilenameJSONGateway    string
 	}
 	tests := []struct {
 		name    string
@@ -28,6 +30,8 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 				outputFilenameJSONCRD:        "custom_resources/json/expected-output.json",
 				outputFilenameYAMLAnnotation: "annotations/yaml/expected-output.yaml",
 				outputFilenameJSONAnnotation: "annotations/json/expected-output.json",
+				outputFilenameYAMLGateway:    "gateway/yaml/expected-output.yaml",
+				outputFilenameJSONGateway:    "gateway/json/expected-output.json",
 			},
 			wantErr: false,
 		},
@@ -68,6 +72,20 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 				assert.Equal(t, string(expected), string(output))
 			}
 
+			output, err = MarshalKongToKICYaml(inputContent, GATEWAY)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err == nil {
+
+				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameYAMLGateway)
+				if err != nil {
+					assert.Fail(t, err.Error())
+				}
+				assert.Equal(t, string(expected), string(output))
+			}
+
 			output, err = MarshalKongToKICJson(inputContent, CUSTOMRESOURCE)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
@@ -90,6 +108,20 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 			if err == nil {
 
 				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameJSONAnnotation)
+				if err != nil {
+					assert.Fail(t, err.Error())
+				}
+				assert.Equal(t, string(expected), string(output))
+			}
+
+			output, err = MarshalKongToKICJson(inputContent, GATEWAY)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if err == nil {
+
+				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameJSONGateway)
 				if err != nil {
 					assert.Fail(t, err.Error())
 				}

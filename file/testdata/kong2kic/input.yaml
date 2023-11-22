@@ -222,7 +222,7 @@ services:
       - example
       - api
     routes:
-      - name: _thisISAveryvery_long_example-route+name_toVALIDATEthat(the slugify functionality w0rks4s3xp3ct3d)_
+      - name: _route_thisISAveryvery_long_+name_toVALIDATEthat(the slugify functionality w0rks4s3xp3ct3d)_
         methods:
           - GET
           - POST
@@ -231,7 +231,7 @@ services:
           - another-example.com
           - yet-another-example.com
         paths:
-          - /v1/example
+          - ~/v1/example/?$
           - /v1/another-example
           - /v1/yet-another-example
         protocols:
@@ -239,10 +239,10 @@ services:
           - https
         headers:
           x-my-header:
-            - foo
-            - bar
+            - ~*foos?bar$
           x-another-header:
-            - bla
+            - first-header-value
+            - second-header-value
         regex_priority: 1
         strip_path: false
         preserve_host: true
@@ -450,6 +450,7 @@ consumers:
       - key: my_jwt_secret
         algorithm: HS256
         secret: my_secret_key
+        rsa_public_key: my_rsa_public_key
         tags:
           - internal
     keyauth_credentials:
@@ -475,19 +476,21 @@ consumer_groups:
   - name: example-consumer-group
     consumers:
       - username: example-user
-plugins:
-- name: rate-limiting-advanced
-  consumer_group: example-consumer-group
-  config:
-    limit:
-    - 5
-    window_size:
-    - 30
-    identifier: consumer
-    sync_rate: -1
-    namespace: example_namespace
-    strategy: local
-    hide_client_headers: false
+    plugins:
+      - name: rate-limiting-advanced
+        config:
+          limit:
+          - 5
+          window_size:
+          - 30
+          identifier: consumer
+          sync_rate: -1
+          namespace: example_namespace
+          strategy: local
+          hide_client_headers: false
+          window_type: sliding
+          retry_after_jitter_max:
+          - 0
     
     
     

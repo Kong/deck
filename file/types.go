@@ -13,6 +13,7 @@ import (
 	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1beta1"
 	k8scorev1 "k8s.io/api/core/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
+	k8sgwapiv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/yaml"
 )
 
@@ -29,10 +30,12 @@ const (
 	// YAML if YAML file format.
 	YAML = "YAML"
 	// KIC YAML and JSON file format for ingress controller.
-	KICYAMLCrd        = "KIC_YAML_CRD"
-	KICJSONCrd        = "KIC_JSON_CRD"
-	KICYAMLAnnotation = "KIC_YAML_ANNOTATION"
-	KICJSONAnnotation = "KIC_JSON_ANNOTATION"
+	KICYAMLCrdIngressAPI        = "KIC_YAML_CRD"
+	KICJSONCrdIngressAPI        = "KIC_JSON_CRD"
+	KICYAMLAnnotationIngressAPI = "KIC_YAML_ANNOTATION"
+	KICJSONAnnotationIngressAPI = "KIC_JSON_ANNOTATION"
+	KICYAMLGatewayAPI           = "KIC_YAML_GATEWAY"
+	KICJSONGatewayAPI           = "KIC_JSON_GATEWAY"
 )
 
 const (
@@ -763,6 +766,7 @@ type KICContent struct {
 	Secrets            []k8scorev1.Secret             `json:"secrets,omitempty" yaml:",omitempty"`
 	KongConsumers      []kicv1.KongConsumer           `json:"consumers,omitempty" yaml:",omitempty"`
 	KongConsumerGroups []kicv1beta1.KongConsumerGroup `json:"consumerGroups,omitempty" yaml:",omitempty"`
+	HTTPRoutes         []k8sgwapiv1.HTTPRoute         `json:"httpRoutes,omitempty" yaml:",omitempty"`
 }
 
 func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
@@ -819,6 +823,15 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 		output = append(output, ingresses...)
 		output = append(output, []byte("---\n")...)
 
+	}
+
+	for _, httpRoute := range k.HTTPRoutes {
+		httpRoutes, err := yaml.Marshal(httpRoute)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, httpRoutes...)
+		output = append(output, []byte("---\n")...)
 	}
 
 	for _, service := range k.Services {
@@ -910,6 +923,14 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, ingresses...)
+	}
+
+	for _, httpRoute := range k.HTTPRoutes {
+		httpRoutes, err := json.MarshalIndent(httpRoute, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, httpRoutes...)
 	}
 
 	for _, service := range k.Services {

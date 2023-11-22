@@ -109,7 +109,7 @@
     "kind": "KongIngress",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp458db225e7",
+        "name": "example-service--route-thisisaveryvery-long2093a020ca",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -122,11 +122,11 @@
         ],
         "headers": {
             "x-another-header": [
-                "bla"
+                "first-header-value",
+                "second-header-value"
             ],
             "x-my-header": [
-                "foo",
-                "bar"
+                "~*foos?bar$"
             ]
         },
         "protocols": [
@@ -170,7 +170,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp74c5dc2067",
+        "name": "example-service--route-thisisaveryvery-long9344b5559f",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -188,7 +188,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampb74d1356ad",
+        "name": "example-service--route-thisisaveryvery-longfdeaa51f90",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -217,7 +217,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp6f248cccf4",
+        "name": "example-service--route-thisisaveryvery-long3b4b1fae8e",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -233,7 +233,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampd4db3da64d",
+        "name": "example-service--route-thisisaveryvery-long59030a424c",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -254,7 +254,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp197b8a3d26",
+        "name": "example-service--route-thisisaveryvery-longb44edd01cf",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -274,7 +274,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp414691f96c",
+        "name": "example-service--route-thisisaveryvery-longef35b834c6",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -299,7 +299,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp5734a64044",
+        "name": "example-service--route-thisisaveryvery-longb2c08ebc54",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -315,7 +315,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp7acb4e5480",
+        "name": "example-service--route-thisisaveryvery-longc400f1ab11",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -335,7 +335,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampfab4d85783",
+        "name": "example-service--route-thisisaveryvery-long47f9f5054d",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -351,7 +351,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampcb3ded9d5d",
+        "name": "example-service--route-thisisaveryvery-long26f9714514",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -366,7 +366,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampf7403f01c9",
+        "name": "example-service--route-thisisaveryvery-long0239c8f63e",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -395,7 +395,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp404e065618",
+        "name": "example-service--route-thisisaveryvery-long5494737f3e",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -415,7 +415,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp1b46e36834",
+        "name": "example-service--route-thisisaveryvery-long89ae2d2b5d",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -434,7 +434,7 @@
     "kind": "KongPlugin",
     "apiVersion": "configuration.konghq.com/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-exampbdb13cbef5",
+        "name": "example-service--route-thisisaveryvery-longb2440ac898",
         "creationTimestamp": null,
         "annotations": {
             "kubernetes.io/ingress.class": "kong"
@@ -473,39 +473,14 @@
     "plugin": "rate-limiting-advanced",
     "status": {}
 }{
-    "kind": "KongPlugin",
-    "apiVersion": "configuration.konghq.com/v1",
-    "metadata": {
-        "name": "example-consumer-group-rate-limiting-advanced",
-        "creationTimestamp": null,
-        "annotations": {
-            "kubernetes.io/ingress.class": "kong"
-        }
-    },
-    "config": {
-        "hide_client_headers": false,
-        "identifier": "consumer",
-        "limit": [
-            5
-        ],
-        "namespace": "example_namespace",
-        "strategy": "local",
-        "sync_rate": -1,
-        "window_size": [
-            30
-        ]
-    },
-    "plugin": "example-consumer-group-rate-limiting-advanced",
-    "status": {}
-}{
     "kind": "Ingress",
     "apiVersion": "networking.k8s.io/v1",
     "metadata": {
-        "name": "example-service--thisisaveryvery-long-examp458db225e7",
+        "name": "example-service--route-thisisaveryvery-long2093a020ca",
         "creationTimestamp": null,
         "annotations": {
-            "konghq.com/override": "example-service--thisisaveryvery-long-examp458db225e7",
-            "konghq.com/plugins": "example-service--thisisaveryvery-long-examp74c5dc2067,example-service--thisisaveryvery-long-exampb74d1356ad,example-service--thisisaveryvery-long-examp6f248cccf4,example-service--thisisaveryvery-long-exampd4db3da64d,example-service--thisisaveryvery-long-examp197b8a3d26,example-service--thisisaveryvery-long-examp414691f96c,example-service--thisisaveryvery-long-examp5734a64044,example-service--thisisaveryvery-long-examp7acb4e5480,example-service--thisisaveryvery-long-exampfab4d85783,example-service--thisisaveryvery-long-exampcb3ded9d5d,example-service--thisisaveryvery-long-exampf7403f01c9,example-service--thisisaveryvery-long-examp404e065618,example-service--thisisaveryvery-long-examp1b46e36834,example-service--thisisaveryvery-long-exampbdb13cbef5"
+            "konghq.com/override": "example-service--route-thisisaveryvery-long2093a020ca",
+            "konghq.com/plugins": "example-service--route-thisisaveryvery-long9344b5559f,example-service--route-thisisaveryvery-longfdeaa51f90,example-service--route-thisisaveryvery-long3b4b1fae8e,example-service--route-thisisaveryvery-long59030a424c,example-service--route-thisisaveryvery-longb44edd01cf,example-service--route-thisisaveryvery-longef35b834c6,example-service--route-thisisaveryvery-longb2c08ebc54,example-service--route-thisisaveryvery-longc400f1ab11,example-service--route-thisisaveryvery-long47f9f5054d,example-service--route-thisisaveryvery-long26f9714514,example-service--route-thisisaveryvery-long0239c8f63e,example-service--route-thisisaveryvery-long5494737f3e,example-service--route-thisisaveryvery-long89ae2d2b5d,example-service--route-thisisaveryvery-longb2440ac898"
         }
     },
     "spec": {
@@ -516,7 +491,7 @@
                 "http": {
                     "paths": [
                         {
-                            "path": "/v1/example",
+                            "path": "/~/v1/example/?$",
                             "pathType": "ImplementationSpecific",
                             "backend": {
                                 "service": {
@@ -559,7 +534,7 @@
                 "http": {
                     "paths": [
                         {
-                            "path": "/v1/example",
+                            "path": "/~/v1/example/?$",
                             "pathType": "ImplementationSpecific",
                             "backend": {
                                 "service": {
@@ -602,7 +577,7 @@
                 "http": {
                     "paths": [
                         {
-                            "path": "/v1/example",
+                            "path": "/~/v1/example/?$",
                             "pathType": "ImplementationSpecific",
                             "backend": {
                                 "service": {
@@ -699,6 +674,7 @@
         "algorithm": "HS256",
         "key": "my_jwt_secret",
         "kongCredType": "jwt",
+        "rsa_public_key": "my_rsa_public_key",
         "secret": "my_secret_key"
     }
 }{
@@ -852,7 +828,6 @@
         "name": "example-consumer-group",
         "creationTimestamp": null,
         "annotations": {
-            "konghq.com/plugins": "example-consumer-group-rate-limiting-advanced",
             "kubernetes.io/ingress.class": "kong"
         }
     },

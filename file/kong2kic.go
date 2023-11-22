@@ -15,6 +15,7 @@ import (
 	k8snetv1 "k8s.io/api/networking/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	k8sgwapiv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // Builder + Director design pattern to create kubernetes manifests based on:
@@ -44,128 +45,183 @@ const (
 
 func getBuilder(builderType string) IBuilder {
 	if builderType == CUSTOMRESOURCE {
-		return newCustomResourceBuilder()
+		return newIngressAPICustomResourceBuilder()
 	} else if builderType == ANNOTATIONS {
-		return newAnnotationsBuilder()
+		return newIngressAPIAnnotationsBuilder()
+	} else if builderType == GATEWAY {
+		return newGatewayAPIBuilder()
 	}
-
-	// if builderType == GATEWAY {
-	// 	// TODO: implement gateway builder
-	// }
 	return nil
 }
 
-type CustomResourceBuilder struct {
+type IngressAPICustomResourceBuilder struct {
 	kicContent *KICContent
 }
 
-func newCustomResourceBuilder() *CustomResourceBuilder {
-	return &CustomResourceBuilder{
+func newIngressAPICustomResourceBuilder() *IngressAPICustomResourceBuilder {
+	return &IngressAPICustomResourceBuilder{
 		kicContent: &KICContent{},
 	}
 }
 
-func (b *CustomResourceBuilder) buildServices(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildServices(content *Content) {
 	err := populateKICServicesWithCustomResources(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *CustomResourceBuilder) buildRoutes(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildRoutes(content *Content) {
 	err := populateKICIngressesWithCustomResources(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *CustomResourceBuilder) buildGlobalPlugins(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildGlobalPlugins(content *Content) {
 	err := populateKICKongClusterPlugins(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *CustomResourceBuilder) buildConsumers(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildConsumers(content *Content) {
 	err := populateKICConsumers(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *CustomResourceBuilder) buildConsumerGroups(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildConsumerGroups(content *Content) {
 	err := populateKICConsumerGroups(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *CustomResourceBuilder) buildCACertificates(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildCACertificates(content *Content) {
 	populateKICCACertificate(content, b.kicContent)
 }
 
-func (b *CustomResourceBuilder) buildCertificates(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildCertificates(content *Content) {
 	populateKICCertificates(content, b.kicContent)
 }
 
-func (b *CustomResourceBuilder) getContent() *KICContent {
+func (b *IngressAPICustomResourceBuilder) getContent() *KICContent {
 	return b.kicContent
 }
 
-type AnnotationsBuilder struct {
+type IngressAPIAnnotationsBuilder struct {
 	kicContent *KICContent
 }
 
-func newAnnotationsBuilder() *AnnotationsBuilder {
-	return &AnnotationsBuilder{
+func newIngressAPIAnnotationsBuilder() *IngressAPIAnnotationsBuilder {
+	return &IngressAPIAnnotationsBuilder{
 		kicContent: &KICContent{},
 	}
 }
 
-func (b *AnnotationsBuilder) buildServices(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildServices(content *Content) {
 	err := populateKICServicesWithAnnotations(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *AnnotationsBuilder) buildRoutes(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildRoutes(content *Content) {
 	err := populateKICIngressesWithAnnotations(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *AnnotationsBuilder) buildGlobalPlugins(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildGlobalPlugins(content *Content) {
 	err := populateKICKongClusterPlugins(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *AnnotationsBuilder) buildConsumers(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildConsumers(content *Content) {
 	err := populateKICConsumers(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *AnnotationsBuilder) buildConsumerGroups(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildConsumerGroups(content *Content) {
 	err := populateKICConsumerGroups(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *AnnotationsBuilder) buildCACertificates(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildCACertificates(content *Content) {
 	populateKICCACertificate(content, b.kicContent)
 }
 
-func (b *AnnotationsBuilder) buildCertificates(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildCertificates(content *Content) {
 	populateKICCertificates(content, b.kicContent)
 }
 
-func (b *AnnotationsBuilder) getContent() *KICContent {
+func (b *IngressAPIAnnotationsBuilder) getContent() *KICContent {
+	return b.kicContent
+}
+
+type GatewayAPIBuilder struct {
+	kicContent *KICContent
+}
+
+func newGatewayAPIBuilder() *GatewayAPIBuilder {
+	return &GatewayAPIBuilder{
+		kicContent: &KICContent{},
+	}
+}
+
+func (b *GatewayAPIBuilder) buildServices(content *Content) {
+	err := populateKICServicesWithAnnotations(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *GatewayAPIBuilder) buildRoutes(content *Content) {
+	err := populateKICIngressesWithGatewayAPI(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *GatewayAPIBuilder) buildGlobalPlugins(content *Content) {
+	err := populateKICKongClusterPlugins(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *GatewayAPIBuilder) buildConsumers(content *Content) {
+	err := populateKICConsumers(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *GatewayAPIBuilder) buildConsumerGroups(content *Content) {
+	err := populateKICConsumerGroups(content, b.kicContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (b *GatewayAPIBuilder) buildCACertificates(content *Content) {
+	populateKICCACertificate(content, b.kicContent)
+}
+
+func (b *GatewayAPIBuilder) buildCertificates(content *Content) {
+	populateKICCertificates(content, b.kicContent)
+}
+
+func (b *GatewayAPIBuilder) getContent() *KICContent {
 	return b.kicContent
 }
 
@@ -963,13 +1019,14 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 					// if path starts with ~ then add / to the beginning of the path
 					// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingr
 					//                                             ess-regular-expression-paths-for-kong-3x-compatibility
+					sCopy := *path
 					if strings.HasPrefix(*path, "~") {
-						*path = "/" + *path
+						sCopy = "/" + *path
 					}
 					if service.Port != nil {
 						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 							k8snetv1.HTTPIngressPath{
-								Path:     *path,
+								Path:     sCopy,
 								PathType: &pathTypeImplSpecific,
 								Backend: k8snetv1.IngressBackend{
 									Service: &k8snetv1.IngressServiceBackend{
@@ -983,7 +1040,7 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 					} else {
 						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 							k8snetv1.HTTPIngressPath{
-								Path:     *path,
+								Path:     sCopy,
 								PathType: &pathTypeImplSpecific,
 								Backend: k8snetv1.IngressBackend{
 									Service: &k8snetv1.IngressServiceBackend{
@@ -1011,13 +1068,14 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 						// if path starts with ~ then add / to the beginning of the path
 						// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingr
 						//                                             ess-regular-expression-paths-for-kong-3x-compatibility
+						sCopy := *path
 						if strings.HasPrefix(*path, "~") {
-							*path = "/" + *path
+							sCopy = "/" + *path
 						}
 						if service.Port != nil {
 							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 								k8snetv1.HTTPIngressPath{
-									Path:     *path,
+									Path:     sCopy,
 									PathType: &pathTypeImplSpecific,
 									Backend: k8snetv1.IngressBackend{
 										Service: &k8snetv1.IngressServiceBackend{
@@ -1031,7 +1089,7 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 						} else {
 							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 								k8snetv1.HTTPIngressPath{
-									Path:     *path,
+									Path:     sCopy,
 									PathType: &pathTypeImplSpecific,
 									Backend: k8snetv1.IngressBackend{
 										Service: &k8snetv1.IngressServiceBackend{
@@ -1277,13 +1335,14 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 					// if path starts with ~ then add / to the beginning of the path
 					// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingr
 					//                                             ess-regular-expression-paths-for-kong-3x-compatibility
+					sCopy := *path
 					if strings.HasPrefix(*path, "~") {
-						*path = "/" + *path
+						sCopy = "/" + *path
 					}
 					if service.Port != nil {
 						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 							k8snetv1.HTTPIngressPath{
-								Path:     *path,
+								Path:     sCopy,
 								PathType: &pathTypeImplSpecific,
 								Backend: k8snetv1.IngressBackend{
 									Service: &k8snetv1.IngressServiceBackend{
@@ -1297,7 +1356,7 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 					} else {
 						ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 							k8snetv1.HTTPIngressPath{
-								Path:     *path,
+								Path:     sCopy,
 								PathType: &pathTypeImplSpecific,
 								Backend: k8snetv1.IngressBackend{
 									Service: &k8snetv1.IngressServiceBackend{
@@ -1325,13 +1384,14 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 						// if path starts with ~ then add / to the beginning of the path
 						// see: https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/upgrade-kong-3x/#update-ingr
 						//                                             ess-regular-expression-paths-for-kong-3x-compatibility
+						sCopy := *path
 						if strings.HasPrefix(*path, "~") {
-							*path = "/" + *path
+							sCopy = "/" + *path
 						}
 						if service.Port != nil {
 							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 								k8snetv1.HTTPIngressPath{
-									Path:     *path,
+									Path:     sCopy,
 									PathType: &pathTypeImplSpecific,
 									Backend: k8snetv1.IngressBackend{
 										Service: &k8snetv1.IngressServiceBackend{
@@ -1345,7 +1405,7 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 						} else {
 							ingressRule.IngressRuleValue.HTTP.Paths = append(ingressRule.IngressRuleValue.HTTP.Paths,
 								k8snetv1.HTTPIngressPath{
-									Path:     *path,
+									Path:     sCopy,
 									PathType: &pathTypeImplSpecific,
 									Backend: k8snetv1.IngressBackend{
 										Service: &k8snetv1.IngressServiceBackend{
@@ -1359,15 +1419,237 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 				}
 			}
 
-			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
-			// create a plugins annotation in the routeIngresses to link them to this plugin.
-			// separate plugins with commas
 			err := addPluginsToRoute(service, route, k8sIngress, kicContent)
 			if err != nil {
 				return err
 			}
 			kicContent.Ingresses = append(kicContent.Ingresses, k8sIngress)
 		}
+	}
+	return nil
+}
+
+// ///
+// Functions for GATEWAY API based manifests
+// ///
+func populateKICIngressesWithGatewayAPI(content *Content, kicContent *KICContent) error {
+	for _, service := range content.Services {
+		for _, route := range service.Routes {
+			var httpRoute k8sgwapiv1.HTTPRoute
+			httpRoute.Kind = "HTTPRoute"
+			httpRoute.APIVersion = "gateway.networking.k8s.io/v1"
+			if service.Name != nil && route.Name != nil {
+				httpRoute.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name)
+			} else {
+				log.Println("Service name or route name is empty. This is not recommended." +
+					"Please, provide a name for the service and the route before generating HTTPRoute manifests.")
+			}
+			httpRoute.ObjectMeta.Annotations = make(map[string]string)
+
+			// add konghq.com/preserve-host annotation if route.PreserveHost is not nil
+			if route.PreserveHost != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/preserve-host"] = strconv.FormatBool(*route.PreserveHost)
+			}
+
+			// add konghq.com/strip-path annotation if route.StripPath is not nil
+			if route.StripPath != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/strip-path"] = strconv.FormatBool(*route.StripPath)
+			}
+
+			// add konghq.com/https-redirect-status-code annotation if route.HTTPSRedirectStatusCode is not nil
+			if route.HTTPSRedirectStatusCode != nil {
+				value := strconv.Itoa(*route.HTTPSRedirectStatusCode)
+				httpRoute.ObjectMeta.Annotations["konghq.com/https-redirect-status-code"] = value
+			}
+
+			// add konghq.com/regex-priority annotation if route.RegexPriority is not nil
+			if route.RegexPriority != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/regex-priority"] = strconv.Itoa(*route.RegexPriority)
+			}
+
+			// add konghq.com/path-handling annotation if route.PathHandling is not nil
+			if route.PathHandling != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/path-handling"] = *route.PathHandling
+			}
+
+			// add konghq.com/snis annotation if route.SNIs is not nil
+			if route.SNIs != nil {
+				var snis string
+				for _, sni := range route.SNIs {
+					if snis == "" {
+						snis = *sni
+					} else {
+						snis = snis + "," + *sni
+					}
+				}
+				httpRoute.ObjectMeta.Annotations["konghq.com/snis"] = snis
+			}
+
+			// add konghq.com/request-buffering annotation if route.RequestBuffering is not nil
+			if route.RequestBuffering != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/request-buffering"] = strconv.FormatBool(*route.RequestBuffering)
+			}
+
+			// add konghq.com/response-buffering annotation if route.ResponseBuffering is not nil
+			if route.ResponseBuffering != nil {
+				httpRoute.ObjectMeta.Annotations["konghq.com/response-buffering"] = strconv.FormatBool(*route.ResponseBuffering)
+			}
+
+			// if route.hosts is not nil, add them to the httpRoute
+			if route.Hosts != nil {
+				for _, host := range route.Hosts {
+					httpRoute.Spec.Hostnames = append(httpRoute.Spec.Hostnames, k8sgwapiv1.Hostname(*host))
+				}
+			}
+
+			// add kong as the spec.parentRef.name
+			httpRoute.Spec.ParentRefs = append(httpRoute.Spec.ParentRefs, k8sgwapiv1.ParentReference{
+				Name: "kong",
+			})
+
+			// add service details to HTTPBackendRef
+			portNumber := k8sgwapiv1.PortNumber(*service.Port)
+			backendRef := k8sgwapiv1.BackendRef{
+				BackendObjectReference: k8sgwapiv1.BackendObjectReference{
+					Name: k8sgwapiv1.ObjectName(*service.Name),
+					Port: &portNumber,
+				},
+			}
+
+			var httpHeaderMatch []k8sgwapiv1.HTTPHeaderMatch
+			headerMatchExact := k8sgwapiv1.HeaderMatchExact
+			headerMatchRegex := k8sgwapiv1.HeaderMatchRegularExpression
+			// if route.Headers is not nil, add them to the httpHeaderMatch
+			if route.Headers != nil {
+				for key, values := range route.Headers {
+					// if values has only one value and that value starts with
+					// the special prefix ~*, the value is interpreted as a regular expression.
+					if len(values) == 1 && strings.HasPrefix(values[0], "~*") {
+						httpHeaderMatch = append(httpHeaderMatch, k8sgwapiv1.HTTPHeaderMatch{
+							Name:  k8sgwapiv1.HTTPHeaderName(key),
+							Value: values[0][2:],
+							Type:  &headerMatchRegex,
+						})
+					} else {
+						// if multiple values are present, add them as comma separated values
+						// if only one value is present, add it as a single value
+						var value string
+						if len(values) > 1 {
+							value = strings.Join(values, ",")
+						} else {
+							value = values[0]
+						}
+						httpHeaderMatch = append(httpHeaderMatch, k8sgwapiv1.HTTPHeaderMatch{
+							Name:  k8sgwapiv1.HTTPHeaderName(key),
+							Value: value,
+							Type:  &headerMatchExact,
+						})
+					}
+				}
+			}
+
+			// If path is not nil, then for each path, for each method, add a httpRouteRule
+			// to the httpRoute
+			if route.Paths != nil {
+				for _, path := range route.Paths {
+					var httpPathMatch k8sgwapiv1.HTTPPathMatch
+					pathMatchRegex := k8sgwapiv1.PathMatchRegularExpression
+					pathMatchPrefix := k8sgwapiv1.PathMatchPathPrefix
+
+					if strings.HasPrefix(*path, "~") {
+						httpPathMatch.Type = &pathMatchRegex
+						regexPath := (*path)[1:]
+						httpPathMatch.Value = &regexPath
+					} else {
+						httpPathMatch.Type = &pathMatchPrefix
+						httpPathMatch.Value = path
+					}
+
+					for _, method := range route.Methods {
+						httpMethod := k8sgwapiv1.HTTPMethod(*method)
+						httpRoute.Spec.Rules = append(httpRoute.Spec.Rules, k8sgwapiv1.HTTPRouteRule{
+							Matches: []k8sgwapiv1.HTTPRouteMatch{
+								{
+									Path:    &httpPathMatch,
+									Method:  &httpMethod,
+									Headers: httpHeaderMatch,
+								},
+							},
+							BackendRefs: []k8sgwapiv1.HTTPBackendRef{
+								{
+									BackendRef: backendRef,
+								},
+							},
+						})
+					}
+				}
+			} else {
+				// If path is nil, then for each method, add a httpRouteRule
+				// to the httpRoute with headers and no path
+				for _, method := range route.Methods {
+					httpMethod := k8sgwapiv1.HTTPMethod(*method)
+					httpRoute.Spec.Rules = append(httpRoute.Spec.Rules, k8sgwapiv1.HTTPRouteRule{
+						Matches: []k8sgwapiv1.HTTPRouteMatch{
+							{
+								Method:  &httpMethod,
+								Headers: httpHeaderMatch,
+							},
+						},
+						BackendRefs: []k8sgwapiv1.HTTPBackendRef{
+							{
+								BackendRef: backendRef,
+							},
+						},
+					})
+				}
+			}
+			err := addPluginsToGatewayAPIRoute(service, route, httpRoute, kicContent)
+			if err != nil {
+				return err
+			}
+			kicContent.HTTPRoutes = append(kicContent.HTTPRoutes, httpRoute)
+		}
+	}
+	return nil
+}
+
+func addPluginsToGatewayAPIRoute(
+	service FService, route *FRoute, httpRoute k8sgwapiv1.HTTPRoute, kicContent *KICContent,
+) error {
+	for _, plugin := range route.Plugins {
+		var kongPlugin kicv1.KongPlugin
+		kongPlugin.APIVersion = KICAPIVersion
+		kongPlugin.Kind = KongPluginKind
+		if plugin.Name != nil && route.Name != nil && service.Name != nil {
+			kongPlugin.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name + "-" + *plugin.Name)
+		} else {
+			log.Println("Service name, route name or plugin name is empty. This is not recommended." +
+				"Please, provide a name for the service, route and the plugin before generating Kong Ingress Controller manifests.")
+		}
+		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongPlugin.PluginName = *plugin.Name
+
+		var configJSON apiextensionsv1.JSON
+		var err error
+		configJSON.Raw, err = json.Marshal(plugin.Config)
+		if err != nil {
+			return err
+		}
+		kongPlugin.Config = configJSON
+
+		// add plugins as extensionRef under filters for every rule
+		for i := range httpRoute.Spec.Rules {
+			httpRoute.Spec.Rules[i].Filters = append(httpRoute.Spec.Rules[i].Filters, k8sgwapiv1.HTTPRouteFilter{
+				ExtensionRef: &k8sgwapiv1.LocalObjectReference{
+					Name:  k8sgwapiv1.ObjectName(kongPlugin.ObjectMeta.Name),
+					Kind:  KongPluginKind,
+					Group: "configuration.konghq.com",
+				},
+				Type: k8sgwapiv1.HTTPRouteFilterExtensionRef,
+			})
+		}
+
+		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 	}
 	return nil
 }

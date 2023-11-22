@@ -343,99 +343,543 @@ metadata:
 plugin: rate-limiting-advanced
 status: {}
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
   annotations:
-    konghq.com/headers.x-another-header: first-header-value,second-header-value
-    konghq.com/headers.x-my-header: ~*foos?bar$
     konghq.com/https-redirect-status-code: "302"
-    konghq.com/methods: GET,POST
-    konghq.com/plugins: example-service--route-thisisaveryvery-long9344b5559f,example-service--route-thisisaveryvery-longfdeaa51f90,example-service--route-thisisaveryvery-long3b4b1fae8e,example-service--route-thisisaveryvery-long59030a424c,example-service--route-thisisaveryvery-longb44edd01cf,example-service--route-thisisaveryvery-longef35b834c6,example-service--route-thisisaveryvery-longb2c08ebc54,example-service--route-thisisaveryvery-longc400f1ab11,example-service--route-thisisaveryvery-long47f9f5054d,example-service--route-thisisaveryvery-long26f9714514,example-service--route-thisisaveryvery-long0239c8f63e,example-service--route-thisisaveryvery-long5494737f3e,example-service--route-thisisaveryvery-long89ae2d2b5d,example-service--route-thisisaveryvery-longb2440ac898
     konghq.com/preserve-host: "true"
-    konghq.com/protocols: http,https
     konghq.com/regex-priority: "1"
     konghq.com/snis: example.com
     konghq.com/strip-path: "false"
   creationTimestamp: null
   name: example-service--route-thisisaveryvery-long2093a020ca
 spec:
-  ingressClassName: kong
+  hostnames:
+  - example.com
+  - another-example.com
+  - yet-another-example.com
+  parentRefs:
+  - name: kong
   rules:
-  - host: example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
-  - host: another-example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
-  - host: yet-another-example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
 status:
-  loadBalancer: {}
+  parents: null
 ---
 apiVersion: v1
 kind: Service
