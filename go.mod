@@ -19,7 +19,7 @@ require (
 	github.com/spf13/viper v1.17.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/sync v0.5.0
-	k8s.io/code-generator v0.28.3
+	k8s.io/code-generator v0.28.4
 	sigs.k8s.io/yaml v1.4.0
 )
 
