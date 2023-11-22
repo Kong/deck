@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kong/deck/dump"
-	"github.com/kong/deck/file"
+	"github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/file"
 )
 
 func TestDetermineSelectorTag(t *testing.T) {

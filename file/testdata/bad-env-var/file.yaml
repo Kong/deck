@@ -1,9 +1,0 @@
-services:
-- name: svc2
-  host: ${{ env "SVC2_HOST" }}
-  routes:
-  - name: r2
-    paths:
-    - /r2
-plugins:
-- name: prometheus

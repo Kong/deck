@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kong/deck/state"
-	"github.com/kong/deck/utils"
+	"github.com/kong/go-database-reconciler/pkg/state"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
