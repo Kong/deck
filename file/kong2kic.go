@@ -41,7 +41,14 @@ const (
 	KongPluginKind = "KongPlugin"
 	SecretKind     = "Secret"
 	IngressKind    = "KongIngress"
+	IngressClass   = "kubernetes.io/ingress.class"
 )
+
+// ClassName is set by the CLI flag --class-name
+var ClassName = "kong"
+
+// GatewayAPIVersion is set by the CLI flag --v1beta1
+var GatewayAPIVersion = "gateway.networking.k8s.io/v1"
 
 func getBuilder(builderType string) IBuilder {
 	if builderType == CUSTOMRESOURCE {
@@ -306,7 +313,7 @@ func populateKICCACertificate(content *Content, file *KICContent) {
 		secret.TypeMeta.Kind = SecretKind
 		secret.Type = "generic"
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["ca.crt"] = *caCert.Cert
 		if caCert.CertDigest != nil {
@@ -329,7 +336,7 @@ func populateKICCertificates(content *Content, file *KICContent) {
 		secret.TypeMeta.Kind = SecretKind
 		secret.Type = "kubernetes.io/tls"
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.Data = make(map[string][]byte)
 		secret.Data["tls.crt"] = []byte(*cert.Cert)
 		secret.Data["tls.key"] = []byte(*cert.Key)
@@ -352,7 +359,7 @@ func populateKICKongClusterPlugins(content *Content, file *KICContent) error {
 		var kongPlugin kicv1.KongClusterPlugin
 		kongPlugin.APIVersion = KICAPIVersion
 		kongPlugin.Kind = "KongClusterPlugin"
-		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		if plugin.Name != nil {
 			kongPlugin.PluginName = *plugin.Name
 			kongPlugin.ObjectMeta.Name = calculateSlug(*plugin.Name)
@@ -383,7 +390,7 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 		kongConsumer.APIVersion = KICAPIVersion
 		kongConsumer.Kind = "KongConsumer"
 		kongConsumer.ObjectMeta.Name = calculateSlug(*consumer.Username)
-		kongConsumer.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongConsumer.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongConsumer.Username = *consumer.Username
 		if consumer.CustomID != nil {
 			kongConsumer.CustomID = *consumer.CustomID
@@ -403,7 +410,7 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 			var kongPlugin kicv1.KongPlugin
 			kongPlugin.APIVersion = KICAPIVersion
 			kongPlugin.Kind = KongPluginKind
-			kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+			kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 			if plugin.Name != nil {
 				kongPlugin.PluginName = *plugin.Name
 				kongPlugin.ObjectMeta.Name = calculateSlug(*consumer.Username + "-" + *plugin.Name)
@@ -445,7 +452,7 @@ func populateKICMTLSAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCon
 		secret.TypeMeta.Kind = SecretKind
 		secret.Type = "Opaque"
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "mtls-auth"
 
@@ -476,7 +483,7 @@ func populateKICACLGroupSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCon
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 
 		secret.StringData["kongCredType"] = "acl"
@@ -499,7 +506,7 @@ func populateKICOAuth2CredSecrets(consumer *FConsumer, kongConsumer *kicv1.KongC
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "oauth2"
 
@@ -538,7 +545,7 @@ func populateKICBasicAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCo
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "basic-auth"
 
@@ -564,7 +571,7 @@ func populateKICJWTAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCons
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "jwt"
 
@@ -600,7 +607,7 @@ func populateKICHMACSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsume
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "hmac-auth"
 
@@ -628,7 +635,7 @@ func populateKICKeyAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCons
 		secret.TypeMeta.APIVersion = "v1"
 		secret.TypeMeta.Kind = SecretKind
 		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		secret.StringData["kongCredType"] = "key-auth"
 
@@ -656,7 +663,7 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 			log.Println("Service name is empty. This is not recommended." +
 				"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
 		}
-		kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongIngress.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 
 		// add an annotation to the k8sservice to link this kongIngress to it
 		k8sservice.ObjectMeta.Annotations["konghq.com/override"] = kongIngress.ObjectMeta.Name
@@ -698,7 +705,7 @@ func addPluginsToService(service FService, k8sService k8scorev1.Service, kicCont
 			log.Println("Service name or plugin name is empty. This is not recommended." +
 				"Please, provide a name for the service and the plugin before generating Kong Ingress Controller manifests.")
 		}
-		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongPlugin.PluginName = *plugin.Name
 
 		var configJSON apiextensionsv1.JSON
@@ -732,7 +739,7 @@ func addPluginsToRoute(service FService, route *FRoute, ingress k8snetv1.Ingress
 			log.Println("Service name, route name or plugin name is empty. This is not recommended." +
 				"Please, provide a name for the service, route and the plugin before generating Kong Ingress Controller manifests.")
 		}
-		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongPlugin.PluginName = *plugin.Name
 
 		var configJSON apiextensionsv1.JSON
@@ -767,7 +774,7 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 			log.Println("Consumer group name is empty. This is not recommended." +
 				"Please, provide a name for the consumer group before generating Kong Ingress Controller manifests.")
 		}
-		kongConsumerGroup.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongConsumerGroup.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongConsumerGroup.Name = *consumerGroup.Name
 
 		// Iterate over the consumers in consumerGroup and
@@ -792,7 +799,7 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 				var kongPlugin kicv1.KongPlugin
 				kongPlugin.APIVersion = KICAPIVersion
 				kongPlugin.Kind = KongPluginKind
-				kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+				kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 				if plugin.Name != nil {
 					kongPlugin.PluginName = *consumerGroup.Name + "-" + *plugin.Name
 					kongPlugin.ObjectMeta.Name = calculateSlug(*consumerGroup.Name + "-" + *plugin.Name)
@@ -847,7 +854,7 @@ func populateKICServiceProxyAndUpstreamCustomResources(
 		log.Println("Service name is empty. This is not recommended." +
 			"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
 	}
-	kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+	kongIngress.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 
 	// add an annotation to the k8sservice to link this kongIngress to it
 	k8sservice.ObjectMeta.Annotations["konghq.com/override"] = kongIngress.ObjectMeta.Name
@@ -971,7 +978,7 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 				log.Println("Service name or route name is empty. This is not recommended." +
 					"Please, provide a name for the service and the route before generating Kong Ingress Controller manifests.")
 			}
-			ingressClassName := "kong"
+			ingressClassName := ClassName
 			k8sIngress.Spec.IngressClassName = &ingressClassName
 			k8sIngress.ObjectMeta.Annotations = make(map[string]string)
 
@@ -980,7 +987,7 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 			kongIngress.APIVersion = KICAPIVersion
 			kongIngress.Kind = IngressKind
 			kongIngress.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name)
-			kongIngress.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+			kongIngress.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 
 			var kongProtocols []*kicv1.KongProtocol
 			for _, protocol := range route.Protocols {
@@ -1235,7 +1242,7 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 				log.Println("Service name or route name is empty. This is not recommended." +
 					"Please, provide a name for the service and the route before generating Kong Ingress Controller manifests.")
 			}
-			ingressClassName := "kong"
+			ingressClassName := ClassName
 			k8sIngress.Spec.IngressClassName = &ingressClassName
 			k8sIngress.ObjectMeta.Annotations = make(map[string]string)
 
@@ -1437,7 +1444,7 @@ func populateKICIngressesWithGatewayAPI(content *Content, kicContent *KICContent
 		for _, route := range service.Routes {
 			var httpRoute k8sgwapiv1.HTTPRoute
 			httpRoute.Kind = "HTTPRoute"
-			httpRoute.APIVersion = "gateway.networking.k8s.io/v1"
+			httpRoute.APIVersion = GatewayAPIVersion
 			if service.Name != nil && route.Name != nil {
 				httpRoute.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name)
 			} else {
@@ -1504,7 +1511,7 @@ func populateKICIngressesWithGatewayAPI(content *Content, kicContent *KICContent
 
 			// add kong as the spec.parentRef.name
 			httpRoute.Spec.ParentRefs = append(httpRoute.Spec.ParentRefs, k8sgwapiv1.ParentReference{
-				Name: "kong",
+				Name: k8sgwapiv1.ObjectName(ClassName),
 			})
 
 			// add service details to HTTPBackendRef
@@ -1626,7 +1633,7 @@ func addPluginsToGatewayAPIRoute(
 			log.Println("Service name, route name or plugin name is empty. This is not recommended." +
 				"Please, provide a name for the service, route and the plugin before generating Kong Ingress Controller manifests.")
 		}
-		kongPlugin.ObjectMeta.Annotations = map[string]string{"kubernetes.io/ingress.class": "kong"}
+		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongPlugin.PluginName = *plugin.Name
 
 		var configJSON apiextensionsv1.JSON
