@@ -74,9 +74,6 @@ func newOpenapi2KongCmd() *cobra.Command {
 		Short: "Convert OpenAPI files to Kong's decK format",
 		Long: `Convert OpenAPI files to Kong's decK format.
 
-IMPORTANT: due to comatibility issues with the older 'inso' tool, it is strongly recommended
-to use the '--inso-compatible' flag when converting OpenAPI files.
-
 The example file at https://github.com/Kong/go-apiops/blob/main/docs/learnservice_oas.yaml
 has extensive annotations explaining the conversion process, as well as all supported 
 custom annotations (x-kong-... directives).
