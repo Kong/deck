@@ -7,7 +7,7 @@ replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.5.0
+	github.com/daveshanley/vacuum v0.5.2
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.24
@@ -36,7 +36,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d // indirect
-	github.com/dop251/goja_nodejs v0.0.0-20231022114343-5c1f9037c9ab // indirect
+	github.com/dop251/goja_nodejs v0.0.0-20231122114759-e84d9a924c5c // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -82,12 +82,12 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/mozillazg/go-unidecode v0.2.0 // indirect
-	github.com/pb33f/libopenapi v0.13.11 // indirect
-	github.com/pb33f/libopenapi-validator v0.0.28 // indirect
+	github.com/pb33f/libopenapi v0.13.14 // indirect
+	github.com/pb33f/libopenapi-validator v0.0.30 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/pterm/pterm v0.12.70 // indirect
+	github.com/pterm/pterm v0.12.71 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sagikazarmark/locafero v0.3.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
