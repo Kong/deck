@@ -47,6 +47,25 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
+
+		// if this is an online validation, we need to look up upstream consumers if required.
+		lookUpSelectorTagsConsumers, err := determineLookUpSelectorTagsConsumers(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags: %w", err)
+		}
+
+		if lookUpSelectorTagsConsumers != nil {
+			consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, lookUpSelectorTagsConsumers)
+			if err != nil {
+				return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
+			}
+			for _, c := range consumersGlobal {
+				targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
+				if err != nil {
+					return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
+				}
+			}
+		}
 	}
 
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{

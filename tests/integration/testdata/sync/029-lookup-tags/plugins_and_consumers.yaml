@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+- name: rate-limiting-advanced
+  config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    namespace: foo
+    sync_rate: -1
+  consumer: foo
+consumers:
+- username: foo
