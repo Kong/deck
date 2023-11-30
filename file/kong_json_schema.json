@@ -1217,7 +1217,7 @@
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/KongDefaults"
         },
-        "lookup_tags": {
+        "default_lookup_tags": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/LookUpSelectorTags"
         },

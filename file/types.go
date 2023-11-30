@@ -598,7 +598,7 @@ type KongDefaults struct {
 // +k8s:deepcopy-gen=true
 type Info struct {
 	SelectorTags       []string            `json:"select_tags,omitempty" yaml:"select_tags,omitempty"`
-	LookUpSelectorTags *LookUpSelectorTags `json:"lookup_tags,omitempty" yaml:"lookup_tags,omitempty"`
+	LookUpSelectorTags *LookUpSelectorTags `json:"default_lookup_tags,omitempty" yaml:"default_lookup_tags,omitempty"`
 	Defaults           KongDefaults        `json:"defaults,omitempty" yaml:"defaults,omitempty"`
 }
 
