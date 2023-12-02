@@ -38,8 +38,8 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 		use = "diff"
 		short = "[deprecated] see 'deck gateway diff --help' for changes to the command"
 		execute = func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(os.Stderr, "Warning: 'deck diff' is DEPRECATED and will be removed in a future version. "+
-				"Use 'deck gateway diff' instead.\n"+
+			fmt.Fprintf(os.Stderr, "Info: 'deck diff' functionality has moved to 'deck gateway diff' and will be removed\n"+
+				"in a future MAJOR version of deck. Migration to 'deck gateway diff' is recommended.\n"+
 				"   Note: - see 'deck gateway diff --help' for changes to the command\n"+
 				"         - files changed to positional arguments without the '-s/--state' flag\n"+
 				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")

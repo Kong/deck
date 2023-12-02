@@ -112,8 +112,8 @@ func newResetCmd(deprecated bool) *cobra.Command {
 	if deprecated {
 		short = "[deprecated] use 'deck gateway reset' instead"
 		execute = func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(os.Stderr, "Warning: 'deck reset' is DEPRECATED and will be removed in a future version. "+
-				"Use 'deck gateway reset' instead.\n")
+			fmt.Fprintf(os.Stderr, "Info: 'deck reset' functionality has moved to 'deck gateway reset' and will be removed\n"+
+				"in a future MAJOR version of deck. Migration to 'deck gateway reset' is recommended.\n")
 			return executeReset(cmd, args)
 		}
 	}

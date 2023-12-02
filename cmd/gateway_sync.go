@@ -39,8 +39,8 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 		use = "sync"
 		short = "[deprecated] see 'deck gateway sync --help' for changes to the command"
 		execute = func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(os.Stderr, "Warning: 'deck sync' is DEPRECATED and will be removed in a "+
-				"future version. Use 'deck gateway sync' instead.\n"+
+			fmt.Fprintf(os.Stderr, "Info: 'deck sync' functionality has moved to 'deck gateway sync' and will be removed\n"+
+				"in a future MAJOR version of deck. Migration to 'deck gateway sync' is recommended.\n"+
 				"   Note: - see 'deck gateway sync --help' for changes to the command\n"+
 				"         - files changed to positional arguments without the '-s/--state' flag\n"+
 				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")

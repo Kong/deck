@@ -99,8 +99,9 @@ this command unless --online flag is used.
 `
 
 		execute = func(cmd *cobra.Command, args []string) error {
-			fmt.Fprintf(os.Stderr, "Warning: 'deck validate' is DEPRECATED and will be removed in a "+
-				"future version. Use 'deck [file|gateway] validate' instead.\n"+
+			fmt.Fprintf(os.Stderr, "Info: 'deck validate' functionality has moved to 'deck [file|gateway] validate' and\n"+
+				"will be removed  in a future MAJOR version of deck.\n"+
+				"Migration to 'deck [file|gateway] validate' is recommended.\n"+
 				"   Note: - see 'deck [file|gateway] validate --help' for changes to the command\n"+
 				"         - files changed to positional arguments without the '-s/--state' flag\n"+
 				"         - the '--online' flag is removed, use either 'deck file' or 'deck gateway'\n"+

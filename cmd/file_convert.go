@@ -94,8 +94,8 @@ func newConvertCmd(deprecated bool) *cobra.Command {
 		execute = func(cmd *cobra.Command, args []string) error {
 			convertCmdInputFile = convertCmdInputFileDeprecated
 			convertCmdOutputFile = convertCmdOutputFileDeprecated
-			fmt.Fprintf(os.Stderr, "Warning: 'deck convert' is DEPRECATED and will be removed in a "+
-				"future version. Use 'deck file convert' instead.\n"+
+			fmt.Fprintf(os.Stderr, "Info: 'deck convert' functionality has moved 'deck file convert' and will be removed\n"+
+				"in a future MAJOR version of deck. Migration to 'deck file convert' is recommended.\n"+
 				"   Note: - see 'deck file convert --help' for changes to the command\n"+
 				"         - files changed to positional arguments without the '-s/--state' flag\n"+
 				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")
