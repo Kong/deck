@@ -670,8 +670,10 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 
 		// Find the upstream (if any) whose name matches the service host and copy the upstream
 		// into a kicv1.KongIngress resource. Append the kicv1.KongIngress to kicContent.KongIngresses.
+		var found bool = false
 		for _, upstream := range content.Upstreams {
 			if upstream.Name != nil && strings.EqualFold(*upstream.Name, *service.Host) {
+				found = true
 				kongIngress.Upstream = &kicv1.KongIngressUpstream{
 					HostHeader:             upstream.HostHeader,
 					Algorithm:              upstream.Algorithm,
@@ -690,7 +692,9 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 				}
 			}
 		}
-		kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
+		if found {
+			kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
+		}
 	}
 }
 
