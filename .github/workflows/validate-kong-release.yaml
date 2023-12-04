@@ -36,6 +36,7 @@ jobs:
         id: license
         with:
           password: ${{ secrets.PULP_PASSWORD }}
+          op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Setup Kong
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
