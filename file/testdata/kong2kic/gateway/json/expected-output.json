@@ -1377,7 +1377,7 @@
         "algorithm": "HS256",
         "key": "my_jwt_secret",
         "kongCredType": "jwt",
-        "rsa_public_key": "my_rsa_public_key",
+        "rsa_public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxXzYS5yESbekTF3xLiQX\nZZZfXt0S/nzFp3f2Oux3W7/ydvZ8XSd8+s+wm5oqEcSV9n+5n3ENZbt1A/wgnGI3\noWrv0yRB9HugzTIGPpI1AQv9Z4p8E44RrB74/uTxYwb9+4yvpuz/fzTt3Gz+Kzc4\n4fGGq8VpGMFj6AE65ZcOAHHUJe4VuoreBXLYDJcHl2WPIdNKDGscFjElDneLRhWQ\nDfxekDJIQMWCjyBEXacfP6cc9U8Qld6TuVcwi1P2xb8tBDD4MIFL/psfzUhfv1Lw\nO/XZEffJxCqkQn7dsCYy3wpaTjb6XmJ5j0Dbml4f0Bv40Y1mjlAf7C662Mbuguf6\newIDAQAB\n-----END PUBLIC KEY-----",
         "secret": "my_secret_key"
     }
 }{
