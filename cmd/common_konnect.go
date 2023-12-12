@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -172,10 +171,6 @@ func dumpKonnectV2(ctx context.Context) error {
 	if dumpConfig.KonnectRuntimeGroup == "" {
 		dumpConfig.KonnectRuntimeGroup = defaultRuntimeGroupName
 	}
-	kongVersion, err := fetchKonnectKongVersion(ctx, client)
-	if err != nil {
-		return fmt.Errorf("reading Konnect Kong version: %w", err)
-	}
 	rawState, err := dump.Get(ctx, client, dumpConfig)
 	if err != nil {
 		return fmt.Errorf("reading configuration from Kong: %w", err)
@@ -190,7 +185,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		FileFormat:       file.Format(strings.ToUpper(konnectDumpCmdStateFormat)),
 		WithID:           dumpWithID,
 		RuntimeGroupName: konnectRuntimeGroup,
-		KongVersion:      kongVersion,
+		KongVersion:      fetchKonnectKongVersion(),
 	})
 }
 
@@ -386,17 +381,10 @@ func getKonnectState(ctx context.Context,
 	return ks, nil
 }
 
-func fetchKonnectKongVersion(ctx context.Context, client *kong.Client) (string, error) {
-	req, err := http.NewRequest("GET",
-		utils.CleanAddress(client.BaseRootURL())+"/v1", nil)
-	if err != nil {
-		return "", err
-	}
-
-	var resp map[string]interface{}
-	_, err = client.Do(ctx, req, &resp)
-	if err != nil {
-		return "", err
-	}
-	return resp["version"].(string), nil
+func fetchKonnectKongVersion() string {
+	// Returning an hardcoded version for now. decK only needs the version
+	// to determine the format_version expected in the state file. Since
+	// Konnect is always on the latest version, we can safely return the
+	// latest version here and avoid making an extra and unnecessary request.
+	return "3.5.0.0"
 }
