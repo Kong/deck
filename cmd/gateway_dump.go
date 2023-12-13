@@ -142,11 +142,13 @@ func newDumpCmd(deprecated bool) *cobra.Command {
 	execute := executeDump
 	fileOutDefault := "-"
 	if deprecated {
-		short = "[deprecated] use 'gateway dump' instead"
+		short = "[deprecated] see 'deck gateway dump --help' for changes to the command"
 		execute = func(cmd *cobra.Command, args []string) error {
 			dumpCmdKongStateFile = dumpCmdKongStateFileDeprecated
-			fmt.Fprintf(os.Stderr, "Warning: 'deck dump' is DEPRECATED and will be removed in a future version. "+
-				"Use 'deck gateway dump' instead.\n")
+			fmt.Fprintf(os.Stderr, "Info: 'deck dump' functionality has moved to 'deck gateway dump' and will be removed\n"+
+				"in a future MAJOR version of deck. Migration to 'deck gateway dump' is recommended.\n"+
+				"   Note: - see 'deck gateway dump --help' for changes to the command\n"+
+				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")
 			return executeDump(cmd, args)
 		}
 		fileOutDefault = defaultFileOutName
