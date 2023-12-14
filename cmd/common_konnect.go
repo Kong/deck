@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -216,8 +217,17 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, false)
 	// print stats before error to report completed operations
+	for _, c := range changes.Creating {
+		cprint.CreatePrintln("creating", c.Kind, c.Name)
+	}
+	for _, c := range changes.Updating {
+		cprint.UpdatePrintln("updating", c.Kind, c.Name, c.Diff)
+	}
+	for _, c := range changes.Deleting {
+		cprint.DeletePrintln("deleting", c.Kind, c.Name)
+	}
 	printStats(stats)
 	if errs != nil {
 		return utils.ErrArray{Errors: errs}
