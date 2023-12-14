@@ -62,4 +62,4 @@ docker run -d --name $GATEWAY_CONTAINER_NAME \
   -p 127.0.0.1:8444:8444 \
   $KONG_IMAGE
 
-waitContainer "Kong" 8001 0.2
+waitContainer "Kong" 8001 5
