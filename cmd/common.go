@@ -11,7 +11,7 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
-	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -281,6 +281,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err != nil {
 		return err
 	}
+	if len(rawState.Warnings) > 0 {
+		for _, warning := range rawState.Warnings {
+			// for whatever reason, the update color was overloaded as the warning color long ago
+			cprint.UpdatePrintln(warning)
+		}
+	}
 	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
 		return err
 	}
@@ -306,6 +312,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if diffCmdNonZeroExitCode && totalOps > 0 {
 		os.Exit(exitCodeDiffDetection)
 	}
+	// NOTE TRC apparently we handle json output printing here, in syncmain?
 	if enableJSONOutput {
 		jsonOutputBytes, jsonErr := json.MarshalIndent(jsonOutput, "", "\t")
 		if jsonErr != nil {
@@ -374,8 +381,20 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	}
 
 	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
+	// TODO TRC not familiar with the differences between this and jsonoutput. jsonoutput is unfortunately a module
+	// global and idk how we handle actually printing it. apparently _it_ prints in syncmain and this prints here,
+	// because organic inconsistency. we _only_ use changes currently for json out
 	// print stats before error to report completed operations
 	if !enableJSONOutput {
+		for _, c := range changes.Creating {
+			cprint.CreatePrintln("creating", c.Kind, c.Name)
+		}
+		for _, c := range changes.Updating {
+			cprint.UpdatePrintln("updating", c.Kind, c.Name, c.Diff)
+		}
+		for _, c := range changes.Deleting {
+			cprint.DeletePrintln("deleting", c.Kind, c.Name)
+		}
 		printStats(stats)
 	}
 	if errs != nil {

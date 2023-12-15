@@ -126,4 +126,5 @@ docker run -d --name $GATEWAY_CONTAINER_NAME \
   -p 8004:8004 \
   $KONG_IMAGE
 
-waitContainer "Kong" 8001 0.2
+waitContainer "Kong" 8001 5
+curl --retry 12 --retry-all-errors http://localhost:8001
