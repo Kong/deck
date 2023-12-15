@@ -11,7 +11,7 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
-	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"

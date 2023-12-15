@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/blang/semver/v4"
-	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"github.com/kong/deck/cprint"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
