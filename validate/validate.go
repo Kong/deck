@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
@@ -194,6 +195,7 @@ func validate3xRoutes(routes *state.RoutesCollection) {
 		}
 	}
 	if len(unsupportedRoutes) > 0 {
-		utils.PrintRouteRegexWarning(unsupportedRoutes)
+		// for whatever reason, the update color was overloaded as the warning color long ago
+		cprint.UpdatePrintln(utils.FormatRouteRegexWarning(unsupportedRoutes))
 	}
 }

@@ -281,6 +281,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err != nil {
 		return err
 	}
+	if len(rawState.Warnings) > 0 {
+		for _, warning := range rawState.Warnings {
+			// for whatever reason, the update color was overloaded as the warning color long ago
+			cprint.UpdatePrintln(warning)
+		}
+	}
 	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
 		return err
 	}
