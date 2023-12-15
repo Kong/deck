@@ -286,6 +286,8 @@ github.com/kong/go-apiops v0.1.24 h1:gFPwDzHBzhHih5oV/ru0fWYUiWMYwBYWXEdNS9i5ldo
 github.com/kong/go-apiops v0.1.24/go.mod h1:kFc+1mlnUpmyCqem9O7aes3UaBnezu4WhgDCfrh5zAA=
 github.com/kong/go-database-reconciler v1.1.1-0.20231215011801-78622f3b9fba h1:UBEEJ4tTkDRKvP3rV2ADc8f7ydTdqKFDmUC2bsjYP0U=
 github.com/kong/go-database-reconciler v1.1.1-0.20231215011801-78622f3b9fba/go.mod h1:R1T9TcsStMQIXGWD47oaaxlKsY1rC0u7z7ajBFZjHZo=
+github.com/kong/go-database-reconciler v1.1.1-0.20231215013017-e6dae7f6d2c0 h1:1hToTmIj94PGnjehQQlx9g+HGgvzbus2tL8a6vmhBt0=
+github.com/kong/go-database-reconciler v1.1.1-0.20231215013017-e6dae7f6d2c0/go.mod h1:R1T9TcsStMQIXGWD47oaaxlKsY1rC0u7z7ajBFZjHZo=
 github.com/kong/go-kong v0.48.0 h1:vK1OpoxO50qlKdwPfmx9ChvkTKRsoCCB3b3iHo1umLc=
 github.com/kong/go-kong v0.48.0/go.mod h1:qH4CEFqT83ywmu1TlMZX09clQH4B8/dX88CtT/jdv/E=
 github.com/kong/go-slugify v0.0.0-20231027194833-8e212cc29c16 h1:twB8aTpaG0t29jL+VYtkZiP5nMOTznt7/q4mPuNa54E=
