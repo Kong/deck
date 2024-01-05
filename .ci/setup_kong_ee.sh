@@ -74,7 +74,8 @@ docker network create $NETWORK_NAME
 waitPostGres() {
   for try in {1..100}; do
     echo "waiting for PostgreSQL"
-    nc localhost 5432 && break;
+    #nc localhost 5432 && break;
+    docker exec --user root $1 pg_isready && break;
     sleep 0.2
   done
 }
@@ -96,7 +97,7 @@ docker run --rm -d --name $PG_CONTAINER_NAME \
   -e "POSTGRES_PASSWORD=$KONG_DB_PASSWORD" \
   postgres:9.6
 
-waitPostGres
+waitPostGres $PG_CONTAINER_NAME
 
 # Prepare the Kong database
 docker run --rm --network=$NETWORK_NAME \
