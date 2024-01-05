@@ -68,9 +68,6 @@ KONG_PG_HOST=pg
 
 GATEWAY_CONTAINER_NAME=kong
 
-# create docker network
-docker network create $NETWORK_NAME
-
 waitContainer() {
   for try in {1..100}; do
     echo "waiting for $1"
