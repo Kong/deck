@@ -80,14 +80,14 @@
 
 - Correct bug when consumer-group-consumer doesn't have an username.
   [#1113](https://github.com/Kong/deck/pull/1113)
-- Improve deprecation warnings to reduce upgrade friction.
+- Improve deprecation warnings to reduce upgrade friction and show warning when reading STDIN from terminal.
   [#1115](https://github.com/Kong/deck/pull/1115)
-- O2K: Server ports will now be properly parsed, 32767 to 65535 are now accepted.
+- 'file openapi2kong': Server ports will now be properly parsed, 32767 to 65535 are now accepted.
   [apiops #105](https://github.com/Kong/go-apiops/pull/105)
 
 ### Added
 
-- O2K: will now generate OpenIDConnect plugins.
+- 'file openapi2kong': will now generate OpenIDConnect plugins.
   [apiops #107](https://github.com/Kong/go-apiops/pull/107)
 
 ### Refactored
