@@ -4730,21 +4730,21 @@ func Test_Sync_LookupConsumerTags(t *testing.T) {
 	setup(t)
 
 	// test that reference to non-existing consumer fails.
-	pluginsNoLookupStateFile := "testdata/sync/028-lookup-tags/plugins_no_lookup.yaml"
+	pluginsNoLookupStateFile := "testdata/sync/029-lookup-tags/plugins_no_lookup.yaml"
 	err := sync(pluginsNoLookupStateFile)
 	require.Error(t, err)
 	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to existing local consumer succeeds.
-	pluginsAndConsumersStateFile := "testdata/sync/028-lookup-tags/plugins_and_consumers.yaml"
+	pluginsAndConsumersStateFile := "testdata/sync/029-lookup-tags/plugins_and_consumers.yaml"
 	require.NoError(t, sync(pluginsAndConsumersStateFile))
 	reset(t)
 
 	// test that reference to existing global consumer succeeds via lookup tags.
-	globalConsumersStateFile := "testdata/sync/028-lookup-tags/global_consumers.yaml"
+	globalConsumersStateFile := "testdata/sync/029-lookup-tags/global_consumers.yaml"
 	require.NoError(t, sync(globalConsumersStateFile))
 	// sync plugins with lookup reference to global consumers.
-	pluginsLookupStateFile := "testdata/sync/028-lookup-tags/plugins_lookup.yaml"
+	pluginsLookupStateFile := "testdata/sync/029-lookup-tags/plugins_lookup.yaml"
 	require.NoError(t, sync(pluginsLookupStateFile))
 	reset(t)
 
