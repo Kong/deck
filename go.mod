@@ -11,7 +11,7 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.27
-	github.com/kong/go-database-reconciler v1.1.0
+	github.com/kong/go-database-reconciler v1.2.0
 	github.com/kong/go-kong v0.50.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
