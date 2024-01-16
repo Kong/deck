@@ -2,20 +2,30 @@ package kong2kic
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var baseLocation = "testdata/"
 
-func compareFileContent(t *testing.T, expectedFilename string, actual []byte) {
+func compareFileContent(t *testing.T, expectedFilename string, actualContent []byte) {
 	expected, err := os.ReadFile(baseLocation + expectedFilename)
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
-	assert.Equal(t, string(expected), string(actual))
+
+	actualFilename := baseLocation + strings.Replace(expectedFilename, "-expected.", "-actual.", 1)
+	os.WriteFile(actualFilename, actualContent, 0o600)
+
+	if strings.HasSuffix(expectedFilename, ".json") {
+		require.JSONEq(t, string(expected), string(actualContent))
+	} else {
+		require.YAMLEq(t, string(expected), string(actualContent))
+	}
 }
 
 func Test_convertKongGatewayToIngress(t *testing.T) {
