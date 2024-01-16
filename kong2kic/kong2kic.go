@@ -1,4 +1,4 @@
-package file
+package kong2kic
 
 import (
 	"crypto/sha256"
@@ -42,6 +42,13 @@ const (
 	SecretKind     = "Secret"
 	IngressKind    = "KongIngress"
 	IngressClass   = "kubernetes.io/ingress.class"
+	// KIC YAML and JSON file format for ingress controller.
+	KICYAMLCrdIngressAPI        = "KIC_YAML_CRD"
+	KICJSONCrdIngressAPI        = "KIC_JSON_CRD"
+	KICYAMLAnnotationIngressAPI = "KIC_YAML_ANNOTATION"
+	KICJSONAnnotationIngressAPI = "KIC_JSON_ANNOTATION"
+	KICYAMLGatewayAPI           = "KIC_YAML_GATEWAY"
+	KICJSONGatewayAPI           = "KIC_JSON_GATEWAY"
 )
 
 // ClassName is set by the CLI flag --class-name

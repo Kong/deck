@@ -1,9 +1,10 @@
-package file
+package kong2kic
 
 import (
 	"os"
 	"testing"
 
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +40,7 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 	for _, tt := range tests {
 		BaseLocation := "testdata/kong2kic/"
 		t.Run(tt.name, func(t *testing.T) {
-			inputContent, err := GetContentFromFiles([]string{BaseLocation + tt.args.inputFilename}, false)
+			inputContent, err := file.GetContentFromFiles([]string{BaseLocation + tt.args.inputFilename}, false)
 			if err != nil {
 				assert.Fail(t, err.Error())
 			}
