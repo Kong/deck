@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gosimple/slug"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	kicv1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1"
 	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1beta1"
 	k8scorev1 "k8s.io/api/core/v1"
@@ -23,13 +24,13 @@ import (
 // 2 - Kong annotations
 // 3 - Kubernetes Gateway spec
 type IBuilder interface {
-	buildServices(*Content)
-	buildRoutes(*Content)
-	buildGlobalPlugins(*Content)
-	buildConsumers(*Content)
-	buildConsumerGroups(*Content)
-	buildCACertificates(*Content)
-	buildCertificates(*Content)
+	buildServices(*file.Content)
+	buildRoutes(*file.Content)
+	buildGlobalPlugins(*file.Content)
+	buildConsumers(*file.Content)
+	buildConsumerGroups(*file.Content)
+	buildCACertificates(*file.Content)
+	buildCertificates(*file.Content)
 	getContent() *KICContent
 }
 
@@ -78,46 +79,46 @@ func newIngressAPICustomResourceBuilder() *IngressAPICustomResourceBuilder {
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildServices(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildServices(content *file.Content) {
 	err := populateKICServicesWithCustomResources(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildRoutes(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildRoutes(content *file.Content) {
 	err := populateKICIngressesWithCustomResources(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildGlobalPlugins(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildGlobalPlugins(content *file.Content) {
 	err := populateKICKongClusterPlugins(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildConsumers(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildConsumers(content *file.Content) {
 	err := populateKICConsumers(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildConsumerGroups(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildConsumerGroups(content *file.Content) {
 	err := populateKICConsumerGroups(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPICustomResourceBuilder) buildCACertificates(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildCACertificates(content *file.Content) {
 	populateKICCACertificate(content, b.kicContent)
 }
 
-func (b *IngressAPICustomResourceBuilder) buildCertificates(content *Content) {
+func (b *IngressAPICustomResourceBuilder) buildCertificates(content *file.Content) {
 	populateKICCertificates(content, b.kicContent)
 }
 
@@ -135,46 +136,46 @@ func newIngressAPIAnnotationsBuilder() *IngressAPIAnnotationsBuilder {
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildServices(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildServices(content *file.Content) {
 	err := populateKICServicesWithAnnotations(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildRoutes(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildRoutes(content *file.Content) {
 	err := populateKICIngressesWithAnnotations(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildGlobalPlugins(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildGlobalPlugins(content *file.Content) {
 	err := populateKICKongClusterPlugins(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildConsumers(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildConsumers(content *file.Content) {
 	err := populateKICConsumers(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildConsumerGroups(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildConsumerGroups(content *file.Content) {
 	err := populateKICConsumerGroups(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildCACertificates(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildCACertificates(content *file.Content) {
 	populateKICCACertificate(content, b.kicContent)
 }
 
-func (b *IngressAPIAnnotationsBuilder) buildCertificates(content *Content) {
+func (b *IngressAPIAnnotationsBuilder) buildCertificates(content *file.Content) {
 	populateKICCertificates(content, b.kicContent)
 }
 
@@ -192,46 +193,46 @@ func newGatewayAPIBuilder() *GatewayAPIBuilder {
 	}
 }
 
-func (b *GatewayAPIBuilder) buildServices(content *Content) {
+func (b *GatewayAPIBuilder) buildServices(content *file.Content) {
 	err := populateKICServicesWithAnnotations(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *GatewayAPIBuilder) buildRoutes(content *Content) {
+func (b *GatewayAPIBuilder) buildRoutes(content *file.Content) {
 	err := populateKICIngressesWithGatewayAPI(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *GatewayAPIBuilder) buildGlobalPlugins(content *Content) {
+func (b *GatewayAPIBuilder) buildGlobalPlugins(content *file.Content) {
 	err := populateKICKongClusterPlugins(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *GatewayAPIBuilder) buildConsumers(content *Content) {
+func (b *GatewayAPIBuilder) buildConsumers(content *file.Content) {
 	err := populateKICConsumers(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *GatewayAPIBuilder) buildConsumerGroups(content *Content) {
+func (b *GatewayAPIBuilder) buildConsumerGroups(content *file.Content) {
 	err := populateKICConsumerGroups(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (b *GatewayAPIBuilder) buildCACertificates(content *Content) {
+func (b *GatewayAPIBuilder) buildCACertificates(content *file.Content) {
 	populateKICCACertificate(content, b.kicContent)
 }
 
-func (b *GatewayAPIBuilder) buildCertificates(content *Content) {
+func (b *GatewayAPIBuilder) buildCertificates(content *file.Content) {
 	populateKICCertificates(content, b.kicContent)
 }
 
@@ -249,7 +250,7 @@ func newDirector(builder IBuilder) *Director {
 	}
 }
 
-func (d *Director) buildManifests(content *Content) *KICContent {
+func (d *Director) buildManifests(content *file.Content) *KICContent {
 	d.builder.buildServices(content)
 	d.builder.buildRoutes(content)
 	d.builder.buildGlobalPlugins(content)
@@ -264,17 +265,17 @@ func (d *Director) buildManifests(content *Content) *KICContent {
 /// End of Builder + Director
 ////////////////////
 
-func MarshalKongToKICYaml(content *Content, builderType string) ([]byte, error) {
+func MarshalKongToKICYaml(content *file.Content, builderType string) ([]byte, error) {
 	kicContent := convertKongToKIC(content, builderType)
 	return kicContent.marshalKICContentToYaml()
 }
 
-func MarshalKongToKICJson(content *Content, builderType string) ([]byte, error) {
+func MarshalKongToKICJson(content *file.Content, builderType string) ([]byte, error) {
 	kicContent := convertKongToKIC(content, builderType)
 	return kicContent.marshalKICContentToJSON()
 }
 
-func convertKongToKIC(content *Content, builderType string) *KICContent {
+func convertKongToKIC(content *file.Content, builderType string) *KICContent {
 	builder := getBuilder(builderType)
 	director := newDirector(builder)
 	return director.buildManifests(content)
@@ -308,7 +309,7 @@ func calculateSlug(input string) string {
 // Functions valid for both custom resources and annotations based manifests
 /////
 
-func populateKICCACertificate(content *Content, file *KICContent) {
+func populateKICCACertificate(content *file.Content, file *KICContent) {
 	// iterate content.CACertificates and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, caCert := range content.CACertificates {
 		digest := sha256.Sum256([]byte(*caCert.Cert))
@@ -331,7 +332,7 @@ func populateKICCACertificate(content *Content, file *KICContent) {
 	}
 }
 
-func populateKICCertificates(content *Content, file *KICContent) {
+func populateKICCertificates(content *file.Content, file *KICContent) {
 	// iterate content.Certificates and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, cert := range content.Certificates {
 		digest := sha256.Sum256([]byte(*cert.Cert))
@@ -353,7 +354,7 @@ func populateKICCertificates(content *Content, file *KICContent) {
 	}
 }
 
-func populateKICKongClusterPlugins(content *Content, file *KICContent) error {
+func populateKICKongClusterPlugins(content *file.Content, file *KICContent) error {
 	// Global Plugins map to KongClusterPlugins
 	// iterate content.Plugins and copy them into kicv1.KongPlugin manifests
 	// add the kicv1.KongPlugin to the KICContent.KongClusterPlugins slice
@@ -388,7 +389,7 @@ func populateKICKongClusterPlugins(content *Content, file *KICContent) error {
 	return nil
 }
 
-func populateKICConsumers(content *Content, file *KICContent) error {
+func populateKICConsumers(content *file.Content, file *KICContent) error {
 	// Iterate Kong Consumers and copy them into KongConsumer
 	for i := range content.Consumers {
 		consumer := content.Consumers[i]
@@ -450,7 +451,7 @@ func populateKICConsumers(content *Content, file *KICContent) error {
 	return nil
 }
 
-func populateKICMTLSAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICMTLSAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.MTLSAuths and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, mtlsAuth := range consumer.MTLSAuths {
 		var secret k8scorev1.Secret
@@ -482,7 +483,7 @@ func populateKICMTLSAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCon
 	}
 }
 
-func populateKICACLGroupSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICACLGroupSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.ACLGroups and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, aclGroup := range consumer.ACLGroups {
 		var secret k8scorev1.Secret
@@ -505,7 +506,7 @@ func populateKICACLGroupSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCon
 	}
 }
 
-func populateKICOAuth2CredSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICOAuth2CredSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.OAuth2Creds and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, oauth2Cred := range consumer.Oauth2Creds {
 		var secret k8scorev1.Secret
@@ -544,7 +545,7 @@ func populateKICOAuth2CredSecrets(consumer *FConsumer, kongConsumer *kicv1.KongC
 	}
 }
 
-func populateKICBasicAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICBasicAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.BasicAuths and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, basicAuth := range consumer.BasicAuths {
 		var secret k8scorev1.Secret
@@ -570,7 +571,7 @@ func populateKICBasicAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCo
 	}
 }
 
-func populateKICJWTAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICJWTAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.JWTAuths and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, jwtAuth := range consumer.JWTAuths {
 		var secret k8scorev1.Secret
@@ -606,7 +607,7 @@ func populateKICJWTAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCons
 	}
 }
 
-func populateKICHMACSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICHMACSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.HMACAuths and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	for _, hmacAuth := range consumer.HMACAuths {
 		var secret k8scorev1.Secret
@@ -633,7 +634,7 @@ func populateKICHMACSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsume
 	}
 }
 
-func populateKICKeyAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICKeyAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
 	// iterate consumer.KeyAuths and copy them into k8scorev1.Secret, then add them to kicContent.Secrets
 	// add the secret name to the kongConsumer.credentials
 	for _, keyAuth := range consumer.KeyAuths {
@@ -657,7 +658,12 @@ func populateKICKeyAuthSecrets(consumer *FConsumer, kongConsumer *kicv1.KongCons
 	}
 }
 
-func populateKICUpstream(content *Content, service *FService, k8sservice *k8scorev1.Service, kicContent *KICContent) {
+func populateKICUpstream(
+	content *file.Content,
+	service *file.FService,
+	k8sservice *k8scorev1.Service,
+	kicContent *KICContent,
+) {
 	// add Kong specific configuration to the k8s service via a KongIngress resource
 
 	if content.Upstreams != nil {
@@ -677,7 +683,7 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 
 		// Find the upstream (if any) whose name matches the service host and copy the upstream
 		// into a kicv1.KongIngress resource. Append the kicv1.KongIngress to kicContent.KongIngresses.
-		var found bool = false
+		found := false
 		for _, upstream := range content.Upstreams {
 			if upstream.Name != nil && strings.EqualFold(*upstream.Name, *service.Host) {
 				found = true
@@ -705,7 +711,7 @@ func populateKICUpstream(content *Content, service *FService, k8sservice *k8scor
 	}
 }
 
-func addPluginsToService(service FService, k8sService k8scorev1.Service, kicContent *KICContent) error {
+func addPluginsToService(service file.FService, k8sService k8scorev1.Service, kicContent *KICContent) error {
 	for _, plugin := range service.Plugins {
 		var kongPlugin kicv1.KongPlugin
 		kongPlugin.APIVersion = KICAPIVersion
@@ -739,7 +745,12 @@ func addPluginsToService(service FService, k8sService k8scorev1.Service, kicCont
 	return nil
 }
 
-func addPluginsToRoute(service FService, route *FRoute, ingress k8snetv1.Ingress, kicContent *KICContent) error {
+func addPluginsToRoute(
+	service file.FService,
+	route *file.FRoute,
+	ingress k8snetv1.Ingress,
+	kicContent *KICContent,
+) error {
 	for _, plugin := range route.Plugins {
 		var kongPlugin kicv1.KongPlugin
 		kongPlugin.APIVersion = KICAPIVersion
@@ -773,7 +784,7 @@ func addPluginsToRoute(service FService, route *FRoute, ingress k8snetv1.Ingress
 	return nil
 }
 
-func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
+func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) error {
 	// iterate over the consumer groups and create a KongConsumerGroup for each one
 	for _, consumerGroup := range content.ConsumerGroups {
 		var kongConsumerGroup kicv1beta1.KongConsumerGroup
@@ -849,8 +860,8 @@ func populateKICConsumerGroups(content *Content, kicContent *KICContent) error {
 /////
 
 func populateKICServiceProxyAndUpstreamCustomResources(
-	content *Content,
-	service *FService,
+	content *file.Content,
+	service *file.FService,
 	k8sservice *k8scorev1.Service,
 	kicContent *KICContent,
 ) {
@@ -905,7 +916,7 @@ func populateKICServiceProxyAndUpstreamCustomResources(
 	kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
 }
 
-func populateKICServicesWithCustomResources(content *Content, kicContent *KICContent) error {
+func populateKICServicesWithCustomResources(content *file.Content, kicContent *KICContent) error {
 	// Iterate Kong Services and create k8s Services,
 	// then create KongIngress resources for Kong Service
 	// specific configuration and Upstream data.
@@ -964,7 +975,7 @@ func populateKICServicesWithCustomResources(content *Content, kicContent *KICCon
 	return nil
 }
 
-func populateKICIngressesWithCustomResources(content *Content, kicContent *KICContent) error {
+func populateKICIngressesWithCustomResources(content *file.Content, kicContent *KICContent) error {
 	// For each route under each service create one ingress.
 	// If the route has multiple hosts, create the relevant host declarations in the ingress
 	// and under each hosts create a declaration for each path in the route.
@@ -1139,7 +1150,7 @@ func populateKICIngressesWithCustomResources(content *Content, kicContent *KICCo
 // Functions for ANNOTATION based manifests
 /////
 
-func populateKICServicesWithAnnotations(content *Content, kicContent *KICContent) error {
+func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICContent) error {
 	// Iterate Kong Services and create k8s Services,
 	// then create KongIngress resources for Kong Service Upstream data.
 	// Finally, create KongPlugin resources for each plugin
@@ -1228,7 +1239,7 @@ func populateKICServicesWithAnnotations(content *Content, kicContent *KICContent
 	return nil
 }
 
-func populateKICIngressesWithAnnotations(content *Content, kicContent *KICContent) error {
+func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICContent) error {
 	// For each route under each service create one ingress.
 	// If the route has multiple hosts, create the relevant host declarations in the ingress
 	// and under each hosts create a declaration for each path in the route.
@@ -1450,7 +1461,7 @@ func populateKICIngressesWithAnnotations(content *Content, kicContent *KICConten
 // ///
 // Functions for GATEWAY API based manifests
 // ///
-func populateKICIngressesWithGatewayAPI(content *Content, kicContent *KICContent) error {
+func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICContent) error {
 	for _, service := range content.Services {
 		for _, route := range service.Routes {
 			var httpRoute k8sgwapiv1.HTTPRoute
@@ -1632,7 +1643,7 @@ func populateKICIngressesWithGatewayAPI(content *Content, kicContent *KICContent
 }
 
 func addPluginsToGatewayAPIRoute(
-	service FService, route *FRoute, httpRoute k8sgwapiv1.HTTPRoute, kicContent *KICContent,
+	service file.FService, route *file.FRoute, httpRoute k8sgwapiv1.HTTPRoute, kicContent *KICContent,
 ) error {
 	for _, plugin := range route.Plugins {
 		var kongPlugin kicv1.KongPlugin
