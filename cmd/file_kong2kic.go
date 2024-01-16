@@ -5,8 +5,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/kong/deck/file"
+	"github.com/kong/deck/kong2kic"
 	"github.com/kong/go-apiops/logbasics"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/spf13/cobra"
 )
 
@@ -29,11 +30,11 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 	)
 
 	if CmdKong2KicV1beta1 {
-		file.GatewayAPIVersion = "gateway.networking.k8s.io/v1beta1"
+		kong2kic.GatewayAPIVersion = "gateway.networking.k8s.io/v1beta1"
 	} else {
-		file.GatewayAPIVersion = "gateway.networking.k8s.io/v1"
+		kong2kic.GatewayAPIVersion = "gateway.networking.k8s.io/v1"
 	}
-	file.ClassName = CmdKong2KicClassName
+	kong2kic.ClassName = CmdKong2KicClassName
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
 
@@ -46,25 +47,26 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 	if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" &&
 		strings.ToUpper(cmdKong2KicAPI) == "INGRESS" &&
 		strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
-		outputFileFormat = file.KICJSONCrdIngressAPI
+
+		outputFileFormat = kong2kic.KICJSONCrdIngressAPI
 	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" &&
 		strings.ToUpper(cmdKong2KicAPI) == "INGRESS" &&
 		strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
-		outputFileFormat = file.KICJSONAnnotationIngressAPI
+		outputFileFormat = kong2kic.KICJSONAnnotationIngressAPI
 	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" &&
 		strings.ToUpper(cmdKong2KicAPI) == "INGRESS" &&
 		strings.ToUpper(cmdKong2KicManifestStyle) == "CRD" {
-		outputFileFormat = file.KICYAMLCrdIngressAPI
+		outputFileFormat = kong2kic.KICYAMLCrdIngressAPI
 	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" &&
 		strings.ToUpper(cmdKong2KicAPI) == "INGRESS" &&
 		strings.ToUpper(cmdKong2KicManifestStyle) == "ANNOTATION" {
-		outputFileFormat = file.KICYAMLAnnotationIngressAPI
+		outputFileFormat = kong2kic.KICYAMLAnnotationIngressAPI
 	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "JSON" &&
 		strings.ToUpper(cmdKong2KicAPI) == "GATEWAY" {
-		outputFileFormat = file.KICJSONGatewayAPI
+		outputFileFormat = kong2kic.KICJSONGatewayAPI
 	} else if strings.ToUpper(cmdKong2KicOutputFormat) == "YAML" &&
 		strings.ToUpper(cmdKong2KicAPI) == "GATEWAY" {
-		outputFileFormat = file.KICYAMLGatewayAPI
+		outputFileFormat = kong2kic.KICYAMLGatewayAPI
 	} else {
 		return fmt.Errorf("invalid combination of output format and manifest style")
 	}
