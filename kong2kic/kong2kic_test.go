@@ -8,125 +8,79 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_convertKongGatewayToIngress(t *testing.T) {
-	type args struct {
-		inputFilename                string
-		outputFilenameYAMLCRD        string
-		outputFilenameYAMLAnnotation string
-		outputFilenameJSONCRD        string
-		outputFilenameJSONAnnotation string
-		outputFilenameYAMLGateway    string
-		outputFilenameJSONGateway    string
+var baseLocation = "testdata/"
+
+func compareFileContent(t *testing.T, expectedFilename string, actual []byte) {
+	expected, err := os.ReadFile(baseLocation + expectedFilename)
+	if err != nil {
+		assert.Fail(t, err.Error())
 	}
+	assert.Equal(t, string(expected), string(actual))
+}
+
+func Test_convertKongGatewayToIngress(t *testing.T) {
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name           string
+		inputFilename  string
+		outputFilename string
+		builderType    string
+		wantErr        bool
 	}{
 		{
-			name: "Kong to KIC",
-			args: args{
-				inputFilename:                "input.yaml",
-				outputFilenameYAMLCRD:        "custom_resources/yaml/expected-output.yaml",
-				outputFilenameJSONCRD:        "custom_resources/json/expected-output.json",
-				outputFilenameYAMLAnnotation: "annotations/yaml/expected-output.yaml",
-				outputFilenameJSONAnnotation: "annotations/json/expected-output.json",
-				outputFilenameYAMLGateway:    "gateway/yaml/expected-output.yaml",
-				outputFilenameJSONGateway:    "gateway/json/expected-output.json",
-			},
-			wantErr: false,
+			name:           "Kong to KIC: customresources, yaml",
+			inputFilename:  "input.yaml",
+			outputFilename: "custom_resources/yaml/output-expected.yaml",
+			builderType:    CUSTOMRESOURCE,
+			wantErr:        false,
+		},
+		{
+			name:           "Kong to KIC: customresources, json",
+			inputFilename:  "input.yaml",
+			outputFilename: "custom_resources/json/output-expected.json",
+			builderType:    CUSTOMRESOURCE,
+			wantErr:        false,
+		},
+		{
+			name:           "Kong to KIC: annotations, yaml",
+			inputFilename:  "input.yaml",
+			outputFilename: "annotations/yaml/output-expected.yaml",
+			builderType:    ANNOTATIONS,
+			wantErr:        false,
+		},
+		{
+			name:           "Kong to KIC: annotations, json",
+			inputFilename:  "input.yaml",
+			outputFilename: "annotations/json/output-expected.json",
+			builderType:    ANNOTATIONS,
+			wantErr:        false,
+		},
+		{
+			name:           "Kong to KIC: gateway, yaml",
+			inputFilename:  "input.yaml",
+			outputFilename: "gateway/yaml/output-expected.yaml",
+			builderType:    GATEWAY,
+			wantErr:        false,
+		},
+		{
+			name:           "Kong to KIC: gateway, json",
+			inputFilename:  "input.yaml",
+			outputFilename: "gateway/json/output-expected.json",
+			builderType:    GATEWAY,
+			wantErr:        false,
 		},
 	}
 	for _, tt := range tests {
-		BaseLocation := "testdata/kong2kic/"
 		t.Run(tt.name, func(t *testing.T) {
-			inputContent, err := file.GetContentFromFiles([]string{BaseLocation + tt.args.inputFilename}, false)
+			inputContent, err := file.GetContentFromFiles([]string{baseLocation + tt.inputFilename}, false)
 			if err != nil {
 				assert.Fail(t, err.Error())
 			}
 
-			output, err := MarshalKongToKICYaml(inputContent, CUSTOMRESOURCE)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
+			output, err := MarshalKongToKICYaml(inputContent, tt.builderType)
 			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameYAMLCRD)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
-			}
-
-			output, err = MarshalKongToKICYaml(inputContent, ANNOTATIONS)
-			if (err != nil) != tt.wantErr {
+				compareFileContent(t, tt.outputFilename, output)
+			} else if (err != nil) != tt.wantErr {
 				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameYAMLAnnotation)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
-			}
-
-			output, err = MarshalKongToKICYaml(inputContent, GATEWAY)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameYAMLGateway)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
-			}
-
-			output, err = MarshalKongToKICJson(inputContent, CUSTOMRESOURCE)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameJSONCRD)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
-			}
-
-			output, err = MarshalKongToKICJson(inputContent, ANNOTATIONS)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameJSONAnnotation)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
-			}
-
-			output, err = MarshalKongToKICJson(inputContent, GATEWAY)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("KongToKIC() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if err == nil {
-
-				expected, err := os.ReadFile(BaseLocation + tt.args.outputFilenameJSONGateway)
-				if err != nil {
-					assert.Fail(t, err.Error())
-				}
-				assert.Equal(t, string(expected), string(output))
 			}
 		})
 	}
