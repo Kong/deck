@@ -35,3 +35,6 @@ docs/cli-docs/
 # editor files
 .vscode/
 .idea/
+
+# generated test 'actuals'
+kong2kic/testdata/**/*-actual.*
