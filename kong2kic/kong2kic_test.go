@@ -12,6 +12,11 @@ import (
 
 var baseLocation = "testdata/"
 
+func fixJSONstream(input string) string {
+	// this is a stream of json files, must update to an actual json array
+	return "[" + strings.Replace(input, "}{", "},{", -1) + "]"
+}
+
 func compareFileContent(t *testing.T, expectedFilename string, actualContent []byte) {
 	expected, err := os.ReadFile(baseLocation + expectedFilename)
 	if err != nil {
@@ -22,7 +27,8 @@ func compareFileContent(t *testing.T, expectedFilename string, actualContent []b
 	os.WriteFile(actualFilename, actualContent, 0o600)
 
 	if strings.HasSuffix(expectedFilename, ".json") {
-		require.JSONEq(t, string(expected), string(actualContent))
+		// this is a stream of json files, must update to an actual json array
+		require.JSONEq(t, fixJSONstream(string(expected)), fixJSONstream(string(actualContent)))
 	} else {
 		require.YAMLEq(t, string(expected), string(actualContent))
 	}
@@ -86,7 +92,13 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 				assert.Fail(t, err.Error())
 			}
 
-			output, err := MarshalKongToKICYaml(inputContent, tt.builderType)
+			var output []byte
+			if strings.HasSuffix(tt.outputFilename, ".json") {
+				output, err = MarshalKongToKICJson(inputContent, tt.builderType)
+			} else {
+				output, err = MarshalKongToKICYaml(inputContent, tt.builderType)
+			}
+
 			if err == nil {
 				compareFileContent(t, tt.outputFilename, output)
 			} else if (err != nil) != tt.wantErr {
