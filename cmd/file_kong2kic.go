@@ -71,7 +71,7 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("invalid combination of output format and manifest style")
 	}
 
-	err = file.WriteContentToFile(outputContent, cmdKong2KicOutputFilename, outputFileFormat)
+	err = kong2kic.WriteContentToFile(outputContent, cmdKong2KicOutputFilename, outputFileFormat)
 
 	if err != nil {
 		return fmt.Errorf("failed converting Kong to Ingress '%s'; %w", cmdKong2KicInputFilename, err)
