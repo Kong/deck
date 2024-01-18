@@ -23,6 +23,7 @@ var (
 
 // Executes the CLI command "kong2kic"
 func executeKong2Kic(cmd *cobra.Command, _ []string) error {
+	_ = sendAnalytics("file-kong2kic", "", modeLocal)
 	var (
 		outputContent    *file.Content
 		err              error
