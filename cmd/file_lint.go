@@ -74,6 +74,7 @@ func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
 func executeLint(cmd *cobra.Command, args []string) error {
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+	_ = sendAnalytics("file-lint", "", modeLocal)
 
 	customRuleSet, err := getRuleSet(args[0])
 	if err != nil {
