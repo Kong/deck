@@ -240,7 +240,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
 	if err != nil {
-		return fmt.Errorf("error determining lookup selector tags: %w", err)
+		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
 	}
 
 	if dumpConfig.LookUpSelectorTagsConsumers != nil {
@@ -252,6 +252,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
 			if err != nil {
 				return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
+			}
+		}
+	}
+
+	dumpConfig.LookUpSelectorTagsRoutes, err = determineLookUpSelectorTagsRoutes(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for routes: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsRoutes != nil {
+		routesGlobal, err := dump.GetAllRoutes(ctx, kongClient, dumpConfig.LookUpSelectorTagsRoutes)
+		if err != nil {
+			return fmt.Errorf("error retrieving global routes via lookup selector tags: %w", err)
+		}
+		for _, r := range routesGlobal {
+			targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
+			if err != nil {
+				return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
 			}
 		}
 	}
@@ -349,6 +367,21 @@ func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string,
 		utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
 		return targetContent.Info.LookUpSelectorTags.Consumers, nil
+
+	}
+	return nil, nil
+}
+
+func determineLookUpSelectorTagsRoutes(targetContent file.Content) ([]string, error) {
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.Routes != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Routes) == 0 {
+			return nil, fmt.Errorf("global routes specified but no global tags")
+		}
+		utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Routes)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.Routes)
+		return targetContent.Info.LookUpSelectorTags.Routes, nil
 
 	}
 	return nil, nil

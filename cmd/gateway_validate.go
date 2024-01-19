@@ -51,7 +51,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		// if this is an online validation, we need to look up upstream consumers if required.
 		lookUpSelectorTagsConsumers, err := determineLookUpSelectorTagsConsumers(*targetContent)
 		if err != nil {
-			return fmt.Errorf("error determining lookup selector tags: %w", err)
+			return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
 		}
 
 		if lookUpSelectorTagsConsumers != nil {
@@ -63,6 +63,25 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 				targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
 				if err != nil {
 					return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
+				}
+			}
+		}
+
+		// if this is an online validation, we need to look up upstream routes if required.
+		lookUpSelectorTagsRoutes, err := determineLookUpSelectorTagsRoutes(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags for routes: %w", err)
+		}
+
+		if lookUpSelectorTagsRoutes != nil {
+			routesGlobal, err := dump.GetAllRoutes(ctx, kongClient, lookUpSelectorTagsRoutes)
+			if err != nil {
+				return fmt.Errorf("error retrieving global routes via lookup selector tags: %w", err)
+			}
+			for _, r := range routesGlobal {
+				targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
+				if err != nil {
+					return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
 				}
 			}
 		}
