@@ -1,0 +1,8 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - global-routes
+routes:
+- name: foo
+  paths:
+  - /foo

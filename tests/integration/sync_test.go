@@ -4825,3 +4825,41 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 }
+
+// Test_Sync_LookupRoutesTags tests that existing behavior when referencing
+// routes from plugins is preserved:
+// - if a referenced route is not present in the state file, the sync fails
+// - if a referenced route is present in the state file, the sync succeeds
+//
+// This test also tests that the new behavior is implemented correctly:
+//   - if a referenced route is not present in the state file, but is present
+//     in Kong when using the new lookup selector tags, the sync succeeds
+//   - if a referenced route is not present in the state file and neither in
+//     Kong when using the new lookup selector tags, the sync fails
+func Test_Sync_LookupRoutesTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	// test that reference to non-existing route fails.
+	pluginsNoLookupStateFile := "testdata/sync/030-lookup-tags-routes/plugins_no_lookup.yaml"
+	err := sync(pluginsNoLookupStateFile)
+	require.Error(t, err)
+	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to existing local route succeeds.
+	pluginsAndRoutesStateFile := "testdata/sync/030-lookup-tags-routes/plugins_and_routes.yaml"
+	require.NoError(t, sync(pluginsAndRoutesStateFile))
+	reset(t)
+
+	// test that reference to existing global route succeeds via lookup tags.
+	globalRoutesStateFile := "testdata/sync/030-lookup-tags-routes/global_routes.yaml"
+	require.NoError(t, sync(globalRoutesStateFile))
+	// sync plugins with lookup reference to global routes.
+	pluginsLookupStateFile := "testdata/sync/030-lookup-tags-routes/plugins_lookup.yaml"
+	require.NoError(t, sync(pluginsLookupStateFile))
+	reset(t)
+
+	// test that reference to non-existing global route fails via lookup tags.
+	require.Error(t, sync(pluginsLookupStateFile))
+	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
+}
