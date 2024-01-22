@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.31.0](#v1310)
 - [v1.30.0](#v1300)
 - [v1.29.2](#v1292)
 - [v1.29.1](#v1291)
@@ -71,6 +72,21 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.31.0]
+
+> Release date: 2023/01/22
+
+### Fixes
+
+- Add missing analytics for `file` commands.
+  [#1171](https://github.com/Kong/deck/pull/1171)
+
+### Added
+
+- Add support to `default_lookup_tags` to pull entities not part of the configuration file.
+  [#1124](https://github.com/Kong/deck/pull/1124)
+  [#1173](https://github.com/Kong/deck/pull/1173)
 
 ## [v1.30.0]
 
@@ -1509,6 +1525,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.31.0]: https://github.com/kong/deck/compare/v1.30.0...v1.31.0
 [v1.30.0]: https://github.com/kong/deck/compare/v1.29.2...v1.30.0
 [v1.29.2]: https://github.com/kong/deck/compare/v1.29.1...v1.29.2
 [v1.29.1]: https://github.com/kong/deck/compare/v1.29.0...v1.29.1
