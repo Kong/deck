@@ -59,50 +59,53 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-func validateInput(cmdKong2KicOutputFormat, cmdKong2KicAPI, cmdKong2KicManifestStyle string) (outputFileFormat file.Format, err error) {
-		const (
-			JSON        = "JSON"
-			YAML        = "YAML"
-			INGRESS     = "INGRESS"
-			GATEWAY     = "GATEWAY"
-			CRD         = "CRD"
-			ANNOTATION  = "ANNOTATION"
-		)
+func validateInput(cmdKong2KicOutputFormat, cmdKong2KicAPI, cmdKong2KicManifestStyle string) (
+	outputFileFormat file.Format, err error,
+) {
+	const (
+		JSON       = "JSON"
+		YAML       = "YAML"
+		INGRESS    = "INGRESS"
+		GATEWAY    = "GATEWAY"
+		CRD        = "CRD"
+		ANNOTATION = "ANNOTATION"
+	)
 
-		if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
-			strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
-			strings.ToUpper(cmdKong2KicManifestStyle) == CRD {
-			outputFileFormat = kong2kic.KICJSONCrdIngressAPI
-		} else if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
-			strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
-			strings.ToUpper(cmdKong2KicManifestStyle) == ANNOTATION {
-			outputFileFormat = kong2kic.KICJSONAnnotationIngressAPI
-		} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
-			strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
-			strings.ToUpper(cmdKong2KicManifestStyle) == CRD {
-			outputFileFormat = kong2kic.KICYAMLCrdIngressAPI
-		} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
-			strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
-			strings.ToUpper(cmdKong2KicManifestStyle) == ANNOTATION {
-			outputFileFormat = kong2kic.KICYAMLAnnotationIngressAPI
-		} else if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
-			strings.ToUpper(cmdKong2KicAPI) == GATEWAY {
-			outputFileFormat = kong2kic.KICJSONGatewayAPI
-		} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
-			strings.ToUpper(cmdKong2KicAPI) == GATEWAY {
-			outputFileFormat = kong2kic.KICYAMLGatewayAPI
-		} else {
-			err = fmt.Errorf("invalid combination of output format and manifest style. Valid combinations are:\n"+
-				"Ingress API with annotation style in YAML format: --format yaml --api ingress --style annotation\n"+
-				"Ingress API with annotation style in JSON format: --format json --api ingress --style annotation\n"+
-				"Ingress API with CRD style in YAML format: --format yaml --api ingress --style crd\n"+
-				"Ingress API with CRD style in JSON format: --format json --api ingress --style crd\n"+
-				"Gateway API in YAML format: --format yaml --api gateway\n"+
-				"Gateway API in JSON format: --format json --api gateway")
-		}
-
-		return outputFileFormat, err
+	if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
+		strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == CRD {
+		outputFileFormat = kong2kic.KICJSONCrdIngressAPI
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
+		strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == ANNOTATION {
+		outputFileFormat = kong2kic.KICJSONAnnotationIngressAPI
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
+		strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == CRD {
+		outputFileFormat = kong2kic.KICYAMLCrdIngressAPI
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
+		strings.ToUpper(cmdKong2KicAPI) == INGRESS &&
+		strings.ToUpper(cmdKong2KicManifestStyle) == ANNOTATION {
+		outputFileFormat = kong2kic.KICYAMLAnnotationIngressAPI
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == JSON &&
+		strings.ToUpper(cmdKong2KicAPI) == GATEWAY {
+		outputFileFormat = kong2kic.KICJSONGatewayAPI
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == YAML &&
+		strings.ToUpper(cmdKong2KicAPI) == GATEWAY {
+		outputFileFormat = kong2kic.KICYAMLGatewayAPI
+	} else {
+		err = fmt.Errorf("invalid combination of output format and manifest style. Valid combinations are:\n" +
+			"Ingress API with annotation style in YAML format: --format yaml --api ingress --style annotation\n" +
+			"Ingress API with annotation style in JSON format: --format json --api ingress --style annotation\n" +
+			"Ingress API with CRD style in YAML format: --format yaml --api ingress --style crd\n" +
+			"Ingress API with CRD style in JSON format: --format json --api ingress --style crd\n" +
+			"Gateway API in YAML format: --format yaml --api gateway\n" +
+			"Gateway API in JSON format: --format json --api gateway")
 	}
+
+	return outputFileFormat, err
+}
+
 //
 //
 // Define the CLI data for the openapi2kong command

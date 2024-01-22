@@ -40,7 +40,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	)
 
 	const (
-		YAML_SEPARATOR = "---\n"
+		yamlSeparator = "---\n"
 	)
 
 	// iterate over the slices of kongIngresses, kongPlugins,
@@ -54,7 +54,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, kongIngresses...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 	}
 
 	for _, kongPlugin := range k.KongPlugins {
@@ -63,7 +63,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, kongPlugins...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -73,7 +73,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, kongClusterPlugins...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -83,7 +83,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, ingresses...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -93,7 +93,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, httpRoutes...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 	}
 
 	for _, service := range k.Services {
@@ -102,7 +102,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, services...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -112,7 +112,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, secrets...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -122,7 +122,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, kongConsumers...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 
 	}
 
@@ -132,7 +132,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 			return nil, err
 		}
 		output = append(output, kongConsumerGroups...)
-		output = append(output, []byte(YAML_SEPARATOR)...)
+		output = append(output, []byte(yamlSeparator)...)
 	}
 
 	return output, nil
