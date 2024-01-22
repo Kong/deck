@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.31.1](#v1311)
 - [v1.31.0](#v1310)
 - [v1.30.0](#v1300)
 - [v1.29.2](#v1292)
@@ -73,9 +74,19 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.31.1]
+
+> Release date: 2024/01/22
+
+### Fixes
+
+- Fix bug when using consumer-group scoped plugins with multiple nested entities.
+  [#1177](https://github.com/Kong/deck/pull/1177)
+  [go-database-reconciler #45](https://github.com/Kong/go-database-reconciler/pull/45)
+
 ## [v1.31.0]
 
-> Release date: 2023/01/22
+> Release date: 2024/01/22
 
 ### Fixes
 
@@ -90,7 +101,7 @@
 
 ## [v1.30.0]
 
-> Release date: 2023/01/11
+> Release date: 2024/01/11
 
 ### Fixes
 
@@ -1525,6 +1536,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.31.1]: https://github.com/kong/deck/compare/v1.31.0...v1.31.1
 [v1.31.0]: https://github.com/kong/deck/compare/v1.30.0...v1.31.0
 [v1.30.0]: https://github.com/kong/deck/compare/v1.29.2...v1.30.0
 [v1.29.2]: https://github.com/kong/deck/compare/v1.29.1...v1.29.2
