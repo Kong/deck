@@ -28,6 +28,11 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-namespace", "", modeLocal)
 
+	err := namespace.CheckNamespace(cmdNamespacePathPrefix)
+	if err != nil {
+		return fmt.Errorf("invalid path-prefix '%s': %w", cmdNamespacePathPrefix, err)
+	}
+
 	cmdNamespaceOutputFormat = strings.ToUpper(cmdNamespaceOutputFormat)
 
 	trackInfo := deckformat.HistoryNewEntry("namespace")
@@ -90,7 +95,7 @@ following approaches are used:
 `,
 		RunE: executeNamespace,
 		Example: `# Apply namespace to a deckfile
-deck file namespace --namespace=/my-namespace --state=deckfile.yaml
+deck file namespace --path-prefix=/kong --state=deckfile.yaml
 
 # Apply namespace to a deckfile, and write to a new file
 # Example file 'kong.yaml':
