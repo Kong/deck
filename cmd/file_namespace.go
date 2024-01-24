@@ -59,7 +59,7 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 
 	err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix, cmdNamespaceAllowEmptySelectors)
 	if err != nil {
-		return fmt.Errorf("failed to apply the namespace: %w. Use --allow-empty-selectors to suppress this error.", err)
+		return fmt.Errorf("failed to apply the namespace: %w", err)
 	}
 
 	data = jsonbasics.ConvertToJSONobject(yamlNode)
