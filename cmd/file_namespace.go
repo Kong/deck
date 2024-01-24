@@ -141,6 +141,7 @@ routes:
 		"The path based namespace to apply.")
 	namespaceCmd.Flags().BoolVarP(&cmdNamespaceAllowEmptySelectors, "allow-empty-selectors",
 		"", false, "do not error out if the selectors return empty")
+	namespaceCmd.Flags().Lookup("allow-empty-selectors").Hidden = true
 
 	return namespaceCmd
 }
