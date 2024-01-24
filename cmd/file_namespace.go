@@ -15,11 +15,12 @@ import (
 )
 
 var (
-	cmdNamespaceInputFilename  string
-	cmdNamespaceOutputFilename string
-	cmdNamespaceOutputFormat   string
-	cmdNamespaceSelectors      []string
-	cmdNamespacePathPrefix     string
+	cmdNamespaceInputFilename       string
+	cmdNamespaceOutputFilename      string
+	cmdNamespaceOutputFormat        string
+	cmdNamespaceSelectors           []string
+	cmdNamespacePathPrefix          string
+	cmdNamespaceAllowEmptySelectors bool
 )
 
 // Executes the CLI command "namespace"
@@ -56,7 +57,7 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix)
+	err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix, cmdNamespaceAllowEmptySelectors)
 	if err != nil {
 		return fmt.Errorf("failed to apply the namespace: %w", err)
 	}
@@ -138,6 +139,8 @@ routes:
 			"to selecting all routes.")
 	namespaceCmd.Flags().StringVarP(&cmdNamespacePathPrefix, "path-prefix", "p", "",
 		"The path based namespace to apply.")
+	namespaceCmd.Flags().BoolVarP(&cmdNamespaceAllowEmptySelectors, "allow-empty-selectors",
+		"", false, "do not error out if the selectors return empty")
 
 	return namespaceCmd
 }

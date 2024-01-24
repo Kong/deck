@@ -180,8 +180,8 @@ github.com/klauspost/cpuid/v2 v2.0.10/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuOb
 github.com/klauspost/cpuid/v2 v2.0.12/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuObKfj5c0PQa7c=
 github.com/klauspost/cpuid/v2 v2.2.3 h1:sxCkb+qR91z4vsqw4vGGZlDgPz3G7gjaLyK3V8y70BU=
 github.com/klauspost/cpuid/v2 v2.2.3/go.mod h1:RVVoqg1df56z8g3pUjL/3lE5UfnlrJX8tyFgg4nqhuY=
-github.com/kong/go-apiops v0.1.28 h1:Gniizfl4abbo+9wSx1oORN3GhEgklP4CQpzdcM5J5LM=
-github.com/kong/go-apiops v0.1.28/go.mod h1:ZNdiTZyVrAssB4wjEYWV7BfpcV9UME9LxnDDZhMPuNU=
+github.com/kong/go-apiops v0.1.29 h1:c+AB8MmGIr+K01Afm4GB2xaOmJnD/8KWMJQkr9qssnc=
+github.com/kong/go-apiops v0.1.29/go.mod h1:ZNdiTZyVrAssB4wjEYWV7BfpcV9UME9LxnDDZhMPuNU=
 github.com/kong/go-database-reconciler v1.3.1 h1:lppM6Tc7aGIpGMWax1zDgE0H4/ghSbB4c3Vt/E0OnzM=
 github.com/kong/go-database-reconciler v1.3.1/go.mod h1:kcK/+GpWqC4v0QJIKCfb1iZ3u+bKvQBfI1AxtayXdYs=
 github.com/kong/go-kong v0.50.0 h1:HDKn3o/02AH4cURvjzS09gqC4bHZDva5H8JJwYi7T1U=
