@@ -132,8 +132,8 @@ github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38/go.mod h1:kpwsk12EmLe
 github.com/google/pprof v0.0.0-20230207041349-798e818bf904/go.mod h1:uglQLonpP8qtYCYyzA+8c/9qtqgA3qsXGYqCPKARAFg=
 github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98 h1:pUa4ghanp6q4IJHwE9RwLgmVFfReJN+KbQ8ExNEUUoQ=
 github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
-github.com/google/uuid v1.5.0 h1:1p67kYwdtXjb0gL0BPiP1Av9wiZPo5A8z2cWkTZ+eyU=
-github.com/google/uuid v1.5.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gookit/color v1.4.2/go.mod h1:fqRyamkC1W8uxl+lxCQxOT09l/vYfZ+QeiX3rKQHCoQ=
 github.com/gookit/color v1.5.0/go.mod h1:43aQb+Zerm/BWh2GnrgOQm7ffz7tvQXEKV6BFMl7wAo=
 github.com/gookit/color v1.5.4 h1:FZmqs7XOyGgCAxmWyPslpiok1k05wmY3SJTytgvYFs0=
@@ -182,8 +182,8 @@ github.com/klauspost/cpuid/v2 v2.2.3 h1:sxCkb+qR91z4vsqw4vGGZlDgPz3G7gjaLyK3V8y7
 github.com/klauspost/cpuid/v2 v2.2.3/go.mod h1:RVVoqg1df56z8g3pUjL/3lE5UfnlrJX8tyFgg4nqhuY=
 github.com/kong/go-apiops v0.1.29 h1:c+AB8MmGIr+K01Afm4GB2xaOmJnD/8KWMJQkr9qssnc=
 github.com/kong/go-apiops v0.1.29/go.mod h1:ZNdiTZyVrAssB4wjEYWV7BfpcV9UME9LxnDDZhMPuNU=
-github.com/kong/go-database-reconciler v1.3.1 h1:lppM6Tc7aGIpGMWax1zDgE0H4/ghSbB4c3Vt/E0OnzM=
-github.com/kong/go-database-reconciler v1.3.1/go.mod h1:kcK/+GpWqC4v0QJIKCfb1iZ3u+bKvQBfI1AxtayXdYs=
+github.com/kong/go-database-reconciler v1.3.2 h1:pDrC7nudiAk9TerzLTPKpnRIOxs6hruGVKRDiYAPErQ=
+github.com/kong/go-database-reconciler v1.3.2/go.mod h1:4kOmpkeR32JxWvw2z2rSab2/VqVFq0+rsT+V590OCrI=
 github.com/kong/go-kong v0.51.0 h1:KuSvo+b265KuFGOkkdYONGtG6ci8WLomJ/5Xhs0XSHE=
 github.com/kong/go-kong v0.51.0/go.mod h1:JdLpEwKi/Usq2TCTEtIS4f6ADWN7sdDMSS1PvvD1Ldw=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
