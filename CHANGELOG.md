@@ -77,7 +77,7 @@
 
 ## [v1.32.0]
 
-> Release date: 2024/01/24
+> Release date: 2024/01/25
 
 ### Added
 
