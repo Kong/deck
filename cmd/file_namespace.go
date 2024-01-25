@@ -59,6 +59,10 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 
 	err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix, cmdNamespaceAllowEmptySelectors)
 	if err != nil {
+		if strings.Contains(err.Error(), "no routes matched the selectors") {
+			// append CLI specific message
+			err = fmt.Errorf("%w (use --allow-empty-selectors to suppress this error)", err)
+		}
 		return fmt.Errorf("failed to apply the namespace: %w", err)
 	}
 
