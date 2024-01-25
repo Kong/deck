@@ -1,6 +1,7 @@
 module github.com/kong/deck
 
-go 1.21.1
+go 1.21.5
+
 toolchain go1.21.6
 
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
