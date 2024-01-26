@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.32.1](#v1321)
 - [v1.32.0](#v1320)
 - [v1.31.1](#v1311)
 - [v1.31.0](#v1310)
@@ -74,6 +75,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.32.1]
+
+> Release date: 2024/01/29
+
+### Fixes
+
+- Correct a defect preventing the use of plugins config deduplication when
+  consumer-group scoped plugins are used.
+  [#1190](https://github.com/Kong/deck/pull/1190)
+  [go-database-reconciler #45](https://github.com/Kong/go-database-reconciler/pull/45)
 
 ## [v1.32.0]
 
@@ -1546,6 +1558,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.32.1]: https://github.com/kong/deck/compare/v1.32.0...v1.32.1
 [v1.32.0]: https://github.com/kong/deck/compare/v1.31.1...v1.32.0
 [v1.31.1]: https://github.com/kong/deck/compare/v1.31.0...v1.31.1
 [v1.31.0]: https://github.com/kong/deck/compare/v1.30.0...v1.31.0
