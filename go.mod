@@ -11,7 +11,7 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.29
-	github.com/kong/go-database-reconciler v1.4.0
+	github.com/kong/go-database-reconciler v1.5.0
 	github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
@@ -92,7 +92,7 @@ require (
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1 // indirect
-	github.com/shirou/gopsutil/v3 v3.23.12 // indirect
+	github.com/shirou/gopsutil/v3 v3.24.1 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
