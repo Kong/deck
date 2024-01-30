@@ -172,6 +172,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if konnectRuntimeGroup != "" {
 			konnectControlPlane = konnectRuntimeGroup
 		}
+		konnectConfig.TLSConfig = rootConfig.TLSConfig
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return err

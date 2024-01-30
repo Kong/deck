@@ -32,7 +32,10 @@ func authenticate(
 func GetKongClientForKonnectMode(
 	ctx context.Context, konnectConfig *utils.KonnectConfig,
 ) (*kong.Client, error) {
-	httpClient := utils.HTTPClient()
+	httpClient, err := utils.HTTPClientWithTLSConfig(konnectConfig.TLSConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	if konnectConfig.Token != "" {
 		konnectConfig.Headers = append(
@@ -45,7 +48,6 @@ func GetKongClientForKonnectMode(
 	}
 
 	// authenticate with konnect
-	var err error
 	var konnectClient *konnect.Client
 	var konnectAddress string
 	// get Konnect client
@@ -75,6 +77,7 @@ func GetKongClientForKonnectMode(
 		Debug:      konnectConfig.Debug,
 		Headers:    konnectConfig.Headers,
 		Retryable:  true,
+		TLSConfig:  konnectConfig.TLSConfig,
 	})
 }
 
@@ -86,6 +89,7 @@ func resetKonnectV2(ctx context.Context) error {
 		konnectControlPlane = defaultControlPlaneName
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
+	konnectConfig.TLSConfig = rootConfig.TLSConfig
 	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
@@ -113,6 +117,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		konnectControlPlane = defaultControlPlaneName
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
+	konnectConfig.TLSConfig = rootConfig.TLSConfig
 	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
 		return err
