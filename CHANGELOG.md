@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.33.0](#v1330)
 - [v1.32.1](#v1321)
 - [v1.32.0](#v1320)
 - [v1.31.1](#v1311)
@@ -75,6 +76,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.33.0]
+
+> Release date: 2024/02/01
+
+### Fixes
+
+- Correct a defect preventing TLS configuration flags from being used with Konnect.
+  [#1194](https://github.com/Kong/deck/pull/1194)
+  [go-database-reconciler #52](https://github.com/Kong/go-database-reconciler/pull/52)
 
 ## [v1.32.1]
 
@@ -1558,6 +1569,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.33.0]: https://github.com/kong/deck/compare/v1.32.1...v1.33.0
 [v1.32.1]: https://github.com/kong/deck/compare/v1.32.0...v1.32.1
 [v1.32.0]: https://github.com/kong/deck/compare/v1.31.1...v1.32.0
 [v1.31.1]: https://github.com/kong/deck/compare/v1.31.0...v1.31.1
