@@ -14,6 +14,7 @@ on:
 
 jobs:
   integration:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     strategy:
       matrix:
         kong_image:
