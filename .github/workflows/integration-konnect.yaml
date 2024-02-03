@@ -10,6 +10,7 @@ on: [pull_request]
 
 jobs:
   integration:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
