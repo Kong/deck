@@ -7,6 +7,7 @@ on:
 
 jobs:
   goreleaser:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,6 +34,7 @@ jobs:
           path: dist/*
 
   build-push-images:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: ubuntu-latest
     steps:
       - name: Add standard tags
