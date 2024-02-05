@@ -469,3 +469,78 @@ func Test_convertKongGatewayToKonnect(t *testing.T) {
 		})
 	}
 }
+
+func Test_convertAutoFields(t *testing.T) {
+	content := &file.Content{
+		Services: []file.FService{
+			{
+				Service: kong.Service{
+					Name: kong.String("s1"),
+					Host: kong.String("httpbin.org"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name:   kong.String("rate-limiting-advanced"),
+							Config: kong.Configuration{},
+						},
+					},
+				},
+			},
+		},
+		Routes: []file.FRoute{
+			{
+				Route: kong.Route{
+					Name:  kong.String("r1"),
+					Paths: []*string{kong.String("/r1")},
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name:   kong.String("rate-limiting-advanced"),
+							Config: kong.Configuration{},
+						},
+					},
+				},
+			},
+		},
+		Consumers: []file.FConsumer{
+			{
+				Consumer: kong.Consumer{
+					Username: kong.String("foo"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name:   kong.String("rate-limiting-advanced"),
+							Config: kong.Configuration{},
+						},
+					},
+				},
+			},
+		},
+		Plugins: []file.FPlugin{
+			{
+				Plugin: kong.Plugin{
+					Name:   kong.String("rate-limiting-advanced"),
+					Config: kong.Configuration{},
+				},
+			},
+		},
+	}
+
+	got, err := convertKongGateway2xTo3x(content, "-")
+	assert.NoError(t, err)
+
+	globalPluginConfig := got.Plugins[0].Config
+	assert.NotEmpty(t, globalPluginConfig["namespace"])
+
+	servicePluginConfig := got.Services[0].Plugins[0].Config
+	assert.NotEmpty(t, servicePluginConfig["namespace"])
+
+	routePluginConfig := got.Routes[0].Plugins[0].Config
+	assert.NotEmpty(t, routePluginConfig["namespace"])
+
+	consumerPluginConfig := got.Consumers[0].Plugins[0].Config
+	assert.NotEmpty(t, consumerPluginConfig["namespace"])
+}
