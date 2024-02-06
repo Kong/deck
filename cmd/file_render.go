@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	fileRenderCmdKongStateFile  []string
-	fileRenderCmdKongFileOutput string
-	fileRenderCmdStateFormat    string
+	fileRenderCmdKongStateFile   []string
+	fileRenderCmdKongFileOutput  string
+	fileRenderCmdStateFormat     string
+	fileRenderCmdPopulateEnvVars bool
 )
 
 func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
@@ -22,7 +23,7 @@ func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
 		file.Format(strings.ToUpper(fileRenderCmdStateFormat)),
 		convert.FormatDistributed,
 		convert.FormatKongGateway3x,
-		true)
+		!fileRenderCmdPopulateEnvVars)
 }
 
 func newFileRenderCmd() *cobra.Command {
@@ -61,6 +62,9 @@ combined JSON file:
 			"Use `-` to write to stdout.")
 	renderCmd.Flags().StringVar(&fileRenderCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml.")
+	renderCmd.Flags().BoolVar(&fileRenderCmdPopulateEnvVars, "populate-env-vars", false,
+		"Populate 'DECK_' environment variables in the output file. The default behavior\n"+
+			"is to mock environment variable values.")
 
 	return renderCmd
 }
