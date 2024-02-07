@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+- config:
+    foo: ${{ env "DECK_FOO_FLOAT" | toFloat }}
+  name: foofloat
+services:
+- connect_timeout: 60000
+  enabled: ${{ env "DECK_MOCKBIN_ENABLED" | toBool }}
+  host: ${{ env "DECK_MOCKBIN_HOST" }}
+  name: svc1
+  protocol: http
+  read_timeout: 60000
+  write_timeout: ${{ env "DECK_WRITE_TIMEOUT" | toInt }}

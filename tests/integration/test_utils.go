@@ -353,3 +353,26 @@ func ping(opts ...string) error {
 	deckCmd.SetArgs(args)
 	return deckCmd.ExecuteContext(context.Background())
 }
+
+func render(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"file", "render"}
+
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return stripansi.Strip(string(out)), cmdErr
+}
