@@ -3,7 +3,6 @@ kind: KongIngress
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service-upstream
 upstream:
   algorithm: round-robin
@@ -95,10 +94,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service-rate-limiting-advanced
 plugin: rate-limiting-advanced
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -110,10 +107,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long9344b5559f
 plugin: aws-lambda
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -132,10 +127,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longfdeaa51f90
 plugin: cors
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -145,10 +138,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long3b4b1fae8e
 plugin: file-log
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -163,10 +154,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long59030a424c
 plugin: http-log
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -178,10 +167,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longb44edd01cf
 plugin: ip-restriction
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -198,10 +185,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longef35b834c6
 plugin: rate-limiting-advanced
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -211,10 +196,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longb2c08ebc54
 plugin: request-termination
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -226,10 +209,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longc400f1ab11
 plugin: response-ratelimiting
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -239,10 +220,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long47f9f5054d
 plugin: tcp-log
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -251,10 +230,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long26f9714514
 plugin: basic-auth
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -274,10 +251,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long0239c8f63e
 plugin: jwt
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -290,10 +265,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long5494737f3e
 plugin: key-auth
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -305,10 +278,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long89ae2d2b5d
 plugin: mtls-auth
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -318,10 +289,8 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-longb2440ac898
 plugin: acl
-status: {}
 ---
 apiVersion: configuration.konghq.com/v1
 config:
@@ -338,12 +307,10 @@ kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-user-rate-limiting-advanced
 plugin: rate-limiting-advanced
-status: {}
 ---
-apiVersion: gateway.networking.k8s.io/v1
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   annotations:
@@ -352,7 +319,6 @@ metadata:
     konghq.com/regex-priority: "1"
     konghq.com/snis: example.com
     konghq.com/strip-path: "false"
-  creationTimestamp: null
   name: example-service--route-thisisaveryvery-long2093a020ca
 spec:
   hostnames:
@@ -878,8 +844,6 @@ spec:
       path:
         type: PathPrefix
         value: /v1/yet-another-example
-status:
-  parents: null
 ---
 apiVersion: v1
 kind: Service
@@ -893,7 +857,6 @@ metadata:
     konghq.com/read-timeout: "60000"
     konghq.com/retries: "5"
     konghq.com/write-timeout: "60000"
-  creationTimestamp: null
   name: example-service
 spec:
   ports:
@@ -902,15 +865,12 @@ spec:
     targetPort: 80
   selector:
     app: example-service
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: key-auth-example-user
 stringData:
   key: my_api_key
@@ -921,7 +881,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: jwt-auth-example-user
 stringData:
   algorithm: HS256
@@ -944,7 +903,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: basic-auth-example-user
 stringData:
   kongCredType: basic-auth
@@ -956,7 +914,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: acl-group-example-user
 stringData:
   group: acl_group
@@ -967,7 +924,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: mtls-auth-example-user
 stringData:
   id: cce8c384-721f-4f58-85dd-50834e3e733a
@@ -980,7 +936,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-a672ab52d2341203bd70116b456413d7ac3ffc162abbf
 stringData:
   ca.crt: |
@@ -1002,7 +957,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e6e08e84471
 stringData:
   ca.crt: |
@@ -1025,7 +979,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-6b095c7ff377b01252a4dfec59c582fe32934fa7ed0cf
 stringData:
   ca.crt: |
@@ -1052,7 +1005,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: cert-0ee0e1584c8637facac95bd5fce315367dee124c0086d41e
 type: kubernetes.io/tls
 ---
@@ -1064,7 +1016,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: cert-b12464ec431576239dd9cc2545d528f6cbdbd988cf076323
 type: kubernetes.io/tls
 ---
@@ -1083,9 +1034,7 @@ metadata:
   annotations:
     konghq.com/plugins: example-user-rate-limiting-advanced
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-user
-status: {}
 username: example-user
 ---
 apiVersion: configuration.konghq.com/v1beta1
@@ -1093,7 +1042,5 @@ kind: KongConsumerGroup
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-consumer-group
-status: {}
 ---

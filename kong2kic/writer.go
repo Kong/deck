@@ -10,7 +10,7 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/utils"
 )
 
-func WriteContentToFile(content *file.Content, filename string, format file.Format) error {
+func WriteContentToFile(content *file.Content, filename string, format file.Format, yamlOrJSON string) error {
 	var c []byte
 	var err error
 
@@ -25,33 +25,39 @@ func WriteContentToFile(content *file.Content, filename string, format file.Form
 	// 	if err != nil {
 	// 		return err
 	// 	}
-	case KICJSONCrdIngressAPI:
-		c, err = MarshalKongToKICJson(content, CUSTOMRESOURCE)
+	case KICV3GATEWAY:
+		if yamlOrJSON == file.YAML {
+			c, err = MarshalKongToKICYaml(content, KICV3GATEWAY)
+		} else {
+			c, err = MarshalKongToKICJson(content, KICV3GATEWAY)
+		}
 		if err != nil {
 			return err
 		}
-	case KICYAMLCrdIngressAPI:
-		c, err = MarshalKongToKICYaml(content, CUSTOMRESOURCE)
+	case KICV3INGRESS:
+		if yamlOrJSON == file.YAML {
+			c, err = MarshalKongToKICYaml(content, KICV3INGRESS)
+		} else {
+			c, err = MarshalKongToKICJson(content, KICV3INGRESS)
+		}
 		if err != nil {
 			return err
 		}
-	case KICJSONAnnotationIngressAPI:
-		c, err = MarshalKongToKICJson(content, ANNOTATIONS)
+	case KICV2GATEWAY:
+		if yamlOrJSON == file.YAML {
+			c, err = MarshalKongToKICYaml(content, KICV2GATEWAY)
+		} else {
+			c, err = MarshalKongToKICJson(content, KICV2GATEWAY)
+		}
 		if err != nil {
 			return err
 		}
-	case KICYAMLAnnotationIngressAPI:
-		c, err = MarshalKongToKICYaml(content, ANNOTATIONS)
-		if err != nil {
-			return err
+	case KICV2INGRESS:
+		if yamlOrJSON == file.YAML {
+			c, err = MarshalKongToKICYaml(content, KICV2INGRESS)
+		} else {
+			c, err = MarshalKongToKICJson(content, KICV2INGRESS)
 		}
-	case KICJSONGatewayAPI:
-		c, err = MarshalKongToKICJson(content, GATEWAY)
-		if err != nil {
-			return err
-		}
-	case KICYAMLGatewayAPI:
-		c, err = MarshalKongToKICYaml(content, GATEWAY)
 		if err != nil {
 			return err
 		}

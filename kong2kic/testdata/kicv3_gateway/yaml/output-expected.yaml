@@ -1,22 +1,775 @@
 apiVersion: configuration.konghq.com/v1
-kind: KongIngress
+config:
+  hide_client_headers: false
+  identifier: consumer
+  limit:
+  - 5
+  namespace: example_namespace
+  strategy: local
+  sync_rate: -1
+  window_size:
+  - 30
+kind: KongPlugin
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service-proxy-upstream
-proxy:
-  connect_timeout: 5000
-  path: /v1
-  protocol: http
-  read_timeout: 60000
-  retries: 5
-  write_timeout: 60000
-upstream:
+  name: example-service-rate-limiting-advanced
+plugin: rate-limiting-advanced
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  aws_key: my_key
+  aws_region: us-west-2
+  aws_secret: my_secret
+  function_name: my_function
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long9344b5559f
+plugin: aws-lambda
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  credentials: true
+  exposed_headers:
+  - X-My-Header
+  headers:
+  - Authorization
+  max_age: 3600
+  methods:
+  - GET
+  - POST
+  origins:
+  - example.com
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longfdeaa51f90
+plugin: cors
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  path: /var/log/kong/kong.log
+  reopen: true
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long3b4b1fae8e
+plugin: file-log
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  content_type: application/json
+  http_endpoint: http://example.com/logs
+  keepalive: 60000
+  method: POST
+  queue_size: 1000
+  retry_count: 10
+  timeout: 10000
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long59030a424c
+plugin: http-log
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  allow:
+  - 192.168.0.1/24
+  deny:
+  - 192.168.0.2/32
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longb44edd01cf
+plugin: ip-restriction
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  hide_client_headers: false
+  identifier: consumer
+  limit:
+  - 5
+  namespace: example_namespace
+  strategy: local
+  sync_rate: -1
+  window_size:
+  - 30
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longef35b834c6
+plugin: rate-limiting-advanced
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  message: Forbidden
+  status_code: 403
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longb2c08ebc54
+plugin: request-termination
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  limits:
+    limit_name:
+      minute: 10
+  policy: local
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longc400f1ab11
+plugin: response-ratelimiting
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  host: example.com
+  port: 1234
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long47f9f5054d
+plugin: tcp-log
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  hide_credentials: false
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long26f9714514
+plugin: basic-auth
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  anonymous: null
+  claims_to_verify:
+  - exp
+  - nbf
+  header_names:
+  - Authorization
+  key_claim_name: kid
+  maximum_expiration: 3600
+  run_on_preflight: true
+  secret_is_base64: false
+  uri_param_names:
+  - token
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long0239c8f63e
+plugin: jwt
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  hide_credentials: false
+  key_in_body: false
+  key_names:
+  - apikey
+  run_on_preflight: true
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long5494737f3e
+plugin: key-auth
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  ca_certificates:
+  - cce8c384-721f-4f58-85dd-50834e3e733a
+  revocation_check_mode: SKIP
+  skip_consumer_lookup: false
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-long89ae2d2b5d
+plugin: mtls-auth
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  allow:
+  - admin
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-service--route-thisisaveryvery-longb2440ac898
+plugin: acl
+---
+apiVersion: configuration.konghq.com/v1
+config:
+  hide_client_headers: false
+  identifier: consumer
+  limit:
+  - 5
+  namespace: example_namespace
+  strategy: local
+  sync_rate: -1
+  window_size:
+  - 30
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-user-rate-limiting-advanced
+plugin: rate-limiting-advanced
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  annotations:
+    konghq.com/https-redirect-status-code: "302"
+    konghq.com/preserve-host: "true"
+    konghq.com/regex-priority: "1"
+    konghq.com/snis: example.com
+    konghq.com/strip-path: "false"
+  name: example-service--route-thisisaveryvery-long2093a020ca
+spec:
+  hostnames:
+  - example.com
+  - another-example.com
+  - yet-another-example.com
+  parentRefs:
+  - name: kong
+  rules:
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: GET
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: POST
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
+  - backendRefs:
+    - name: example-service
+      port: 80
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long9344b5559f
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longfdeaa51f90
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long3b4b1fae8e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long59030a424c
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb44edd01cf
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longef35b834c6
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2c08ebc54
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longc400f1ab11
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long47f9f5054d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long26f9714514
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long0239c8f63e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long5494737f3e
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-long89ae2d2b5d
+      type: ExtensionRef
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: example-service--route-thisisaveryvery-longb2440ac898
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: KongUpstreamPolicy
+metadata:
+  name: example-service-upstream
+spec:
   algorithm: round-robin
-  hash_fallback: none
-  hash_on: none
-  hash_on_cookie_path: /
   healthchecks:
     active:
       concurrency: 10
@@ -27,19 +780,19 @@ upstream:
         - foo
         - bar
       healthy:
-        http_statuses:
+        httpStatuses:
         - 200
         - 302
         interval: 0
         successes: 0
-      http_path: /
-      https_sni: example.com
-      https_verify_certificate: true
+      httpPath: /
+      httpsSni: example.com
+      httpsVerifyCertificate: true
       timeout: 1
       type: http
       unhealthy:
-        http_failures: 0
-        http_statuses:
+        httpFailures: 0
+        httpStatuses:
         - 429
         - 404
         - 500
@@ -49,11 +802,11 @@ upstream:
         - 504
         - 505
         interval: 0
-        tcp_failures: 0
+        tcpFailures: 0
         timeouts: 0
     passive:
       healthy:
-        http_statuses:
+        httpStatuses:
         - 200
         - 201
         - 202
@@ -76,400 +829,28 @@ upstream:
         successes: 0
       type: http
       unhealthy:
-        http_failures: 0
-        http_statuses:
+        httpFailures: 0
+        httpStatuses:
         - 429
         - 500
         - 503
-        tcp_failures: 0
+        tcpFailures: 0
         timeouts: 0
     threshold: 0
-  host_header: example.com
   slots: 10000
----
-apiVersion: configuration.konghq.com/v1
-kind: KongIngress
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long2093a020ca
-route:
-  headers:
-    x-another-header:
-    - first-header-value
-    - second-header-value
-    x-my-header:
-    - ~*foos?bar$
-  https_redirect_status_code: 302
-  methods:
-  - GET
-  - POST
-  preserve_host: true
-  protocols:
-  - http
-  - https
-  regex_priority: 1
-  snis:
-  - example.com
-  strip_path: false
----
-apiVersion: configuration.konghq.com/v1
-config:
-  hide_client_headers: false
-  identifier: consumer
-  limit:
-  - 5
-  namespace: example_namespace
-  strategy: local
-  sync_rate: -1
-  window_size:
-  - 30
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service-rate-limiting-advanced
-plugin: rate-limiting-advanced
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  aws_key: my_key
-  aws_region: us-west-2
-  aws_secret: my_secret
-  function_name: my_function
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long9344b5559f
-plugin: aws-lambda
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  credentials: true
-  exposed_headers:
-  - X-My-Header
-  headers:
-  - Authorization
-  max_age: 3600
-  methods:
-  - GET
-  - POST
-  origins:
-  - example.com
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longfdeaa51f90
-plugin: cors
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  path: /var/log/kong/kong.log
-  reopen: true
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long3b4b1fae8e
-plugin: file-log
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  content_type: application/json
-  http_endpoint: http://example.com/logs
-  keepalive: 60000
-  method: POST
-  queue_size: 1000
-  retry_count: 10
-  timeout: 10000
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long59030a424c
-plugin: http-log
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  allow:
-  - 192.168.0.1/24
-  deny:
-  - 192.168.0.2/32
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longb44edd01cf
-plugin: ip-restriction
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  hide_client_headers: false
-  identifier: consumer
-  limit:
-  - 5
-  namespace: example_namespace
-  strategy: local
-  sync_rate: -1
-  window_size:
-  - 30
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longef35b834c6
-plugin: rate-limiting-advanced
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  message: Forbidden
-  status_code: 403
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longb2c08ebc54
-plugin: request-termination
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  limits:
-    limit_name:
-      minute: 10
-  policy: local
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longc400f1ab11
-plugin: response-ratelimiting
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  host: example.com
-  port: 1234
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long47f9f5054d
-plugin: tcp-log
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  hide_credentials: false
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long26f9714514
-plugin: basic-auth
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  anonymous: null
-  claims_to_verify:
-  - exp
-  - nbf
-  header_names:
-  - Authorization
-  key_claim_name: kid
-  maximum_expiration: 3600
-  run_on_preflight: true
-  secret_is_base64: false
-  uri_param_names:
-  - token
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long0239c8f63e
-plugin: jwt
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  hide_credentials: false
-  key_in_body: false
-  key_names:
-  - apikey
-  run_on_preflight: true
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long5494737f3e
-plugin: key-auth
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  ca_certificates:
-  - cce8c384-721f-4f58-85dd-50834e3e733a
-  revocation_check_mode: SKIP
-  skip_consumer_lookup: false
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long89ae2d2b5d
-plugin: mtls-auth
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  allow:
-  - admin
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-longb2440ac898
-plugin: acl
-status: {}
----
-apiVersion: configuration.konghq.com/v1
-config:
-  hide_client_headers: false
-  identifier: consumer
-  limit:
-  - 5
-  namespace: example_namespace
-  strategy: local
-  sync_rate: -1
-  window_size:
-  - 30
-kind: KongPlugin
-metadata:
-  annotations:
-    kubernetes.io/ingress.class: kong
-  creationTimestamp: null
-  name: example-user-rate-limiting-advanced
-plugin: rate-limiting-advanced
-status: {}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  annotations:
-    konghq.com/override: example-service--route-thisisaveryvery-long2093a020ca
-    konghq.com/plugins: example-service--route-thisisaveryvery-long9344b5559f,example-service--route-thisisaveryvery-longfdeaa51f90,example-service--route-thisisaveryvery-long3b4b1fae8e,example-service--route-thisisaveryvery-long59030a424c,example-service--route-thisisaveryvery-longb44edd01cf,example-service--route-thisisaveryvery-longef35b834c6,example-service--route-thisisaveryvery-longb2c08ebc54,example-service--route-thisisaveryvery-longc400f1ab11,example-service--route-thisisaveryvery-long47f9f5054d,example-service--route-thisisaveryvery-long26f9714514,example-service--route-thisisaveryvery-long0239c8f63e,example-service--route-thisisaveryvery-long5494737f3e,example-service--route-thisisaveryvery-long89ae2d2b5d,example-service--route-thisisaveryvery-longb2440ac898
-  creationTimestamp: null
-  name: example-service--route-thisisaveryvery-long2093a020ca
-spec:
-  ingressClassName: kong
-  rules:
-  - host: example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
-  - host: another-example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
-  - host: yet-another-example.com
-    http:
-      paths:
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /~/v1/example/?$
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/another-example
-        pathType: ImplementationSpecific
-      - backend:
-          service:
-            name: example-service
-            port:
-              number: 80
-        path: /v1/yet-another-example
-        pathType: ImplementationSpecific
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    konghq.com/override: example-service-proxy-upstream
+    konghq.com/connect-timeout: "5000"
+    konghq.com/path: /v1
     konghq.com/plugins: example-service-rate-limiting-advanced
-  creationTimestamp: null
+    konghq.com/protocol: http
+    konghq.com/read-timeout: "60000"
+    konghq.com/retries: "5"
+    konghq.com/upstream-policy: example-service-upstream
+    konghq.com/write-timeout: "60000"
   name: example-service
 spec:
   ports:
@@ -478,31 +859,29 @@ spec:
     targetPort: 80
   selector:
     app: example-service
-status:
-  loadBalancer: {}
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
+  labels:
+    konghq.com/credential: key-auth
   name: key-auth-example-user
 stringData:
   key: my_api_key
-  kongCredType: key-auth
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
+  labels:
+    konghq.com/credential: jwt
   name: jwt-auth-example-user
 stringData:
   algorithm: HS256
   key: my_jwt_secret
-  kongCredType: jwt
   rsa_public_key: |-
     -----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxXzYS5yESbekTF3xLiQX
@@ -520,10 +899,10 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
+  labels:
+    konghq.com/credential: basic-auth
   name: basic-auth-example-user
 stringData:
-  kongCredType: basic-auth
   password: my_basic_password
   username: my_basic_user
 ---
@@ -532,22 +911,22 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
+  labels:
+    konghq.com/credential: acl
   name: acl-group-example-user
 stringData:
   group: acl_group
-  kongCredType: acl
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
+  labels:
+    konghq.com/credential: mtls-auth
   name: mtls-auth-example-user
 stringData:
   id: cce8c384-721f-4f58-85dd-50834e3e733a
-  kongCredType: mtls-auth
   subject_name: example-user@example.com
 type: Opaque
 ---
@@ -556,7 +935,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-a672ab52d2341203bd70116b456413d7ac3ffc162abbf
 stringData:
   ca.crt: |
@@ -578,7 +956,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e6e08e84471
 stringData:
   ca.crt: |
@@ -601,7 +978,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: ca-cert-6b095c7ff377b01252a4dfec59c582fe32934fa7ed0cf
 stringData:
   ca.crt: |
@@ -628,7 +1004,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: cert-0ee0e1584c8637facac95bd5fce315367dee124c0086d41e
 type: kubernetes.io/tls
 ---
@@ -640,7 +1015,6 @@ kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: cert-b12464ec431576239dd9cc2545d528f6cbdbd988cf076323
 type: kubernetes.io/tls
 ---
@@ -659,9 +1033,7 @@ metadata:
   annotations:
     konghq.com/plugins: example-user-rate-limiting-advanced
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-user
-status: {}
 username: example-user
 ---
 apiVersion: configuration.konghq.com/v1beta1
@@ -669,7 +1041,5 @@ kind: KongConsumerGroup
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  creationTimestamp: null
   name: example-consumer-group
-status: {}
 ---

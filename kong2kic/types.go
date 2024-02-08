@@ -3,8 +3,9 @@ package kong2kic
 import (
 	"encoding/json"
 
-	kicv1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1"
-	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v2/pkg/apis/configuration/v1beta1"
+	"github.com/kong/go-database-reconciler/pkg/file"
+	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
+	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1beta1"
 	k8scorev1 "k8s.io/api/core/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
 	k8sgwapiv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -14,30 +15,20 @@ import (
 // KICContent represents a serialized Kong state for KIC.
 // +k8s:deepcopy-gen=true
 type KICContent struct {
-	KongIngresses      []kicv1.KongIngress            `json:"kongIngresses,omitempty" yaml:",omitempty"`
-	KongPlugins        []kicv1.KongPlugin             `json:"kongPlugins,omitempty" yaml:",omitempty"`
-	KongClusterPlugins []kicv1.KongClusterPlugin      `json:"clusterPlugins,omitempty" yaml:",omitempty"`
-	Ingresses          []k8snetv1.Ingress             `json:"ingresses,omitempty" yaml:",omitempty"`
-	Services           []k8scorev1.Service            `json:"services,omitempty" yaml:",omitempty"`
-	Secrets            []k8scorev1.Secret             `json:"secrets,omitempty" yaml:",omitempty"`
-	KongConsumers      []kicv1.KongConsumer           `json:"consumers,omitempty" yaml:",omitempty"`
-	KongConsumerGroups []kicv1beta1.KongConsumerGroup `json:"consumerGroups,omitempty" yaml:",omitempty"`
-	HTTPRoutes         []k8sgwapiv1.HTTPRoute         `json:"httpRoutes,omitempty" yaml:",omitempty"`
+	KongIngresses        []kicv1.KongIngress             `json:"kongIngresses,omitempty" yaml:",omitempty"`
+	KongPlugins          []kicv1.KongPlugin              `json:"kongPlugins,omitempty" yaml:",omitempty"`
+	KongClusterPlugins   []kicv1.KongClusterPlugin       `json:"clusterPlugins,omitempty" yaml:",omitempty"`
+	Ingresses            []k8snetv1.Ingress              `json:"ingresses,omitempty" yaml:",omitempty"`
+	Services             []k8scorev1.Service             `json:"services,omitempty" yaml:",omitempty"`
+	Secrets              []k8scorev1.Secret              `json:"secrets,omitempty" yaml:",omitempty"`
+	KongConsumers        []kicv1.KongConsumer            `json:"consumers,omitempty" yaml:",omitempty"`
+	KongConsumerGroups   []kicv1beta1.KongConsumerGroup  `json:"consumerGroups,omitempty" yaml:",omitempty"`
+	HTTPRoutes           []k8sgwapiv1.HTTPRoute          `json:"httpRoutes,omitempty" yaml:",omitempty"`
+	KongUpstreamPolicies []kicv1beta1.KongUpstreamPolicy `json:"upstreamPolicies,omitempty" yaml:",omitempty"`
 }
 
 func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
-	var (
-		kongIngresses      []byte
-		kongPlugins        []byte
-		kongClusterPlugins []byte
-		ingresses          []byte
-		services           []byte
-		secrets            []byte
-		kongConsumers      []byte
-		kongConsumerGroups []byte
-		err                error
-		output             []byte
-	)
+	var output []byte
 
 	const (
 		yamlSeparator = "---\n"
@@ -49,7 +40,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	// and append it to the output slice
 	// then return the output slice
 	for _, kongIngress := range k.KongIngresses {
-		kongIngresses, err = yaml.Marshal(kongIngress)
+		kongIngresses, err := SerializeObjectDroppingFields(kongIngress, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -58,7 +49,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, kongPlugin := range k.KongPlugins {
-		kongPlugins, err = yaml.Marshal(kongPlugin)
+		kongPlugins, err := SerializeObjectDroppingFields(kongPlugin, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +59,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, kongClusterPlugin := range k.KongClusterPlugins {
-		kongClusterPlugins, err = yaml.Marshal(kongClusterPlugin)
+		kongClusterPlugins, err := SerializeObjectDroppingFields(kongClusterPlugin, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +69,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, ingress := range k.Ingresses {
-		ingresses, err = yaml.Marshal(ingress)
+		ingresses, err := SerializeObjectDroppingFields(ingress, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +79,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, httpRoute := range k.HTTPRoutes {
-		httpRoutes, err := yaml.Marshal(httpRoute)
+		httpRoutes, err := SerializeObjectDroppingFields(httpRoute, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -96,8 +87,17 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 		output = append(output, []byte(yamlSeparator)...)
 	}
 
+	for _, kongUpstreamPolicy := range k.KongUpstreamPolicies {
+		kongUpstreamPolicies, err := SerializeObjectDroppingFields(kongUpstreamPolicy, file.YAML)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongUpstreamPolicies...)
+		output = append(output, []byte(yamlSeparator)...)
+	}
+
 	for _, service := range k.Services {
-		services, err = yaml.Marshal(service)
+		services, err := SerializeObjectDroppingFields(service, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +107,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, secret := range k.Secrets {
-		secrets, err = yaml.Marshal(secret)
+		secrets, err := SerializeObjectDroppingFields(secret, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +117,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, kongConsumer := range k.KongConsumers {
-		kongConsumers, err = yaml.Marshal(kongConsumer)
+		kongConsumers, err := SerializeObjectDroppingFields(kongConsumer, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -127,7 +127,7 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 	}
 
 	for _, kongConsumerGroup := range k.KongConsumerGroups {
-		kongConsumerGroups, err = yaml.Marshal(kongConsumerGroup)
+		kongConsumerGroups, err := SerializeObjectDroppingFields(kongConsumerGroup, file.YAML)
 		if err != nil {
 			return nil, err
 		}
@@ -139,15 +139,6 @@ func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
 }
 
 func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
-	var kongIngresses []byte
-	var kongPlugins []byte
-	var kongClusterPlugins []byte
-	var ingresses []byte
-	var services []byte
-	var secrets []byte
-	var kongConsumers []byte
-	var kongConsumerGroups []byte
-	var err error
 	var output []byte
 
 	// iterate over the slices of kongIngresses, kongPlugins,
@@ -156,7 +147,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	// and append it to the output slice
 	// then return the output slice
 	for _, kongIngress := range k.KongIngresses {
-		kongIngresses, err = json.MarshalIndent(kongIngress, "", "    ")
+		kongIngresses, err := SerializeObjectDroppingFields(kongIngress, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +155,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, kongPlugin := range k.KongPlugins {
-		kongPlugins, err = json.MarshalIndent(kongPlugin, "", "    ")
+		kongPlugins, err := SerializeObjectDroppingFields(kongPlugin, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +163,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, kongClusterPlugin := range k.KongClusterPlugins {
-		kongClusterPlugins, err = json.MarshalIndent(kongClusterPlugin, "", "    ")
+		kongClusterPlugins, err := SerializeObjectDroppingFields(kongClusterPlugin, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -180,7 +171,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, ingress := range k.Ingresses {
-		ingresses, err = json.MarshalIndent(ingress, "", "    ")
+		ingresses, err := SerializeObjectDroppingFields(ingress, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -188,15 +179,23 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, httpRoute := range k.HTTPRoutes {
-		httpRoutes, err := json.MarshalIndent(httpRoute, "", "    ")
+		httpRoutes, err := SerializeObjectDroppingFields(httpRoute, file.JSON)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, httpRoutes...)
 	}
 
+	for _, kongUpstreamPolicy := range k.KongUpstreamPolicies {
+		kongUpstreamPolicies, err := SerializeObjectDroppingFields(kongUpstreamPolicy, file.JSON)
+		if err != nil {
+			return nil, err
+		}
+		output = append(output, kongUpstreamPolicies...)
+	}
+
 	for _, service := range k.Services {
-		services, err = json.MarshalIndent(service, "", "    ")
+		services, err := SerializeObjectDroppingFields(service, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -204,7 +203,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, secret := range k.Secrets {
-		secrets, err = json.MarshalIndent(secret, "", "    ")
+		secrets, err := SerializeObjectDroppingFields(secret, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -212,7 +211,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, kongConsumer := range k.KongConsumers {
-		kongConsumers, err = json.MarshalIndent(kongConsumer, "", "    ")
+		kongConsumers, err := SerializeObjectDroppingFields(kongConsumer, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -220,7 +219,7 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	for _, kongConsumerGroup := range k.KongConsumerGroups {
-		kongConsumerGroups, err = json.MarshalIndent(kongConsumerGroup, "", "    ")
+		kongConsumerGroups, err := SerializeObjectDroppingFields(kongConsumerGroup, file.JSON)
 		if err != nil {
 			return nil, err
 		}
@@ -228,4 +227,32 @@ func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
 	}
 
 	return output, nil
+}
+
+func SerializeObjectDroppingFields(obj interface{}, format string) ([]byte, error) {
+	objBytes, err := json.Marshal(obj)
+	result := []byte{}
+	if err != nil {
+		return nil, err
+	}
+	genericObj := map[string]interface{}{}
+	if err := json.Unmarshal(objBytes, &genericObj); err != nil {
+		return nil, err
+	}
+
+	delete(genericObj, "status")
+	delete(genericObj["metadata"].(map[string]interface{}), "creationTimestamp")
+
+	if format == file.JSON {
+		result, err = json.MarshalIndent(genericObj, "", "    ")
+		if err != nil {
+			return nil, err
+		}
+	} else if format == file.YAML {
+		result, err = yaml.Marshal(genericObj)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, err
 }
