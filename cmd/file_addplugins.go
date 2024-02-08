@@ -32,6 +32,9 @@ func executeAddPlugins(cmd *cobra.Command, cfgFiles []string) error {
 
 	var pluginConfigs []map[string]interface{}
 	{
+		if len(cmdAddPluginsStrConfigs) == 0 && len(cmdAddPluginsSelectors) > 0 {
+			return fmt.Errorf("--selector flag given, but no --config specified")
+		}
 		for _, strConfig := range cmdAddPluginsStrConfigs {
 			pluginConfig, err := filebasics.Deserialize([]byte(strConfig))
 			if err != nil {
