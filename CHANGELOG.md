@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.34.0](#v1340)
 - [v1.33.0](#v1330)
 - [v1.32.1](#v1321)
 - [v1.32.0](#v1320)
@@ -76,6 +77,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.34.0]
+
+> Release date: 2024/02/08
+
+### Fixes
+
+- Correct consumer_groups -> consumers reference and allow importing their relationships
+  from upstream using `default_lookup_tags`.
+  [#1211](https://github.com/Kong/deck/pull/1211)
+  [go-database-reconciler #57](https://github.com/Kong/go-database-reconciler/pull/57)
 
 ## [v1.33.0]
 
@@ -1569,6 +1581,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.34.0]: https://github.com/kong/deck/compare/v1.33.0...v1.34.0
 [v1.33.0]: https://github.com/kong/deck/compare/v1.32.1...v1.33.0
 [v1.32.1]: https://github.com/kong/deck/compare/v1.32.0...v1.32.1
 [v1.32.0]: https://github.com/kong/deck/compare/v1.31.1...v1.32.0
