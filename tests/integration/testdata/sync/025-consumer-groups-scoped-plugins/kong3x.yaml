@@ -20,7 +20,6 @@ consumer_groups:
   name: silver
   consumers:
   - username: bar
-  - username: baz
   plugins:
   - name: rate-limiting-advanced
     config:
