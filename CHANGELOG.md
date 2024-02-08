@@ -86,8 +86,10 @@
 
 - Correct consumer_groups -> consumers reference and allow importing their relationships
   from upstream using `default_lookup_tags`.
-  [#1211](https://github.com/Kong/deck/pull/1211)
+  [#1212](https://github.com/Kong/deck/pull/1212)
   [go-database-reconciler #57](https://github.com/Kong/go-database-reconciler/pull/57)
+- CLI fix: error out if `deck file addplugins` gets a `--selector` but no `--config`.
+  [#1211](https://github.com/Kong/deck/pull/1211)
 
 ## [v1.33.0]
 
