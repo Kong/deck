@@ -1,0 +1,1486 @@
+{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "hide_client_headers": false,
+        "identifier": "consumer",
+        "limit": [
+            5
+        ],
+        "namespace": "example_namespace",
+        "strategy": "local",
+        "sync_rate": -1,
+        "window_size": [
+            30
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service-rate-limiting-advanced"
+    },
+    "plugin": "rate-limiting-advanced"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "aws_key": "my_key",
+        "aws_region": "us-west-2",
+        "aws_secret": "my_secret",
+        "function_name": "my_function"
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long9344b5559f"
+    },
+    "plugin": "aws-lambda"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "credentials": true,
+        "exposed_headers": [
+            "X-My-Header"
+        ],
+        "headers": [
+            "Authorization"
+        ],
+        "max_age": 3600,
+        "methods": [
+            "GET",
+            "POST"
+        ],
+        "origins": [
+            "example.com"
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+    },
+    "plugin": "cors"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "path": "/var/log/kong/kong.log",
+        "reopen": true
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+    },
+    "plugin": "file-log"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "content_type": "application/json",
+        "http_endpoint": "http://example.com/logs",
+        "keepalive": 60000,
+        "method": "POST",
+        "queue_size": 1000,
+        "retry_count": 10,
+        "timeout": 10000
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long59030a424c"
+    },
+    "plugin": "http-log"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "allow": [
+            "192.168.0.1/24"
+        ],
+        "deny": [
+            "192.168.0.2/32"
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+    },
+    "plugin": "ip-restriction"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "hide_client_headers": false,
+        "identifier": "consumer",
+        "limit": [
+            5
+        ],
+        "namespace": "example_namespace",
+        "strategy": "local",
+        "sync_rate": -1,
+        "window_size": [
+            30
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longef35b834c6"
+    },
+    "plugin": "rate-limiting-advanced"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "message": "Forbidden",
+        "status_code": 403
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+    },
+    "plugin": "request-termination"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "limits": {
+            "limit_name": {
+                "minute": 10
+            }
+        },
+        "policy": "local"
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+    },
+    "plugin": "response-ratelimiting"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "host": "example.com",
+        "port": 1234
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+    },
+    "plugin": "tcp-log"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "hide_credentials": false
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long26f9714514"
+    },
+    "plugin": "basic-auth"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "anonymous": null,
+        "claims_to_verify": [
+            "exp",
+            "nbf"
+        ],
+        "header_names": [
+            "Authorization"
+        ],
+        "key_claim_name": "kid",
+        "maximum_expiration": 3600,
+        "run_on_preflight": true,
+        "secret_is_base64": false,
+        "uri_param_names": [
+            "token"
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+    },
+    "plugin": "jwt"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "hide_credentials": false,
+        "key_in_body": false,
+        "key_names": [
+            "apikey"
+        ],
+        "run_on_preflight": true
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long5494737f3e"
+    },
+    "plugin": "key-auth"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "ca_certificates": [
+            "cce8c384-721f-4f58-85dd-50834e3e733a"
+        ],
+        "revocation_check_mode": "SKIP",
+        "skip_consumer_lookup": false
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+    },
+    "plugin": "mtls-auth"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "allow": [
+            "admin"
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-service--route-thisisaveryvery-longb2440ac898"
+    },
+    "plugin": "acl"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "config": {
+        "hide_client_headers": false,
+        "identifier": "consumer",
+        "limit": [
+            5
+        ],
+        "namespace": "example_namespace",
+        "strategy": "local",
+        "sync_rate": -1,
+        "window_size": [
+            30
+        ]
+    },
+    "kind": "KongPlugin",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-user-rate-limiting-advanced"
+    },
+    "plugin": "rate-limiting-advanced"
+}{
+    "apiVersion": "gateway.networking.k8s.io/v1",
+    "kind": "HTTPRoute",
+    "metadata": {
+        "annotations": {
+            "konghq.com/https-redirect-status-code": "302",
+            "konghq.com/preserve-host": "true",
+            "konghq.com/regex-priority": "1",
+            "konghq.com/snis": "example.com",
+            "konghq.com/strip-path": "false"
+        },
+        "name": "example-service--route-thisisaveryvery-long2093a020ca"
+    },
+    "spec": {
+        "hostnames": [
+            "example.com",
+            "another-example.com",
+            "yet-another-example.com"
+        ],
+        "parentRefs": [
+            {
+                "name": "kong"
+            }
+        ],
+        "rules": [
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "GET",
+                        "path": {
+                            "type": "RegularExpression",
+                            "value": "/v1/example/?$"
+                        }
+                    }
+                ]
+            },
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "POST",
+                        "path": {
+                            "type": "RegularExpression",
+                            "value": "/v1/example/?$"
+                        }
+                    }
+                ]
+            },
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "GET",
+                        "path": {
+                            "type": "PathPrefix",
+                            "value": "/v1/another-example"
+                        }
+                    }
+                ]
+            },
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "POST",
+                        "path": {
+                            "type": "PathPrefix",
+                            "value": "/v1/another-example"
+                        }
+                    }
+                ]
+            },
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "GET",
+                        "path": {
+                            "type": "PathPrefix",
+                            "value": "/v1/yet-another-example"
+                        }
+                    }
+                ]
+            },
+            {
+                "backendRefs": [
+                    {
+                        "name": "example-service",
+                        "port": 80
+                    }
+                ],
+                "filters": [
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long9344b5559f"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longfdeaa51f90"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long3b4b1fae8e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long59030a424c"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb44edd01cf"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longef35b834c6"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2c08ebc54"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longc400f1ab11"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long47f9f5054d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long26f9714514"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long0239c8f63e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long5494737f3e"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-long89ae2d2b5d"
+                        },
+                        "type": "ExtensionRef"
+                    },
+                    {
+                        "extensionRef": {
+                            "group": "configuration.konghq.com",
+                            "kind": "KongPlugin",
+                            "name": "example-service--route-thisisaveryvery-longb2440ac898"
+                        },
+                        "type": "ExtensionRef"
+                    }
+                ],
+                "matches": [
+                    {
+                        "headers": [
+                            {
+                                "name": "x-another-header",
+                                "type": "Exact",
+                                "value": "first-header-value,second-header-value"
+                            },
+                            {
+                                "name": "x-my-header",
+                                "type": "RegularExpression",
+                                "value": "foos?bar$"
+                            }
+                        ],
+                        "method": "POST",
+                        "path": {
+                            "type": "PathPrefix",
+                            "value": "/v1/yet-another-example"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}{
+    "apiVersion": "configuration.konghq.com/v1beta1",
+    "kind": "KongUpstreamPolicy",
+    "metadata": {
+        "name": "example-service-upstream"
+    },
+    "spec": {
+        "algorithm": "round-robin",
+        "healthchecks": {
+            "active": {
+                "concurrency": 10,
+                "headers": {
+                    "x-another-header": [
+                        "bla"
+                    ],
+                    "x-my-header": [
+                        "foo",
+                        "bar"
+                    ]
+                },
+                "healthy": {
+                    "httpStatuses": [
+                        200,
+                        302
+                    ],
+                    "interval": 0,
+                    "successes": 0
+                },
+                "httpPath": "/",
+                "httpsSni": "example.com",
+                "httpsVerifyCertificate": true,
+                "timeout": 1,
+                "type": "http",
+                "unhealthy": {
+                    "httpFailures": 0,
+                    "httpStatuses": [
+                        429,
+                        404,
+                        500,
+                        501,
+                        502,
+                        503,
+                        504,
+                        505
+                    ],
+                    "interval": 0,
+                    "tcpFailures": 0,
+                    "timeouts": 0
+                }
+            },
+            "passive": {
+                "healthy": {
+                    "httpStatuses": [
+                        200,
+                        201,
+                        202,
+                        203,
+                        204,
+                        205,
+                        206,
+                        207,
+                        208,
+                        226,
+                        300,
+                        301,
+                        302,
+                        303,
+                        304,
+                        305,
+                        306,
+                        307,
+                        308
+                    ],
+                    "successes": 0
+                },
+                "type": "http",
+                "unhealthy": {
+                    "httpFailures": 0,
+                    "httpStatuses": [
+                        429,
+                        500,
+                        503
+                    ],
+                    "tcpFailures": 0,
+                    "timeouts": 0
+                }
+            },
+            "threshold": 0
+        },
+        "slots": 10000
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+        "annotations": {
+            "konghq.com/connect-timeout": "5000",
+            "konghq.com/path": "/v1",
+            "konghq.com/plugins": "example-service-rate-limiting-advanced",
+            "konghq.com/protocol": "http",
+            "konghq.com/read-timeout": "60000",
+            "konghq.com/retries": "5",
+            "konghq.com/upstream-policy": "example-service-upstream",
+            "konghq.com/write-timeout": "60000"
+        },
+        "name": "example-service"
+    },
+    "spec": {
+        "ports": [
+            {
+                "port": 80,
+                "protocol": "TCP",
+                "targetPort": 80
+            }
+        ],
+        "selector": {
+            "app": "example-service"
+        }
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "labels": {
+            "konghq.com/credential": "key-auth"
+        },
+        "name": "key-auth-example-user"
+    },
+    "stringData": {
+        "key": "my_api_key"
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "labels": {
+            "konghq.com/credential": "jwt"
+        },
+        "name": "jwt-auth-example-user"
+    },
+    "stringData": {
+        "algorithm": "HS256",
+        "key": "my_jwt_secret",
+        "rsa_public_key": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxXzYS5yESbekTF3xLiQX\nZZZfXt0S/nzFp3f2Oux3W7/ydvZ8XSd8+s+wm5oqEcSV9n+5n3ENZbt1A/wgnGI3\noWrv0yRB9HugzTIGPpI1AQv9Z4p8E44RrB74/uTxYwb9+4yvpuz/fzTt3Gz+Kzc4\n4fGGq8VpGMFj6AE65ZcOAHHUJe4VuoreBXLYDJcHl2WPIdNKDGscFjElDneLRhWQ\nDfxekDJIQMWCjyBEXacfP6cc9U8Qld6TuVcwi1P2xb8tBDD4MIFL/psfzUhfv1Lw\nO/XZEffJxCqkQn7dsCYy3wpaTjb6XmJ5j0Dbml4f0Bv40Y1mjlAf7C662Mbuguf6\newIDAQAB\n-----END PUBLIC KEY-----",
+        "secret": "my_secret_key"
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "labels": {
+            "konghq.com/credential": "basic-auth"
+        },
+        "name": "basic-auth-example-user"
+    },
+    "stringData": {
+        "password": "my_basic_password",
+        "username": "my_basic_user"
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "labels": {
+            "konghq.com/credential": "acl"
+        },
+        "name": "acl-group-example-user"
+    },
+    "stringData": {
+        "group": "acl_group"
+    }
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "labels": {
+            "konghq.com/credential": "mtls-auth"
+        },
+        "name": "mtls-auth-example-user"
+    },
+    "stringData": {
+        "id": "cce8c384-721f-4f58-85dd-50834e3e733a",
+        "subject_name": "example-user@example.com"
+    },
+    "type": "Opaque"
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "ca-cert-a672ab52d2341203bd70116b456413d7ac3ffc162abbf"
+    },
+    "stringData": {
+        "ca.crt": "-----BEGIN CERTIFICATE-----\nMIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa\nMBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw\nNjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG\nSM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx\n7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB\n/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2\nScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR\nPSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ\n-----END CERTIFICATE-----\n",
+        "ca.digest": "f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5"
+    },
+    "type": "generic"
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e6e08e84471"
+    },
+    "stringData": {
+        "ca.crt": "-----BEGIN CERTIFICATE-----\nMIIBqTCCAVCgAwIBAgIQb5LqGa9gS3+Mc2ntWfSoJjAKBggqhkjOPQQDAjAcMRow\nGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMjA2MTMxMzM5MTVaFw0yMzA2\nMTMxOTM5MTVaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0\nZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQImvnSuvXkGy88lvx8a7of\ne0MEMRI2siVvybvWXNpeXXlixgaq7weJ7pewf3HywfO68Va6kn8ehWh7s0D7SLHM\no2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E\nFgQUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE\nQ8V+CMwzqzcwCgYIKoZIzj0EAwIDRwAwRAIgNZ+JPA1OqF5DsPapAZ2YsUOgIpn3\nZbQuYKCAV0SD4EcCIFnfA5rWrc1AgtUw5inJQqJQRNgoPuC14vACqI48BiRl\n-----END CERTIFICATE-----\n",
+        "ca.digest": "dbef7ed285fb292e24f84ffba93c48d92fa322387d85469c460c655abedd5308"
+    },
+    "type": "generic"
+}{
+    "apiVersion": "v1",
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "ca-cert-6b095c7ff377b01252a4dfec59c582fe32934fa7ed0cf"
+    },
+    "stringData": {
+        "ca.crt": "-----BEGIN CERTIFICATE-----\nMIIBujCCAV+gAwIBAgIRAMkGpj7WZf+2RFE/q7ZhejEwCgYIKoZIzj0EAwIwKjEo\nMCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjA2\nMTMxMzQwNTFaFw0yMjEyMTMwNDQwNTFaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS\nb290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQB\nmy/zhZ3F2HvHFqtQzuD3lXX8SeYakxiBQvaGkGSLKD67N3vh7iC2rTSdj/vAs8ws\nY9X+mXzS6GDKC8PbSX6xo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw\nBgEB/wIBADAdBgNVHQ4EFgQURwCm53YPStZoAMfnVyknH4IgZa4wHwYDVR0jBBgw\nFoAUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwCgYIKoZIzj0EAwIDSQAwRgIhAN1pkUKc\nazM4PiXOnkILB2KBDIF4XpHf+4ThDMODzXP8AiEA45KXA3qMrRPQV1oBfWZ3hLgX\ngxUhveuHBXMWnzUbn6U=\n-----END CERTIFICATE-----\n",
+        "ca.digest": "45b2b6dd9d4102955b1b1e4b540e677f140521462ed4f22fa5a713863ca84600"
+    },
+    "type": "generic"
+}{
+    "apiVersion": "v1",
+    "data": {
+        "tls.crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVDVENDQXZHZ0F3SUJBZ0lVQXVzWUdQOUJ3b0xGRkFKZEIvalk2ZVV6VXlBd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2daSXhDekFKQmdOVkJBWVRBbFZMTVJJd0VBWURWUVFJREFsSVlXMXdjMmhwY21VeEVqQVFCZ05WQkFjTQpDVUZzWkdWeWMyaHZkREVRTUE0R0ExVUVDZ3dIUzI5dVp5QlZTekVRTUE0R0ExVUVDd3dIVTNWd2NHOXlkREVZCk1CWUdBMVVFQXd3UFUzVndjRzl5ZENCU2IyOTBJRU5CTVIwd0d3WUpLb1pJaHZjTkFRa0JGZzV6ZEhWQWEyOXUKWjJoeExtTnZiVEFlRncweU1UQXhNVFV4TVRFNU5ETmFGdzB5TWpBMU16QXhNVEU1TkROYU1JR1JNUXN3Q1FZRApWUVFHRXdKVlN6RVNNQkFHQTFVRUNBd0pTR0Z0Y0hOb2FYSmxNUkl3RUFZRFZRUUhEQWxCYkdSbGNuTm9iM1F4CkVEQU9CZ05WQkFvTUIwdHZibWNnVlVzeEVEQU9CZ05WQkFzTUIxTjFjSEJ2Y25ReEZ6QVZCZ05WQkFNTURuQnkKYjNoNUxtdHZibWN1YkdGdU1SMHdHd1lKS29aSWh2Y05BUWtCRmc1emRIVkFhMjl1WjJoeExtTnZiVENDQVNJdwpEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSlViS2lxb0NLMUJUTmsvN2w0Mm42dWt5VEV1CmVMeUIyM2UvOTBQelQvb3o4d1p6Z3dUb2R6YkZBUzJWdEZyMUVLcUZ6b3IwRHJYcDlDTG5lYk9kaUFSM0k2TEQKL1dZL3gwS1czbHgzRjM1ZkdpVU9TTFBUSDh6ZWlEVE14MTFDY0tEeGVzQStNMi9zNXEwaWdrT1E0ejR3M3ZvegptNWE1MkljUVRTQThLNWtuTlUxcVVaQkxwYytraHhGY2FoZUVLMWpzSVNKSmhjZGl6WkJmR2RrOFMxdnB5ajVGCnVDWjdvYVJ2TkE2aW1IalNKd3BnbzM2emQ4NFRncklnVmo5UjRRdEp5c1d5L1grYmJhS1VpS0JXd0F0ZDQrRFQKRVA5MGwvbnk5c3p1MmZpams0LzZrMW50WHVmR1R5dk0rSjAvcUoxM2U5OVRWWU9WYW5JVG5wVE8rNmNDQXdFQQpBYU5XTUZRd0h3WURWUjBqQkJnd0ZvQVVkc2twZjB3SlJReGp0elFGWmNpV21VZmwyYmN3Q1FZRFZSMFRCQUl3CkFEQUxCZ05WSFE4RUJBTUNCUEF3R1FZRFZSMFJCQkl3RUlJT2NISnZlSGt1YTI5dVp5NXNZVzR3RFFZSktvWkkKaHZjTkFRRUxCUUFEZ2dFQkFKVnJUV1FSUXpOdHlwYTlPWEZZQURtOEZheTFWTW9wM0JZMmtoMHRmWWdRRUovNApwSlVqNkNhc3pRWi9BaXg2TGFQblhGY29QQ0RxcXYwMG1nanU4NlBNYW1yL3pBOVVTWGs4ZVRtekprcDVSa2xTCkdkcWlYYm9xRVNpUVZ2YU56M2tkVzd3Z056NEZ3YUdDemtFaS9kY2MyTGR0ekxwV2l6eCtUbHhNTXFqb25VVU0Kb3ZaZ1pvK09saFdSc0RWVC9xeTVTRnRBMHZsVk50ZEJyMmVnWGIxSDdKOFVEQytmYXgvaUthNytmQlVIWk9POQpGazlVOGJ4Z2ZRK2pQSVZWTDhDZkF0UjY4U29zN05wV0gwUzJlbXFaUm5RdmYwTVNOZGtUUUtXbjRxUjlzY2tqCkV3eHM1RmJyTW1nQ09nd2sxUHRnUm1kUDNSTUUwSHdLL0IwM3NhUT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ==",
+        "tls.key": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ1ZHeW9xcUFpdFFVeloKUCs1ZU5wK3JwTWt4TG5pOGdkdDN2L2REODAvNk0vTUdjNE1FNkhjMnhRRXRsYlJhOVJDcWhjNks5QTYxNmZRaQo1M216bllnRWR5T2l3LzFtUDhkQ2x0NWNkeGQrWHhvbERraXoweC9NM29nMHpNZGRRbkNnOFhyQVBqTnY3T2F0CklvSkRrT00rTU43Nk01dVd1ZGlIRUUwZ1BDdVpKelZOYWxHUVM2WFBwSWNSWEdvWGhDdFk3Q0VpU1lYSFlzMlEKWHhuWlBFdGI2Y28rUmJnbWU2R2tielFPb3BoNDBpY0tZS04rczNmT0U0S3lJRlkvVWVFTFNjckZzdjEvbTIyaQpsSWlnVnNBTFhlUGcweEQvZEpmNTh2Yk03dG40bzVPUCtwTlo3VjdueGs4cnpQaWRQNmlkZDN2ZlUxV0RsV3B5CkU1NlV6dnVuQWdNQkFBRUNnZ0VBY3E3bEhOQUhkSExnVDh5clk0MXgvQXdQcnlOR08vOUpOVzdTR1ZLQWRqb1UKdHlhTFpIQUVtWHluTGsrUjI4L1lGTUE4SDRZZDltOU9sclloVmpSWkZNNHArNXZ4UC83WUhQQjdjUFVzZmNkYQpEWnhSOFBYMjVKVllmL3Z0YjE2VjBFUkxuS2Q2MnFDRXdDL2xyMkEyV0hRd1hKTHJIZUF0bVp6QkpZVUNKNVhqCkR2MVpoeUZqa25zd2FWMHZHWGU2bmpUSTZDek1RRFRHeXNvYWdwQ0NvN1JXZ3pqTFJFZzJCR1dkMlVRcFk0QVcKbllBUDRRTnQ4MlVNUWJnSXFzRU1qNjRtelM5UStvMVA4NEoxbmFTUDVzQ0kyMkxlRlJwNmllelpjK0Q4RUgvNQpSTk9OR1NOV2wzZzZic3ZOMVZ5d1l3alduK3dhRDNYQWpYVXUrcGVVZ1FLQmdRRER1MVFQMjhvU01LaXZIZGZvCmtRMUhyVE5CUmM5ZVdlQU1aRnVJYmJQTE44cmRFaWJwT20zRHdUcWl0aG5haHFTME5MT3NCblhOdHVMdzFRci8Kem1Pem4weURPNVhHOGRsS3I5dnFXZUJMZGNSeWRMSkJad3FFeldmNEp3d3dnZkszckl0UmFJYm5BeG5HVVRTNQpTcnJoTmZCQUlHUzlqeDVYMmt2TEM3aEZRUUtCZ1FEREJJcnBMVElqUkRsb1daY3UwM3o5QmhiOGpRQ3lHYjVDCjRNWXMrZHVDblFJZE5xLyttYVBzcEp6YlZtRjRiNlMxeklQd2VJM2ZNdk1lcVJUYnVmK2RycEVsc3QxYnVGVE8KUDBVTU1uNFYrNHFHSU9Pa0l5NUpJS3dSOHNKRDl0TkRVUHR4dURFb3RUQjlJeVd4NnBkbUNGejV2L2JnZ0RDdQpyZW9xZmxMKzV3S0JnUUNEdmIrTDJRUytqNC9LSmswZmxSb2FKMks3U1ZDVkVlc3lqQTNyMnVMTUltWmh2QWtDCnJEZ2JMU0RaU2JaSEZwOGZSK1d6SUxvRDExZ1NmMktpNFBqTWVxa1dIM0hsY1AwdlB3VEhUTzBoL1VkWFBtS0kKa09GTWw3Q21IeW9lTUNqOUpaNjBFYVhUTVl3VXBxM1ZGWTZKYlRPakJlcW9oLzhGWk1IbERhTmV3UUtCZ0NIZwpFQ0VnOEt5ZmxUbERGcmZUbE1wKzNFOVNUdVNoQkNPcDE4TElSQkVVSk9IZU5nUUx2Q1hIRWxnblVSY1NqWkhtCnpLUmd6SVFRM1pwZDFIbTJmV2h1Z2xnQ0VlRjB5NFpvQng1dlJ1ZWFvaDFhYVRDQnkvQjM5R3ZKdDJVRzR2dTIKZlhicmY5NktXcm5oK1JKR3BiWGJqZ3IwQlhaSnppc0ptcnQyNWdQUkFvR0JBSTNjK0lOcFFYd3JFK0xCekNQdQpMd0lWdmttNU5wZUlsS1F0RE5ycUcxUXZVaHF5WjIvWGl0YzRGeWljY1c3V0h4a0dLR1p5ajdHYm1wcUVPbnlZCmlWa3UwTFNmdFpneWNldDJ1TWRwMEhhVkFnaTVTNmFWZjV5TjBVLzhSNVRveGNidUVmcXdyQkl5UmdzZThseDMKTk5Tdkx4UEFlbXBtaUZQU2s5QXRvYllWCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0="
+    },
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "cert-0ee0e1584c8637facac95bd5fce315367dee124c0086d41e"
+    },
+    "type": "kubernetes.io/tls"
+}{
+    "apiVersion": "v1",
+    "data": {
+        "tls.crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZlRENDQkdDZ0F3SUJBZ0lVQXVzWUdQOUJ3b0xGRkFKZEIvalk2ZVV6VXlRd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2daSXhDekFKQmdOVkJBWVRBbFZMTVJJd0VBWURWUVFJREFsSVlXMXdjMmhwY21VeEVqQVFCZ05WQkFjTQpDVUZzWkdWeWMyaHZkREVRTUE0R0ExVUVDZ3dIUzI5dVp5QlZTekVRTUE0R0ExVUVDd3dIVTNWd2NHOXlkREVZCk1CWUdBMVVFQXd3UFUzVndjRzl5ZENCU2IyOTBJRU5CTVIwd0d3WUpLb1pJaHZjTkFRa0JGZzV6ZEhWQWEyOXUKWjJoeExtTnZiVEFlRncweU1UQXhNakF4TlRBME5EVmFGdzB5TWpBeE1qQXhOVEEwTkRWYU1JR1FNUXN3Q1FZRApWUVFHRXdKVlN6RVNNQkFHQTFVRUNBd0pTR0Z0Y0hOb2FYSmxNUkl3RUFZRFZRUUhEQWxCYkdSbGNuTm9iM1F4CkVEQU9CZ05WQkFvTUIwdHZibWNnVlVzeEVEQU9CZ05WQkFzTUIxTjFjSEJ2Y25ReEZqQVVCZ05WQkFNTURXMTAKYkhNdFkyOXVjM1Z0WlhJeEhUQWJCZ2txaGtpRzl3MEJDUUVXRG5OMGRVQnJiMjVuYUhFdVkyOXRNSUlDSWpBTgpCZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUExLys4My9ZTmlFVktZdmN1VndZR3ZlNmFmc2cxCkJZQ24xK0U5VXdnaDB1d0FlblQvREtCOE5ocW9WeGM3Y1oySGFUSTE0NklHbUZJQ21jdGxUV3ZMUExnbEhtVG8KYnlPVVY2dElKQWp2enlFT3BDNDU4aExHZ2J2OG1oR1hKV1B4QlZ1N1d5NkhhcHoyYmswY0VzY2ZMN1BIS2FSdQozRDZyOC96YmhoV0FxZTRFSXQrTlZZVDZiYWFZQnM3YlBaUVhzL3NsdUtJK0ROWXVEZWFBbW9TdUNjNGVpbjZ6CjB4RHFDU01tUGViempuczAzdHRCMjl2V0wzZVlZOWR2Z29DZCtDUGhYVC9DNENIdHZLYkgraE9RWUR0VkY2TU8KMW1tQUJBUVRRV01SLzAwK1FJMHh0dnVYdEVQdXJsYTVkQTBUTjZkZENUT09jSUxLeDYyejVvYzNLcXIrbkhIYQo3MXpOekFSVVZhWjJ2eTFwUlZyMERaZ0I3S3FjRlhoeS9veThJcG14VVIxQVNCRFpsNkI2UktyZFF3dmdMZ21uCjNNL3JvTkxBVSszbno0aXRwdC96ZitYMHN1d2R0aHJmbGljMVI2OHoxU2xZYnlvR0FSV2taL3BPbDZrTE5WSzIKT3NxUXVJQ2Fham5XN3Qxb0RkN3oxKzNobSt1b3J5RHd2RzZmM1Q5WnZXaktYWWNLZzdiK0JqYkZkYWhiRHl3RApQZ25oU3o5QWFvVldoUitHSElQcmpSQ2xNcEVrcmEveUdKRnZIM1VwWGhnZzlkMERyTFpFNTFaNzVhOVN2bkFqCnZkTHVOaHg0Ykpid0xCZ05Hc0pNa3VwekJydzRpQ2ZiS0ZjQmJQOG8wWGp0YXJqN1QvbWtXdVExR2pXcWZ5ckQKNTVOZWNCUE53NUM5QlIwQ0F3RUFBYU9CeFRDQndqQUpCZ05WSFJNRUFqQUFNQkVHQ1dDR1NBR0crRUlCQVFRRQpBd0lGb0RBekJnbGdoa2dCaHZoQ0FRMEVKaFlrVDNCbGJsTlRUQ0JIWlc1bGNtRjBaV1FnUTJ4cFpXNTBJRU5sCmNuUnBabWxqWVhSbE1CMEdBMVVkRGdRV0JCU1YzRitlaWNVOFNWVDRMY0RKNmVNelAwdG9kekFmQmdOVkhTTUUKR0RBV2dCUjJ5U2wvVEFsRkRHTzNOQVZseUphWlIrWFp0ekFPQmdOVkhROEJBZjhFQkFNQ0JlQXdIUVlEVlIwbApCQll3RkFZSUt3WUJCUVVIQXdJR0NDc0dBUVVGQndNRU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjVMME9aCldFTEc5UHc2T2wxQnNaWWdwTFI0UEdOQkI5ZEttLzlkZCtxK29oWlZGQ2ZYY2paM1lPVTF2aC9ISFFyQUxSTlkKSTU4SnhjVkNPeC9xSVcydUEwaVNDcUlUMHNOYjljSkx4ZlpmN1grQnpQUFBudTB1Z1VKcDdHekxObkhpdHJMQwpYYjFubW1lZndncmFOenArYTVJclI4UmNRRzFtWUR1UysySEsvcnlibzIyWGNDeGhvYjhPaURFbjgreXRrS3lRCklwbXJmOUQrLzY4L2loNmF6MHcxYWFrQVNNbUZlOHovcDZWZ1ZRa0N5U0NXV0ZHNTI1QlJkR21TSW1xVlo0eGEKYVFGTjNMK29OK0pKY0NGVHRoTE9BWW8zMkpIK3hMTXo3UG9relNMODRnM2I2OGg1OWhYRG9NU3dCMTBHdGhMNQpUOHRxVjZpNW1pS1d3dmZaCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=",
+        "tls.key": "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS1FJQkFBS0NBZ0VBMS8rODMvWU5pRVZLWXZjdVZ3WUd2ZTZhZnNnMUJZQ24xK0U5VXdnaDB1d0FlblQvCkRLQjhOaHFvVnhjN2NaMkhhVEkxNDZJR21GSUNtY3RsVFd2TFBMZ2xIbVRvYnlPVVY2dElKQWp2enlFT3BDNDUKOGhMR2didjhtaEdYSldQeEJWdTdXeTZIYXB6MmJrMGNFc2NmTDdQSEthUnUzRDZyOC96YmhoV0FxZTRFSXQrTgpWWVQ2YmFhWUJzN2JQWlFYcy9zbHVLSStETll1RGVhQW1vU3VDYzRlaW42ejB4RHFDU01tUGViempuczAzdHRCCjI5dldMM2VZWTlkdmdvQ2QrQ1BoWFQvQzRDSHR2S2JIK2hPUVlEdFZGNk1PMW1tQUJBUVRRV01SLzAwK1FJMHgKdHZ1WHRFUHVybGE1ZEEwVE42ZGRDVE9PY0lMS3g2Mno1b2MzS3FyK25ISGE3MXpOekFSVVZhWjJ2eTFwUlZyMApEWmdCN0txY0ZYaHkvb3k4SXBteFVSMUFTQkRabDZCNlJLcmRRd3ZnTGdtbjNNL3JvTkxBVSszbno0aXRwdC96CmYrWDBzdXdkdGhyZmxpYzFSNjh6MVNsWWJ5b0dBUldrWi9wT2w2a0xOVksyT3NxUXVJQ2Fham5XN3Qxb0RkN3oKMSszaG0rdW9yeUR3dkc2ZjNUOVp2V2pLWFljS2c3YitCamJGZGFoYkR5d0RQZ25oU3o5QWFvVldoUitHSElQcgpqUkNsTXBFa3JhL3lHSkZ2SDNVcFhoZ2c5ZDBEckxaRTUxWjc1YTlTdm5BanZkTHVOaHg0Ykpid0xCZ05Hc0pNCmt1cHpCcnc0aUNmYktGY0JiUDhvMFhqdGFyajdUL21rV3VRMUdqV3FmeXJENTVOZWNCUE53NUM5QlIwQ0F3RUEKQVFLQ0FnRUF5bXVPckcvaEpLaVMyb1g4dG04ZVdGWklFTEk5QmlnWW96WWhDelFleHBTR3Fqd0VYT2YxSDVzQgowWVFqSUFsWndocmM1N09LN0twR1o2eDJCZ1VUMUpaWnFzODBDQnRXeElYdXVGNXJwamU3aWQ4TVRMQ051VHpiCnIrTDJPNE1hZDBRTkk1bEtMSDVtYnQzeWhpSjNOblFMSEJwT0RqYnBYR0RGdFRWbmUxaGtKZTVNZkMxL3BzeXQKd2d1TzZIbGxjVFRXbDkzcnVvbnBaUHR6MzlxaFl1ejRNQ0FuRTVEUlVyak8rTW43eTdYb3lVUyt4blNSbDdCRApicVdSaWNKUXlCK1A3cHgzV3laUXJpKzZUc0NRMTY0aXcyRDY0YkxDMW9DZkx2TFNCZWgwZzNnT2RBWDVtR1RsClJCcGY5OExkRkpYU21YSG9kY1lNbE81VEhxSHU3bU9FOHp2UERiT3pwd0tmdEUxMVBTK2xodXEvZlJFSm5yQXgKcGJ2VGt2MmMxbnU5MGdrcmFjdjZQaFJDOFloQklhMmdxaG94WTdySDdVcFlhMWM1UWFKemc1aWJpdGVUTFJLQwplOVptZm9QV2FZMmtzWTRnQldaL3Ayd29rSjhVNlpIRXNFZlFTOVdpYk1wcVJzZElOV1E5Sm5JQkxLblR1cUIwCkIyOUU5akhBbDhyd01UMi9EaUlpVmpIY2R3cFAzN014b3RLdllERncreURjWkRlS1RJaDEzM1haTld5Ty9UY0gKYURyTkIwZHltcXVudU5tZlB0czU2NkFZRXJ5bTBuZGNtbUx1R0lLS0UrbDFoMSs1Q1dqZHNUZHJra1haSy93MQppL2tyZkxydVFxUWNXM0Jwbmc4SkFLaXJ2R2ZZSnhJRWFDTHF0ZXBiN1lhSGhhSTNnejBDZ2dFQkFQTzBVUTZlCm9Qek1ZbUVlZ3AyTGpBZkhaaHdHVjBmcGlDNm54RVdLb0VFN1RiNXp5QjhybGtGSXBRbFhtbGpRdmYzeERtcS8KVGEzSmxrYVkyOTBvRmMweXBwOXpVWS9zVUd5YzNwdmx0eGwwZ0xLT1BuSWtvUDNtYTJIekJ4UVJyR1JkY0ZoSApBSG9tODBCbTlBUG0yOUwwTUZ1T3VoR0d4a0d2UUN4SCtLbW1vaHZaTVVFcU5JdVdpOFhCN21hRFhjQW1TSjd4CllkUUFnTHNwUkora2taTSs1OVhpanl2WXZnMDR4Q3UxRlNvcCtMb2wreEJ3V0FSNU9hS25iWjlMK2pLdHpieEMKSVM3RVJUbGhzaGFtMmRZSW03U0ZjRC9PY0xWNmx1cXJlUjBzdlM2SFFpczFrR3huTnhrQkFickIxUVord0xLcApRenRuT2s3MEgvZVdQNXNDZ2dFQkFPTGxsQ0h1UmxvcUV5ekRUNXNWYmZsQ01UVnNYbUhHSjQvcUk0QW4rZXRJCjNEQ29tTkxQQUlCS1lBaU5ncVdBbS93Zkx5NXJIdTJaR3pjUG43Y1FGL3hLcDAwdURHS25jUXozWjlKRG9mSTEKcnBMSCt0M0xKOWwvRXpRdjF0cHp3T1U1cmhGTm1xckpud3kxN0J0T21sQ0tBUW5WbXlEa0x5UjlBaFdrQ1RpOApCTERxNm14MVg2MUs2UDExR0F4QWQ3ME5GTnpEODg2OERkcTJYSW53RXdYemYvRkhRVy9KVllaRUFhN2RuNEtGCndRL3RQU3NwUDB2R3pEZmdOSTY0UHROZVBuWi9lMDBYWHFBN2xhMk9TY3JvK1NEU3lYR2xES1g0WGh3d1RERDEKK3UzVmJVbWpJbnBFSkwzYlU4Yy9xZTM2VWhvc2VGMUcwY20yMnNIcWhhY0NnZ0VBWTNBKzVyMDVLUTFvVXdKMAovejJ5YkhZakp1bzdjTjlNTHVWTGc2aVZ6U2dhaDh5TWFwT0pZcWYybDBKRWUxcnBPeFhCOFRLUHlvcUhvOVM1Cldac0NrbERKaGlReXNvd1ZJTXc5Vk5VOWljaHN2dTZsY2tPWjRSL0V6eG12MkxPQmFRNXJTY25tMnZETHJvcVQKcElmdFNEMVZBZmJSMjFibnpHTnF4dWF6QXQ0NEpTN1JGeXJXZCtKOHM3dDJ3Q04zL0hCaWoyQWtyN0ZvMVhWNApSNytKbXRBL0hwbXNHNUw3c1Q5cFpBQW1XNmIyazFYdUJINGltK2l1Nkx4eVVWNVovNVhGYmJ4NTk3QWtJczdICk1ORHg3NUJob0I0V2VDS1BBSzI5cUpGQkFQT0JXZHZjMXU2ck9HQkJMaFdvRkFFRkgvcFdQRkF1VzYyNkwvOFMKa0I2aFl3S0NBUUIzL0pJZWMyUHUwR3M5YzdlSU9vZmlsWGR5V2ZGN1lRK1EwbStkbVFaWHZ6cjUzRjZjdEd6KwphdFpvRDNWMFVoT3ErMDYzREZ6WnB1cTJibU8ycWlNVS91R0VOZ0xFdE9sYXd3YTdNWnJWZkQvcVRTakQyMmdpClkwbmpnaHpyZnVVV0V5K1M1T2dTd3ZhQ0FUNXZubHlLbE1CQjFCenFBdUZQT1hBOXczWkE4MlREcmliejNnb1AKbVJxbTFpSTJjRzBobzJaUjdLbmt2SnZTK2picmx2Sm9aa0ZWZGFvTUZIdE91bTN0YkRPckVWSnNPcmZyT0MvSgp3Y0pERmlTVkNLZm9uT0VKUnhjTVNIeDQzYW1ra3lkQXozelhOOERoZ1RlMEdTaWpYWU1kTFNkYVdGQW43Y1lRCnhESnQyQ3R3cGFFV1FSYmowbnFBVVRBbHJMWDRjQzNuQW9JQkFRQ2wxY1Y4NmJZdzhDS3JDdWY5VEYwS2s1cGQKUkVkaWxEcGtzNFoxUkg0TXBCRFdMdHZNZVFxbE5zTisvUnVnS1FFeE8wSFRkWkl5bjdjQlJSbG9EMnhjTmNKQQpHL3JVTWVsL3g0ZmhhRU9FN1V3OXJtVGVmdnBjZ1dtdFh3NjRzTUE4S0ZBNG9DWEljZ2J3TDVRK3N6cU5OV0FOCmFicGdsMERuVTA2WXlCRG9LLzdEMEI4S3QzcVMxTjZYWCtaNXd0UHZnbGJEMkhDWXk2cmRrcWk4SWJRLzZPZVMKd0c3cC83ZzNKbE9FeW90TXE5Q2wyVDB3VE5EU0xsbWErbXdjOW1JTElURFh6bldpTFFTem5FNjltZWJXQlVyMwpTYnQ5MWVmSDMwaW5SeDg1SDBwTkpycFpzSDBBNmF5TDBnVEpTdVVjMGVKWFlSNVBvMWdSUU1PU0lFV2gKLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0="
+    },
+    "kind": "Secret",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "cert-b12464ec431576239dd9cc2545d528f6cbdbd988cf076323"
+    },
+    "type": "kubernetes.io/tls"
+}{
+    "apiVersion": "configuration.konghq.com/v1",
+    "consumerGroups": [
+        "example-consumer-group"
+    ],
+    "credentials": [
+        "key-auth-example-user",
+        "jwt-auth-example-user",
+        "basic-auth-example-user",
+        "acl-group-example-user",
+        "mtls-auth-example-user"
+    ],
+    "custom_id": "1234567890",
+    "kind": "KongConsumer",
+    "metadata": {
+        "annotations": {
+            "konghq.com/plugins": "example-user-rate-limiting-advanced",
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-user"
+    },
+    "username": "example-user"
+}{
+    "apiVersion": "configuration.konghq.com/v1beta1",
+    "kind": "KongConsumerGroup",
+    "metadata": {
+        "annotations": {
+            "kubernetes.io/ingress.class": "kong"
+        },
+        "name": "example-consumer-group"
+    }
+}

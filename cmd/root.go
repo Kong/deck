@@ -312,9 +312,11 @@ func initConfig() {
 	}
 
 	rootConfig.Address = viper.GetString("kong-addr")
-	rootConfig.TLSServerName = viper.GetString("tls-server-name")
-	rootConfig.TLSSkipVerify = viper.GetBool("tls-skip-verify")
-	rootConfig.TLSCACert = caCertContent
+
+	tlsServerName := viper.GetString("tls-server-name")
+	tlsSkipVerify := viper.GetBool("tls-skip-verify")
+	tlsCACert := caCertContent
+
 	rootConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
@@ -334,7 +336,7 @@ func initConfig() {
 			clientCertContent = strings.TrimRight(clientCertContent, "\n")
 		}
 	}
-	rootConfig.TLSClientCert = clientCertContent
+	tlsClientCert := clientCertContent
 
 	clientKeyContent := viper.GetString("tls-client-key")
 
@@ -350,13 +352,21 @@ func initConfig() {
 			clientKeyContent = strings.TrimRight(clientKeyContent, "\n")
 		}
 	}
-	rootConfig.TLSClientKey = clientKeyContent
+	tlsClientKey := clientKeyContent
 
-	if (rootConfig.TLSClientKey == "" && rootConfig.TLSClientCert != "") ||
-		(rootConfig.TLSClientKey != "" && rootConfig.TLSClientCert == "") {
+	if (tlsClientKey == "" && tlsClientCert != "") ||
+		(tlsClientKey != "" && tlsClientCert == "") {
 		fmt.Printf("tls-client-cert and tls-client-key / tls-client-cert-file and tls-client-key-file " +
 			"must be used in conjunction but only one was provided")
 		os.Exit(1)
+	}
+
+	rootConfig.TLSConfig = utils.TLSConfig{
+		ServerName: tlsServerName,
+		SkipVerify: tlsSkipVerify,
+		CACert:     tlsCACert,
+		ClientCert: tlsClientCert,
+		ClientKey:  tlsClientKey,
 	}
 
 	// cookie-jar support
