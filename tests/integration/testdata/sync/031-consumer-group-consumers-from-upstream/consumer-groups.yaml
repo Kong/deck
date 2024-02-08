@@ -1,0 +1,14 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+  - project:the-project
+  - managed-by:deck
+  default_lookup_tags:
+    consumers:
+    - managed-by:the-background-process
+    - project:the-project
+consumer_groups:
+- name: group-1
+  consumers:
+  - username: consumer-1

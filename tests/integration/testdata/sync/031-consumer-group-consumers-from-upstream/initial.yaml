@@ -1,0 +1,16 @@
+_format_version: "3.0"
+consumer_groups:
+- id: c0f6c818-470c-4df7-8515-c8e904765fcc
+  name: group-1
+  tags:
+  - project:the-project
+  - managed-by:deck
+consumers:
+- id: 97cab250-1b0a-4119-aa2e-0756e8931034
+  username: consumer-1
+  groups:
+  - id: c0f6c818-470c-4df7-8515-c8e904765fcc
+    name: group-1
+  tags:
+  - project:the-project
+  - managed-by:the-background-process

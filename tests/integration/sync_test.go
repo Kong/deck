@@ -4863,3 +4863,55 @@ func Test_Sync_LookupRoutesTags(t *testing.T) {
 	require.Error(t, sync(pluginsLookupStateFile))
 	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
 }
+
+// test scope:
+//   - 3.5.0+
+//   - konnect
+func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	expectedState := utils.KongRawState{
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("c0f6c818-470c-4df7-8515-c8e904765fcc"),
+					Name: kong.String("group-1"),
+					Tags: kong.StringSlice("project:the-project", "managed-by:deck"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+						Username: kong.String("consumer-1"),
+						Tags:     kong.StringSlice("project:the-project", "managed-by:the-background-process"),
+					},
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+				Username: kong.String("consumer-1"),
+				Tags:     kong.StringSlice("project:the-project", "managed-by:the-background-process"),
+			},
+		},
+	}
+
+	// simulate the following scenario:
+	// - a consumer-group defined with a set of tags, ideally managed by decK
+	// - a consumer defined with another set of tags, ideally managed by an external process
+	// - the consumer -> consumer-group relationship, ideally managed by an external process
+	require.NoError(t, sync("testdata/sync/031-consumer-group-consumers-from-upstream/initial.yaml"))
+	testKongState(t, client, false, expectedState, nil)
+
+	// referencing the relationship in a file without the consumer would still work
+	// if default_lookup_tags are defined to pull consumers from upstream.
+	require.NoError(t, sync("testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml"))
+	testKongState(t, client, false, expectedState, nil)
+}
