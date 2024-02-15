@@ -240,6 +240,7 @@ func SerializeObjectDroppingFields(obj interface{}, format string) ([]byte, erro
 		return nil, err
 	}
 
+	// We're deleting fields that are not meant to be supplied by users.
 	delete(genericObj, "status")
 	delete(genericObj["metadata"].(map[string]interface{}), "creationTimestamp")
 
