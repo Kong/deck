@@ -28,20 +28,10 @@ jobs:
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
-        # this action often fails, hence we wrap it in a retry
-        # uses: codecov/codecov-action@v3
-        # with:
-        #   name: codecov-deck
-        #   token: ${{ secrets.CODECOV_TOKEN }}
-        #   fail_ci_if_error: true
-        uses: Wandalen/wretry.action@v1.3.0
+        uses: codecov/codecov-action@v3
         with:
-          action: codecov/codecov-action@v3
-          with: |
-            name: codecov-deck
-            token: ${{ secrets.CODECOV_TOKEN }}
-            fail_ci_if_error: true
-          attempt_limit: 3
-          attempt_delay: 15000
+          name: codecov-deck
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
       - name: Build
         run: make build
