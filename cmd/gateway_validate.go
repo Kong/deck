@@ -148,7 +148,7 @@ this command unless --online flag is used.
 			return executeValidate(cmd, args)
 		}
 		argsValidator = validateNoArgs
-		preRun = func(cmd *cobra.Command, args []string) error {
+		preRun = func(_ *cobra.Command, _ []string) error {
 			if len(diffCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
@@ -156,7 +156,7 @@ this command unless --online flag is used.
 			return preRunSilenceEventsFlag()
 		}
 	} else {
-		preRun = func(cmd *cobra.Command, args []string) error {
+		preRun = func(_ *cobra.Command, args []string) error {
 			validateOnline = online
 			validateCmdKongStateFile = args
 			if len(validateCmdKongStateFile) == 0 {

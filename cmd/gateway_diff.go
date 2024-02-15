@@ -26,7 +26,7 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 	short := "Diff the current entities in Kong with the one on disks"
 	execute := executeDiff
 	argsValidator := cobra.MinimumNArgs(0)
-	preRun := func(cmd *cobra.Command, args []string) error {
+	preRun := func(_ *cobra.Command, args []string) error {
 		diffCmdKongStateFile = args
 		if len(diffCmdKongStateFile) == 0 {
 			diffCmdKongStateFile = []string{"-"}
@@ -47,7 +47,7 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 			return executeDiff(cmd, args)
 		}
 		argsValidator = validateNoArgs
-		preRun = func(cmd *cobra.Command, args []string) error {
+		preRun = func(_ *cobra.Command, _ []string) error {
 			if len(diffCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")

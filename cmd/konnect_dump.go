@@ -27,7 +27,7 @@ func newKonnectDumpCmd() *cobra.Command {
 	The file can then be read using the 'deck konnect sync' command or 'deck konnect diff' command to
 	configure Konnect.` + konnectAlphaState,
 		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			httpClient := utils.HTTPClient()
 			_ = sendAnalytics("konnect-dump", "", modeKonnect)
 

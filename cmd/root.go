@@ -44,7 +44,7 @@ configuration file.
 
 It can be used to export, import, or sync entities to Kong.`,
 		SilenceUsage: true,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
 				return fmt.Errorf("invalid URL: %w", err)
 			}
