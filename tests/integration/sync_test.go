@@ -195,6 +195,24 @@ var (
 		},
 	}
 
+	plugin36 = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+				"realm":            string("service"),
+			},
+		},
+	}
+
 	plugin_on_entities = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
@@ -1536,7 +1554,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 }
 
 // test scope:
-//   - 3.x
+// - >=3.0 <3.6.0
 func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -1560,7 +1578,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0 <3.6.0")
 			setup(t)
 
 			sync(tc.kongFile)
@@ -1570,8 +1588,8 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 }
 
 // test scope:
-//   - konnect
-func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
+//   - 3.6+
+func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	if err != nil {
@@ -1588,13 +1606,13 @@ func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: plugin,
+				Plugins: plugin36,
 			},
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "konnect", "")
+			runWhenKongOrKonnect(t, ">=3.6.0")
 			setup(t)
 
 			sync(tc.kongFile)

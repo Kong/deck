@@ -2,7 +2,9 @@ package convert
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/blang/semver/v4"
@@ -27,6 +29,9 @@ const (
 	FormatKongGateway2x Format = "kong-gateway-2.x"
 	// FormatKongGateway3x represents the Kong gateway 3.x format.
 	FormatKongGateway3x Format = "kong-gateway-3.x"
+
+	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
+	rlaNamespaceDefaultLength      = 32
 )
 
 // AllFormats contains all available formats.
@@ -100,6 +105,22 @@ func Convert(
 	return err
 }
 
+func randomString(n int) (string, error) {
+	const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzj"
+	charsetLength := big.NewInt(int64(len(charset)))
+
+	ret := make([]byte, n)
+	for i := 0; i < n; i++ {
+		num, err := rand.Int(rand.Reader, charsetLength)
+		if err != nil {
+			return "", fmt.Errorf("error generating random string: %w", err)
+		}
+		ret[i] = charset[num.Int64()]
+	}
+
+	return string(ret), nil
+}
+
 func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Content, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input content is nil")
@@ -140,6 +161,11 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 			filename, changedRoutesLen, strings.Join(changedRoutes, "\n"))
 	}
 
+	// generate any missing required auto fields.
+	if err := generateAutoFields(outputContent); err != nil {
+		return nil, err
+	}
+
 	cprint.UpdatePrintf(
 		"From the '%s' config file,\n"+
 			"the _format_version field has been migrated from '%s' to '%s'.\n"+
@@ -151,6 +177,64 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 	outputContent.FormatVersion = "3.0"
 
 	return outputContent, nil
+}
+
+func generateAutoFields(content *file.Content) error {
+	for _, plugin := range content.Plugins {
+		if *plugin.Name == rateLimitingAdvancedPluginName {
+			plugin := plugin
+			if err := autoGenerateNamespaceForRLAPlugin(&plugin); err != nil {
+				return err
+			}
+		}
+	}
+
+	for _, service := range content.Services {
+		for _, plugin := range service.Plugins {
+			if *plugin.Name == rateLimitingAdvancedPluginName {
+				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	for _, route := range content.Routes {
+		for _, plugin := range route.Plugins {
+			if *plugin.Name == rateLimitingAdvancedPluginName {
+				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	for _, consumer := range content.Consumers {
+		for _, plugin := range consumer.Plugins {
+			if *plugin.Name == rateLimitingAdvancedPluginName {
+				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func autoGenerateNamespaceForRLAPlugin(plugin *file.FPlugin) error {
+	if plugin.Config != nil {
+		ns, ok := plugin.Config["namespace"]
+		if !ok || ns == nil {
+			// namespace is not set, generate one.
+			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
+			if err != nil {
+				return fmt.Errorf("error generating random namespace: %w", err)
+			}
+			plugin.Config["namespace"] = randomNamespace
+		}
+	}
+	return nil
 }
 
 func migrateRoutesPathFieldPre300(route *file.FRoute) (*file.FRoute, bool) {
