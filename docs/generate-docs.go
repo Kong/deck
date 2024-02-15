@@ -18,7 +18,7 @@ import (
 
 func genMarkdownTree(cmd *cobra.Command, dir string) error {
 	identity := func(s string) string { return s }
-	emptyStr := func(s string) string { return "" }
+	emptyStr := func(_ string) string { return "" }
 	return genMarkdownTreeCustom(cmd, dir, emptyStr, identity)
 }
 

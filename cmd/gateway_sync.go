@@ -27,7 +27,7 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 	short := "Sync performs operations to get Kong's configuration to match the state file"
 	execute := executeSync
 	argsValidator := cobra.MinimumNArgs(0)
-	preRun := func(cmd *cobra.Command, args []string) error {
+	preRun := func(_ *cobra.Command, args []string) error {
 		syncCmdKongStateFile = args
 		if len(syncCmdKongStateFile) == 0 {
 			syncCmdKongStateFile = []string{"-"}
@@ -47,7 +47,7 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 			return executeSync(cmd, args)
 		}
 		argsValidator = validateNoArgs
-		preRun = func(cmd *cobra.Command, args []string) error {
+		preRun = func(_ *cobra.Command, _ []string) error {
 			if len(syncCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")

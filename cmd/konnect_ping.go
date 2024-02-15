@@ -16,7 +16,7 @@ func newKonnectPingCmd() *cobra.Command {
 can connect to Konnect's API endpoint. It also validates the supplied
 credentials.` + konnectAlphaState,
 		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			_ = sendAnalytics("konnect-ping", "", modeKonnect)
 			client, err := utils.GetKonnectClient(nil, konnectConfig)
 			if err != nil {

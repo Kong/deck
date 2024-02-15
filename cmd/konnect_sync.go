@@ -13,12 +13,12 @@ func newKonnectSyncCmd() *cobra.Command {
 		Long: `The konnect sync command reads the state file and performs operations in Konnect
 to get Konnect's state in sync with the input state.` + konnectAlphaState,
 		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			_ = sendAnalytics("konnect-sync", "", modeKonnect)
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, false,
 				konnectDiffCmdParallelism)
 		},
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return preRunSilenceEventsFlag()
 		},
 	}

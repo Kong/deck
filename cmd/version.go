@@ -22,7 +22,7 @@ func newVersionCmd() *cobra.Command {
 		Long: `The version command prints the version of decK along with a Git short
 commit hash of the source tree.`,
 		Args: validateNoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			fmt.Printf("decK %s (%s) \n", VERSION, COMMIT)
 		},
 	}

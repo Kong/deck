@@ -47,7 +47,7 @@ combined JSON file:
 `,
 		Args: cobra.ArbitraryArgs,
 		RunE: executeFileRenderCmd,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+		PreRunE: func(_ *cobra.Command, args []string) error {
 			fileRenderCmdKongStateFile = args
 			if len(fileRenderCmdKongStateFile) == 0 {
 				fileRenderCmdKongStateFile = []string{"-"} // default to stdin

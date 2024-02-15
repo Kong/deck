@@ -21,12 +21,12 @@ func newKonnectDiffCmd() *cobra.Command {
 	the entities in local files. This allows you to see the entities
 	that will be created, updated, or deleted.` + konnectAlphaState,
 		Args: validateNoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			_ = sendAnalytics("konnect-diff", "", modeKonnect)
 			return syncKonnect(cmd.Context(), konnectDiffCmdKongStateFile, true,
 				konnectDiffCmdParallelism)
 		},
-		PreRunE: func(cmd *cobra.Command, args []string) error {
+		PreRunE: func(_ *cobra.Command, _ []string) error {
 			return preRunSilenceEventsFlag()
 		},
 	}
