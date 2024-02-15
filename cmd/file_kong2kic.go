@@ -46,7 +46,6 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 
 	outputContent = inputContent.DeepCopy()
 	err = kong2kic.WriteContentToFile(outputContent, cmdKong2KicOutputFilename, outputFileFormat, yamlOrJSON)
-
 	if err != nil {
 		return fmt.Errorf("failed converting Kong to Ingress '%s'; %w", cmdKong2KicInputFilename, err)
 	}
