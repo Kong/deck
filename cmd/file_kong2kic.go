@@ -17,7 +17,7 @@ var (
 	cmdKong2KicOutputFormat   string
 	cmdKong2KicClassName      string
 	cmdKong2KicIngress        bool
-	cmdKong2KicKICv2          bool
+	cmdKong2KicVersion        string
 )
 
 // Executes the CLI command "kong2kic"
@@ -33,6 +33,11 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 	kong2kic.ClassName = cmdKong2KicClassName
 	verbosity, _ := cmd.Flags().GetInt("verbose")
 	logbasics.Initialize(log.LstdFlags, verbosity)
+
+	// if cmdKong2KicVersion is not 2 or 3 return an error
+	if cmdKong2KicVersion != "2" && cmdKong2KicVersion != "3" {
+		return fmt.Errorf("invalid KIC version '%s'. Please use --help for more information", cmdKong2KicVersion)
+	}
 
 	inputContent, err := file.GetContentFromFiles([]string{cmdKong2KicInputFilename}, false)
 	if err != nil {
@@ -58,40 +63,40 @@ func validateInput(cmdKong2KicOutputFormat string) (
 	yamlOrJSON string,
 	err error,
 ) {
-	if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && !cmdKong2KicKICv2 && !cmdKong2KicIngress {
+	if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicVersion == "3" && !cmdKong2KicIngress {
 		// default to KICv 3.x and Gateway API YAML
 		outputFileFormat = kong2kic.KICV3GATEWAY
 		yamlOrJSON = file.YAML
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && !cmdKong2KicKICv2 && !cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicVersion == "3" && !cmdKong2KicIngress {
 		// KICv 3.x and Gateway API JSON
 		outputFileFormat = kong2kic.KICV3GATEWAY
 		yamlOrJSON = file.JSON
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && !cmdKong2KicKICv2 && cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicVersion == "3" && cmdKong2KicIngress {
 		// KICv 3.x and Ingress API YAML
 		outputFileFormat = kong2kic.KICV3INGRESS
 		yamlOrJSON = file.YAML
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && !cmdKong2KicKICv2 && cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicVersion == "3" && cmdKong2KicIngress {
 		// KICv 3.x and Ingress API JSON
 		outputFileFormat = kong2kic.KICV3INGRESS
 		yamlOrJSON = file.JSON
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicKICv2 && !cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicVersion == "2" && !cmdKong2KicIngress {
 		// KICv 2.x and Gateway API YAML
 		outputFileFormat = kong2kic.KICV2GATEWAY
 		yamlOrJSON = file.YAML
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicKICv2 && !cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicVersion == "2" && !cmdKong2KicIngress {
 		// KICv 2.x and Gateway API JSON
 		outputFileFormat = kong2kic.KICV2GATEWAY
 		yamlOrJSON = file.JSON
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicKICv2 && cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.YAML && cmdKong2KicVersion == "2" && cmdKong2KicIngress {
 		// KICv 2.x and Ingress API YAML
 		outputFileFormat = kong2kic.KICV2INGRESS
 		yamlOrJSON = file.YAML
-	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicKICv2 && cmdKong2KicIngress {
+	} else if strings.ToUpper(cmdKong2KicOutputFormat) == file.JSON && cmdKong2KicVersion == "2" && cmdKong2KicIngress {
 		// KICv 2.x and Ingress API JSON
 		outputFileFormat = kong2kic.KICV2INGRESS
 		yamlOrJSON = file.JSON
 	} else {
-		err = fmt.Errorf("invalid combination parameters. Please use --help for more information")
+		err = fmt.Errorf("invalid combination of parameters. Please use --help for more information")
 	}
 
 	return outputFileFormat, yamlOrJSON, err
@@ -121,14 +126,14 @@ manifests for KIC v3.x using the Kubernetes Gateway API. Only HTTP/HTTPS routes 
 	kong2KicCmd.Flags().StringVarP(&cmdKong2KicOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
 	kong2KicCmd.Flags().StringVarP(&cmdKong2KicOutputFormat, "format", "f", "yaml",
-		"output file format: json or yaml.")
+		"Output file format: json or yaml.")
+	kong2KicCmd.Flags().StringVar(&cmdKong2KicVersion, "kic-version", "3",
+		"Generate manifests for KIC v3 or v2. Possible values are 2 or 3.")
 	kong2KicCmd.Flags().StringVar(&cmdKong2KicClassName, "class-name", "kong",
 		`Value to use for "kubernetes.io/ingress.class" ObjectMeta.Annotations and for
 		"parentRefs.name" in the case of HTTPRoute.`)
 	kong2KicCmd.Flags().BoolVar(&cmdKong2KicIngress, "ingress", false,
 		`Use Kubernetes Ingress API manifests instead of Gateway API manifests.`)
-	kong2KicCmd.Flags().BoolVar(&cmdKong2KicKICv2, "kicv2", false,
-		`Generate manifests compatible with KIC v2.x.`)
 
 	return kong2KicCmd
 }
