@@ -108,9 +108,9 @@ func Test_convertKongGatewayToIngress(t *testing.T) {
 
 			var output []byte
 			if strings.HasSuffix(tt.outputFilename, ".json") {
-				output, err = MarshalKongToKICJson(inputContent, tt.builderType)
+				output, err = MarshalKongToKIC(inputContent, tt.builderType, file.JSON)
 			} else {
-				output, err = MarshalKongToKICYaml(inputContent, tt.builderType)
+				output, err = MarshalKongToKIC(inputContent, tt.builderType, file.YAML)
 			}
 
 			if err == nil {

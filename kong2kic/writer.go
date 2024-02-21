@@ -15,49 +15,23 @@ func WriteContentToFile(content *file.Content, filename string, format file.Form
 	var err error
 
 	switch format {
-	// case YAML:
-	// 	c, err = yaml.Marshal(content)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// case JSON:
-	// 	c, err = json.MarshalIndent(content, "", "  ")
-	// 	if err != nil {
-	// 		return err
-	// 	}
 	case KICV3GATEWAY:
-		if yamlOrJSON == file.YAML {
-			c, err = MarshalKongToKICYaml(content, KICV3GATEWAY)
-		} else {
-			c, err = MarshalKongToKICJson(content, KICV3GATEWAY)
-		}
+		c, err = MarshalKongToKIC(content, KICV3GATEWAY, yamlOrJSON)
 		if err != nil {
 			return err
 		}
 	case KICV3INGRESS:
-		if yamlOrJSON == file.YAML {
-			c, err = MarshalKongToKICYaml(content, KICV3INGRESS)
-		} else {
-			c, err = MarshalKongToKICJson(content, KICV3INGRESS)
-		}
+		c, err = MarshalKongToKIC(content, KICV3INGRESS, yamlOrJSON)
 		if err != nil {
 			return err
 		}
 	case KICV2GATEWAY:
-		if yamlOrJSON == file.YAML {
-			c, err = MarshalKongToKICYaml(content, KICV2GATEWAY)
-		} else {
-			c, err = MarshalKongToKICJson(content, KICV2GATEWAY)
-		}
+		c, err = MarshalKongToKIC(content, KICV2GATEWAY, yamlOrJSON)
 		if err != nil {
 			return err
 		}
 	case KICV2INGRESS:
-		if yamlOrJSON == file.YAML {
-			c, err = MarshalKongToKICYaml(content, KICV2INGRESS)
-		} else {
-			c, err = MarshalKongToKICJson(content, KICV2INGRESS)
-		}
+		c, err = MarshalKongToKIC(content, KICV2INGRESS, yamlOrJSON)
 		if err != nil {
 			return err
 		}
@@ -67,7 +41,7 @@ func WriteContentToFile(content *file.Content, filename string, format file.Form
 
 	if filename == "-" {
 		if _, err := fmt.Print(string(c)); err != nil {
-			return fmt.Errorf("writing file: %w", err)
+			return fmt.Errorf("writing to stdout: %w", err)
 		}
 	} else {
 		filename = utils.AddExtToFilename(filename, strings.ToLower(string(format)))

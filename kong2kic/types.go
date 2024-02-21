@@ -27,203 +27,121 @@ type KICContent struct {
 	KongUpstreamPolicies []kicv1beta1.KongUpstreamPolicy `json:"upstreamPolicies,omitempty" yaml:",omitempty"`
 }
 
-func (k KICContent) marshalKICContentToYaml() ([]byte, error) {
+func (k KICContent) marshalKICContentToFormat(format string) ([]byte, error) {
 	var output []byte
 
 	const (
 		yamlSeparator = "---\n"
 	)
 
-	// iterate over the slices of kongIngresses, kongPlugins,
-	// kongClusterPlugins, ingresses, services, secrets, kongConsumers
-	// and marshal each one in yaml format
-	// and append it to the output slice
-	// then return the output slice
 	for _, kongIngress := range k.KongIngresses {
-		kongIngresses, err := SerializeObjectDroppingFields(kongIngress, file.YAML)
+		kongIngresses, err := SerializeObjectDroppingFields(kongIngress, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongIngresses...)
-		output = append(output, []byte(yamlSeparator)...)
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, kongPlugin := range k.KongPlugins {
-		kongPlugins, err := SerializeObjectDroppingFields(kongPlugin, file.YAML)
+		kongPlugins, err := SerializeObjectDroppingFields(kongPlugin, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongPlugins...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, kongClusterPlugin := range k.KongClusterPlugins {
-		kongClusterPlugins, err := SerializeObjectDroppingFields(kongClusterPlugin, file.YAML)
+		kongClusterPlugins, err := SerializeObjectDroppingFields(kongClusterPlugin, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongClusterPlugins...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, ingress := range k.Ingresses {
-		ingresses, err := SerializeObjectDroppingFields(ingress, file.YAML)
+		ingresses, err := SerializeObjectDroppingFields(ingress, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, ingresses...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, httpRoute := range k.HTTPRoutes {
-		httpRoutes, err := SerializeObjectDroppingFields(httpRoute, file.YAML)
+		httpRoutes, err := SerializeObjectDroppingFields(httpRoute, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, httpRoutes...)
-		output = append(output, []byte(yamlSeparator)...)
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, kongUpstreamPolicy := range k.KongUpstreamPolicies {
-		kongUpstreamPolicies, err := SerializeObjectDroppingFields(kongUpstreamPolicy, file.YAML)
+		kongUpstreamPolicies, err := SerializeObjectDroppingFields(kongUpstreamPolicy, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongUpstreamPolicies...)
-		output = append(output, []byte(yamlSeparator)...)
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, service := range k.Services {
-		services, err := SerializeObjectDroppingFields(service, file.YAML)
+		services, err := SerializeObjectDroppingFields(service, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, services...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, secret := range k.Secrets {
-		secrets, err := SerializeObjectDroppingFields(secret, file.YAML)
+		secrets, err := SerializeObjectDroppingFields(secret, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, secrets...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, kongConsumer := range k.KongConsumers {
-		kongConsumers, err := SerializeObjectDroppingFields(kongConsumer, file.YAML)
+		kongConsumers, err := SerializeObjectDroppingFields(kongConsumer, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongConsumers...)
-		output = append(output, []byte(yamlSeparator)...)
-
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
+		}
 	}
 
 	for _, kongConsumerGroup := range k.KongConsumerGroups {
-		kongConsumerGroups, err := SerializeObjectDroppingFields(kongConsumerGroup, file.YAML)
+		kongConsumerGroups, err := SerializeObjectDroppingFields(kongConsumerGroup, format)
 		if err != nil {
 			return nil, err
 		}
 		output = append(output, kongConsumerGroups...)
-		output = append(output, []byte(yamlSeparator)...)
-	}
-
-	return output, nil
-}
-
-func (k KICContent) marshalKICContentToJSON() ([]byte, error) {
-	var output []byte
-
-	// iterate over the slices of kongIngresses, kongPlugins,
-	// kongClusterPlugins, ingresses, services, secrets, kongConsumers
-	// and marshal each one in json format
-	// and append it to the output slice
-	// then return the output slice
-	for _, kongIngress := range k.KongIngresses {
-		kongIngresses, err := SerializeObjectDroppingFields(kongIngress, file.JSON)
-		if err != nil {
-			return nil, err
+		if format == file.YAML {
+			output = append(output, []byte(yamlSeparator)...)
 		}
-		output = append(output, kongIngresses...)
-	}
-
-	for _, kongPlugin := range k.KongPlugins {
-		kongPlugins, err := SerializeObjectDroppingFields(kongPlugin, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, kongPlugins...)
-	}
-
-	for _, kongClusterPlugin := range k.KongClusterPlugins {
-		kongClusterPlugins, err := SerializeObjectDroppingFields(kongClusterPlugin, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, kongClusterPlugins...)
-	}
-
-	for _, ingress := range k.Ingresses {
-		ingresses, err := SerializeObjectDroppingFields(ingress, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, ingresses...)
-	}
-
-	for _, httpRoute := range k.HTTPRoutes {
-		httpRoutes, err := SerializeObjectDroppingFields(httpRoute, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, httpRoutes...)
-	}
-
-	for _, kongUpstreamPolicy := range k.KongUpstreamPolicies {
-		kongUpstreamPolicies, err := SerializeObjectDroppingFields(kongUpstreamPolicy, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, kongUpstreamPolicies...)
-	}
-
-	for _, service := range k.Services {
-		services, err := SerializeObjectDroppingFields(service, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, services...)
-	}
-
-	for _, secret := range k.Secrets {
-		secrets, err := SerializeObjectDroppingFields(secret, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, secrets...)
-	}
-
-	for _, kongConsumer := range k.KongConsumers {
-		kongConsumers, err := SerializeObjectDroppingFields(kongConsumer, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, kongConsumers...)
-	}
-
-	for _, kongConsumerGroup := range k.KongConsumerGroups {
-		kongConsumerGroups, err := SerializeObjectDroppingFields(kongConsumerGroup, file.JSON)
-		if err != nil {
-			return nil, err
-		}
-		output = append(output, kongConsumerGroups...)
 	}
 
 	return output, nil

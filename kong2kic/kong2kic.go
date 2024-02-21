@@ -323,16 +323,10 @@ func (d *Director) buildManifests(content *file.Content) *KICContent {
 /// End of Builder + Director
 ////////////////////
 
-func MarshalKongToKICYaml(content *file.Content, builderType string) ([]byte, error) {
+func MarshalKongToKIC(content *file.Content, builderType string, format string) ([]byte, error) {
 	targetKICVersionAPI = builderType
 	kicContent := convertKongToKIC(content, builderType)
-	return kicContent.marshalKICContentToYaml()
-}
-
-func MarshalKongToKICJson(content *file.Content, builderType string) ([]byte, error) {
-	targetKICVersionAPI = builderType
-	kicContent := convertKongToKIC(content, builderType)
-	return kicContent.marshalKICContentToJSON()
+	return kicContent.marshalKICContentToFormat(format)
 }
 
 func convertKongToKIC(content *file.Content, builderType string) *KICContent {
