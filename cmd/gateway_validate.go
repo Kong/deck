@@ -21,6 +21,7 @@ var (
 	validateWorkspace            string
 	validateParallelism          int
 	validateJSONOutput           bool
+	validateKonnectCompatibility bool
 )
 
 func executeValidate(cmd *cobra.Command, _ []string) error {
@@ -100,6 +101,12 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ks, err := state.Get(rawState)
 	if err != nil {
 		return err
+	}
+
+	if validateKonnectCompatibility {
+		if errs := validate.KonnectCompatibility(targetContent); len(errs) != 0 {
+			return validate.ErrorsWrapper{Errors: errs}
+		}
 	}
 
 	if validateOnline {
@@ -207,6 +214,8 @@ this command unless --online flag is used.
 		10, "Maximum number of concurrent requests to Kong.")
 	validateCmd.Flags().BoolVar(&validateJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
+		false, "validate that the state file(s) are ready to be migrated to Konnect")
 
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
