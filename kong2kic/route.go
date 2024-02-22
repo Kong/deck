@@ -38,6 +38,7 @@ func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICC
 			} else {
 				log.Println("Service name or route name is empty. This is not recommended." +
 					"Please, provide a name for the service and the route before generating Kong Ingress Controller manifests.")
+				continue
 			}
 			ingressClassName := ClassName
 			k8sIngress.Spec.IngressClassName = &ingressClassName
@@ -289,6 +290,7 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 			} else {
 				log.Println("Service name or route name is empty. This is not recommended." +
 					"Please, provide a name for the service and the route before generating HTTPRoute manifests.")
+				continue
 			}
 			httpRoute.ObjectMeta.Annotations = make(map[string]string)
 

@@ -21,6 +21,7 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 		} else {
 			log.Println("Consumer group name is empty. This is not recommended." +
 				"Please, provide a name for the consumer group before generating Kong Ingress Controller manifests.")
+			continue
 		}
 		kongConsumerGroup.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongConsumerGroup.Name = *consumerGroup.Name
@@ -54,6 +55,7 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 				} else {
 					log.Println("Plugin name is empty. This is not recommended." +
 						"Please, provide a name for the plugin before generating Kong Ingress Controller manifests.")
+					continue
 				}
 
 				// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON

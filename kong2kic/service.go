@@ -31,6 +31,7 @@ func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICCo
 		} else {
 			log.Println("Service name is empty. This is not recommended." +
 				"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
+			continue
 		}
 		k8sService.ObjectMeta.Annotations = make(map[string]string)
 
@@ -118,6 +119,7 @@ func addPluginsToService(service file.FService, k8sService k8scorev1.Service, ki
 		} else {
 			log.Println("Service name or plugin name is empty. This is not recommended." +
 				"Please, provide a name for the service and the plugin before generating Kong Ingress Controller manifests.")
+			continue
 		}
 		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		kongPlugin.PluginName = *plugin.Name

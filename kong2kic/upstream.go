@@ -26,6 +26,7 @@ func populateKICUpstreamPolicy(
 		} else {
 			log.Println("Service name is empty. This is not recommended." +
 				"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
+			return
 		}
 
 		k8sservice.ObjectMeta.Annotations["konghq.com/upstream-policy"] = kongUpstreamPolicy.ObjectMeta.Name
@@ -177,6 +178,7 @@ func populateKICUpstream(
 		} else {
 			log.Println("Service name is empty. This is not recommended." +
 				"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
+			return
 		}
 		kongIngress.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 
