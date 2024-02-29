@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.35.0](#v1350)
 - [v1.34.0](#v1340)
 - [v1.33.0](#v1330)
 - [v1.32.1](#v1321)
@@ -77,6 +78,22 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.35.0]
+
+> Release date: 2024/02/29
+
+### Added
+
+- Added a new `file kong2kic` command to convert a Kong declarative file to k8s
+  resources for the Kong Ingress Controller (supports Ingress and Gateway resources).
+  [#1050](https://github.com/Kong/deck/pull/1050)
+
+### Fixes
+
+- auto-generate rla (rate-limiting-advanced) namespaces in the `convert` subcommand.
+  [#1206](https://github.com/Kong/deck/pull/1206)
+
 
 ## [v1.34.0]
 
@@ -1583,6 +1600,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.35.0]: https://github.com/kong/deck/compare/v1.34.0...v1.35.0
 [v1.34.0]: https://github.com/kong/deck/compare/v1.33.0...v1.34.0
 [v1.33.0]: https://github.com/kong/deck/compare/v1.32.1...v1.33.0
 [v1.32.1]: https://github.com/kong/deck/compare/v1.32.0...v1.32.1
