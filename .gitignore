@@ -24,10 +24,17 @@ _testmain.go
 *.test
 *.prof
 
+# Apple cruft
+.DS_Store
+
 # for this repo only
 deck
 dist/
 docs/cli-docs/
 
-# vscode editor files
+# editor files
 .vscode/
+.idea/
+
+# generated test 'actuals'
+kong2kic/testdata/**/*-actual.*
