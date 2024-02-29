@@ -29,14 +29,14 @@ func populateKICUpstreamPolicy(
 			return
 		}
 
-		k8sservice.ObjectMeta.Annotations["konghq.com/upstream-policy"] = kongUpstreamPolicy.ObjectMeta.Name
-
 		// Find the upstream (if any) whose name matches the service host and copy the upstream
 		// into kongUpstreamPolicy. Append the kongUpstreamPolicy to kicContent.KongUpstreamPolicies.
 		found := false
 		for _, upstream := range content.Upstreams {
 			if upstream.Name != nil && strings.EqualFold(*upstream.Name, *service.Host) {
 				found = true
+				// add an annotation to the k8sservice to link this kongUpstreamPolicy to it
+				k8sservice.ObjectMeta.Annotations["konghq.com/upstream-policy"] = kongUpstreamPolicy.ObjectMeta.Name
 				var threshold int
 				if upstream.Healthchecks != nil && upstream.Healthchecks.Threshold != nil {
 					threshold = int(*upstream.Healthchecks.Threshold)

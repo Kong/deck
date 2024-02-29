@@ -356,12 +356,21 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 			})
 
 			// add service details to HTTPBackendRef
-			portNumber := k8sgwapiv1.PortNumber(*service.Port)
-			backendRef := k8sgwapiv1.BackendRef{
-				BackendObjectReference: k8sgwapiv1.BackendObjectReference{
-					Name: k8sgwapiv1.ObjectName(*service.Name),
-					Port: &portNumber,
-				},
+			var backendRef k8sgwapiv1.BackendRef
+			if service.Port != nil {
+				portNumber := k8sgwapiv1.PortNumber(*service.Port)
+				backendRef = k8sgwapiv1.BackendRef{
+					BackendObjectReference: k8sgwapiv1.BackendObjectReference{
+						Name: k8sgwapiv1.ObjectName(*service.Name),
+						Port: &portNumber,
+					},
+				}
+			} else {
+				backendRef = k8sgwapiv1.BackendRef{
+					BackendObjectReference: k8sgwapiv1.BackendObjectReference{
+						Name: k8sgwapiv1.ObjectName(*service.Name),
+					},
+				}
 			}
 
 			var httpHeaderMatch []k8sgwapiv1.HTTPHeaderMatch
@@ -411,6 +420,23 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 					} else {
 						httpPathMatch.Type = &pathMatchPrefix
 						httpPathMatch.Value = path
+					}
+
+					// if no method is specified, add a httpRouteRule to the httpRoute with headers and path
+					if route.Methods == nil {
+						httpRoute.Spec.Rules = append(httpRoute.Spec.Rules, k8sgwapiv1.HTTPRouteRule{
+							Matches: []k8sgwapiv1.HTTPRouteMatch{
+								{
+									Path:    &httpPathMatch,
+									Headers: httpHeaderMatch,
+								},
+							},
+							BackendRefs: []k8sgwapiv1.HTTPBackendRef{
+								{
+									BackendRef: backendRef,
+								},
+							},
+						})
 					}
 
 					for _, method := range route.Methods {
