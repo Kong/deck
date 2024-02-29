@@ -22,7 +22,7 @@ require (
 	k8s.io/api v0.29.1
 	k8s.io/apiextensions-apiserver v0.29.1
 	k8s.io/apimachinery v0.29.1
-	k8s.io/code-generator v0.29.1
+	k8s.io/code-generator v0.29.2
 	sigs.k8s.io/gateway-api v1.0.0
 	sigs.k8s.io/yaml v1.4.0
 )
