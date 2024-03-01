@@ -356,21 +356,15 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 			})
 
 			// add service details to HTTPBackendRef
-			var backendRef k8sgwapiv1.BackendRef
+
+			backendRef := k8sgwapiv1.BackendRef{
+				BackendObjectReference: k8sgwapiv1.BackendObjectReference{
+					Name: k8sgwapiv1.ObjectName(*service.Name),
+				},
+			}
 			if service.Port != nil {
 				portNumber := k8sgwapiv1.PortNumber(*service.Port)
-				backendRef = k8sgwapiv1.BackendRef{
-					BackendObjectReference: k8sgwapiv1.BackendObjectReference{
-						Name: k8sgwapiv1.ObjectName(*service.Name),
-						Port: &portNumber,
-					},
-				}
-			} else {
-				backendRef = k8sgwapiv1.BackendRef{
-					BackendObjectReference: k8sgwapiv1.BackendObjectReference{
-						Name: k8sgwapiv1.ObjectName(*service.Name),
-					},
-				}
+				backendRef.Port = &portNumber
 			}
 
 			var httpHeaderMatch []k8sgwapiv1.HTTPHeaderMatch
