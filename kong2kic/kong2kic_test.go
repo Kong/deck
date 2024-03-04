@@ -189,7 +189,7 @@ func Test_convertKongGatewayToKIC(t *testing.T) {
 }
 
 func Test_deployManifests(t *testing.T) {
-	var ctx = context.Background()
+	ctx := context.Background()
 	t.Parallel()
 
 	t.Log("configuring the testing environment")
@@ -250,7 +250,7 @@ func Test_deployManifests(t *testing.T) {
 
 	config := env.Cluster().Config()
 
-	// deploy the Gateway API CRDs 
+	// deploy the Gateway API CRDs
 	clientset := deployGatewayAPICRDs(t, config)
 
 	// obtain the ServerPreferredResources from the cluster
