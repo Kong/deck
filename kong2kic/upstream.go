@@ -31,10 +31,8 @@ func populateKICUpstreamPolicy(
 
 		// Find the upstream (if any) whose name matches the service host and copy the upstream
 		// into kongUpstreamPolicy. Append the kongUpstreamPolicy to kicContent.KongUpstreamPolicies.
-		found := false
 		for _, upstream := range content.Upstreams {
 			if upstream.Name != nil && strings.EqualFold(*upstream.Name, *service.Host) {
-				found = true
 				// add an annotation to the k8sservice to link this kongUpstreamPolicy to it
 				k8sservice.ObjectMeta.Annotations["konghq.com/upstream-policy"] = kongUpstreamPolicy.ObjectMeta.Name
 				var threshold int
@@ -152,9 +150,22 @@ func populateKICUpstreamPolicy(
 						},
 					}
 				}
-			}
-			if found {
+				// add konghq.com/tags annotation if upstream.Tags is not nil
+				if upstream.Tags != nil {
+					var tags []string
+					for _, tag := range upstream.Tags {
+						if tag != nil {
+							tags = append(tags, *tag)
+						}
+					}
+					// initialize the annotations map if it is nil
+					if kongUpstreamPolicy.ObjectMeta.Annotations == nil {
+						kongUpstreamPolicy.ObjectMeta.Annotations = make(map[string]string)
+					}
+					kongUpstreamPolicy.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+				}
 				kicContent.KongUpstreamPolicies = append(kicContent.KongUpstreamPolicies, kongUpstreamPolicy)
+				break
 			}
 		}
 	}
@@ -187,10 +198,8 @@ func populateKICUpstream(
 
 		// Find the upstream (if any) whose name matches the service host and copy the upstream
 		// into a kicv1.KongIngress resource. Append the kicv1.KongIngress to kicContent.KongIngresses.
-		found := false
 		for _, upstream := range content.Upstreams {
 			if upstream.Name != nil && strings.EqualFold(*upstream.Name, *service.Host) {
-				found = true
 				kongIngress.Upstream = &kicv1.KongIngressUpstream{
 					HostHeader:             upstream.HostHeader,
 					Algorithm:              upstream.Algorithm,
@@ -207,10 +216,19 @@ func populateKICUpstream(
 					HashOnURICapture:       upstream.HashOnURICapture,
 					HashFallbackURICapture: upstream.HashFallbackURICapture,
 				}
+				// add konghq.com/tags annotation if upstream.Tags is not nil
+				if upstream.Tags != nil {
+					var tags []string
+					for _, tag := range upstream.Tags {
+						if tag != nil {
+							tags = append(tags, *tag)
+						}
+					}
+					kongIngress.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+				}
+				kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
+				break
 			}
-		}
-		if found {
-			kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)
 		}
 	}
 }

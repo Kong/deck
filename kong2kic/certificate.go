@@ -3,6 +3,8 @@ package kong2kic
 import (
 	"crypto/sha256"
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	k8scorev1 "k8s.io/api/core/v1"
@@ -22,9 +24,26 @@ func populateKICCertificates(content *file.Content, file *KICContent) {
 		secret.ObjectMeta.Name = calculateSlug(secretName)
 		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
-		secret.StringData["tls.crt"] = *cert.Cert
-		secret.StringData["tls.key"] = *cert.Key
+		if cert.Cert != nil && cert.Key != nil {
+			secret.StringData["tls.crt"] = *cert.Cert
+			secret.StringData["tls.key"] = *cert.Key
+		} else {
+			log.Println("Certificate or Key is empty. This is not recommended." +
+				"Please, provide a certificate and key before generating Kong Ingress Controller manifests.")
+			continue
+		}
 		// what to do with SNIs?
+
+		// add konghq.com/tags annotation if cert.Tags is not nil
+		if cert.Tags != nil {
+			var tags []string
+			for _, tag := range cert.Tags {
+				if tag != nil {
+					tags = append(tags, *tag)
+				}
+			}
+			secret.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+		}
 
 		file.Secrets = append(file.Secrets, secret)
 	}

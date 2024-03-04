@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-kong/kong"
 	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
 	k8scorev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -24,6 +26,17 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 		kongConsumer.Username = *consumer.Username
 		if consumer.CustomID != nil {
 			kongConsumer.CustomID = *consumer.CustomID
+		}
+
+		// add konghq.com/tags annotation if consumer.Tags is not nil
+		if consumer.Tags != nil {
+			var tags []string
+			for _, tag := range consumer.Tags {
+				if tag != nil {
+					tags = append(tags, *tag)
+				}
+			}
+			kongConsumer.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
 		}
 
 		populateKICKeyAuthSecrets(&consumer, &kongConsumer, file)
@@ -48,6 +61,40 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 				log.Println("Plugin name is empty. This is not recommended." +
 					"Please, provide a name for the plugin before generating Kong Ingress Controller manifests.")
 				continue
+			}
+
+			// add konghq.com/tags annotation if plugin.Tags is not nil
+			if plugin.Tags != nil {
+				var tags []string
+				for _, tag := range plugin.Tags {
+					if tag != nil {
+						tags = append(tags, *tag)
+					}
+				}
+				kongPlugin.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+			}
+
+			// populate enabled, runon, ordering and protocols
+			if plugin.Enabled != nil {
+				kongPlugin.Disabled = !*plugin.Enabled
+			}
+			if plugin.RunOn != nil {
+				kongPlugin.RunOn = *plugin.RunOn
+			}
+			if plugin.Ordering != nil {
+				kongPlugin.Ordering = &kong.PluginOrdering{
+					Before: plugin.Ordering.Before,
+					After:  plugin.Ordering.After,
+				}
+			}
+			if plugin.Protocols != nil {
+				protocols := make([]string, len(plugin.Protocols))
+				for i, protocol := range plugin.Protocols {
+					if protocol != nil {
+						protocols[i] = *protocol
+					}
+				}
+				kongPlugin.Protocols = kicv1.StringsToKongProtocols(protocols)
 			}
 
 			// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON

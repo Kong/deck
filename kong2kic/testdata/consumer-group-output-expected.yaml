@@ -1,0 +1,32 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  hour: 10000
+  policy: local
+  second: 5
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-consumer-group-rate-limiting
+plugin: rate-limiting
+---
+apiVersion: configuration.konghq.com/v1
+consumerGroups:
+- example-consumer-group
+kind: KongConsumer
+metadata:
+  annotations:
+    konghq.com/tags: internal
+    kubernetes.io/ingress.class: kong
+  name: example-user
+username: example-user
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: KongConsumerGroup
+metadata:
+  annotations:
+    konghq.com/plugins: example-consumer-group-rate-limiting
+    konghq.com/tags: internal-gold-users
+    kubernetes.io/ingress.class: kong
+  name: example-consumer-group
+---
