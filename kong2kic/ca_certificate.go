@@ -3,6 +3,8 @@ package kong2kic
 import (
 	"crypto/sha256"
 	"fmt"
+	"log"
+	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	k8scorev1 "k8s.io/api/core/v1"
@@ -22,9 +24,26 @@ func populateKICCACertificate(content *file.Content, file *KICContent) {
 		secret.ObjectMeta.Name = calculateSlug(secretName)
 		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
-		secret.StringData["ca.crt"] = *caCert.Cert
+		if caCert.Cert != nil {
+			secret.StringData["ca.crt"] = *caCert.Cert
+		} else {
+			log.Println("CA Certificate is empty. This is not recommended." +
+				"Please, provide a certificate for the CA before generating Kong Ingress Controller manifests.")
+			continue
+		}
 		if caCert.CertDigest != nil {
 			secret.StringData["ca.digest"] = *caCert.CertDigest
+		}
+
+		// add konghq.com/tags annotation if cacert.Tags is not nil
+		if caCert.Tags != nil {
+			var tags []string
+			for _, tag := range caCert.Tags {
+				if tag != nil {
+					tags = append(tags, *tag)
+				}
+			}
+			secret.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
 		}
 
 		file.Secrets = append(file.Secrets, secret)

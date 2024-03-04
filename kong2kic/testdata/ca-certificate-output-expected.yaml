@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    konghq.com/tags: root-ca
+    kubernetes.io/ingress.class: kong
+  name: ca-cert-a672ab52d2341203bd70116b456413d7ac3ffc162abbf
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+    MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+    NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+    SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+    7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+    /wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+    ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+    PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
+    -----END CERTIFICATE-----
+  ca.digest: f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    konghq.com/tags: intermediate_ca1
+    kubernetes.io/ingress.class: kong
+  name: ca-cert-a4f087c2ee00e6d43cfb4f6884fc1e79f7e6e08e84471
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBqTCCAVCgAwIBAgIQb5LqGa9gS3+Mc2ntWfSoJjAKBggqhkjOPQQDAjAcMRow
+    GAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTAeFw0yMjA2MTMxMzM5MTVaFw0yMzA2
+    MTMxOTM5MTVaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBSb290IEludGVybWVkaWF0
+    ZTEgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQImvnSuvXkGy88lvx8a7of
+    e0MEMRI2siVvybvWXNpeXXlixgaq7weJ7pewf3HywfO68Va6kn8ehWh7s0D7SLHM
+    o2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgwBgEB/wIBATAdBgNVHQ4E
+    FgQUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwHwYDVR0jBBgwFoAUPQlIjj4Y6eyg9knE
+    Q8V+CMwzqzcwCgYIKoZIzj0EAwIDRwAwRAIgNZ+JPA1OqF5DsPapAZ2YsUOgIpn3
+    ZbQuYKCAV0SD4EcCIFnfA5rWrc1AgtUw5inJQqJQRNgoPuC14vACqI48BiRl
+    -----END CERTIFICATE-----
+  ca.digest: dbef7ed285fb292e24f84ffba93c48d92fa322387d85469c460c655abedd5308
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    konghq.com/tags: intermediate_ca2
+    kubernetes.io/ingress.class: kong
+  name: ca-cert-6b095c7ff377b01252a4dfec59c582fe32934fa7ed0cf
+stringData:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBujCCAV+gAwIBAgIRAMkGpj7WZf+2RFE/q7ZhejEwCgYIKoZIzj0EAwIwKjEo
+    MCYGA1UEAxMfRGVtbyBLb25nIFJvb3QgSW50ZXJtZWRpYXRlMSBDQTAeFw0yMjA2
+    MTMxMzQwNTFaFw0yMjEyMTMwNDQwNTFaMCoxKDAmBgNVBAMTH0RlbW8gS29uZyBS
+    b290IEludGVybWVkaWF0ZTIgQ0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQB
+    my/zhZ3F2HvHFqtQzuD3lXX8SeYakxiBQvaGkGSLKD67N3vh7iC2rTSdj/vAs8ws
+    Y9X+mXzS6GDKC8PbSX6xo2YwZDAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/BAgw
+    BgEB/wIBADAdBgNVHQ4EFgQURwCm53YPStZoAMfnVyknH4IgZa4wHwYDVR0jBBgw
+    FoAUhuxCKmCSvZWf95+iZ+Wsz9DJJVMwCgYIKoZIzj0EAwIDSQAwRgIhAN1pkUKc
+    azM4PiXOnkILB2KBDIF4XpHf+4ThDMODzXP8AiEA45KXA3qMrRPQV1oBfWZ3hLgX
+    gxUhveuHBXMWnzUbn6U=
+    -----END CERTIFICATE-----
+  ca.digest: 45b2b6dd9d4102955b1b1e4b540e677f140521462ed4f22fa5a713863ca84600
+type: Opaque
+---

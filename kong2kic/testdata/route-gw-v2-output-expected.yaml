@@ -1,0 +1,189 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  aws_key: my_key
+  aws_region: us-west-2
+  aws_secret: my_secret
+  function_name: my_function
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: simple-service--route-thisisaveryvery-long-6d6e69918e
+plugin: aws-lambda
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: simple-service-simple-route
+spec:
+  parentRefs:
+  - name: kong
+  rules:
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    matches:
+    - path:
+        type: PathPrefix
+        value: /r1
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  annotations:
+    konghq.com/https-redirect-status-code: "302"
+    konghq.com/preserve-host: "true"
+    konghq.com/regex-priority: "1"
+    konghq.com/snis: example.com
+    konghq.com/strip-path: "false"
+    konghq.com/tags: version:v1
+  name: simple-service--route-thisisaveryvery-long-b00bc5bc73
+spec:
+  hostnames:
+  - example.com
+  - another-example.com
+  - yet-another-example.com
+  parentRefs:
+  - name: kong
+  rules:
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: RegularExpression
+        value: /v1/example/?$
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/another-example
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: GET
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service--route-thisisaveryvery-long-6d6e69918e
+      type: ExtensionRef
+    matches:
+    - headers:
+      - name: x-another-header
+        type: Exact
+        value: first-header-value,second-header-value
+      - name: x-my-header
+        type: RegularExpression
+        value: foos?bar$
+      method: POST
+      path:
+        type: PathPrefix
+        value: /v1/yet-another-example
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/tags: simple-service
+  name: simple-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: simple-service
+---
