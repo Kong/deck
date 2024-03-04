@@ -1,0 +1,61 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  credentials: true
+  exposed_headers:
+  - X-Auth-Token
+  headers:
+  - Accept
+  - Accept-Version
+  - Content-Length
+  - Content-MD5
+  - Content-Type
+  - Date
+  - X-Auth-Token
+  max_age: 3600
+  methods:
+  - GET
+  - POST
+  origins:
+  - http://mockbin.com
+kind: KongPlugin
+metadata:
+  annotations:
+    konghq.com/tags: cors-complex-service
+    kubernetes.io/ingress.class: kong
+  name: complex-service-cors
+plugin: cors
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/client-cert: 4e3ad2e4-0bc4-4638-8e34-c84a417ba39b
+    konghq.com/connect-timeout: "5000"
+    konghq.com/path: /v1
+    konghq.com/plugins: complex-service-cors
+    konghq.com/protocol: http
+    konghq.com/read-timeout: "60000"
+    konghq.com/retries: "5"
+    konghq.com/tags: example,api
+    konghq.com/write-timeout: "60000"
+  name: complex-service
+spec:
+  externalName: example-api.com
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  type: ExternalName
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: simple-service
+---
