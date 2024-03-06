@@ -10,7 +10,7 @@ require (
 	github.com/daveshanley/vacuum v0.5.0
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
-	github.com/kong/go-apiops v0.1.30
+	github.com/kong/go-apiops v0.1.31
 	github.com/kong/go-database-reconciler v1.7.0
 	github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7
 	github.com/mitchellh/go-homedir v1.1.0
@@ -127,8 +127,8 @@ require (
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/term v0.17.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
