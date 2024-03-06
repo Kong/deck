@@ -292,6 +292,24 @@ func Test_Convert(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "converts from distributed to kong gateway 3.x with env variables",
+			args: args{
+				inputFilenames:         []string{"testdata/8/input.yaml"},
+				outputFilename:         "testdata/8/output.yaml",
+				expectedOutputFilename: "testdata/8/output-expected.yaml",
+				fromFormat:             FormatDistributed,
+				toFormat:               FormatKongGateway3x,
+				disableMocks:           true,
+				envVars: map[string]string{
+					"DECK_MOCKBIN_HOST":    "mockbin.org",
+					"DECK_MOCKBIN_ENABLED": "true",
+					"DECK_WRITE_TIMEOUT":   "777",
+					"DECK_FOO_FLOAT":       "666",
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "converts from distributed to kong gateway with env variables (mocked)",
 			args: args{
 				inputFilenames:         []string{"testdata/9/input.yaml"},
