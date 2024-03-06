@@ -21,6 +21,8 @@ var (
 	cmdNamespaceSelectors           []string
 	cmdNamespacePathPrefix          string
 	cmdNamespaceAllowEmptySelectors bool
+	cmdNamespaceHosts               []string
+	cmdClearHosts                   bool
 )
 
 // Executes the CLI command "namespace"
@@ -29,9 +31,11 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-namespace", "", modeLocal)
 
-	err := namespace.CheckNamespace(cmdNamespacePathPrefix)
-	if err != nil {
-		return fmt.Errorf("invalid path-prefix '%s': %w", cmdNamespacePathPrefix, err)
+	if cmdNamespacePathPrefix != "" {
+		err := namespace.CheckNamespace(cmdNamespacePathPrefix)
+		if err != nil {
+			return fmt.Errorf("invalid path-prefix '%s': %w", cmdNamespacePathPrefix, err)
+		}
 	}
 
 	cmdNamespaceOutputFormat = strings.ToUpper(cmdNamespaceOutputFormat)
@@ -41,6 +45,8 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 	trackInfo["output"] = cmdNamespaceOutputFilename
 	trackInfo["selectors"] = cmdNamespaceSelectors
 	trackInfo["path-prefix"] = cmdNamespacePathPrefix
+	trackInfo["hosts"] = cmdNamespaceHosts
+	trackInfo["clear-hosts"] = cmdClearHosts
 
 	// do the work: read/namespace/write
 	data, err := filebasics.DeserializeFile(cmdNamespaceInputFilename)
@@ -57,13 +63,29 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix, cmdNamespaceAllowEmptySelectors)
-	if err != nil {
-		if strings.Contains(err.Error(), "no routes matched the selectors") {
-			// append CLI specific message
-			err = fmt.Errorf("%w (use --allow-empty-selectors to suppress this error)", err)
+	// apply the path-based namespace
+	if cmdNamespacePathPrefix != "" {
+		err = namespace.Apply(yamlNode, selectors, cmdNamespacePathPrefix, cmdNamespaceAllowEmptySelectors)
+		if err != nil {
+			if strings.Contains(err.Error(), "no routes matched the selectors") {
+				// append CLI specific message
+				err = fmt.Errorf("%w (use --allow-empty-selectors to suppress this error)", err)
+			}
+			return fmt.Errorf("failed to apply the path namespace: %w", err)
 		}
-		return fmt.Errorf("failed to apply the namespace: %w", err)
+	}
+
+	// apply the host-based namespace
+	if len(cmdNamespaceHosts) > 0 || cmdClearHosts {
+		err = namespace.ApplyNamespaceHost(yamlNode, selectors, cmdNamespaceHosts,
+			cmdClearHosts, cmdNamespaceAllowEmptySelectors)
+		if err != nil {
+			if strings.Contains(err.Error(), "no routes matched the selectors") {
+				// append CLI specific message
+				err = fmt.Errorf("%w (use --allow-empty-selectors to suppress this error)", err)
+			}
+			return fmt.Errorf("failed to apply the host namespace: %w", err)
+		}
 	}
 
 	data = jsonbasics.ConvertToJSONobject(yamlNode)
@@ -81,17 +103,25 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 func newNamespaceCmd() *cobra.Command {
 	namespaceCmd := &cobra.Command{
 		Use:   "namespace [flags]",
-		Short: "Apply a namespace to routes in a decK file by prefixing the path",
-		Long: `Apply a namespace to routes in a decK file by prefixing the path.
+		Short: "Apply a namespace to routes in a decK file by path or hostname",
+		Long: `Apply a namespace to routes in a decK file by path or hostname.
 
-By prefixing paths with a specific segment, colliding paths to services can be
-namespaced to prevent the collisions. Eg. 2 API definitions that both expose a
-'/list' path. By prefixing one with '/addressbook' and the other with '/cookbook'
-the resulting paths '/addressbook/list' and '/cookbook/list' can be exposed without
-colliding.
+There are 2 main ways to namespace api's:
 
-To remove the prefix from the path before the request is routed to the service, the
-following approaches are used:
+1. use path prefixes, all on the same hostname;
+   a. http://api.acme.com/service1/somepath
+   b. http://api.acme.com/service2/somepath
+2. use separate hostnames
+   a. http://service1.api.acme.com/somepath
+   b. http://service2.api.acme.com/somepath
+
+For hostnames the --host and --clear-hosts flags are used. Just using --host appends
+to the existing hosts, adding --clear-hosts will effectively replace the existing ones.
+For path prefixes the --path-prefix flag is used. Combining them is possible.
+
+Note on path-prefixing: To remain transparent to the backend services, the added path
+prefix must be removed from the path before the request is routed to the service.
+To remove the prefix the following approaches are used (in order):
 - if the route has 'strip_path=true' then the added prefix will already be stripped
 - if the related service has a 'path' property that matches the prefix, then the
   'service.path' property is updated to remove the prefix
@@ -99,8 +129,8 @@ following approaches are used:
 
 `,
 		RunE: executeNamespace,
-		Example: `# Apply namespace to a deckfile
-deck file namespace --path-prefix=/kong --state=deckfile.yaml
+		Example: `# Apply namespace to a deckfile, path and host:
+deck file namespace --path-prefix=/kong --host=konghq.com --state=deckfile.yaml
 
 # Apply namespace to a deckfile, and write to a new file
 # Example file 'kong.yaml':
@@ -120,9 +150,13 @@ routes:
 - paths:
   - ~/kong/tracks/system$
   strip_path: true
+  hosts:
+  - konghq.com
 - paths:
   - ~/kong/list$
   strip_path: false
+  hosts:
+  - konghq.com
   plugins:
   - name: pre-function
     config:
@@ -144,7 +178,11 @@ routes:
 	namespaceCmd.Flags().StringVarP(&cmdNamespacePathPrefix, "path-prefix", "p", "",
 		"The path based namespace to apply.")
 	namespaceCmd.Flags().BoolVarP(&cmdNamespaceAllowEmptySelectors, "allow-empty-selectors",
-		"", false, "do not error out if the selectors return empty")
+		"", false, "Do not error out if the selectors return empty")
+	namespaceCmd.Flags().StringArrayVarP(&cmdNamespaceHosts, "host", "", []string{},
+		"Hostname to add for host-based namespacing. Repeat for multiple hosts.")
+	namespaceCmd.Flags().BoolVarP(&cmdClearHosts, "clear-hosts", "c", false,
+		"Clear existing hosts.")
 
 	return namespaceCmd
 }
