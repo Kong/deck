@@ -1,0 +1,19 @@
+consumers:
+  - username: example-user
+    tags:
+      - internal
+consumer_groups:
+  - name: example-consumer-group
+    consumers:
+      - username: example-user
+    plugins:
+      - name: rate-limiting
+        config:
+          second: 5
+          hour: 10000
+          policy: local
+    tags:
+      - internal-gold-users
+    
+    
+    
