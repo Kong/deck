@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.36.0](#v1360)
 - [v1.35.0](#v1350)
 - [v1.34.0](#v1340)
 - [v1.33.0](#v1330)
@@ -78,6 +79,25 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.36.0]
+
+> Release date: 2024/03/13
+
+### Added
+
+- This completes the namespace feature, by adding the host-based
+  namespacing to the existing path-based namespacing.
+  [#1241](https://github.com/Kong/deck/pull/1241)
+
+### Fixes
+
+- Use correct workspace when running online validation.
+  [#1243](https://github.com/Kong/deck/pull/1243)
+- Limit path-param names to 32 chars (`go-apiops`)
+  [#153 go-apiops](https://github.com/Kong/go-apiops/pull/153)
+- Correct various issues with the `file kong2kic` command.
+  [#1230](https://github.com/Kong/deck/pull/1230)
 
 ## [v1.35.0]
 
@@ -1600,6 +1620,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.36.0]: https://github.com/kong/deck/compare/v1.35.0...v1.36.0
 [v1.35.0]: https://github.com/kong/deck/compare/v1.34.0...v1.35.0
 [v1.34.0]: https://github.com/kong/deck/compare/v1.33.0...v1.34.0
 [v1.33.0]: https://github.com/kong/deck/compare/v1.32.1...v1.33.0
