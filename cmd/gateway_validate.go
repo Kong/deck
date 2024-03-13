@@ -216,7 +216,7 @@ this command unless --online flag is used.
 
 func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
 	// make sure we are able to connect to Kong
-	kongVersion, err := fetchKongVersion(ctx, rootConfig)
+	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(validateWorkspace))
 	if err != nil {
 		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
 	}
