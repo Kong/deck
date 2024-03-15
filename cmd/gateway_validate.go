@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/blang/semver/v4"
+	"github.com/kong/deck/utils"
 	"github.com/kong/deck/validate"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
-	"github.com/kong/go-database-reconciler/pkg/utils"
+	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
@@ -103,7 +105,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 
 	if validateOnline {
-		if errs := validateWithKong(ctx, kongClient, ks); len(errs) != 0 {
+		if errs := validateWithKong(ctx, kongClient, ks, targetContent.FormatVersion); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
 		}
 	}
@@ -214,13 +216,16 @@ this command unless --online flag is used.
 	return validateCmd
 }
 
-func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.KongState) []error {
-	// make sure we are able to connect to Kong
-	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(validateWorkspace))
-	if err != nil {
-		return []error{fmt.Errorf("couldn't fetch Kong version: %w", err)}
+func validateWithKong(
+	ctx context.Context,
+	kongClient *kong.Client,
+	ks *state.KongState,
+	formatVersion string,
+) []error {
+	if formatVersion == "" {
+		formatVersion = utils.DefaultFormatVersion
 	}
-	parsedKongVersion, err := utils.ParseKongVersion(kongVersion)
+	parsedFormatVersion, err := semver.ParseTolerant(formatVersion)
 	if err != nil {
 		return []error{fmt.Errorf("parsing Kong version: %w", err)}
 	}
@@ -232,7 +237,7 @@ func validateWithKong(ctx context.Context, kongClient *kong.Client, ks *state.Ko
 		RBACResourcesOnly: validateCmdRBACResourcesOnly,
 	}
 	validator := validate.NewValidator(opts)
-	return validator.Validate(parsedKongVersion)
+	return validator.Validate(parsedFormatVersion)
 }
 
 func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Client, error) {
@@ -250,7 +255,7 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 	}
 
 	wsConfig := rootConfig.ForWorkspace(workspaceName)
-	kongClient, err := utils.GetKongClient(wsConfig)
+	kongClient, err := reconcilerUtils.GetKongClient(wsConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -263,58 +268,58 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 func ensureGetAllMethods() error {
 	// let's make sure ASAP that all resources have the expected GetAll method
 	dummyEmptyState, _ := state.NewKongState()
-	if _, err := utils.CallGetAll(dummyEmptyState.Services); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Services); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.ACLGroups); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.ACLGroups); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.BasicAuths); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.BasicAuths); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.CACertificates); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.CACertificates); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Certificates); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Certificates); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Consumers); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Consumers); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Documents); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Documents); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.HMACAuths); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.HMACAuths); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.JWTAuths); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.JWTAuths); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.KeyAuths); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.KeyAuths); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Oauth2Creds); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Oauth2Creds); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Plugins); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Plugins); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Routes); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Routes); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.SNIs); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.SNIs); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Targets); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Targets); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.Upstreams); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.Upstreams); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.RBACEndpointPermissions); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.RBACEndpointPermissions); err != nil {
 		return err
 	}
-	if _, err := utils.CallGetAll(dummyEmptyState.RBACRoles); err != nil {
+	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.RBACRoles); err != nil {
 		return err
 	}
 	return nil

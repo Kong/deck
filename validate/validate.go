@@ -9,8 +9,9 @@ import (
 	"sync"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-database-reconciler/pkg/state"
-	"github.com/kong/go-database-reconciler/pkg/utils"
+	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 )
 
@@ -80,7 +81,7 @@ func (v *Validator) validateEntity(entityType string, entity interface{}) (bool,
 }
 
 func (v *Validator) entities(obj interface{}, entityType string) []error {
-	entities, err := utils.CallGetAll(obj)
+	entities, err := reconcilerUtils.CallGetAll(obj)
 	if err != nil {
 		return []error{err}
 	}
@@ -115,7 +116,7 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 	return errors
 }
 
-func (v *Validator) Validate(kongVersion semver.Version) []error {
+func (v *Validator) Validate(formatVersion semver.Version) []error {
 	allErr := []error{}
 
 	// validate RBAC resources first.
@@ -179,7 +180,11 @@ func (v *Validator) Validate(kongVersion semver.Version) []error {
 	}
 
 	// validate routes format with Kong 3.x
-	if utils.Kong300Version.LTE(kongVersion) {
+	parsed30, err := semver.ParseTolerant(utils.FormatVersion30)
+	if err != nil {
+		allErr = append(allErr, err)
+	}
+	if parsed30.LTE(formatVersion) {
 		validate3xRoutes(v.state.Routes)
 	}
 	return allErr
@@ -189,11 +194,11 @@ func validate3xRoutes(routes *state.RoutesCollection) {
 	results, _ := routes.GetAll()
 	unsupportedRoutes := []string{}
 	for _, r := range results {
-		if utils.HasPathsWithRegex300AndAbove(r.Route) {
+		if reconcilerUtils.HasPathsWithRegex300AndAbove(r.Route) {
 			unsupportedRoutes = append(unsupportedRoutes, *r.Route.ID)
 		}
 	}
 	if len(unsupportedRoutes) > 0 {
-		utils.PrintRouteRegexWarning(unsupportedRoutes)
+		reconcilerUtils.PrintRouteRegexWarning(unsupportedRoutes)
 	}
 }
