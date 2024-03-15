@@ -11,21 +11,18 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/utils"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
-	"github.com/kong/go-database-reconciler/pkg/utils"
+	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
-const (
-	exitCodeDiffDetection = 2
-	defaultFormatVersion  = "1.1"
-	formatVersion30       = "3.0"
-)
+const exitCodeDiffDetection = 2
 
 var (
 	dumpConfig   dump.Config
@@ -52,7 +49,7 @@ func getMode(targetContent *file.Content) mode {
 }
 
 // workspaceExists checks if workspace exists in Kong.
-func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspaceName string) (bool, error) {
+func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfig, workspaceName string) (bool, error) {
 	rootConfig := config.ForWorkspace("")
 	if workspaceName == "" {
 		// default workspace always exists
@@ -64,7 +61,7 @@ func workspaceExists(ctx context.Context, config utils.KongClientConfig, workspa
 		return true, nil
 	}
 
-	rootClient, err := utils.GetKongClient(rootConfig)
+	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
 	if err != nil {
 		return false, err
 	}
@@ -180,13 +177,13 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		dumpConfig.KonnectControlPlane = konnectControlPlane
 	}
 
-	rootClient, err := utils.GetKongClient(rootConfig)
+	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
 	if err != nil {
 		return err
 	}
 
 	// prepare to read the current state from Kong
-	var wsConfig utils.KongClientConfig
+	var wsConfig reconcilerUtils.KongClientConfig
 	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
@@ -201,20 +198,20 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return fmt.Errorf("reading Kong version: %w", err)
 		}
 	}
-	parsedKongVersion, err = utils.ParseKongVersion(kongVersion)
+	parsedKongVersion, err = reconcilerUtils.ParseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
 	}
 
-	if parsedKongVersion.GTE(utils.Kong300Version) &&
-		targetContent.FormatVersion != formatVersion30 {
+	if parsedKongVersion.GTE(reconcilerUtils.Kong300Version) &&
+		targetContent.FormatVersion != utils.FormatVersion30 {
 		formatVersion := targetContent.FormatVersion
 		if formatVersion == "" {
-			formatVersion = defaultFormatVersion
+			formatVersion = utils.DefaultFormatVersion
 		}
 		return fmt.Errorf(
 			"cannot apply '%s' config format version to Kong version 3.0 or above.\n"+
-				utils.UpgradeMessage, formatVersion)
+				reconcilerUtils.UpgradeMessage, formatVersion)
 	}
 
 	// TODO: instead of guessing the cobra command here, move the sendAnalytics
@@ -228,7 +225,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	if kongClient == nil {
-		kongClient, err = utils.GetKongClient(wsConfig)
+		kongClient, err = reconcilerUtils.GetKongClient(wsConfig)
 		if err != nil {
 			return err
 		}
@@ -275,7 +272,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
-	if utils.Kong340Version.LTE(parsedKongVersion) {
+	if reconcilerUtils.Kong340Version.LTE(parsedKongVersion) {
 		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
 
@@ -330,7 +327,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
 	if err != nil {
 		if enableJSONOutput {
-			var errs utils.ErrArray
+			var errs reconcilerUtils.ErrArray
 			if errors.As(err, &errs) {
 				jsonOutput.Errors = append(jsonOutput.Errors, errs.ErrorList()...)
 			} else {
@@ -365,7 +362,7 @@ func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string,
 		if len(targetContent.Info.LookUpSelectorTags.Consumers) == 0 {
 			return nil, fmt.Errorf("global consumers specified but no global tags")
 		}
-		utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Consumers)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Consumers)
 		return targetContent.Info.LookUpSelectorTags.Consumers, nil
 
@@ -380,7 +377,7 @@ func determineLookUpSelectorTagsRoutes(targetContent file.Content) ([]string, er
 		if len(targetContent.Info.LookUpSelectorTags.Routes) == 0 {
 			return nil, fmt.Errorf("global routes specified but no global tags")
 		}
-		utils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Routes)
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Routes)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Routes)
 		return targetContent.Info.LookUpSelectorTags.Routes, nil
 
@@ -391,7 +388,7 @@ func determineLookUpSelectorTagsRoutes(targetContent file.Content) ([]string, er
 func determineSelectorTag(targetContent file.Content, config dump.Config) ([]string, error) {
 	if targetContent.Info != nil {
 		if len(targetContent.Info.SelectorTags) > 0 {
-			utils.RemoveDuplicates(&targetContent.Info.SelectorTags)
+			reconcilerUtils.RemoveDuplicates(&targetContent.Info.SelectorTags)
 			if len(config.SelectorTags) > 0 {
 				sort.Strings(config.SelectorTags)
 				sort.Strings(targetContent.Info.SelectorTags)
@@ -446,7 +443,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		printStats(stats)
 	}
 	if errs != nil {
-		return 0, utils.ErrArray{Errors: errs}
+		return 0, reconcilerUtils.ErrArray{Errors: errs}
 	}
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
 
@@ -466,14 +463,14 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	return int(totalOps), nil
 }
 
-func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (string, error) {
+func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
 	var version string
 
 	workspace := config.Workspace
 
 	// remove workspace to be able to call top-level / endpoint
 	config.Workspace = ""
-	client, err := utils.GetKongClient(config)
+	client, err := reconcilerUtils.GetKongClient(config)
 	if err != nil {
 		return "", err
 	}
@@ -484,7 +481,7 @@ func fetchKongVersion(ctx context.Context, config utils.KongClientConfig) (strin
 		}
 		// try with workspace path
 		req, err := http.NewRequest("GET",
-			utils.CleanAddress(config.Address)+"/"+workspace+"/kong",
+			reconcilerUtils.CleanAddress(config.Address)+"/"+workspace+"/kong",
 			nil)
 		if err != nil {
 			return "", err
@@ -509,7 +506,7 @@ func validateNoArgs(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func checkForRBACResources(content utils.KongRawState,
+func checkForRBACResources(content reconcilerUtils.KongRawState,
 	rbacResourcesOnly bool,
 ) error {
 	proxyConfig := containsProxyConfiguration(content)
@@ -527,7 +524,7 @@ func checkForRBACResources(content utils.KongRawState,
 	return nil
 }
 
-func containsProxyConfiguration(content utils.KongRawState) bool {
+func containsProxyConfiguration(content reconcilerUtils.KongRawState) bool {
 	return len(content.Services) != 0 ||
 		len(content.Routes) != 0 ||
 		len(content.Plugins) != 0 ||
@@ -537,7 +534,7 @@ func containsProxyConfiguration(content utils.KongRawState) bool {
 		len(content.Consumers) != 0
 }
 
-func containsRBACConfiguration(content utils.KongRawState) bool {
+func containsRBACConfiguration(content reconcilerUtils.KongRawState) bool {
 	return len(content.RBACRoles) != 0
 }
 
@@ -556,7 +553,7 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 	case modeLocal:
 		modeStr = "local"
 	}
-	return utils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
+	return reconcilerUtils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
 }
 
 func inKonnectMode(targetContent *file.Content) bool {
