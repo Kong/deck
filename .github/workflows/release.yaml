@@ -34,7 +34,7 @@ jobs:
           path: dist/*
 
   build-push-images:
-    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - name: Add standard tags
