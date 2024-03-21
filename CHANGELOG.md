@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.36.1](#v1361)
 - [v1.36.0](#v1360)
 - [v1.35.0](#v1350)
 - [v1.34.0](#v1340)
@@ -79,6 +80,18 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.36.1]
+
+> Release date: 2024/03/21
+
+### Fixes
+
+- Avoid showing bogus diffs due to endpoint_permission roles array
+  not being sorted.
+  [#71 go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/71)
+- Do not fetch Kong version when using `validate` command.
+  [#1247](https://github.com/Kong/deck/pull/1247)
 
 ## [v1.36.0]
 
@@ -1620,6 +1633,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.36.1]: https://github.com/kong/deck/compare/v1.36.0...v1.36.1
 [v1.36.0]: https://github.com/kong/deck/compare/v1.35.0...v1.36.0
 [v1.35.0]: https://github.com/kong/deck/compare/v1.34.0...v1.35.0
 [v1.34.0]: https://github.com/kong/deck/compare/v1.33.0...v1.34.0
