@@ -14,7 +14,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.31
 	github.com/kong/go-database-reconciler v1.8.0
-	github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7
+	github.com/kong/go-kong v0.52.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5

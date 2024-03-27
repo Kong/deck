@@ -195,6 +195,8 @@ github.com/kong/go-database-reconciler v1.8.0 h1:0NxfKGEJxcfmSJ3sECIAcW7dBnpHP0i
 github.com/kong/go-database-reconciler v1.8.0/go.mod h1:8dVqldn0hnDsr4KL7M8pKdAz9WcFPBo0B3p7SIiHihI=
 github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7 h1:/iV93Gwv410lIeJx8VCfCA4fpuvSuTw2LqZpDXsIE9Q=
 github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7/go.mod h1:YNkLvjxfOqS+BZ1J2YWOy/83wc26JM5QJbAukoeg1sY=
+github.com/kong/go-kong v0.52.0 h1:qQnYXTNpMpfLd2q61dy6MB2atN1f3+LjKCc5qkjcD58=
+github.com/kong/go-kong v0.52.0/go.mod h1:Uqahp6hm7+JrL768AiohkwzwPuqajzc0+6nBPB6SO6s=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
 github.com/kong/go-slugify v1.0.0/go.mod h1:dbR2h3J2QKXQ1k0aww6cN7o4cIcwlWflr6RKRdcoaiw=
 github.com/kong/kubernetes-ingress-controller/v3 v3.1.2 h1:Ikj7Aj9kT6YKBvMCtX74XOQ7Y9v0eyQtdMvGvFjCLt4=
