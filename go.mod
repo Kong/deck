@@ -29,6 +29,10 @@ require (
 	sigs.k8s.io/yaml v1.4.0
 )
 
+replace github.com/kong/go-database-reconciler v1.7.0 => ../go-database-reconciler
+
+replace github.com/kong/go-kong v0.51.1-0.20240125175037-0c077f5b9ac7 => ../go-kong
+
 require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect

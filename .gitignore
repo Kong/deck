@@ -31,6 +31,7 @@ _testmain.go
 deck
 dist/
 docs/cli-docs/
+bin/
 
 # editor files
 .vscode/

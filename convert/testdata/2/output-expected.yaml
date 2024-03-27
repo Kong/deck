@@ -103,6 +103,12 @@ plugins:
   - http
   - https
   run_on: first
+filter_chains:
+- name: filter_chain1
+  service: 300f010e-3f17-48ce-8a55-f2d9f9bd65b6
+  filters:
+  - name: example-filter
+    config: "{ \"my_greeting\": \"Hello, decK!\" }"
 service_packages:
 - description: placeholder description for svc1 service package
   name: svc1
