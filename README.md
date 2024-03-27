@@ -73,7 +73,7 @@ the GitHub [release page](https://github.com/kong/deck/releases)
 or install by downloading the binary:
 
 ```shell
-$ curl -sL https://github.com/kong/deck/releases/download/v1.8.1/deck_1.8.1_linux_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/kong/deck/releases/download/v1.36.1/deck_1.36.1_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
 ```
@@ -84,7 +84,7 @@ If you are on Windows, you can download the binary from the GitHub
 [release page](https://github.com/kong/deck/releases) or via PowerShell:
 
 ```shell
-$ curl -sL https://github.com/kong/deck/releases/download/v1.8.1/deck_1.8.1_windows_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/kong/deck/releases/download/v1.36.1/deck_1.36.1_windows_amd64.tar.gz -o deck.tar.gz
 $ tar -xzvf deck.tar.gz
 ```
 
