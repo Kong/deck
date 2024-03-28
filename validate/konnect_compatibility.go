@@ -9,10 +9,21 @@ import (
 	"github.com/kong/go-kong/kong"
 )
 
+var (
+	errKonnect            = "[konnect] section not specified - ensure details are set via cli flags"
+	errWorkspace          = "[workspaces] not supported by Konnect - use control planes instead"
+	errNoVersion          = "[version] unable to determine decK file version"
+	errBadVersion         = fmt.Sprintf("[version] decK file version must be '%.1f' or greater", supportedVersion)
+	errPluginIncompatible = "[%s] plugin is not compatible with Konnect"
+	errPluginNoCluster    = "[%s] plugin can't be used with cluster strategy"
+)
+
+var supportedVersion = 3.0
+
 func checkPlugin(name *string, config kong.Configuration) error {
 	switch *name {
 	case "jwt-signer", "vault-auth", "oauth2":
-		return fmt.Errorf("[%s] plugin is not compatible with Konnect", *name)
+		return fmt.Errorf(errPluginIncompatible, *name)
 	case "application-registration":
 		return fmt.Errorf("[%s] available in Konnect, but doesn't require this plugin", *name)
 	case "key-auth-enc":
@@ -21,7 +32,7 @@ func checkPlugin(name *string, config kong.Configuration) error {
 		return fmt.Errorf("[%s] plugin not bundled with Kong Gateway - installed as a LuaRocks package", *name)
 	case "rate-limiting", "rate-limiting-advanced", "response-ratelimiting", "graphql-rate-limiting-advanced":
 		if config["strategy"] == "cluster" {
-			return fmt.Errorf("[%s] plugin can't be used with cluster strategy", *name)
+			return fmt.Errorf(errPluginNoCluster, *name)
 		}
 	default:
 	}
@@ -32,19 +43,19 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 	var errs []error
 
 	if targetContent.Workspace != "" {
-		errs = append(errs, errors.New("[workspaces] not supported by Konnect - use control planes instead"))
+		errs = append(errs, errors.New(errWorkspace))
 	}
 
 	if targetContent.Konnect == nil {
-		errs = append(errs, errors.New("[konnect] section not specified - ensure details are set via cli flags"))
+		errs = append(errs, errors.New(errKonnect))
 	}
 
 	versionNumber, err := strconv.ParseFloat(targetContent.FormatVersion, 32)
 	if err != nil {
-		errs = append(errs, errors.New("[version] unable to determine decK file version"))
+		errs = append(errs, errors.New(errNoVersion))
 	} else {
-		if versionNumber < 3.0 {
-			errs = append(errs, errors.New("[version] decK file version must be '3.0' or greater"))
+		if versionNumber < supportedVersion {
+			errs = append(errs, errors.New(errBadVersion))
 		}
 	}
 
@@ -52,7 +63,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 		if plugin.Enabled != nil && *plugin.Enabled && plugin.Config != nil {
 			err := checkPlugin(plugin.Name, plugin.Config)
 			if err != nil {
-				errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+				errs = append(errs, err)
 			}
 		}
 	}
@@ -62,7 +73,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 			if plugin.Enabled != nil && *plugin.Enabled && plugin.Config != nil {
 				err := checkPlugin(plugin.Name, plugin.Config)
 				if err != nil {
-					errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+					errs = append(errs, err)
 				}
 			}
 		}
@@ -72,7 +83,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 		for _, plugin := range consumerGroup.Plugins {
 			err := checkPlugin(plugin.Name, plugin.Config)
 			if err != nil {
-				errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+				errs = append(errs, err)
 			}
 		}
 	}
@@ -82,7 +93,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 			if plugin.Enabled != nil && *plugin.Enabled && plugin.Config != nil {
 				err := checkPlugin(plugin.Name, plugin.Config)
 				if err != nil {
-					errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+					errs = append(errs, err)
 				}
 			}
 		}
@@ -94,7 +105,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 				if plugin.Enabled != nil && *plugin.Enabled && plugin.Config != nil {
 					err := checkPlugin(plugin.Name, plugin.Config)
 					if err != nil {
-						errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+						errs = append(errs, err)
 					}
 				}
 			}
@@ -106,7 +117,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 			if plugin.Enabled != nil && *plugin.Enabled && plugin.Config != nil {
 				err := checkPlugin(plugin.Name, plugin.Config)
 				if err != nil {
-					errs = append(errs, checkPlugin(plugin.Name, plugin.Config))
+					errs = append(errs, err)
 				}
 			}
 		}

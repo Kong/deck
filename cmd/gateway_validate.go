@@ -215,7 +215,7 @@ this command unless --online flag is used.
 	validateCmd.Flags().BoolVar(&validateJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
-		false, "validate that the state file(s) are ready to be migrated to Konnect")
+		false, "validate that the state file(s) are ready to be deployed to Konnect")
 
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
