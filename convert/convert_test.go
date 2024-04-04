@@ -538,6 +538,19 @@ func Test_convertAutoFields(t *testing.T) {
 				},
 			},
 		},
+		ConsumerGroups: []file.FConsumerGroupObject{
+			{
+				ConsumerGroup: kong.ConsumerGroup{
+					Name: kong.String("my_consumer_group"),
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name:   kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{},
+					},
+				},
+			},
+		},
 		Plugins: []file.FPlugin{
 			{
 				Plugin: kong.Plugin{
@@ -562,4 +575,7 @@ func Test_convertAutoFields(t *testing.T) {
 
 	consumerPluginConfig := got.Consumers[0].Plugins[0].Config
 	assert.NotEmpty(t, consumerPluginConfig["namespace"])
+
+	consumerGroupPluginConfig := got.ConsumerGroups[0].Plugins[0].Config
+	assert.NotEmpty(t, consumerGroupPluginConfig["namespace"])
 }

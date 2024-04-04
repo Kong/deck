@@ -219,10 +219,35 @@ func generateAutoFields(content *file.Content) error {
 		}
 	}
 
+	for _, consumerGroup := range content.ConsumerGroups {
+		for _, plugin := range consumerGroup.Plugins {
+			if *plugin.Name == rateLimitingAdvancedPluginName {
+				if err := autoGenerateNamespaceForRLAPluginConsumerGroups(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
 func autoGenerateNamespaceForRLAPlugin(plugin *file.FPlugin) error {
+	if plugin.Config != nil {
+		ns, ok := plugin.Config["namespace"]
+		if !ok || ns == nil {
+			// namespace is not set, generate one.
+			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
+			if err != nil {
+				return fmt.Errorf("error generating random namespace: %w", err)
+			}
+			plugin.Config["namespace"] = randomNamespace
+		}
+	}
+	return nil
+}
+
+func autoGenerateNamespaceForRLAPluginConsumerGroups(plugin *kong.ConsumerGroupPlugin) error {
 	if plugin.Config != nil {
 		ns, ok := plugin.Config["namespace"]
 		if !ok || ns == nil {
