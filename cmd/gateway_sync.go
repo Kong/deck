@@ -12,6 +12,7 @@ var (
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
 	syncJSONOutput       bool
+	skipHash             bool
 )
 
 var syncCmdKongStateFile []string
@@ -110,6 +111,8 @@ to get Kong's state in sync with the input state.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	syncCmd.Flags().BoolVar(&skipHash, "skip-hash",
+		false, "do not make the CP re-hash basic-auth passwords.")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }
