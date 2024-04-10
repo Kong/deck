@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.37.0](#v1370)
 - [v1.36.2](#v1362)
 - [v1.36.1](#v1361)
 - [v1.36.0](#v1360)
@@ -81,6 +82,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.37.0]
+
+> Release date: 2024/04/10
+
+### Added
+
+- Adds a `--konnect-compatibility` flag to `deck gateway validate` that validates Konnect
+  readiness from an existing decK state.
+  [#1227](https://github.com/Kong/deck/pull/1227)
 
 ## [v1.36.2]
 
@@ -1647,6 +1658,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.37.0]: https://github.com/kong/deck/compare/v1.36.2...v1.37.0
 [v1.36.2]: https://github.com/kong/deck/compare/v1.36.1...v1.36.2
 [v1.36.1]: https://github.com/kong/deck/compare/v1.36.0...v1.36.1
 [v1.36.0]: https://github.com/kong/deck/compare/v1.35.0...v1.36.0
