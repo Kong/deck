@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.36.2](#v1362)
 - [v1.36.1](#v1361)
 - [v1.36.0](#v1360)
 - [v1.35.0](#v1350)
@@ -80,6 +81,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.36.2]
+
+> Release date: 2024/04/10
+
+### Fixes
+
+- Auto-generate rla (rate-limiting-advanced) namespaces in the `convert` subcommand
+  when using Consumer Groups too.
+  [#1263](https://github.com/Kong/deck/pull/1263)
 
 ## [v1.36.1]
 
@@ -1633,6 +1644,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.36.2]: https://github.com/kong/deck/compare/v1.36.1...v1.36.2
 [v1.36.1]: https://github.com/kong/deck/compare/v1.36.0...v1.36.1
 [v1.36.0]: https://github.com/kong/deck/compare/v1.35.0...v1.36.0
 [v1.35.0]: https://github.com/kong/deck/compare/v1.34.0...v1.35.0
