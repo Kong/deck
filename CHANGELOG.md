@@ -91,6 +91,9 @@
 - Auto-generate rla (rate-limiting-advanced) namespaces in the `convert` subcommand
   when using Consumer Groups too.
   [#1263](https://github.com/Kong/deck/pull/1263)
+- OpenAPI 2 Kong: change regex priority field to int from uint, to allow for negative
+  priorities.
+  [go-apiops # 162](https://github.com/Kong/go-apiops/pull/162)
 
 ## [v1.36.1]
 
