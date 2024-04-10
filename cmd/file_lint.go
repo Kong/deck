@@ -56,17 +56,41 @@ func ParseSeverity(s string) Severity {
 	}
 	return SeverityWarn
 }
+func isOpenApiSpec(fileBytes []byte) bool {
+
+	fileContent := string(fileBytes)
+
+	lines := strings.Split(fileContent, "\n")
+
+	// More sophisticated checks could be done here. I took
+	// the easy way out to handle either JSON or YAML documents
+	// and their various possible formats
+	if len(lines) > 0 && strings.Contains(lines[0], "openapi") {
+		return true
+	} else {
+		return false
+	}
+}
 
 // getRuleSet reads the ruleset file by the provided name and returns a RuleSet object.
 func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
+
 	ruleSetBytes, err := filebasics.ReadFile(ruleSetFile)
 	if err != nil {
 		return nil, fmt.Errorf("error reading ruleset file: %w", err)
 	}
+
 	customRuleSet, err := rulesets.CreateRuleSetFromData(ruleSetBytes)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ruleset: %w", err)
 	}
+
+	extends := customRuleSet.GetExtendsValue()
+	if len(extends) > 0 {
+		defaultRuleSet := rulesets.BuildDefaultRuleSets()
+		return defaultRuleSet.GenerateRuleSetFromSuppliedRuleSet(customRuleSet), nil
+	}
+
 	return customRuleSet, nil
 }
 
@@ -89,7 +113,8 @@ func executeLint(cmd *cobra.Command, args []string) error {
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
 		Spec:              stateFileBytes,
-		SkipDocumentCheck: true,
+		SkipDocumentCheck: !isOpenApiSpec(stateFileBytes),
+		AllowLookup:       true,
 	})
 
 	var (

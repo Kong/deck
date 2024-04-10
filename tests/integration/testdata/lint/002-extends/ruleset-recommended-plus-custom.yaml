@@ -1,0 +1,11 @@
+extends: [[spectral:oas, recommended]]
+
+rules:
+  x-visibility-truthy:
+    description: x-visibility check
+    message: "Make sure x-visibility is available for every operation"
+    severity: "error"
+    given: "$.paths.*.*"
+    then:
+      field: x-visibility
+      function: truthy

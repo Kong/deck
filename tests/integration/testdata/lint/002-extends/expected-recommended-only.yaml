@@ -1,0 +1,45 @@
+fail_count: 7
+results:
+- Character: 0
+  Column: 5
+  Line: 7
+  Message: 'Server URL is not valid: must not have a trailing slash'
+  Path: $
+  Severity: warn
+- Character: 0
+  Column: 5
+  Line: 8
+  Message: 'Server URL is not valid: must not have a trailing slash'
+  Path: $
+  Severity: warn
+- Character: 0
+  Column: 24
+  Line: 28
+  Message: Description at line `28` is a duplicate of line `18`
+  Path: $
+  Severity: info
+- Character: 0
+  Column: 5
+  Line: 11
+  Message: path segments `internalRoute` do not use kebab-case
+  Path: $
+  Severity: warn
+- Character: 0
+  Column: 5
+  Line: 21
+  Message: path segments `externalRoute` do not use kebab-case
+  Path: $
+  Severity: warn
+- Character: 0
+  Column: 3
+  Line: 10
+  Message: operation method `GET` at path `/internalRoute` is missing a `description`
+  Path: $
+  Severity: warn
+- Character: 0
+  Column: 3
+  Line: 20
+  Message: operation method `GET` at path `/externalRoute` is missing a `description`
+  Path: $
+  Severity: warn
+total_count: 7

@@ -1,0 +1,9 @@
+fail_count: 1
+results:
+- Character: 0
+  Column: 13
+  Line: 5
+  Message: 'Must use HTTPS protocol: `http` does not match the expression `^https`'
+  Path: $.services[*].protocol
+  Severity: error
+total_count: 1
