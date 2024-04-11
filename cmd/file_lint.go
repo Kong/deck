@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"github.com/kong/go-apiops/filebasics"
 	"github.com/kong/go-apiops/logbasics"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 var (
@@ -56,25 +58,28 @@ func ParseSeverity(s string) Severity {
 	}
 	return SeverityWarn
 }
-func isOpenApiSpec(fileBytes []byte) bool {
 
-	fileContent := string(fileBytes)
+func isOpenAPISpec(fileBytes []byte) bool {
+	var contents map[string]interface{}
 
-	lines := strings.Split(fileContent, "\n")
+	// This marshalling is redundant with what happens
+	// in the linting command. There is likely an algorithm
+	// we could use to determine JSON vs YAML and pull out the
+	// openapi key without unmarshalling the entire file.
+	err := json.Unmarshal(fileBytes, &contents)
+	if err != nil {
+		err = yaml.Unmarshal(fileBytes, &contents)
+	}
 
-	// More sophisticated checks could be done here. I took
-	// the easy way out to handle either JSON or YAML documents
-	// and their various possible formats
-	if len(lines) > 0 && strings.Contains(lines[0], "openapi") {
-		return true
-	} else {
+	if err != nil {
 		return false
 	}
+
+	return contents["openapi"] != nil
 }
 
 // getRuleSet reads the ruleset file by the provided name and returns a RuleSet object.
 func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
-
 	ruleSetBytes, err := filebasics.ReadFile(ruleSetFile)
 	if err != nil {
 		return nil, fmt.Errorf("error reading ruleset file: %w", err)
@@ -113,7 +118,7 @@ func executeLint(cmd *cobra.Command, args []string) error {
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
 		Spec:              stateFileBytes,
-		SkipDocumentCheck: !isOpenApiSpec(stateFileBytes),
+		SkipDocumentCheck: !isOpenAPISpec(stateFileBytes),
 		AllowLookup:       true,
 	})
 
