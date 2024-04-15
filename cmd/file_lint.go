@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -66,11 +65,7 @@ func isOpenAPISpec(fileBytes []byte) bool {
 	// in the linting command. There is likely an algorithm
 	// we could use to determine JSON vs YAML and pull out the
 	// openapi key without unmarshalling the entire file.
-	err := json.Unmarshal(fileBytes, &contents)
-	if err != nil {
-		err = yaml.Unmarshal(fileBytes, &contents)
-	}
-
+	err := yaml.Unmarshal(fileBytes, &contents)
 	if err != nil {
 		return false
 	}
