@@ -90,6 +90,30 @@ func Test_LintStructured(t *testing.T) {
 			displayOnlyFailures: true,
 			failSeverity:        "error",
 		},
+		{
+			name:         "lint OAS with recommended ruleset",
+			stateFile:    "testdata/lint/002-extends/oas.yaml",
+			rulesetFile:  "testdata/lint/002-extends/ruleset-recommended-only.yaml",
+			expectedFile: "testdata/lint/002-extends/expected-recommended-only.yaml",
+			format:       "yaml",
+			failSeverity: "info",
+		},
+		{
+			name:         "lint decK with recommended ruleset OFF",
+			stateFile:    "testdata/lint/002-extends/kong.yaml",
+			rulesetFile:  "testdata/lint/002-extends/ruleset-recommended-off-kong.yaml",
+			expectedFile: "testdata/lint/002-extends/expected-recommended-off-kong.yaml",
+			format:       "yaml",
+			failSeverity: "error",
+		},
+		{
+			name:         "lint OAS with recommended ruleset AND custom rules",
+			stateFile:    "testdata/lint/002-extends/oas.yaml",
+			rulesetFile:  "testdata/lint/002-extends/ruleset-recommended-plus-custom.yaml",
+			expectedFile: "testdata/lint/002-extends/expected-recommended-plus-custom.yaml",
+			format:       "yaml",
+			failSeverity: "error",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

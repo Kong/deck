@@ -1,0 +1,19 @@
+extends: [[spectral:oas, off]]
+
+rules:
+  version-30:
+    description: "Check the version is correct"
+    given: $._format_version
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^3.0$"
+  https-only:
+    description: "Must use HTTPS protocol"
+    given: $.services[*].protocol
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^https"
