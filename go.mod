@@ -13,7 +13,7 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.32
-	github.com/kong/go-database-reconciler v1.8.0
+	github.com/kong/go-database-reconciler v1.9.0
 	github.com/kong/go-kong v0.54.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
@@ -32,7 +32,7 @@ require (
 require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/pb33f/doctor v0.0.4 // indirect
 	github.com/pb33f/libopenapi v0.15.14 // indirect
 	github.com/pb33f/libopenapi-validator v0.0.42 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.2 // indirect
+	github.com/shirou/gopsutil/v3 v3.24.3 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
