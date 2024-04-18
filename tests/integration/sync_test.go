@@ -935,7 +935,7 @@ var (
 		},
 	}
 
-	consumerGroupScopedPlugins35x = []*kong.Plugin{
+	consumerGroupScopedPlugins36x = []*kong.Plugin{
 		{
 			Name: kong.String("rate-limiting-advanced"),
 			ConsumerGroup: &kong.ConsumerGroup{
@@ -1089,6 +1089,7 @@ var (
 				"key_in_header":    true,
 				"key_in_query":     true,
 				"key_names":        []interface{}{"apikey"},
+				"realm":            nil,
 				"run_on_preflight": true,
 			},
 			Enabled:   kong.Bool(true),
@@ -4298,7 +4299,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 	}
 }
 
-func Test_Sync_ConsumerGroupsScopedPlugins_After350(t *testing.T) {
+func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 	const (
 		maxGoldRequestsNumber    = 10
 		maxSilverRequestsNumber  = 7
@@ -4340,7 +4341,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After350(t *testing.T) {
 						},
 					},
 				},
-				Plugins:  consumerGroupScopedPlugins35x,
+				Plugins:  consumerGroupScopedPlugins36x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
@@ -4368,7 +4369,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After350(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.5.0")
+			runWhen(t, "enterprise", ">=3.6.0")
 			setup(t)
 
 			sync(tc.kongFile)
@@ -4501,7 +4502,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 						},
 					},
 				},
-				Plugins:  consumerGroupScopedPlugins35x,
+				Plugins:  consumerGroupScopedPlugins36x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
