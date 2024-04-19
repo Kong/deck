@@ -22,7 +22,6 @@ var (
 	validateOnline               bool
 	validateWorkspace            string
 	validateParallelism          int
-	validateJSONOutput           bool
 	validateKonnectCompatibility bool
 )
 
@@ -214,8 +213,6 @@ this command unless --online flag is used.
 			"This takes precedence over _workspace fields in state files.")
 	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
 		10, "Maximum number of concurrent requests to Kong.")
-	validateCmd.Flags().BoolVar(&validateJSONOutput, "json-output",
-		false, "generate command execution report in a JSON format")
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
 
@@ -253,7 +250,7 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 	workspaceName := validateWorkspace
 	if validateWorkspace != "" {
 		// check if workspace exists
-		workspaceName := getWorkspaceName(validateWorkspace, targetContent, validateJSONOutput)
+		workspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
 		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
 		if err != nil {
 			return nil, err
