@@ -7,8 +7,8 @@ replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.9.11
-	github.com/fatih/color v1.15.0
+	github.com/daveshanley/vacuum v0.9.14
+	github.com/fatih/color v1.16.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.32
 	github.com/kong/go-database-reconciler v1.10.0
@@ -33,13 +33,14 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/hashicorp/go-hclog v1.6.2 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.5 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
-	github.com/pb33f/doctor v0.0.4 // indirect
-	github.com/pb33f/libopenapi v0.15.14 // indirect
-	github.com/pb33f/libopenapi-validator v0.0.42 // indirect
+	github.com/pb33f/doctor v0.0.5 // indirect
+	github.com/pb33f/libopenapi v0.15.15 // indirect
+	github.com/pb33f/libopenapi-validator v0.0.47 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.3 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
