@@ -15,7 +15,6 @@ import (
 )
 
 func Test_LintPlain(t *testing.T) {
-
 	tests := []struct {
 		name        string
 		stateFile   string
