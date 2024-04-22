@@ -15,8 +15,6 @@ import (
 )
 
 func Test_LintPlain(t *testing.T) {
-	t.Skip("This test is failing due to a race condition into the daveshanley/vacuum package")
-
 	tests := []struct {
 		name        string
 		stateFile   string
@@ -51,8 +49,6 @@ type lintErrors struct {
 }
 
 func Test_LintStructured(t *testing.T) {
-	t.Skip("This test is failing due to a race condition into the daveshanley/vacuum package")
-
 	tests := []struct {
 		name                string
 		stateFile           string
