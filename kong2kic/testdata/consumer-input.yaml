@@ -1,0 +1,43 @@
+consumers:
+  - username: example-user
+    custom_id: "1234567890"
+    tags:
+      - internal
+    acls:
+      - group: acl_group
+        tags:
+          - internal
+    basicauth_credentials:
+      - username: my_basic_user
+        password: my_basic_password
+        tags:
+          - internal
+    jwt_secrets:
+      - key: my_jwt_secret
+        algorithm: HS256
+        secret: my_secret_key
+        rsa_public_key: |-
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxXzYS5yESbekTF3xLiQX
+          ZZZfXt0S/nzFp3f2Oux3W7/ydvZ8XSd8+s+wm5oqEcSV9n+5n3ENZbt1A/wgnGI3
+          oWrv0yRB9HugzTIGPpI1AQv9Z4p8E44RrB74/uTxYwb9+4yvpuz/fzTt3Gz+Kzc4
+          4fGGq8VpGMFj6AE65ZcOAHHUJe4VuoreBXLYDJcHl2WPIdNKDGscFjElDneLRhWQ
+          DfxekDJIQMWCjyBEXacfP6cc9U8Qld6TuVcwi1P2xb8tBDD4MIFL/psfzUhfv1Lw
+          O/XZEffJxCqkQn7dsCYy3wpaTjb6XmJ5j0Dbml4f0Bv40Y1mjlAf7C662Mbuguf6
+          ewIDAQAB
+          -----END PUBLIC KEY-----
+        tags:
+          - internal
+    keyauth_credentials:
+      - key: my_api_key
+        tags:
+          - internal
+    mtls_auth_credentials:
+      - id: cce8c384-721f-4f58-85dd-50834e3e733a
+        subject_name: example-user@example.com
+    plugins:
+      - name: rate-limiting
+        config:
+          second: 5
+          hour: 10000
+          policy: local
