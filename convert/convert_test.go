@@ -579,3 +579,195 @@ func Test_convertAutoFields(t *testing.T) {
 	consumerGroupPluginConfig := got.ConsumerGroups[0].Plugins[0].Config
 	assert.NotEmpty(t, consumerGroupPluginConfig["namespace"])
 }
+
+func Test_convertPreFunction(t *testing.T) {
+	content := &file.Content{
+		Services: []file.FService{
+			{
+				Service: kong.Service{
+					Name: kong.String("s1"),
+					Host: kong.String("httpbin.org"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"functions": "kong.log.err(\"service\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		Routes: []file.FRoute{
+			{
+				Route: kong.Route{
+					Name:  kong.String("r1"),
+					Paths: []*string{kong.String("/r1")},
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"functions": "kong.log.err(\"route\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		Consumers: []file.FConsumer{
+			{
+				Consumer: kong.Consumer{
+					Username: kong.String("foo"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"functions": "kong.log.err(\"consumer\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		ConsumerGroups: []file.FConsumerGroupObject{
+			{
+				ConsumerGroup: kong.ConsumerGroup{
+					Name: kong.String("my_consumer_group"),
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("pre-function"),
+						Config: kong.Configuration{
+							"functions": "kong.log.err(\"consumer_group\")",
+						},
+					},
+				},
+			},
+		},
+		Plugins: []file.FPlugin{
+			{
+				Plugin: kong.Plugin{
+					Name: kong.String("pre-function"),
+					Config: kong.Configuration{
+						"functions": "kong.log.err(\"global\")",
+					},
+				},
+			},
+		},
+	}
+
+	got, err := convertKongGateway2xTo3x(content, "-")
+	assert.NoError(t, err)
+
+	globalPluginConfig := got.Plugins[0].Config
+	assert.Contains(t, globalPluginConfig["access"], "global")
+	assert.Empty(t, globalPluginConfig["functions"])
+
+	servicePluginConfig := got.Services[0].Plugins[0].Config
+	assert.Contains(t, servicePluginConfig["access"], "service")
+	assert.Empty(t, servicePluginConfig["functions"])
+
+	routePluginConfig := got.Routes[0].Plugins[0].Config
+	assert.Contains(t, routePluginConfig["access"], "route")
+	assert.Empty(t, routePluginConfig["functions"])
+
+	consumerPluginConfig := got.Consumers[0].Plugins[0].Config
+	assert.Contains(t, consumerPluginConfig["access"], "consumer")
+	assert.Empty(t, consumerPluginConfig["functions"])
+
+	consumerGroupPluginConfig := got.ConsumerGroups[0].Plugins[0].Config
+	assert.Contains(t, consumerGroupPluginConfig["access"], "consumer_group")
+	assert.Empty(t, consumerGroupPluginConfig["functions"])
+}
+
+func Test_convertPreFunctionWithError(t *testing.T) {
+	content := &file.Content{
+		Services: []file.FService{
+			{
+				Service: kong.Service{
+					Name: kong.String("s1"),
+					Host: kong.String("httpbin.org"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"should_be_functions": "kong.log.err(\"service\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		Routes: []file.FRoute{
+			{
+				Route: kong.Route{
+					Name:  kong.String("r1"),
+					Paths: []*string{kong.String("/r1")},
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"should_be_functions": "kong.log.err(\"route\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		Consumers: []file.FConsumer{
+			{
+				Consumer: kong.Consumer{
+					Username: kong.String("foo"),
+				},
+				Plugins: []*file.FPlugin{
+					{
+						Plugin: kong.Plugin{
+							Name: kong.String("pre-function"),
+							Config: kong.Configuration{
+								"should_be_functions": "kong.log.err(\"consumer\")",
+							},
+						},
+					},
+				},
+			},
+		},
+		ConsumerGroups: []file.FConsumerGroupObject{
+			{
+				ConsumerGroup: kong.ConsumerGroup{
+					Name: kong.String("my_consumer_group"),
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("pre-function"),
+						Config: kong.Configuration{
+							"should_be_functions": "kong.log.err(\"consumer_group\")",
+						},
+					},
+				},
+			},
+		},
+		Plugins: []file.FPlugin{
+			{
+				Plugin: kong.Plugin{
+					Name: kong.String("pre-function"),
+					Config: kong.Configuration{
+						"should_be_functions": "kong.log.err(\"global\")",
+					},
+				},
+			},
+		},
+	}
+
+	_, err := convertKongGateway2xTo3x(content, "-")
+	assert.Error(t, err)
+}
