@@ -1,0 +1,169 @@
+diff --git a/pkg/konnect/control_plane_relations_service.go b/pkg/konnect/control_plane_relations_service.go
+index 74197f7..f9b0e20 100644
+--- a/pkg/konnect/control_plane_relations_service.go
++++ b/pkg/konnect/control_plane_relations_service.go
+@@ -122,16 +122,16 @@ func (s *ControlPlaneRelationsService) List(ctx context.Context,
+ func (s *ControlPlaneRelationsService) ListAll(ctx context.Context) ([]*ControlPlaneServiceRelation,
+ 	error,
+ ) {
+-	var relations, data []*ControlPlaneServiceRelation
+-	var err error
+-	opt := &ListOpt{Size: pageSize}
+-
+-	for opt != nil {
+-		data, opt, err = s.List(ctx, opt)
+-		if err != nil {
+-			return nil, err
+-		}
+-		relations = append(relations, data...)
+-	}
++	var relations []*ControlPlaneServiceRelation
++	// var err error
++	// opt := &ListOpt{Size: pageSize}
++
++	// for opt != nil {
++	// 	data, opt, err = s.List(ctx, opt)
++	// 	if err != nil {
++	// 		return nil, err
++	// 	}
++	// 	relations = append(relations, data...)
++	// }
+ 	return relations, nil
+ }
+diff --git a/pkg/konnect/document_service.go b/pkg/konnect/document_service.go
+index 3e31014..2c1e235 100644
+--- a/pkg/konnect/document_service.go
++++ b/pkg/konnect/document_service.go
+@@ -134,17 +134,17 @@ func (d *DocumentService) listAllByPath(ctx context.Context, path string) ([]*Do
+ 
+ // ListAllForParent fetches all Documents in Konnect for a parent entity.
+ func (d *DocumentService) ListAllForParent(ctx context.Context, parent ParentInfoer) ([]*Document, error) {
+-	if parent == nil {
+-		return nil, fmt.Errorf("parent cannot be nil")
+-	}
++	// if parent == nil {
++	// 	return nil, fmt.Errorf("parent cannot be nil")
++	// }
+ 	var docs []*Document
+-	var err error
+-	docs, err = d.listAllByPath(ctx, parent.URL()+"/documents")
+-	if err != nil {
+-		return nil, err
+-	}
+-	for _, doc := range docs {
+-		doc.Parent = parent
+-	}
++	// var err error
++	// docs, err = d.listAllByPath(ctx, parent.URL()+"/documents")
++	// if err != nil {
++	// 	return nil, err
++	// }
++	// for _, doc := range docs {
++	// 	doc.Parent = parent
++	// }
+ 	return docs, nil
+ }
+diff --git a/pkg/konnect/service_package_service.go b/pkg/konnect/service_package_service.go
+index 28fb6c3..3781979 100644
+--- a/pkg/konnect/service_package_service.go
++++ b/pkg/konnect/service_package_service.go
+@@ -103,16 +103,16 @@ func (s *ServicePackageService) List(ctx context.Context,
+ func (s *ServicePackageService) ListAll(ctx context.Context) ([]*ServicePackage,
+ 	error,
+ ) {
+-	var servicePackages, data []*ServicePackage
+-	var err error
+-	opt := &ListOpt{Size: pageSize}
+-
+-	for opt != nil {
+-		data, opt, err = s.List(ctx, opt)
+-		if err != nil {
+-			return nil, err
+-		}
+-		servicePackages = append(servicePackages, data...)
+-	}
++	var servicePackages []*ServicePackage
++	// var err error
++	// opt := &ListOpt{Size: pageSize}
++
++	// for opt != nil {
++	// 	data, opt, err = s.List(ctx, opt)
++	// 	if err != nil {
++	// 		return nil, err
++	// 	}
++	// 	servicePackages = append(servicePackages, data...)
++	// }
+ 	return servicePackages, nil
+ }
+diff --git a/pkg/konnect/service_version_service.go b/pkg/konnect/service_version_service.go
+index 08b3101..0395ced 100644
+--- a/pkg/konnect/service_version_service.go
++++ b/pkg/konnect/service_version_service.go
+@@ -3,7 +3,6 @@ package konnect
+ import (
+ 	"context"
+ 	"fmt"
+-	"net/http"
+ )
+ 
+ type ServiceVersionService service
+@@ -91,17 +90,17 @@ func (s *ServiceVersionService) Update(ctx context.Context,
+ func (s *ServiceVersionService) ListForPackage(ctx context.Context,
+ 	servicePackageID *string,
+ ) ([]ServiceVersion, error) {
+-	endpoint := "/api/service_packages/" + *servicePackageID + "/service_versions"
+-	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
+-	if err != nil {
+-		return nil, err
+-	}
+-	// Note: This endpoint doesn't follow the structure of paginated endpoints
+-	// and instead returns an array with all service versions.
++	// endpoint := "/api/service_packages/" + *servicePackageID + "/service_versions"
++	// req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
++	// if err != nil {
++	// 	return nil, err
++	// }
++	// // Note: This endpoint doesn't follow the structure of paginated endpoints
++	// // and instead returns an array with all service versions.
+ 	var response []ServiceVersion
+-	_, err = s.client.Do(ctx, req, &response)
+-	if err != nil {
+-		return nil, err
+-	}
++	// _, err = s.client.Do(ctx, req, &response)
++	// if err != nil {
++	// 	return nil, err
++	// }
+ 	return response, nil
+ }
+diff --git a/pkg/types/core.go b/pkg/types/core.go
+index 1fdc1d7..ced9dfa 100644
+--- a/pkg/types/core.go
++++ b/pkg/types/core.go
+@@ -249,7 +249,7 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
+ 			typ: ConsumerGroup,
+ 			crudActions: &consumerGroupCRUD{
+ 				client:    opts.KongClient,
+-				isKonnect: opts.IsKonnect,
++				isKonnect: true,
+ 			},
+ 			postProcessActions: &consumerGroupPostAction{
+ 				currentState: opts.CurrentState,
+@@ -265,7 +265,7 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
+ 			typ: ConsumerGroupConsumer,
+ 			crudActions: &consumerGroupConsumerCRUD{
+ 				client:    opts.KongClient,
+-				isKonnect: opts.IsKonnect,
++				isKonnect: true,
+ 			},
+ 			postProcessActions: &consumerGroupConsumerPostAction{
+ 				currentState: opts.CurrentState,
+@@ -281,7 +281,7 @@ func NewEntity(t EntityType, opts EntityOpts) (Entity, error) {
+ 			typ: ConsumerGroupPlugin,
+ 			crudActions: &consumerGroupPluginCRUD{
+ 				client:    opts.KongClient,
+-				isKonnect: opts.IsKonnect,
++				isKonnect: true,
+ 			},
+ 			postProcessActions: &consumerGroupPluginPostAction{
+ 				currentState: opts.CurrentState,

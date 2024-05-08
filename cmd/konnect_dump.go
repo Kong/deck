@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"net/url"
+	"path"
 	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -43,29 +44,35 @@ func newKonnectDumpCmd() *cobra.Command {
 				return err
 			}
 
-			// authenticate with konnect
-			_, err = konnectClient.Auth.Login(cmd.Context(),
-				konnectConfig.Email,
-				konnectConfig.Password)
-			if err != nil {
-				return fmt.Errorf("authenticating with Konnect: %w", err)
-			}
+			// // authenticate with konnect
+			// _, err = konnectClient.Auth.Login(cmd.Context(),
+			// 	konnectConfig.Email,
+			// 	konnectConfig.Password)
+			// if err != nil {
+			// 	return fmt.Errorf("authenticating with Konnect: %w", err)
+			// }
 
-			// get kong control plane ID
-			kongCPID, err := fetchKongControlPlaneID(cmd.Context(), konnectClient)
-			if err != nil {
-				return err
-			}
+			// // get kong control plane ID
+			// kongCPID, err := fetchKongControlPlaneID(cmd.Context(), konnectClient)
+			// if err != nil {
+			// 	return err
+			// }
 
 			// initialize kong client
 			kongClient, err := utils.GetKongClient(utils.KongClientConfig{
-				Address:    konnectConfig.Address + "/api/control_planes/" + kongCPID,
+				Address:    konnectConfig.Address,
 				HTTPClient: httpClient,
 				Debug:      konnectConfig.Debug,
 			})
 			if err != nil {
 				return err
 			}
+
+			parsedUrl, err := url.Parse(konnectConfig.Address)
+			if err != nil {
+				return err
+			}
+			kongCPID := path.Base(parsedUrl.Path)
 
 			ks, err := getKonnectState(cmd.Context(), kongClient, konnectClient, kongCPID,
 				!konnectDumpIncludeConsumers)
