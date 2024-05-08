@@ -11,8 +11,8 @@ require (
 	github.com/fatih/color v1.15.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.33
-	github.com/kong/go-database-reconciler v1.10.0
-	github.com/kong/go-kong v0.54.0
+	github.com/kong/go-database-reconciler v1.11.0
+	github.com/kong/go-kong v0.55.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -22,7 +22,7 @@ require (
 	k8s.io/api v0.29.3
 	k8s.io/apiextensions-apiserver v0.29.2
 	k8s.io/apimachinery v0.29.3
-	k8s.io/code-generator v0.29.3
+	k8s.io/code-generator v0.29.4
 	sigs.k8s.io/gateway-api v1.0.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -40,7 +40,7 @@ require (
 	github.com/pb33f/doctor v0.0.6 // indirect
 	github.com/pb33f/libopenapi v0.16.1 // indirect
 	github.com/pb33f/libopenapi-validator v0.0.49 // indirect
-	github.com/shirou/gopsutil/v3 v3.24.3 // indirect
+	github.com/shirou/gopsutil/v3 v3.24.4 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
