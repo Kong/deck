@@ -64,15 +64,20 @@ func pingKonnect(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	// authenticate with konnect
-	res, err := authenticate(ctx, konnectClient, konnectConfig)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
-	}
+	if konnectConfig.Dev {
+		fmt.Println("Successfully Konnected to Kong!")
+		fmt.Println("Kong version: ", fetchKonnectKongVersion())
+	} else {
+		// authenticate with konnect
+		res, err := authenticate(ctx, konnectClient, konnectConfig)
+		if err != nil {
+			return fmt.Errorf("authenticating with Konnect: %w", err)
+		}
 
-	fmt.Printf("Successfully Konnected to the %s organization!\n", res.Name)
-	if konnectConfig.Debug {
-		fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+		fmt.Printf("Successfully Konnected to the %s organization!\n", res.Name)
+		if konnectConfig.Debug {
+			fmt.Printf("Organization ID: %s\n", res.OrganizationID)
+		}
 	}
 	_ = sendAnalytics("ping", "", modeKonnect)
 	return nil

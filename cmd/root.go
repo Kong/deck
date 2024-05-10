@@ -203,6 +203,16 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-addr",
 		rootCmd.PersistentFlags().Lookup("konnect-addr"))
 
+	// TMP
+	// when using --konnect-dev with dump, diff or sync,
+	// pass --konnect-runtime-group-name <cluster-id>
+	rootCmd.PersistentFlags().Bool("konnect-dev", false,
+		"Enable konnect local development mode.\n"+
+			"Use this mode to communicate directly with a konnect CP.")
+	rootCmd.Flags().MarkHidden("konnect-dev") // TODO make this one work
+	viper.BindPFlag("konnect-dev",
+		rootCmd.PersistentFlags().Lookup("konnect-dev"))
+
 	rootCmd.PersistentFlags().String("konnect-runtime-group-name", "",
 		"Konnect Runtime group name.")
 	rootCmd.PersistentFlags().MarkDeprecated(
@@ -422,6 +432,7 @@ func initKonnectConfig() error {
 	konnectConfig.Address = viper.GetString("konnect-addr")
 	konnectConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	konnectControlPlane = viper.GetString("konnect-control-plane-name")
+	konnectConfig.Dev = viper.GetBool("konnect-dev")
 	konnectRuntimeGroup = viper.GetString("konnect-runtime-group-name")
 	return nil
 }

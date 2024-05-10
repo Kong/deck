@@ -55,23 +55,30 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, err
 	}
-	_, err = authenticate(ctx, konnectClient, *konnectConfig)
-	if err != nil {
-		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
-	}
-	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
-	if err != nil {
-		return nil, err
+	if !konnectConfig.Dev {
+		_, err = authenticate(ctx, konnectClient, *konnectConfig)
+		if err != nil {
+			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+		}
 	}
 
-	// set the kong control plane ID in the client
-	konnectClient.SetRuntimeGroupID(cpID)
-	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + cpID
-	// TODO: replace the above with the following once the Konnect API is updated
-	// konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID
+	if konnectConfig.Dev {
+		// Local Development mode enabled, use konnect-addr as the CP addr.
+		konnectAddress = konnectConfig.Address
+	} else {
+		cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
+		if err != nil {
+			return nil, err
+		}
+		// set the kong control plane ID in the client
+		konnectClient.SetRuntimeGroupID(cpID)
+		konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + cpID
+		// TODO: replace the above with the following once the Konnect API is updated
+		// konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID
+	}
 
 	// initialize kong client
-	return utils.GetKongClient(utils.KongClientConfig{
+	kongClient, err := utils.GetKongClient(utils.KongClientConfig{
 		Address:    konnectAddress,
 		HTTPClient: httpClient,
 		Debug:      konnectConfig.Debug,
@@ -79,6 +86,14 @@ func GetKongClientForKonnectMode(
 		Retryable:  true,
 		TLSConfig:  konnectConfig.TLSConfig,
 	})
+	if err != nil {
+		return kongClient, err
+	}
+	if konnectConfig.Dev {
+		kongClient.QueryParams.Add("cluster.id", konnectRuntimeGroup)
+	}
+
+	return kongClient, nil
 }
 
 func resetKonnectV2(ctx context.Context) error {
