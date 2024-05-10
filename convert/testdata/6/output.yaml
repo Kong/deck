@@ -1,0 +1,62 @@
+_format_version: "3.0"
+plugins:
+- enabled: true
+  name: prometheus
+  protocols:
+  - http
+  - https
+  run_on: first
+services:
+- connect_timeout: 30000
+  host: mockbin.org
+  name: svc1
+  protocol: http
+  read_timeout: 60000
+  routes:
+  - https_redirect_status_code: 301
+    name: r1
+    paths:
+    - /r1
+    preserve_host: false
+    protocols:
+    - https
+    regex_priority: 0
+    strip_path: true
+  tags:
+  - team-svc1
+  write_timeout: 30000
+- connect_timeout: 30000
+  host: mockbin.org
+  name: svc2
+  protocol: http
+  read_timeout: 60000
+  routes:
+  - https_redirect_status_code: 301
+    name: r2
+    paths:
+    - /r2
+    preserve_host: false
+    protocols:
+    - https
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 30000
+- connect_timeout: 30000
+  host: mockbin.org
+  name: svc3
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  routes:
+  - https_redirect_status_code: 301
+    methods:
+    - GET
+    name: r3
+    paths:
+    - /r3
+    preserve_host: false
+    protocols:
+    - https
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 30000

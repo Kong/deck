@@ -84,15 +84,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string,
 ) error {
 	// read target file
-	targetContent, err := file.GetContentFromFiles(filenames)
+	inputFileContent, err := file.GetContentFromFiles(filenames)
 	if err != nil {
 		return err
 	}
 	if dumpConfig.SkipConsumers {
-		targetContent.Consumers = []file.FConsumer{}
+		inputFileContent.Consumers = []file.FConsumer{}
 	}
 	if dumpConfig.SkipCACerts {
-		targetContent.CACertificates = []file.FCACertificate{}
+		inputFileContent.CACertificates = []file.FCACertificate{}
 	}
 
 	cmd := "sync"
@@ -101,26 +101,26 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	var kongClient *kong.Client
-	mode := getMode(targetContent)
+	mode := getMode(inputFileContent)
 	if mode == modeKonnect {
-		if targetContent.Workspace != "" {
+		if inputFileContent.Workspace != "" {
 			return fmt.Errorf("_workspace set in config file.\n"+
 				"Workspaces are not supported in Konnect. "+
 				"Please remove '_workspace: %s' from your "+
-				"configuration and try again", targetContent.Workspace)
+				"configuration and try again", inputFileContent.Workspace)
 		}
 		if workspace != "" {
 			return fmt.Errorf("--workspace flag is not supported when running against Konnect")
 		}
-		if targetContent.Konnect != nil {
+		if inputFileContent.Konnect != nil {
 			if konnectRuntimeGroup != "" &&
-				targetContent.Konnect.RuntimeGroupName != konnectRuntimeGroup {
+				inputFileContent.Konnect.RuntimeGroupName != konnectRuntimeGroup {
 				return fmt.Errorf("warning: runtime group '%v' specified via "+
 					"--konnect-runtime-group flag is "+
 					"different from '%v' found in state file(s)",
-					konnectRuntimeGroup, targetContent.Konnect.RuntimeGroupName)
+					konnectRuntimeGroup, inputFileContent.Konnect.RuntimeGroupName)
 			}
-			konnectRuntimeGroup = targetContent.Konnect.RuntimeGroupName
+			konnectRuntimeGroup = inputFileContent.Konnect.RuntimeGroupName
 		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
@@ -136,7 +136,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	// prepare to read the current state from Kong
 	var wsConfig utils.KongClientConfig
-	workspaceName := getWorkspaceName(workspace, targetContent)
+	workspaceName := getWorkspaceName(workspace, inputFileContent)
 	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
@@ -156,8 +156,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	if parsedKongVersion.GTE(utils.Kong300Version) &&
-		targetContent.FormatVersion != formatVersion30 {
-		formatVersion := targetContent.FormatVersion
+		inputFileContent.FormatVersion != formatVersion30 {
+		formatVersion := inputFileContent.FormatVersion
 		if formatVersion == "" {
 			formatVersion = defaultFormatVersion
 		}
@@ -183,21 +183,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
-	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
+	dumpConfig.SelectorTags, err = determineSelectorTag(*inputFileContent, dumpConfig)
 	if err != nil {
 		return err
 	}
 
 	// read the current state
-	var currentState *state.KongState
+	var currentKongState *state.KongState
 	if workspaceExists {
-		currentState, err = fetchCurrentState(ctx, kongClient, dumpConfig)
+		currentKongState, err = fetchCurrentState(ctx, kongClient, dumpConfig)
 		if err != nil {
 			return err
 		}
 	} else {
 		// inject empty state
-		currentState, err = state.NewKongState()
+		currentKongState, err = state.NewKongState()
 		if err != nil {
 			return err
 		}
@@ -211,9 +211,33 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
+	// check entities with possible references.
+	for _, route := range inputFileContent.Routes {
+		if route.Service != nil {
+			if route.Service.Name != nil {
+				var found bool
+				for _, service := range inputFileContent.Services {
+					if *service.Name == *route.Service.Name {
+						found = true
+						break
+					}
+				}
+				if !found {
+					var foundInCurrentState bool
+					for _, service := range currentKongState.Services {
+						if *service.Name == *route.Service.Name {
+							foundInCurrentState = true
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+
 	// read the target state
-	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
-		CurrentState: currentState,
+	rawState, err := file.Get(ctx, inputFileContent, file.RenderConfig{
+		CurrentState: currentKongState,
 		KongVersion:  parsedKongVersion,
 	}, dumpConfig, kongClient)
 	if err != nil {
@@ -228,7 +252,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
+		ctx, currentKongState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect)
 	if err != nil {
 		return err
 	}
