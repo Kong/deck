@@ -139,11 +139,12 @@ order they are given:
 	}
 `,
 		RunE: executeAddPlugins,
-		Example: "# adds 2 plugins to all services in a deck file, except if they are already present\n" +
-			"cat kong.yml | deck file add-plugins --selector='services[*]' plugin1.json plugin2.yml\n" +
+		Example: "# adds a plugin to all services in a deck file, except if it is already present\n" +
+			"cat kong.yml | deck file add-plugins --selector='services[*]' \\\n" +
+			"               --config='{\"name\":\"my-plugin\",\"config\":{\"my-property\":\"value\"}}'\n" +
 			"\n" +
-			"# same, but now overwriting plugins if they already exist\n" +
-			"cat kong.yml | deck file add-plugins --overwrite --selector='services[*]' plugin1.json plugin2.yml",
+			"# same, but now overwriting plugins if they already exist and reading from files\n" +
+			"cat kong.yml | deck file add-plugins --overwrite plugin1.json plugin2.yml",
 		Args: cobra.MinimumNArgs(0),
 	}
 
