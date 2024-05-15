@@ -231,9 +231,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
-	dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, kongClient)
-	if err != nil {
-		return err
+	if mode != modeKonnect {
+		dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, kongClient)
+		if err != nil {
+			return err
+		}
 	}
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)

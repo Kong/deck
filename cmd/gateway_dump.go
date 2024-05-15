@@ -57,9 +57,11 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, wsClient)
-	if err != nil {
-		return err
+	if !inKonnectMode(nil) {
+		dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, wsClient)
+		if err != nil {
+			return err
+		}
 	}
 
 	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
