@@ -106,7 +106,7 @@ The output will be targeted at Kong version 3.x.
 			"will be added, implicit if '--inso-compatible' is set).")
 	openapi2kongCmd.Flags().BoolVarP(&cmdO2KinsoCompat, "inso-compatible", "i", false,
 		"This flag will enable Inso compatibility. The generated entity names will be\n"+
-			"the same, and no 'id' fields will be gnerated.")
+			"the same, and no 'id' fields will be generated.")
 	openapi2kongCmd.Flags().BoolVarP(&cmdO2Ksecurity, "generate-security", "", false, "generate OpenIDConnect plugins "+
 		"from the security directives")
 	openapi2kongCmd.Flags().BoolVarP(&cmdO2KignoreSecurityError, "ignore-security-errors", "", false,
