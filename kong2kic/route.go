@@ -3,6 +3,7 @@ package kong2kic
 import (
 	"encoding/json"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -274,6 +275,36 @@ func addPluginsToRoute(
 	return nil
 }
 
+// HeadersByNameTypeAndValue is a type to sort headers by name, type and value.
+// This is needed to ensure that the order of headers is consistent across runs.
+type HeadersByNameTypeAndValue []k8sgwapiv1.HTTPHeaderMatch
+
+func (a HeadersByNameTypeAndValue) Len() int      { return len(a) }
+func (a HeadersByNameTypeAndValue) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a HeadersByNameTypeAndValue) Less(i, j int) bool {
+	if a[i].Name < a[j].Name {
+		return true
+	}
+	if a[i].Name > a[j].Name {
+		return false
+	}
+
+	if a[i].Type != nil && a[j].Type == nil {
+		return true
+	}
+	if a[i].Type == nil && a[j].Type != nil {
+		return false
+	}
+
+	if *a[i].Type < *a[j].Type {
+		return true
+	}
+	if *a[i].Type > *a[j].Type {
+		return false
+	}
+	return a[i].Value < a[j].Value
+}
+
 // Convert route to HTTPRoute (Gateway API)
 func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICContent) error {
 	for _, service := range content.Services {
@@ -397,6 +428,7 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 						})
 					}
 				}
+				sort.Sort(HeadersByNameTypeAndValue(httpHeaderMatch))
 			}
 
 			// If path is not nil, then for each path, for each method, add a httpRouteRule
