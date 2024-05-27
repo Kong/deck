@@ -186,6 +186,8 @@ func sortSlices(x, y interface{}) bool {
 func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	expectedState utils.KongRawState, ignoreFields []cmp.Option,
 ) {
+	t.Helper()
+
 	// Get entities from Kong
 	ctx := context.Background()
 	dumpConfig := deckDump.Config{}
@@ -236,6 +238,8 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 }
 
 func reset(t *testing.T, opts ...string) {
+	t.Helper()
+
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"reset", "--force"}
 	if len(opts) > 0 {
