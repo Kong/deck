@@ -4934,3 +4934,66 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 	require.NoError(t, sync("testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 }
+
+// test scope:
+//   - 3.6.0+
+func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.6.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	expectedState := utils.KongRawState{
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("c0f6c818-470c-4df7-8515-c8e904765fcc"),
+					Name: kong.String("group-1"),
+					Tags: kong.StringSlice("project:the-project", "managed-by:deck"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+						Username: kong.String("consumer-1"),
+					},
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+				Username: kong.String("consumer-1"),
+			},
+		},
+	}
+
+	// simulate the following scenario:
+	// - a consumer-group defined with a set of tags, ideally managed by decK
+	// - a consumer and the consumer -> consumer-group managed externally
+	require.NoError(t, sync("testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
+
+	// create the consumer
+	_, err = client.Consumers.Create(
+		context.Background(),
+		&kong.Consumer{
+			ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+			Username: kong.String("consumer-1"),
+		},
+	)
+	require.NoError(t, err)
+
+	// map the consumer into the consumer-group
+	_, err = client.ConsumerGroupConsumers.Create(
+		context.Background(),
+		kong.String("c0f6c818-470c-4df7-8515-c8e904765fcc"),
+		kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+	)
+	require.NoError(t, err)
+
+	// re-sync again
+	require.NoError(t, sync("testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
+	testKongState(t, client, false, expectedState, nil)
+}

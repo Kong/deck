@@ -1,0 +1,12 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+  - project:the-project
+  - managed-by:deck
+consumer_groups:
+- id: c0f6c818-470c-4df7-8515-c8e904765fcc
+  name: group-1
+  tags:
+  - project:the-project
+  - managed-by:deck
