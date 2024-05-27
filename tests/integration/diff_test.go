@@ -10,6 +10,12 @@ import (
 )
 
 var (
+	emptyOutput = `Summary:
+  Created: 0
+  Updated: 0
+  Deleted: 0
+`
+
 	expectedOutputMasked = `updating service svc1  {
    "connect_timeout": 60000,
    "enabled": true,
@@ -741,4 +747,21 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			assert.Equal(t, expectedOutputUnMaskedJSON, out)
 		})
 	}
+}
+
+// test scope:
+//   - 3.5
+func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.5.0")
+	setup(t)
+
+	// test that the diff command does not return any changes when
+	// array fields are not sorted.
+	stateFile := "testdata/diff/004-no-diff-plugin/kong.yaml"
+	assert.NoError(t, sync(stateFile, "--timeout", "60"))
+
+	out, err := diff(stateFile)
+	assert.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+	reset(t)
 }

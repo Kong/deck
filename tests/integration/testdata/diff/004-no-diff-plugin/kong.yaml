@@ -1,0 +1,8 @@
+_format_version: "3.0"
+plugins:
+  - name: openid-connect
+    config:
+      extra_jwks_uris:
+      - https://foo.com/baz
+      - https://foo.com/bar
+      issuer: https://test.com
