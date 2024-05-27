@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.38.0](#v1380)
 - [v1.37.0](#v1370)
 - [v1.36.2](#v1362)
 - [v1.36.1](#v1361)
@@ -82,6 +83,31 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.38.0]
+
+> Release date: 2024/05/27
+
+### Fixes
+
+- Correct plugins config comparison to avoid misleading diffs.
+  [#1306](https://github.com/Kong/deck/pull/1306)
+  [go-database-reconciler #93](https://github.com/Kong/go-database-reconciler/pull/93)
+- Make KIC v2 Gateway API v2 config generation deterministic.
+  [#1302](https://github.com/Kong/deck/pull/1302)
+- Correct tags filtering with Consumers and Consumer Groups.
+  [#1293](https://github.com/Kong/deck/pull/1293)
+  [go-database-reconciler #88](https://github.com/Kong/go-database-reconciler/pull/88)
+- Correct tags filtering with Consumers and Consumer Groups.
+  [#1293](https://github.com/Kong/deck/pull/1293)
+  [go-database-reconciler #88](https://github.com/Kong/go-database-reconciler/pull/88)
+- request-validator support `+json` suffix for schemas.
+  [#1303](https://github.com/Kong/deck/pull/1303)
+  [go-apiops #175](https://github.com/Kong/go-apiops/pull/175)
+- Correct typo in inso-compatible flag.
+  [#1295](https://github.com/Kong/deck/pull/1295)
+- Correct bad example on `add-plugins`.
+  [#1294](https://github.com/Kong/deck/pull/1294)
 
 ## [v1.37.0]
 
@@ -1658,6 +1684,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.38.0]: https://github.com/kong/deck/compare/v1.37.0...v1.38.0
 [v1.37.0]: https://github.com/kong/deck/compare/v1.36.2...v1.37.0
 [v1.36.2]: https://github.com/kong/deck/compare/v1.36.1...v1.36.2
 [v1.36.1]: https://github.com/kong/deck/compare/v1.36.0...v1.36.1
