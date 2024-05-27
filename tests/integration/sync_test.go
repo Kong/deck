@@ -4717,7 +4717,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 						},
 					},
 				},
-				Plugins:  consumerGroupScopedPlugins36x,
+				Plugins:  consumerGroupScopedPlugins37x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
