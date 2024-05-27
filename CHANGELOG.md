@@ -105,6 +105,10 @@
   [#1295](https://github.com/Kong/deck/pull/1295)
 - Correct bad example on the `add-plugins` command cli help.
   [#1294](https://github.com/Kong/deck/pull/1294)
+- Removed the unsupported `json-output` flag from `validate`
+  [#1278](https://github.com/Kong/deck/pull/1278)
+- Fixed race condition in `lint` command (bump vacuum library)
+  [#1281](https://github.com/Kong/deck/pull/1281)
   
 ### Added
 
