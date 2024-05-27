@@ -2,7 +2,7 @@
 
 set -e
 
-KONG_IMAGE=${KONG_IMAGE}
+KONG_IMAGE=${KONG_IMAGE:-kong}
 NETWORK_NAME=deck-test
 
 PG_CONTAINER_NAME=pg
