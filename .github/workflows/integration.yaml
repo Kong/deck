@@ -35,6 +35,7 @@ jobs:
         - 'kong:3.3'
         - 'kong:3.4'
         - 'kong:3.5'
+        - 'kong:3.6'
         - 'kong/kong:master-alpine'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
