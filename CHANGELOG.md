@@ -101,13 +101,17 @@
 - Correct tags filtering with Consumers and Consumer Groups.
   [#1293](https://github.com/Kong/deck/pull/1293)
   [go-database-reconciler #88](https://github.com/Kong/go-database-reconciler/pull/88)
-- request-validator support `+json` suffix for schemas.
+- Correct typo in inso-compatible flag of `openapi2kong` command.
+  [#1295](https://github.com/Kong/deck/pull/1295)
+- Correct bad example on the `add-plugins` command cli help.
+  [#1294](https://github.com/Kong/deck/pull/1294)
+  
+### Added
+
+- `openapi2kong` now generates request-validator schemas for content-types with `+json` suffix.
   [#1303](https://github.com/Kong/deck/pull/1303)
   [go-apiops #175](https://github.com/Kong/go-apiops/pull/175)
-- Correct typo in inso-compatible flag.
-  [#1295](https://github.com/Kong/deck/pull/1295)
-- Correct bad example on `add-plugins`.
-  [#1294](https://github.com/Kong/deck/pull/1294)
+
 
 ## [v1.37.0]
 
