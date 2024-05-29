@@ -6,3 +6,15 @@ plugins:
       - https://foo.com/baz
       - https://foo.com/bar
       issuer: https://test.com
+  - config:
+      bootstrap_servers:
+      - host: foo-2.bar.com
+        port: 9096
+      - host: foo-3.bar.com
+        port: 9096
+      - host: foo-1.bar.com
+        port: 9096
+      cluster_name: foo
+      topic: foo
+    enabled: true
+    name: kafka-log
