@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.38.1](#v1381)
 - [v1.38.0](#v1380)
 - [v1.37.0](#v1370)
 - [v1.36.2](#v1362)
@@ -84,6 +85,16 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.38.1]
+
+> Release date: 2024/05/29
+
+### Fixes
+
+- Correct bug on plugins config comparison.
+  [#1311](https://github.com/Kong/deck/pull/1311)
+  [go-database-reconciler #95](https://github.com/Kong/go-database-reconciler/pull/95)
+
 ## [v1.38.0]
 
 > Release date: 2024/05/27
@@ -109,7 +120,7 @@
   [#1278](https://github.com/Kong/deck/pull/1278)
 - Fixed race condition in `lint` command (bump vacuum library)
   [#1281](https://github.com/Kong/deck/pull/1281)
-  
+
 ### Added
 
 - `openapi2kong` now generates request-validator schemas for content-types with `+json` suffix.
@@ -1692,6 +1703,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.38.1]: https://github.com/kong/deck/compare/v1.38.0...v1.38.1
 [v1.38.0]: https://github.com/kong/deck/compare/v1.37.0...v1.38.0
 [v1.37.0]: https://github.com/kong/deck/compare/v1.36.2...v1.37.0
 [v1.36.2]: https://github.com/kong/deck/compare/v1.36.1...v1.36.2
