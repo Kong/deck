@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/daveshanley/vacuum/model"
+	"github.com/daveshanley/vacuum/plugin"
 	"github.com/daveshanley/vacuum/motor"
 	"github.com/daveshanley/vacuum/rulesets"
 	"github.com/kong/go-apiops/filebasics"
@@ -20,6 +22,7 @@ var (
 	cmdLintFailSeverity   string
 	cmdLintOutputFilename string
 	cmdLintOnlyFailures   bool
+	cmdCustomFunctionsPath string
 )
 
 const plainTextFormat = "plain"
@@ -110,11 +113,16 @@ func executeLint(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read input file '%s'; %w", cmdLintInputFilename, err)
 	}
 
+	functionsFlag, _ := cmd.Flags().GetString("functions")
+	var customFunctions map[string]model.RuleFunction
+	customFunctions, _ = LoadCustomFunctions(functionsFlag, false)
+
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
 		Spec:              stateFileBytes,
 		SkipDocumentCheck: !isOpenAPISpec(stateFileBytes),
 		AllowLookup:       true,
+		CustomFunctions:   customFunctions,
 	})
 
 	var (
@@ -184,6 +192,25 @@ func executeLint(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// LoadCustomFunctions will scan for (and load) custom functions defined as vacuum plugins.
+func LoadCustomFunctions(
+	functionsFlag string,
+	silence bool,
+) (map[string]model.RuleFunction, error) {
+	// check custom functions
+	if functionsFlag != "" {
+		pm, err := plugin.LoadFunctions(functionsFlag, silence)
+		if err != nil {
+			fmt.Printf("Error: Unable to open custom functions: %v\n", err)
+			fmt.Println()
+			return nil, err
+		}
+		fmt.Printf("Info: Loaded %d custom function(s) successfully.\n", pm.LoadedFunctionCount())
+		return pm.GetCustomFunctions(), nil
+	}
+	return nil, nil
+}
+
 //
 //
 // Define the CLI data for the lint command
@@ -220,6 +247,8 @@ func newLintCmd() *cobra.Command {
 	lintCmd.Flags().BoolVarP(&cmdLintOnlyFailures,
 		"display-only-failures", "D", false,
 		"only output results equal to or greater than --fail-severity")
+	lintCmd.Flags().StringVarP(&cmdCustomFunctionsPath, "functions", "f", "",
+		"Path to the custom functions directory")
 
 	return lintCmd
 }
