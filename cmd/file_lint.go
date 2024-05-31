@@ -17,12 +17,12 @@ import (
 )
 
 var (
-	cmdLintInputFilename  string
-	cmdLintFormat         string
-	cmdLintFailSeverity   string
-	cmdLintOutputFilename string
-	cmdLintOnlyFailures   bool
-	cmdCustomFunctionsPath string
+	cmdLintInputFilename       string
+	cmdLintFormat              string
+	cmdLintFailSeverity        string
+	cmdLintOutputFilename      string
+	cmdLintOnlyFailures        bool
+	cmdLintCustomFunctionsPath string
 )
 
 const plainTextFormat = "plain"
@@ -113,9 +113,8 @@ func executeLint(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read input file '%s'; %w", cmdLintInputFilename, err)
 	}
 
-	functionsFlag, _ := cmd.Flags().GetString("functions")
 	var customFunctions map[string]model.RuleFunction
-	customFunctions, _ = LoadCustomFunctions(functionsFlag, false)
+	customFunctions, _ = LoadCustomFunctions(cmdLintCustomFunctionsPath, false)
 
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
@@ -201,11 +200,9 @@ func LoadCustomFunctions(
 	if functionsFlag != "" {
 		pm, err := plugin.LoadFunctions(functionsFlag, silence)
 		if err != nil {
-			fmt.Printf("Error: Unable to open custom functions: %v\n", err)
-			fmt.Println()
-			return nil, err
+			return nil, fmt.Errorf("unable to open custom functions: %w", err)
 		}
-		fmt.Printf("Info: Loaded %d custom function(s) successfully.\n", pm.LoadedFunctionCount())
+		logbasics.Debug("Custom function(s) loaded successfully", "custom-function", pm.LoadedFunctionCount())
 		return pm.GetCustomFunctions(), nil
 	}
 	return nil, nil
@@ -247,7 +244,7 @@ func newLintCmd() *cobra.Command {
 	lintCmd.Flags().BoolVarP(&cmdLintOnlyFailures,
 		"display-only-failures", "D", false,
 		"only output results equal to or greater than --fail-severity")
-	lintCmd.Flags().StringVarP(&cmdCustomFunctionsPath, "functions", "f", "",
+	lintCmd.Flags().StringVarP(&cmdLintCustomFunctionsPath, "custom-function-path", "f", "",
 		"Path to the custom functions directory")
 
 	return lintCmd
