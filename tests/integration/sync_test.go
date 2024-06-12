@@ -5255,33 +5255,33 @@ func Test_Sync_FilterChains(t *testing.T) {
 	}
 
 	serviceChain := kong.FilterChain{
-		Name: kong.String("service"),
-		ID: kong.String("d3ed9313-acf2-4982-af3c-83d9b52795c3"),
+		Name:    kong.String("service"),
+		ID:      kong.String("d3ed9313-acf2-4982-af3c-83d9b52795c3"),
 		Enabled: kong.Bool(true),
 		Service: &kong.Service{
 			ID: service.ID,
 		},
 		Filters: []*kong.Filter{
 			{
-				Name: kong.String("response_transformer"),
+				Name:    kong.String("response_transformer"),
 				Enabled: kong.Bool(true),
-				Config: kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:test\"\n    ]\n  }\n}\n"`),
+				Config:  kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:test\"\n    ]\n  }\n}\n"`),
 			},
 		},
 	}
 
 	routeChain := kong.FilterChain{
-		Name: kong.String("route"),
-		ID: kong.String("7b95fe94-df9b-421a-8a7b-c4d8fddbf363"),
+		Name:    kong.String("route"),
+		ID:      kong.String("7b95fe94-df9b-421a-8a7b-c4d8fddbf363"),
 		Enabled: kong.Bool(true),
 		Route: &kong.Route{
 			ID: route.ID,
 		},
 		Filters: []*kong.Filter{
 			{
-				Name: kong.String("response_transformer"),
+				Name:    kong.String("response_transformer"),
 				Enabled: kong.Bool(true),
-				Config: kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-route:test\"\n    ]\n  }\n}\n"`),
+				Config:  kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-route:test\"\n    ]\n  }\n}\n"`),
 			},
 		},
 	}
