@@ -57,13 +57,6 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	if !inKonnectMode(nil) {
-		dumpConfig.IsFilterChainsSupported, err = determineFilterChainSupport(ctx, wsClient)
-		if err != nil {
-			return err
-		}
-	}
-
 	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 
 	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
