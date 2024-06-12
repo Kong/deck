@@ -1,0 +1,12 @@
+_format_version: "3.0"
+services:
+- name: test
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: test
+  port: 8080
+  protocol: http
+  routes:
+  - name: r1
+    id: 37fc74bd-bac6-4bce-bd54-6ec4d341c1c1
+    paths:
+      - /r1
