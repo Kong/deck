@@ -5306,7 +5306,8 @@ func Test_Sync_FilterChains(t *testing.T) {
 
 	require.NoError(t, sync("testdata/sync/033-filter-chains/update.yaml"))
 
-	serviceChain.Filters[0].Config = kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:CHANGED\"\n    ]\n  }\n}\n"`)
+	newJson := kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:CHANGED\"\n    ]\n  }\n}\n"`)
+	serviceChain.Filters[0].Config = newJson
 	routeChain.Filters[0].Enabled = kong.Bool(false)
 
 	testKongState(t, client, false, expectedState, nil)
