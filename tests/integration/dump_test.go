@@ -289,14 +289,36 @@ func Test_Dump_FilterChains(t *testing.T) {
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
 
-	require.NoError(t, sync("testdata/dump/004-filter-chains/kong.yaml"))
+	tests := []struct {
+		version  string
+		input    string
+		expected string
+	}{
+		{
+			version:  "<3.5.0",
+			input:    "testdata/dump/004-filter-chains/kong-3.4.x.yaml",
+			expected: "testdata/dump/004-filter-chains/expected-3.4.x.yaml",
+		},
+		{
+			version:  ">=3.5.0",
+			input:    "testdata/dump/004-filter-chains/kong.yaml",
+			expected: "testdata/dump/004-filter-chains/expected.yaml",
+		},
+	}
 
-	var output string
-	flags := []string{"-o", "-"}
-	output, err := dump(flags...)
-	assert.NoError(t, err)
+	for _, tc := range tests {
+		t.Run(tc.version, func(t *testing.T) {
+			runWhen(t, "kong", tc.version)
+			require.NoError(t, sync(tc.input))
 
-	expected, err := readFile("testdata/dump/004-filter-chains/expected.yaml")
-	assert.NoError(t, err)
-	assert.Equal(t, expected, output)
+			var output string
+			flags := []string{"-o", "-"}
+			output, err := dump(flags...)
+			assert.NoError(t, err)
+
+			expected, err := readFile(tc.expected)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
 }

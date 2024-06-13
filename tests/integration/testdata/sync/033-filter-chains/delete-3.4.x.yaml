@@ -16,7 +16,11 @@ services:
         filters:
           - name: response_transformer
             enabled: false
-            config:
-              add:
-                headers:
-                  - x-route:test
+            config: |
+              {
+                "add": {
+                  "headers": [
+                    "x-route:test"
+                  ]
+                }
+              }

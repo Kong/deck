@@ -5213,8 +5213,6 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	testKongState(t, client, false, expectedState, nil)
 }
 
-// test scope:
-//   - 3.4.0+
 func Test_Sync_FilterChains(t *testing.T) {
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
@@ -5286,39 +5284,97 @@ func Test_Sync_FilterChains(t *testing.T) {
 		},
 	}
 
-	expectedState := utils.KongRawState{
-		Services: []*kong.Service{&service},
-		Routes:   []*kong.Route{&route},
+	tests := []struct {
+		name        string
+		version     string
+		createFile  string
+		createState func(*utils.KongRawState)
+		updateFile  string
+		updateState func(*utils.KongRawState)
+		deleteFile  string
+		deleteState func(*utils.KongRawState)
+	}{
+		// in Kong 3.4.x, filter configurations must always be strings
+		{
+			name:       "kong 3.4.x",
+			version:    "<3.5.0",
+			createFile: "testdata/sync/033-filter-chains/create-3.4.x.yaml",
+			createState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					routeChain.DeepCopy(),
+					serviceChain.DeepCopy(),
+				}
+			},
+			updateFile: "testdata/sync/033-filter-chains/update-3.4.x.yaml",
+			updateState: func(state *utils.KongRawState) {
+				state.FilterChains[0].Filters[0].Enabled = kong.Bool(false)
+				cfg := kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:CHANGED\"\n    ]\n  }\n}\n"`)
+				state.FilterChains[1].Filters[0].Config = cfg
+			},
+			deleteFile: "testdata/sync/033-filter-chains/delete-3.4.x.yaml",
+			deleteState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					state.FilterChains[0],
+				}
+			},
+		},
+		// kong 3.5.0 introduced optional JSON[Schema] support for filter configurations
+		{
+			name:       "kong >=3.5",
+			version:    ">=3.5.0",
+			createFile: "testdata/sync/033-filter-chains/create.yaml",
+			createState: func(state *utils.KongRawState) {
+				rc := routeChain.DeepCopy()
+				rc.Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-route:test"]}}`)
+
+				sc := serviceChain.DeepCopy()
+				sc.Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-service:test"]}}`)
+
+				state.FilterChains = []*kong.FilterChain{
+					rc,
+					sc,
+				}
+			},
+			updateFile: "testdata/sync/033-filter-chains/update.yaml",
+			updateState: func(state *utils.KongRawState) {
+				state.FilterChains[0].Filters[0].Enabled = kong.Bool(false)
+				state.FilterChains[1].Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-service:CHANGED"]}}`)
+			},
+			deleteFile: "testdata/sync/033-filter-chains/delete.yaml",
+			deleteState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					state.FilterChains[0],
+				}
+			},
+		},
 	}
 
-	require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "kong", tc.version)
 
-	testKongState(t, client, false, expectedState, nil)
+			state := utils.KongRawState{
+				Services: []*kong.Service{&service},
+				Routes:   []*kong.Route{&route},
+			}
 
-	require.NoError(t, sync("testdata/sync/033-filter-chains/create.yaml"))
+			require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
 
-	expectedState.FilterChains = []*kong.FilterChain{
-		&routeChain,
-		&serviceChain,
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.createFile))
+			tc.createState(&state)
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.updateFile))
+			tc.updateState(&state)
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.deleteFile))
+			tc.deleteState(&state)
+			testKongState(t, client, false, state, nil)
+		})
 	}
-
-	testKongState(t, client, false, expectedState, nil)
-
-	require.NoError(t, sync("testdata/sync/033-filter-chains/update.yaml"))
-
-	newConfig := kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:CHANGED\"\n    ]\n  }\n}\n"`)
-	serviceChain.Filters[0].Config = newConfig
-	routeChain.Filters[0].Enabled = kong.Bool(false)
-
-	testKongState(t, client, false, expectedState, nil)
-
-	require.NoError(t, sync("testdata/sync/033-filter-chains/delete.yaml"))
-
-	expectedState.FilterChains = []*kong.FilterChain{
-		&routeChain,
-	}
-
-	testKongState(t, client, false, expectedState, nil)
 }
 
 func Test_Sync_FilterChainsUnsupported(t *testing.T) {

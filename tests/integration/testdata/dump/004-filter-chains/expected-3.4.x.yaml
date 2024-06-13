@@ -5,10 +5,14 @@ services:
   filter_chains:
   - enabled: true
     filters:
-    - config:
-        add:
-          headers:
-          - x-service:test
+    - config: |
+        {
+          "add": {
+            "headers": [
+              "x-service:test"
+            ]
+          }
+        }
       enabled: true
       name: response_transformer
     name: service
@@ -22,10 +26,14 @@ services:
   - filter_chains:
     - enabled: true
       filters:
-      - config:
-          add:
-            headers:
-            - x-route:test
+      - config: |
+          {
+            "add": {
+              "headers": [
+                "x-route:test"
+              ]
+            }
+          }
         enabled: true
         name: response_transformer
       name: route
