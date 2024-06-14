@@ -5212,3 +5212,174 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	require.NoError(t, sync("testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 }
+
+func Test_Sync_FilterChains(t *testing.T) {
+	runWhen(t, "kong", ">=3.4.0")
+	setup(t)
+
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	service := kong.Service{
+		ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+		Name:           kong.String("test"),
+		ConnectTimeout: kong.Int(60000),
+		Enabled:        kong.Bool(true),
+		Host:           kong.String("test"),
+		Port:           kong.Int(8080),
+		Protocol:       kong.String("http"),
+		ReadTimeout:    kong.Int(60000),
+		Retries:        kong.Int(5),
+		WriteTimeout:   kong.Int(60000),
+	}
+
+	route := kong.Route{
+		ID:                      kong.String("37fc74bd-bac6-4bce-bd54-6ec4d341c1c1"),
+		Name:                    kong.String("r1"),
+		Paths:                   kong.StringSlice("/r1"),
+		PathHandling:            kong.String("v0"),
+		PreserveHost:            kong.Bool(false),
+		Protocols:               kong.StringSlice("http", "https"),
+		RegexPriority:           new(int),
+		StripPath:               kong.Bool(true),
+		HTTPSRedirectStatusCode: kong.Int(426),
+		RequestBuffering:        kong.Bool(true),
+		ResponseBuffering:       kong.Bool(true),
+		Service: &kong.Service{
+			ID: service.ID,
+		},
+	}
+
+	serviceChain := kong.FilterChain{
+		Name:    kong.String("service"),
+		ID:      kong.String("d3ed9313-acf2-4982-af3c-83d9b52795c3"),
+		Enabled: kong.Bool(true),
+		Service: &kong.Service{
+			ID: service.ID,
+		},
+		Filters: []*kong.Filter{
+			{
+				Name:    kong.String("response_transformer"),
+				Enabled: kong.Bool(true),
+				Config:  kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:test\"\n    ]\n  }\n}\n"`),
+			},
+		},
+	}
+
+	routeChain := kong.FilterChain{
+		Name:    kong.String("route"),
+		ID:      kong.String("7b95fe94-df9b-421a-8a7b-c4d8fddbf363"),
+		Enabled: kong.Bool(true),
+		Route: &kong.Route{
+			ID: route.ID,
+		},
+		Filters: []*kong.Filter{
+			{
+				Name:    kong.String("response_transformer"),
+				Enabled: kong.Bool(true),
+				Config:  kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-route:test\"\n    ]\n  }\n}\n"`),
+			},
+		},
+	}
+
+	tests := []struct {
+		name        string
+		version     string
+		createFile  string
+		createState func(*utils.KongRawState)
+		updateFile  string
+		updateState func(*utils.KongRawState)
+		deleteFile  string
+		deleteState func(*utils.KongRawState)
+	}{
+		// in Kong 3.4.x, filter configurations must always be strings
+		{
+			name:       "kong 3.4.x",
+			version:    "<3.5.0",
+			createFile: "testdata/sync/033-filter-chains/create-3.4.x.yaml",
+			createState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					routeChain.DeepCopy(),
+					serviceChain.DeepCopy(),
+				}
+			},
+			updateFile: "testdata/sync/033-filter-chains/update-3.4.x.yaml",
+			updateState: func(state *utils.KongRawState) {
+				state.FilterChains[0].Filters[0].Enabled = kong.Bool(false)
+				cfg := kong.JSONRawMessage(`"{\n  \"add\": {\n    \"headers\": [\n      \"x-service:CHANGED\"\n    ]\n  }\n}\n"`)
+				state.FilterChains[1].Filters[0].Config = cfg
+			},
+			deleteFile: "testdata/sync/033-filter-chains/delete-3.4.x.yaml",
+			deleteState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					state.FilterChains[0],
+				}
+			},
+		},
+		// kong 3.5.0 introduced optional JSON[Schema] support for filter configurations
+		{
+			name:       "kong >=3.5",
+			version:    ">=3.5.0",
+			createFile: "testdata/sync/033-filter-chains/create.yaml",
+			createState: func(state *utils.KongRawState) {
+				rc := routeChain.DeepCopy()
+				rc.Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-route:test"]}}`)
+
+				sc := serviceChain.DeepCopy()
+				sc.Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-service:test"]}}`)
+
+				state.FilterChains = []*kong.FilterChain{
+					rc,
+					sc,
+				}
+			},
+			updateFile: "testdata/sync/033-filter-chains/update.yaml",
+			updateState: func(state *utils.KongRawState) {
+				state.FilterChains[0].Filters[0].Enabled = kong.Bool(false)
+				state.FilterChains[1].Filters[0].Config = kong.JSONRawMessage(`{"add":{"headers":["x-service:CHANGED"]}}`)
+			},
+			deleteFile: "testdata/sync/033-filter-chains/delete.yaml",
+			deleteState: func(state *utils.KongRawState) {
+				state.FilterChains = []*kong.FilterChain{
+					state.FilterChains[0],
+				}
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "kong", tc.version)
+
+			state := utils.KongRawState{
+				Services: []*kong.Service{&service},
+				Routes:   []*kong.Route{&route},
+			}
+
+			require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
+
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.createFile))
+			tc.createState(&state)
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.updateFile))
+			tc.updateState(&state)
+			testKongState(t, client, false, state, nil)
+
+			require.NoError(t, sync(tc.deleteFile))
+			tc.deleteState(&state)
+			testKongState(t, client, false, state, nil)
+		})
+	}
+}
+
+func Test_Sync_FilterChainsUnsupported(t *testing.T) {
+	runWhen(t, "kong", "<3.4.0")
+	setup(t)
+	require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
+	require.Error(t, sync("testdata/sync/033-filter-chains/create.yaml"))
+}

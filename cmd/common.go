@@ -528,6 +528,7 @@ func containsProxyConfiguration(content reconcilerUtils.KongRawState) bool {
 	return len(content.Services) != 0 ||
 		len(content.Routes) != 0 ||
 		len(content.Plugins) != 0 ||
+		len(content.FilterChains) != 0 ||
 		len(content.Upstreams) != 0 ||
 		len(content.Certificates) != 0 ||
 		len(content.CACertificates) != 0 ||

@@ -1,0 +1,53 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  filter_chains:
+  - enabled: true
+    filters:
+    - config: |
+        {
+          "add": {
+            "headers": [
+              "x-service:test"
+            ]
+          }
+        }
+      enabled: true
+      name: response_transformer
+    name: service
+  host: test
+  name: test
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - filter_chains:
+    - enabled: true
+      filters:
+      - config: |
+          {
+            "add": {
+              "headers": [
+                "x-route:test"
+              ]
+            }
+          }
+        enabled: true
+        name: response_transformer
+      name: route
+    https_redirect_status_code: 426
+    name: r1
+    path_handling: v0
+    paths:
+    - /r1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

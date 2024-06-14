@@ -36,7 +36,7 @@ jobs:
         - 'kong:3.4'
         - 'kong:3.5'
         - 'kong:3.6'
-        - 'kong/kong:master-alpine'
+        - 'kong/kong:master'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}

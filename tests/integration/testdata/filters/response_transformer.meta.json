@@ -1,0 +1,138 @@
+{
+  "config_schema": {
+    "$id": "response_transformer",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Response Transformer",
+    "type": "object",
+    "anyOf": [
+      {"required": ["add"]},
+      {"required": ["remove"]},
+      {"required": ["rename"]},
+      {"required": ["replace"]},
+      {"required": ["append"]}
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "add": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "description": "add headers",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json": {
+            "description": "add JSON properties",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json_types": {
+            "description": "List of JSON type names. Specify the types of the JSON values returned when adding JSON properties.",
+            "$ref": "#/definitions/JsonTypesArray"
+          }
+        },
+        "anyOf": [
+          {"required": ["headers"]},
+          {"required": ["json"]}
+        ]
+      },
+      "remove": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "description": "remove headers",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json": {
+            "description": "remove JSON attributes",
+            "$ref": "#/definitions/stringArray"
+          }
+        },
+        "anyOf": [
+          {"required": ["headers"]},
+          {"required": ["json"]}
+        ]
+      },
+      "rename": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "description": "rename headers",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json": {
+            "description": "rename JSON attributes",
+            "$ref": "#/definitions/stringArray"
+          }
+        },
+        "anyOf": [
+          {"required": ["headers"]},
+          {"required": ["json"]}
+        ]
+      },
+      "replace": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "description": "replace headers",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json": {
+            "description": "replace JSON properties",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json_types": {
+            "description": "List of JSON type names. Specify the types of the JSON values returned when replacing JSON properties.",
+            "$ref": "#/definitions/JsonTypesArray"
+          }
+        },
+        "anyOf": [
+          {"required": ["headers"]},
+          {"required": ["json"]}
+        ]
+      },
+      "append": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "headers": {
+            "description": "append headers",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json": {
+            "description": "append JSON properties",
+            "$ref": "#/definitions/stringArray"
+          },
+          "json_types": {
+            "description": "List of JSON type names. Specify the types of the JSON values returned when appending JSON properties.",
+            "$ref": "#/definitions/JsonTypesArray"
+          }
+        },
+        "anyOf": [
+          {"required": ["headers"]},
+          {"required": ["json"]}
+        ]
+      }
+    },
+    "definitions": {
+      "stringArray": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "JsonTypesArray": {
+        "type": "array",
+        "items": {
+          "enum": [
+            "boolean",
+            "number",
+            "string"
+          ]
+        }
+      }
+    }
+  }
+}
