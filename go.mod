@@ -8,7 +8,7 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.9.15
-	github.com/fatih/color v1.15.0
+	github.com/fatih/color v1.17.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.33
 	github.com/kong/go-database-reconciler v1.12.2
