@@ -21,8 +21,8 @@ require (
 	golang.org/x/sync v0.7.0
 	k8s.io/api v0.29.3
 	k8s.io/apiextensions-apiserver v0.29.2
-	k8s.io/apimachinery v0.29.3
-	k8s.io/code-generator v0.29.4
+	k8s.io/apimachinery v0.30.2
+	k8s.io/code-generator v0.30.2
 	sigs.k8s.io/gateway-api v1.0.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -50,6 +50,7 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
 )
 
 require (
@@ -66,7 +67,6 @@ require (
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204 // indirect
 	github.com/dop251/goja_nodejs v0.0.0-20240418154818-2aae10d4cbcf // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
-	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/getkin/kin-openapi v0.108.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
@@ -144,9 +144,8 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/gengo v0.0.0-20230829151522-9cce18d56c01 // indirect
-	k8s.io/klog/v2 v2.110.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20240103051144-eec4567ac022 // indirect
+	k8s.io/klog/v2 v2.120.1 // indirect
+	k8s.io/kube-openapi v0.0.0-20240228011516-70dd3763d340 // indirect
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
 	sigs.k8s.io/controller-runtime v0.17.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
