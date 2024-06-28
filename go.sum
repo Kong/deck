@@ -507,10 +507,10 @@ gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-k8s.io/api v0.29.3 h1:2ORfZ7+bGC3YJqGpV0KSDDEVf8hdGQ6A03/50vj8pmw=
-k8s.io/api v0.29.3/go.mod h1:y2yg2NTyHUUkIoTC+phinTnEa3KFM6RZ3szxt014a80=
-k8s.io/apiextensions-apiserver v0.29.2 h1:UK3xB5lOWSnhaCk0RFZ0LUacPZz9RY4wi/yt2Iu+btg=
-k8s.io/apiextensions-apiserver v0.29.2/go.mod h1:aLfYjpA5p3OwtqNXQFkhJ56TB+spV8Gc4wfMhUA3/b8=
+k8s.io/api v0.30.2 h1:+ZhRj+28QT4UOH+BKznu4CBgPWgkXO7XAvMcMl0qKvI=
+k8s.io/api v0.30.2/go.mod h1:ULg5g9JvOev2dG0u2hig4Z7tQ2hHIuS+m8MNZ+X6EmI=
+k8s.io/apiextensions-apiserver v0.30.2 h1:l7Eue2t6QiLHErfn2vwK4KgF4NeDgjQkCXtEbOocKIE=
+k8s.io/apiextensions-apiserver v0.30.2/go.mod h1:lsJFLYyK40iguuinsb3nt+Sj6CmodSI4ACDLep1rgjw=
 k8s.io/apimachinery v0.30.2 h1:fEMcnBj6qkzzPGSVsAZtQThU62SmQ4ZymlXRC5yFSCg=
 k8s.io/apimachinery v0.30.2/go.mod h1:iexa2somDaxdnj7bha06bhb43Zpa6eWH8N8dbqVjTUc=
 k8s.io/code-generator v0.30.2 h1:ZY1+aGkqZVwKIyGsOzquaeZ5rSfE6wZHur8z3jQAaiw=
