@@ -66,6 +66,7 @@ jobs:
           flavor: |
             latest=${{ startsWith(github.ref, 'refs/tags/v1') }}
       - name: Build and push
+        timeout-minutes: 25
         id: docker_build
         uses: docker/build-push-action@v6
         with:
