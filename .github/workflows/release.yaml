@@ -8,7 +8,7 @@ on:
 jobs:
   goreleaser:
     timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-kong
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,8 +34,8 @@ jobs:
           path: dist/*
 
   build-push-images:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    runs-on: ubuntu-latest-kong
     steps:
       - name: Add standard tags
         run: |
@@ -66,7 +66,7 @@ jobs:
           flavor: |
             latest=${{ startsWith(github.ref, 'refs/tags/v1') }}
       - name: Build and push
-        timeout-minutes: 25
+        timeout-minutes: 120
         id: docker_build
         uses: docker/build-push-action@v6
         with:
