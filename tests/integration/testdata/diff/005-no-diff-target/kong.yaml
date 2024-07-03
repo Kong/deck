@@ -1,0 +1,6 @@
+_format_version: "3.0"
+upstreams:
+- name: upstream1
+  algorithm: round-robin
+  targets:
+  - target: "::1"
