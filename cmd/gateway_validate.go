@@ -27,9 +27,6 @@ var (
 
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
-	if validateOnline && mode == modeKonnect {
-		return fmt.Errorf("online validation not yet supported in konnect mode")
-	}
 	_ = sendAnalytics("validate", "", mode)
 	// read target file
 	// this does json schema validation as well
@@ -45,7 +42,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
-		kongClient, err = getKongClient(ctx, targetContent)
+		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
 		}
@@ -246,7 +243,9 @@ func validateWithKong(
 	return validator.Validate(parsedFormatVersion)
 }
 
-func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Client, error) {
+func getKongClient(
+	ctx context.Context, targetContent *file.Content, mode mode,
+) (*kong.Client, error) {
 	workspaceName := validateWorkspace
 	if validateWorkspace != "" {
 		// check if workspace exists
@@ -260,10 +259,22 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 		}
 	}
 
-	wsConfig := rootConfig.ForWorkspace(workspaceName)
-	kongClient, err := reconcilerUtils.GetKongClient(wsConfig)
-	if err != nil {
-		return nil, err
+	var (
+		kongClient *kong.Client
+		err        error
+	)
+	if mode == modeKonnect {
+		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return nil, err
+		}
+		dumpConfig.KonnectControlPlane = konnectControlPlane
+	} else {
+		wsConfig := rootConfig.ForWorkspace(workspaceName)
+		kongClient, err = reconcilerUtils.GetKongClient(wsConfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return kongClient, nil
 }
