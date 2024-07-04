@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.39.2](#v1392)
 - [v1.39.1](#v1391)
 - [v1.39.0](#v1390)
 - [v1.38.1](#v1381)
@@ -86,6 +87,19 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.39.2]
+
+> Release date: 2024/07/04
+
+### Fixes
+
+- Correct IPv6 targets comparison to avoid misleading diffs and failing syncs.
+  [#1333](https://github.com/Kong/deck/pull/1333)
+  [go-database-reconciler #109](https://github.com/Kong/go-database-reconciler/pull/109)
+- Make lookups for consumer-group's consumers more performant.
+  [#1333](https://github.com/Kong/deck/pull/1333)
+  [go-database-reconciler #102](https://github.com/Kong/go-database-reconciler/pull/102)
 
 ## [v1.39.1]
 
@@ -1723,6 +1737,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.39.2]: https://github.com/kong/deck/compare/v1.39.1...v1.39.2
 [v1.39.1]: https://github.com/kong/deck/compare/v1.39.0...v1.39.1
 [v1.39.0]: https://github.com/kong/deck/compare/v1.38.1...v1.39.0
 [v1.38.1]: https://github.com/kong/deck/compare/v1.38.0...v1.38.1
