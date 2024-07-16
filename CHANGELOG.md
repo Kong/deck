@@ -94,9 +94,7 @@
 
 ### Chores
 
-- Fixed unclean builds due to flaky tests coming from latest container images
-  [#1337](https://github.com/Kong/deck/pull/1337)
-- Removed inconsistency between golang version of released decK versions and the one used in the project.
+- Fixes [#1228](https://github.com/Kong/deck/issues/1282) by updating the golang version from 1.21 to 1.22, thus removing the inconsistency between decK releases' version and the one used in the project. 
   [#1336](https://github.com/Kong/deck/pull/1336)
 
 ## [v1.39.2]
