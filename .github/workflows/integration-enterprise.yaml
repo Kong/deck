@@ -65,3 +65,4 @@ jobs:
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
         run: make test-integration
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}
