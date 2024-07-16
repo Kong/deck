@@ -47,7 +47,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.20'
+          go-version-file: go.mod
       - name: Setup Kong
         run: make setup-kong
       - name: Run integration tests
