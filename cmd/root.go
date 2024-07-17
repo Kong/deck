@@ -373,7 +373,9 @@ func initConfig() {
 	// cookie-jar support
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
 
-	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
+	if viper.IsSet("no-color") {
+		color.NoColor = viper.GetBool("no-color")
+	}
 
 	if err := initKonnectConfig(); err != nil {
 		fmt.Println(err)
