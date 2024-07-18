@@ -167,6 +167,18 @@ If the 'values' object instead is an array, then any arrays returned by the sele
 will get the 'values' appended to them.
 `,
 		RunE: executePatch,
+		PersistentPreRunE: func(_ *cobra.Command, args []string) error {
+			if len(args) > 0 && (len(cmdPatchSelectors) > 0 || len(cmdPatchValues) > 0) {
+				return fmt.Errorf("cannot use patch file argument along with '--selector' and '--value'")
+			}
+
+			if len(args) == 0 && len(cmdPatchSelectors) == 0 && len(cmdPatchValues) == 0 {
+				return fmt.Errorf("must specify at least one of these: " +
+					"a patch file argument or a '--selector' and '--value' combination")
+			}
+
+			return nil
+		},
 		Example: "# update the read-timeout on all services\n" +
 			"cat kong.yml | deck file patch --selector=\"$..services[*]\" --value=\"read_timeout:10000\"",
 	}
