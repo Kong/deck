@@ -1,0 +1,127 @@
+{{- range .Routes }}
+  {{/* Assign a variable to the current Route before iterating over Plugins */}}
+  {{- $route := .}}
+resource "konnect_gateway_route" "{{ cleanField .Name }}" {
+  {{- if .Name }}
+  name = "{{ .Name }}"
+  {{- end }}
+  {{- if .CreatedAt }}
+  created_at = {{ .CreatedAt }}
+  {{- end }}
+  {{- if .Expression }}
+  expression = "{{ .Expression }}"
+  {{- end }}
+  {{- if .Hosts }}
+  hosts = [{{ range $index, $host := .Hosts }}{{ if $index }}, {{ end }}"{{ $host }}"{{ end }}]
+  {{- end }}
+  {{- if .Headers }}
+  headers = {
+    {{- range $key, $value := .Headers }}
+    "{{ $key }}" = jsonencode({{ printf "%s" (jsonmarshal $value) }})
+    {{- end }}
+  }
+  {{- end }}
+  {{- if .ID }}
+  id = "{{ .ID }}"
+  {{- end }}
+  {{- if .Methods }}
+  methods = [{{ range $index, $method := .Methods }}{{ if $index }}, {{ end }}"{{ $method }}"{{ end }}]
+  {{- end }}
+  {{- if .Paths }}
+  paths = [{{ range $index, $path := .Paths }}{{ if $index }}, {{ end }}"{{ $path }}"{{ end }}]
+  {{- end }}
+  {{- if .PathHandling }}
+  path_handling = "{{ .PathHandling }}"
+  {{- end }}
+  {{- if .PreserveHost }}
+  preserve_host = {{ .PreserveHost }}
+  {{- end }}
+  {{- if .Priority }}
+  priority = {{ .Priority }}
+  {{- end }}
+  {{- if .Protocols }}
+  protocols = [{{ range $index, $protocol := .Protocols }}{{ if $index }}, {{ end }}"{{ $protocol }}"{{ end }}]
+  {{- end }}
+  {{- if .RegexPriority }}
+  regex_priority = {{ .RegexPriority }}
+  {{- end }}
+  {{- if $.Name }}
+  {{- end }}
+  {{- if .StripPath }}
+  strip_path = {{ .StripPath }}
+  {{- end }}
+  {{- if .UpdatedAt }}
+  updated_at = {{ .UpdatedAt }}
+  {{- end }}
+  {{- if .SNIs }}
+  snis = [{{ range $index, $sni := .SNIs }}{{ if $index }}, {{ end }}"{{ $sni }}"{{ end }}]
+  {{- end }}
+  {{- if .Sources }}
+  sources = [
+    {{- range $index, $source := .Sources }}
+    {{- if $index }},{{ end }}
+    {
+      ip   = "{{ $source.IP }}"
+      {{- if $source.Port }}
+      port = {{ $source.Port }}
+      {{- end }}
+    }
+    {{- end }}
+  ]
+  {{- end }}
+  {{- if .Destinations }}
+  destinations = [
+    {{- range $index, $destination := .Destinations }}
+    {{- if $index }},{{ end }}
+    {
+      ip   = "{{ $destination.IP }}"
+      port = {{ $destination.Port }}
+    }
+    {{- end }}
+  ]
+  {{- end }}
+  {{- if .Tags }}
+  tags = [{{ range $index, $tag := .Tags }}{{ if $index }}, {{ end }}"{{ $tag }}"{{ end }}]
+  {{- end }}
+  {{- if .HTTPSRedirectStatusCode }}
+  https_redirect_status_code = {{ .HTTPSRedirectStatusCode }}
+  {{- end }}
+  {{- if .RequestBuffering }}
+  request_buffering = {{ .RequestBuffering }}
+  {{- end }}
+  {{- if .ResponseBuffering }}
+  response_buffering = {{ .ResponseBuffering }}
+  {{- end }}
+  service = {
+    id = konnect_gateway_service.{{ cleanField $.Name }}.id
+  }  
+  control_plane_id = var.control_plane_id
+}
+{{- range .Plugins }}
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Name }}_{{ cleanField $route.Name }}_{{ cleanField .Name }}" {
+  {{- if .InstanceName }}
+  instance_name = "{{ .InstanceName }}"
+  {{- end }}
+  {{- if .RunOn }}
+  run_on = "{{ .RunOn }}"
+  {{- end }}
+  {{- if .Enabled }}
+  enabled = {{ .Enabled }}
+  {{- end }}
+  {{- if .Config }}
+  config = {{ printf "%s" (jsonmarshal .Config) }}
+  {{- end }}
+  {{- if .Protocols }}
+  protocols = [{{ range $index, $value := .Protocols }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  service = {
+    id = konnect_gateway_route.{{ cleanField $route.Name }}.id
+  }
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+
+{{- end }}

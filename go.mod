@@ -31,15 +31,26 @@ require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/ericlagergren/decimal v0.0.0-20221120152707-495c53812d05 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.2 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
+	github.com/hashicorp/go-plugin v1.6.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.5 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
+	github.com/hashicorp/terraform-plugin-framework v1.7.0 // indirect
+	github.com/hashicorp/terraform-plugin-framework-validators v0.10.0 // indirect
+	github.com/hashicorp/terraform-plugin-go v0.22.1 // indirect
+	github.com/hashicorp/terraform-plugin-log v0.9.0 // indirect
+	github.com/hashicorp/terraform-registry-address v0.2.3 // indirect
+	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
+	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
+	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
+	github.com/oklog/run v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/pb33f/doctor v0.0.6 // indirect
 	github.com/pb33f/libopenapi v0.16.1 // indirect
@@ -47,8 +58,12 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
+	google.golang.org/grpc v1.62.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
 )
@@ -96,6 +111,7 @@ require (
 	github.com/kong/go-slugify v1.0.0 // indirect
 	github.com/kong/kubernetes-ingress-controller/v3 v3.1.2
 	github.com/kong/semver/v4 v4.0.1 // indirect
+	github.com/kong/terraform-provider-konnect v0.6.0
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/lufia/plan9stats v0.0.0-20230326075908-cb1d2100619a // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -103,6 +119,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mitchellh/hashstructure v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

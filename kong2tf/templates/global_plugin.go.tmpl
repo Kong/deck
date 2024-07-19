@@ -1,0 +1,21 @@
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField .Name }}" {
+  {{- if .InstanceName }}
+  instance_name = "{{ .InstanceName }}"
+  {{- end }}
+  {{- if .RunOn }}
+  run_on = "{{ .RunOn }}"
+  {{- end }}
+  {{- if .Enabled }}
+  enabled = {{ .Enabled }}
+  {{- end }}
+  {{- if .Config }}
+  config = {{ printf "%s" (jsonmarshal .Config) }}
+  {{- end }}
+  {{- if .Protocols }}
+  protocols = [{{ range $index, $value := .Protocols }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  control_plane_id = var.control_plane_id
+}

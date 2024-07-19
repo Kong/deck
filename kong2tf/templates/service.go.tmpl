@@ -1,0 +1,69 @@
+resource "konnect_gateway_service" "{{ cleanField .Name }}" {
+  {{- if .Name }}
+  name             = "{{ .Name }}"
+  {{- end }}
+  {{- if .Protocol }}
+  protocol         = "{{ .Protocol }}"
+  {{- end }}
+  {{- if .Host }}
+  host             = "{{ .Host }}"
+  {{- end }}
+  {{- if .Port }}
+  port             = {{ .Port }}
+  {{- end }}
+  {{- if .Path }}
+  path             = "{{ .Path }}"
+  {{- end }}
+  {{- if .ConnectTimeout }}
+  connect_timeout  = {{ .ConnectTimeout }}
+  {{- end }}
+  {{- if .ReadTimeout }}
+  read_timeout     = {{ .ReadTimeout }}
+  {{- end }}
+  {{- if .WriteTimeout }}
+  write_timeout    = {{ .WriteTimeout }}
+  {{- end }}
+  {{- if .Retries }}
+  retries          = {{ .Retries }}
+  {{- end }}
+  {{- if .TLSVerify }}
+  tls_verify       = {{ .TLSVerify }}
+  {{- end }}
+  {{- if .TLSVerifyDepth }}
+  tls_verify_depth = {{ .TLSVerifyDepth }}
+  {{- end }}
+  {{- if .CACertificates }}
+  ca_certificates  = [{{ range $index, $value := .CACertificates }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  control_plane_id = var.control_plane_id
+}
+
+{{- range .Plugins }}
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Name }}_{{ cleanField .Name }}" {
+  {{- if .InstanceName }}
+  instance_name = "{{ .InstanceName }}"
+  {{- end }}
+  {{- if .RunOn }}
+  run_on = "{{ .RunOn }}"
+  {{- end }}
+  {{- if .Enabled }}
+  enabled = {{ .Enabled }}
+  {{- end }}
+  {{- if .Config }}
+  config = {{ printf "%s" (jsonmarshal .Config) }}
+  {{- end }}
+  {{- if .Protocols }}
+  protocols = [{{ range $index, $value := .Protocols }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  service = {
+    id = konnect_gateway_service.{{ cleanField $.Name }}.id
+  }
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
