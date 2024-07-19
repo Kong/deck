@@ -1,0 +1,120 @@
+resource "konnect_gateway_consumer" "{{ cleanField .Username }}" {
+  {{- if .Username }}
+  username         = "{{ .Username }}"
+  {{- end }}
+  {{- if .CustomID }}
+  custom_id        = "{{ .CustomID }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  control_plane_id = var.control_plane_id
+}
+
+{{- range .KeyAuths }}
+resource "konnect_gateway_key_auth" "{{ cleanField $.Username }}_{{ cleanField .Key }}" {
+  {{- if .Key }}
+  key              = "{{ .Key }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+
+{{- range .HMACAuths }}
+resource "konnect_gateway_hmac_auth" "{{ cleanField $.Username }}_{{ cleanField .Username }}" {
+  {{- if .Username }}
+  username         = "{{ .Username }}"
+  {{- end }}
+  {{- if .Secret }}
+  secret           = "{{ .Secret }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+
+{{- range .JWTAuths }}
+resource "konnect_gateway_jwt" "{{ cleanField $.Username }}_{{ cleanField .Key }}" {
+  {{- if .Key }}
+  key              = "{{ .Key }}"
+  {{- end }}
+  {{- if .Algorithm }}
+  algorithm        = "{{ .Algorithm }}"
+  {{- end }}
+  {{- if .Secret }}
+  secret           = "{{ .Secret }}"
+  {{- end }}
+  {{- if .RSAPublicKey }}
+  rsa_public_key   = <<EOF
+  {{ .RSAPublicKey }}
+  EOF
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+
+{{- range .BasicAuths }}
+resource "konnect_gateway_basic_auth" "{{ cleanField $.Username }}_{{ cleanField .Username }}" {
+  {{- if .Username }}
+  username         = "{{ .Username }}"
+  {{- end }}
+  {{- if .Password }}
+  password         = "{{ .Password }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+
+{{- range .ACLGroups }}
+resource "konnect_gateway_acl" "{{ cleanField $.Username }}_{{ cleanField .Group }}" {
+  {{- if .Group }}
+  group            = "{{ .Group }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
+{{- range .Plugins }}
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Username }}_{{ cleanField .Name }}" {
+  {{- if .InstanceName }}
+  instance_name = "{{ .InstanceName }}"
+  {{- end }}
+  {{- if .RunOn }}
+  run_on = "{{ .RunOn }}"
+  {{- end }}
+  {{- if .Enabled }}
+  enabled = {{ .Enabled }}
+  {{- end }}
+  {{- if .Config }}
+  config = {{ printf "%s" (jsonmarshal .Config) }}
+  {{- end }}
+  {{- if .Protocols }}
+  protocols = [{{ range $index, $value := .Protocols }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  consumer = {
+    id = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  }
+  control_plane_id = var.control_plane_id
+}
+{{- end }}

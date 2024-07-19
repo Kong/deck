@@ -1,0 +1,29 @@
+resource "konnect_gateway_consumer_group" "{{ cleanField .Name }}" {
+  {{- if .Name }}
+  name             = "{{ .Name }}"
+  {{- end }}
+  {{- if .Tags }}
+  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- end }}
+  control_plane_id = var.control_plane_id
+}
+
+{{- range .Consumers }}
+resource "konnect_gateway_consumer_group_member" "{{ cleanField .Username }}" {
+  consumer_id       = konnect_gateway_consumer.{{ cleanField .Username }}.id
+  consumer_group_id = konnect_gateway_consumer_group.{{ cleanField $.Name }}.id
+  control_plane_id  = var.control_plane_id
+}
+{{- end }}
+
+{{- range .Plugins }}
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Name }}_{{ cleanField .Name }}" {
+  {{- if .Config }}
+  config = {{ printf "%s" (jsonmarshal .Config) }}
+  {{- end }}
+  consumer_group = {
+    id = konnect_gateway_consumer_group.{{ cleanField $.Name }}.id
+  }
+  control_plane_id = var.control_plane_id
+}
+{{- end }}
