@@ -17,7 +17,7 @@ resource "konnect_gateway_route" "example-route" {
 }
 resource "konnect_gateway_plugin_cors" "example-service_example-route_cors" {
   config = {"credentials":true,"exposed_headers":["X-My-Header"],"headers":["Authorization"],"max_age":3600,"methods":["GET","POST"],"origins":["example.com"]}
-  service = {
+  route = {
     id = konnect_gateway_route.example-route.id
   }
   control_plane_id = var.control_plane_id

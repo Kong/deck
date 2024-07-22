@@ -117,7 +117,7 @@ resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  service = {
+  route = {
     id = konnect_gateway_route.{{ cleanField $route.Name }}.id
   }
   control_plane_id = var.control_plane_id

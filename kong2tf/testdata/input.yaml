@@ -367,12 +367,6 @@ services:
                 - apikey
               key_in_body: false
               run_on_preflight: true
-          - name: mtls-auth
-            config:
-              ca_certificates:
-                - cce8c384-721f-4f58-85dd-50834e3e733a
-              skip_consumer_lookup: false
-              revocation_check_mode: SKIP
           - name: acl
             config:
               allow: 
