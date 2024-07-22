@@ -1,0 +1,22 @@
+services:
+  - name: example-service
+    url: http://example-api.com
+    plugins:
+      - name: rate-limiting-advanced
+        config:
+          limit:
+          - 5
+          window_size:
+          - 30
+          identifier: consumer
+          sync_rate: -1
+          namespace: example_namespace
+          strategy: local
+          hide_client_headers: false
+        ordering:
+          before:
+            access: 
+              - another-plugin
+          after:
+            access: 
+              - yet-another-plugin

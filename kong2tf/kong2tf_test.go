@@ -12,11 +12,6 @@ import (
 
 var baseLocation = "testdata/"
 
-func fixJSONstream(input string) string {
-	// this is a stream of json files, must update to an actual json array
-	return "[" + strings.Replace(input, "}{", "},{", -1) + "]"
-}
-
 func compareFileContent(t *testing.T, expectedFilename string, actualContent []byte) {
 	expected, err := os.ReadFile(baseLocation + expectedFilename)
 	if err != nil {
@@ -52,6 +47,102 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			name:           "route",
 			inputFilename:  "route-input.yaml",
 			outputFilename: "route-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "ca-certificate",
+			inputFilename:  "ca-certificate-input.yaml",
+			outputFilename: "ca-certificate-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "certificate",
+			inputFilename:  "certificate-sni-input.yaml",
+			outputFilename: "certificate-sni-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-acl",
+			inputFilename:  "consumer-acl-input.yaml",
+			outputFilename: "consumer-acl-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-basic-auth",
+			inputFilename:  "consumer-basic-auth-input.yaml",
+			outputFilename: "consumer-basic-auth-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-hmac-auth",
+			inputFilename:  "consumer-hmac-auth-input.yaml",
+			outputFilename: "consumer-hmac-auth-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-jwt",
+			inputFilename:  "consumer-jwt-input.yaml",
+			outputFilename: "consumer-jwt-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-key-auth",
+			inputFilename:  "consumer-key-auth-input.yaml",
+			outputFilename: "consumer-key-auth-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-no-auth",
+			inputFilename:  "consumer-no-auth-input.yaml",
+			outputFilename: "consumer-no-auth-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-group",
+			inputFilename:  "consumer-group-input.yaml",
+			outputFilename: "consumer-group-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-group-plugin",
+			inputFilename:  "consumer-group-plugin-input.yaml",
+			outputFilename: "consumer-group-plugin-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "consumer-plugin",
+			inputFilename:  "consumer-plugin-input.yaml",
+			outputFilename: "consumer-plugin-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "global-plugin",
+			inputFilename:  "global-plugin-input.yaml",
+			outputFilename: "global-plugin-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "route-plugin",
+			inputFilename:  "route-plugin-input.yaml",
+			outputFilename: "route-plugin-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "service-plugin",
+			inputFilename:  "service-plugin-input.yaml",
+			outputFilename: "service-plugin-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "upstream",
+			inputFilename:  "upstream-target-input.yaml",
+			outputFilename: "upstream-target-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "vault",
+			inputFilename:  "vault-input.yaml",
+			outputFilename: "vault-output-expected.tf",
 			wantErr:        false,
 		},
 	}

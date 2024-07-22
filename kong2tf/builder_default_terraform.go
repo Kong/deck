@@ -15,9 +15,9 @@ import (
 
 // cleanField removes all characters from the input string that are not letters, digits, underscores, and dashes.
 func cleanField(input string) string {
-    // Regular expression to match disallowed characters and replace them
-    re := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
-    return re.ReplaceAllString(input, "")
+	// Regular expression to match disallowed characters and replace them
+	re := regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+	return re.ReplaceAllString(input, "")
 }
 
 // dashToUnderscore replaces all dashes in the input string with underscores.
@@ -27,8 +27,12 @@ func dashToUnderscore(input string) string {
 	return re.ReplaceAllString(input, "_")
 }
 
-
-var funcs = template.FuncMap{"hash": hashstructure.Hash, "jsonmarshal": json.Marshal, "cleanField": cleanField, "dashToUnderscore": dashToUnderscore}
+var funcs = template.FuncMap{
+	"hash":             hashstructure.Hash,
+	"jsonmarshal":      json.Marshal,
+	"cleanField":       cleanField,
+	"dashToUnderscore": dashToUnderscore,
+}
 
 type DefaultTerraformBuider struct {
 	content string
@@ -42,7 +46,6 @@ func newDefaultTerraformBuilder() *DefaultTerraformBuider {
 var terraformServiceTemplate string
 
 func (b *DefaultTerraformBuider) buildServices(content *file.Content) {
-
 	tmpl, err := template.New(terraformServiceTemplate).Funcs(funcs).Parse(terraformServiceTemplate)
 	if err != nil {
 		log.Fatal(err, "Failed to parse template")
@@ -50,12 +53,11 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content) {
 	}
 
 	for index, service := range content.Services {
-		
+
 		var buffer bytes.Buffer
 		err = tmpl.Execute(&buffer, service)
 		if err != nil {
 			log.Fatal(err, "Failed to execute template for service", "serviceIndex", index+1)
-			continue // Changed from log.Fatalf to continue after logging the error
 		}
 
 		b.content += buffer.String()
@@ -66,7 +68,6 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content) {
 var terraformRouteTemplate string
 
 func (b *DefaultTerraformBuider) buildRoutes(content *file.Content) {
-
 	logbasics.Info("Starting to build routes")
 	logbasics.Info("Template content before parsing", "template", terraformRouteTemplate)
 
@@ -84,14 +85,12 @@ func (b *DefaultTerraformBuider) buildRoutes(content *file.Content) {
 		}
 		b.content += buffer.String()
 	}
-
 }
 
 //go:embed templates/global_plugin.go.tmpl
 var terraformGlobalPluginTemplate string
 
 func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content) {
-
 	logbasics.Info("Starting to build global plugins")
 	logbasics.Info("Template content before parsing", "template", terraformGlobalPluginTemplate)
 
@@ -115,7 +114,6 @@ func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content) {
 var terraformConsumerTemplate string
 
 func (b *DefaultTerraformBuider) buildConsumers(content *file.Content) {
-	
 	logbasics.Info("Starting to build consumers")
 	logbasics.Info("Template content before parsing", "template", terraformConsumerTemplate)
 
@@ -139,7 +137,6 @@ func (b *DefaultTerraformBuider) buildConsumers(content *file.Content) {
 var terraformConsumerGroupTemplate string
 
 func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content) {
-
 	logbasics.Info("Starting to build consumer groups")
 	logbasics.Info("Template content before parsing", "template", terraformConsumerGroupTemplate)
 
@@ -163,7 +160,6 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content) {
 var terraformUpstreamTemplate string
 
 func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content) {
-
 	tmpl, err := template.New(terraformUpstreamTemplate).Funcs(funcs).Parse(terraformUpstreamTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -184,7 +180,6 @@ func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content) {
 var terraformCACertificateTemplate string
 
 func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content) {
-
 	tmpl, err := template.New(terraformCACertificateTemplate).Funcs(funcs).Parse(terraformCACertificateTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -205,7 +200,6 @@ func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content) {
 var terraformCertificateTemplate string
 
 func (b *DefaultTerraformBuider) buildCertificates(content *file.Content) {
-
 	tmpl, err := template.New(terraformCertificateTemplate).Funcs(funcs).Parse(terraformCertificateTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -226,7 +220,6 @@ func (b *DefaultTerraformBuider) buildCertificates(content *file.Content) {
 var terraformVaultTemplate string
 
 func (b *DefaultTerraformBuider) buildVaults(content *file.Content) {
-	
 	tmpl, err := template.New(terraformVaultTemplate).Funcs(funcs).Parse(terraformVaultTemplate)
 	if err != nil {
 		log.Fatal(err)

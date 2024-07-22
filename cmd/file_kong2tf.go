@@ -14,7 +14,6 @@ import (
 var (
 	cmdKong2TfInputFilename  string
 	cmdKong2TfOutputFilename string
-	cmdKong2TfControlPlaneId string
 )
 
 // Executes the CLI command "kong2Tf"

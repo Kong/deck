@@ -1,0 +1,7 @@
+consumers:
+  - username: example-user
+    basicauth_credentials:
+      - username: my_basic_user
+        password: my_basic_password
+        tags:
+          - internal

@@ -1,0 +1,8 @@
+vaults:
+- config:
+    prefix: MY_SECRET_
+  description: ENV vault for secrets
+  name: env
+  prefix: my-env-vault
+  tags:
+    - env-vault

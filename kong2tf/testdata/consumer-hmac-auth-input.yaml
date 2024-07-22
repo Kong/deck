@@ -1,0 +1,5 @@
+consumers:
+  - username: example-user
+    hmacauth_credentials:
+      - username: example-user
+        secret: just-a-secret

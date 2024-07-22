@@ -1,0 +1,16 @@
+consumer_groups:
+  - name: example-consumer-group
+    plugins:
+      - name: rate-limiting-advanced
+        config:
+          limit:
+          - 5
+          window_size:
+          - 30
+          identifier: consumer
+          sync_rate: -1
+          namespace: example_namespace
+          strategy: local
+          hide_client_headers: false
+          window_type: sliding
+          retry_after_jitter_max: 0

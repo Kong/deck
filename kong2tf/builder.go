@@ -38,7 +38,7 @@ func (d *Director) builTerraformResources(content *file.Content) string {
 	d.builder.buildRoutes(content)
 	d.builder.buildConsumers(content)
 	d.builder.buildConsumerGroups(content)
-    d.builder.buildCACertificates(content)
+	d.builder.buildCACertificates(content)
 	d.builder.buildCertificates(content)
 	d.builder.buildVaults(content)
 	return d.builder.getContent()
