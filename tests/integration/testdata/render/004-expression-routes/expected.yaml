@@ -1,0 +1,19 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  host: localhost
+  name: foo
+  port: 8001
+  protocol: http
+  read_timeout: 60000
+  routes:
+  - expression: (net.protocol == "http") && (http.method == "GET") && (http.path ==
+      "/foo")
+    name: foo
+    preserve_host: false
+    priority: 0
+    protocols:
+    - http
+    - https
+    strip_path: true
+  write_timeout: 60000

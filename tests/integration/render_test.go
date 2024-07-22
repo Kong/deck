@@ -33,6 +33,20 @@ func Test_RenderPlain(t *testing.T) {
 				"DECK_FOO_FLOAT":       "123",
 			},
 		},
+		{
+			name:           "render with traditional route",
+			stateFile:      "testdata/render/003-traditional-routes/input.yaml",
+			additionalArgs: []string{},
+			expectedFile:   "testdata/render/003-traditional-routes/expected.yaml",
+			envVars:        map[string]string{},
+		},
+		{
+			name:           "render with expression route",
+			stateFile:      "testdata/render/004-expression-routes/input.yaml",
+			additionalArgs: []string{},
+			expectedFile:   "testdata/render/004-expression-routes/expected.yaml",
+			envVars:        map[string]string{},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

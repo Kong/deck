@@ -1,0 +1,19 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  host: localhost
+  name: foo
+  port: 8001
+  protocol: http
+  read_timeout: 60000
+  routes:
+  - name: foo
+    paths:
+    - /foo
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    strip_path: true
+  write_timeout: 60000
