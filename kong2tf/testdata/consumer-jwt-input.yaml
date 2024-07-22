@@ -1,0 +1,8 @@
+consumers:
+  - username: example-user
+    jwt_secrets:
+      - key: my_jwt_secret
+        algorithm: HS256
+        secret: my_secret_key
+        tags:
+          - internal

@@ -1,0 +1,4 @@
+consumer_groups:
+  - name: example-consumer-group
+    consumers:
+      - username: example-user

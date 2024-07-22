@@ -1,0 +1,21 @@
+services:
+  - name: example-service
+    url: http://example-api.com
+    routes:
+      - name: example-route
+        paths:
+          - ~/v1/example/?$
+        plugins:
+        - name: cors
+          config:
+            origins:
+              - example.com
+            methods:
+              - GET
+              - POST
+            headers:
+              - Authorization
+            exposed_headers:
+              - X-My-Header
+            max_age: 3600
+            credentials: true

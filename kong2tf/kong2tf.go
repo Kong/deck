@@ -3,7 +3,7 @@ package kong2tf
 import "github.com/kong/go-database-reconciler/pkg/file"
 
 type TfConfig struct {
-	ControlPlaneId string
+	ControlPlaneID string
 }
 
 func Convert(inputContent *file.Content) (string, error) {

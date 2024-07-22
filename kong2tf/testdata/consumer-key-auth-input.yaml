@@ -1,0 +1,6 @@
+consumers:
+  - username: example-user
+    keyauth_credentials:
+      - key: my_api_key
+        tags:
+          - internal

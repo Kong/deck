@@ -1,0 +1,14 @@
+consumers:
+  - username: example-user
+    plugins:
+      - name: rate-limiting-advanced
+        config:
+          limit:
+          - 5
+          window_size:
+          - 30
+          identifier: consumer
+          sync_rate: -1
+          namespace: example_namespace
+          strategy: local
+          hide_client_headers: false
