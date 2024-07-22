@@ -1,0 +1,14 @@
+services:
+- host: localhost
+  name: foo
+  port: 8001
+  protocol: http
+  routes:
+  routes:
+   - name: foo
+     paths:
+     - /foo
+     preserve_host: false
+     protocols:
+     - http
+     - https
