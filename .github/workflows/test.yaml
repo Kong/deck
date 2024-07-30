@@ -24,7 +24,7 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v6.0.1
+        uses: golangci/golangci-lint-action@v6.1.0
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
