@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.39.4](#v1394)
 - [v1.39.3](#v1393)
 - [v1.39.2](#v1392)
 - [v1.39.1](#v1391)
@@ -88,6 +89,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.39.4]
+> Release date: 2024/08/01
+
+### Fixes
+
+- Correct --no-color flag behaviour in non-tty environments
+The changes retain the default behaviour of showing colors in tty and no colors in non-tty if no flag is passed. However, on passing the --no-color=false, non-tty environments can also get colored output.[#1339](https://github.com/Kong/deck/pull/1339)
+- Add validation on `deck file patch` to avoid confusing behaviour. The command intends to patch input files either via selector-value flags or command arguments. The change ensures that at least one of these is present, but not both at the same time.[#1342](https://github.com/Kong/deck/pull/1342) 
+- Fix rendering for expression routes, keeping kong gateway version in consideration. [go-database-reconciler #118](https://github.com/Kong/go-database-reconciler/pull/118) [#1351](https://github.com/Kong/deck/pull/1351)
 
 ## [v1.39.3]
 > Release date: 2024/07/16
@@ -1746,6 +1757,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.39.4]: https://github.com/Kong/deck/compare/v1.39.3...v1.39.4
 [v1.39.3]: https://github.com/Kong/deck/compare/v1.39.2...v1.39.3
 [v1.39.2]: https://github.com/kong/deck/compare/v1.39.1...v1.39.2
 [v1.39.1]: https://github.com/kong/deck/compare/v1.39.0...v1.39.1
