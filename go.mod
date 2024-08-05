@@ -43,7 +43,6 @@ require (
 	github.com/pb33f/doctor v0.0.6 // indirect
 	github.com/pb33f/libopenapi v0.16.1 // indirect
 	github.com/pb33f/libopenapi-validator v0.0.49 // indirect
-	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
@@ -67,7 +66,7 @@ require (
 	github.com/dop251/goja_nodejs v0.0.0-20240418154818-2aae10d4cbcf // indirect
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/getkin/kin-openapi v0.127.0 // indirect
+	github.com/getkin/kin-openapi v0.108.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
