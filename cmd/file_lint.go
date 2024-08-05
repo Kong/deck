@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/daveshanley/vacuum/model"
+	"github.com/daveshanley/vacuum/plugin"
 	"github.com/daveshanley/vacuum/motor"
 	"github.com/daveshanley/vacuum/rulesets"
 	"github.com/kong/go-apiops/filebasics"
@@ -15,11 +17,12 @@ import (
 )
 
 var (
-	cmdLintInputFilename  string
-	cmdLintFormat         string
-	cmdLintFailSeverity   string
-	cmdLintOutputFilename string
-	cmdLintOnlyFailures   bool
+	cmdLintInputFilename       string
+	cmdLintFormat              string
+	cmdLintFailSeverity        string
+	cmdLintOutputFilename      string
+	cmdLintOnlyFailures        bool
+	cmdLintCustomFunctionsPath string
 )
 
 const plainTextFormat = "plain"
@@ -110,11 +113,15 @@ func executeLint(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read input file '%s'; %w", cmdLintInputFilename, err)
 	}
 
+	var customFunctions map[string]model.RuleFunction
+	customFunctions, _ = LoadCustomFunctions(cmdLintCustomFunctionsPath, false)
+
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
 		Spec:              stateFileBytes,
 		SkipDocumentCheck: !isOpenAPISpec(stateFileBytes),
 		AllowLookup:       true,
+		CustomFunctions:   customFunctions,
 	})
 
 	var (
@@ -184,6 +191,23 @@ func executeLint(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// LoadCustomFunctions will scan for (and load) custom functions defined as vacuum plugins.
+func LoadCustomFunctions(
+	functionsFlag string,
+	silence bool,
+) (map[string]model.RuleFunction, error) {
+	// check custom functions
+	if functionsFlag != "" {
+		pm, err := plugin.LoadFunctions(functionsFlag, silence)
+		if err != nil {
+			return nil, fmt.Errorf("unable to open custom functions: %w", err)
+		}
+		logbasics.Debug("Custom function(s) loaded successfully", "custom-function", pm.LoadedFunctionCount())
+		return pm.GetCustomFunctions(), nil
+	}
+	return nil, nil
+}
+
 //
 //
 // Define the CLI data for the lint command
@@ -220,6 +244,8 @@ func newLintCmd() *cobra.Command {
 	lintCmd.Flags().BoolVarP(&cmdLintOnlyFailures,
 		"display-only-failures", "D", false,
 		"only output results equal to or greater than --fail-severity")
+	lintCmd.Flags().StringVarP(&cmdLintCustomFunctionsPath, "custom-function-path", "f", "",
+		"Path to the custom functions directory")
 
 	return lintCmd
 }
