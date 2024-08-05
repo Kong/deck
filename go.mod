@@ -10,11 +10,11 @@ require (
 	github.com/daveshanley/vacuum v0.9.15
 	github.com/fatih/color v1.17.0
 	github.com/google/go-cmp v0.6.0
-	github.com/kong/go-apiops v0.1.33
+	github.com/kong/go-apiops v0.1.35
 	github.com/kong/go-database-reconciler v1.14.2
 	github.com/kong/go-kong v0.55.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
@@ -43,7 +43,7 @@ require (
 	github.com/pb33f/doctor v0.0.6 // indirect
 	github.com/pb33f/libopenapi v0.16.1 // indirect
 	github.com/pb33f/libopenapi-validator v0.0.49 // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
@@ -65,16 +65,16 @@ require (
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/dop251/goja v0.0.0-20240220182346-e401ed450204 // indirect
 	github.com/dop251/goja_nodejs v0.0.0-20240418154818-2aae10d4cbcf // indirect
-	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
+	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/getkin/kin-openapi v0.108.0 // indirect
+	github.com/getkin/kin-openapi v0.127.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/go-openapi/jsonpointer v0.20.2 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
-	github.com/go-openapi/swag v0.22.7 // indirect
+	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
@@ -89,7 +89,7 @@ require (
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/invopop/yaml v0.1.0 // indirect
+	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kong/go-slugify v1.0.0 // indirect
