@@ -38,6 +38,12 @@ type DefaultTerraformBuider struct {
 	content string
 }
 
+type TemplateObjectWrapper struct {
+	Content                          interface{}
+	GenerateImportsForControlPlaneID *string
+	IgnoreCredentialChanges          bool
+}
+
 func newDefaultTerraformBuilder() *DefaultTerraformBuider {
 	return &DefaultTerraformBuider{}
 }
@@ -45,7 +51,7 @@ func newDefaultTerraformBuilder() *DefaultTerraformBuider {
 //go:embed templates/service.go.tmpl
 var terraformServiceTemplate string
 
-func (b *DefaultTerraformBuider) buildServices(content *file.Content) {
+func (b *DefaultTerraformBuider) buildServices(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	tmpl, err := template.New(terraformServiceTemplate).Funcs(funcs).Parse(terraformServiceTemplate)
 	if err != nil {
 		log.Fatal(err, "Failed to parse template")
@@ -67,7 +73,7 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content) {
 //go:embed templates/route.go.tmpl
 var terraformRouteTemplate string
 
-func (b *DefaultTerraformBuider) buildRoutes(content *file.Content) {
+func (b *DefaultTerraformBuider) buildRoutes(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	logbasics.Info("Starting to build routes")
 	logbasics.Info("Template content before parsing", "template", terraformRouteTemplate)
 
@@ -90,7 +96,7 @@ func (b *DefaultTerraformBuider) buildRoutes(content *file.Content) {
 //go:embed templates/global_plugin.go.tmpl
 var terraformGlobalPluginTemplate string
 
-func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content) {
+func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	logbasics.Info("Starting to build global plugins")
 	logbasics.Info("Template content before parsing", "template", terraformGlobalPluginTemplate)
 
@@ -113,7 +119,7 @@ func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content) {
 //go:embed templates/consumer.go.tmpl
 var terraformConsumerTemplate string
 
-func (b *DefaultTerraformBuider) buildConsumers(content *file.Content) {
+func (b *DefaultTerraformBuider) buildConsumers(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	logbasics.Info("Starting to build consumers")
 	logbasics.Info("Template content before parsing", "template", terraformConsumerTemplate)
 
@@ -123,9 +129,14 @@ func (b *DefaultTerraformBuider) buildConsumers(content *file.Content) {
 	}
 
 	for _, consumer := range content.Consumers {
+		wrapper := TemplateObjectWrapper{
+			Content:                          consumer,
+			GenerateImportsForControlPlaneID: generateImportsForControlPlaneID,
+			IgnoreCredentialChanges:          ignoreCredentialChanges,
+		}
 		var buffer bytes.Buffer
 
-		err = tmpl.Execute(&buffer, consumer)
+		err = tmpl.Execute(&buffer, wrapper)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -136,7 +147,7 @@ func (b *DefaultTerraformBuider) buildConsumers(content *file.Content) {
 //go:embed templates/consumer_group.go.tmpl
 var terraformConsumerGroupTemplate string
 
-func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content) {
+func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	logbasics.Info("Starting to build consumer groups")
 	logbasics.Info("Template content before parsing", "template", terraformConsumerGroupTemplate)
 
@@ -159,7 +170,7 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content) {
 //go:embed templates/upstream.go.tmpl
 var terraformUpstreamTemplate string
 
-func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content) {
+func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	tmpl, err := template.New(terraformUpstreamTemplate).Funcs(funcs).Parse(terraformUpstreamTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -179,7 +190,7 @@ func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content) {
 //go:embed templates/ca_certificate.go.tmpl
 var terraformCACertificateTemplate string
 
-func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content) {
+func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	tmpl, err := template.New(terraformCACertificateTemplate).Funcs(funcs).Parse(terraformCACertificateTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -199,7 +210,7 @@ func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content) {
 //go:embed templates/certificate.go.tmpl
 var terraformCertificateTemplate string
 
-func (b *DefaultTerraformBuider) buildCertificates(content *file.Content) {
+func (b *DefaultTerraformBuider) buildCertificates(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	tmpl, err := template.New(terraformCertificateTemplate).Funcs(funcs).Parse(terraformCertificateTemplate)
 	if err != nil {
 		log.Fatal(err)
@@ -219,7 +230,7 @@ func (b *DefaultTerraformBuider) buildCertificates(content *file.Content) {
 //go:embed templates/vault.go.tmpl
 var terraformVaultTemplate string
 
-func (b *DefaultTerraformBuider) buildVaults(content *file.Content) {
+func (b *DefaultTerraformBuider) buildVaults(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
 	tmpl, err := template.New(terraformVaultTemplate).Funcs(funcs).Parse(terraformVaultTemplate)
 	if err != nil {
 		log.Fatal(err)

@@ -21,9 +21,6 @@ resource "konnect_gateway_route" "{{ cleanField .Name }}" {
     {{- end }}
   }
   {{- end }}
-  {{- if .ID }}
-  id = "{{ .ID }}"
-  {{- end }}
   {{- if .Methods }}
   methods = [{{ range $index, $method := .Methods }}{{ if $index }}, {{ end }}"{{ $method }}"{{ end }}]
   {{- end }}

@@ -1,33 +1,50 @@
-resource "konnect_gateway_consumer" "{{ cleanField .Username }}" {
-  {{- if .Username }}
-  username         = "{{ .Username }}"
+resource "konnect_gateway_consumer" "{{ cleanField .Content.Username }}" {
+  {{- if .Content.Username }}
+  username         = "{{ .Content.Username }}"
   {{- end }}
-  {{- if .CustomID }}
-  custom_id        = "{{ .CustomID }}"
+  {{- if .Content.CustomID }}
+  custom_id        = "{{ .Content.CustomID }}"
   {{- end }}
-  {{- if .Tags }}
-  tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
+  {{- if .Content.Tags }}
+  tags             = [{{ range $index, $value := .Content.Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
   control_plane_id = var.control_plane_id
 }
 
-{{- range .KeyAuths }}
-resource "konnect_gateway_key_auth" "{{ cleanField $.Username }}_{{ cleanField .Key }}" {
+{{- if .GenerateImportsForControlPlaneID }}
+import {
+  to = konnect_gateway_consumer.{{ cleanField .Content.Username }}
+  id = "{ \"id\": \"{{ .Content.ID }}\", \"control_plane_id\": \"{{ .GenerateImportsForControlPlaneID }}\" }"
+}
+
+{{- end }}
+
+{{- range .Content.KeyAuths }}
+resource "konnect_gateway_key_auth" "{{ cleanField $.Content.Username }}_{{ cleanField .Key }}" {
   {{- if .Key }}
   key              = "{{ .Key }}"
   {{- end }}
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   control_plane_id = var.control_plane_id
 }
+
+{{- if $.GenerateImportsForControlPlaneID }}
+import {
+  to = konnect_gateway_key_auth.{{ cleanField $.Content.Username }}_{{ cleanField .Key }}
+  id = "{ \"id\": \"{{ .ID }}\", \"consumer_id\": \"{{ $.Content.ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}
 
-{{- range .HMACAuths }}
-resource "konnect_gateway_hmac_auth" "{{ cleanField $.Username }}_{{ cleanField .Username }}" {
-  {{- if .Username }}
-  username         = "{{ .Username }}"
+{{- end }}
+
+{{- range .Content.HMACAuths }}
+resource "konnect_gateway_hmac_auth" "{{ cleanField $.Content.Username }}_{{ cleanField .Username }}" {
+  {{- if .Content.Username }}
+  username         = "{{ .Content.Username }}"
   {{- end }}
   {{- if .Secret }}
   secret           = "{{ .Secret }}"
@@ -35,13 +52,22 @@ resource "konnect_gateway_hmac_auth" "{{ cleanField $.Username }}_{{ cleanField 
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   control_plane_id = var.control_plane_id
 }
+
+{{- if $.GenerateImportsForControlPlaneID }}
+import {
+  to = konnect_gateway_hmac_auth.{{ cleanField $.Content.Username }}_{{ cleanField .Username }}
+  id = "{ \"id\": \"{{ .ID }}\", \"consumer_id\": \"{{ $.Content.ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}
 
-{{- range .JWTAuths }}
-resource "konnect_gateway_jwt" "{{ cleanField $.Username }}_{{ cleanField .Key }}" {
+{{- end }}
+
+{{- range .Content.JWTAuths }}
+resource "konnect_gateway_jwt" "{{ cleanField $.Content.Username }}_{{ cleanField .Key }}" {
   {{- if .Key }}
   key              = "{{ .Key }}"
   {{- end }}
@@ -59,13 +85,28 @@ resource "konnect_gateway_jwt" "{{ cleanField $.Username }}_{{ cleanField .Key }
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   control_plane_id = var.control_plane_id
+
+  {{- if $.IgnoreCredentialChanges }}
+  lifecycle {
+    ignore_changes = [ 
+      secret,
+      key,
+    ]
+  }
+  {{- end }}
 }
+
+import {
+  to = konnect_gateway_jwt.{{ cleanField $.Content.Username }}_{{ cleanField .Key }}
+  id = "{ \"id\": \"{{ .ID }}\", \"consumer_id\": \"{{ $.Content.ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}
 
-{{- range .BasicAuths }}
-resource "konnect_gateway_basic_auth" "{{ cleanField $.Username }}_{{ cleanField .Username }}" {
+{{- range .Content.BasicAuths }}
+resource "konnect_gateway_basic_auth" "{{ cleanField $.Content.Username }}_{{ cleanField .Username }}" {
   {{- if .Username }}
   username         = "{{ .Username }}"
   {{- end }}
@@ -75,25 +116,46 @@ resource "konnect_gateway_basic_auth" "{{ cleanField $.Username }}_{{ cleanField
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   control_plane_id = var.control_plane_id
+
+  {{- if $.IgnoreCredentialChanges }}
+  lifecycle {
+    ignore_changes = [ 
+      password,
+    ]
+  }
+  {{- end }}
 }
+
+import {
+  to = konnect_gateway_basic_auth.{{ cleanField $.Content.Username }}_{{ cleanField .Username }}
+  id = "{ \"id\": \"{{ .ID }}\", \"consumer_id\": \"{{ $.Content.ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}
 
-{{- range .ACLGroups }}
-resource "konnect_gateway_acl" "{{ cleanField $.Username }}_{{ cleanField .Group }}" {
+{{- range .Content.ACLGroups }}
+resource "konnect_gateway_acl" "{{ cleanField $.Content.Username }}_{{ cleanField .Group }}" {
   {{- if .Group }}
   group            = "{{ .Group }}"
   {{- end }}
   {{- if .Tags }}
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
-  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+  consumer_id      = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   control_plane_id = var.control_plane_id
 }
+
+import {
+  to = konnect_gateway_acl.{{ cleanField $.Content.Username }}_{{ cleanField .Group }}
+  id = "{ \"id\": \"{{ .ID }}\", \"consumer_id\": \"{{ $.Content.ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}
-{{- range .Plugins }}
-resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Username }}_{{ cleanField .Name }}" {
+
+{{- range .Content.Plugins }}
+resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.Content.Username }}_{{ cleanField .Name }}" {
   {{- if .InstanceName }}
   instance_name = "{{ .InstanceName }}"
   {{- end }}
@@ -113,8 +175,14 @@ resource "konnect_gateway_plugin_{{ dashToUnderscore .Name }}" "{{ cleanField $.
   tags             = [{{ range $index, $value := .Tags }}{{ if $index }}, {{ end }}"{{ $value }}"{{ end }}]
   {{- end }}
   consumer = {
-    id = konnect_gateway_consumer.{{ cleanField $.Username }}.id
+    id = konnect_gateway_consumer.{{ cleanField $.Content.Username }}.id
   }
   control_plane_id = var.control_plane_id
 }
+
+import {
+  to = konnect_gateway_plugin_{{ dashToUnderscore .Name }}.{{ cleanField $.Content.Username }}_{{ cleanField .Name }}
+  id = "{ \"id\": \"{{ .ID }}\", \"control_plane_id\": \"{{ $.GenerateImportsForControlPlaneID }}\" }"
+}
+
 {{- end }}

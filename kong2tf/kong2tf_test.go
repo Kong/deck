@@ -153,7 +153,7 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 				assert.Fail(t, err.Error())
 			}
 
-			output, err := Convert(inputContent)
+			output, err := Convert(inputContent, nil, false)
 
 			if err == nil {
 				compareFileContent(t, tt.outputFilename, []byte(output))

@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	cmdKong2TfInputFilename  string
-	cmdKong2TfOutputFilename string
+	cmdKong2TfInputFilename                    string
+	cmdKong2TfOutputFilename                   string
+	cmdKong2TfGenerateImportsForControlPlaneID string
+	cmdKong2TfIgnoreCredentialChanges          bool
 )
 
 // Executes the CLI command "kong2Tf"
@@ -37,7 +39,12 @@ func executeKong2Tf(cmd *cobra.Command, _ []string) error {
 	logbasics.Info("Successfully read input file '%s'", cmdKong2TfInputFilename)
 
 	logbasics.Info("Converting Kong configuration to Terraform")
-	result, err = kong2tf.Convert(inputContent)
+
+	var generateImportsForControlPlaneID *string
+	if cmdKong2TfGenerateImportsForControlPlaneID != "" {
+		generateImportsForControlPlaneID = &cmdKong2TfGenerateImportsForControlPlaneID
+	}
+	result, err = kong2tf.Convert(inputContent, generateImportsForControlPlaneID, cmdKong2TfIgnoreCredentialChanges)
 	if err != nil {
 		log.Printf("Error converting Kong configuration to Terraform; %v", err)
 		return fmt.Errorf("failed converting Kong configuration to Terraform; %w", err)
@@ -78,6 +85,10 @@ into Terraform resources.`,
 		"decK file to process. Use - to read from stdin.")
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
+	kong2TfCmd.Flags().StringVarP(&cmdKong2TfGenerateImportsForControlPlaneID, "generate-imports-for-control-plane-id", "g", "",
+		"decK file to process. Use - to read from stdin.")
+	kong2TfCmd.Flags().BoolVar(&cmdKong2TfIgnoreCredentialChanges, "ignore-credential-changes", false,
+		"Enable flag to add a 'lifecycle' block to each consumer credential, that ignores any changes from local to remote state.")
 
 	return kong2TfCmd
 }

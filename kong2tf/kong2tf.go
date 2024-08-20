@@ -6,8 +6,8 @@ type TfConfig struct {
 	ControlPlaneID string
 }
 
-func Convert(inputContent *file.Content) (string, error) {
+func Convert(inputContent *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) (string, error) {
 	builder := getTerraformBuilder()
 	director := newDirector(builder)
-	return director.builTerraformResources(inputContent), nil
+	return director.builTerraformResources(inputContent, generateImportsForControlPlaneID, ignoreCredentialChanges), nil
 }
