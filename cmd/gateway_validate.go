@@ -51,6 +51,25 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		}
 
 		// if this is an online validation, we need to look up upstream consumers if required.
+		lookUpSelectorTagsConsumerGroups, err := determineLookUpSelectorTagsConsumerGroups(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags for consumer grous: %w", err)
+		}
+
+		if lookUpSelectorTagsConsumerGroups != nil {
+			consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, lookUpSelectorTagsConsumerGroups)
+			if err != nil {
+				return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
+			}
+			for _, c := range consumerGroupsGlobal {
+				targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
+				if err != nil {
+					return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
+				}
+			}
+		}
+
+		// if this is an online validation, we need to look up upstream consumers if required.
 		lookUpSelectorTagsConsumers, err := determineLookUpSelectorTagsConsumers(*targetContent)
 		if err != nil {
 			return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
@@ -84,6 +103,25 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 				targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
 				if err != nil {
 					return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
+				}
+			}
+		}
+
+		// if this is an online validation, we need to look up upstream services if required.
+		lookUpSelectorTagsServices, err := determineLookUpSelectorTagsServices(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags for services: %w", err)
+		}
+
+		if lookUpSelectorTagsServices != nil {
+			servicesGlobal, err := dump.GetAllServices(ctx, kongClient, lookUpSelectorTagsServices)
+			if err != nil {
+				return fmt.Errorf("error retrieving global services via lookup selector tags: %w", err)
+			}
+			for _, r := range servicesGlobal {
+				targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
+				if err != nil {
+					return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
 				}
 			}
 		}
