@@ -5098,6 +5098,50 @@ func Test_Sync_LookupRoutesTags(t *testing.T) {
 	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
 }
 
+// Test_Sync_LookupServicesConsumerGroupsTags tests that existing behavior when referencing
+// services and consumer groups from plugins is preserved:
+// - if a referenced service and consumer group are not present in the state file, the sync fails
+// - if a referenced service and consumer group are present in the state file, the sync succeeds
+//
+// This test also tests that the new behavior is implemented correctly:
+//   - if a referenced service or consumer group is not present in the state file, but is present
+//     in Kong when using the new lookup selector tags, the sync succeeds
+//   - if a referenced service or consumer group is not present in the state file and neither in
+//     Kong when using the new lookup selector tags, the sync fails
+func Test_Sync_LookupRoutesTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	// test that reference to non-existing service fails.
+	pluginsNoLookupStateFile := "testdata/sync/034-lookup-tags-services-consumerGroups/plugins_no_lookup_service.yaml"
+	err := sync(pluginsNoLookupStateFile)
+	require.Error(t, err)
+	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to non-existing consumer group fails.
+	pluginsNoLookupStateFile := "testdata/sync/034-lookup-tags-services-consumerGroups/plugins_no_lookup_consumerGroup.yaml"
+	err := sync(pluginsNoLookupStateFile)
+	require.Error(t, err)
+	require.EqualError(t, err, "building state: consumer-group foo2 for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to existing local service and consumer group succeeds.
+	pluginsAndServiceConsumersGroupsStateFile := "testdata/sync/034-lookup-tags-services-consumerGroups/plugins_and_services_consumerGroups.yaml"
+	require.NoError(t, sync(pluginsAndServiceConsumersGroupsStateFile))
+	reset(t)
+
+	// test that reference to existing global service and consumer group succeeds via lookup tags.
+	globalServicesConsumerGroupsStateFile := "testdata/sync/034-lookup-tags-services-consumerGroups/global_services_consumerGroups.yaml"
+	require.NoError(t, sync(globalServicesConsumerGroupsStateFile))
+	// sync plugins with lookup reference to global routes.
+	pluginsLookupStateFile := "testdata/sync/034-lookup-tags-services-consumerGroups/plugins_lookup.yaml"
+	require.NoError(t, sync(pluginsLookupStateFile))
+	reset(t)
+
+	// test that reference to non-existing global services or consumer groups fails via lookup tags.
+	require.Error(t, sync(pluginsLookupStateFile))
+	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
+}
+
 // test scope:
 //   - 3.5.0+
 //   - konnect

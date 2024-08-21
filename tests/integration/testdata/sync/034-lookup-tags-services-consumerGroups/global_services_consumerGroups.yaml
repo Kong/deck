@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - global-services-consumerGroups
+services:
+- name: foo
+  host: test.com
+consumer_groups:
+- name: foo2
