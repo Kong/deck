@@ -1,0 +1,20 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - zendesk
+services:
+- connect_timeout: 1000
+  name: test
+  retries: 0
+  routes:
+  - name: test-route
+    paths:
+    - /test
+    preserve_host: true
+    protocols:
+    - http
+    - https
+    strip_path: false
+  url: http://localhost:5678
+consumer_groups:
+- name: support-professional
