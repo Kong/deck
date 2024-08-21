@@ -241,9 +241,7 @@ func reset(t *testing.T, opts ...string) {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	if err := deckCmd.Execute(); err != nil {
-		t.Fatalf(err.Error(), "failed to reset Kong's state")
-	}
+	require.NoError(t, deckCmd.Execute(), "failed to reset Kong's state")
 }
 
 func readFile(filepath string) (string, error) {
