@@ -17,14 +17,10 @@ jobs:
     timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup go
-        uses: actions/setup-go@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - name: Setup golangci-lint
-        uses: golangci/golangci-lint-action@v6.1.0
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
@@ -33,5 +29,24 @@ jobs:
           name: codecov-deck
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
+
+  lint:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: golangci/golangci-lint-action@v6.1.0
+
+  build:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
       - name: Build
         run: make build
