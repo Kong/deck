@@ -367,9 +367,8 @@ func Test_Convert(t *testing.T) {
 
 func wipeServiceID(content *file.Content) *file.Content {
 	result := content.DeepCopy()
-	result.ServicePackages = nil
+	result.ServicePackages = make([]file.FServicePackage, 0, len(content.ServicePackages))
 	for _, sp := range content.ServicePackages {
-		sp := sp
 		sp = zeroOutID(sp)
 		result.ServicePackages = append(result.ServicePackages, sp)
 	}
