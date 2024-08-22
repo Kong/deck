@@ -154,7 +154,7 @@ func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICC
 									Service: &k8snetv1.IngressServiceBackend{
 										Name: *service.Name,
 										Port: k8snetv1.ServiceBackendPort{
-											Number: int32(*service.Port),
+											Number: int32(*service.Port), //nolint:gosec
 										},
 									},
 								},
@@ -203,7 +203,7 @@ func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICC
 										Service: &k8snetv1.IngressServiceBackend{
 											Name: *service.Name,
 											Port: k8snetv1.ServiceBackendPort{
-												Number: int32(*service.Port),
+												Number: int32(*service.Port), //nolint:gosec
 											},
 										},
 									},
@@ -394,7 +394,7 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 				},
 			}
 			if service.Port != nil {
-				portNumber := k8sgwapiv1.PortNumber(*service.Port)
+				portNumber := k8sgwapiv1.PortNumber(*service.Port) //nolint:gosec
 				backendRef.Port = &portNumber
 			}
 

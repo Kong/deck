@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
+
+source ./.ci/lib.sh
 
 MY_SECRET_CERT='''-----BEGIN CERTIFICATE-----
 MIIEczCCAlugAwIBAgIJAMw8/GAiHIFBMA0GCSqGSIb3DQEBCwUAMDYxCzAJBgNV
@@ -57,73 +59,33 @@ KlBs7O9y+fc4AIIn6JD+9tymB1TWEn1B+3Vv6jmtzbztuCQTbJ6rTT3CFcE6TdyJ
 8rYuG3/p2VkcG29TWbQARtj5ewv9p5QNfaecUzN+tps89YzawWQBanwI
 -----END RSA PRIVATE KEY-----'''
 
-KONG_IMAGE=${KONG_IMAGE:-kong/kong-gateway}
-NETWORK_NAME=deck-test
+readonly KONG_IMAGE=${KONG_IMAGE:-kong/kong-gateway}
+readonly GATEWAY_CONTAINER_NAME=kong
 
-PG_CONTAINER_NAME=pg
-DATABASE_USER=kong
-DATABASE_NAME=kong
-KONG_DB_PASSWORD=kong
-KONG_PG_HOST=pg
-
-GATEWAY_CONTAINER_NAME=kong
-
-waitContainer() {
-  for try in {1..100}; do
-    echo "waiting for $1"
-    docker exec --user root $2 $3 && break;
-    sleep 0.2
-  done
-}
-
-# create docker network
-docker network create $NETWORK_NAME
-
-# Start a PostgreSQL container
-docker run --rm -d --name $PG_CONTAINER_NAME \
-  --network=$NETWORK_NAME \
-  -p 5432:5432 \
-  -e "POSTGRES_USER=$DATABASE_USER" \
-  -e "POSTGRES_DB=$DATABASE_NAME" \
-  -e "POSTGRES_PASSWORD=$KONG_DB_PASSWORD" \
-  postgres:9.6
-
-waitContainer "PostGres" $PG_CONTAINER_NAME pg_isready
-
-# Prepare the Kong database
-docker run --rm --network=$NETWORK_NAME \
-  -e "KONG_DATABASE=postgres" \
-  -e "KONG_PG_HOST=$KONG_PG_HOST" \
-  -e "KONG_PG_PASSWORD=$KONG_DB_PASSWORD" \
-  -e "KONG_PASSWORD=$KONG_DB_PASSWORD" \
-  -e "KONG_LICENSE_DATA=$KONG_LICENSE_DATA" \
-  $KONG_IMAGE kong migrations bootstrap
+initNetwork
+initDb
+initMigrations "${KONG_IMAGE}" \
+    -e "KONG_LICENSE_DATA=${KONG_LICENSE_DATA}"
 
 # Start Kong Gateway EE
-docker run -d --name $GATEWAY_CONTAINER_NAME \
-  --network=$NETWORK_NAME \
-  -e "KONG_DATABASE=postgres" \
-  -e "KONG_PG_HOST=$KONG_PG_HOST" \
-  -e "KONG_PG_USER=$DATABASE_USER" \
-  -e "KONG_PG_PASSWORD=$KONG_DB_PASSWORD" \
-  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
-  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
-  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
-  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
-  -e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
-  -e "KONG_PORTAL_GUI_URI=127.0.0.1:8003" \
-  -e "KONG_ADMIN_GUI_URL=http://127.0.0.1:8002" \
-  -e "KONG_LICENSE_DATA=$KONG_LICENSE_DATA" \
-  -e "MY_SECRET_CERT=$MY_SECRET_CERT" \
-  -e "MY_SECRET_KEY=$MY_SECRET_KEY" \
-  -p 8000:8000 \
-  -p 8443:8443 \
-  -p 8001:8001 \
-  -p 8444:8444 \
-  -p 8002:8002 \
-  -p 8445:8445 \
-  -p 8003:8003 \
-  -p 8004:8004 \
-  $KONG_IMAGE
+docker run \
+    --detach \
+    --name $GATEWAY_CONTAINER_NAME \
+    "${DOCKER_ARGS[@]}" \
+    -e "KONG_ADMIN_LISTEN=0.0.0.0:8001" \
+    -e "KONG_PORTAL_GUI_URI=127.0.0.1:8003" \
+    -e "KONG_ADMIN_GUI_URL=http://127.0.0.1:8002" \
+    -e "KONG_LICENSE_DATA=$KONG_LICENSE_DATA" \
+    -e "MY_SECRET_CERT=$MY_SECRET_CERT" \
+    -e "MY_SECRET_KEY=$MY_SECRET_KEY" \
+    -p 8000:8000 \
+    -p 8443:8443 \
+    -p 8001:8001 \
+    -p 8444:8444 \
+    -p 8002:8002 \
+    -p 8445:8445 \
+    -p 8003:8003 \
+    -p 8004:8004 \
+    "$KONG_IMAGE"
 
-waitContainer "Kong" $GATEWAY_CONTAINER_NAME "kong health"
+waitContainer "${GATEWAY_CONTAINER_NAME}" kong health

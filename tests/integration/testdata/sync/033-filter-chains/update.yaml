@@ -1,0 +1,32 @@
+_format_version: "3.0"
+services:
+- name: test
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  host: test
+  port: 8080
+  protocol: http
+  filter_chains:
+    - name: service
+      id: d3ed9313-acf2-4982-af3c-83d9b52795c3
+      filters:
+        - name: response_transformer
+          config:
+            add:
+              headers:
+               - x-service:CHANGED
+  routes:
+  - name: r1
+    id: 37fc74bd-bac6-4bce-bd54-6ec4d341c1c1
+    paths:
+      - /r1
+    filter_chains:
+      - name: route
+        id: 7b95fe94-df9b-421a-8a7b-c4d8fddbf363
+        filters:
+          - name: response_transformer
+            enabled: false
+            config:
+              add:
+                headers:
+                  - x-route:test
+

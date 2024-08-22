@@ -1,5 +1,10 @@
 # Table of Contents
 
+- [v1.39.4](#v1394)
+- [v1.39.3](#v1393)
+- [v1.39.2](#v1392)
+- [v1.39.1](#v1391)
+- [v1.39.0](#v1390)
 - [v1.38.1](#v1381)
 - [v1.38.0](#v1380)
 - [v1.37.0](#v1370)
@@ -84,6 +89,55 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.39.4]
+> Release date: 2024/08/01
+
+### Fixes
+
+- Correct --no-color flag behaviour in non-tty environments
+The changes retain the default behaviour of showing colors in tty and no colors in non-tty if no flag is passed. However, on passing the --no-color=false, non-tty environments can also get colored output.[#1339](https://github.com/Kong/deck/pull/1339)
+- Add validation on `deck file patch` to avoid confusing behaviour. The command intends to patch input files either via selector-value flags or command arguments. The change ensures that at least one of these is present, but not both at the same time.[#1342](https://github.com/Kong/deck/pull/1342) 
+- Fix rendering for expression routes, keeping kong gateway version in consideration. [go-database-reconciler #118](https://github.com/Kong/go-database-reconciler/pull/118) [#1351](https://github.com/Kong/deck/pull/1351)
+
+## [v1.39.3]
+> Release date: 2024/07/16
+
+### Chores
+
+- Fixes [#1228](https://github.com/Kong/deck/issues/1282) by updating the golang version from 1.21 to 1.22, thus removing the inconsistency between decK releases' version and the one used in the project. 
+  [#1336](https://github.com/Kong/deck/pull/1336)
+
+## [v1.39.2]
+
+> Release date: 2024/07/04
+
+### Fixes
+
+- Correct IPv6 targets comparison to avoid misleading diffs and failing syncs.
+  [#1333](https://github.com/Kong/deck/pull/1333)
+  [go-database-reconciler #109](https://github.com/Kong/go-database-reconciler/pull/109)
+- Make lookups for consumer-group's consumers more performant.
+  [#1333](https://github.com/Kong/deck/pull/1333)
+  [go-database-reconciler #102](https://github.com/Kong/go-database-reconciler/pull/102)
+
+## [v1.39.1]
+
+> Release date: 2024/06/28
+
+### Chores
+
+- Bumped CodeGen
+  [#1319](https://github.com/Kong/deck/pull/1319)
+
+## [v1.39.0]
+
+> Release date: 2024/06/28
+
+### Fixes
+
+- Bump Go version to 1.22.4
+  [#1321](https://github.com/Kong/deck/pull/1321)
 
 ## [v1.38.1]
 
@@ -1703,6 +1757,11 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.39.4]: https://github.com/Kong/deck/compare/v1.39.3...v1.39.4
+[v1.39.3]: https://github.com/Kong/deck/compare/v1.39.2...v1.39.3
+[v1.39.2]: https://github.com/kong/deck/compare/v1.39.1...v1.39.2
+[v1.39.1]: https://github.com/kong/deck/compare/v1.39.0...v1.39.1
+[v1.39.0]: https://github.com/kong/deck/compare/v1.38.1...v1.39.0
 [v1.38.1]: https://github.com/kong/deck/compare/v1.38.0...v1.38.1
 [v1.38.0]: https://github.com/kong/deck/compare/v1.37.0...v1.38.0
 [v1.37.0]: https://github.com/kong/deck/compare/v1.36.2...v1.37.0

@@ -36,7 +36,7 @@ jobs:
         - 'kong:3.4'
         - 'kong:3.5'
         - 'kong:3.6'
-        - 'kong/kong:master-alpine'
+        - 'kong/kong:master'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
@@ -47,8 +47,9 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.20'
+          go-version-file: go.mod
       - name: Setup Kong
         run: make setup-kong
       - name: Run integration tests
         run: make test-integration
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong:master' }}

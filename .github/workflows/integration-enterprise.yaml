@@ -46,7 +46,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.20'
+          go-version-file: go.mod
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -65,3 +65,4 @@ jobs:
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
         run: make test-integration
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}

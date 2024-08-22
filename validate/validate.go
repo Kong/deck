@@ -178,6 +178,9 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 	if err := v.entities(v.state.Upstreams, "upstreams"); err != nil {
 		allErr = append(allErr, err...)
 	}
+	if err := v.entities(v.state.FilterChains, "filter_chains"); err != nil {
+		allErr = append(allErr, err...)
+	}
 
 	// validate routes format with Kong 3.x
 	parsed30, err := semver.ParseTolerant(utils.FormatVersion30)

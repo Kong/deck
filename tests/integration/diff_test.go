@@ -765,3 +765,20 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 	assert.Equal(t, emptyOutput, out)
 	reset(t)
 }
+
+// test scope:
+//   - 3.5
+func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
+	runWhen(t, "kong", ">=3.5.0")
+	setup(t)
+
+	// test that the diff command does not return any changes when
+	// target is a compressed IPv6.
+	stateFile := "testdata/diff/005-no-diff-target/kong.yaml"
+	assert.NoError(t, sync(stateFile))
+
+	out, err := diff(stateFile)
+	assert.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+	reset(t)
+}

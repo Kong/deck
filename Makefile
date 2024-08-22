@@ -40,3 +40,7 @@ test-integration:
 	go test -v -count=1 -tags=integration \
 		-race \
 		./tests/integration/...
+
+.PHONY: clean
+clean:
+	bash .ci/clean_kong.sh
