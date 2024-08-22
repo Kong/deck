@@ -11,7 +11,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.35
-	github.com/kong/go-database-reconciler v1.14.3
+	github.com/kong/go-database-reconciler v1.14.4
 	github.com/kong/go-kong v0.56.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
@@ -58,7 +58,7 @@ require (
 	atomicgo.dev/cursor v0.2.0 // indirect
 	atomicgo.dev/keyboard v0.2.9 // indirect
 	atomicgo.dev/schedule v0.1.0 // indirect
-	dario.cat/mergo v1.0.0 // indirect
+	dario.cat/mergo v1.0.1 // indirect
 	github.com/Kong/go-diff v1.2.2 // indirect
 	github.com/Kong/gojsondiff v1.3.2 // indirect
 	github.com/adrg/strutil v0.3.0 // indirect
@@ -138,7 +138,7 @@ require (
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
-	golang.org/x/term v0.22.0 // indirect
+	golang.org/x/term v0.23.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
