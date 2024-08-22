@@ -18,21 +18,7 @@ jobs:
     strategy:
       matrix:
         kong_image:
-        - 'kong:1.4.3'
-        - 'kong:1.5.1'
-        - 'kong:2.0.5'
-        - 'kong:2.1.4'
-        - 'kong:2.2.2'
-        - 'kong:2.3.3'
-        - 'kong:2.4.1'
-        - 'kong:2.5.1'
-        - 'kong:2.6.0'
-        - 'kong:2.7'
         - 'kong:2.8'
-        - 'kong:3.0'
-        - 'kong:3.1'
-        - 'kong:3.2'
-        - 'kong:3.3'
         - 'kong:3.4'
         - 'kong:3.5'
         - 'kong:3.6'
