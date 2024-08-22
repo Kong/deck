@@ -173,7 +173,7 @@ this command unless --online flag is used.
 			return preRunSilenceEventsFlag()
 		}
 
-		if validateOnline {
+		if online {
 			short = short + " (online)"
 			long = long + "Validates against the Kong API, via communication with Kong. This increases the\n" +
 				"time for validation but catches significant errors. No resource is created in Kong.\n" +
@@ -211,11 +211,13 @@ this command unless --online flag is used.
 		"", "validate configuration of a specific workspace "+
 			"(Kong Enterprise only).\n"+
 			"This takes precedence over _workspace fields in state files.")
-	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
-		10, "Maximum number of concurrent requests to Kong.")
-	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
-		false, "validate that the state file(s) are ready to be deployed to Konnect")
-
+	if online {
+		validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
+			10, "Maximum number of concurrent requests to Kong.")
+	} else {
+		validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
+			false, "validate that the state file(s) are ready to be deployed to Konnect")
+	}
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
 	}
