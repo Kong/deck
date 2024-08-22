@@ -22,7 +22,7 @@ require (
 	k8s.io/api v0.31.0
 	k8s.io/apiextensions-apiserver v0.30.3
 	k8s.io/apimachinery v0.31.0
-	k8s.io/code-generator v0.30.3
+	k8s.io/code-generator v0.31.0
 	sigs.k8s.io/gateway-api v1.1.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -31,6 +31,7 @@ require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/emicklei/go-restful/v3 v3.12.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
