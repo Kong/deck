@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.39.5](#v1395)
 - [v1.39.4](#v1394)
 - [v1.39.3](#v1393)
 - [v1.39.2](#v1392)
@@ -89,6 +90,13 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.39.5]
+> Release date: 2024/08/22
+
+### Fixes
+
+- Fixed `deck file openapi2kong` command where parameter schema wasn't getting generated properly. [#1355](https://github.com/Kong/deck/pull/1355) [go-apiops #186](https://github.com/Kong/go-apiops/pull/186)
 
 ## [v1.39.4]
 > Release date: 2024/08/01
@@ -1757,6 +1765,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.39.5]: https://github.com/Kong/deck/compare/v1.39.4...v1.39.5
 [v1.39.4]: https://github.com/Kong/deck/compare/v1.39.3...v1.39.4
 [v1.39.3]: https://github.com/Kong/deck/compare/v1.39.2...v1.39.3
 [v1.39.2]: https://github.com/kong/deck/compare/v1.39.1...v1.39.2
