@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
@@ -16,12 +17,38 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-const defaultControlPlaneName = "default"
+const (
+	defaultControlPlaneName         = "default"
+	maxRetriesForAuth               = 5
+	apiRateLimitExceededErrorString = "API rate limit exceeded"
+)
 
 func authenticate(
 	ctx context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
 ) (konnect.AuthResponse, error) {
-	return client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
+	attempts := 0
+	backoff := 200 * time.Millisecond
+
+	for {
+		// fmt.Printf("Attempt #%d\n", attempts+1)
+		authResponse, err := client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
+		if err == nil {
+			return authResponse, nil
+		}
+
+		if !strings.Contains(err.Error(), apiRateLimitExceededErrorString) {
+			return authResponse, err
+		}
+
+		attempts++
+		if attempts > maxRetriesForAuth {
+			return authResponse, fmt.Errorf("maximum retries (%d) exceeded for authentication", maxRetriesForAuth)
+		}
+
+		time.Sleep(backoff)
+		backoff *= 2
+	}
+	// return client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
 }
 
 // GetKongClientForKonnectMode abstracts the different cloud environments users
