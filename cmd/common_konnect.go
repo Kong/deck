@@ -30,7 +30,6 @@ func authenticate(
 	backoff := 200 * time.Millisecond
 
 	for {
-		// fmt.Printf("Attempt #%d\n", attempts+1)
 		authResponse, err := client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
 		if err == nil {
 			return authResponse, nil
@@ -48,7 +47,6 @@ func authenticate(
 		time.Sleep(backoff)
 		backoff *= 2
 	}
-	// return client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
 }
 
 // GetKongClientForKonnectMode abstracts the different cloud environments users
