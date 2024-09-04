@@ -43,7 +43,8 @@ func getTestClient() (*kong.Client, error) {
 		return cmd.GetKongClientForKonnectMode(ctx, &konnectConfig)
 	}
 	return utils.GetKongClient(utils.KongClientConfig{
-		Address: getKongAddress(),
+		Address:   getKongAddress(),
+		Retryable: true,
 	})
 }
 
@@ -236,7 +237,7 @@ func reset(t *testing.T, opts ...string) {
 	t.Helper()
 
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"reset", "--force"}
+	args := []string{"gateway", "reset", "--force"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
