@@ -1,6 +1,6 @@
 variable "control_plane_id" {
   type = "string"
-  default = "YOUR_CONTROL_PLANE_ID"
+  default = "abc-123"
 }
 
 resource "konnect_gateway_consumer" "example_user" {
@@ -9,12 +9,21 @@ resource "konnect_gateway_consumer" "example_user" {
   control_plane_id = var.control_plane_id
 }
 
-resource "konnect_gateway_hmac_auth" "example_user_hmac_auth_example_user" {
-  username = "example-user"
-  secret = "just-a-secret"
+resource "konnect_gateway_jwt" "example_user_jwt_my_jwt_secret" {
+  algorithm = "HS256"
+  key = "my_jwt_secret"
+  secret = "my_secret_key"
+  tags = ["internal"]
 
   consumer_id = konnect_gateway_consumer.example_user.id
 
   control_plane_id = var.control_plane_id
+  lifecycle {
+    ignore_changes = [
+      secret,
+      key
+    ]
+  }
+
 }
 

@@ -5,15 +5,16 @@ import (
 )
 
 type ITerraformBuilder interface {
-	buildServices(*file.Content, *string, bool)
-	buildRoutes(*file.Content, *string, bool)
-	buildGlobalPlugins(*file.Content, *string, bool)
+	buildControlPlaneVar(*string)
+	buildServices(*file.Content, *string)
+	buildRoutes(*file.Content, *string)
+	buildGlobalPlugins(*file.Content, *string)
 	buildConsumers(*file.Content, *string, bool)
-	buildConsumerGroups(*file.Content, *string, bool)
-	buildUpstreams(*file.Content, *string, bool)
-	buildCACertificates(*file.Content, *string, bool)
-	buildCertificates(*file.Content, *string, bool)
-	buildVaults(*file.Content, *string, bool)
+	buildConsumerGroups(*file.Content, *string)
+	buildUpstreams(*file.Content, *string)
+	buildCACertificates(*file.Content, *string)
+	buildCertificates(*file.Content, *string)
+	buildVaults(*file.Content, *string)
 	getContent() string
 }
 
@@ -31,16 +32,20 @@ func newDirector(builder ITerraformBuilder) *Director {
 	}
 }
 
-func (d *Director) builTerraformResources(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) string {
-
-	d.builder.buildGlobalPlugins(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildServices(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildUpstreams(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildRoutes(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
+func (d *Director) builTerraformResources(
+	content *file.Content,
+	generateImportsForControlPlaneID *string,
+	ignoreCredentialChanges bool,
+) string {
+	d.builder.buildControlPlaneVar(generateImportsForControlPlaneID)
+	d.builder.buildGlobalPlugins(content, generateImportsForControlPlaneID)
+	d.builder.buildServices(content, generateImportsForControlPlaneID)
+	d.builder.buildUpstreams(content, generateImportsForControlPlaneID)
+	d.builder.buildRoutes(content, generateImportsForControlPlaneID)
 	d.builder.buildConsumers(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildConsumerGroups(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildCACertificates(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildCertificates(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
-	d.builder.buildVaults(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
+	d.builder.buildConsumerGroups(content, generateImportsForControlPlaneID)
+	d.builder.buildCACertificates(content, generateImportsForControlPlaneID)
+	d.builder.buildCertificates(content, generateImportsForControlPlaneID)
+	d.builder.buildVaults(content, generateImportsForControlPlaneID)
 	return d.builder.getContent()
 }

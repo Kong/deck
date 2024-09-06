@@ -88,7 +88,8 @@ into Terraform resources.`,
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfGenerateImportsForControlPlaneID, "generate-imports-for-control-plane-id", "g", "",
 		"decK file to process. Use - to read from stdin.")
 	kong2TfCmd.Flags().BoolVar(&cmdKong2TfIgnoreCredentialChanges, "ignore-credential-changes", false,
-		"Enable flag to add a 'lifecycle' block to each consumer credential, that ignores any changes from local to remote state.")
+		"Enable flag to add a 'lifecycle' block to each consumer credential, " +
+		"that ignores any changes from local to remote state.")
 
 	return kong2TfCmd
 }

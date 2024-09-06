@@ -1,0 +1,7 @@
+plugins:
+  - name: rate-limiting
+    enabled: false
+    config:
+      second: 5
+      hour: 10000
+      policy: local
