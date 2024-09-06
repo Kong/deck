@@ -5,6 +5,7 @@ import (
 )
 
 type ITerraformBuilder interface {
+	buildControlPlaneVar(*file.Content, *string, bool)
 	buildServices(*file.Content, *string, bool)
 	buildRoutes(*file.Content, *string, bool)
 	buildGlobalPlugins(*file.Content, *string, bool)
@@ -33,6 +34,7 @@ func newDirector(builder ITerraformBuilder) *Director {
 
 func (d *Director) builTerraformResources(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) string {
 
+	d.builder.buildControlPlaneVar(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
 	d.builder.buildGlobalPlugins(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
 	d.builder.buildServices(content, generateImportsForControlPlaneID, ignoreCredentialChanges)
 	d.builder.buildUpstreams(content, generateImportsForControlPlaneID, ignoreCredentialChanges)

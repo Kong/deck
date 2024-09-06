@@ -81,4 +81,4 @@ upstreams:
     - target: 10.10.10.10:8000
       weight: 100
     - target: 10.10.10.11:8000
-      weight: 100
+      weight: 200

@@ -36,3 +36,13 @@ services:
         destinations:
           - ip: 10.10.10.10
             port: 8080
+
+routes:
+  - name: top-level-route
+    hosts:
+      - top-level.example.com
+  - name: top-level-with-service-route
+    service:
+      name: example-service
+    hosts:
+      - top-level-with-service.example.com

@@ -1,14 +1,15 @@
 package kong2tf
 
 import (
-	"bytes"
+	"crypto/md5"
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"log"
 	"regexp"
+	"strings"
 	"text/template"
 
-	"github.com/kong/go-apiops/logbasics"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/mitchellh/hashstructure"
 )
@@ -38,212 +39,366 @@ type DefaultTerraformBuider struct {
 	content string
 }
 
-type TemplateObjectWrapper struct {
-	Content                          interface{}
-	GenerateImportsForControlPlaneID *string
-	IgnoreCredentialChanges          bool
-}
-
 func newDefaultTerraformBuilder() *DefaultTerraformBuider {
 	return &DefaultTerraformBuider{}
 }
 
-//go:embed templates/service.go.tmpl
-var terraformServiceTemplate string
+// Generic function that takes type T and returns map[string]any using JSON marshalling
+func toMapAny(resource any) map[string]any {
+	resourceMap := make(map[string]interface{})
+	resourceJSON, err := json.Marshal(resource)
+	if err != nil {
+		log.Fatal(err, "Failed to marshal resource")
+		return resourceMap
+	}
+	err = json.Unmarshal(resourceJSON, &resourceMap)
+	if err != nil {
+		log.Fatal(err, "Failed to unmarshal resource")
+		return resourceMap
+	}
+	return resourceMap
+}
+
+func (b *DefaultTerraformBuider) buildControlPlaneVar(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
+	cpId := "YOUR_CONTROL_PLANE_ID"
+	if generateImportsForControlPlaneID != nil {
+		cpId = *generateImportsForControlPlaneID
+	}
+	b.content += fmt.Sprintf(`variable "control_plane_id" {
+  type = "string"
+  default = "%s"
+}`, cpId) + "\n\n"
+}
 
 func (b *DefaultTerraformBuider) buildServices(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	tmpl, err := template.New(terraformServiceTemplate).Funcs(funcs).Parse(terraformServiceTemplate)
-	if err != nil {
-		log.Fatal(err, "Failed to parse template")
-		return // Changed from log.Fatalf to return after logging the error
-	}
+	for _, service := range content.Services {
+		parentResourceName := strings.ReplaceAll(*service.Name, "-", "_")
+		b.content += generateResource("gateway_service", parentResourceName, toMapAny(service), map[string]string{}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": service.ID,
+			},
+		}, []string{})
 
-	for index, service := range content.Services {
+		for _, route := range service.Routes {
+			resourceName := strings.ReplaceAll(*route.Name, "-", "_")
+			b.content += generateResource("gateway_route", resourceName, toMapAny(route), map[string]string{
+				"service": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": route.ID,
+				},
+			}, []string{})
 
-		var buffer bytes.Buffer
-		err = tmpl.Execute(&buffer, service)
-		if err != nil {
-			log.Fatal(err, "Failed to execute template for service", "serviceIndex", index+1)
+			for _, plugin := range route.Plugins {
+				pluginName := strings.ReplaceAll(*plugin.Name, "-", "_")
+				b.content += generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
+					"route": resourceName,
+				}, importConfig{
+					controlPlaneId: generateImportsForControlPlaneID,
+					importValues: map[string]*string{
+						"id": plugin.ID,
+					},
+				}, []string{})
+			}
 		}
 
-		b.content += buffer.String()
+		for _, plugin := range service.Plugins {
+			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
+			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+				"service": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": plugin.ID,
+				},
+			}, []string{})
+		}
 	}
 }
-
-//go:embed templates/route.go.tmpl
-var terraformRouteTemplate string
 
 func (b *DefaultTerraformBuider) buildRoutes(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	logbasics.Info("Starting to build routes")
-	logbasics.Info("Template content before parsing", "template", terraformRouteTemplate)
-
-	tmpl, err := template.New(terraformRouteTemplate).Funcs(funcs).Parse(terraformRouteTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, service := range content.Services {
-		var buffer bytes.Buffer
-
-		err = tmpl.Execute(&buffer, service)
-		if err != nil {
-			log.Fatal(err)
+	for _, route := range content.Routes {
+		parentResourceName := strings.ReplaceAll(*route.Name, "-", "_")
+		parents := map[string]string{}
+		if route.Service != nil {
+			parents["service"] = strings.ReplaceAll(*route.Service.Name, "-", "_")
 		}
-		b.content += buffer.String()
+		b.content += generateResource("gateway_route", parentResourceName, toMapAny(route), parents, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": route.ID,
+			},
+		}, []string{})
+
+		for _, plugin := range route.Plugins {
+			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
+			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+				"route": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": plugin.ID,
+				},
+			}, []string{})
+		}
 	}
 }
-
-//go:embed templates/global_plugin.go.tmpl
-var terraformGlobalPluginTemplate string
 
 func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	logbasics.Info("Starting to build global plugins")
-	logbasics.Info("Template content before parsing", "template", terraformGlobalPluginTemplate)
-
-	tmpl, err := template.New(terraformGlobalPluginTemplate).Funcs(funcs).Parse(terraformGlobalPluginTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, globalPlugin := range content.Plugins {
-		var buffer bytes.Buffer
-
-		err = tmpl.Execute(&buffer, globalPlugin)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b.content += buffer.String()
+		resourceName := strings.ReplaceAll(*globalPlugin.Name, "-", "_")
+		b.content += generateResource("gateway_plugin", resourceName, toMapAny(globalPlugin), map[string]string{}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": globalPlugin.ID,
+			},
+		}, []string{})
 	}
 }
-
-//go:embed templates/consumer.go.tmpl
-var terraformConsumerTemplate string
 
 func (b *DefaultTerraformBuider) buildConsumers(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	logbasics.Info("Starting to build consumers")
-	logbasics.Info("Template content before parsing", "template", terraformConsumerTemplate)
-
-	tmpl, err := template.New(terraformConsumerTemplate).Funcs(funcs).Parse(terraformConsumerTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, consumer := range content.Consumers {
-		wrapper := TemplateObjectWrapper{
-			Content:                          consumer,
-			GenerateImportsForControlPlaneID: generateImportsForControlPlaneID,
-			IgnoreCredentialChanges:          ignoreCredentialChanges,
-		}
-		var buffer bytes.Buffer
+		parentResourceName := strings.ReplaceAll(*consumer.Username, "-", "_")
+		b.content += generateResource("gateway_consumer", parentResourceName, toMapAny(consumer), map[string]string{}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": consumer.ID,
+			},
+		}, []string{})
 
-		err = tmpl.Execute(&buffer, wrapper)
-		if err != nil {
-			log.Fatal(err)
+		for _, cg := range consumer.Groups {
+			resourceName := strings.ReplaceAll(*cg.Name, "-", "_")
+
+			b.content += generateRelationship("gateway_consumer_group_member", resourceName+"_"+parentResourceName, map[string]string{
+				"consumer":       parentResourceName,
+				"consumer_group": resourceName,
+			}, toMapAny(consumer), importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"consumer_id":       consumer.ID,
+					"consumer_group_id": cg.ID,
+				},
+			})
 		}
-		b.content += buffer.String()
+
+		for _, acl := range consumer.ACLGroups {
+			resourceName := "acl_" + strings.ReplaceAll(*acl.Group, "-", "_")
+			b.content += generateResource("gateway_acl", resourceName, toMapAny(acl), map[string]string{
+				"consumer_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          acl.ID,
+					"consumer_id": consumer.ID,
+				},
+			}, []string{})
+		}
+
+		for _, basicauth := range consumer.BasicAuths {
+			lifecycle := []string{}
+
+			if ignoreCredentialChanges {
+				lifecycle = []string{
+					"password",
+				}
+			}
+
+			resourceName := "basic_auth_" + strings.ReplaceAll(*basicauth.Username, "-", "_")
+			b.content += generateResource("gateway_basic_auth", resourceName, toMapAny(basicauth), map[string]string{
+				"consumer_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          basicauth.ID,
+					"consumer_id": consumer.ID,
+				},
+			}, lifecycle)
+		}
+
+		for _, keyauth := range consumer.KeyAuths {
+			resourceName := "key_auth_" + strings.ReplaceAll(*keyauth.Key, "-", "_")
+			b.content += generateResource("gateway_key_auth", resourceName, toMapAny(keyauth), map[string]string{
+				"consumer_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          keyauth.ID,
+					"consumer_id": consumer.ID,
+				},
+			}, []string{})
+		}
+
+		for _, jwt := range consumer.JWTAuths {
+			lifecycle := []string{}
+
+			if ignoreCredentialChanges {
+				lifecycle = []string{
+					"secret", "key",
+				}
+			}
+			resourceName := "jwt_" + strings.ReplaceAll(*jwt.Key, "-", "_")
+			b.content += generateResource("gateway_jwt", resourceName, toMapAny(jwt), map[string]string{
+				"consumer_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          jwt.ID,
+					"consumer_id": consumer.ID,
+				},
+			}, lifecycle)
+		}
+
+		for _, hmacauth := range consumer.HMACAuths {
+			resourceName := "hmac_auth_" + strings.ReplaceAll(*hmacauth.Username, "-", "_")
+			b.content += generateResource("gateway_hmac_auth", resourceName, toMapAny(hmacauth), map[string]string{
+				"consumer_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          hmacauth.ID,
+					"consumer_id": consumer.ID,
+				},
+			}, []string{})
+		}
+
+		for _, plugin := range consumer.Plugins {
+			pluginName := strings.ReplaceAll(*plugin.Name, "-", "_")
+			b.content += generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
+				"consumer": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": plugin.ID,
+				},
+			}, []string{})
+		}
+
 	}
 }
-
-//go:embed templates/consumer_group.go.tmpl
-var terraformConsumerGroupTemplate string
 
 func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	logbasics.Info("Starting to build consumer groups")
-	logbasics.Info("Template content before parsing", "template", terraformConsumerGroupTemplate)
+	for _, cg := range content.ConsumerGroups {
+		parentResourceName := strings.ReplaceAll(*cg.Name, "-", "_")
+		parents := map[string]string{}
+		b.content += generateResource("gateway_consumer_group", parentResourceName, toMapAny(cg), parents, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": cg.ID,
+			},
+		}, []string{})
 
-	tmpl, err := template.New(terraformConsumerGroupTemplate).Funcs(funcs).Parse(terraformConsumerGroupTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
+		// We intentionally don't generate consumers here. Consumers is a FK reference, not a definition.
+		for _, consumer := range cg.Consumers {
+			resourceName := strings.ReplaceAll(*consumer.Username, "-", "_")
 
-	for _, consumerGroup := range content.ConsumerGroups {
-		var buffer bytes.Buffer
-
-		err = tmpl.Execute(&buffer, consumerGroup)
-		if err != nil {
-			log.Fatal(err)
+			b.content += generateRelationship("gateway_consumer_group_member", parentResourceName+"_"+resourceName, map[string]string{
+				"consumer":       resourceName,
+				"consumer_group": parentResourceName,
+			}, toMapAny(consumer), importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"consumer_id":       consumer.ID,
+					"consumer_group_id": cg.ID,
+				},
+			})
 		}
-		b.content += buffer.String()
+
+		for _, plugin := range cg.Plugins {
+			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
+			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+				"consumer_group": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": plugin.ID,
+				},
+			}, []string{})
+		}
 	}
 }
-
-//go:embed templates/upstream.go.tmpl
-var terraformUpstreamTemplate string
 
 func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	tmpl, err := template.New(terraformUpstreamTemplate).Funcs(funcs).Parse(terraformUpstreamTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, upstream := range content.Upstreams {
-		var buffer bytes.Buffer
+		parentResourceName := strings.ReplaceAll(*upstream.Name, "-", "_")
+		parentResourceName = "upstream_" + strings.ReplaceAll(parentResourceName, ".", "_")
+		parents := map[string]string{}
+		b.content += generateResource("gateway_upstream", parentResourceName, toMapAny(upstream), parents, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": upstream.ID,
+			},
+		}, []string{})
 
-		err = tmpl.Execute(&buffer, upstream)
-		if err != nil {
-			log.Fatal(err)
+		for _, target := range upstream.Targets {
+			resourceName := strings.ReplaceAll(*target.Target.Target, ".", "_")
+			resourceName = "target_" + strings.ReplaceAll(resourceName, ":", "_")
+			b.content += generateResource("gateway_target", resourceName, toMapAny(target), map[string]string{
+				"upstream_id": parentResourceName,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id":          target.ID,
+					"upstream_id": upstream.ID,
+				},
+			}, []string{})
 		}
-		b.content += buffer.String()
 	}
 }
-
-//go:embed templates/ca_certificate.go.tmpl
-var terraformCACertificateTemplate string
 
 func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	tmpl, err := template.New(terraformCACertificateTemplate).Funcs(funcs).Parse(terraformCACertificateTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	idx := 0
 	for _, caCertificate := range content.CACertificates {
-		var buffer bytes.Buffer
-
-		err = tmpl.Execute(&buffer, caCertificate)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b.content += buffer.String()
+		hashedCert := fmt.Sprintf("%x", md5.Sum([]byte(*caCertificate.Cert)))
+		resourceName := "ca_cert_" + hashedCert
+		idx += 1
+		b.content += generateResource("gateway_ca_certificate", resourceName, toMapAny(caCertificate), map[string]string{}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": caCertificate.ID,
+			},
+		}, []string{})
 	}
 }
-
-//go:embed templates/certificate.go.tmpl
-var terraformCertificateTemplate string
 
 func (b *DefaultTerraformBuider) buildCertificates(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	tmpl, err := template.New(terraformCertificateTemplate).Funcs(funcs).Parse(terraformCertificateTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, certificate := range content.Certificates {
-		var buffer bytes.Buffer
+		hashedCert := fmt.Sprintf("%x", md5.Sum([]byte(*certificate.Cert)))
+		resourceName := "cert_" + hashedCert
+		b.content += generateResource("gateway_certificate", resourceName, toMapAny(certificate), map[string]string{}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": certificate.ID,
+			},
+		}, []string{})
 
-		err = tmpl.Execute(&buffer, certificate)
-		if err != nil {
-			log.Fatal(err)
+		for _, sni := range certificate.SNIs {
+			resourceName := "sni_" + strings.ReplaceAll(*sni.Name, ".", "_")
+			b.content += generateResource("gateway_sni", resourceName, toMapAny(sni), map[string]string{
+				"certificate": "cert_" + hashedCert,
+			}, importConfig{
+				controlPlaneId: generateImportsForControlPlaneID,
+				importValues: map[string]*string{
+					"id": sni.ID,
+				},
+			}, []string{})
 		}
-		b.content += buffer.String()
 	}
 }
 
-//go:embed templates/vault.go.tmpl
-var terraformVaultTemplate string
-
 func (b *DefaultTerraformBuider) buildVaults(content *file.Content, generateImportsForControlPlaneID *string, ignoreCredentialChanges bool) {
-	tmpl, err := template.New(terraformVaultTemplate).Funcs(funcs).Parse(terraformVaultTemplate)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, vault := range content.Vaults {
-		var buffer bytes.Buffer
-
-		err = tmpl.Execute(&buffer, vault)
-		if err != nil {
-			log.Fatal(err)
-		}
-		b.content += buffer.String()
+		parentResourceName := strings.ReplaceAll(*vault.Name, "-", "_")
+		parents := map[string]string{}
+		b.content += generateResourceWithCustomizations("gateway_vault", parentResourceName, toMapAny(vault), parents, map[string]string{
+			"config": "jsonencode",
+		}, importConfig{
+			controlPlaneId: generateImportsForControlPlaneID,
+			importValues: map[string]*string{
+				"id": vault.ID,
+			},
+		}, []string{})
 	}
 }
 

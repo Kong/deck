@@ -30,6 +30,40 @@ func compareFileContent(t *testing.T, expectedFilename string, actualContent []b
 	require.Equal(t, expectedFields, actualFields)
 }
 
+func Test_convertKongGatewayToTerraformWithImports(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputFilename  string
+		outputFilename string
+		wantErr        bool
+	}{
+		{
+			name:           "consumer-jwt",
+			inputFilename:  "consumer-jwt-input.yaml",
+			outputFilename: "consumer-jwt-output-with-imports-expected.tf",
+			wantErr:        false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			inputContent, err := file.GetContentFromFiles([]string{baseLocation + tt.inputFilename}, false)
+			if err != nil {
+				assert.Fail(t, err.Error())
+			}
+
+			cpId := new(string)
+			*cpId = "abc-123"
+			output, err := Convert(inputContent, cpId, true)
+
+			if err == nil {
+				compareFileContent(t, tt.outputFilename, []byte(output))
+			} else if (err != nil) != tt.wantErr {
+				t.Errorf("KongToTerraform error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func Test_convertKongGatewayToTerraform(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -116,9 +150,15 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			wantErr:        false,
 		},
 		{
-			name:           "global-plugin",
-			inputFilename:  "global-plugin-input.yaml",
-			outputFilename: "global-plugin-output-expected.tf",
+			name:           "global-plugin-oidc",
+			inputFilename:  "global-plugin-oidc-input.yaml",
+			outputFilename: "global-plugin-oidc-output-expected.tf",
+			wantErr:        false,
+		},
+		{
+			name:           "global-plugin-rate-limiting",
+			inputFilename:  "global-plugin-rate-limiting-input.yaml",
+			outputFilename: "global-plugin-rate-limiting-output-expected.tf",
 			wantErr:        false,
 		},
 		{

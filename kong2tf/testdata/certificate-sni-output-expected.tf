@@ -1,6 +1,11 @@
-resource "konnect_gateway_certificate" "Cert_3549910271731929142" {
-  cert             = <<EOF
-  -----BEGIN CERTIFICATE-----
+variable "control_plane_id" {
+  type = "string"
+  default = "YOUR_CONTROL_PLANE_ID"
+}
+
+resource "konnect_gateway_certificate" "cert_724715fca2416fb3c8f215f45d07fd43" {
+  cert = <<EOF
+-----BEGIN CERTIFICATE-----
 MIIECTCCAvGgAwIBAgIUAusYGP9BwoLFFAJdB/jY6eUzUyAwDQYJKoZIhvcNAQEL
 BQAwgZIxCzAJBgNVBAYTAlVLMRIwEAYDVQQIDAlIYW1wc2hpcmUxEjAQBgNVBAcM
 CUFsZGVyc2hvdDEQMA4GA1UECgwHS29uZyBVSzEQMA4GA1UECwwHU3VwcG9ydDEY
@@ -24,9 +29,9 @@ ovZgZo+OlhWRsDVT/qy5SFtA0vlVNtdBr2egXb1H7J8UDC+fax/iKa7+fBUHZOO9
 Fk9U8bxgfQ+jPIVVL8CfAtR68Sos7NpWH0S2emqZRnQvf0MSNdkTQKWn4qR9sckj
 Ewxs5FbrMmgCOgwk1PtgRmdP3RME0HwK/B03saQ=
 -----END CERTIFICATE-----
-  EOF
-  key             = <<EOF
-  -----BEGIN PRIVATE KEY-----
+EOF
+  key = <<EOF
+-----BEGIN PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCVGyoqqAitQUzZ
 P+5eNp+rpMkxLni8gdt3v/dD80/6M/MGc4ME6Hc2xQEtlbRa9RCqhc6K9A616fQi
 53mznYgEdyOiw/1mP8dClt5cdxd+XxolDkiz0x/M3og0zMddQnCg8XrAPjNv7Oat
@@ -54,14 +59,19 @@ LwIVvkm5NpeIlKQtDNrqG1QvUhqyZ2/Xitc4FyiccW7WHxkGKGZyj7GbmpqEOnyY
 iVku0LSftZgycet2uMdp0HaVAgi5S6aVf5yN0U/8R5ToxcbuEfqwrBIyRgse8lx3
 NNSvLxPAempmiFPSk9AtobYV
 -----END PRIVATE KEY-----
-  EOF
-  tags             = ["proxy.kong.lan"]
+EOF
+  tags = ["proxy.kong.lan"]
+
   control_plane_id = var.control_plane_id
 }
-resource "konnect_gateway_sni" "proxykonglan" {
-  name             = "proxy.kong.lan"
+
+resource "konnect_gateway_sni" "sni_proxy_kong_lan" {
+  name = "proxy.kong.lan"
+
   certificate = {
-    id = konnect_gateway_certificate.Cert_3549910271731929142.id
+    id = konnect_gateway_certificate.cert_724715fca2416fb3c8f215f45d07fd43.id
   }
+
   control_plane_id = var.control_plane_id
 }
+
