@@ -566,6 +566,8 @@ func inKonnectMode(targetContent *file.Content) bool {
 		konnectConfig.Password != "" ||
 		konnectConfig.Token != "" {
 		return true
+	} else if konnectConnectionDesired {
+		return true
 	}
 	return false
 }
