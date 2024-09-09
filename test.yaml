@@ -1,0 +1,104 @@
+_format_version: "3.0"
+consumer_groups:
+- name: some-other-consumergroup
+  tags:
+  - zendesk
+- name: support-enterprise
+  tags:
+  - zendesk
+consumers:
+- groups:
+  - name: support-enterprise
+    tags:
+    - zendesk
+  tags:
+  - zendesk
+  username: consumer1
+- groups:
+  - name: support-enterprise
+    tags:
+    - zendesk
+  tags:
+  - zendesk
+  username: consumer2
+plugins:
+- config:
+    consumer_groups: null
+    dictionary_name: kong_rate_limiting_counters
+    disable_penalty: false
+    enforce_consumer_groups: false
+    error_code: 429
+    error_message: API rate limit exceeded
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 10
+    namespace: VPJBlUtVlxIF8nZmbX6IIEIfvo3OjSot
+    path: null
+    redis:
+      cluster_addresses: null
+      connect_timeout: null
+      database: 0
+      host: null
+      keepalive_backlog: null
+      keepalive_pool_size: 256
+      password: null
+      port: null
+      read_timeout: null
+      send_timeout: null
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: -1
+    window_size:
+    - 60
+    window_type: sliding
+  enabled: true
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  consumer: support-professional
+  tags:
+  - zendesk
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.org
+  name: support
+  path: /anything
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: support
+    path_handling: v0
+    paths:
+    - /example
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - zendesk
+  tags:
+  - zendesk
+  write_timeout: 60000

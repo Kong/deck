@@ -119,6 +119,17 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 	return nil
 }
 
+func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
+	filteredPlugins := []file.FPlugin{}
+	
+	for _, plugin := range targetContentPlugins {
+		if plugin.Consumer == nil && plugin.ConsumerGroup == nil {
+			filteredPlugins = append(filteredPlugins, plugin)
+		}
+	}
+	return filteredPlugins
+}
+
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string, enableJSONOutput bool,
 ) error {
@@ -139,6 +150,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 		targetContent.ConsumerGroups = []file.FConsumerGroupObject{}
+		targetContent.Plugins = RemoveConsumerPlugins(targetContent.Plugins)
 	}
 	if dumpConfig.SkipCACerts {
 		targetContent.CACertificates = []file.FCACertificate{}
