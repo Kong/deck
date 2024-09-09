@@ -1,4 +1,7 @@
 _format_version: "3.0"
+_info:
+  select_tags:
+  - managed-by-deck
 plugins:
 - name: rate-limiting-advanced
   config:
@@ -13,5 +16,7 @@ plugins:
 services:
 - name: foo
   host: test.com
-consumer_groups:
-- name: foo2
+routes:
+- name: bar
+  paths: 
+  - /test

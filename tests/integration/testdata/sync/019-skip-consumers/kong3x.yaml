@@ -43,3 +43,13 @@ services:
   protocol: http
   read_timeout: 60000
   retries: 5
+plugins:
+  - name: rate-limiting-advanced
+    config:
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+    consumer: bar

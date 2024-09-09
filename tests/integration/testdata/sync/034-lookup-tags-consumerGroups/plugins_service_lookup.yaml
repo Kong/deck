@@ -4,9 +4,9 @@ _info:
   - managed-by-deck
   default_lookup_tags:
     services:
-    - global-services-consumerGroups
+    - global-entities-consumerGroups
     consumer_groups:
-    - global-services-consumerGroups
+    - global-entities-consumerGroups
 plugins:
 - name: rate-limiting-advanced
   config:

@@ -1,0 +1,31 @@
+_format_version: "3.0"
+plugins:
+- name: rate-limiting-advanced
+  config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    namespace: foo
+    sync_rate: -1
+  service: foo
+  consumer_group: foo2
+- name: rate-limiting-advanced
+  config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    namespace: foo
+    sync_rate: -1
+  route: bar
+  consumer_group: foo2
+services:
+- name: foo
+  host: test.com
+routes:
+- name: bar
+  paths: 
+  - /test
+consumer_groups:
+- name: foo2
