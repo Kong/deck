@@ -62,7 +62,8 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 				return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 			}
 			for _, c := range consumerGroupsGlobal {
-				targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
+				targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
+					file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
 				if err != nil {
 					return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
 				}
