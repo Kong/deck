@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.39.7](#v1397)
 - [v1.39.6](#v1396)
 - [v1.39.5](#v1395)
 - [v1.39.4](#v1394)
@@ -91,6 +92,19 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.39.7]
+> Release date: 2024/09/10
+
+### Fixes
+
+- Fixed the issue that was preventing a consumer to be in more than one consumer-groups [#1394](https://github.com/Kong/deck/pull/1394)
+[go-database-reconciler #140](https://github.com/Kong/go-database-reconciler/pull/140)
+- Fields marked as auto in schema are filled with nil in the config sent to the Control Plane. In case a field is marked as auto and is a required field, deck would throw an error if the user doesn't fill it in the declarative configuration file.
+[#1394](https://github.com/Kong/deck/pull/1394) [go-database-reconciler #139](https://github.com/Kong/go-database-reconciler/pull/139)
+- Defaults are no longer filled by deck. They will only be used for computing a diff, but not sent to the Control Plane.
+[#1394](https://github.com/Kong/deck/pull/1394) [go-database-reconciler #133](https://github.com/Kong/go-database-reconciler/pull/133)
+
 
 ## [v1.39.6]
 > Release date: 2024/08/22
@@ -1774,6 +1788,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.39.7]: https://github.com/Kong/deck/compare/v1.39.6...v1.39.7
 [v1.39.6]: https://github.com/Kong/deck/compare/v1.39.5...v1.39.6
 [v1.39.5]: https://github.com/Kong/deck/compare/v1.39.4...v1.39.5
 [v1.39.4]: https://github.com/Kong/deck/compare/v1.39.3...v1.39.4
