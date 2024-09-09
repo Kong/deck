@@ -593,11 +593,11 @@ func checkForRBACResources(content reconcilerUtils.KongRawState,
 		common := "At a time, state file(s) must entirely consist of either proxy " +
 			"configuration or RBAC configuration."
 		if rbacResourcesOnly {
-			return fmt.Errorf("When --rbac-resources-only is used, state file(s) " +
-				"cannot contain any resources other than RBAC resources. " + common)
+			return fmt.Errorf("when --rbac-resources-only is used, state file(s) "+
+				"cannot contain any resources other than RBAC resources. %s", common)
 		}
-		return fmt.Errorf("State file(s) contains RBAC resources. " +
-			"Please use --rbac-resources-only flag to manage these resources. " + common)
+		return fmt.Errorf("state file(s) contains RBAC resources. "+
+			"Please use --rbac-resources-only flag to manage these resources. %s", common)
 	}
 	return nil
 }

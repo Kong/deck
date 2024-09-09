@@ -39,9 +39,7 @@ u8S6yNlu2Q==
 func Test_Reset_SkipCACert_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -75,9 +73,7 @@ func Test_Reset_SkipCACert_2x(t *testing.T) {
 func Test_Reset_SkipCACert_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -113,9 +109,7 @@ func Test_Reset_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	reset(t)

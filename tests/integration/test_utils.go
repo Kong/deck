@@ -15,12 +15,8 @@ import (
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/require"
 )
-
-func int32p(i int) *int32 {
-	p := int32(i)
-	return &p
-}
 
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
@@ -47,7 +43,8 @@ func getTestClient() (*kong.Client, error) {
 		return cmd.GetKongClientForKonnectMode(ctx, &konnectConfig)
 	}
 	return utils.GetKongClient(utils.KongClientConfig{
-		Address: getKongAddress(),
+		Address:   getKongAddress(),
+		Retryable: true,
 	})
 }
 
@@ -206,9 +203,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		}
 	}
 	kongState, err := deckDump.Get(ctx, client, dumpConfig)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	require.NoError(t, err)
 
 	opt := []cmp.Option{
 		cmpopts.IgnoreFields(kong.Service{}, "CreatedAt", "UpdatedAt"),
@@ -234,7 +229,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	opt = append(opt, ignoreFields...)
 
 	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
-		t.Errorf(diff)
+		t.Errorf("unexpected diff:\n%s", diff)
 	}
 }
 
@@ -242,14 +237,12 @@ func reset(t *testing.T, opts ...string) {
 	t.Helper()
 
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"reset", "--force"}
+	args := []string{"gateway", "reset", "--force"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	if err := deckCmd.Execute(); err != nil {
-		t.Fatalf(err.Error(), "failed to reset Kong's state")
-	}
+	require.NoError(t, deckCmd.Execute(), "failed to reset Kong's state")
 }
 
 func readFile(filepath string) (string, error) {

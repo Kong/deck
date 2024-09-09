@@ -44,9 +44,11 @@ func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICCo
 
 		if service.Port != nil {
 			sPort := k8scorev1.ServicePort{
-				Protocol:   protocol,
-				Port:       int32(*service.Port),
-				TargetPort: intstr.IntOrString{IntVal: int32(*service.Port)},
+				Protocol: protocol,
+				Port:     int32(*service.Port), //nolint:gosec
+				TargetPort: intstr.IntOrString{
+					IntVal: int32(*service.Port), //nolint:gosec
+				},
 			}
 			k8sService.Spec.Ports = append(k8sService.Spec.Ports, sPort)
 		}

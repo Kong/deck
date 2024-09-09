@@ -36,7 +36,7 @@ func WriteContentToFile(content *file.Content, filename string, format file.Form
 			return err
 		}
 	default:
-		return fmt.Errorf("unknown file format: " + string(format))
+		return fmt.Errorf("unknown file format: %s", format)
 	}
 
 	if filename == "-" {
