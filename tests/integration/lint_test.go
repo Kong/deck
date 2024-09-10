@@ -157,7 +157,7 @@ func Test_LintStructured(t *testing.T) {
 				cmpopts.EquateEmpty(),
 			}
 			if diff := cmp.Diff(outputErrors, expectedErrors, cmpOpts...); diff != "" {
-				t.Errorf(diff)
+				t.Errorf("got unexpected diff\n:%s", diff)
 			}
 		})
 	}
