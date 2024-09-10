@@ -38,3 +38,5 @@ docs/cli-docs/
 
 # generated test 'actuals'
 kong2kic/testdata/**/*-actual.*
+kong2tf/testdata/**/*-actual.*
+kong2tf/terraform
