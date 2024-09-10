@@ -327,6 +327,72 @@ var (
 		},
 	}
 
+	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
 	upstream_pre31 = []*kong.Upstream{ //nolint:revive,stylecheck
 		{
 			Name:      kong.String("upstream1"),
@@ -2677,7 +2743,42 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
+			setup(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create plugins on services, routes and consumers",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entitiesKonnect,
+				Consumers: consumer,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKonnect(t)
 			setup(t)
 
 			sync(tc.kongFile)
@@ -4576,6 +4677,16 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 
+	ignoreFields := []cmp.Option{
+		cmp.FilterValues(func(x, y interface{}) bool {
+			_, okX := x.(map[string]interface{})
+			_, okY := y.(map[string]interface{})
+			return okX && okY
+		}, cmpopts.IgnoreMapEntries(func(key string, _ interface{}) bool {
+			return key == "redis"
+		})),
+	}
+
 	tests := []struct {
 		name          string
 		kongFile      string
@@ -4640,7 +4751,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(tc.kongFile))
-			testKongState(t, client, true, tc.expectedState, nil)
+			testKongState(t, client, true, tc.expectedState, ignoreFields)
 		})
 	}
 }

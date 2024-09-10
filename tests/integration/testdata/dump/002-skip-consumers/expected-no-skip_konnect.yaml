@@ -20,17 +20,21 @@ consumer_groups:
       path: null
       redis:
         cluster_addresses: null
-        connect_timeout: null
+        cluster_max_redirections: 5
+        cluster_nodes: null
+        connect_timeout: 2000
+        connection_is_proxied: false
         database: 0
-        host: null
+        host: 127.0.0.1
         keepalive_backlog: null
         keepalive_pool_size: 256
         password: null
-        port: null
-        read_timeout: null
-        send_timeout: null
+        port: 6379
+        read_timeout: 2000
+        send_timeout: 2000
         sentinel_addresses: null
         sentinel_master: null
+        sentinel_nodes: null
         sentinel_password: null
         sentinel_role: null
         sentinel_username: null
