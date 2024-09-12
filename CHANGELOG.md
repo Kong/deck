@@ -102,7 +102,7 @@
 - Bumped up go-apiops library. The updated lib has a fix for `deck file openapi2kong` command where parameters.required field was coming as null, if not passed by user. [#1400](https://github.com/Kong/deck/pull/1400) [go-apiops #205](https://github.com/Kong/go-apiops/pull/205)
 - Bumped up go-kong library. The updated lib prevents unset plugin's configuration "record" fields to be filled with empty tables: {}
 for deck files. Since, deck doesn't fill defaults anymore, this fix ensures that deck doesn't pass empty record fields while syncing plugin configurations.
-[#1401](https://github.com/Kong/deck/pull/1400) [go-kong #467](https://github.com/Kong/go-kong/pull/467)
+[#1401](https://github.com/Kong/deck/pull/1401) [go-kong #467](https://github.com/Kong/go-kong/pull/467)
 
 ## [v1.40.0]
 > Release date: 2024/09/10
