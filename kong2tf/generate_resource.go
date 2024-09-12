@@ -353,6 +353,9 @@ func outputList(entityType string, key string, input []interface{}, depth int) s
 
 // Ends a list rendering in Go
 func endList(input []interface{}, depth int) string {
+	if len(input) == 0 {
+		return "]\n"
+	}
 	lastLine := line("]", depth, "\n")
 	if _, ok := input[len(input)-1].(map[string]interface{}); ok {
 		return lastLine
