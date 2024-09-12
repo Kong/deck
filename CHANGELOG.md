@@ -1804,7 +1804,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
-[v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.0
+[v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1
 [v1.40.0]: https://github.com/Kong/deck/compare/v1.39.6...v1.40.0
 [v1.39.6]: https://github.com/Kong/deck/compare/v1.39.5...v1.39.6
 [v1.39.5]: https://github.com/Kong/deck/compare/v1.39.4...v1.39.5
