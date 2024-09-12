@@ -179,8 +179,8 @@ github.com/klauspost/cpuid/v2 v2.0.10/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuOb
 github.com/klauspost/cpuid/v2 v2.0.12/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuObKfj5c0PQa7c=
 github.com/klauspost/cpuid/v2 v2.2.5 h1:0E5MSMDEoAulmXNFquVs//DdoomxaoTY1kUhbc/qbZg=
 github.com/klauspost/cpuid/v2 v2.2.5/go.mod h1:Lcz8mBdAVJIBVzewtcLocK12l3Y+JytZYpaMropDUws=
-github.com/kong/go-apiops v0.1.36 h1:WejXoJZXAI8ZdwrCUyx1ONOfBw0e2GeopqW1/rjy7Wk=
-github.com/kong/go-apiops v0.1.36/go.mod h1:B0WFsqonn+xnHgHg0x063fADFC21mhNOsOXsbKdZTpM=
+github.com/kong/go-apiops v0.1.37 h1:AwIslsbnx9JAFdPy8UI6NF/I+X2ypi7TJmdDNwKe/bY=
+github.com/kong/go-apiops v0.1.37/go.mod h1:B0WFsqonn+xnHgHg0x063fADFC21mhNOsOXsbKdZTpM=
 github.com/kong/go-database-reconciler v1.14.7 h1:U8VnKYFz8oBnAgDxipBHNR9KCOxexffQlmCyfWhafV4=
 github.com/kong/go-database-reconciler v1.14.7/go.mod h1:T5BkBw13PZWub3y2jKAoM7fYD+UmXp2iNqj1YqD0L90=
 github.com/kong/go-kong v0.59.0 h1:U6dE2sqb8E8j0kESW/RCW9TkXH8Y3W0EtNDXJVsDNuM=
@@ -218,8 +218,6 @@ github.com/mattn/go-runewidth v0.0.15 h1:UNAjwbU9l54TA3KzvqLGxwWjHmMgBUVhBiTjelZ
 github.com/mattn/go-runewidth v0.0.15/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
-github.com/mitchellh/hashstructure v1.1.0 h1:P6P1hdjqAAknpY/M1CGipelZgp+4y9ja9kmUZPXP+H0=
-github.com/mitchellh/hashstructure v1.1.0/go.mod h1:xUDAozZz0Wmdiufv0uyhnHkUTN6/6d8ulp4AwfLKrmA=
 github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
