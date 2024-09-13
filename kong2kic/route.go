@@ -82,7 +82,12 @@ func addAnnotationsFromRoute(route *file.FRoute, annotations map[string]string) 
 }
 
 // Helper function to create ingress paths
-func createIngressPaths(route *file.FRoute, serviceName string, servicePort *int, pathType k8snetv1.PathType) []k8snetv1.HTTPIngressPath {
+func createIngressPaths(
+	route *file.FRoute,
+	serviceName string,
+	servicePort *int,
+	pathType k8snetv1.PathType,
+) []k8snetv1.HTTPIngressPath {
 	var paths []k8snetv1.HTTPIngressPath
 	for _, path := range route.Paths {
 		sCopy := *path

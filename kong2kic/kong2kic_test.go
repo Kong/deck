@@ -222,12 +222,12 @@ func Test_deployManifests(t *testing.T) {
 			require.True(t, ready)
 
 			t.Log("verifying the kong proxy is returning its default 404 response")
-			proxyURL, err := getKongProxyURL(ctx, env, kongAddon)
+			proxyURL, err := getKongProxyURL(ctx, env)
 			require.NoError(t, err)
 			verifyKongProxyResponse(t, proxyURL)
 
 			t.Log("verifying that the kong addon deployed both proxy and controller")
-			verifyKongDeployment(t, ctx, env, kongAddon)
+			verifyKongDeployment(ctx, t, env, kongAddon)
 
 			config := env.Cluster().Config()
 
@@ -251,11 +251,14 @@ func Test_deployManifests(t *testing.T) {
 }
 
 // Helper function to set up the testing environment with a specific KIC version
-func setupTestingEnvironmentWithVersion(ctx context.Context, kicVersion string) (environment.Environment, *kong.Addon, error) {
+func setupTestingEnvironmentWithVersion(
+	ctx context.Context,
+	kicVersion string,
+) (environment.Environment, *kong.Addon, error) {
 	builder := environment.NewBuilder()
 	kongAddonBuilder := kong.NewBuilder().
 		WithControllerImage("kong/kubernetes-ingress-controller", kicVersion).
-		WithProxyImage("kong","3.4") // Adjust proxy image if needed
+		WithProxyImage("kong", "3.4") // Adjust proxy image if needed
 
 	kongAddon := kongAddonBuilder.Build()
 	env, err := builder.WithAddons(metallb.New(), kongAddon).Build(ctx)
@@ -271,7 +274,7 @@ func teardownEnvironment(ctx context.Context, t *testing.T, env environment.Envi
 }
 
 // Helper function to get Kong proxy URL
-func getKongProxyURL(ctx context.Context, env environment.Environment, kongAddon *kong.Addon) (string, error) {
+func getKongProxyURL(ctx context.Context, env environment.Environment) (string, error) {
 	kongAon, err := env.Cluster().GetAddon("kong")
 	if err != nil {
 		return "", err
@@ -301,7 +304,7 @@ func verifyKongProxyResponse(t *testing.T, proxyURL string) {
 }
 
 // Helper function to verify Kong deployment
-func verifyKongDeployment(t *testing.T, ctx context.Context, env environment.Environment, kongAddon *kong.Addon) {
+func verifyKongDeployment(ctx context.Context, t *testing.T, env environment.Environment, kongAddon *kong.Addon) {
 	client := env.Cluster().Client()
 	appsV1 := client.AppsV1()
 	deployments := appsV1.Deployments(kongAddon.Namespace())
@@ -368,7 +371,12 @@ func getKindToResourceMap(clientset *clientset.Clientset) (map[string]string, er
 }
 
 // Helper function to deploy manifests to the cluster
-func deployManifestsToClusterForVersion(t *testing.T, dynamicClient dynamic.Interface, kindToResource map[string]string, version string) error {
+func deployManifestsToClusterForVersion(
+	t *testing.T,
+	dynamicClient dynamic.Interface,
+	kindToResource map[string]string,
+	version string,
+) error {
 	files, err := os.ReadDir("testdata/")
 	if err != nil {
 		return err
@@ -452,7 +460,10 @@ func deployManifestToCluster(
 }
 
 // Helper function to get GroupVersionResource from an unstructured object
-func getGroupVersionResource(obj *unstructured.Unstructured, kindToResource map[string]string) (schema.GroupVersionResource, error) {
+func getGroupVersionResource(
+	obj *unstructured.Unstructured,
+	kindToResource map[string]string,
+) (schema.GroupVersionResource, error) {
 	apiVersion := obj.GetAPIVersion()
 	kind := obj.GetKind()
 	resource, exists := kindToResource[kind]
@@ -473,9 +484,8 @@ func getGroupVersionResource(obj *unstructured.Unstructured, kindToResource map[
 			Version:  parts[0],
 			Resource: resource,
 		}, nil
-	} else {
-		return schema.GroupVersionResource{}, errors.New("invalid apiVersion: " + apiVersion)
 	}
+	return schema.GroupVersionResource{}, errors.New("invalid apiVersion: " + apiVersion)
 }
 
 // Helper function to set namespace if needed

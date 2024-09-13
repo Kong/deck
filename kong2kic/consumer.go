@@ -11,6 +11,7 @@ import (
 // Function to populate KIC Consumers and their credentials
 func populateKICConsumers(content *file.Content, file *KICContent) error {
 	for _, consumer := range content.Consumers {
+		consumer := consumer
 		if consumer.Username == nil {
 			log.Println("Consumer username is empty. Please provide a username for the consumer.")
 			continue
