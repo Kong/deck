@@ -176,7 +176,6 @@ func Test_convertKongGatewayToKIC(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt // Capture range variable
 		t.Run(tt.name, func(t *testing.T) {
 			inputPath := filepath.Join(baseLocation, tt.inputFilename)
 			inputContent, err := file.GetContentFromFiles([]string{inputPath}, false)
@@ -202,7 +201,6 @@ func Test_convertKongGatewayToKIC(t *testing.T) {
 func Test_deployManifests(t *testing.T) {
 	versions := []string{"2.12", "3.0", "3.1", "3.2", "3.3"}
 	for _, version := range versions {
-		version := version // Capture range variable
 		t.Run("KIC Version "+version, func(t *testing.T) {
 			t.Parallel()
 			ctx := context.Background()
@@ -283,7 +281,7 @@ func getKongProxyURL(ctx context.Context, env environment.Environment) (string, 
 	if !ok {
 		return "", errors.New("failed to cast kong addon")
 	}
-	proxyURL, err := kongAddonRaw.ProxyURL(ctx, env.Cluster())
+	proxyURL, err := kongAddonRaw.ProxyHTTPURL(ctx, env.Cluster())
 	if err != nil {
 		return "", err
 	}

@@ -3,7 +3,6 @@ package kong2kic
 import (
 	"encoding/json"
 	"log"
-	"sort"
 	"strconv"
 	"strings"
 
