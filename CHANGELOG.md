@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.40.1](#v1401)
 - [v1.40.0](#v1400)
 - [v1.39.6](#v1396)
 - [v1.39.5](#v1395)
@@ -92,6 +93,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.40.1]
+> Release date: 2024/09/12
+
+### Fixes
+- Fixed the issue in `deck file kong2tf` command where users were facing a panic error with using jwt plugins when passing an empty list to cookie_names field. [#1399](https://github.com/Kong/deck/pull/1399)
+- Bumped up go-apiops library. The updated lib has a fix for `deck file openapi2kong` command where parameters.required field was coming as null, if not passed by user. [#1400](https://github.com/Kong/deck/pull/1400) [go-apiops #205](https://github.com/Kong/go-apiops/pull/205)
+- Bumped up go-kong library. The updated lib prevents unset plugin's configuration "record" fields to be filled with empty tables: {}
+for deck files. Since, deck doesn't fill defaults anymore, this fix ensures that deck doesn't pass empty record fields while syncing plugin configurations.
+[#1401](https://github.com/Kong/deck/pull/1401) [go-kong #467](https://github.com/Kong/go-kong/pull/467)
 
 ## [v1.40.0]
 > Release date: 2024/09/10
@@ -1793,6 +1804,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1
 [v1.40.0]: https://github.com/Kong/deck/compare/v1.39.6...v1.40.0
 [v1.39.6]: https://github.com/Kong/deck/compare/v1.39.5...v1.39.6
 [v1.39.5]: https://github.com/Kong/deck/compare/v1.39.4...v1.39.5
