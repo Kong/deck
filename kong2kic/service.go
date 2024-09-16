@@ -70,7 +70,8 @@ func createK8sService(service *file.FService, upstreams []file.FUpstream) *k8sco
 			log.Fatalf("Port %d is not within the valid range. Please provide a port between 0 and 65535.\n", *service.Port)
 		}
 		servicePort := k8scorev1.ServicePort{
-			Protocol:   protocol,
+			Protocol: protocol,
+			//nolint: gosec
 			Port:       int32(*service.Port),
 			TargetPort: intstr.FromInt(*service.Port),
 		}
