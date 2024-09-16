@@ -18,8 +18,8 @@ metadata:
   annotations:
     konghq.com/tags: internal
     kubernetes.io/ingress.class: kong
-  name: example-user
-username: example-user
+  name: example-consumer-group-user
+username: example-consumer-group-user
 ---
 apiVersion: configuration.konghq.com/v1beta1
 kind: KongConsumerGroup

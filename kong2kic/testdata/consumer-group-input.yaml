@@ -1,11 +1,11 @@
 consumers:
-  - username: example-user
+  - username: example-consumer-group-user
     tags:
       - internal
 consumer_groups:
   - name: example-consumer-group
     consumers:
-      - username: example-user
+      - username: example-consumer-group-user
     plugins:
       - name: rate-limiting
         config:
