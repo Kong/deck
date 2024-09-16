@@ -99,6 +99,10 @@ func createIngressPaths(
 			},
 		}
 		if servicePort != nil {
+			// check that the port is within the valid range
+			if *servicePort > 65535 || *servicePort < 0 {
+				log.Fatalf("Port %d is not within the valid range. Please provide a port between 0 and 65535.\n", *servicePort)
+			}
 			backend.Service.Port.Number = int32(*servicePort)
 		}
 		paths = append(paths, k8snetv1.HTTPIngressPath{

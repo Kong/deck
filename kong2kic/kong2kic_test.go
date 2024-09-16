@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -266,7 +267,14 @@ func setupTestingEnvironmentWithVersion(
 	return env, kongAddon, nil
 }
 
+// Mutex to avoid race condition on ~/.kube/config file
+var teardownMutex sync.Mutex
+
 func teardownEnvironment(ctx context.Context, t *testing.T, env environment.Environment) {
+	// Lock the mutex to ensure only one teardown process at a time
+	teardownMutex.Lock()
+	defer teardownMutex.Unlock()
+
 	t.Logf("cleaning up environment %s and cluster %s", env.Name(), env.Cluster().Name())
 	require.NoError(t, env.Cleanup(ctx))
 }
