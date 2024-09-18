@@ -31,7 +31,8 @@ consumer_groups:
       - 60
       window_type: sliding
 consumers:
-- groups:
+- id: 416b038a-fd00-45fd-a5a2-a74bf70017fa
+  groups:
   - name: silver
   username: bar
 - username: baz
