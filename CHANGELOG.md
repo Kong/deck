@@ -1,5 +1,7 @@
 # Table of Contents
 
+- [v1.40.1](#v1401)
+- [v1.40.0](#v1400)
 - [v1.39.6](#v1396)
 - [v1.39.5](#v1395)
 - [v1.39.4](#v1394)
@@ -91,6 +93,34 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.40.1]
+> Release date: 2024/09/12
+
+### Fixes
+- Fixed the issue in `deck file kong2tf` command where users were facing a panic error with using jwt plugins when passing an empty list to cookie_names field. [#1399](https://github.com/Kong/deck/pull/1399)
+- Bumped up go-apiops library. The updated lib has a fix for `deck file openapi2kong` command where parameters.required field was coming as null, if not passed by user. [#1400](https://github.com/Kong/deck/pull/1400) [go-apiops #205](https://github.com/Kong/go-apiops/pull/205)
+- Bumped up go-kong library. The updated lib prevents unset plugin's configuration "record" fields to be filled with empty tables: {}
+for deck files. Since, deck doesn't fill defaults anymore, this fix ensures that deck doesn't pass empty record fields while syncing plugin configurations.
+[#1401](https://github.com/Kong/deck/pull/1401) [go-kong #467](https://github.com/Kong/go-kong/pull/467)
+
+## [v1.40.0]
+> Release date: 2024/09/10
+
+### Added
+- Added a new `file kong2tf` command to convert a deck file to Terraform configuration [#1391](https://github.com/Kong/deck/pull/1391), along with two command line flags:
+  - `--generate-imports-for-control-plane-id`: If this is provided, import blocks will be added to Terraform to adopt existing resources.
+  - `--ignore-credential-changes`: If this is provided, any credentials will be ignored until they are destroyed and recreated.
+
+### Fixes
+
+- Fixed the issue that was preventing a consumer to be in more than one consumer-groups [#1394](https://github.com/Kong/deck/pull/1394)
+[go-database-reconciler #140](https://github.com/Kong/go-database-reconciler/pull/140)
+- Fields marked as auto in schema are filled with nil in the config sent to the Control Plane. In case a field is marked as auto and is a required field, deck would throw an error if the user doesn't fill it in the declarative configuration file.
+[#1394](https://github.com/Kong/deck/pull/1394) [go-database-reconciler #139](https://github.com/Kong/go-database-reconciler/pull/139)
+- Defaults are no longer filled by deck. They will only be used for computing a diff, but not sent to the Control Plane.
+[#1394](https://github.com/Kong/deck/pull/1394) [go-database-reconciler #133](https://github.com/Kong/go-database-reconciler/pull/133)
+
 
 ## [v1.39.6]
 > Release date: 2024/08/22
@@ -1774,6 +1804,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1
+[v1.40.0]: https://github.com/Kong/deck/compare/v1.39.6...v1.40.0
 [v1.39.6]: https://github.com/Kong/deck/compare/v1.39.5...v1.39.6
 [v1.39.5]: https://github.com/Kong/deck/compare/v1.39.4...v1.39.5
 [v1.39.4]: https://github.com/Kong/deck/compare/v1.39.3...v1.39.4

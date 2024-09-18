@@ -1,0 +1,48 @@
+services:
+  - name: example-service
+    url: http://example-api.com
+    routes:
+      - name: example-route
+        methods:
+          - GET
+          - POST
+        hosts:
+          - example.com
+          - another-example.com
+          - yet-another-example.com
+        paths:
+          - ~/v1/example/?$
+          - /v1/another-example
+          - /v1/yet-another-example
+        protocols:
+          - http
+          - https
+        headers:
+          x-my-header:
+            - ~*foos?bar$
+          x-another-header:
+            - first-header-value
+            - second-header-value
+        regex_priority: 1
+        strip_path: false
+        preserve_host: true
+        tags:
+          - version:v1
+        https_redirect_status_code: 302
+        snis:
+          - example.com
+        sources:
+          - ip: 192.168.0.1
+        destinations:
+          - ip: 10.10.10.10
+            port: 8080
+
+routes:
+  - name: top-level-route
+    hosts:
+      - top-level.example.com
+  - name: top-level-with-service-route
+    service:
+      name: example-service
+    hosts:
+      - top-level-with-service.example.com
