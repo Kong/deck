@@ -3781,7 +3781,7 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 							"hide_client_headers":     bool(false),
 							"identifier":              string("consumer"),
 							"limit":                   []any{float64(10)},
-							"namespace":               string("silver"),
+							"namespace":               string("foo"),
 							"path":                    nil,
 							"redis": map[string]any{
 								"cluster_addresses":   nil,
