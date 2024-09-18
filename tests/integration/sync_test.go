@@ -3617,7 +3617,7 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 // test scope:
 //   - 3.4.x
 func Test_Sync_SkipConsumers_34x(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.4.0")
+	runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
