@@ -50,6 +50,7 @@ services:
 plugins:
   - name: rate-limiting-advanced
     config:
+      namespace: foo
       limit:
       - 10
       retry_after_jitter_max: 1
