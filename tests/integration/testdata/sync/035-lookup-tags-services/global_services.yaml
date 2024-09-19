@@ -1,0 +1,7 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - global-services
+services:
+- name: foo
+  host: test.com

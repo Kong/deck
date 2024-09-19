@@ -1,0 +1,13 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - global-entities-consumerGroups
+services:
+- name: foo
+  host: test.com
+routes:
+- name: bar
+  paths:
+  - /test
+consumer_groups:
+- name: foo2
