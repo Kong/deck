@@ -22,7 +22,8 @@ func TestGenerateComplexLayout(t *testing.T) {
 					"nested_nested_nested_field1": "nested_nested_nested_string"
 				}
 			}
-		}
+		},
+		"field4": []
 	}`
 
 	var entity map[string]any
@@ -43,6 +44,7 @@ func TestGenerateComplexLayout(t *testing.T) {
       }
     }
   }
+  field4 = []	
 
   service = {
     id = konnect_gateway_service.some_service.id
