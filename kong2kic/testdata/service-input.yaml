@@ -1,0 +1,40 @@
+services:
+  - name: complex-service
+    url: http://example-api.com
+    protocol: http
+    host: example-api.com
+    port: 80
+    path: /v1
+    retries: 5
+    connect_timeout: 5000
+    write_timeout: 60000
+    read_timeout: 60000
+    enabled: true
+    client_certificate: 4e3ad2e4-0bc4-4638-8e34-c84a417ba39b
+    tags:
+      - example
+      - api
+    plugins:
+      - name: cors
+        config:
+          origins:
+          - http://mockbin.com
+          methods:
+          - GET
+          - POST
+          headers:
+          - Accept
+          - Accept-Version
+          - Content-Length
+          - Content-MD5
+          - Content-Type
+          - Date
+          - X-Auth-Token
+          exposed_headers:
+          - X-Auth-Token
+          credentials: true
+          max_age: 3600
+        tags:
+          - cors-complex-service
+  - name: simple-service
+    port: 8080
