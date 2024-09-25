@@ -26,7 +26,8 @@ var (
 	rootConfig    utils.KongClientConfig
 	konnectConfig utils.KonnectConfig
 
-	disableAnalytics bool
+	disableAnalytics         bool
+	konnectConnectionDesired bool
 
 	konnectRuntimeGroup string
 	konnectControlPlane string
@@ -376,6 +377,10 @@ func initConfig() {
 
 	if viper.IsSet("no-color") {
 		color.NoColor = viper.GetBool("no-color")
+	}
+
+	if viper.IsSet("konnect-addr") {
+		konnectConnectionDesired = true
 	}
 
 	if err := initKonnectConfig(); err != nil {
