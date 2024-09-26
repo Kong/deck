@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.40.2](#v1402)
 - [v1.40.1](#v1401)
 - [v1.40.0](#v1400)
 - [v1.39.6](#v1396)
@@ -93,6 +94,13 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.40.2]
+> Release date: 2024/09/19
+
+### Added
+- Add support for default lookup services. [#1367](https://github.com/Kong/deck/pull/1367)
+[go-database-reconciler #130](https://github.com/Kong/go-database-reconciler/pull/130)
 
 ## [v1.40.1]
 > Release date: 2024/09/12
@@ -1804,6 +1812,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.40.2]: https://github.com/Kong/deck/compare/v1.40.1...v1.40.2
 [v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1
 [v1.40.0]: https://github.com/Kong/deck/compare/v1.39.6...v1.40.0
 [v1.39.6]: https://github.com/Kong/deck/compare/v1.39.5...v1.39.6
