@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.40.3](#v1403)
 - [v1.40.2](#v1402)
 - [v1.40.1](#v1401)
 - [v1.40.0](#v1400)
@@ -94,6 +95,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.40.3]
+> Release date: 2024/09/26
+
+### Fixes
+- Fixed the behaviour of --konnect-addr flag in case default Konnect URL is used with it.
+Earlier, using the default URL with the said flag ran the command against the gateway.
+[#1398](https://github.com/Kong/deck/pull/1398)
+- Bumped up go-apiops to `v0.1.38` and replaced yaml/v3 package with [Kong's own fork](https://github.com/Kong/yaml). This change allows deck commands to process OAS files with path lengths > 128 characters which was a limitation from the original yaml library.[#1405](https://github.com/Kong/deck/pull/1405) [go-apiops #208](https://github.com/Kong/go-apiops/pull/208) [Kong/yaml #1](https://github.com/Kong/yaml/pull/1)
 
 ## [v1.40.2]
 > Release date: 2024/09/19
@@ -1812,6 +1822,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.40.3]: https://github.com/Kong/deck/compare/v1.40.2...v1.40.3
 [v1.40.2]: https://github.com/Kong/deck/compare/v1.40.1...v1.40.2
 [v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1
 [v1.40.0]: https://github.com/Kong/deck/compare/v1.39.6...v1.40.0
