@@ -1,0 +1,9 @@
+services:
+- host: localhost
+  name: foo
+  port: 8001
+  protocol: http
+  routes:
+  - expression: (net.protocol == "http") && (http.method == "GET") && (http.path ==
+      "/foo")
+    name: foo

@@ -119,6 +119,17 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 	return nil
 }
 
+func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
+	filteredPlugins := []file.FPlugin{}
+
+	for _, plugin := range targetContentPlugins {
+		if plugin.Consumer == nil && plugin.ConsumerGroup == nil {
+			filteredPlugins = append(filteredPlugins, plugin)
+		}
+	}
+	return filteredPlugins
+}
+
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string, enableJSONOutput bool,
 ) error {
@@ -139,6 +150,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if dumpConfig.SkipConsumers {
 		targetContent.Consumers = []file.FConsumer{}
 		targetContent.ConsumerGroups = []file.FConsumerGroupObject{}
+		targetContent.Plugins = RemoveConsumerPlugins(targetContent.Plugins)
 	}
 	if dumpConfig.SkipCACerts {
 		targetContent.CACertificates = []file.FCACertificate{}
@@ -236,6 +248,25 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
+	dumpConfig.LookUpSelectorTagsConsumerGroups, err = determineLookUpSelectorTagsConsumerGroups(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for consumer groups: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsConsumerGroups != nil {
+		consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumerGroups)
+		if err != nil {
+			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
+		}
+		for _, c := range consumerGroupsGlobal {
+			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
+				file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
+			if err != nil {
+				return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
+			}
+		}
+	}
+
 	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
 	if err != nil {
 		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
@@ -268,6 +299,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
 			if err != nil {
 				return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
+			}
+		}
+	}
+
+	dumpConfig.LookUpSelectorTagsServices, err = determineLookUpSelectorTagsServices(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for services: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsServices != nil {
+		servicesGlobal, err := dump.GetAllServices(ctx, kongClient, dumpConfig.LookUpSelectorTagsServices)
+		if err != nil {
+			return fmt.Errorf("error retrieving global services via lookup selector tags: %w", err)
+		}
+		for _, r := range servicesGlobal {
+			targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
+			if err != nil {
+				return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
 			}
 		}
 	}
@@ -355,6 +404,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
+func determineLookUpSelectorTagsConsumerGroups(targetContent file.Content) ([]string, error) {
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.ConsumerGroups != nil {
+		if len(targetContent.Info.LookUpSelectorTags.ConsumerGroups) == 0 {
+			return nil, fmt.Errorf("global consumer groups specified but no global tags")
+		}
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.ConsumerGroups)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.ConsumerGroups)
+		return targetContent.Info.LookUpSelectorTags.ConsumerGroups, nil
+
+	}
+	return nil, nil
+}
+
 func determineLookUpSelectorTagsConsumers(targetContent file.Content) ([]string, error) {
 	if targetContent.Info != nil &&
 		targetContent.Info.LookUpSelectorTags != nil &&
@@ -380,6 +444,21 @@ func determineLookUpSelectorTagsRoutes(targetContent file.Content) ([]string, er
 		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Routes)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Routes)
 		return targetContent.Info.LookUpSelectorTags.Routes, nil
+
+	}
+	return nil, nil
+}
+
+func determineLookUpSelectorTagsServices(targetContent file.Content) ([]string, error) {
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.Services != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Services) == 0 {
+			return nil, fmt.Errorf("global services specified but no global tags")
+		}
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Services)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.Services)
+		return targetContent.Info.LookUpSelectorTags.Services, nil
 
 	}
 	return nil, nil
@@ -515,11 +594,11 @@ func checkForRBACResources(content reconcilerUtils.KongRawState,
 		common := "At a time, state file(s) must entirely consist of either proxy " +
 			"configuration or RBAC configuration."
 		if rbacResourcesOnly {
-			return fmt.Errorf("When --rbac-resources-only is used, state file(s) " +
-				"cannot contain any resources other than RBAC resources. " + common)
+			return fmt.Errorf("when --rbac-resources-only is used, state file(s) "+
+				"cannot contain any resources other than RBAC resources. %s", common)
 		}
-		return fmt.Errorf("State file(s) contains RBAC resources. " +
-			"Please use --rbac-resources-only flag to manage these resources. " + common)
+		return fmt.Errorf("state file(s) contains RBAC resources. "+
+			"Please use --rbac-resources-only flag to manage these resources. %s", common)
 	}
 	return nil
 }
@@ -565,6 +644,8 @@ func inKonnectMode(targetContent *file.Content) bool {
 	} else if konnectConfig.Email != "" ||
 		konnectConfig.Password != "" ||
 		konnectConfig.Token != "" {
+		return true
+	} else if konnectConnectionDesired {
 		return true
 	}
 	return false

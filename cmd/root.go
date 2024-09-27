@@ -26,7 +26,8 @@ var (
 	rootConfig    utils.KongClientConfig
 	konnectConfig utils.KonnectConfig
 
-	disableAnalytics bool
+	disableAnalytics         bool
+	konnectConnectionDesired bool
 
 	konnectRuntimeGroup string
 	konnectControlPlane string
@@ -253,6 +254,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newConvertCmd(false))
 		fileCmd.AddCommand(newValidateCmd(false, false)) // file-based validation
 		fileCmd.AddCommand(newKong2KicCmd())
+		fileCmd.AddCommand(newKong2TfCmd())
 	}
 	return rootCmd
 }
@@ -373,7 +375,13 @@ func initConfig() {
 	// cookie-jar support
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
 
-	color.NoColor = (color.NoColor || viper.GetBool("no-color"))
+	if viper.IsSet("no-color") {
+		color.NoColor = viper.GetBool("no-color")
+	}
+
+	if viper.IsSet("konnect-addr") {
+		konnectConnectionDesired = true
+	}
 
 	if err := initKonnectConfig(); err != nil {
 		fmt.Println(err)

@@ -8,7 +8,7 @@ linters:
   - dogsled
   - durationcheck
   - exhaustive
-  - exportloopref
+  - copyloopvar
   - gci
   - goconst
   - gofmt
@@ -19,7 +19,9 @@ linters:
   - govet
   - importas
   - lll
-  - megacheck
+  - gosimple
+  - staticcheck
+  - unused
   - misspell
   - nakedret
   - nilerr

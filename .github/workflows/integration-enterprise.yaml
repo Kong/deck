@@ -18,22 +18,11 @@ jobs:
     strategy:
       matrix:
         kong_image:
-        - 'kong/kong-gateway:1.5.0.11'
-        - 'kong/kong-gateway:2.1.4.6'
-        - 'kong/kong-gateway:2.2.1.3'
-        - 'kong/kong-gateway:2.3.3.4'
-        - 'kong/kong-gateway:2.4.1.3'
-        - 'kong/kong-gateway:2.5.1.2'
-        - 'kong/kong-gateway:2.6.0.2'
-        - 'kong/kong-gateway:2.7'
         - 'kong/kong-gateway:2.8'
-        - 'kong/kong-gateway:3.0'
-        - 'kong/kong-gateway:3.1'
-        - 'kong/kong-gateway:3.2'
-        - 'kong/kong-gateway:3.3'
         - 'kong/kong-gateway:3.4'
         - 'kong/kong-gateway:3.5'
         - 'kong/kong-gateway:3.6'
+        - 'kong/kong-gateway:3.7'
         - 'kong/kong-gateway-dev:latest'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
@@ -46,7 +35,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: '^1.20'
+          go-version-file: go.mod
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -55,7 +44,6 @@ jobs:
       - uses: Kong/kong-license@master
         id: license
         with:
-          password: ${{ secrets.PULP_PASSWORD }}
           op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       - name: Setup Kong
         env:
@@ -65,3 +53,4 @@ jobs:
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
         run: make test-integration
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}

@@ -327,6 +327,72 @@ var (
 		},
 	}
 
+	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
 	upstream_pre31 = []*kong.Upstream{ //nolint:revive,stylecheck
 		{
 			Name:      kong.String("upstream1"),
@@ -1264,9 +1330,7 @@ var (
 func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// ignore entities fields based on Kong version
 	ignoreFields := []cmp.Option{
@@ -1311,9 +1375,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1353,9 +1415,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1402,9 +1462,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1446,9 +1504,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1487,9 +1543,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1528,9 +1582,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1569,9 +1621,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1603,9 +1653,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1637,9 +1685,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1686,9 +1732,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1720,9 +1764,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1754,9 +1796,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -1790,9 +1830,7 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// ignore entities fields based on Kong version
 	ignoreFields := []cmp.Option{
@@ -1845,9 +1883,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1880,9 +1916,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1915,9 +1949,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1950,9 +1982,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -1993,9 +2023,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2028,9 +2056,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2063,9 +2089,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2098,9 +2122,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2131,9 +2153,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 func Test_Sync_RateLimitingPlugin(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2172,9 +2192,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// ignore entities fields based on Kong version
 	ignoreFields := []cmp.Option{
@@ -2216,9 +2234,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2261,9 +2277,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2301,9 +2315,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2336,9 +2348,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 func Test_Sync_SkipCACert_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2372,9 +2382,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 func Test_Sync_SkipCACert_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2408,9 +2416,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 func Test_Sync_RBAC_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2513,9 +2519,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 func Test_Sync_RBAC_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2618,9 +2622,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2651,9 +2653,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2687,9 +2687,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2724,9 +2722,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -2747,7 +2743,42 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
+			setup(t)
+
+			sync(tc.kongFile)
+			testKongState(t, client, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create plugins on services, routes and consumers",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entitiesKonnect,
+				Consumers: consumer,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenKonnect(t)
 			setup(t)
 
 			sync(tc.kongFile)
@@ -2761,9 +2792,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 func Test_Sync_PluginOrdering(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -2920,9 +2949,7 @@ u8S6yNlu2Q==
 func Test_Sync_Vault(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3042,9 +3069,7 @@ func Test_Sync_Vault(t *testing.T) {
 func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3086,9 +3111,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3130,9 +3153,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3174,9 +3195,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3217,9 +3236,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 //   - 2.7+
 func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 	tests := []struct {
 		name          string
 		kongFile      string
@@ -3257,9 +3274,7 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 //   - 3.1
 func Test_Sync_ConsumerGroups_31(t *testing.T) {
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 	tests := []struct {
 		name            string
 		kongFile        string
@@ -3333,9 +3348,8 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 		maxRegularRequestsNumber = 5
 	)
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
+	require.NoError(t, err)
 	tests := []struct {
 		name          string
 		kongFile      string
@@ -3442,9 +3456,7 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 //   - konnect
 func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 	tests := []struct {
 		name            string
 		kongFile        string
@@ -3481,9 +3493,7 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 func Test_Sync_PluginInstanceName(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name            string
@@ -3562,9 +3572,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 func Test_Sync_SkipConsumers(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -3612,9 +3620,7 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -3759,6 +3765,55 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 						Enabled:   kong.Bool(true),
 						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
 					},
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("416b038a-fd00-45fd-a5a2-a74bf70017fa"),
+						},
+						Config: kong.Configuration{
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(10)},
+							"namespace":               string("foo"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cluster_addresses":   nil,
+								"connect_timeout":     nil,
+								"database":            float64(0),
+								"host":                nil,
+								"keepalive_backlog":   nil,
+								"keepalive_pool_size": float64(30),
+								"password":            nil,
+								"port":                nil,
+								"read_timeout":        nil,
+								"send_timeout":        nil,
+								"sentinel_addresses":  nil,
+								"sentinel_master":     nil,
+								"sentinel_password":   nil,
+								"sentinel_role":       nil,
+								"sentinel_username":   nil,
+								"server_name":         nil,
+								"ssl":                 false,
+								"ssl_verify":          false,
+								"timeout":             float64(2000),
+								"username":            nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              float64(-1),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
 				},
 			},
 			skipConsumers: false,
@@ -3784,9 +3839,7 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 	runWhenKonnect(t)
 	// setup stage
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	tests := []struct {
 		name          string
@@ -3994,9 +4047,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 	runWhenKongOrKonnect(t, ">=3.0.0")
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// These are the IDs that should be present in Kong after the second sync in all cases.
 	var (
@@ -4096,9 +4147,7 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	const (
 		beforeConfig = "testdata/sync/021-update-with-explicit-ids/before.yaml"
@@ -4149,9 +4198,7 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	const (
 		beforeConfig = "testdata/sync/022-update-with-explicit-ids-with-no-names/before.yaml"
@@ -4194,9 +4241,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
 	require.NoError(t, err)
@@ -4256,9 +4301,7 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
 	require.NoError(t, err)
@@ -4334,9 +4377,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 		maxRegularRequestsNumber = 5
 	)
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 	tests := []struct {
 		name          string
 		kongFile      string
@@ -4685,6 +4726,16 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 
+	ignoreFields := []cmp.Option{
+		cmp.FilterValues(func(x, y interface{}) bool {
+			_, okX := x.(map[string]interface{})
+			_, okY := y.(map[string]interface{})
+			return okX && okY
+		}, cmpopts.IgnoreMapEntries(func(key string, _ interface{}) bool {
+			return key == "redis"
+		})),
+	}
+
 	tests := []struct {
 		name          string
 		kongFile      string
@@ -4749,7 +4800,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(tc.kongFile))
-			testKongState(t, client, true, tc.expectedState, nil)
+			testKongState(t, client, true, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -4847,9 +4898,8 @@ func Test_Sync_KonnectRename(t *testing.T) {
 				})
 			}
 			client, err := getTestClient()
-			if err != nil {
-				t.Fatalf(err.Error())
-			}
+			require.NoError(t, err)
+
 			sync(tc.kongFile, tc.flags...)
 			testKongState(t, client, true, tc.expectedState, nil)
 		})
@@ -4907,9 +4957,7 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	const (
 		oldConfig = "testdata/sync/027-created-at/old.yaml"
@@ -4922,9 +4970,7 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	// get the current state
 	ctx := context.Background()
 	oldKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// update entities
 	time.Sleep(time.Second)
@@ -4932,9 +4978,7 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 
 	// get the new state
 	newKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	require.NoError(t, err)
 
 	// verify that the created_at have not changed across deployments
 	require.Equal(t, oldKongState.Services[0].CreatedAt, newKongState.Services[0].CreatedAt)
@@ -4964,21 +5008,21 @@ func Test_Sync_LookupConsumerTags(t *testing.T) {
 	setup(t)
 
 	// test that reference to non-existing consumer fails.
-	pluginsNoLookupStateFile := "testdata/sync/029-lookup-tags/plugins_no_lookup.yaml"
+	pluginsNoLookupStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_no_lookup.yaml"
 	err := sync(pluginsNoLookupStateFile)
 	require.Error(t, err)
 	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to existing local consumer succeeds.
-	pluginsAndConsumersStateFile := "testdata/sync/029-lookup-tags/plugins_and_consumers.yaml"
+	pluginsAndConsumersStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_and_consumers.yaml"
 	require.NoError(t, sync(pluginsAndConsumersStateFile))
 	reset(t)
 
 	// test that reference to existing global consumer succeeds via lookup tags.
-	globalConsumersStateFile := "testdata/sync/029-lookup-tags/global_consumers.yaml"
+	globalConsumersStateFile := "testdata/sync/029-lookup-tags-consumers/global_consumers.yaml"
 	require.NoError(t, sync(globalConsumersStateFile))
 	// sync plugins with lookup reference to global consumers.
-	pluginsLookupStateFile := "testdata/sync/029-lookup-tags/plugins_lookup.yaml"
+	pluginsLookupStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_lookup.yaml"
 	require.NoError(t, sync(pluginsLookupStateFile))
 	reset(t)
 
@@ -4996,9 +5040,7 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	expectedState := utils.KongRawState{
 		ConsumerGroups: []*kong.ConsumerGroupObject{
@@ -5060,6 +5102,45 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	testKongState(t, client, false, expectedState, nil)
 }
 
+// Test_Sync_LookupServicesTags tests that existing behavior when referencing
+// services from plugins is preserved:
+// - if a referenced service is not present in the state file, the sync fails
+// - if a referenced service is present in the state file, the sync succeeds
+//
+// This test also tests that the new behavior is implemented correctly:
+//   - if a referenced service is not present in the state file, but is present
+//     in Kong when using the new lookup selector tags, the sync succeeds
+//   - if a referenced service is not present in the state file and neither in
+//     Kong when using the new lookup selector tags, the sync fails
+func Test_Sync_LookupServicesTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	// test that reference to non-existing service fails.
+	pluginsNoLookupServiceStateFile := "testdata/sync/035-lookup-tags-services/plugins_no_lookup.yaml"
+	err := sync(pluginsNoLookupServiceStateFile)
+	require.Error(t, err)
+	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to existing local service succeeds.
+	pluginsAndServicesStateFile := "testdata/sync/035-lookup-tags-services/plugins_and_services.yaml"
+	require.NoError(t, sync(pluginsAndServicesStateFile))
+	reset(t)
+
+	// test that reference to existing global service succeeds via lookup tags.
+	globalServicesStateFile := "testdata/sync/035-lookup-tags-services/global_services.yaml"
+	require.NoError(t, sync(globalServicesStateFile))
+
+	// sync plugins with lookup reference to global services.
+	pluginsLookupServiceStateFile := "testdata/sync/035-lookup-tags-services/plugins_lookup.yaml"
+	require.NoError(t, sync(pluginsLookupServiceStateFile))
+	reset(t)
+
+	// test that reference to non-existing global service fails via lookup tags.
+	require.Error(t, sync(pluginsLookupServiceStateFile))
+	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
+}
+
 // Test_Sync_LookupRoutesTags tests that existing behavior when referencing
 // routes from plugins is preserved:
 // - if a referenced route is not present in the state file, the sync fails
@@ -5098,6 +5179,77 @@ func Test_Sync_LookupRoutesTags(t *testing.T) {
 	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
 }
 
+// Test_Sync_LookupConsumerGroupsTags tests that existing behavior when referencing
+// consumer groups from plugins is preserved:
+// - if a referenced service/route and consumer group are not present in the state file, the sync fails
+// - if a referenced service/route and consumer group are present in the state file, the sync succeeds
+//
+// This test also tests that the new behavior is implemented correctly:
+//   - if a referenced service/route/consumer or consumer group is not present in the state file, but is present
+//     in Kong when using the new lookup selector tags, the sync succeeds
+//   - if a referenced service/route or consumer group is not present in the state file and neither in
+//     Kong when using the new lookup selector tags, the sync fails
+func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	// test that reference to non-existing service fails.
+	pluginsNoLookupServiceStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_service.yaml"
+	errNoService := sync(pluginsNoLookupServiceStateFile)
+	require.Error(t, errNoService)
+	require.EqualError(t, errNoService, "building state: service foo for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to non-existing route fails.
+	pluginsNoLookupRouteStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_route.yaml"
+	errNoRoute := sync(pluginsNoLookupRouteStateFile)
+	require.Error(t, errNoRoute)
+	require.EqualError(t, errNoRoute, "building state: route bar for plugin rate-limiting-advanced: entity not found")
+
+	// test that reference to non-existing consumer group fails.
+	pluginsNoLookupConsumergroupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_consumerGroup.yaml" //nolint:lll
+	errNoConsumerGroup := sync(pluginsNoLookupConsumergroupStateFile)
+	require.Error(t, errNoConsumerGroup)
+	require.EqualError(
+		t,
+		errNoConsumerGroup,
+		"building state: consumer-group foo2 for plugin rate-limiting-advanced: entity not found",
+	)
+
+	// test that reference to existing local service and consumer group succeeds.
+	pluginsAndEntitiesConsumersGroupsStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_and_entities_consumerGroups.yaml" //nolint:lll
+	require.NoError(t, sync(pluginsAndEntitiesConsumersGroupsStateFile))
+	reset(t)
+
+	// test that reference to existing global service and consumer group succeeds via lookup tags.
+	globalEntitiesConsumerGroupsStateFile := "testdata/sync/034-lookup-tags-consumerGroups/global_entities_consumerGroups.yaml" //nolint:lll
+	require.NoError(t, sync(globalEntitiesConsumerGroupsStateFile))
+	// sync plugins with lookup reference to global service.
+	pluginsServiceLookupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_service_lookup.yaml"
+	require.NoError(t, sync(pluginsServiceLookupStateFile))
+	// sync plugins with lookup reference to global route.
+	pluginsRouteLookupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_route_lookup.yaml"
+	require.NoError(t, sync(pluginsRouteLookupStateFile))
+	reset(t)
+
+	// test that reference to non-existing global service or consumer groups fails via lookup tags.
+	errServiceNoReference := sync(pluginsServiceLookupStateFile)
+	require.Error(t, errServiceNoReference)
+	require.EqualError(
+		t,
+		errServiceNoReference,
+		"building state: service foo for plugin rate-limiting-advanced: entity not found",
+	)
+
+	// test that reference to non-existing global route or consumer groups fails via lookup tags.
+	errRouteNoReference := sync(pluginsRouteLookupStateFile)
+	require.Error(t, errRouteNoReference)
+	require.EqualError(
+		t,
+		errRouteNoReference,
+		"building state: route bar for plugin rate-limiting-advanced: entity not found",
+	)
+}
+
 // test scope:
 //   - 3.5.0+
 //   - konnect
@@ -5107,9 +5259,7 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	expectedState := utils.KongRawState{
 		ConsumerGroups: []*kong.ConsumerGroupObject{
@@ -5157,9 +5307,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	expectedState := utils.KongRawState{
 		ConsumerGroups: []*kong.ConsumerGroupObject{
@@ -5218,9 +5366,7 @@ func Test_Sync_FilterChains(t *testing.T) {
 	setup(t)
 
 	client, err := getTestClient()
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
+	require.NoError(t, err)
 
 	service := kong.Service{
 		ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),

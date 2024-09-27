@@ -1,0 +1,24 @@
+variable "control_plane_id" {
+  type = "string"
+  default = "YOUR_CONTROL_PLANE_ID"
+}
+
+resource "konnect_gateway_ca_certificate" "ca_cert_236f23c811e37d144f92767e6c845006" {
+  cert = <<EOF
+-----BEGIN CERTIFICATE-----
+MIIBfDCCASKgAwIBAgIRAJqcZC1VSvSQLMN1+7yAeswwCgYIKoZIzj0EAwIwHDEa
+MBgGA1UEAxMRRGVtbyBLb25nIFJvb3QgQ0EwHhcNMjIwNjEzMTMzNzMzWhcNMjcw
+NjEzMTkzNzMzWjAcMRowGAYDVQQDExFEZW1vIEtvbmcgUm9vdCBDQTBZMBMGByqG
+SM49AgEGCCqGSM49AwEHA0IABOGR89IyhreSHRAi6wp9a5DBIDp4YYSdWzuEdlNx
+7pX1G4T7x68xUXJZXRUPFyT8Xzn5KwCJm8RVT+nAhrsUx6SjRTBDMA4GA1UdDwEB
+/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgECMB0GA1UdDgQWBBQ9CUiOPhjp7KD2
+ScRDxX4IzDOrNzAKBggqhkjOPQQDAgNIADBFAiEAw6Dov0c0L++1W9VufAfSMdNR
+PSDfPU0MiUiG59/VIBICIEFn/6c5eQc3hUUBL74/RmNT2b1zxBmp7RiPXJAnAAwJ
+-----END CERTIFICATE-----
+EOF
+  cert_digest = "f1baffe9fe9cf8497e38a4271d67fab44423678b7e7c0f677a50f37c113d81b5"
+  tags = ["root-ca"]
+
+  control_plane_id = var.control_plane_id
+}
+

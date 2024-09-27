@@ -1,0 +1,6 @@
+consumers:
+  - username: example-user
+    acls:
+      - group: demo_group
+        tags:
+          - internal
