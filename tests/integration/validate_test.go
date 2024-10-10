@@ -93,3 +93,97 @@ func Test_Validate_Konnect(t *testing.T) {
 		})
 	}
 }
+func Test_Validate_File(t *testing.T) {
+	setup(t)
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		errorExpected  bool
+	}{
+		{
+			name:           "file validate format version 1.1",
+			stateFile:      "testdata/validate/kong.yaml",
+			additionalArgs: []string{},
+		},
+		{
+			name:           "file validate format version 3.0",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{},
+		},
+		{
+			name:           "file validate with --konnect-compatibility",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--konnect-compatibility"},
+		},
+		{
+			name:           "file validate with --workspace",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--workspace=default"},
+		},
+		{
+			name:           "file validate with --rbac-resources-only",
+			stateFile:      "testdata/validate/rbac-resources.yaml",
+			additionalArgs: []string{"--rbac-resources-only"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			validateOpts := []string{
+				tc.stateFile,
+			}
+			validateOpts = append(validateOpts, tc.additionalArgs...)
+
+			err := validate(false, validateOpts...)
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func Test_Validate_Gateway(t *testing.T) {
+	setup(t)
+	runWhen(t, "kong", ">=2.8.0")
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		errorExpected  bool
+	}{
+		{
+			name:           "validate format version 1.1",
+			stateFile:      "testdata/validate/kong.yaml",
+			additionalArgs: []string{},
+		},
+		{
+			name:           "validate format version 3.0",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{},
+		},
+		{
+			name:           "validate with --konnect-compatibility",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--konnect-compatibility"},
+		},
+		{
+			name:           "validate with --workspace",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--workspace=default"},
+		},
+		// TODO: Add a rbac flag test, once the behaviour is fixed
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			validateOpts := []string{
+				tc.stateFile,
+			}
+			validateOpts = append(validateOpts, tc.additionalArgs...)
+
+			err := validate(true, validateOpts...)
+			assert.NoError(t, err)
+		})
+	}
+}
