@@ -53,7 +53,7 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorString:    "[rbac] not yet supported by konnect",
 		},
 		{
-			name:           "validate with workspaces set",
+			name:           "validate with workspace set",
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--workspace=default"},
 			errorExpected:  true,

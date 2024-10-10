@@ -148,10 +148,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		if validateCmdRBACResourcesOnly {
 			return fmt.Errorf("[rbac] not yet supported by konnect")
 		}
-
-		if validateWorkspace != "" {
-			return fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
-		}
 	}
 
 	if validateOnline {
@@ -295,6 +291,9 @@ func getKongClient(
 ) (*kong.Client, error) {
 	workspaceName := validateWorkspace
 	if validateWorkspace != "" {
+		if mode == modeKonnect {
+			return nil, fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
+		}
 		// check if workspace exists
 		workspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
 		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
