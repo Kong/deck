@@ -21,9 +21,9 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/sync v0.8.0
-	k8s.io/api v0.31.0
+	k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver v0.31.0
-	k8s.io/apimachinery v0.31.0
+	k8s.io/apimachinery v0.31.1
 	k8s.io/code-generator v0.31.0
 	sigs.k8s.io/gateway-api v1.1.0
 	sigs.k8s.io/yaml v1.4.0
