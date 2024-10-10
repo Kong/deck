@@ -1,0 +1,32 @@
+_format_version: "3.0"
+services:
+  - name: example-service
+    url: http://mockbin.org
+    routes:
+      - name: example-route
+        paths:
+          - /mock
+        methods:
+          - GET
+          - POST
+        strip_path: false
+        preserve_host: true
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 5
+          policy: local
+consumers:
+  - keyauth_credentials:
+    - key: alice-secret-key
+    username: alice
+  - keyauth_credentials:
+    - key: bob-secret-key
+    username: bob
+plugins:
+  - name: key-auth
+    config:
+      key_names:
+        - apikey
+      hide_credentials: true
+      run_on_preflight: true
