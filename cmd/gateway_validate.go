@@ -42,10 +42,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
-		if validateCmdRBACResourcesOnly && mode == modeKonnect {
-			return fmt.Errorf("rbac validation not yet supported in konnect mode")
-		}
-
 		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
@@ -144,9 +140,17 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	if validateKonnectCompatibility {
+	if validateKonnectCompatibility || mode == modeKonnect {
 		if errs := validate.KonnectCompatibility(targetContent); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
+		}
+
+		if validateCmdRBACResourcesOnly {
+			return fmt.Errorf("[rbac] not yet supported by konnect")
+		}
+
+		if validateWorkspace != "" {
+			return fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
 		}
 	}
 
