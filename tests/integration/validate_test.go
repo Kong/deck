@@ -78,4 +78,3 @@ func Test_Validate_Konnect_RBAC(t *testing.T) {
 		})
 	}
 }
-
