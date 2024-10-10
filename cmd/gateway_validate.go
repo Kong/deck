@@ -256,6 +256,9 @@ this command unless --online flag is used.
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
 
+	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "workspace")
+	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "rbac-resources-only")
+
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
 	}
