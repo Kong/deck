@@ -213,7 +213,7 @@ this command unless --online flag is used.
 			return preRunSilenceEventsFlag()
 		}
 
-		if validateOnline {
+		if online {
 			short = short + " (online)"
 			long = long + "Validates against the Kong API, via communication with Kong. This increases the\n" +
 				"time for validation but catches significant errors. No resource is created in Kong.\n" +
