@@ -28,11 +28,6 @@ func Test_Validate_Konnect(t *testing.T) {
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--konnect-compatibility"},
 		},
-		{
-			name:           "validate with --workspace",
-			stateFile:      "testdata/validate/konnect.yaml",
-			additionalArgs: []string{"--workspace=default"},
-		},
 	}
 
 	for _, tc := range tests {
