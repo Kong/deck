@@ -40,7 +40,7 @@ func (b *DefaultTerraformBuider) buildControlPlaneVar(controlPlaneID *string) {
 		cpID = *controlPlaneID
 	}
 	b.content += fmt.Sprintf(`variable "control_plane_id" {
-  type = "string"
+  type = string
   default = "%s"
 }`, cpID) + "\n\n"
 }
