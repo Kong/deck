@@ -42,6 +42,10 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
+		if validateCmdRBACResourcesOnly && mode == modeKonnect {
+			return fmt.Errorf("rbac validation not yet supported in konnect mode")
+		}
+
 		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
