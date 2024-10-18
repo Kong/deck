@@ -8,6 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	ONLINE  = true
+	OFFLINE = false
+)
+
 func Test_Validate_Konnect(t *testing.T) {
 	setup(t)
 	runWhen(t, "konnect", "")
@@ -70,21 +75,21 @@ func Test_Validate_Konnect(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			validateOpts := []string{
+			validateOpts := append([]string{
 				tc.stateFile,
-			}
-			validateOpts = append(validateOpts, tc.additionalArgs...)
+			}, tc.additionalArgs...)
 
-			err := validate(true, validateOpts...)
+			err := validate(ONLINE, validateOpts...)
 
 			if tc.errorExpected {
 				assert.Error(t, err)
 				if tc.errorString != "" {
 					assert.Contains(t, err.Error(), tc.errorString)
 				}
-			} else {
-				assert.NoError(t, err)
+				return
 			}
+
+			assert.NoError(t, err)
 		})
 	}
 }

@@ -390,7 +390,5 @@ func validate(online bool, opts ...string) error {
 	}
 	deckCmd.SetArgs(args)
 
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	return cmdErr
+	return deckCmd.ExecuteContext(context.Background())
 }
