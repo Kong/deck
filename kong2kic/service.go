@@ -1,147 +1,159 @@
 package kong2kic
 
 import (
-	"encoding/json"
 	"log"
 	"strconv"
 	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
-	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
 	k8scorev1 "k8s.io/api/core/v1"
-	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
+// Main function to populate KIC services with annotations
 func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICContent) error {
-	// Iterate Kong Services and create k8s Services,
-	// then create KongIngress resources for Kong Service Upstream data.
-	// Finally, create KongPlugin resources for each plugin
-	// associated with the service.
-	for i := range content.Services {
-		service := content.Services[i]
-
-		var k8sService k8scorev1.Service
-		var protocol k8scorev1.Protocol
-
-		k8sService.TypeMeta.APIVersion = "v1"
-		k8sService.TypeMeta.Kind = "Service"
-		if service.Name != nil {
-			k8sService.ObjectMeta.Name = calculateSlug(*service.Name)
-		} else {
-			log.Println("Service name is empty. This is not recommended." +
-				"Please, provide a name for the service before generating Kong Ingress Controller manifests.")
+	for _, service := range content.Services {
+		if service.Name == nil {
+			log.Println("Service name is empty. Please provide a name for the service.")
 			continue
 		}
-		k8sService.ObjectMeta.Annotations = make(map[string]string)
 
-		// default TCP unless service.Protocol is equal to k8scorev1.ProtocolUDP
-		if service.Protocol != nil && k8scorev1.Protocol(strings.ToUpper(*service.Protocol)) == k8scorev1.ProtocolUDP {
-			protocol = k8scorev1.ProtocolUDP
-		} else {
-			protocol = k8scorev1.ProtocolTCP
-		}
+		// Create Kubernetes service
+		k8sService := createK8sService(&service, content.Upstreams)
 
-		if service.Port != nil {
-			sPort := k8scorev1.ServicePort{
-				Protocol: protocol,
-				Port:     int32(*service.Port), //nolint:gosec
-				TargetPort: intstr.IntOrString{
-					IntVal: int32(*service.Port), //nolint:gosec
-				},
-			}
-			k8sService.Spec.Ports = append(k8sService.Spec.Ports, sPort)
-		}
+		// Add annotations from the service object
+		addAnnotationsFromService(&service, k8sService.ObjectMeta.Annotations)
 
-		if service.Name != nil {
-			k8sService.Spec.Selector = map[string]string{"app": *service.Name}
-		} else {
-			log.Println("Service without a name is not recommended")
-		}
-
-		// add konghq.com/read-timeout annotation if service.ReadTimeout is not nil
-		if service.ReadTimeout != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/read-timeout"] = strconv.Itoa(*service.ReadTimeout)
-		}
-
-		// add konghq.com/write-timeout annotation if service.WriteTimeout is not nil
-		if service.WriteTimeout != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/write-timeout"] = strconv.Itoa(*service.WriteTimeout)
-		}
-
-		// add konghq.com/connect-timeout annotation if service.ConnectTimeout is not nil
-		if service.ConnectTimeout != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/connect-timeout"] = strconv.Itoa(*service.ConnectTimeout)
-		}
-
-		// add konghq.com/protocol annotation if service.Protocol is not nil
-		if service.Protocol != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/protocol"] = *service.Protocol
-		}
-
-		// add konghq.com/path annotation if service.Path is not nil
-		if service.Path != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/path"] = *service.Path
-		}
-
-		// add konghq.com/retries annotation if service.Retries is not nil
-		if service.Retries != nil {
-			k8sService.ObjectMeta.Annotations["konghq.com/retries"] = strconv.Itoa(*service.Retries)
-		}
-
+		// Populate upstream policies based on KIC version
 		if targetKICVersionAPI == KICV3GATEWAY || targetKICVersionAPI == KICV3INGRESS {
-			// Use KongUpstreamPolicy for KICv3
-			populateKICUpstreamPolicy(content, &service, &k8sService, kicContent)
+			populateKICUpstreamPolicy(content, &service, k8sService, kicContent)
 		} else {
-			// Use KongIngress for KICv2
-			populateKICUpstream(content, &service, &k8sService, kicContent)
+			populateKICUpstream(content, &service, k8sService, kicContent)
 		}
 
-		// iterate over the plugins for this service, create a KongPlugin for each one and add an annotation to the service
-		// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON
-		// create a plugins annotation in the k8sservice to link the plugin to it
-		err := addPluginsToService(service, k8sService, kicContent)
+		// Add plugins to the service
+		err := addPluginsToService(&service, k8sService, kicContent)
 		if err != nil {
 			return err
 		}
 
-		kicContent.Services = append(kicContent.Services, k8sService)
-
+		// Append the Kubernetes service to KIC content
+		kicContent.Services = append(kicContent.Services, *k8sService)
 	}
 	return nil
 }
 
-func addPluginsToService(service file.FService, k8sService k8scorev1.Service, kicContent *KICContent) error {
+// Helper function to create a Kubernetes Service from a Kong service
+func createK8sService(service *file.FService, upstreams []file.FUpstream) *k8scorev1.Service {
+	k8sService := &k8scorev1.Service{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Service",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        calculateSlug(*service.Name),
+			Annotations: make(map[string]string),
+		},
+	}
+
+	// Determine the protocol (default to TCP)
+	protocol := k8scorev1.ProtocolTCP
+	if service.Protocol != nil && strings.ToUpper(*service.Protocol) == string(k8scorev1.ProtocolUDP) {
+		protocol = k8scorev1.ProtocolUDP
+	}
+
+	// Set the service port
+	if service.Port != nil {
+		// check that the port is within the valid range
+		if *service.Port > 65535 || *service.Port < 0 {
+			log.Fatalf("Port %d is not within the valid range. Please provide a port between 0 and 65535.\n", *service.Port)
+		}
+		servicePort := k8scorev1.ServicePort{
+			Protocol: protocol,
+			//nolint: gosec
+			Port:       int32(*service.Port),
+			TargetPort: intstr.FromInt(*service.Port),
+		}
+		k8sService.Spec.Ports = []k8scorev1.ServicePort{servicePort}
+	}
+
+	// Configure the service selector or external name
+	if service.Host == nil {
+		k8sService.Spec.Selector = map[string]string{"app": *service.Name}
+	} else {
+		k8sService.Spec.Type = k8scorev1.ServiceTypeExternalName
+		k8sService.Spec.ExternalName = *service.Host
+
+		// Check if the host matches any upstream
+		if isUpstreamReferenced(service.Host, upstreams) {
+			k8sService.Spec.Selector = map[string]string{"app": *service.Name}
+			k8sService.Spec.Type = ""
+			k8sService.Spec.ExternalName = ""
+		}
+	}
+
+	return k8sService
+}
+
+// Helper function to check if the service host matches any upstream name
+func isUpstreamReferenced(host *string, upstreams []file.FUpstream) bool {
+	for _, upstream := range upstreams {
+		if upstream.Name != nil && strings.EqualFold(*upstream.Name, *host) {
+			return true
+		}
+	}
+	return false
+}
+
+// Helper function to add annotations from a service to a Kubernetes service
+func addAnnotationsFromService(service *file.FService, annotations map[string]string) {
+	if service.Protocol != nil {
+		annotations["konghq.com/protocol"] = *service.Protocol
+	}
+	if service.Path != nil {
+		annotations["konghq.com/path"] = *service.Path
+	}
+	if service.ClientCertificate != nil && service.ClientCertificate.ID != nil {
+		annotations["konghq.com/client-cert"] = *service.ClientCertificate.ID
+	}
+	if service.ReadTimeout != nil {
+		annotations["konghq.com/read-timeout"] = strconv.Itoa(*service.ReadTimeout)
+	}
+	if service.WriteTimeout != nil {
+		annotations["konghq.com/write-timeout"] = strconv.Itoa(*service.WriteTimeout)
+	}
+	if service.ConnectTimeout != nil {
+		annotations["konghq.com/connect-timeout"] = strconv.Itoa(*service.ConnectTimeout)
+	}
+	if service.Retries != nil {
+		annotations["konghq.com/retries"] = strconv.Itoa(*service.Retries)
+	}
+	addTagsToAnnotations(service.Tags, annotations)
+}
+
+// Helper function to add plugins to a service
+func addPluginsToService(service *file.FService, k8sService *k8scorev1.Service, kicContent *KICContent) error {
 	for _, plugin := range service.Plugins {
-		var kongPlugin kicv1.KongPlugin
-		kongPlugin.APIVersion = KICAPIVersion
-		kongPlugin.Kind = KongPluginKind
-		if plugin.Name != nil && service.Name != nil {
-			kongPlugin.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *plugin.Name)
-		} else {
-			log.Println("Service name or plugin name is empty. This is not recommended." +
-				"Please, provide a name for the service and the plugin before generating Kong Ingress Controller manifests.")
+		if plugin.Name == nil || service.Name == nil {
+			log.Println("Service name or plugin name is empty. Please provide names for both.")
 			continue
 		}
-		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
-		kongPlugin.PluginName = *plugin.Name
 
-		var configJSON apiextensionsv1.JSON
-		var err error
-		configJSON.Raw, err = json.Marshal(plugin.Config)
+		// Create a KongPlugin
+		kongPlugin, err := createKongPlugin(plugin, *service.Name)
 		if err != nil {
 			return err
 		}
-		kongPlugin.Config = configJSON
-
-		if k8sService.ObjectMeta.Annotations["konghq.com/plugins"] == "" {
-			k8sService.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
-		} else {
-			annotations := k8sService.ObjectMeta.Annotations["konghq.com/plugins"] + "," + kongPlugin.ObjectMeta.Name
-			k8sService.ObjectMeta.Annotations["konghq.com/plugins"] = annotations
+		if kongPlugin == nil {
+			continue
 		}
 
-		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
+		// Add the plugin name to the service annotations
+		addPluginToAnnotations(kongPlugin.ObjectMeta.Name, k8sService.ObjectMeta.Annotations)
+
+		// Append the KongPlugin to KIC content
+		kicContent.KongPlugins = append(kicContent.KongPlugins, *kongPlugin)
 	}
 	return nil
 }

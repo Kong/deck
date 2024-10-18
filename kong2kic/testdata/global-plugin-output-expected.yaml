@@ -1,0 +1,15 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  bandwidth_metrics: true
+  latency_metrics: true
+  per_consumer: true
+  status_code_metrics: true
+  upstream_health_metrics: true
+kind: KongClusterPlugin
+metadata:
+  annotations:
+    konghq.com/tags: cloudops-managed,metrics
+    kubernetes.io/ingress.class: kong
+  name: prometheus
+plugin: prometheus
+---

@@ -1,0 +1,47 @@
+services:
+  - name: simple-service
+    port: 8080
+    tags:
+      - simple-service
+    routes:
+      - name: simple-route
+        paths:
+        - /r1
+      - name: _route_thisISAveryvery_long_+name_toVALIDATEthat(the slugify functionality w0rks4s3xp3ct3d)_
+        methods:
+          - GET
+          - POST
+        hosts:
+          - example.com
+          - another-example.com
+          - yet-another-example.com
+        paths:
+          - ~/v1/example/?$
+          - /v1/another-example
+          - /v1/yet-another-example
+        protocols:
+          - http
+          - https
+        headers:
+          x-my-header:
+            - ~*foos?bar$
+          x-another-header:
+            - first-header-value
+            - second-header-value
+        regex_priority: 1
+        strip_path: false
+        preserve_host: true
+        tags:
+          - version:v1
+        https_redirect_status_code: 302
+        snis:
+          - example.com
+        sources:
+          - ip: 192.168.0.1
+        plugins:
+          - name: aws-lambda
+            config:
+              aws_key: my_key
+              aws_secret: my_secret
+              function_name: my_function
+              aws_region: us-west-2
