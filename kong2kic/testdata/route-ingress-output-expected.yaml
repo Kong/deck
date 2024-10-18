@@ -1,0 +1,136 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  aws_key: my_key
+  aws_region: us-west-2
+  aws_secret: my_secret
+  function_name: my_function
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: simple-service--route-thisisaveryvery-long-6d6e69918e
+plugin: aws-lambda
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simple-service-simple-route
+spec:
+  ingressClassName: kong
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /r1
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    konghq.com/headers.x-another-header: first-header-value,second-header-value
+    konghq.com/headers.x-my-header: ~*foos?bar$
+    konghq.com/https-redirect-status-code: "302"
+    konghq.com/methods: GET,POST
+    konghq.com/plugins: simple-service--route-thisisaveryvery-long-6d6e69918e
+    konghq.com/preserve-host: "true"
+    konghq.com/protocols: http,https
+    konghq.com/regex-priority: "1"
+    konghq.com/snis: example.com
+    konghq.com/strip-path: "false"
+    konghq.com/tags: version:v1
+  name: simple-service--route-thisisaveryvery-long-b00bc5bc73
+spec:
+  ingressClassName: kong
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /~/v1/example/?$
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/another-example
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/yet-another-example
+        pathType: ImplementationSpecific
+  - host: another-example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /~/v1/example/?$
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/another-example
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/yet-another-example
+        pathType: ImplementationSpecific
+  - host: yet-another-example.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /~/v1/example/?$
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/another-example
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: simple-service
+            port:
+              number: 8080
+        path: /v1/yet-another-example
+        pathType: ImplementationSpecific
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/tags: simple-service
+  name: simple-service
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: simple-service
+---

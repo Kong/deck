@@ -1,0 +1,91 @@
+apiVersion: configuration.konghq.com/v1beta1
+kind: KongUpstreamPolicy
+metadata:
+  annotations:
+    konghq.com/tags: user-level,low-priority
+  name: simple-service-upstream
+spec:
+  algorithm: round-robin
+  healthchecks:
+    active:
+      concurrency: 10
+      headers:
+        x-another-header:
+        - bla
+        x-my-header:
+        - foo
+        - bar
+      healthy:
+        httpStatuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      httpPath: /
+      httpsSni: example.com
+      httpsVerifyCertificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        httpFailures: 0
+        httpStatuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcpFailures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        httpStatuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        httpFailures: 0
+        httpStatuses:
+        - 429
+        - 500
+        - 503
+        tcpFailures: 0
+        timeouts: 0
+    threshold: 0
+  slots: 10000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    konghq.com/upstream-policy: simple-service-upstream
+  name: simple-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: simple-service
+---
