@@ -27,9 +27,6 @@ var (
 
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
-	if validateOnline && mode == modeKonnect {
-		return fmt.Errorf("online validation not yet supported in konnect mode")
-	}
 	_ = sendAnalytics("validate", "", mode)
 	// read target file
 	// this does json schema validation as well
@@ -45,7 +42,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
-		kongClient, err = getKongClient(ctx, targetContent)
+		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
 		}
@@ -143,9 +140,13 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	if validateKonnectCompatibility {
+	if validateKonnectCompatibility || (mode == modeKonnect && validateOnline) {
 		if errs := validate.KonnectCompatibility(targetContent); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
+		}
+
+		if validateCmdRBACResourcesOnly {
+			return fmt.Errorf("[rbac] not yet supported by konnect")
 		}
 	}
 
@@ -212,7 +213,7 @@ this command unless --online flag is used.
 			return preRunSilenceEventsFlag()
 		}
 
-		if validateOnline {
+		if online {
 			short = short + " (online)"
 			long = long + "Validates against the Kong API, via communication with Kong. This increases the\n" +
 				"time for validation but catches significant errors. No resource is created in Kong.\n" +
@@ -255,6 +256,9 @@ this command unless --online flag is used.
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
 
+	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "workspace")
+	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "rbac-resources-only")
+
 	if err := ensureGetAllMethods(); err != nil {
 		panic(err.Error())
 	}
@@ -285,9 +289,14 @@ func validateWithKong(
 	return validator.Validate(parsedFormatVersion)
 }
 
-func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Client, error) {
+func getKongClient(
+	ctx context.Context, targetContent *file.Content, mode mode,
+) (*kong.Client, error) {
 	workspaceName := validateWorkspace
 	if validateWorkspace != "" {
+		if mode == modeKonnect {
+			return nil, fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
+		}
 		// check if workspace exists
 		workspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
 		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
@@ -299,10 +308,22 @@ func getKongClient(ctx context.Context, targetContent *file.Content) (*kong.Clie
 		}
 	}
 
-	wsConfig := rootConfig.ForWorkspace(workspaceName)
-	kongClient, err := reconcilerUtils.GetKongClient(wsConfig)
-	if err != nil {
-		return nil, err
+	var (
+		kongClient *kong.Client
+		err        error
+	)
+	if mode == modeKonnect {
+		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return nil, err
+		}
+		dumpConfig.KonnectControlPlane = konnectControlPlane
+	} else {
+		wsConfig := rootConfig.ForWorkspace(workspaceName)
+		kongClient, err = reconcilerUtils.GetKongClient(wsConfig)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return kongClient, nil
 }
