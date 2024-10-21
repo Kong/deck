@@ -109,8 +109,6 @@
 It is now deprecated and will be removed in a future Terraform versions. Thus, removed them from kong2tf generation, so as
 to avoid potential errors in `terraform apply`. [#1412](https://github.com/Kong/deck/pull/1412)
 
-
-
 ## [v1.40.3]
 > Release date: 2024/09/26
 
