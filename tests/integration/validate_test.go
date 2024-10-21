@@ -137,7 +137,7 @@ func Test_Validate_File(t *testing.T) {
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
-			err := validate(false, validateOpts...)
+			err := validate(OFFLINE, validateOpts...)
 			assert.NoError(t, err)
 		})
 	}
@@ -177,7 +177,7 @@ func Test_Validate_Gateway(t *testing.T) {
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
-			err := validate(true, validateOpts...)
+			err := validate(ONLINE, validateOpts...)
 			assert.NoError(t, err)
 		})
 	}
@@ -223,7 +223,7 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
-			err := validate(true, validateOpts...)
+			err := validate(ONLINE, validateOpts...)
 			assert.NoError(t, err)
 		})
 	}
