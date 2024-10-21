@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
 )
 
 var (
-	errKonnect            = "[konnect] section not specified - ensure details are set via cli flags"
+	errKonnect            = "[konnect] section not specified - ensure details are set via cli flags when executing live commands against Konnect"
 	errWorkspace          = "[workspaces] not supported by Konnect - use control planes instead"
 	errNoVersion          = "[version] unable to determine decK file version"
 	errBadVersion         = fmt.Sprintf("[version] decK file version must be '%.1f' or greater", supportedVersion)
@@ -47,7 +48,7 @@ func KonnectCompatibility(targetContent *file.Content) []error {
 	}
 
 	if targetContent.Konnect == nil {
-		errs = append(errs, errors.New(errKonnect))
+		cprint.UpdatePrintf("Warning: " + errKonnect + "\n")
 	}
 
 	versionNumber, err := strconv.ParseFloat(targetContent.FormatVersion, 32)
