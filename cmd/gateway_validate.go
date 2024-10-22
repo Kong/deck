@@ -141,7 +141,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 
 	if validateKonnectCompatibility || (mode == modeKonnect && validateOnline) {
-		if errs := validate.KonnectCompatibility(targetContent); len(errs) != 0 {
+		if errs := validate.KonnectCompatibility(targetContent, dumpConfig); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
 		}
 

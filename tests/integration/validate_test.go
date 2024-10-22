@@ -65,11 +65,16 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorString:    "[workspaces] not supported by Konnect - use control planes instead",
 		},
 		{
-			name:           "validate with no konnect config in file",
+			name:           "validate with no konnect config in file, passed via cli flag konnect control plane",
 			stateFile:      "testdata/validate/konnect_invalid.yaml",
-			additionalArgs: []string{},
-			errorExpected:  true,
-			errorString:    "[konnect] section not specified - ensure details are set via cli flags",
+			additionalArgs: []string{"--konnect-control-plane-name=default"},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with no konnect config in file, passed via cli flag konnect runtime group",
+			stateFile:      "testdata/validate/konnect_invalid.yaml",
+			additionalArgs: []string{"--konnect-runtime-group-name=default"},
+			errorExpected:  false,
 		},
 	}
 
