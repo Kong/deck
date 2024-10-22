@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
@@ -12,9 +13,10 @@ import (
 
 func Test_KonnectCompatibility(t *testing.T) {
 	tests := []struct {
-		name     string
-		content  *file.Content
-		expected []error
+		name       string
+		content    *file.Content
+		dumpConfig dump.Config
+		expected   []error
 	}{
 		{
 			name: "version invalid",
@@ -26,6 +28,7 @@ func Test_KonnectCompatibility(t *testing.T) {
 					ControlPlaneName: "s",
 				},
 			},
+			dumpConfig: dump.Config{},
 			expected: []error{
 				errors.New(errWorkspace),
 				errors.New(errBadVersion),
@@ -36,6 +39,7 @@ func Test_KonnectCompatibility(t *testing.T) {
 			content: &file.Content{
 				FormatVersion: "3.1",
 			},
+			dumpConfig: dump.Config{},
 			expected: []error{
 				errors.New(errKonnect),
 			},
@@ -60,6 +64,7 @@ func Test_KonnectCompatibility(t *testing.T) {
 					}},
 				},
 			},
+			dumpConfig: dump.Config{},
 			expected: []error{
 				fmt.Errorf(errPluginIncompatible, "oauth2"),
 			},
@@ -95,6 +100,7 @@ func Test_KonnectCompatibility(t *testing.T) {
 					}},
 				},
 			},
+			dumpConfig: dump.Config{},
 			expected: []error{
 				fmt.Errorf(errPluginIncompatible, "oauth2"),
 				fmt.Errorf("[%s] keys are automatically encrypted in Konnect, use the key auth plugin instead", "key-auth-enc"),
@@ -128,15 +134,26 @@ func Test_KonnectCompatibility(t *testing.T) {
 					},
 				},
 			},
+			dumpConfig: dump.Config{},
 			expected: []error{
 				fmt.Errorf(errPluginNoCluster, "response-ratelimiting"),
 				fmt.Errorf("[%s] keys are automatically encrypted in Konnect, use the key auth plugin instead", "key-auth-enc"),
 			},
 		},
+		{
+			name: "no konnect info in file, but passed via cli flag",
+			content: &file.Content{
+				FormatVersion: "3.1",
+			},
+			dumpConfig: dump.Config{
+				KonnectControlPlane: "default",
+			},
+			expected: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			errs := KonnectCompatibility(tt.content)
+			errs := KonnectCompatibility(tt.content, tt.dumpConfig)
 			assert.Equal(t, tt.expected, errs)
 		})
 	}
