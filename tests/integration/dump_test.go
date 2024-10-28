@@ -138,7 +138,7 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-381.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.8.1") },
 		},
 	}
 	for _, tc := range tests {
