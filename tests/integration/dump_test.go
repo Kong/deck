@@ -42,21 +42,31 @@ func Test_Dump_SelectTags_30(t *testing.T) {
 	}
 }
 
+// Fails on 3.8.1
+// "ai_metrics: false" present in actual, but not expected
 func Test_Dump_SelectTags_3x(t *testing.T) {
 	tests := []struct {
 		name         string
 		stateFile    string
 		expectedFile string
+		runWhen      string
 	}{
 		{
-			name:         "dump with select-tags",
+			name:         "dump with select-tags >=3.1.0 <3.8.1",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected.yaml",
+			runWhen:      ">=3.1.0 <3.8.1",
+		},
+		{
+			name:         "dump with select-tags 3.8.1",
+			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
+			expectedFile: "testdata/dump/001-entities-with-tags/expected381.yaml",
+			runWhen:      ">=3.8.1",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.1.0")
+			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
 			assert.NoError(t, sync(tc.stateFile))
@@ -118,10 +128,20 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			skipConsumers: true,
 			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
 		},
+		// Failing on 3.8.1
+		// Schema changes?
+		// nulls for port, timeouts, etc expected but found real values in actual
 		{
 			name:          "3.5 dump with no skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-35.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0 <3.8.1") },
+		},
+		{
+			name:          "3.8.1 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-381.yaml",
 			skipConsumers: false,
 			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
 		},

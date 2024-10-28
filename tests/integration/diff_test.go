@@ -751,6 +751,8 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 
 // test scope:
 //   - 3.5
+//
+// Failed for 3.8.1.0
 func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.5.0")
 	setup(t)
