@@ -42,8 +42,6 @@ func Test_Dump_SelectTags_30(t *testing.T) {
 	}
 }
 
-// Fails on 3.8.1
-// "ai_metrics: false" present in actual, but not expected
 func Test_Dump_SelectTags_3x(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -128,9 +126,6 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			skipConsumers: true,
 			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
 		},
-		// Failing on 3.8.1
-		// Schema changes?
-		// nulls for port, timeouts, etc expected but found real values in actual
 		{
 			name:          "3.5 dump with no skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",

@@ -1414,6 +1414,7 @@ var (
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
 					"database":                 float64(0),
 					"host":                     string("127.0.0.1"),
 					"keepalive_backlog":        nil,
@@ -1466,6 +1467,7 @@ var (
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
 					"database":                 float64(0),
 					"host":                     string("127.0.0.1"),
 					"keepalive_backlog":        nil,
@@ -1515,6 +1517,7 @@ var (
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
 					"database":                 float64(0),
 					"host":                     string("127.0.0.1"),
 					"keepalive_backlog":        nil,
@@ -2956,8 +2959,6 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 
 // test scope:
 //   - 3.0.0+
-//
-// Fails on 3.8.1, ai_metrics not found in expected
 func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -4821,7 +4822,6 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 				},
 			},
 		},
-		// Fails on 3.8.1, schema changes, nulls present in expected instead of real values for ports, hosts, timeouts, etc
 		{
 			name:     "creates consumer groups scoped plugins",
 			runWhen:  ">=3.7.0 <3.8.1",
