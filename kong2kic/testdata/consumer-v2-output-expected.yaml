@@ -1,0 +1,94 @@
+apiVersion: configuration.konghq.com/v1
+config:
+  hour: 10000
+  policy: local
+  second: 5
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: example-user-rate-limiting
+plugin: rate-limiting
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: key-auth-example-user
+stringData:
+  key: my_api_key
+  kongCredType: key-auth
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: jwt-auth-example-user
+stringData:
+  algorithm: HS256
+  key: my_jwt_secret
+  kongCredType: jwt
+  rsa_public_key: |-
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxXzYS5yESbekTF3xLiQX
+    ZZZfXt0S/nzFp3f2Oux3W7/ydvZ8XSd8+s+wm5oqEcSV9n+5n3ENZbt1A/wgnGI3
+    oWrv0yRB9HugzTIGPpI1AQv9Z4p8E44RrB74/uTxYwb9+4yvpuz/fzTt3Gz+Kzc4
+    4fGGq8VpGMFj6AE65ZcOAHHUJe4VuoreBXLYDJcHl2WPIdNKDGscFjElDneLRhWQ
+    DfxekDJIQMWCjyBEXacfP6cc9U8Qld6TuVcwi1P2xb8tBDD4MIFL/psfzUhfv1Lw
+    O/XZEffJxCqkQn7dsCYy3wpaTjb6XmJ5j0Dbml4f0Bv40Y1mjlAf7C662Mbuguf6
+    ewIDAQAB
+    -----END PUBLIC KEY-----
+  secret: my_secret_key
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: basic-auth-example-user
+stringData:
+  kongCredType: basic-auth
+  password: my_basic_password
+  username: my_basic_user
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: acl-group-example-user
+stringData:
+  group: acl_group
+  kongCredType: acl
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: mtls-auth-example-user
+stringData:
+  id: cce8c384-721f-4f58-85dd-50834e3e733a
+  kongCredType: mtls-auth
+  subject_name: example-user@example.com
+type: Opaque
+---
+apiVersion: configuration.konghq.com/v1
+credentials:
+- key-auth-example-user
+- jwt-auth-example-user
+- basic-auth-example-user
+- acl-group-example-user
+- mtls-auth-example-user
+custom_id: "1234567890"
+kind: KongConsumer
+metadata:
+  annotations:
+    konghq.com/plugins: example-user-rate-limiting
+    konghq.com/tags: internal
+    kubernetes.io/ingress.class: kong
+  name: example-user
+username: example-user
+---

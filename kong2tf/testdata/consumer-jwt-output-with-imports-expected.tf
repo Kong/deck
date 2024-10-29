@@ -1,5 +1,5 @@
 variable "control_plane_id" {
-  type = "string"
+  type = string
   default = "abc-123"
 }
 

@@ -1,5 +1,7 @@
 # Table of Contents
 
+- [v1.41.1](#v1411)
+- [v1.41.0](#v1410)
 - [v1.40.3](#v1403)
 - [v1.40.2](#v1402)
 - [v1.40.1](#v1401)
@@ -95,6 +97,25 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.41.1]
+> Release date: 2024/10/22
+
+### Fixes
+- `deck gateway validate` for Konnect supports Konnect configs passed by CLI flags now.
+Earlier, the validation was failing if control plane information was passed via CLI flags.
+
+## [v1.41.0]
+> Release date: 2024/10/21
+
+### Added
+- `deck gateway validate` command now supports Konnect. Konnect entities can be validated online with this change. 
+[#1335](https://github.com/Kong/deck/pull/1335)
+
+### Fixes
+- Quoted type constraints are removed for Terraform. Type constraints in quotes were required in Terraform <= 0.11, 
+It is now deprecated and will be removed in a future Terraform versions. Thus, removed them from kong2tf generation, so as
+to avoid potential errors in `terraform apply`. [#1412](https://github.com/Kong/deck/pull/1412)
 
 ## [v1.40.3]
 > Release date: 2024/09/26
@@ -1822,6 +1843,8 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.41.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.41.1
+[v1.41.0]: https://github.com/Kong/deck/compare/v1.40.3...v1.41.0
 [v1.40.3]: https://github.com/Kong/deck/compare/v1.40.2...v1.40.3
 [v1.40.2]: https://github.com/Kong/deck/compare/v1.40.1...v1.40.2
 [v1.40.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.40.1

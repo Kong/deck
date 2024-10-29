@@ -374,3 +374,21 @@ func render(opts ...string) (string, error) {
 
 	return stripansi.Strip(string(out)), cmdErr
 }
+
+func validate(online bool, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+
+	var args []string
+	if online {
+		args = []string{"gateway", "validate"}
+	} else {
+		args = []string{"file", "validate"}
+	}
+
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	return deckCmd.ExecuteContext(context.Background())
+}
