@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
 )
@@ -39,14 +40,14 @@ func checkPlugin(name *string, config kong.Configuration) error {
 	return nil
 }
 
-func KonnectCompatibility(targetContent *file.Content) []error {
+func KonnectCompatibility(targetContent *file.Content, dumpConfig dump.Config) []error {
 	var errs []error
 
 	if targetContent.Workspace != "" {
 		errs = append(errs, errors.New(errWorkspace))
 	}
 
-	if targetContent.Konnect == nil {
+	if targetContent.Konnect == nil && dumpConfig.KonnectControlPlane == "" {
 		errs = append(errs, errors.New(errKonnect))
 	}
 
