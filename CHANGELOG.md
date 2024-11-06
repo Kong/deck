@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.41.2](#v1412)
 - [v1.41.1](#v1411)
 - [v1.41.0](#v1410)
 - [v1.40.3](#v1403)
@@ -97,6 +98,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.41.2]
+> Release date: 2024/11/06
+
+### Fixes
+- Added fix to validate for top-level type in parameter schemas in request-validator plugin while
+using `deck file openapi2kong`. [go-apiops #215](https://github.com/Kong/go-apiops/pull/215)
+- Added support for defining path parameters outside REST methods for request-validation while
+using `deck file openapi2kong`. [go-apiops #216](https://github.com/Kong/go-apiops/pull/216)
+(#1429)[https://github.com/Kong/deck/pull/1429]
 
 ## [v1.41.1]
 > Release date: 2024/10/22
@@ -1843,6 +1854,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.41.2]: https://github.com/Kong/deck/compare/v1.41.1...v1.41.2
 [v1.41.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.41.1
 [v1.41.0]: https://github.com/Kong/deck/compare/v1.40.3...v1.41.0
 [v1.40.3]: https://github.com/Kong/deck/compare/v1.40.2...v1.40.3
