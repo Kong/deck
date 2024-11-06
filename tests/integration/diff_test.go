@@ -752,18 +752,38 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 // test scope:
 //   - 3.5
 func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.5.0")
-	setup(t)
+	tests := []struct {
+		name      string
+		stateFile string
+		runWhen   string
+	}{
+		{
+			name:      "no diffs with unordered arrays >=3.5.0 <3.8.1",
+			stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
+			runWhen:   ">=3.5.0 <3.8.1",
+		},
+		// Uncomment post solving: https://konghq.atlassian.net/browse/FTI-6303
+		// {
+		// 	name:      "no diffs with unordered arrays >=3.8.1",
+		// 	stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
+		// 	runWhen:   ">=3.8.1",
+		// },
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", tc.runWhen)
+			setup(t)
 
-	// test that the diff command does not return any changes when
-	// array fields are not sorted.
-	stateFile := "testdata/diff/004-no-diff-plugin/kong.yaml"
-	assert.NoError(t, sync(stateFile, "--timeout", "60"))
+			// test that the diff command does not return any changes when
+			// array fields are not sorted.
+			assert.NoError(t, sync(tc.stateFile, "--timeout", "60"))
 
-	out, err := diff(stateFile)
-	assert.NoError(t, err)
-	assert.Equal(t, emptyOutput, out)
-	reset(t)
+			out, err := diff(tc.stateFile)
+			assert.NoError(t, err)
+			assert.Equal(t, emptyOutput, out)
+			reset(t)
+		})
+	}
 }
 
 // test scope:
