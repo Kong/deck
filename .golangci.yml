@@ -27,6 +27,7 @@ linters:
   - nilerr
   - nolintlint
   - predeclared
+  - prealloc
   - revive
   - stylecheck
   - unconvert

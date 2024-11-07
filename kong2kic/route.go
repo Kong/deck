@@ -87,7 +87,7 @@ func createIngressPaths(
 	servicePort *int,
 	pathType k8snetv1.PathType,
 ) []k8snetv1.HTTPIngressPath {
-	var paths []k8snetv1.HTTPIngressPath
+	paths := make([]k8snetv1.HTTPIngressPath, 0, len(route.Paths))
 	for _, path := range route.Paths {
 		sCopy := *path
 		if strings.HasPrefix(sCopy, "~") {

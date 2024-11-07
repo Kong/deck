@@ -30,7 +30,7 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 	if err != nil {
 		return nil, fmt.Errorf("fetching workspaces from Kong: %w", err)
 	}
-	var res []string
+	res := make([]string, 0, len(workspaces))
 	for _, workspace := range workspaces {
 		res = append(res, *workspace.Name)
 	}

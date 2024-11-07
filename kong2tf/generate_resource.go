@@ -219,7 +219,7 @@ func generateParents(parents map[string]string) string {
 		return ""
 	}
 
-	var result []string
+	result := make([]string, 0, len(parents))
 	for k, v := range parents {
 		v = strings.ReplaceAll(v, "-", "_")
 		// if parent ends with _id, use it as-is
