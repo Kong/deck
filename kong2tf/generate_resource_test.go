@@ -190,8 +190,10 @@ func TestImports(t *testing.T) {
 
 import {
   to = konnect_entity_type.name
-  id = "{\"id\": \"some_id\", \"field2_nested\": \"subkey\", \"control_plane_id\": \"abc-123\"}"
-}`
+  id = "{\"field2_nested\": \"subkey\", \"id\": \"some_id\", \"control_plane_id\": \"abc-123\"}"
+}
+
+`
 
 	cpID := new(string)
 	*cpID = "abc-123"
@@ -203,5 +205,5 @@ import {
 			"field2_nested": func() *string { s := "subkey"; return &s }(),
 		},
 	}, []string{})
-	require.Equal(t, strings.Fields(expected), strings.Fields(result))
+	require.Equal(t, expected, result)
 }

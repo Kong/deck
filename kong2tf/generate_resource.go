@@ -174,22 +174,55 @@ func generateImports(
 }`, entityType, name, generateImportKeys(keysFromEntity, cpID))
 }
 
+type importKeys struct {
+	keyValues      map[string]*string `json:"-"`
+	controlPlaneID *string            `json:"-"`
+}
+
+func (i importKeys) Marshal() (string, error) {
+	keys := make([]string, 0, len(i.keyValues))
+	for k := range i.keyValues {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var sb strings.Builder
+	if err := sb.WriteByte('{'); err != nil {
+		return "", err
+	}
+	for _, k := range keys {
+		_, err := sb.WriteString(fmt.Sprintf(`\"%s\": \"%s\", `, k, *i.keyValues[k]))
+		if err != nil {
+			return "", err
+		}
+	}
+
+	_, err := sb.WriteString(fmt.Sprintf(`\"control_plane_id\": \"%s\"`, *i.controlPlaneID))
+	if err != nil {
+		return "", err
+	}
+
+	if err := sb.WriteByte('}'); err != nil {
+		return "", err
+	}
+
+	return sb.String(), nil
+}
+
 func generateImportKeys(keys map[string]*string, cpID *string) string {
 	if len(keys) == 0 {
 		return ""
 	}
 
-	s := "{"
-	for k, val := range keys {
-		s += fmt.Sprintf(`\"%s\": \"%s\", `, k, *val)
+	importKeys := importKeys{
+		keyValues:      keys,
+		controlPlaneID: cpID,
 	}
 
-	s += fmt.Sprintf(`\"control_plane_id\": \"%s\", `, *cpID)
-
-	s = strings.TrimRight(s, ", ")
-
-	s += "}"
-
+	s, err := importKeys.Marshal()
+	if err != nil {
+		panic(err)
+	}
 	return s
 }
 
