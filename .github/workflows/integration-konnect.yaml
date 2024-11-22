@@ -6,7 +6,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.sha }}
   cancel-in-progress: true
 
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   integration:
