@@ -6,8 +6,8 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
-	kicv1beta1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1beta1"
+	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	kcv1beta1 "github.com/kong/kubernetes-configuration/api/configuration/v1beta1"
 	k8scorev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -26,23 +26,23 @@ func findMatchingUpstream(serviceHost *string, upstreams []file.FUpstream) *file
 }
 
 // Helper function to convert HTTP statuses
-func convertHTTPStatuses(statuses []int) []kicv1beta1.HTTPStatus {
+func convertHTTPStatuses(statuses []int) []kcv1beta1.HTTPStatus {
 	if statuses == nil {
 		return nil
 	}
-	result := make([]kicv1beta1.HTTPStatus, len(statuses))
+	result := make([]kcv1beta1.HTTPStatus, len(statuses))
 	for i, status := range statuses {
-		result[i] = kicv1beta1.HTTPStatus(status)
+		result[i] = kcv1beta1.HTTPStatus(status)
 	}
 	return result
 }
 
 // Helper function to populate active healthcheck
-func populateActiveHealthcheck(active *kong.ActiveHealthcheck) *kicv1beta1.KongUpstreamActiveHealthcheck {
+func populateActiveHealthcheck(active *kong.ActiveHealthcheck) *kcv1beta1.KongUpstreamActiveHealthcheck {
 	if active == nil {
 		return nil
 	}
-	return &kicv1beta1.KongUpstreamActiveHealthcheck{
+	return &kcv1beta1.KongUpstreamActiveHealthcheck{
 		Type:                   active.Type,
 		Concurrency:            active.Concurrency,
 		HTTPPath:               active.HTTPPath,
@@ -56,11 +56,11 @@ func populateActiveHealthcheck(active *kong.ActiveHealthcheck) *kicv1beta1.KongU
 }
 
 // Helper function to populate passive healthcheck
-func populatePassiveHealthcheck(passive *kong.PassiveHealthcheck) *kicv1beta1.KongUpstreamPassiveHealthcheck {
+func populatePassiveHealthcheck(passive *kong.PassiveHealthcheck) *kcv1beta1.KongUpstreamPassiveHealthcheck {
 	if passive == nil {
 		return nil
 	}
-	return &kicv1beta1.KongUpstreamPassiveHealthcheck{
+	return &kcv1beta1.KongUpstreamPassiveHealthcheck{
 		Type:      passive.Type,
 		Healthy:   populateHealthcheckHealthy(passive.Healthy),
 		Unhealthy: populateHealthcheckUnhealthy(passive.Unhealthy),
@@ -68,11 +68,11 @@ func populatePassiveHealthcheck(passive *kong.PassiveHealthcheck) *kicv1beta1.Ko
 }
 
 // Helper function to populate healthcheck healthy settings
-func populateHealthcheckHealthy(healthy *kong.Healthy) *kicv1beta1.KongUpstreamHealthcheckHealthy {
+func populateHealthcheckHealthy(healthy *kong.Healthy) *kcv1beta1.KongUpstreamHealthcheckHealthy {
 	if healthy == nil {
 		return nil
 	}
-	return &kicv1beta1.KongUpstreamHealthcheckHealthy{
+	return &kcv1beta1.KongUpstreamHealthcheckHealthy{
 		Interval:     healthy.Interval,
 		Successes:    healthy.Successes,
 		HTTPStatuses: convertHTTPStatuses(healthy.HTTPStatuses),
@@ -80,11 +80,11 @@ func populateHealthcheckHealthy(healthy *kong.Healthy) *kicv1beta1.KongUpstreamH
 }
 
 // Helper function to populate healthcheck unhealthy settings
-func populateHealthcheckUnhealthy(unhealthy *kong.Unhealthy) *kicv1beta1.KongUpstreamHealthcheckUnhealthy {
+func populateHealthcheckUnhealthy(unhealthy *kong.Unhealthy) *kcv1beta1.KongUpstreamHealthcheckUnhealthy {
 	if unhealthy == nil {
 		return nil
 	}
-	return &kicv1beta1.KongUpstreamHealthcheckUnhealthy{
+	return &kcv1beta1.KongUpstreamHealthcheckUnhealthy{
 		HTTPFailures: unhealthy.HTTPFailures,
 		TCPFailures:  unhealthy.TCPFailures,
 		Timeouts:     unhealthy.Timeouts,
@@ -112,7 +112,7 @@ func populateKICUpstreamPolicy(
 	}
 
 	// Create KongUpstreamPolicy
-	kongUpstreamPolicy := kicv1beta1.KongUpstreamPolicy{
+	kongUpstreamPolicy := kcv1beta1.KongUpstreamPolicy{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: KICAPIVersionV1Beta1,
 			Kind:       UpstreamPolicyKind,
@@ -140,7 +140,7 @@ func populateKICUpstreamPolicy(
 }
 
 // Helper function to populate KongUpstreamPolicy Spec
-func populateKongUpstreamPolicySpec(upstream *file.FUpstream, policy *kicv1beta1.KongUpstreamPolicy) {
+func populateKongUpstreamPolicySpec(upstream *file.FUpstream, policy *kcv1beta1.KongUpstreamPolicy) {
 	if upstream.Algorithm != nil {
 		policy.Spec.Algorithm = upstream.Algorithm
 	}
@@ -150,8 +150,8 @@ func populateKongUpstreamPolicySpec(upstream *file.FUpstream, policy *kicv1beta1
 
 	if upstream.Algorithm != nil && *upstream.Algorithm == "consistent-hashing" {
 		if upstream.HashOn != nil {
-			policy.Spec.HashOn = &kicv1beta1.KongUpstreamHash{
-				Input:      (*kicv1beta1.HashInput)(upstream.HashOn),
+			policy.Spec.HashOn = &kcv1beta1.KongUpstreamHash{
+				Input:      (*kcv1beta1.HashInput)(upstream.HashOn),
 				Header:     upstream.HashOnHeader,
 				Cookie:     upstream.HashOnCookie,
 				CookiePath: upstream.HashOnCookiePath,
@@ -160,8 +160,8 @@ func populateKongUpstreamPolicySpec(upstream *file.FUpstream, policy *kicv1beta1
 			}
 		}
 		if upstream.HashFallback != nil {
-			policy.Spec.HashOnFallback = &kicv1beta1.KongUpstreamHash{
-				Input:      (*kicv1beta1.HashInput)(upstream.HashFallback),
+			policy.Spec.HashOnFallback = &kcv1beta1.KongUpstreamHash{
+				Input:      (*kcv1beta1.HashInput)(upstream.HashFallback),
 				Header:     upstream.HashFallbackHeader,
 				QueryArg:   upstream.HashFallbackQueryArg,
 				URICapture: upstream.HashFallbackURICapture,
@@ -175,7 +175,7 @@ func populateKongUpstreamPolicySpec(upstream *file.FUpstream, policy *kicv1beta1
 		if upstream.Healthchecks.Threshold != nil {
 			threshold = int(*upstream.Healthchecks.Threshold)
 		}
-		policy.Spec.Healthchecks = &kicv1beta1.KongUpstreamHealthcheck{
+		policy.Spec.Healthchecks = &kcv1beta1.KongUpstreamHealthcheck{
 			Threshold: &threshold,
 			Active:    populateActiveHealthcheck(upstream.Healthchecks.Active),
 			Passive:   populatePassiveHealthcheck(upstream.Healthchecks.Passive),
@@ -202,7 +202,7 @@ func populateKICUpstream(
 	}
 
 	// Create KongIngress
-	kongIngress := kicv1.KongIngress{
+	kongIngress := kcv1.KongIngress{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: KICAPIVersion,
 			Kind:       IngressKind,
@@ -211,7 +211,7 @@ func populateKICUpstream(
 			Name:        calculateSlug(*service.Name + "-upstream"),
 			Annotations: map[string]string{IngressClass: ClassName},
 		},
-		Upstream: &kicv1.KongIngressUpstream{
+		Upstream: &kcv1.KongIngressUpstream{
 			HostHeader:             upstream.HostHeader,
 			Algorithm:              upstream.Algorithm,
 			Slots:                  upstream.Slots,

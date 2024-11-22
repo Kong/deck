@@ -106,3 +106,15 @@ linters-settings:
       - golang.org/x/net/context:
           recommendations:
           - context
+      - github.com/kong/kubernetes-ingress-controller/v3:
+          recommendations:
+          - github.com/kong/kubernetes-configuration
+      - github.com/kong/gateway-operator:
+          recommendations:
+          - github.com/kong/kubernetes-configuration
+  importas:
+    no-unaliased: true
+    alias:
+    - pkg: github.com/kong/kubernetes-configuration/api/configuration/(v[\w\d]+)
+      alias: kc${1}
+
