@@ -16,6 +16,7 @@ consumer_groups:
       identifier: consumer
       limit:
       - 30000
+      lock_dictionary_name: kong_locks
       namespace: basic
       path: null
       redis:
