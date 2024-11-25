@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.41.3](#v1413)
 - [v1.41.2](#v1412)
 - [v1.41.1](#v1411)
 - [v1.41.0](#v1410)
@@ -98,6 +99,18 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.41.3]
+> Release date: 2024/11/25
+
+### Fixes
+- Updated Konnect authentication logic to properly handle geo rewrites. 
+[#1451](https://github.com/Kong/deck/pull/1451)
+[go-database-reconciler #146](https://github.com/Kong/go-database-reconciler/pull/146)
+- Fixed false diffs for gateway by clearing unmatching deprecated fields from
+plugin schemas. [#1451](https://github.com/Kong/deck/pull/1451)
+[go-database-reconciler #145](https://github.com/Kong/go-database-reconciler/pull/145)
+[go-kong #473](https://github.com/Kong/go-kong/pull/473)
 
 ## [v1.41.2]
 > Release date: 2024/11/06
@@ -1854,6 +1867,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.41.3]: https://github.com/Kong/deck/compare/v1.41.2...v1.41.3
 [v1.41.2]: https://github.com/Kong/deck/compare/v1.41.1...v1.41.2
 [v1.41.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.41.1
 [v1.41.0]: https://github.com/Kong/deck/compare/v1.40.3...v1.41.0
