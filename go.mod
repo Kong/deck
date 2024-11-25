@@ -22,11 +22,11 @@ require (
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/sync v0.8.0
 	k8s.io/api v0.31.2
-	k8s.io/apiextensions-apiserver v0.31.0
+	k8s.io/apiextensions-apiserver v0.31.1
 	k8s.io/apimachinery v0.31.2
-	k8s.io/client-go v0.31.0
+	k8s.io/client-go v0.31.1
 	k8s.io/code-generator v0.31.2
-	sigs.k8s.io/gateway-api v1.1.0
+	sigs.k8s.io/gateway-api v1.2.0
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -98,7 +98,7 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/cli-runtime v0.31.0 // indirect
-	k8s.io/component-base v0.31.0 // indirect
+	k8s.io/component-base v0.31.1 // indirect
 	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
 	k8s.io/kubectl v0.31.0 // indirect
 	sigs.k8s.io/kind v0.24.0 // indirect
