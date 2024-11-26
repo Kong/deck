@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -16,7 +16,7 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 			continue
 		}
 		username := *consumer.Username
-		kongConsumer := kcv1.KongConsumer{
+		kongConsumer := configurationv1.KongConsumer{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: KICAPIVersion,
 				Kind:       "KongConsumer",

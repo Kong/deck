@@ -7,21 +7,21 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
 func populateKICKongClusterPlugins(content *file.Content, file *KICContent) error {
 	// Global Plugins map to KongClusterPlugins
-	// iterate content.Plugins and copy them into kcv1.KongPlugin manifests
-	// add the kcv1.KongPlugin to the KICContent.KongClusterPlugins slice
+	// iterate content.Plugins and copy them into configurationv1.KongPlugin manifests
+	// add the configurationv1.KongPlugin to the KICContent.KongClusterPlugins slice
 	for _, plugin := range content.Plugins {
 		// skip this plugin instance if it is a kongconsumergroup plugin.
 		// It is a kongconsumergroup plugin if it has a consumer_group property
 		if plugin.ConsumerGroup != nil {
 			continue
 		}
-		var kongClusterPlugin kcv1.KongClusterPlugin
+		var kongClusterPlugin configurationv1.KongClusterPlugin
 		kongClusterPlugin.APIVersion = KICAPIVersion
 		kongClusterPlugin.Kind = "KongClusterPlugin"
 		kongClusterPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
@@ -54,7 +54,7 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 					protocols[i] = *protocol
 				}
 			}
-			kongClusterPlugin.Protocols = kcv1.StringsToKongProtocols(protocols)
+			kongClusterPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
 		}
 
 		// add konghq.com/tags annotation if plugin.Tags is not nil

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
-	kcv1beta1 "github.com/kong/kubernetes-configuration/api/configuration/v1beta1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1beta1 "github.com/kong/kubernetes-configuration/api/configuration/v1beta1"
 	k8scorev1 "k8s.io/api/core/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
 	k8sgwapiv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -15,16 +15,16 @@ import (
 // KICContent represents a serialized Kong state for KIC.
 // +k8s:deepcopy-gen=true
 type KICContent struct {
-	KongIngresses        []kcv1.KongIngress             `json:"kongIngresses,omitempty" yaml:",omitempty"`
-	KongPlugins          []kcv1.KongPlugin              `json:"kongPlugins,omitempty" yaml:",omitempty"`
-	KongClusterPlugins   []kcv1.KongClusterPlugin       `json:"clusterPlugins,omitempty" yaml:",omitempty"`
-	Ingresses            []k8snetv1.Ingress             `json:"ingresses,omitempty" yaml:",omitempty"`
-	Services             []k8scorev1.Service            `json:"services,omitempty" yaml:",omitempty"`
-	Secrets              []k8scorev1.Secret             `json:"secrets,omitempty" yaml:",omitempty"`
-	KongConsumers        []kcv1.KongConsumer            `json:"consumers,omitempty" yaml:",omitempty"`
-	KongConsumerGroups   []kcv1beta1.KongConsumerGroup  `json:"consumerGroups,omitempty" yaml:",omitempty"`
-	HTTPRoutes           []k8sgwapiv1.HTTPRoute         `json:"httpRoutes,omitempty" yaml:",omitempty"`
-	KongUpstreamPolicies []kcv1beta1.KongUpstreamPolicy `json:"upstreamPolicies,omitempty" yaml:",omitempty"`
+	KongIngresses        []configurationv1.KongIngress             `json:"kongIngresses,omitempty" yaml:",omitempty"`
+	KongPlugins          []configurationv1.KongPlugin              `json:"kongPlugins,omitempty" yaml:",omitempty"`
+	KongClusterPlugins   []configurationv1.KongClusterPlugin       `json:"clusterPlugins,omitempty" yaml:",omitempty"`
+	Ingresses            []k8snetv1.Ingress                        `json:"ingresses,omitempty" yaml:",omitempty"`
+	Services             []k8scorev1.Service                       `json:"services,omitempty" yaml:",omitempty"`
+	Secrets              []k8scorev1.Secret                        `json:"secrets,omitempty" yaml:",omitempty"`
+	KongConsumers        []configurationv1.KongConsumer            `json:"consumers,omitempty" yaml:",omitempty"`
+	KongConsumerGroups   []configurationv1beta1.KongConsumerGroup  `json:"consumerGroups,omitempty" yaml:",omitempty"`
+	HTTPRoutes           []k8sgwapiv1.HTTPRoute                    `json:"httpRoutes,omitempty" yaml:",omitempty"`
+	KongUpstreamPolicies []configurationv1beta1.KongUpstreamPolicy `json:"upstreamPolicies,omitempty" yaml:",omitempty"`
 }
 
 func (k KICContent) marshalKICContentToFormat(format string) ([]byte, error) {

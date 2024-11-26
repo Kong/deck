@@ -6,20 +6,22 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
-	kcv1beta1 "github.com/kong/kubernetes-configuration/api/configuration/v1beta1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1beta1 "github.com/kong/kubernetes-configuration/api/configuration/v1beta1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Helper function to populate consumer group plugins
-func createConsumerGroupKongPlugin(plugin *kong.ConsumerGroupPlugin, ownerName string) (*kcv1.KongPlugin, error) {
+func createConsumerGroupKongPlugin(
+	plugin *kong.ConsumerGroupPlugin, ownerName string,
+) (*configurationv1.KongPlugin, error) {
 	if plugin.Name == nil {
 		log.Println("Plugin name is empty. Please provide a name for the plugin.")
 		return nil, nil
 	}
 	pluginName := *plugin.Name
-	kongPlugin := &kcv1.KongPlugin{
+	kongPlugin := &configurationv1.KongPlugin{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "configuration.konghq.com/v1",
 			Kind:       "KongPlugin",
@@ -51,7 +53,7 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 		}
 		groupName := *consumerGroup.Name
 
-		kongConsumerGroup := kcv1beta1.KongConsumerGroup{
+		kongConsumerGroup := configurationv1beta1.KongConsumerGroup{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: "configuration.konghq.com/v1beta1",
 				Kind:       "KongConsumerGroup",

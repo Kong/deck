@@ -7,7 +7,7 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -37,13 +37,13 @@ func addPluginToAnnotations(pluginName string, annotations map[string]string) {
 }
 
 // Helper function to create a KongPlugin from a plugin
-func createKongPlugin(plugin *file.FPlugin, ownerName string) (*kcv1.KongPlugin, error) {
+func createKongPlugin(plugin *file.FPlugin, ownerName string) (*configurationv1.KongPlugin, error) {
 	if plugin.Name == nil {
 		log.Println("Plugin name is empty. Please provide a name for the plugin.")
 		return nil, nil
 	}
 	pluginName := *plugin.Name
-	kongPlugin := &kcv1.KongPlugin{
+	kongPlugin := &configurationv1.KongPlugin{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: KICAPIVersion,
 			Kind:       KongPluginKind,
@@ -78,7 +78,7 @@ func createKongPlugin(plugin *file.FPlugin, ownerName string) (*kcv1.KongPlugin,
 				protocols = append(protocols, *protocol)
 			}
 		}
-		kongPlugin.Protocols = kcv1.StringsToKongProtocols(protocols)
+		kongPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
 	}
 
 	// Transform the plugin config

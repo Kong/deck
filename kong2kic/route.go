@@ -8,7 +8,7 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kcv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -192,7 +192,7 @@ func addPluginsToRoute(
 			continue
 		}
 		pluginName := *plugin.Name
-		kongPlugin := kcv1.KongPlugin{
+		kongPlugin := configurationv1.KongPlugin{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: KICAPIVersion,
 				Kind:       KongPluginKind,
@@ -224,7 +224,7 @@ func addPluginsToRoute(
 					protocols = append(protocols, *protocol)
 				}
 			}
-			kongPlugin.Protocols = kcv1.StringsToKongProtocols(protocols)
+			kongPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
 		}
 		if plugin.Tags != nil {
 			var tags []string
