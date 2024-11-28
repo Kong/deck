@@ -1,108 +1,119 @@
 run:
   timeout: 10m
   build-tags:
-  - integration
+    - integration
 linters:
   enable:
-  - asciicheck
-  - dogsled
-  - durationcheck
-  - exhaustive
-  - copyloopvar
-  - gci
-  - goconst
-  - gofmt
-  - gofumpt
-  - goimports
-  - gomodguard
-  - gosec
-  - govet
-  - importas
-  - lll
-  - gosimple
-  - staticcheck
-  - unused
-  - misspell
-  - nakedret
-  - nilerr
-  - nolintlint
-  - predeclared
-  - prealloc
-  - revive
-  - stylecheck
-  - unconvert
-  - unparam
-  - wastedassign
-  - errorlint
+    - asciicheck
+    - dogsled
+    - durationcheck
+    - exhaustive
+    - copyloopvar
+    - gci
+    - goconst
+    - gofmt
+    - gofumpt
+    - goimports
+    - gomodguard
+    - gosec
+    - govet
+    - importas
+    - lll
+    - gosimple
+    - staticcheck
+    - unused
+    - misspell
+    - nakedret
+    - nilerr
+    - nolintlint
+    - predeclared
+    - prealloc
+    - revive
+    - stylecheck
+    - unconvert
+    - unparam
+    - wastedassign
+    - errorlint
 issues:
   max-same-issues: 0
   exclude-rules:
-  - linters:
-    - gosec
-    text:  "weak cryptographic primitive"
-    path: "state/indexers/md5Indexer.*"
-  - linters:
-    - gosec
-    text: "TLS MinVersion too low"
-    path: "tests/integration/"
-  - linters:
-    - gosec
-    text:  "weak random number generator"
-    path: _test\.go
-  - linters:
-    - errcheck
-    text:  "Error return value" # ignore err not checked in test files
-    path: _test\.go
-  - linters:
-    - gosec
-    text:  "Expect WriteFile permissions to be 0600 or less"
-    path: file/codegen/main.go
-  # ignore unused warnings in test utils files
-  - linters:
-    - unused
-    - unparam
-    path: test_.*
-  # ignore SA1019 deprecation warning
-  - linters:
-    - staticcheck
-    text:  "SA1019: rand..*"
-  # ignore formatting warnings in cmd/root.go due to nolint statements
-  - linters:
-    - gofumpt
-    text:  "File is not `gofumpt`-ed"
-    path: cmd/root.go
-  - linters:
-    - gofmt
-    text:  "File is not `gofmt`-ed with `-s`"
-    path: cmd/root.go
-  - linters:
-    - goimports
-    text:  "File is not `goimports`-ed"
-    path: cmd/root.go
+    - linters:
+        - gosec
+      text: "weak cryptographic primitive"
+      path: "state/indexers/md5Indexer.*"
+    - linters:
+        - gosec
+      text: "TLS MinVersion too low"
+      path: "tests/integration/"
+    - linters:
+        - gosec
+      text: "weak random number generator"
+      path: _test\.go
+    - linters:
+        - errcheck
+      text: "Error return value" # ignore err not checked in test files
+      path: _test\.go
+    - linters:
+        - gosec
+      text: "Expect WriteFile permissions to be 0600 or less"
+      path: file/codegen/main.go
+    # ignore unused warnings in test utils files
+    - linters:
+        - unused
+        - unparam
+      path: test_.*
+    # ignore SA1019 deprecation warning
+    - linters:
+        - staticcheck
+      text: "SA1019: rand..*"
+    # ignore formatting warnings in cmd/root.go due to nolint statements
+    - linters:
+        - gofumpt
+      text: "File is not `gofumpt`-ed"
+      path: cmd/root.go
+    - linters:
+        - gofmt
+      text: "File is not `gofmt`-ed with `-s`"
+      path: cmd/root.go
+    - linters:
+        - goimports
+      text: "File is not `goimports`-ed"
+      path: cmd/root.go
 
 linters-settings:
   gci:
     sections:
-    - standard
-    - default
+      - standard
+      - default
   goconst:
     min-occurrences: 10
   gomodguard:
     blocked:
       modules:
-      - github.com/ghodss/yaml:
-          recommendations:
-          - sigs.k8s.io/yaml
-      - gopkg.in/yaml.v2:
-          recommendations:
-          - sigs.k8s.io/yaml
-      - gopkg.in/yaml.v3:
-          recommendations:
-          - sigs.k8s.io/yaml
-      - github.com/pkg/errors:
-          recommendations:
-          - fmt
-          - errors
-      - golang.org/x/net/context:
-          recommendations:
-          - context
+        - github.com/ghodss/yaml:
+            recommendations:
+              - sigs.k8s.io/yaml
+        - gopkg.in/yaml.v2:
+            recommendations:
+              - sigs.k8s.io/yaml
+        - gopkg.in/yaml.v3:
+            recommendations:
+              - sigs.k8s.io/yaml
+        - github.com/pkg/errors:
+            recommendations:
+              - fmt
+              - errors
+        - golang.org/x/net/context:
+            recommendations:
+              - context
+        - github.com/kong/kubernetes-ingress-controller/v3:
+            recommendations:
+              - github.com/kong/kubernetes-configuration
+        - github.com/kong/gateway-operator:
+            recommendations:
+              - github.com/kong/kubernetes-configuration
+  importas:
+    no-unaliased: true
+    alias:
+      - pkg: github.com/kong/kubernetes-configuration/api/configuration/(v[\w\d]+)
+        alias: configuration${1}

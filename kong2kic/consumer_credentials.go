@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
-	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	k8scorev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -43,7 +43,7 @@ func createCredentialSecret(consumerUsername, credentialType string, dataFields 
 }
 
 // Functions to populate different credential types
-func populateKICKeyAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICKeyAuthSecrets(consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent) {
 	for _, keyAuth := range consumer.KeyAuths {
 		dataFields := map[string]*string{
 			"key": keyAuth.Key,
@@ -54,7 +54,7 @@ func populateKICKeyAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.Kon
 	}
 }
 
-func populateKICHMACSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICHMACSecrets(consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent) {
 	for _, hmacAuth := range consumer.HMACAuths {
 		dataFields := map[string]*string{
 			"username": hmacAuth.Username,
@@ -66,7 +66,7 @@ func populateKICHMACSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongCo
 	}
 }
 
-func populateKICJWTAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICJWTAuthSecrets(consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent) {
 	for _, jwtAuth := range consumer.JWTAuths {
 		dataFields := map[string]*string{
 			"key":            jwtAuth.Key,
@@ -80,7 +80,9 @@ func populateKICJWTAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.Kon
 	}
 }
 
-func populateKICBasicAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICBasicAuthSecrets(
+	consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent,
+) {
 	for _, basicAuth := range consumer.BasicAuths {
 		dataFields := map[string]*string{
 			"username": basicAuth.Username,
@@ -92,7 +94,9 @@ func populateKICBasicAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.K
 	}
 }
 
-func populateKICOAuth2CredSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICOAuth2CredSecrets(
+	consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent,
+) {
 	for _, oauth2Cred := range consumer.Oauth2Creds {
 		dataFields := map[string]*string{
 			"name":          oauth2Cred.Name,
@@ -110,7 +114,9 @@ func populateKICOAuth2CredSecrets(consumer *file.FConsumer, kongConsumer *kicv1.
 	}
 }
 
-func populateKICACLGroupSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICACLGroupSecrets(
+	consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent,
+) {
 	for _, aclGroup := range consumer.ACLGroups {
 		dataFields := map[string]*string{
 			"group": aclGroup.Group,
@@ -121,7 +127,9 @@ func populateKICACLGroupSecrets(consumer *file.FConsumer, kongConsumer *kicv1.Ko
 	}
 }
 
-func populateKICMTLSAuthSecrets(consumer *file.FConsumer, kongConsumer *kicv1.KongConsumer, file *KICContent) {
+func populateKICMTLSAuthSecrets(
+	consumer *file.FConsumer, kongConsumer *configurationv1.KongConsumer, file *KICContent,
+) {
 	for _, mtlsAuth := range consumer.MTLSAuths {
 		dataFields := map[string]*string{
 			"subject_name": mtlsAuth.SubjectName,
