@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/utils"
@@ -17,13 +18,13 @@ import (
 )
 
 var (
-	validateCmdKongStateFile     []string
-	validateCmdRBACResourcesOnly bool
-	validateCmdCheckOnlinePluginsOnly bool
-	validateOnline               bool
-	validateWorkspace            string
-	validateParallelism          int
-	validateKonnectCompatibility bool
+	validateCmdKongStateFile        []string
+	validateCmdOnlineEntitiesFilter []string
+	validateCmdRBACResourcesOnly    bool
+	validateOnline                  bool
+	validateKonnectCompatibility    bool
+	validateWorkspace               string
+	validateParallelism             int
 )
 
 func executeValidate(cmd *cobra.Command, _ []string) error {
@@ -211,6 +212,26 @@ this command unless --online flag is used.
 			if len(validateCmdKongStateFile) == 0 {
 				validateCmdKongStateFile = []string{"-"}
 			}
+
+			// Iterate over the input values and validate them against the keys in entityMap
+			for _, value := range validateCmdOnlineEntitiesFilter {
+				// Check if the value is valid by comparing it with keys in EntityMap
+				if _, exists := validate.EntityMap[value]; !exists {
+					// Generate an error message with the list of valid keys
+					listOfKeys := make([]string, 0, len(validate.EntityMap))
+					for key := range validate.EntityMap {
+						listOfKeys = append(listOfKeys, key)
+					}
+					// Sort the keys alphabetically
+					sort.Strings(listOfKeys)
+
+					return fmt.Errorf(
+						"invalid value '%s' for --check-online-plugins-only; it should be a valid Kong entity. "+
+							"Valid entities: %v",
+						value, listOfKeys,
+					)
+				}
+			}
 			return preRunSilenceEventsFlag()
 		}
 
@@ -238,8 +259,8 @@ this command unless --online flag is used.
 
 	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
 		false, "indicate that the state file(s) contains RBAC resources only (Kong Enterprise only).")
-	validateCmd.Flags().BoolVar(&validateCmdCheckOnlinePluginsOnly, "check-online-plugins-only",
-		false, "indicate that the online validation will be done only on plugins.")
+	validateCmd.Flags().StringSliceVarP(&validateCmdOnlineEntitiesFilter, "online-entities-list",
+		"", []string{}, "indicate the list of entitied that should be validate online validation.")
 	if deprecated {
 		validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
 			"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
@@ -282,12 +303,12 @@ func validateWithKong(
 		return []error{fmt.Errorf("parsing Kong version: %w", err)}
 	}
 	opts := validate.ValidatorOpts{
-		Ctx:               ctx,
-		State:             ks,
-		Client:            kongClient,
-		Parallelism:       validateParallelism,
-		RBACResourcesOnly: validateCmdRBACResourcesOnly,
-		CheckOnlinePluginsOnly: validateCmdCheckOnlinePluginsOnly,
+		Ctx:                  ctx,
+		State:                ks,
+		Client:               kongClient,
+		Parallelism:          validateParallelism,
+		RBACResourcesOnly:    validateCmdRBACResourcesOnly,
+		OnlineEntitiesFilter: validateCmdOnlineEntitiesFilter,
 	}
 	validator := validate.NewValidator(opts)
 	return validator.Validate(parsedFormatVersion)

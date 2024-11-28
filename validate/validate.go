@@ -16,31 +16,55 @@ import (
 )
 
 type Validator struct {
-	ctx               context.Context
-	state             *state.KongState
-	client            *kong.Client
-	parallelism       int
-	rbacResourcesOnly bool
-	CheckOnlinePluginsOnly bool
+	ctx                  context.Context
+	state                *state.KongState
+	client               *kong.Client
+	parallelism          int
+	rbacResourcesOnly    bool
+	onlineEntitiesFilter []string
 }
 
 type ValidatorOpts struct {
-	Ctx               context.Context
-	State             *state.KongState
-	Client            *kong.Client
-	Parallelism       int
-	RBACResourcesOnly bool
-	CheckOnlinePluginsOnly bool
+	Ctx                  context.Context
+	State                *state.KongState
+	Client               *kong.Client
+	Parallelism          int
+	RBACResourcesOnly    bool
+	OnlineEntitiesFilter []string
+}
+
+// Define a map of entity object field names and their corresponding string names
+var EntityMap = map[string]string{
+	"ACLGroups":               "acls",
+	"BasicAuths":              "basicauth_credentials",
+	"CACertificates":          "ca_certificates",
+	"Certificates":            "certificates",
+	"Consumers":               "consumers",
+	"Documents":               "documents",
+	"FilterChains":            "filter_chains",
+	"HMACAuths":               "hmacauth_credentials",
+	"JWTAuths":                "jwt_secrets",
+	"KeyAuths":                "keyauth_credentials",
+	"Oauth2Creds":             "oauth2_credentials",
+	"Plugins":                 "plugins",
+	"RBACEndpointPermissions": "rbac-endpointpermission",
+	"RBACRoles":               "rbac-role",
+	"Routes":                  "routes",
+	"SNIs":                    "snis",
+	"Services":                "services",
+	"Targets":                 "targets",
+	"Upstreams":               "upstreams",
+	"Vaults":                  "vaults",
 }
 
 func NewValidator(opt ValidatorOpts) *Validator {
 	return &Validator{
-		ctx:               opt.Ctx,
-		state:             opt.State,
-		client:            opt.Client,
-		parallelism:       opt.Parallelism,
-		rbacResourcesOnly: opt.RBACResourcesOnly,
-		CheckOnlinePluginsOnly: opt.CheckOnlinePluginsOnly,
+		ctx:                  opt.Ctx,
+		state:                opt.State,
+		client:               opt.Client,
+		parallelism:          opt.Parallelism,
+		rbacResourcesOnly:    opt.RBACResourcesOnly,
+		onlineEntitiesFilter: opt.OnlineEntitiesFilter,
 	}
 }
 
@@ -122,75 +146,48 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 func (v *Validator) Validate(formatVersion semver.Version) []error {
 	allErr := []error{}
 
-	// validate RBAC resources first.
-	if err := v.entities(v.state.RBACEndpointPermissions, "rbac-endpointpermission"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.RBACRoles, "rbac-role"); err != nil {
-		allErr = append(allErr, err...)
-	}
 	if v.rbacResourcesOnly {
+		// validate RBAC resources first.
+		if err := v.entities(v.state.RBACEndpointPermissions, "rbac-endpointpermission"); err != nil {
+			allErr = append(allErr, err...)
+		}
+		if err := v.entities(v.state.RBACRoles, "rbac-role"); err != nil {
+			allErr = append(allErr, err...)
+		}
 		return allErr
 	}
 
-	// validate Plugins resources then.
-	if err := v.entities(v.state.Plugins, "plugins"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if v.CheckOnlinePluginsOnly {
-		return allErr
+	// Create a copy of entityMap with only the specififed resources to check online.
+	filteredEntityMap := make(map[string]string)
+	if len(v.onlineEntitiesFilter) > 0 {
+		for _, value := range v.onlineEntitiesFilter {
+			for key, entityName := range EntityMap {
+				if value == key {
+					filteredEntityMap[key] = entityName
+				}
+			}
+		}
+	} else {
+		// If no filter is specified, use the original entityMap.
+		filteredEntityMap = EntityMap
 	}
 
-	if err := v.entities(v.state.Services, "services"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.ACLGroups, "acls"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.BasicAuths, "basicauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.CACertificates, "ca_certificates"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Certificates, "certificates"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Consumers, "consumers"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Documents, "documents"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.HMACAuths, "hmacauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.JWTAuths, "jwt_secrets"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.KeyAuths, "keyauth_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Oauth2Creds, "oauth2_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Routes, "routes"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.SNIs, "snis"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Targets, "targets"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Upstreams, "upstreams"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.FilterChains, "filter_chains"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Vaults, "vaults"); err != nil {
-		allErr = append(allErr, err...)
+	// Validate each entity using the filtered entityMap
+	for fieldName, entityName := range filteredEntityMap {
+		// Use reflection to get the value of the field from v.state
+		valueOfState := reflect.ValueOf(v.state)
+		if valueOfState.Kind() == reflect.Ptr {
+			valueOfState = valueOfState.Elem() // Dereference if it's a pointer
+		}
+
+		fieldValue := valueOfState.FieldByName(fieldName)
+		if fieldValue.IsValid() && fieldValue.CanInterface() {
+			if err := v.entities(fieldValue.Interface(), entityName); err != nil {
+				allErr = append(allErr, err...)
+			}
+		} else {
+			allErr = append(allErr, fmt.Errorf("invalid field '%s' in state", fieldName))
+		}
 	}
 
 	// validate routes format with Kong 3.x

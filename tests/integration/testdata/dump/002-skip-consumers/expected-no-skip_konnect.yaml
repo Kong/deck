@@ -5,6 +5,7 @@ consumer_groups:
 - name: basic
   plugins:
   - config:
+      compound_identifier: null
       consumer_groups: null
       dictionary_name: kong_rate_limiting_counters
       disable_penalty: false

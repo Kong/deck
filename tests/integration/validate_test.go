@@ -76,6 +76,22 @@ func Test_Validate_Konnect(t *testing.T) {
 			additionalArgs: []string{"--konnect-runtime-group-name=default"},
 			errorExpected:  false,
 		},
+		{
+			name:           "validate with wrong online list, passed via --online-entities-list cli flag",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=services,Routes,Plugins"},
+			errorExpected:  true,
+			errorString: "invalid value 'services' for --check-online-plugins-only; it should be a valid " +
+				"Kong entity. Valid entities: [ACLGroups BasicAuths CACertificates Certificates Consumers Documents " +
+				"FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Plugins RBACEndpointPermissions RBACRoles Routes " +
+				"SNIs Services Targets Upstreams Vaults]",
+		},
+		{
+			name:           "validate with correct online list, passed via --online-entities-list cli flag",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+			errorExpected:  false,
+		},
 	}
 
 	for _, tc := range tests {
@@ -134,9 +150,9 @@ func Test_Validate_File(t *testing.T) {
 			additionalArgs: []string{"--rbac-resources-only"},
 		},
 		{
-			name:           "file validate with --check-online-plugins-only",
+			name:           "file validate with --online-entities-list",
 			stateFile:      "testdata/validate/kong3x.yaml",
-			additionalArgs: []string{"--check-online-plugins-only"},
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
 		},
 	}
 
