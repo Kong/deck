@@ -21,6 +21,7 @@ type Validator struct {
 	client            *kong.Client
 	parallelism       int
 	rbacResourcesOnly bool
+	CheckOnlinePluginsOnly bool
 }
 
 type ValidatorOpts struct {
@@ -29,6 +30,7 @@ type ValidatorOpts struct {
 	Client            *kong.Client
 	Parallelism       int
 	RBACResourcesOnly bool
+	CheckOnlinePluginsOnly bool
 }
 
 func NewValidator(opt ValidatorOpts) *Validator {
@@ -38,6 +40,7 @@ func NewValidator(opt ValidatorOpts) *Validator {
 		client:            opt.Client,
 		parallelism:       opt.Parallelism,
 		rbacResourcesOnly: opt.RBACResourcesOnly,
+		CheckOnlinePluginsOnly: opt.CheckOnlinePluginsOnly,
 	}
 }
 
@@ -130,6 +133,14 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 		return allErr
 	}
 
+	// validate Plugins resources then.
+	if err := v.entities(v.state.Plugins, "plugins"); err != nil {
+		allErr = append(allErr, err...)
+	}
+	if v.CheckOnlinePluginsOnly {
+		return allErr
+	}
+
 	if err := v.entities(v.state.Services, "services"); err != nil {
 		allErr = append(allErr, err...)
 	}
@@ -161,9 +172,6 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 		allErr = append(allErr, err...)
 	}
 	if err := v.entities(v.state.Oauth2Creds, "oauth2_credentials"); err != nil {
-		allErr = append(allErr, err...)
-	}
-	if err := v.entities(v.state.Plugins, "plugins"); err != nil {
 		allErr = append(allErr, err...)
 	}
 	if err := v.entities(v.state.Routes, "routes"); err != nil {

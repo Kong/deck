@@ -133,6 +133,11 @@ func Test_Validate_File(t *testing.T) {
 			stateFile:      "testdata/validate/rbac-resources.yaml",
 			additionalArgs: []string{"--rbac-resources-only"},
 		},
+		{
+			name:           "file validate with --check-online-plugins-only",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--check-online-plugins-only"},
+		},
 	}
 
 	for _, tc := range tests {

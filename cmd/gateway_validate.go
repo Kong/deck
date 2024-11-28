@@ -19,6 +19,7 @@ import (
 var (
 	validateCmdKongStateFile     []string
 	validateCmdRBACResourcesOnly bool
+	validateCmdCheckOnlinePluginsOnly bool
 	validateOnline               bool
 	validateWorkspace            string
 	validateParallelism          int
@@ -237,6 +238,8 @@ this command unless --online flag is used.
 
 	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
 		false, "indicate that the state file(s) contains RBAC resources only (Kong Enterprise only).")
+	validateCmd.Flags().BoolVar(&validateCmdCheckOnlinePluginsOnly, "check-online-plugins-only",
+		false, "indicate that the online validation will be done only on plugins.")
 	if deprecated {
 		validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
 			"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
@@ -284,6 +287,7 @@ func validateWithKong(
 		Client:            kongClient,
 		Parallelism:       validateParallelism,
 		RBACResourcesOnly: validateCmdRBACResourcesOnly,
+		CheckOnlinePluginsOnly: validateCmdCheckOnlinePluginsOnly,
 	}
 	validator := validate.NewValidator(opts)
 	return validator.Validate(parsedFormatVersion)
