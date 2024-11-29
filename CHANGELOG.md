@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.41.4](#v1414)
 - [v1.41.3](#v1413)
 - [v1.41.2](#v1412)
 - [v1.41.1](#v1411)
@@ -99,6 +100,21 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.41.4]
+> Release date: 2024/11/26
+
+### Fixes
+- Added validation for ensuring that cookie parameters in parameter schemas are skipped 
+and a warning is logged for the user while using `deck file openapi2kong` command.
+[#1452](https://github.com/Kong/deck/pull/1452)
+[go-apiops #255](https://github.com/Kong/go-apiops/pull/225)
+- Fixed issue where creating arrays with mixed types using oneOf in OAS specifications were
+failing while using `deck file openapi2kong` command. 
+[#1452](https://github.com/Kong/deck/pull/1452)
+[go-apiops #231](https://github.com/Kong/go-apiops/pull/231)
+
+
 
 ## [v1.41.3]
 > Release date: 2024/11/25
@@ -1867,6 +1883,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.41.4]: https://github.com/Kong/deck/compare/v1.41.3...v1.41.4
 [v1.41.3]: https://github.com/Kong/deck/compare/v1.41.2...v1.41.3
 [v1.41.2]: https://github.com/Kong/deck/compare/v1.41.1...v1.41.2
 [v1.41.1]: https://github.com/Kong/deck/compare/v1.40.0...v1.41.1
