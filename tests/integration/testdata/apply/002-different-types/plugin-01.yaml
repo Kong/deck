@@ -1,0 +1,11 @@
+_format_version: "3.0"
+plugins:
+  - name: basic-auth
+    enabled: true
+    config:
+      hide_credentials: true
+      anonymous: nil
+      realm: service
+    protocols:
+      - http
+      - https
