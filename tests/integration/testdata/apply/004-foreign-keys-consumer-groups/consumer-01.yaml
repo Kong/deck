@@ -1,0 +1,5 @@
+_format_version: "3.0"
+consumers:
+  - username: alice
+    groups:
+      - name: gold
