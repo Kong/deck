@@ -33,6 +33,7 @@ consumer_groups:
         password: null
         port: 6379
         read_timeout: 2000
+        redis_proxy_type: null
         send_timeout: 2000
         sentinel_addresses: null
         sentinel_master: null
