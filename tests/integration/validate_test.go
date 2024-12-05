@@ -149,11 +149,6 @@ func Test_Validate_File(t *testing.T) {
 			stateFile:      "testdata/validate/rbac-resources.yaml",
 			additionalArgs: []string{"--rbac-resources-only"},
 		},
-		{
-			name:           "file validate with --online-entities-list",
-			stateFile:      "testdata/validate/kong3x.yaml",
-			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
-		},
 	}
 
 	for _, tc := range tests {
@@ -238,6 +233,16 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			name:           "validate with --workspace",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--workspace=default"},
+		},
+		{
+			name:           "validate format version 3.0 with --online-entities-list",
+			stateFile:      "testdata/validate/kong-ee.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
+		{
+			name:           "validate with konnect and --online-entities-list",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
 		},
 		// TODO: Add a rbac flag test, once the behaviour is fixed
 	}
