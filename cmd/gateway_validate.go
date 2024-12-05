@@ -226,7 +226,7 @@ this command unless --online flag is used.
 					sort.Strings(listOfKeys)
 
 					return fmt.Errorf(
-						"invalid value '%s' for --check-online-plugins-only; it should be a valid Kong entity. "+
+						"invalid value '%s' for --online-entities-list; it should be a valid Kong entity (case-sensitive). "+
 							"Valid entities: %v",
 						value, listOfKeys,
 					)
@@ -260,7 +260,7 @@ this command unless --online flag is used.
 	validateCmd.Flags().BoolVar(&validateCmdRBACResourcesOnly, "rbac-resources-only",
 		false, "indicate that the state file(s) contains RBAC resources only (Kong Enterprise only).")
 	validateCmd.Flags().StringSliceVarP(&validateCmdOnlineEntitiesFilter, "online-entities-list",
-		"", []string{}, "indicate the list of entitied that should be validate online validation.")
+		"", []string{}, "indicate the list of entities that should be validated online validation.")
 	if deprecated {
 		validateCmd.Flags().StringSliceVarP(&validateCmdKongStateFile,
 			"state", "s", []string{"kong.yaml"}, "file(s) containing Kong's configuration.\n"+
