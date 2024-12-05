@@ -189,6 +189,16 @@ func Test_Validate_Gateway(t *testing.T) {
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--konnect-compatibility"},
 		},
+		{
+			name:           "validate format version 3.0 with --online-entities-list",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
+		{
+			name:           "validate with konnect and --online-entities-list",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
 	}
 
 	for _, tc := range tests {
