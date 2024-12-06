@@ -1397,6 +1397,7 @@ var (
 				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
 			},
 			Config: kong.Configuration{
+				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
@@ -1447,6 +1448,7 @@ var (
 				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
 			},
 			Config: kong.Configuration{
+				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
@@ -1494,6 +1496,7 @@ var (
 		{
 			Name: kong.String("rate-limiting-advanced"),
 			Config: kong.Configuration{
+				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
