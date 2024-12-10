@@ -48,8 +48,8 @@ func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICCo
 func createK8sService(service *file.FService, upstreams []file.FUpstream) *k8scorev1.Service {
 	k8sService := &k8scorev1.Service{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v1",
-			Kind:       "Service",
+			APIVersion: ServiceAPIVersionv1,
+			Kind:       ServiceKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        calculateSlug(*service.Name),
@@ -109,25 +109,25 @@ func isUpstreamReferenced(host *string, upstreams []file.FUpstream) bool {
 // Helper function to add annotations from a service to a Kubernetes service
 func addAnnotationsFromService(service *file.FService, annotations map[string]string) {
 	if service.Protocol != nil {
-		annotations["konghq.com/protocol"] = *service.Protocol
+		annotations[KongHQProtocol] = *service.Protocol
 	}
 	if service.Path != nil {
-		annotations["konghq.com/path"] = *service.Path
+		annotations[KongHQPath] = *service.Path
 	}
 	if service.ClientCertificate != nil && service.ClientCertificate.ID != nil {
-		annotations["konghq.com/client-cert"] = *service.ClientCertificate.ID
+		annotations[KongHQClientCert] = *service.ClientCertificate.ID
 	}
 	if service.ReadTimeout != nil {
-		annotations["konghq.com/read-timeout"] = strconv.Itoa(*service.ReadTimeout)
+		annotations[KongHQReadTimeout] = strconv.Itoa(*service.ReadTimeout)
 	}
 	if service.WriteTimeout != nil {
-		annotations["konghq.com/write-timeout"] = strconv.Itoa(*service.WriteTimeout)
+		annotations[KongHQWriteTimeout] = strconv.Itoa(*service.WriteTimeout)
 	}
 	if service.ConnectTimeout != nil {
-		annotations["konghq.com/connect-timeout"] = strconv.Itoa(*service.ConnectTimeout)
+		annotations[KongHQConnectTimeout] = strconv.Itoa(*service.ConnectTimeout)
 	}
 	if service.Retries != nil {
-		annotations["konghq.com/retries"] = strconv.Itoa(*service.Retries)
+		annotations[KongHQRetries] = strconv.Itoa(*service.Retries)
 	}
 	addTagsToAnnotations(service.Tags, annotations)
 }

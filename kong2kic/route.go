@@ -26,27 +26,27 @@ func addAnnotationsFromRoute(route *file.FRoute, annotations map[string]string) 
 				protocols = append(protocols, *protocol)
 			}
 		}
-		annotations["konghq.com/protocols"] = strings.Join(protocols, ",")
+		annotations[KongHQProtocols] = strings.Join(protocols, ",")
 	}
 	if route.StripPath != nil {
-		annotations["konghq.com/strip-path"] = strconv.FormatBool(*route.StripPath)
+		annotations[KongHQStripPath] = strconv.FormatBool(*route.StripPath)
 	}
 	if route.PreserveHost != nil {
-		annotations["konghq.com/preserve-host"] = strconv.FormatBool(*route.PreserveHost)
+		annotations[KongHQPreserveHost] = strconv.FormatBool(*route.PreserveHost)
 	}
 	if route.RegexPriority != nil {
-		annotations["konghq.com/regex-priority"] = strconv.Itoa(*route.RegexPriority)
+		annotations[KongHQRegexPriority] = strconv.Itoa(*route.RegexPriority)
 	}
 	if route.HTTPSRedirectStatusCode != nil {
-		annotations["konghq.com/https-redirect-status-code"] = strconv.Itoa(*route.HTTPSRedirectStatusCode)
+		annotations[KongHQHTTPSRedirectStatusCode] = strconv.Itoa(*route.HTTPSRedirectStatusCode)
 	}
 	if route.Headers != nil {
 		for key, value := range route.Headers {
-			annotations["konghq.com/headers."+key] = strings.Join(value, ",")
+			annotations[KongHQHeaders+"."+key] = strings.Join(value, ",")
 		}
 	}
 	if route.PathHandling != nil {
-		annotations["konghq.com/path-handling"] = *route.PathHandling
+		annotations[KongHQPathHandling] = *route.PathHandling
 	}
 	if route.SNIs != nil {
 		var snis []string
@@ -55,13 +55,13 @@ func addAnnotationsFromRoute(route *file.FRoute, annotations map[string]string) 
 				snis = append(snis, *sni)
 			}
 		}
-		annotations["konghq.com/snis"] = strings.Join(snis, ",")
+		annotations[KongHQSNIs] = strings.Join(snis, ",")
 	}
 	if route.RequestBuffering != nil {
-		annotations["konghq.com/request-buffering"] = strconv.FormatBool(*route.RequestBuffering)
+		annotations[KongHQRequestBuffering] = strconv.FormatBool(*route.RequestBuffering)
 	}
 	if route.ResponseBuffering != nil {
-		annotations["konghq.com/response-buffering"] = strconv.FormatBool(*route.ResponseBuffering)
+		annotations[KongHQResponseBuffering] = strconv.FormatBool(*route.ResponseBuffering)
 	}
 	if route.Methods != nil {
 		var methods []string
@@ -70,7 +70,8 @@ func addAnnotationsFromRoute(route *file.FRoute, annotations map[string]string) 
 				methods = append(methods, *method)
 			}
 		}
-		annotations["konghq.com/methods"] = strings.Join(methods, ",")
+
+		annotations[KongHQMethods] = strings.Join(methods, ",")
 	}
 	if route.Tags != nil {
 		var tags []string
@@ -79,7 +80,7 @@ func addAnnotationsFromRoute(route *file.FRoute, annotations map[string]string) 
 				tags = append(tags, *tag)
 			}
 		}
-		annotations["konghq.com/tags"] = strings.Join(tags, ",")
+		annotations[KongHQTags] = strings.Join(tags, ",")
 	}
 }
 
@@ -106,7 +107,7 @@ func createIngressPaths(
 			if *servicePort > 65535 || *servicePort < 0 {
 				log.Fatalf("Port %d is not within the valid range. Please provide a port between 0 and 65535.\n", *servicePort)
 			}
-			backend.Service.Port.Number = int32(*servicePort)
+			backend.Service.Port.Number = int32(*servicePort) //nolint:gosec
 		}
 		paths = append(paths, k8snetv1.HTTPIngressPath{
 			Path:     sCopy,
@@ -134,8 +135,8 @@ func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICC
 
 			k8sIngress := k8snetv1.Ingress{
 				TypeMeta: metav1.TypeMeta{
-					APIVersion: "networking.k8s.io/v1",
-					Kind:       "Ingress",
+					APIVersion: IngressAPIVersion,
+					Kind:       IngressKind,
 				},
 				ObjectMeta: metav1.ObjectMeta{
 					Name:        calculateSlug(serviceName + "-" + routeName),
@@ -197,7 +198,7 @@ func addPluginsToRoute(
 		pluginName := *plugin.Name
 		kongPlugin := configurationv1.KongPlugin{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: KICAPIVersion,
+				APIVersion: ConfigurationKongHQv1,
 				Kind:       KongPluginKind,
 			},
 			ObjectMeta: metav1.ObjectMeta{
@@ -236,7 +237,7 @@ func addPluginsToRoute(
 					tags = append(tags, *tag)
 				}
 			}
-			kongPlugin.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+			kongPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		configJSON, err := json.Marshal(plugin.Config)
@@ -248,11 +249,11 @@ func addPluginsToRoute(
 		}
 
 		// Add plugin reference to ingress annotations
-		pluginsAnnotation := ingress.ObjectMeta.Annotations["konghq.com/plugins"]
+		pluginsAnnotation := ingress.ObjectMeta.Annotations[KongHQPlugins]
 		if pluginsAnnotation == "" {
-			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = kongPlugin.ObjectMeta.Name
+			ingress.ObjectMeta.Annotations[KongHQPlugins] = kongPlugin.ObjectMeta.Name
 		} else {
-			ingress.ObjectMeta.Annotations["konghq.com/plugins"] = pluginsAnnotation + "," + kongPlugin.ObjectMeta.Name
+			ingress.ObjectMeta.Annotations[KongHQPlugins] = pluginsAnnotation + "," + kongPlugin.ObjectMeta.Name
 		}
 
 		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
@@ -312,7 +313,8 @@ func populateKICIngressesWithGatewayAPI(content *file.Content, kicContent *KICCo
 
 func createHTTPRoute(service file.FService, route *file.FRoute) (k8sgwapiv1.HTTPRoute, error) {
 	var httpRoute k8sgwapiv1.HTTPRoute
-	httpRoute.Kind = "HTTPRoute"
+
+	httpRoute.Kind = HTTPRouteKind
 	if targetKICVersionAPI == KICV3GATEWAY {
 		httpRoute.APIVersion = GatewayAPIVersionV1
 	} else {
@@ -338,20 +340,20 @@ func createHTTPRoute(service file.FService, route *file.FRoute) (k8sgwapiv1.HTTP
 
 func addAnnotations(httpRoute *k8sgwapiv1.HTTPRoute, route *file.FRoute) {
 	if route.PreserveHost != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/preserve-host"] = strconv.FormatBool(*route.PreserveHost)
+		httpRoute.ObjectMeta.Annotations[KongHQPreserveHost] = strconv.FormatBool(*route.PreserveHost)
 	}
 	if route.StripPath != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/strip-path"] = strconv.FormatBool(*route.StripPath)
+		httpRoute.ObjectMeta.Annotations[KongHQStripPath] = strconv.FormatBool(*route.StripPath)
 	}
 	if route.HTTPSRedirectStatusCode != nil {
 		value := strconv.Itoa(*route.HTTPSRedirectStatusCode)
-		httpRoute.ObjectMeta.Annotations["konghq.com/https-redirect-status-code"] = value
+		httpRoute.ObjectMeta.Annotations[KongHQHTTPSRedirectStatusCode] = value
 	}
 	if route.RegexPriority != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/regex-priority"] = strconv.Itoa(*route.RegexPriority)
+		httpRoute.ObjectMeta.Annotations[KongHQRegexPriority] = strconv.Itoa(*route.RegexPriority)
 	}
 	if route.PathHandling != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/path-handling"] = *route.PathHandling
+		httpRoute.ObjectMeta.Annotations[KongHQPathHandling] = *route.PathHandling
 	}
 	if route.Tags != nil {
 		var tags []string
@@ -360,24 +362,25 @@ func addAnnotations(httpRoute *k8sgwapiv1.HTTPRoute, route *file.FRoute) {
 				tags = append(tags, *tag)
 			}
 		}
-		httpRoute.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+		httpRoute.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
 	}
 	if route.SNIs != nil {
 		var snis string
+		var sb strings.Builder
 		for _, sni := range route.SNIs {
-			if snis == "" {
-				snis = *sni
-			} else {
-				snis = snis + "," + *sni
+			if sb.Len() > 0 {
+				sb.WriteString(",")
 			}
+			sb.WriteString(*sni)
 		}
-		httpRoute.ObjectMeta.Annotations["konghq.com/snis"] = snis
+		snis = sb.String()
+		httpRoute.ObjectMeta.Annotations[KongHQSNIs] = snis
 	}
 	if route.RequestBuffering != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/request-buffering"] = strconv.FormatBool(*route.RequestBuffering)
+		httpRoute.ObjectMeta.Annotations[KongHQRequestBuffering] = strconv.FormatBool(*route.RequestBuffering)
 	}
 	if route.ResponseBuffering != nil {
-		httpRoute.ObjectMeta.Annotations["konghq.com/response-buffering"] = strconv.FormatBool(*route.ResponseBuffering)
+		httpRoute.ObjectMeta.Annotations[KongHQResponseBuffering] = strconv.FormatBool(*route.ResponseBuffering)
 	}
 }
 
@@ -395,7 +398,11 @@ func addParentRefs(httpRoute *k8sgwapiv1.HTTPRoute) {
 	})
 }
 
+// Adds backend references to the given HTTPRoute based on the provided service and route.
+// It constructs BackendRef, HTTPHeaderMatch, and HTTPPathMatch objects and appends them to the HTTPRoute's rules.
+// The function handles different matching types for headers and paths, and supports multiple methods for each route.
 func addBackendRefs(httpRoute *k8sgwapiv1.HTTPRoute, service file.FService, route *file.FRoute) {
+	// make this HTTPRoute point to the service
 	backendRef := k8sgwapiv1.BackendRef{
 		BackendObjectReference: k8sgwapiv1.BackendObjectReference{
 			Name: k8sgwapiv1.ObjectName(*service.Name),
@@ -406,18 +413,21 @@ func addBackendRefs(httpRoute *k8sgwapiv1.HTTPRoute, service file.FService, rout
 		backendRef.Port = &portNumber
 	}
 
+	// add header match conditions to the HTTPRoute
 	var httpHeaderMatch []k8sgwapiv1.HTTPHeaderMatch
 	headerMatchExact := k8sgwapiv1.HeaderMatchExact
 	headerMatchRegex := k8sgwapiv1.HeaderMatchRegularExpression
 	if route.Headers != nil {
 		for key, values := range route.Headers {
 			if len(values) == 1 && strings.HasPrefix(values[0], "~*") {
+				// it's a regular expression header match condition
 				httpHeaderMatch = append(httpHeaderMatch, k8sgwapiv1.HTTPHeaderMatch{
 					Name:  k8sgwapiv1.HTTPHeaderName(key),
 					Value: values[0][2:],
 					Type:  &headerMatchRegex,
 				})
 			} else {
+				// it's an exact header match condition
 				var value string
 				if len(values) > 1 {
 					value = strings.Join(values, ",")
@@ -435,21 +445,25 @@ func addBackendRefs(httpRoute *k8sgwapiv1.HTTPRoute, service file.FService, rout
 	}
 
 	if route.Paths != nil {
+		// evaluate each path and method combination and add them to the HTTPRoute
 		for _, path := range route.Paths {
 			var httpPathMatch k8sgwapiv1.HTTPPathMatch
 			pathMatchRegex := k8sgwapiv1.PathMatchRegularExpression
 			pathMatchPrefix := k8sgwapiv1.PathMatchPathPrefix
 
 			if strings.HasPrefix(*path, "~") {
+				// add regex path match condition
 				httpPathMatch.Type = &pathMatchRegex
 				regexPath := (*path)[1:]
 				httpPathMatch.Value = &regexPath
 			} else {
+				// add regular path match condition
 				httpPathMatch.Type = &pathMatchPrefix
 				httpPathMatch.Value = path
 			}
 
 			if route.Methods == nil {
+				// this route has specific http methods to match
 				httpRoute.Spec.Rules = append(httpRoute.Spec.Rules, k8sgwapiv1.HTTPRouteRule{
 					Matches: []k8sgwapiv1.HTTPRouteMatch{
 						{
@@ -507,8 +521,8 @@ func addPluginsToGatewayAPIRoute(
 	service file.FService, route *file.FRoute, httpRoute k8sgwapiv1.HTTPRoute, kicContent *KICContent,
 ) error {
 	for _, plugin := range route.Plugins {
-		var kongPlugin kicv1.KongPlugin
-		kongPlugin.APIVersion = KICAPIVersion
+		var kongPlugin configurationv1.KongPlugin
+		kongPlugin.APIVersion = ConfigurationKongHQv1
 		kongPlugin.Kind = KongPluginKind
 		if plugin.Name != nil && route.Name != nil && service.Name != nil {
 			kongPlugin.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name + "-" + *plugin.Name)
@@ -534,7 +548,7 @@ func addPluginsToGatewayAPIRoute(
 				ExtensionRef: &k8sgwapiv1.LocalObjectReference{
 					Name:  k8sgwapiv1.ObjectName(kongPlugin.ObjectMeta.Name),
 					Kind:  KongPluginKind,
-					Group: "configuration.konghq.com",
+					Group: ConfigurationKongHQ,
 				},
 				Type: k8sgwapiv1.HTTPRouteFilterExtensionRef,
 			})
