@@ -24,7 +24,7 @@ func (b *KICv3GatewayAPIBuider) buildServices(content *file.Content) {
 }
 
 func (b *KICv3GatewayAPIBuider) buildRoutes(content *file.Content) {
-	err := populateKICIngressesWithAnnotations(content, b.kicContent)
+	err := populateKICIngressesWithGatewayAPI(content, b.kicContent)
 	if err != nil {
 		log.Fatal(err)
 	}

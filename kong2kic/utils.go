@@ -12,6 +12,59 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	KongHQClientCert              = "konghq.com/client-cert"
+	KongHQConnectTimeout          = "konghq.com/connect-timeout"
+	KongHQCredential              = "konghq.com/credential" //nolint: gosec
+	KongHQHeaders                 = "konghq.com/headers"
+	KongHQHTTPSRedirectStatusCode = "konghq.com/https-redirect-status-code"
+	KongHQMethods                 = "konghq.com/methods"
+	KongHQOverride                = "konghq.com/override"
+	KongHQPath                    = "konghq.com/path"
+	KongHQPathHandling            = "konghq.com/path-handling"
+	KongHQPlugins                 = "konghq.com/plugins"
+	KongHQPreserveHost            = "konghq.com/preserve-host"
+	KongHQProtocol                = "konghq.com/protocol"
+	KongHQProtocols               = "konghq.com/protocols"
+	KongHQReadTimeout             = "konghq.com/read-timeout"
+	KongHQRegexPriority           = "konghq.com/regex-priority"
+	KongHQRequestBuffering        = "konghq.com/request-buffering"
+	KongHQResponseBuffering       = "konghq.com/response-buffering"
+	KongHQRetries                 = "konghq.com/retries"
+	KongHQSNIs                    = "konghq.com/snis"
+	KongHQStripPath               = "konghq.com/strip-path"
+	KongHQTags                    = "konghq.com/tags"
+	KongHQUpstreamPolicy          = "konghq.com/upstream-policy"
+	KongHQWriteTimeout            = "konghq.com/write-timeout"
+)
+
+const (
+	ConfigurationKongHQ        = "configuration.konghq.com"
+	ConfigurationKongHQv1      = "configuration.konghq.com/v1"
+	ConfigurationKongHQv1beta1 = "configuration.konghq.com/v1beta1"
+	GatewayAPIVersionV1        = "gateway.networking.k8s.io/v1"
+	GatewayAPIVersionV1Beta1   = "gateway.networking.k8s.io/v1beta1"
+	HTTPRouteKind              = "HTTPRoute"
+	IngressAPIVersion          = "networking.k8s.io/v1"
+	IngressClass               = "kubernetes.io/ingress.class"
+	IngressKind                = "Ingress"
+	KICV2GATEWAY               = "KICV2_GATEWAY"
+	KICV2INGRESS               = "KICV2_INGRESS"
+	KICV3GATEWAY               = "KICV3_GATEWAY"
+	KICV3INGRESS               = "KICV3_INGRESS"
+	KongClusterPluginKind      = "KongClusterPlugin"
+	KongConsumerKind           = "KongConsumer"
+	KongConsumerGroupKind      = "KongConsumerGroup"
+	KongCredType               = "kongCredType"
+	KongIngressKind            = "KongIngress"
+	KongPluginKind             = "KongPlugin"
+	SecretKind                 = "Secret"
+	SecretCADigest             = "ca.digest"
+	ServiceAPIVersionv1        = "v1"
+	ServiceKind                = "Service"
+	UpstreamPolicyKind         = "KongUpstreamPolicy"
+)
+
 // Helper function to add tags to annotations
 func addTagsToAnnotations(tags []*string, annotations map[string]string) {
 	if tags != nil {
@@ -45,7 +98,7 @@ func createKongPlugin(plugin *file.FPlugin, ownerName string) (*configurationv1.
 	pluginName := *plugin.Name
 	kongPlugin := &configurationv1.KongPlugin{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: KICAPIVersion,
+			APIVersion: ConfigurationKongHQv1,
 			Kind:       KongPluginKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{

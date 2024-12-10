@@ -18,8 +18,8 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 		username := *consumer.Username
 		kongConsumer := configurationv1.KongConsumer{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: KICAPIVersion,
-				Kind:       "KongConsumer",
+				APIVersion: ConfigurationKongHQv1,
+				Kind:       KongConsumerKind,
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:        calculateSlug(username),

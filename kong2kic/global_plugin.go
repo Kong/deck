@@ -22,8 +22,8 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 			continue
 		}
 		var kongClusterPlugin configurationv1.KongClusterPlugin
-		kongClusterPlugin.APIVersion = KICAPIVersion
-		kongClusterPlugin.Kind = "KongClusterPlugin"
+		kongClusterPlugin.APIVersion = ConfigurationKongHQv1
+		kongClusterPlugin.Kind = KongClusterPluginKind
 		kongClusterPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
 		if plugin.Name != nil {
 			kongClusterPlugin.PluginName = *plugin.Name
@@ -65,7 +65,7 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 					tags = append(tags, *tag)
 				}
 			}
-			kongClusterPlugin.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+			kongClusterPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON

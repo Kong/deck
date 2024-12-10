@@ -23,8 +23,8 @@ func createConsumerGroupKongPlugin(
 	pluginName := *plugin.Name
 	kongPlugin := &configurationv1.KongPlugin{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: "configuration.konghq.com/v1",
-			Kind:       "KongPlugin",
+			APIVersion: ConfigurationKongHQv1,
+			Kind:       KongPluginKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        calculateSlug(ownerName + "-" + pluginName),
@@ -55,8 +55,8 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 
 		kongConsumerGroup := configurationv1beta1.KongConsumerGroup{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: "configuration.konghq.com/v1beta1",
-				Kind:       "KongConsumerGroup",
+				APIVersion: ConfigurationKongHQv1beta1,
+				Kind:       KongConsumerGroupKind,
 			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:        calculateSlug(groupName),

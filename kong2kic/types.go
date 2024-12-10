@@ -162,6 +162,11 @@ func SerializeObjectDroppingFields(obj interface{}, format string) ([]byte, erro
 	delete(genericObj, "status")
 	delete(genericObj["metadata"].(map[string]interface{}), "creationTimestamp")
 
+	// if genericObject has a Kind field with value "KongConsumer" then delete the field "spec"
+	if genericObj["kind"] == "KongConsumer" || genericObj["kind"] == "KongConsumerGroup" {
+		delete(genericObj, "spec")
+	}
+
 	if format == file.JSON {
 		result, err = json.MarshalIndent(genericObj, "", "    ")
 		if err != nil {

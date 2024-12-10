@@ -9,22 +9,6 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/file"
 )
 
-const (
-	KICV3GATEWAY             = "KICV3_GATEWAY"
-	KICV3INGRESS             = "KICV3_INGRESS"
-	KICV2GATEWAY             = "KICV2_GATEWAY"
-	KICV2INGRESS             = "KICV2_INGRESS"
-	KICAPIVersion            = "configuration.konghq.com/v1"
-	KICAPIVersionV1Beta1     = "configuration.konghq.com/v1beta1"
-	GatewayAPIVersionV1Beta1 = "gateway.networking.k8s.io/v1beta1"
-	GatewayAPIVersionV1      = "gateway.networking.k8s.io/v1"
-	KongPluginKind           = "KongPlugin"
-	SecretKind               = "Secret"
-	IngressKind              = "KongIngress"
-	UpstreamPolicyKind       = "KongUpstreamPolicy"
-	IngressClass             = "kubernetes.io/ingress.class"
-)
-
 // ClassName is set by the CLI flag --class-name
 var ClassName = "kong"
 
