@@ -255,6 +255,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newValidateCmd(false, false)) // file-based validation
 		fileCmd.AddCommand(newKong2KicCmd())
 		fileCmd.AddCommand(newKong2TfCmd())
+		fileCmd.AddCommand(newStatsCmd())
 	}
 	return rootCmd
 }
