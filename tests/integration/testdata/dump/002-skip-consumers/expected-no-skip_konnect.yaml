@@ -5,6 +5,7 @@ consumer_groups:
 - name: basic
   plugins:
   - config:
+      compound_identifier: null
       consumer_groups: null
       dictionary_name: kong_rate_limiting_counters
       disable_penalty: false
@@ -16,6 +17,7 @@ consumer_groups:
       identifier: consumer
       limit:
       - 30000
+      lock_dictionary_name: kong_locks
       namespace: basic
       path: null
       redis:
@@ -31,6 +33,7 @@ consumer_groups:
         password: null
         port: 6379
         read_timeout: 2000
+        redis_proxy_type: null
         send_timeout: 2000
         sentinel_addresses: null
         sentinel_master: null

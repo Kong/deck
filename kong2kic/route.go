@@ -10,7 +10,7 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	kicv1 "github.com/kong/kubernetes-ingress-controller/v3/pkg/apis/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -90,7 +90,7 @@ func createIngressPaths(
 	servicePort *int,
 	pathType k8snetv1.PathType,
 ) []k8snetv1.HTTPIngressPath {
-	var paths []k8snetv1.HTTPIngressPath
+	paths := make([]k8snetv1.HTTPIngressPath, 0, len(route.Paths))
 	for _, path := range route.Paths {
 		sCopy := *path
 		if strings.HasPrefix(sCopy, "~") {
@@ -106,7 +106,6 @@ func createIngressPaths(
 			if *servicePort > 65535 || *servicePort < 0 {
 				log.Fatalf("Port %d is not within the valid range. Please provide a port between 0 and 65535.\n", *servicePort)
 			}
-			//nolint: gosec
 			backend.Service.Port.Number = int32(*servicePort)
 		}
 		paths = append(paths, k8snetv1.HTTPIngressPath{
@@ -196,7 +195,7 @@ func addPluginsToRoute(
 			continue
 		}
 		pluginName := *plugin.Name
-		kongPlugin := kicv1.KongPlugin{
+		kongPlugin := configurationv1.KongPlugin{
 			TypeMeta: metav1.TypeMeta{
 				APIVersion: KICAPIVersion,
 				Kind:       KongPluginKind,
@@ -228,7 +227,7 @@ func addPluginsToRoute(
 					protocols = append(protocols, *protocol)
 				}
 			}
-			kongPlugin.Protocols = kicv1.StringsToKongProtocols(protocols)
+			kongPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
 		}
 		if plugin.Tags != nil {
 			var tags []string
