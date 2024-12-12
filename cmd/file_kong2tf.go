@@ -86,7 +86,9 @@ into Terraform resources.`,
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfGenerateImportsForControlPlaneID,
-		"generate-imports-for-control-plane-id", "g", "", "Generate terraform import statements for the control plane ID.")
+		"generate-imports-for-control-plane-id", "g", "",
+		"Generate terraform import statements for the control plane ID."+
+			"Typically used after `deck gateway dump --with-id` to obtain the IDs of all entities.")
 	kong2TfCmd.Flags().BoolVar(&cmdKong2TfIgnoreCredentialChanges, "ignore-credential-changes", false,
 		"Enable flag to add a 'lifecycle' block to each consumer credential, "+
 			"that ignores any changes from local to remote state.")
