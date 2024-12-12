@@ -76,6 +76,22 @@ func Test_Validate_Konnect(t *testing.T) {
 			additionalArgs: []string{"--konnect-runtime-group-name=default"},
 			errorExpected:  false,
 		},
+		{
+			name:           "validate with wrong online list, passed via --online-entities-list cli flag",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=services,Routes,Plugins"},
+			errorExpected:  true,
+			errorString: "invalid value 'services' for --online-entities-list; it should be a valid " +
+				"Kong entity (case-sensitive). Valid entities: [ACLGroups BasicAuths CACertificates Certificates Consumers " +
+				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Plugins RBACEndpointPermissions RBACRoles " +
+				"Routes SNIs Services Targets Upstreams Vaults]",
+		},
+		{
+			name:           "validate with correct online list, passed via --online-entities-list cli flag",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+			errorExpected:  false,
+		},
 	}
 
 	for _, tc := range tests {
@@ -173,6 +189,16 @@ func Test_Validate_Gateway(t *testing.T) {
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--konnect-compatibility"},
 		},
+		{
+			name:           "validate format version 3.0 with --online-entities-list",
+			stateFile:      "testdata/validate/kong3x.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
+		{
+			name:           "validate with konnect and --online-entities-list",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
 	}
 
 	for _, tc := range tests {
@@ -217,6 +243,16 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			name:           "validate with --workspace",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--workspace=default"},
+		},
+		{
+			name:           "validate format version 3.0 with --online-entities-list",
+			stateFile:      "testdata/validate/kong-ee.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+		},
+		{
+			name:           "validate with konnect and --online-entities-list",
+			stateFile:      "testdata/validate/konnect.yaml",
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
 		},
 		// TODO: Add a rbac flag test, once the behaviour is fixed
 	}
