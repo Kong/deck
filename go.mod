@@ -21,10 +21,10 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.8.0
-	k8s.io/api v0.31.2
+	k8s.io/api v0.32.0
 	k8s.io/apiextensions-apiserver v0.31.2
-	k8s.io/apimachinery v0.31.2
-	k8s.io/client-go v0.31.2
+	k8s.io/apimachinery v0.32.0
+	k8s.io/client-go v0.32.0
 	k8s.io/code-generator v0.31.2
 	sigs.k8s.io/gateway-api v1.2.0
 	sigs.k8s.io/yaml v1.4.0
@@ -57,7 +57,7 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
-	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
+	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/hashicorp/go-memdb v1.3.4 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
@@ -67,7 +67,7 @@ require (
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/moby/spdystream v0.4.0 // indirect
+	github.com/moby/spdystream v0.5.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/monochromegane/go-gitignore v0.0.0-20200626010858-205db1a8cc00 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -95,13 +95,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.28.0 // indirect
 	go.starlark.net v0.0.0-20230525235612-a134d8f9ddca // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
-	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
+	golang.org/x/oauth2 v0.23.0 // indirect
+	golang.org/x/time v0.7.0 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/cli-runtime v0.31.0 // indirect
 	k8s.io/component-base v0.31.2 // indirect
-	k8s.io/gengo/v2 v2.0.0-20240228010128-51d4e06bde70 // indirect
+	k8s.io/gengo/v2 v2.0.0-20240826214909-a7b603a56eb7 // indirect
 	k8s.io/kubectl v0.31.0 // indirect
 	sigs.k8s.io/kind v0.24.0 // indirect
 	sigs.k8s.io/kustomize/api v0.17.3 // indirect
@@ -193,14 +193,14 @@ require (
 	golang.org/x/term v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20240430033511-f0e62f92d13f // indirect
-	k8s.io/utils v0.0.0-20240711033017-18e509b52bc8 // indirect
+	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
+	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
 	sigs.k8s.io/controller-runtime v0.19.1 // indirect
-	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
+	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 )
