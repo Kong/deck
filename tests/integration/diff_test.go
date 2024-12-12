@@ -762,12 +762,11 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 			stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
 			runWhen:   ">=3.5.0 <3.8.1",
 		},
-		// Uncomment post solving: https://konghq.atlassian.net/browse/FTI-6303
-		// {
-		// 	name:      "no diffs with unordered arrays >=3.8.1",
-		// 	stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
-		// 	runWhen:   ">=3.8.1",
-		// },
+		{
+			name:      "no diffs with unordered arrays >=3.8.1",
+			stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
+			runWhen:   ">=3.8.1",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
