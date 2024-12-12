@@ -1,9 +1,11 @@
 name: Konnect Integration Test
 
 concurrency:
-  # Run only for most recent commit in PRs but for all tags and commits on main
+  # Only run one workflow at a time. Konnect integration tests cannot be run in parallel
+  # as they rely on manifests with static identifiers and/or names that would conflict
+  # if run in parallel.
   # Ref: https://docs.github.com/en/actions/using-jobs/using-concurrency
-  group: ${{ github.workflow }}-${{ github.head_ref || github.sha }}
+  group: ${{ github.workflow }}
   cancel-in-progress: true
 
 on: [pull_request]
