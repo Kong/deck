@@ -6,7 +6,7 @@ concurrency:
   # if run in parallel.
   # Ref: https://docs.github.com/en/actions/using-jobs/using-concurrency
   group: ${{ github.workflow }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 on: [pull_request]
 
