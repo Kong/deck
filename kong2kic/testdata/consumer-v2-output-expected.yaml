@@ -19,13 +19,14 @@ metadata:
 stringData:
   key: my_api_key
   kongCredType: key-auth
+type: Opaque
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  name: jwt-auth-example-user
+  name: jwt-example-user
 stringData:
   algorithm: HS256
   key: my_jwt_secret
@@ -41,6 +42,7 @@ stringData:
     ewIDAQAB
     -----END PUBLIC KEY-----
   secret: my_secret_key
+type: Opaque
 ---
 apiVersion: v1
 kind: Secret
@@ -52,16 +54,18 @@ stringData:
   kongCredType: basic-auth
   password: my_basic_password
   username: my_basic_user
+type: Opaque
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   annotations:
     kubernetes.io/ingress.class: kong
-  name: acl-group-example-user
+  name: acl-example-user
 stringData:
   group: acl_group
   kongCredType: acl
+type: Opaque
 ---
 apiVersion: v1
 kind: Secret
@@ -78,9 +82,9 @@ type: Opaque
 apiVersion: configuration.konghq.com/v1
 credentials:
 - key-auth-example-user
-- jwt-auth-example-user
+- jwt-example-user
 - basic-auth-example-user
-- acl-group-example-user
+- acl-example-user
 - mtls-auth-example-user
 custom_id: "1234567890"
 kind: KongConsumer
