@@ -15,9 +15,9 @@ func createCredentialSecret(consumerUsername, credentialType string, dataFields 
 	stringData := make(map[string]string)
 	labels := map[string]string{}
 	if targetKICVersionAPI == KICV3GATEWAY || targetKICVersionAPI == KICV3INGRESS {
-		labels["konghq.com/credential"] = credentialType
+		labels[KongHQCredential] = credentialType
 	} else {
-		stringData["kongCredType"] = credentialType
+		stringData[KongCredType] = credentialType
 	}
 
 	// Add the data fields to stringData
