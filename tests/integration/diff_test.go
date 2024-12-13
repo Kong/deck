@@ -758,14 +758,14 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 		runWhen   string
 	}{
 		{
-			name:      "no diffs with unordered arrays >=3.5.0 <3.8.1",
+			name:      "no diffs with unordered arrays >=3.5.0 <3.8.0",
 			stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
-			runWhen:   ">=3.5.0 <3.8.1",
+			runWhen:   ">=3.5.0 <3.8.0",
 		},
 		{
-			name:      "no diffs with unordered arrays >=3.8.1",
+			name:      "no diffs with unordered arrays >=3.8.0",
 			stateFile: "testdata/diff/004-no-diff-plugin/kong.yaml",
-			runWhen:   ">=3.8.1",
+			runWhen:   ">=3.8.0",
 		},
 	}
 	for _, tc := range tests {
