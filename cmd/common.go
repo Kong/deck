@@ -131,7 +131,7 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool,
+	delay int, workspace string, enableJSONOutput bool, noDeletes bool,
 ) error {
 	// read target file
 	if enableJSONOutput {
@@ -373,7 +373,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput, noDeletes)
 	if err != nil {
 		if enableJSONOutput {
 			var errs reconcilerUtils.ErrArray
@@ -502,7 +502,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool,
+	enableJSONOutput bool, noDeletes bool,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -511,6 +511,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
 		IsKonnect:     isKonnect,
+		NoDeletes:     noDeletes,
 	})
 	if err != nil {
 		return 0, err
