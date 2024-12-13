@@ -3322,7 +3322,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 		runWhen       string
 	}{
 		{
-			name:     "create plugins on services, routes and consumers <3.8.1",
+			name:     "create plugins on services, routes and consumers <3.8.0",
 			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1_207,
@@ -3330,10 +3330,10 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities3x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.0.0 <3.8.1",
+			runWhen: ">=3.0.0 <3.8.0",
 		},
 		{
-			name:     "create plugins on services, routes and consumers >=3.8.1",
+			name:     "create plugins on services, routes and consumers >=3.8.0",
 			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1_207,
@@ -3341,7 +3341,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities381x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.8.1",
+			runWhen: ">=3.8.0",
 		},
 	}
 
@@ -5175,7 +5175,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.7.0 <3.8.1",
+			runWhen:  ">=3.7.0 <3.8.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
@@ -5228,7 +5228,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.8.1 <3.9.0",
+			runWhen:  ">=3.8.0 <3.9.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
