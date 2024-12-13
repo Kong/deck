@@ -22,16 +22,16 @@ require (
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.10.0
 	k8s.io/api v0.32.0
-	k8s.io/apiextensions-apiserver v0.31.2
+	k8s.io/apiextensions-apiserver v0.32.0
 	k8s.io/apimachinery v0.32.0
 	k8s.io/client-go v0.32.0
-	k8s.io/code-generator v0.31.2
+	k8s.io/code-generator v0.32.0
 	sigs.k8s.io/gateway-api v1.2.1
 	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Kong/sdk-konnect-go v0.1.6 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
@@ -100,8 +100,8 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/cli-runtime v0.31.0 // indirect
-	k8s.io/component-base v0.31.2 // indirect
-	k8s.io/gengo/v2 v2.0.0-20240826214909-a7b603a56eb7 // indirect
+	k8s.io/component-base v0.32.0 // indirect
+	k8s.io/gengo/v2 v2.0.0-20240911193312-2b36238f13e9 // indirect
 	k8s.io/kubectl v0.31.0 // indirect
 	sigs.k8s.io/kind v0.24.0 // indirect
 	sigs.k8s.io/kustomize/api v0.17.3 // indirect
