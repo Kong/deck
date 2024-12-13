@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.42.0](#v1420)
 - [v1.41.4](#v1414)
 - [v1.41.3](#v1413)
 - [v1.41.2](#v1412)
@@ -100,6 +101,36 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.42.0]
+> Release date: 2024/12/13
+
+### Added
+- Added a new flag `--online-entities-list` to validate the specified entities
+via `deck gateway validate` command.
+[#1458](https://github.com/Kong/deck/pull/1458)
+- Added feature to ignore entities tagged with `konnect-managed` during
+deck dump, sync and diff. This is valid for Konnect entities only.
+[#1478](https://github.com/Kong/deck/pull/1478)
+[go-database-reconciler #153](https://github.com/Kong/go-database-reconciler/pull/153)
+- Improved speed for deck sync/diff operations involving consumer-groups 
+for gw 3.9+. The underlying API call to `GET /consumer_group` is called
+with query parameter `list_consumers=false`, making it faster for deck
+to deal with cases where a consumer-group holds many consumers.
+(#1475)[https://github.com/Kong/deck/pull/1475]
+(go-kong #487)[https://github.com/Kong/go-kong/pull/487]
+
+
+### Fixes
+- Fixed issue where tags were not getting propagated to consumer-group plugins.
+[#1478](https://github.com/Kong/deck/pull/1458)
+[go-database-reconciler #151](https://github.com/Kong/go-database-reconciler/pull/151)
+[go-kong #485](https://github.com/Kong/go-kong/pull/485)
+- Enhanced help message for generate-imports-for-control-plane-id flag
+[#1448](https://github.com/Kong/deck/pull/1448)
+- Restored to using Gateway API generation in `deck file kong2kic`, rather than
+Ingress API
+[#1431](https://github.com/Kong/deck/pull/1431)
 
 ## [v1.41.4]
 > Release date: 2024/11/26
@@ -1883,6 +1914,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.42.0]: https://github.com/Kong/deck/compare/v1.41.4...v1.42.0
 [v1.41.4]: https://github.com/Kong/deck/compare/v1.41.3...v1.41.4
 [v1.41.3]: https://github.com/Kong/deck/compare/v1.41.2...v1.41.3
 [v1.41.2]: https://github.com/Kong/deck/compare/v1.41.1...v1.41.2
