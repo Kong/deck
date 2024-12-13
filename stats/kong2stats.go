@@ -3,6 +3,7 @@ package stats
 import (
 	"bytes"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -54,6 +55,118 @@ type TagStatistics struct {
 	UpstreamsCount      int `json:"upstreamsCount"`
 	CertificatesCount   int `json:"certificatesCount"`
 	CACertificatesCount int `json:"caCertificatesCount"`
+}
+
+func filterContentByTags(content *file.Content, selectorTags []string) *file.Content {
+	if len(selectorTags) == 0 {
+		return content
+	}
+	v := reflect.ValueOf(content).Elem()
+
+	fieldsToFilter := map[string]bool{
+		"Services":       true,
+		"Routes":         true,
+		"Consumers":      true,
+		"ConsumerGroups": true,
+		"Plugins":        true,
+		"Upstreams":      true,
+		"Certificates":   true,
+		"CACertificates": true,
+	}
+
+	consumerFieldsToFilter := map[string]bool{
+		"Plugins":     true,
+		"KeyAuths":    true,
+		"HMACAuths":   true,
+		"JWTAuths":    true,
+		"BasicAuths":  true,
+		"Oauth2Creds": true,
+		"ACLGroups":   true,
+		"MTLSAuths":   true,
+	}
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldName := v.Type().Field(i).Name
+
+		if fieldsToFilter[fieldName] && field.Kind() == reflect.Slice {
+			filtered := filterByTags(field.Interface(), selectorTags)
+			filteredSlice := reflect.MakeSlice(field.Type(), len(filtered.([]interface{})), len(filtered.([]interface{})))
+			for i, val := range filtered.([]interface{}) {
+				filteredSlice.Index(i).Set(reflect.ValueOf(val))
+			}
+			field.Set(filteredSlice)
+		}
+
+		if fieldName == "Consumers" && field.Kind() == reflect.Slice {
+			for j := 0; j < field.Len(); j++ {
+				consumer := field.Index(j)
+				for k := 0; k < consumer.NumField(); k++ {
+					consumerField := consumer.Field(k)
+					consumerFieldName := consumer.Type().Field(k).Name
+
+					if consumerFieldsToFilter[consumerFieldName] && consumerField.Kind() == reflect.Slice {
+						filtered := filterByTags(consumerField.Interface(), selectorTags)
+						filteredSlice := reflect.MakeSlice(consumerField.Type(), len(filtered.([]interface{})), len(filtered.([]interface{})))
+						for i, val := range filtered.([]interface{}) {
+							filteredSlice.Index(i).Set(reflect.ValueOf(val))
+						}
+						consumerField.Set(filteredSlice)
+					}
+				}
+			}
+		}
+	}
+
+	return content
+}
+
+func filterByTags(slice interface{}, selectorTags []string) interface{} {
+	if len(selectorTags) == 0 {
+		return slice
+	}
+	s := reflect.ValueOf(slice)
+
+	if s.Kind() != reflect.Slice {
+		panic("filterByTags() given a non-slice type")
+	}
+
+	result := make([]interface{}, 0, s.Len())
+
+	for i := 0; i < s.Len(); i++ {
+		elem := s.Index(i).Interface()
+		elemValue := reflect.ValueOf(elem)
+
+		tagsField := elemValue.FieldByName("Tags")
+		if !tagsField.IsValid() {
+			panic("filterByTags() given a slice of structs without a Tags field")
+		}
+
+		tags := tagsField.Interface().([]*string)
+		if containsAllTags(tags, selectorTags) {
+			result = append(result, elem)
+		}
+	}
+
+	return result
+}
+
+func containsAllTags(tags []*string, selectorTags []string) bool {
+	for _, selectorTag := range selectorTags {
+		if !containsTag(tags, selectorTag) {
+			return false
+		}
+	}
+	return true
+}
+
+func containsTag(tags []*string, tag string) bool {
+	for _, t := range tags {
+		if *t == tag {
+			return true
+		}
+	}
+	return false
 }
 
 func calculateContentStatistics(content *file.Content) ContentStatistics {
@@ -238,7 +351,11 @@ func getTableStyle(styleName string) table.Style {
 // 1. entity counts and percentages
 // 2. for each unique tag, entity counts and percentages
 // 3. for each plugin name, plugin counts
-func PrintContentStatistics(content *file.Content, style string, format string, includeTags bool) ([]byte, error) {
+func PrintContentStatistics(content *file.Content, style string, format string, includeTags bool, selectedTags []string) ([]byte, error) {
+	// filter content by tags if selectedTags is not empty
+	if len(selectedTags) > 0 {
+		content = filterContentByTags(content, selectedTags)
+	}
 	stats := calculateContentStatistics(content)
 
 	// 1. entity counts and percentages

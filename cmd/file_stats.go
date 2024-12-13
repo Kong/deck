@@ -16,6 +16,7 @@ var (
 	cmdStatsOutputFormat   string
 	cmdStatsStyle          string
 	cmdStatsIncludeTags    bool
+	cmdStatsSelectorTags   []string
 )
 
 func executeStats(cmd *cobra.Command, _ []string) error {
@@ -47,7 +48,7 @@ func executeStats(cmd *cobra.Command, _ []string) error {
 	outputContent = inputContent.DeepCopy()
 
 	buffer, err := stats.PrintContentStatistics(outputContent, cmdStatsStyle,
-		cmdStatsOutputFormat, cmdStatsIncludeTags)
+		cmdStatsOutputFormat, cmdStatsIncludeTags, cmdStatsSelectorTags)
 	if err != nil {
 		return fmt.Errorf("failed writing output file '%s'; %w", cmdStatsOutputFilename, err)
 	}
@@ -91,6 +92,9 @@ Output in text, csv, html or markdown.`,
 		"Output file to write. Use - to write to stdout.")
 	statsCmd.Flags().StringVarP(&cmdStatsOutputFormat, "render", "r", "txt",
 		"Render as txt, csv, html or md. Default is to render as txt.")
+	statsCmd.Flags().StringSliceVar(&cmdStatsSelectorTags, "select-tag", []string{},
+		"only entities matching specified tags are shown.\n"+
+			"When this setting has multiple tag values, entities must match every tag. Example --select-tag=\"tag1,tag2\"")
 	statsCmd.Flags().BoolVar(&cmdStatsIncludeTags, "with-tags", false,
 		"Include entity count by tag.")
 	statsCmd.Flags().StringVarP(&cmdStatsStyle, "style", "t", "StyleDefault",
