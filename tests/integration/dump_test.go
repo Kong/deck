@@ -50,16 +50,16 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 		runWhen      string
 	}{
 		{
-			name:         "dump with select-tags >=3.1.0 <3.8.1",
+			name:         "dump with select-tags >=3.1.0 <3.8.0",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected.yaml",
-			runWhen:      ">=3.1.0 <3.8.1",
+			runWhen:      ">=3.1.0 <3.8.0",
 		},
 		{
-			name:         "dump with select-tags 3.8.1",
+			name:         "dump with select-tags 3.8.0",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected381.yaml",
-			runWhen:      ">=3.8.1",
+			runWhen:      ">=3.8.0",
 		},
 	}
 	for _, tc := range tests {
@@ -131,14 +131,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-35.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0 <3.8.1") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0 <3.8.0") },
 		},
 		{
-			name:          "3.8.1 dump with no skip-consumers",
+			name:          "3.8.0 dump with no skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-381.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.8.1 <3.9.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.8.0 <3.9.0") },
 		},
 		{
 			name:          "3.9.0 dump with no skip-consumers",
