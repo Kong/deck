@@ -32,7 +32,7 @@ func populateKICCACertificate(content *file.Content, file *KICContent) {
 			continue
 		}
 		if caCert.CertDigest != nil {
-			secret.StringData["ca.digest"] = *caCert.CertDigest
+			secret.StringData[SecretCADigest] = *caCert.CertDigest
 		}
 
 		// add konghq.com/tags annotation if cacert.Tags is not nil
@@ -43,7 +43,7 @@ func populateKICCACertificate(content *file.Content, file *KICContent) {
 					tags = append(tags, *tag)
 				}
 			}
-			secret.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+			secret.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		file.Secrets = append(file.Secrets, secret)

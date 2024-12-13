@@ -42,7 +42,7 @@ func populateKICCertificates(content *file.Content, file *KICContent) {
 					tags = append(tags, *tag)
 				}
 			}
-			secret.ObjectMeta.Annotations["konghq.com/tags"] = strings.Join(tags, ",")
+			secret.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		file.Secrets = append(file.Secrets, secret)
