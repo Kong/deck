@@ -59,7 +59,7 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v5.5.1
+        uses: docker/metadata-action@v5.6.1
         with:
           images: kong/deck
           tags: ${{ env.TAGS_STANDARD }}${{ env.TAGS_SUPPLEMENTAL }}
