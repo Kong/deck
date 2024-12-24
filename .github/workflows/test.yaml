@@ -24,7 +24,7 @@ jobs:
       - name: Run tests with Coverage
         run: make coverage
       - name: Upload Code Coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           name: codecov-deck
           token: ${{ secrets.CODECOV_TOKEN }}
