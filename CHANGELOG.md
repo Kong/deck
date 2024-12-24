@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.42.1](#v1421)
 - [v1.42.0](#v1420)
 - [v1.41.4](#v1414)
 - [v1.41.3](#v1413)
@@ -101,6 +102,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.42.1]
+> Release date: 2024/12/24
+
+### Fixed
+- Updated `golang.org/x/net` to version `v0.33.0` to account for
+vulnerability [CVE-2024-45338](https://avd.aquasec.com/nvd/2024/cve-2024-45338/)
+[#1481](https://github.com/Kong/deck/pull/1481)
+
 
 ## [v1.42.0]
 > Release date: 2024/12/13
@@ -1914,6 +1924,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.42.1]: https://github.com/Kong/deck/compare/v1.42.0...v1.42.1
 [v1.42.0]: https://github.com/Kong/deck/compare/v1.41.4...v1.42.0
 [v1.41.4]: https://github.com/Kong/deck/compare/v1.41.3...v1.41.4
 [v1.41.3]: https://github.com/Kong/deck/compare/v1.41.2...v1.41.3
