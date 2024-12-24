@@ -111,7 +111,6 @@
 vulnerability [CVE-2024-45338](https://avd.aquasec.com/nvd/2024/cve-2024-45338/)
 [#1481](https://github.com/Kong/deck/pull/1481)
 
-
 ## [v1.42.0]
 > Release date: 2024/12/13
 
