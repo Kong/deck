@@ -24,8 +24,8 @@ func TestGenerateComplexLayout(t *testing.T) {
 			}
 		},
 		"field4": [],
-		"field5": "This is a multiline\nstring that spans\nmultiple lines",
-		"field6": ["This is a first multiline\nstring that spans\nmultiple lines", "This is a second multiline\nstring that spans\nmultiple lines"]
+		"field5": "Multi\nline\nstring",
+		"field6": ["Multi\nline\nstring", "Multi\nline\nstring"]
 	}`
 
 	var entity map[string]any
@@ -49,21 +49,21 @@ func TestGenerateComplexLayout(t *testing.T) {
   field4 = []
   field5 = 
     <<EOF
-    This is a multiline
-    string that spans
-    multiple lines
+    Multi
+	line
+	string
     EOF
   field6 = [
     <<EOF
-	This is a first multiline
-	string that spans
-	multiple lines
+	Multi
+	line
+	string
 	EOF
 	,
 	<<EOF
-	This is a second multiline
-	string that spans
-	multiple lines
+	Multi
+	line
+	string
 	EOF
 	]
 
