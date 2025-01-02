@@ -410,7 +410,7 @@ func quote(input interface{}) string {
 		return fmt.Sprintf("%v", v)
 	case string:
 		if strings.Contains(v, "\n") {
-			return fmt.Sprintf("<<EOF\n%s\nEOF", strings.TrimRight(v, "\n"))
+			return fmt.Sprintf("\n<<EOF\n%s\nEOF\n", strings.TrimRight(v, "\n"))
 		}
 		return fmt.Sprintf("\"%s\"", strings.ReplaceAll(v, "\"", "\\\""))
 	default:
