@@ -209,26 +209,35 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// load Kong version after workspace
 	var kongVersion string
 	var parsedKongVersion semver.Version
+	isLicensedKongEnterprise := false
 	if mode == modeKonnect {
 		kongVersion = fetchKonnectKongVersion()
+		isLicensedKongEnterprise = true
 	} else {
 		kongVersion, err = fetchKongVersion(ctx, wsConfig)
 		if err != nil {
 			return fmt.Errorf("reading Kong version: %w", err)
 		}
+
+		// Are we running enterprise?
+		v, err := kong.ParseSemanticVersion(kongVersion)
+		if err != nil {
+			return fmt.Errorf("parsing Kong version: %w", err)
+		}
+
+		// Check if there's an active license for Consumer Group checks
+		if v.IsKongGatewayEnterprise() {
+			isLicensedKongEnterprise, err = isLicensed(ctx, wsConfig)
+			if err != nil {
+				return fmt.Errorf("checking if Kong is licensed: %w", err)
+			}
+		}
 	}
+
 	parsedKongVersion, err = reconcilerUtils.ParseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
 	}
-
-	// Are we running enterprise?
-	v, err := kong.ParseSemanticVersion(kongVersion)
-	if err != nil {
-		return fmt.Errorf("parsing Kong version: %w", err)
-	}
-
-	isKongEnterprise := v.IsKongGatewayEnterprise()
 
 	if parsedKongVersion.GTE(reconcilerUtils.Kong300Version) &&
 		targetContent.FormatVersion != utils.FormatVersion30 {
@@ -264,7 +273,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	// Consumer groups are an enterprise 3.4+ feature
-	if parsedKongVersion.GTE(reconcilerUtils.Kong340Version) && isKongEnterprise {
+	if parsedKongVersion.GTE(reconcilerUtils.Kong340Version) && isLicensedKongEnterprise {
 		dumpConfig.LookUpSelectorTagsConsumerGroups, err = determineLookUpSelectorTagsConsumerGroups(*targetContent)
 		if err != nil {
 			return fmt.Errorf("error determining lookup selector tags for consumer groups: %w", err)
@@ -559,6 +568,31 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		}
 	}
 	return int(totalOps), nil
+}
+
+func isLicensed(ctx context.Context, config reconcilerUtils.KongClientConfig) (bool, error) {
+	client, err := reconcilerUtils.GetKongClient(config)
+	if err != nil {
+		return false, err
+	}
+
+	req, err := http.NewRequest("GET",
+		reconcilerUtils.CleanAddress(config.Address)+"/",
+		nil)
+	if err != nil {
+		return false, err
+	}
+	var resp map[string]interface{}
+	_, err = client.Do(ctx, req, &resp)
+	if err != nil {
+		return false, err
+	}
+	_, ok := resp["license"]
+	if !ok {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
