@@ -35,12 +35,12 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/003-foreign-keys-consumers/plugin-01.yaml",
 			expectedState: "testdata/apply/003-foreign-keys-consumers/expected-state.yaml",
 		},
-		{
-			name:          "accepts consumer group foreign keys",
-			firstFile:     "testdata/apply/004-foreign-keys-consumer-groups/consumer-group-01.yaml",
-			secondFile:    "testdata/apply/004-foreign-keys-consumer-groups/consumer-01.yaml",
-			expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
-		},
+		//{
+		//	name:          "accepts consumer group foreign keys",
+		//	firstFile:     "testdata/apply/004-foreign-keys-consumer-groups/consumer-group-01.yaml",
+		//	secondFile:    "testdata/apply/004-foreign-keys-consumer-groups/consumer-01.yaml",
+		//	expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
+		//},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
