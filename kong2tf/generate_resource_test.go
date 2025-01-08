@@ -23,7 +23,9 @@ func TestGenerateComplexLayout(t *testing.T) {
 				}
 			}
 		},
-		"field4": []
+		"field4": [],
+		"field5": "Multi\nline\nstring",
+		"field6": ["Multi\nline\nstring", "Multi\nline\nstring"]
 	}`
 
 	var entity map[string]any
@@ -34,20 +36,39 @@ func TestGenerateComplexLayout(t *testing.T) {
   field1 = "basic_string"
   field2 = ["list", "of", "strings"]
   field3 = {
-    nested_field1 = "nested_string"
-    nested_field2 = ["list", "of", "nested", "strings"]
-    nested_field3 = {
-      nested_nested_field1 = "nested_nested_string"
-      nested_nested_field2 = ["list", "of", "nested", "nested", "strings"]
-      nested_nested_field3 = {
-        nested_nested_nested_field1 = "nested_nested_nested_string"
-      }
-    }
+	nested_field1 = "nested_string"
+	nested_field2 = ["list", "of", "nested", "strings"]
+	nested_field3 = {
+	  nested_nested_field1 = "nested_nested_string"
+	  nested_nested_field2 = ["list", "of", "nested", "nested", "strings"]
+	  nested_nested_field3 = {
+		nested_nested_nested_field1 = "nested_nested_nested_string"
+	  }
+	}
   }
-  field4 = []	
+  field4 = []
+  field5 = 
+    <<EOF
+    Multi
+	line
+	string
+    EOF
+  field6 = [
+    <<EOF
+	Multi
+	line
+	string
+	EOF
+	,
+	<<EOF
+	Multi
+	line
+	string
+	EOF
+	]
 
   service = {
-    id = konnect_gateway_service.some_service.id
+	id = konnect_gateway_service.some_service.id
   }
   control_plane_id = var.control_plane_id
 }
