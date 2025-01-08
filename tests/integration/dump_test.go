@@ -344,3 +344,29 @@ func Test_Dump_FilterChains(t *testing.T) {
 		})
 	}
 }
+
+func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.9.0")
+	setup(t)
+
+	require.NoError(t, sync("testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml"))
+
+	// With flag set
+	var output string
+	flags := []string{"-o", "-", "--skip-consumers-with-consumer-groups"}
+	output, err := dump(flags...)
+	assert.NoError(t, err)
+
+	expected, err := readFile("testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml")
+	assert.NoError(t, err)
+	assert.Equal(t, expected, output)
+
+	// Without flag set - default behaviour
+	flags = []string{"-o", "-"}
+	output, err = dump(flags...)
+	assert.NoError(t, err)
+
+	expected, err = readFile("testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml")
+	assert.NoError(t, err)
+	assert.Equal(t, expected, output)
+}

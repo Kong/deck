@@ -188,6 +188,10 @@ configure Kong.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
+		false, "do not show the association between consumer and consumer-group.\n"+
+			"If set to true, deck skips listing consumers with consumer-groups,\n"+
+			"thus gaining some performance with large configs.")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+
