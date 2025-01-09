@@ -342,6 +342,28 @@ func lint(opts ...string) (string, error) {
 	return stripansi.Strip(string(out)), cmdErr
 }
 
+func fileConvert(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"file", "convert"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return stripansi.Strip(string(out)), cmdErr
+}
+
 func ping(opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "ping"}
