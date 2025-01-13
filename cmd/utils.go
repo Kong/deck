@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"errors"
+	"slices"
+
 	"github.com/fatih/color"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
@@ -29,4 +32,12 @@ func preRunSilenceEventsFlag() error {
 func addSilenceEventsFlag(set *pflag.FlagSet) {
 	set.BoolVar(&silenceEvents, "silence-events", false,
 		"disable printing events to stdout")
+}
+
+func validateStringOneOf(value string, allowedValues []string, errorMessage string) error {
+	if slices.Contains(allowedValues, value) {
+		return nil
+	}
+
+	return errors.New(errorMessage)
 }

@@ -114,16 +114,23 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		Args: validateNoArgs,
 		RunE: execute,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
-			if convertCmdSourceFormat != string(convert.FormatKongGateway) &&
-				convertCmdSourceFormat != string(convert.FormatKongGateway2x) {
-				return fmt.Errorf("invalid value '%s' found for the 'from' flag. Allowed values: [%s, %s]",
-					convertCmdSourceFormat, string(convert.FormatKongGateway), string(convert.FormatKongGateway2x))
+			validSourceFormats := []string{string(convert.FormatKongGateway), string(convert.FormatKongGateway2x)}
+			validDestinationFormats := []string{string(convert.FormatKonnect), string(convert.FormatKongGateway3x)}
+
+			err := validateStringOneOf(convertCmdSourceFormat, validSourceFormats,
+				fmt.Sprintf("invalid value '%s' found for the 'from' flag. Allowed values: %v",
+					convertCmdSourceFormat, validSourceFormats))
+			if err != nil {
+				return err
 			}
-			if convertCmdDestinationFormat != string(convert.FormatKonnect) &&
-				convertCmdDestinationFormat != string(convert.FormatKongGateway3x) {
-				return fmt.Errorf("invalid value '%s' found for the 'to' flag. Allowed values: [%s, %s]",
-					convertCmdDestinationFormat, string(convert.FormatKonnect), string(convert.FormatKongGateway3x))
+
+			err = validateStringOneOf(convertCmdDestinationFormat, validDestinationFormats,
+				fmt.Sprintf("invalid value '%s' found for the 'to' flag. Allowed values: %v",
+					convertCmdDestinationFormat, validDestinationFormats))
+			if err != nil {
+				return err
 			}
+
 			return nil
 		},
 	}
