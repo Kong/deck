@@ -356,36 +356,50 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 		runWhen                         func(t *testing.T)
 	}{
 		{
-			name:                            "dump with flag --skip-consumers-with-consumer-groups set: <3.9.0 ",
+			name:                            "dump with flag --skip-consumers-with-consumer-groups set: <3.0.0 ",
 			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag_1.yaml",
+			skipConsumersWithConsumerGroups: true,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", "<3.0.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: <3.0.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-no-flag_1.yaml",
+			skipConsumersWithConsumerGroups: false,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", "<3.0.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups set: <3.9.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
 			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml",
 			skipConsumersWithConsumerGroups: true,
 			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.9.0") },
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: <3.9.0 ",
-			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
-			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-no-flag.yaml",
 			skipConsumersWithConsumerGroups: false,
 			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.9.0") },
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups set: >=3.9.0 ",
-			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
 			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml",
 			skipConsumersWithConsumerGroups: true,
 			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: >=3.9.0 ",
-			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
-			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-no-flag.yaml",
 			skipConsumersWithConsumerGroups: false,
 			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups set: Konnect ",
-			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
 			skipConsumersWithConsumerGroups: true,
 			runWhen:                         func(t *testing.T) { runWhenKonnect(t) },
 			errorExpected:                   true,
@@ -393,7 +407,7 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: Konnect ",
-			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
 			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-konnect.yaml",
 			skipConsumersWithConsumerGroups: false,
 			runWhen:                         func(t *testing.T) { runWhenKonnect(t) },
@@ -414,11 +428,11 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 			if tc.skipConsumersWithConsumerGroups {
 				output, err = dump(
 					"--skip-consumers-with-consumer-groups",
-					"-o", "-",
+					"-o", "print-tag.yaml",
 				)
 			} else {
 				output, err = dump(
-					"-o", "-",
+					"-o", "print.yaml",
 				)
 			}
 
