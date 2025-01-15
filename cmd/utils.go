@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 
 	"github.com/fatih/color"
@@ -34,10 +35,15 @@ func addSilenceEventsFlag(set *pflag.FlagSet) {
 		"disable printing events to stdout")
 }
 
-func validateStringOneOf(value string, allowedValues []string, errorMessage string) error {
-	if slices.Contains(allowedValues, value) {
+func validateInputFlag(flagName string, flagValue string, allowedValues []string, errorMessage string) error {
+	if slices.Contains(allowedValues, flagValue) {
 		return nil
 	}
 
-	return errors.New(errorMessage)
+	if errorMessage != "" {
+		return errors.New(errorMessage)
+	}
+
+	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",
+		flagValue, flagName, allowedValues)
 }

@@ -117,16 +117,12 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 			validSourceFormats := []string{string(convert.FormatKongGateway), string(convert.FormatKongGateway2x)}
 			validDestinationFormats := []string{string(convert.FormatKonnect), string(convert.FormatKongGateway3x)}
 
-			err := validateStringOneOf(convertCmdSourceFormat, validSourceFormats,
-				fmt.Sprintf("invalid value '%s' found for the 'from' flag. Allowed values: %v",
-					convertCmdSourceFormat, validSourceFormats))
+			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats, "")
 			if err != nil {
 				return err
 			}
 
-			err = validateStringOneOf(convertCmdDestinationFormat, validDestinationFormats,
-				fmt.Sprintf("invalid value '%s' found for the 'to' flag. Allowed values: %v",
-					convertCmdDestinationFormat, validDestinationFormats))
+			err = validateInputFlag("to", convertCmdDestinationFormat, validDestinationFormats, "")
 			if err != nil {
 				return err
 			}
