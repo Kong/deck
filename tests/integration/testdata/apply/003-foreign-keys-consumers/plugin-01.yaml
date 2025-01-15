@@ -1,0 +1,15 @@
+_format_version: "3.0"
+plugins:
+  - name: request-termination
+    enabled: true
+    consumer: alice
+    config:
+      status_code: 404
+      body: null
+      content_type: null
+      echo: false
+      message: null
+      trigger: null
+    protocols:
+      - http
+      - https

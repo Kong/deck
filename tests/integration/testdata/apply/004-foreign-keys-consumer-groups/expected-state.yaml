@@ -1,0 +1,7 @@
+_format_version: "3.0"
+consumer_groups:
+- name: gold
+consumers:
+- groups:
+  - name: gold
+  username: alice
