@@ -428,11 +428,11 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 			if tc.skipConsumersWithConsumerGroups {
 				output, err = dump(
 					"--skip-consumers-with-consumer-groups",
-					"-o", "print-tag.yaml",
+					"-o", "-",
 				)
 			} else {
 				output, err = dump(
-					"-o", "print.yaml",
+					"-o", "-",
 				)
 			}
 
