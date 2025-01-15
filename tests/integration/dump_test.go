@@ -346,27 +346,92 @@ func Test_Dump_FilterChains(t *testing.T) {
 }
 
 func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.9.0")
-	setup(t)
+	tests := []struct {
+		name                            string
+		stateFile                       string
+		expectedFile                    string
+		errorExpected                   bool
+		errorString                     string
+		skipConsumersWithConsumerGroups bool
+		runWhen                         func(t *testing.T)
+	}{
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups set: <3.9.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml",
+			skipConsumersWithConsumerGroups: true,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.9.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: <3.9.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml",
+			skipConsumersWithConsumerGroups: false,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.9.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups set: >=3.9.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml",
+			skipConsumersWithConsumerGroups: true,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: >=3.9.0 ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml",
+			skipConsumersWithConsumerGroups: false,
+			runWhen:                         func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups set: Konnect ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			skipConsumersWithConsumerGroups: true,
+			runWhen:                         func(t *testing.T) { runWhenKonnect(t) },
+			errorExpected:                   true,
+			errorString:                     "the flag --skip-consumers-with-consumer-groups can not be used with Konnect",
+		},
+		{
+			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: Konnect ",
+			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-konnect.yaml",
+			skipConsumersWithConsumerGroups: false,
+			runWhen:                         func(t *testing.T) { runWhenKonnect(t) },
+		},
+	}
 
-	require.NoError(t, sync("testdata/dump/004-skip-consumers-with-consumer-groups/kong.yaml"))
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
 
-	// With flag set
-	var output string
-	flags := []string{"-o", "-", "--skip-consumers-with-consumer-groups"}
-	output, err := dump(flags...)
-	assert.NoError(t, err)
+			assert.NoError(t, sync(tc.stateFile))
 
-	expected, err := readFile("testdata/dump/004-skip-consumers-with-consumer-groups/expected-with-flag.yaml")
-	assert.NoError(t, err)
-	assert.Equal(t, expected, output)
+			var (
+				output string
+				err    error
+			)
+			if tc.skipConsumersWithConsumerGroups {
+				output, err = dump(
+					"--skip-consumers-with-consumer-groups",
+					"-o", "-",
+				)
+			} else {
+				output, err = dump(
+					"-o", "-",
+				)
+			}
 
-	// Without flag set - default behaviour
-	flags = []string{"-o", "-"}
-	output, err = dump(flags...)
-	assert.NoError(t, err)
+			if tc.errorExpected {
+				assert.Equal(t, err.Error(), tc.errorString)
+				return
+			}
 
-	expected, err = readFile("testdata/dump/004-skip-consumers-with-consumer-groups/expected-without-flag.yaml")
-	assert.NoError(t, err)
-	assert.Equal(t, expected, output)
+			assert.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			assert.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
 }
