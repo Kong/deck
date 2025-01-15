@@ -1,6 +1,10 @@
 package cmd
 
 import (
+	"errors"
+	"fmt"
+	"slices"
+
 	"github.com/fatih/color"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
@@ -29,4 +33,17 @@ func preRunSilenceEventsFlag() error {
 func addSilenceEventsFlag(set *pflag.FlagSet) {
 	set.BoolVar(&silenceEvents, "silence-events", false,
 		"disable printing events to stdout")
+}
+
+func validateInputFlag(flagName string, flagValue string, allowedValues []string, errorMessage string) error {
+	if slices.Contains(allowedValues, flagValue) {
+		return nil
+	}
+
+	if errorMessage != "" {
+		return errors.New(errorMessage)
+	}
+
+	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",
+		flagValue, flagName, allowedValues)
 }
