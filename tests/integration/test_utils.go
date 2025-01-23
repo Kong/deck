@@ -266,6 +266,16 @@ func setup(t *testing.T) {
 	})
 }
 
+func apply(kongFile string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "apply", kongFile}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(context.Background())
+}
+
 func sync(kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "sync", kongFile}
