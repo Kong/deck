@@ -249,6 +249,8 @@ github.com/kong/go-apiops v0.1.41 h1:1KXbQqyhO2E4nEnXJNqUDmHZU/LQ1U7Zoi+MAlcM2P0
 github.com/kong/go-apiops v0.1.41/go.mod h1:sATq9Tz+ivzHKZU+tDXkRtEZnf64xroU3lgv3yXqP4I=
 github.com/kong/go-database-reconciler v1.18.0 h1:j1gVZ1uPfKglBXTyLEqDn0N374z2y/oaXOuCnWRuQTE=
 github.com/kong/go-database-reconciler v1.18.0/go.mod h1:T0SYIHeC/3DeHzThtUS+ooxouN5KBGeKWcjkuCg4MS8=
+github.com/kong/go-database-reconciler v1.18.1 h1:NhV3oDWMO02yj9scFIYfUwoK/KxMxCP0fXkZIBF1QME=
+github.com/kong/go-database-reconciler v1.18.1/go.mod h1:BqaV17xmjYAJfQYlaMKNz/DbJO4FfpwZpKD5dg2Pku0=
 github.com/kong/go-kong v0.63.0 h1:8ECLgkgDqON61qCMq/M0gTwZKYxg55Oy692dRDOOBiU=
 github.com/kong/go-kong v0.63.0/go.mod h1:ma9GWnhkxtrXZlLFfED955HjVzmUojYEHet3lm+PDik=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
@@ -670,12 +672,15 @@ k8s.io/apiextensions-apiserver v0.32.0 h1:S0Xlqt51qzzqjKPxfgX1xh4HBZE+p8KKBq+k2S
 k8s.io/apiextensions-apiserver v0.32.0/go.mod h1:86hblMvN5yxMvZrZFX2OhIHAuFIMJIZ19bTvzkP+Fmw=
 k8s.io/apimachinery v0.32.0 h1:cFSE7N3rmEEtv4ei5X6DaJPHHX0C+upp+v5lVPiEwpg=
 k8s.io/apimachinery v0.32.0/go.mod h1:GpHVgxoKlTxClKcteaeuF1Ul/lDVb74KpZcxcmLDElE=
+k8s.io/apimachinery v0.32.1 h1:683ENpaCBjma4CYqsmZyhEzrGz6cjn1MY/X2jB2hkZs=
+k8s.io/apimachinery v0.32.1/go.mod h1:GpHVgxoKlTxClKcteaeuF1Ul/lDVb74KpZcxcmLDElE=
 k8s.io/cli-runtime v0.31.0 h1:V2Q1gj1u3/WfhD475HBQrIYsoryg/LrhhK4RwpN+DhA=
 k8s.io/cli-runtime v0.31.0/go.mod h1:vg3H94wsubuvWfSmStDbekvbla5vFGC+zLWqcf+bGDw=
 k8s.io/client-go v0.32.0 h1:DimtMcnN/JIKZcrSrstiwvvZvLjG0aSxy8PxN8IChp8=
 k8s.io/client-go v0.32.0/go.mod h1:boDWvdM1Drk4NJj/VddSLnx59X3OPgwrOo0vGbtq9+8=
 k8s.io/code-generator v0.32.0 h1:s0lNN8VSWny8LBz5t5iy7MCdgwdOhdg7vAGVxvS+VWU=
 k8s.io/code-generator v0.32.0/go.mod h1:b7Q7KMZkvsYFy72A79QYjiv4aTz3GvW0f1T3UfhFq4s=
+k8s.io/code-generator v0.32.1/go.mod h1:zaILfm00CVyP/6/pJMJ3zxRepXkxyDfUV5SNG4CjZI4=
 k8s.io/component-base v0.32.0 h1:d6cWHZkCiiep41ObYQS6IcgzOUQUNpywm39KVYaUqzU=
 k8s.io/component-base v0.32.0/go.mod h1:JLG2W5TUxUu5uDyKiH2R/7NnxJo1HlPoRIIbVLkK5eM=
 k8s.io/gengo/v2 v2.0.0-20240911193312-2b36238f13e9 h1:si3PfKm8dDYxgfbeA6orqrtLkvvIeH8UqffFJDl0bz4=
