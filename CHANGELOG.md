@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.43.0](#v1430)
 - [v1.42.1](#v1421)
 - [v1.42.0](#v1420)
 - [v1.41.4](#v1414)
@@ -102,6 +103,47 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.43.0]
+> Release date: 2025/01/23
+
+### Added
+- Added `deck gateway apply` command that allows users 
+to apply partial configuration to a running Gateway instance.
+[#1459](https://github.com/Kong/deck/pull/1459)
+[go-database-reconciler #143](https://github.com/Kong/go-database-reconciler/pull/143)
+- Added support for private link global api endpoint for Konnect.
+[#1500](https://github.com/Kong/deck/pull/1500)
+[go-database-reconciler #165](https://github.com/Kong/go-database-reconciler/pull/165)
+- Added flag `--skip-consumers-with-consumer-groups` for
+`deck gateway dump` command. If set to true, deck skips listing 
+consumers with consumer-groups, thus gaining some performance 
+with large configs. It is not valid for Konnect.
+[#1486](https://github.com/Kong/deck/pull/1486)
+
+### Fixed
+- Adjusted multiline string formatting in terraform resource generation.
+[#1482](https://github.com/Kong/deck/pull/1482)
+- Improved error messaging when mandatory flag is missing in 
+`deck file convert`. [#1487](https://github.com/Kong/deck/pull/1487)
+- Fixed `deck gateway dump` command that was missing associations
+between consumer-groups and consumers.
+[#1486](https://github.com/Kong/deck/pull/1486)
+[go-database-reconciler #159](https://github.com/Kong/go-database-reconciler/pull/159)
+[go-kong #494](https://github.com/Kong/go-kong/pull/494)
+- Added checks for all conflicting nested configs in plugins. 
+A foreign key nested under a plugin of a different scope would error out. 
+This would make sure that a sync does not go through 
+when wrong configurations are passed via deck.
+[go-database-reconciler #157](https://github.com/Kong/go-database-reconciler/pull/157)
+- Fixed req-validator config generation while using 
+`deck file openapi2kong` command when both body and param schema 
+are empty. [#1501](https://github.com/Kong/deck/pull/1501)
+[go-apiops #244](https://github.com/Kong/go-apiops/pull/244)
+- Fixed tags retention on entities while using select-tags.
+[#1500](https://github.com/Kong/deck/pull/1500)
+[go-database-reconciler #156](https://github.com/Kong/go-database-reconciler/pull/156)
+
 
 ## [v1.42.1]
 > Release date: 2024/12/24
@@ -1923,6 +1965,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.43.0]: https://github.com/Kong/deck/compare/v1.42.1...v1.43.0
 [v1.42.1]: https://github.com/Kong/deck/compare/v1.42.0...v1.42.1
 [v1.42.0]: https://github.com/Kong/deck/compare/v1.41.4...v1.42.0
 [v1.41.4]: https://github.com/Kong/deck/compare/v1.41.3...v1.41.4
