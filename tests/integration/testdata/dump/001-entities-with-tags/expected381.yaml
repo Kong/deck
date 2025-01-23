@@ -56,22 +56,48 @@ certificates:
     -----END PRIVATE KEY-----
   snis:
   - name: demo1.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
   - name: demo2.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
   - name: demo3.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
   tags:
   - cloudops-managed
+  - managed-by-deck
+  - org-unit-42
 consumers:
 - acls:
   - group: foo-group
+    tags:
+    - managed-by-deck
+    - org-unit-42
   hmacauth_credentials:
   - secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
+    tags:
+    - managed-by-deck
+    - org-unit-42
     username: hmac-user
   jwt_secrets:
   - algorithm: HS256
     key: MKWeR0nu9OAUR9HrjpUG82Hbfz7ZXsIw
     secret: 6gkrxTKAraykMSpmnLNEGiEE3Yz8XL6U
+    tags:
+    - managed-by-deck
+    - org-unit-42
   keyauth_credentials:
   - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
   username: harry
 plugins:
 - config:
@@ -86,6 +112,9 @@ plugins:
   protocols:
   - http
   - https
+  tags:
+  - managed-by-deck
+  - org-unit-42
 services:
 - connect_timeout: 60000
   enabled: true
@@ -109,8 +138,13 @@ services:
     request_buffering: true
     response_buffering: true
     strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
   tags:
   - team-svc1
+  - managed-by-deck
+  - org-unit-42
   write_timeout: 60000
 - connect_timeout: 60000
   enabled: true
@@ -134,6 +168,12 @@ services:
     request_buffering: true
     response_buffering: true
     strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
   write_timeout: 60000
 - connect_timeout: 60000
   enabled: true
@@ -159,6 +199,12 @@ services:
     request_buffering: true
     response_buffering: true
     strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
   write_timeout: 60000
 upstreams:
 - algorithm: round-robin
@@ -227,11 +273,23 @@ upstreams:
     threshold: 0
   name: upstream1
   slots: 10000
+  tags:
+  - managed-by-deck
+  - org-unit-42
   targets:
-  - target: 198.51.100.11:80
+  - tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.11:80
     weight: 100
-  - target: 198.51.100.12:80
+  - tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.12:80
     weight: 100
-  - target: 198.51.100.13:80
+  - tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.13:80
     weight: 100
   use_srv_name: false
