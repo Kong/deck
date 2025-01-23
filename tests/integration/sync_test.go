@@ -6239,3 +6239,9 @@ func Test_Sync_FilterChainsUnsupported(t *testing.T) {
 	require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
 	require.Error(t, sync("testdata/sync/033-filter-chains/create.yaml"))
 }
+
+func Test_Sync_DegraphqlRoutes(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+	require.NoError(t, sync("testdata/sync/036-degraphql-routes/kong.yaml"))
+}
