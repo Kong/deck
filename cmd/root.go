@@ -237,6 +237,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		gatewayCmd.AddCommand(newPingCmd(false))
 		gatewayCmd.AddCommand(newDumpCmd(false))
 		gatewayCmd.AddCommand(newDiffCmd(false))
+		gatewayCmd.AddCommand(newApplyCmd())
 	}
 	{
 		fileCmd := newFileSubCmd()

@@ -266,9 +266,19 @@ func setup(t *testing.T) {
 	})
 }
 
+func apply(kongFile string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "apply", kongFile}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(context.Background())
+}
+
 func sync(kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"sync", "-s", kongFile}
+	args := []string{"gateway", "sync", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -300,7 +310,7 @@ func diff(kongFile string, opts ...string) (string, error) {
 
 func dump(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"dump"}
+	args := []string{"gateway", "dump"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
@@ -323,6 +333,28 @@ func dump(opts ...string) (string, error) {
 func lint(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"file", "lint"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return stripansi.Strip(string(out)), cmdErr
+}
+
+func fileConvert(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"file", "convert"}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}

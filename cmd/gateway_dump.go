@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -48,6 +49,10 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	if inKonnectMode(nil) {
+		if dumpConfig.SkipConsumersWithConsumerGroups {
+			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
+		}
+
 		_ = sendAnalytics("dump", "", modeKonnect)
 		return dumpKonnectV2(ctx)
 	}
@@ -188,6 +193,10 @@ configure Kong.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
+		false, "do not show the association between consumer and consumer-group.\n"+
+			"If set to true, deck skips listing consumers with consumer-groups,\n"+
+			"thus gaining some performance with large configs. This flag is not valid with Konnect.")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+
