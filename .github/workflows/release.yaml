@@ -9,6 +9,9 @@ jobs:
   goreleaser:
     timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +39,9 @@ jobs:
   build-push-images:
     timeout-minutes: 120
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Add standard tags
         run: |
