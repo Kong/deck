@@ -112,7 +112,7 @@
 to apply partial configuration to a running Gateway instance.
 [#1459](https://github.com/Kong/deck/pull/1459)
 [go-database-reconciler #143](https://github.com/Kong/go-database-reconciler/pull/143)
-- Added support for private link global api endpoin for Konnect.
+- Added support for private link global api endpoint for Konnect.
 [#1500](https://github.com/Kong/deck/pull/1500)
 [go-database-reconciler #165](https://github.com/Kong/go-database-reconciler/pull/165)
 - Added flag `--skip-consumers-with-consumer-groups` for
