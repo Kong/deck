@@ -121,7 +121,6 @@ consumers with consumer-groups, thus gaining some performance
 with large configs. It is not valid for Konnect.
 [#1486](https://github.com/Kong/deck/pull/1486)
 
-
 ### Fixed
 - Adjusted multiline string formatting in terraform resource generation.
 [#1482](https://github.com/Kong/deck/pull/1482)
