@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      actions: write
     steps:
       - name: Add standard tags
         run: |
