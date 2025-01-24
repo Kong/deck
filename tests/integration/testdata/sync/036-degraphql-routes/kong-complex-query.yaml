@@ -21,6 +21,15 @@ services:
 custom_entities:
   - type: degraphql_routes
     fields:
-      uri: "/foo"
-      query: "query{ foo { bar } }"
+      uri: "/search/posts"
+      methods: 
+        - "POST"
+      query: |
+        query SearchPosts($filters: PostsFilters) {
+          posts(filter: $filters) {
+            id
+            title
+            author
+          }
+        }
       service: svc1
