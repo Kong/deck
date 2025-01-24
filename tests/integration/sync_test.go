@@ -6250,7 +6250,7 @@ func Test_Sync_FilterChainsUnsupported(t *testing.T) {
 }
 
 func Test_Sync_DegraphqlRoutes(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -6262,7 +6262,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 	t.Run("create degraphql route", func(t *testing.T) {
 		require.NoError(t, sync("testdata/sync/036-degraphql-routes/kong.yaml"))
 
-		newState, err := fetchCurrentState(t, ctx, client, dumpConfig)
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
 		require.NoError(t, err)
 
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
@@ -6281,7 +6281,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 	t.Run("create degraphql route - complex query", func(t *testing.T) {
 		require.NoError(t, sync("testdata/sync/036-degraphql-routes/kong-complex-query.yaml"))
 
-		newState, err := fetchCurrentState(t, ctx, client, dumpConfig)
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
 		require.NoError(t, err)
 
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()

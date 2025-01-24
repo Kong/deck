@@ -236,7 +236,9 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	}
 }
 
-func fetchCurrentState(t *testing.T, ctx context.Context, client *kong.Client, dumpConfig deckDump.Config) (*state.KongState, error) {
+func fetchCurrentState(ctx context.Context, client *kong.Client,
+	dumpConfig deckDump.Config, t *testing.T,
+) (*state.KongState, error) {
 	t.Helper()
 
 	rawState, err := deckDump.Get(ctx, client, dumpConfig)
