@@ -393,6 +393,11 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
 		return err
 	}
+
+	if mode == modeKonnect && containsCustomEntities(*rawState) {
+		return fmt.Errorf("[custom entities] not yet supported by deck for konnect")
+	}
+
 	targetState, err := state.Get(rawState)
 	if err != nil {
 		return err
@@ -664,6 +669,11 @@ func containsProxyConfiguration(content reconcilerUtils.KongRawState) bool {
 		len(content.Certificates) != 0 ||
 		len(content.CACertificates) != 0 ||
 		len(content.Consumers) != 0
+}
+
+func containsCustomEntities(content reconcilerUtils.KongRawState) bool {
+	// checking for degraphql_routes only as those are the only ones we support for now.
+	return len(content.DegraphqlRoutes) != 0
 }
 
 func containsRBACConfiguration(content reconcilerUtils.KongRawState) bool {

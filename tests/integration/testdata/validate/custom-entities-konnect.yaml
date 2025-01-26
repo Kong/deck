@@ -1,0 +1,16 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+custom_entities:
+  - type: degraphql_routes
+    fields:
+      uri: "/foo"
+      query: "query{ foo { bar } }"
+      service: svc1

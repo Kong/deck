@@ -92,6 +92,12 @@ func Test_Validate_Konnect(t *testing.T) {
 			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
 			errorExpected:  false,
 		},
+		{
+			name:          "validate with custom-entities present",
+			stateFile:     "testdata/validate/custom-entities-konnect.yaml",
+			errorExpected: true,
+			errorString:   "[custom entities] not yet supported by deck for konnect",
+		},
 	}
 
 	for _, tc := range tests {

@@ -6300,6 +6300,17 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 	})
 }
 
+func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	t.Run("create degraphql route", func(t *testing.T) {
+		err := sync("testdata/sync/036-degraphql-routes/kong.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "[custom entities] not yet supported by deck for konnect")
+	})
+}
+
 func Test_Sync_CustomEntitiesFake(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
