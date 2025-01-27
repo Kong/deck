@@ -127,7 +127,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, false)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput)
 	if err != nil {
 		return err
 	}

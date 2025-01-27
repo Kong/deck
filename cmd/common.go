@@ -131,7 +131,7 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool, noDeletes bool,
+	delay int, workspace string, enableJSONOutput bool,
 ) error {
 	// read target file
 	if enableJSONOutput {
@@ -157,13 +157,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	cmd := "sync"
-
-	isPartialApply := false
-	if noDeletes {
-		cmd = "apply"
-		isPartialApply = true
-	}
-
 	if dry {
 		cmd = "diff"
 	}
@@ -209,31 +202,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// load Kong version after workspace
 	var kongVersion string
 	var parsedKongVersion semver.Version
-	isLicensedKongEnterprise := false
 	if mode == modeKonnect {
 		kongVersion = fetchKonnectKongVersion()
-		isLicensedKongEnterprise = true
 	} else {
 		kongVersion, err = fetchKongVersion(ctx, wsConfig)
 		if err != nil {
 			return fmt.Errorf("reading Kong version: %w", err)
 		}
-
-		// Are we running enterprise?
-		v, err := kong.ParseSemanticVersion(kongVersion)
-		if err != nil {
-			return fmt.Errorf("parsing Kong version: %w", err)
-		}
-
-		// Check if there's an active license for Consumer Group checks
-		if v.IsKongGatewayEnterprise() {
-			isLicensedKongEnterprise, err = isLicensed(ctx, wsConfig)
-			if err != nil {
-				return fmt.Errorf("checking if Kong is licensed: %w", err)
-			}
-		}
 	}
-
 	parsedKongVersion, err = reconcilerUtils.ParseKongVersion(kongVersion)
 	if err != nil {
 		return fmt.Errorf("parsing Kong version: %w", err)
@@ -272,24 +248,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	// Consumer groups are an enterprise 3.4+ feature
-	if parsedKongVersion.GTE(reconcilerUtils.Kong340Version) && isLicensedKongEnterprise {
-		dumpConfig.LookUpSelectorTagsConsumerGroups, err = determineLookUpSelectorTagsConsumerGroups(*targetContent)
-		if err != nil {
-			return fmt.Errorf("error determining lookup selector tags for consumer groups: %w", err)
-		}
+	dumpConfig.LookUpSelectorTagsConsumerGroups, err = determineLookUpSelectorTagsConsumerGroups(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for consumer groups: %w", err)
+	}
 
-		if dumpConfig.LookUpSelectorTagsConsumerGroups != nil || isPartialApply {
-			consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumerGroups)
+	if dumpConfig.LookUpSelectorTagsConsumerGroups != nil {
+		consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumerGroups)
+		if err != nil {
+			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
+		}
+		for _, c := range consumerGroupsGlobal {
+			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
+				file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
 			if err != nil {
-				return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
-			}
-			for _, c := range consumerGroupsGlobal {
-				targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
-					file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
-				if err != nil {
-					return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
-				}
+				return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
 			}
 		}
 	}
@@ -299,7 +272,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
 	}
 
-	if dumpConfig.LookUpSelectorTagsConsumers != nil || isPartialApply {
+	if dumpConfig.LookUpSelectorTagsConsumers != nil {
 		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
 		if err != nil {
 			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
@@ -317,7 +290,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return fmt.Errorf("error determining lookup selector tags for routes: %w", err)
 	}
 
-	if dumpConfig.LookUpSelectorTagsRoutes != nil || isPartialApply {
+	if dumpConfig.LookUpSelectorTagsRoutes != nil {
 		routesGlobal, err := dump.GetAllRoutes(ctx, kongClient, dumpConfig.LookUpSelectorTagsRoutes)
 		if err != nil {
 			return fmt.Errorf("error retrieving global routes via lookup selector tags: %w", err)
@@ -335,7 +308,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return fmt.Errorf("error determining lookup selector tags for services: %w", err)
 	}
 
-	if dumpConfig.LookUpSelectorTagsServices != nil || isPartialApply {
+	if dumpConfig.LookUpSelectorTagsServices != nil {
 		servicesGlobal, err := dump.GetAllServices(ctx, kongClient, dumpConfig.LookUpSelectorTagsServices)
 		if err != nil {
 			return fmt.Errorf("error retrieving global services via lookup selector tags: %w", err)
@@ -400,7 +373,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput, noDeletes)
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
 	if err != nil {
 		if enableJSONOutput {
 			var errs reconcilerUtils.ErrArray
@@ -529,7 +502,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool, noDeletes bool,
+	enableJSONOutput bool,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -538,7 +511,6 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
 		IsKonnect:     isKonnect,
-		NoDeletes:     noDeletes,
 	})
 	if err != nil {
 		return 0, err
@@ -568,31 +540,6 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		}
 	}
 	return int(totalOps), nil
-}
-
-func isLicensed(ctx context.Context, config reconcilerUtils.KongClientConfig) (bool, error) {
-	client, err := reconcilerUtils.GetKongClient(config)
-	if err != nil {
-		return false, err
-	}
-
-	req, err := http.NewRequest("GET",
-		reconcilerUtils.CleanAddress(config.Address)+"/",
-		nil)
-	if err != nil {
-		return false, err
-	}
-	var resp map[string]interface{}
-	_, err = client.Do(ctx, req, &resp)
-	if err != nil {
-		return false, err
-	}
-	_, ok := resp["license"]
-	if !ok {
-		return false, nil
-	}
-
-	return true, nil
 }
 
 func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {

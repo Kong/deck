@@ -17,7 +17,7 @@ var (
 
 func executeDiff(cmd *cobra.Command, _ []string) error {
 	return syncMain(cmd.Context(), diffCmdKongStateFile, true,
-		diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, false)
+		diffCmdParallelism, 0, diffWorkspace, diffJSONOutput)
 }
 
 // newDiffCmd represents the diff command
