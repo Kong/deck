@@ -1,0 +1,24 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.konghq.com
+  name: example-service
+  plugins:
+  - config:
+      body: null
+      content_type: null
+      echo: false
+      message: null
+      status_code: 404
+      trigger: null
+    enabled: true
+    name: request-termination
+    protocols:
+    - http
+    - https
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
