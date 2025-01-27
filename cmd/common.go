@@ -131,7 +131,7 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool,
+	delay int, workspace string, enableJSONOutput bool, isPartialApply bool,
 ) error {
 	// read target file
 	if enableJSONOutput {
@@ -157,6 +157,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	cmd := "sync"
+	if isPartialApply {
+		cmd = "apply"
+		dumpConfig.IsPartialApply = true
+	} else {
+		// Explicitly set this here as dumpConfig is a global var
+		dumpConfig.IsPartialApply = false
+	}
+
 	if dry {
 		cmd = "diff"
 	}
@@ -373,7 +381,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect,
+		enableJSONOutput, isPartialApply,
+	)
 	if err != nil {
 		if enableJSONOutput {
 			var errs reconcilerUtils.ErrArray
@@ -502,7 +512,7 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool,
+	enableJSONOutput bool, isPartialApply bool,
 ) (int, error) {
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -511,12 +521,13 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
 		IsKonnect:     isKonnect,
+		NoDeletes:     isPartialApply,
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput, isPartialApply)
 	// print stats before error to report completed operations
 	if !enableJSONOutput {
 		printStats(stats)

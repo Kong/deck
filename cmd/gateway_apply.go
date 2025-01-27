@@ -15,7 +15,7 @@ var applyCmdKongStateFile []string
 
 func executeApply(cmd *cobra.Command, _ []string) error {
 	return syncMain(cmd.Context(), applyCmdKongStateFile, false,
-		applyCmdParallelism, applyCmdDBUpdateDelay, applyWorkspace, applyJSONOutput)
+		applyCmdParallelism, applyCmdDBUpdateDelay, applyWorkspace, applyJSONOutput, true)
 }
 
 func newApplyCmd() *cobra.Command {
