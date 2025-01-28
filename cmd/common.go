@@ -521,7 +521,6 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
 	enableJSONOutput bool, applyType ApplyType,
 ) (int, error) {
-
 	shouldSkipDeletes := applyType == ApplyTypePartial
 
 	s, err := diff.NewSyncer(diff.SyncerOpts{
