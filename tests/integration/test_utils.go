@@ -266,24 +266,24 @@ func setup(t *testing.T) {
 	})
 }
 
-func apply(kongFile string, opts ...string) error {
+func apply(ctx context.Context, kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "apply", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	return deckCmd.ExecuteContext(context.Background())
+	return deckCmd.ExecuteContext(ctx)
 }
 
-func sync(kongFile string, opts ...string) error {
+func sync(ctx context.Context, kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "sync", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	return deckCmd.ExecuteContext(context.Background())
+	return deckCmd.ExecuteContext(ctx)
 }
 
 func diff(kongFile string, opts ...string) (string, error) {

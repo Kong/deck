@@ -19,7 +19,7 @@ func compareFileContent(t *testing.T, expectedFilename string, actualContent []b
 	}
 
 	actualFilename := baseLocation + strings.Replace(expectedFilename, "-expected.", "-actual.", 1)
-	os.WriteFile(actualFilename, actualContent, 0o600)
+	require.NoError(t, os.WriteFile(actualFilename, actualContent, 0o600))
 
 	// compare the actual content with the expected content
 	// both should be the same terraform file

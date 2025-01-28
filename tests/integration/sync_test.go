@@ -1954,7 +1954,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 			runWhen(t, "kong", "<=1.4.3")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
@@ -1994,7 +1994,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 			runWhen(t, "kong", ">1.4.3 <=1.5.1")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2034,7 +2034,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2081,7 +2081,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2123,7 +2123,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2162,7 +2162,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2201,7 +2201,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 			runWhen(t, "konnect", "")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2233,7 +2233,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 			runWhen(t, "kong", "==1.4.3")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2265,7 +2265,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2297,7 +2297,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 			runWhen(t, "kong", "==1.5.1")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2344,7 +2344,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2376,7 +2376,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.6.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2408,7 +2408,7 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.6.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2448,7 +2448,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 			runWhen(t, "kong", "<=1.5.2")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
@@ -2496,7 +2496,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 			runWhen(t, "kong", ">=2.1.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2529,7 +2529,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2562,7 +2562,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2595,7 +2595,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			runWhen(t, "konnect", "")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2636,7 +2636,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 			runWhen(t, "kong", ">=2.4.1 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2669,7 +2669,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2702,7 +2702,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.1.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2735,7 +2735,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			runWhen(t, "konnect", "")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2772,7 +2772,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 			runWhen(t, "kong", "==2.7.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2813,7 +2813,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 			runWhen(t, "kong", "<1.5.1 !1.4.3")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, ignoreFields)
 		})
 	}
@@ -2849,7 +2849,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 			runWhen(t, "kong", ">=2.0.5 <=2.1.4")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2892,7 +2892,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 			runWhen(t, "kong", ">2.2.1 <=2.6.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2930,7 +2930,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 			runWhen(t, "kong", ">2.6.9 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2964,7 +2964,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile, "--skip-ca-certificates")
+			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -2998,7 +2998,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.0.0")
 			setup(t)
 
-			sync(tc.kongFile, "--skip-ca-certificates")
+			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3101,7 +3101,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile, "--rbac-resources-only")
+			require.NoError(t, sync(context.Background(), tc.kongFile, "--rbac-resources-only"))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3204,7 +3204,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
 			setup(t)
 
-			sync(tc.kongFile, "--rbac-resources-only")
+			require.NoError(t, sync(context.Background(), tc.kongFile, "--rbac-resources-only"))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3235,7 +3235,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3266,7 +3266,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 			runWhen(t, "kong", ">=2.7.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3302,7 +3302,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 			runWhen(t, "kong", ">=2.8.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3350,7 +3350,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3385,7 +3385,7 @@ func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3441,7 +3441,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3468,7 +3468,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0")
 			setup(t)
 
-			err := sync(tc.kongFile)
+			err := sync(context.Background(), tc.kongFile)
 			assert.Equal(t, err, tc.expectedError)
 		})
 	}
@@ -3615,7 +3615,7 @@ func Test_Sync_Vault(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
@@ -3702,9 +3702,9 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3744,9 +3744,9 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3786,9 +3786,9 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3828,9 +3828,9 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3868,7 +3868,7 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 			runWhen(t, "enterprise", ">=2.7.0 <3.0.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -3910,9 +3910,9 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
@@ -3996,7 +3996,7 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.0.0 <3.1.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
@@ -4083,9 +4083,9 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 			setup(t)
 
 			// set up initial state
-			sync(tc.kongFileInitial)
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 
 			testKongState(t, client, true, tc.expectedState, nil)
 		})
@@ -4164,7 +4164,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 			runWhenKongOrKonnect(t, ">=3.2.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
 	}
@@ -4209,9 +4209,9 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 			setup(t)
 
 			if tc.skipConsumers {
-				sync(tc.kongFile, "--skip-consumers")
+				require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-consumers"))
 			} else {
-				sync(tc.kongFile)
+				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
@@ -4428,9 +4428,9 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 			setup(t)
 
 			if tc.skipConsumers {
-				sync(tc.kongFile, "--skip-consumers")
+				require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-consumers"))
 			} else {
-				sync(tc.kongFile)
+				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
@@ -4599,9 +4599,9 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 			setup(t)
 
 			if tc.skipConsumers {
-				sync(tc.kongFile, "--skip-consumers")
+				require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-consumers"))
 			} else {
-				sync(tc.kongFile)
+				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
 			testKongState(t, client, false, tc.expectedState, nil)
 		})
@@ -4725,11 +4725,11 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 			setup(t)
 
 			// First, create the entities with the original IDs.
-			err = sync(tc.beforeConfig)
+			err = sync(context.Background(), tc.beforeConfig)
 			require.NoError(t, err)
 
 			// Then, sync again with the same names, but different IDs.
-			err = sync("testdata/sync/020-same-names-altered-ids/desired.yaml")
+			err = sync(context.Background(), "testdata/sync/020-same-names-altered-ids/desired.yaml")
 			require.NoError(t, err)
 
 			// Finally, check that the all entities exist and have the expected IDs.
@@ -4759,11 +4759,11 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 	)
 
 	// First, create entities with IDs assigned explicitly.
-	err = sync(beforeConfig)
+	err = sync(context.Background(), beforeConfig)
 	require.NoError(t, err)
 
 	// Then, sync again, adding tags to every entity just to trigger an update.
-	err = sync(afterConfig)
+	err = sync(context.Background(), afterConfig)
 	require.NoError(t, err)
 
 	// Finally, verify that the update was successful.
@@ -4810,12 +4810,10 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 	)
 
 	// First, create entities with IDs assigned explicitly.
-	err = sync(beforeConfig)
-	require.NoError(t, err)
+	require.NoError(t, sync(context.Background(), beforeConfig))
 
 	// Then, sync again, adding tags to every entity just to trigger an update.
-	err = sync(afterConfig)
-	require.NoError(t, err)
+	require.NoError(t, sync(context.Background(), afterConfig))
 
 	// Finally, verify that the update was successful.
 	testKongState(t, client, false, utils.KongRawState{
@@ -4847,7 +4845,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 
-	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
+	err = sync(context.Background(), "testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
 	require.NoError(t, err)
 
 	// To ignore noise, we ignore the Key and Cert fields because they are not relevant for this test.
@@ -4876,7 +4874,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 		},
 	}, ignoredFields)
 
-	err = sync("testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
+	err = sync(context.Background(), "testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
 	require.NoError(t, err)
 
 	testKongState(t, client, false, utils.KongRawState{
@@ -4907,7 +4905,7 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 
-	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
+	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
 	require.NoError(t, err)
 
 	testKongState(t, client, false, utils.KongRawState{
@@ -4933,7 +4931,7 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 		},
 	}, nil)
 
-	err = sync("testdata/sync/024-consumers-with-custom_id-and-username/kong3x-reverse-order.yaml")
+	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x-reverse-order.yaml")
 	require.NoError(t, err)
 
 	testKongState(t, client, false, utils.KongRawState{
@@ -5045,7 +5043,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.4.0 <3.5.0")
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
@@ -5339,7 +5337,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			setup(t)
 
-			sync(tc.kongFile)
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
@@ -5422,7 +5420,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 			runWhen(t, "enterprise", ">=3.4.0")
 			setup(t)
 
-			err := sync(tc.kongFile)
+			err := sync(context.Background(), tc.kongFile)
 			if tc.expectedError == nil {
 				assert.NoError(t, err)
 			} else {
@@ -5509,7 +5507,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			require.NoError(t, sync(tc.kongFile))
+			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, true, tc.expectedState, ignoreFields)
 		})
 	}
@@ -5610,7 +5608,7 @@ func Test_Sync_KonnectRename(t *testing.T) {
 			client, err := getTestClient()
 			require.NoError(t, err)
 
-			sync(tc.kongFile, tc.flags...)
+			require.NoError(t, sync(context.Background(), tc.kongFile, tc.flags...))
 			testKongState(t, client, true, tc.expectedState, nil)
 		})
 	}
@@ -5654,7 +5652,7 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := sync(tc.kongFile, tc.flags...)
+			err := sync(context.Background(), tc.kongFile, tc.flags...)
 			assert.Equal(t, err, tc.expectedError)
 		})
 	}
@@ -5675,7 +5673,7 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 	)
 
 	// provision entities
-	require.NoError(t, sync(oldConfig))
+	require.NoError(t, sync(context.Background(), oldConfig))
 
 	// get the current state
 	ctx := context.Background()
@@ -5684,7 +5682,7 @@ func Test_Sync_DoNotUpdateCreatedAt(t *testing.T) {
 
 	// update entities
 	time.Sleep(time.Second)
-	require.NoError(t, sync(newConfig))
+	require.NoError(t, sync(context.Background(), newConfig))
 
 	// get the new state
 	newKongState, err := deckDump.Get(ctx, client, deckDump.Config{})
@@ -5719,25 +5717,25 @@ func Test_Sync_LookupConsumerTags(t *testing.T) {
 
 	// test that reference to non-existing consumer fails.
 	pluginsNoLookupStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_no_lookup.yaml"
-	err := sync(pluginsNoLookupStateFile)
+	err := sync(context.Background(), pluginsNoLookupStateFile)
 	require.Error(t, err)
 	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to existing local consumer succeeds.
 	pluginsAndConsumersStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_and_consumers.yaml"
-	require.NoError(t, sync(pluginsAndConsumersStateFile))
+	require.NoError(t, sync(context.Background(), pluginsAndConsumersStateFile))
 	reset(t)
 
 	// test that reference to existing global consumer succeeds via lookup tags.
 	globalConsumersStateFile := "testdata/sync/029-lookup-tags-consumers/global_consumers.yaml"
-	require.NoError(t, sync(globalConsumersStateFile))
+	require.NoError(t, sync(context.Background(), globalConsumersStateFile))
 	// sync plugins with lookup reference to global consumers.
 	pluginsLookupStateFile := "testdata/sync/029-lookup-tags-consumers/plugins_lookup.yaml"
-	require.NoError(t, sync(pluginsLookupStateFile))
+	require.NoError(t, sync(context.Background(), pluginsLookupStateFile))
 	reset(t)
 
 	// test that reference to non-existing global consumer fails via lookup tags.
-	require.Error(t, sync(pluginsLookupStateFile))
+	require.Error(t, sync(context.Background(), pluginsLookupStateFile))
 	require.EqualError(t, err, "building state: consumer foo for plugin rate-limiting-advanced: entity not found")
 }
 
@@ -5808,7 +5806,7 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 			},
 		},
 	}
-	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 }
 
@@ -5828,26 +5826,26 @@ func Test_Sync_LookupServicesTags(t *testing.T) {
 
 	// test that reference to non-existing service fails.
 	pluginsNoLookupServiceStateFile := "testdata/sync/035-lookup-tags-services/plugins_no_lookup.yaml"
-	err := sync(pluginsNoLookupServiceStateFile)
+	err := sync(context.Background(), pluginsNoLookupServiceStateFile)
 	require.Error(t, err)
 	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to existing local service succeeds.
 	pluginsAndServicesStateFile := "testdata/sync/035-lookup-tags-services/plugins_and_services.yaml"
-	require.NoError(t, sync(pluginsAndServicesStateFile))
+	require.NoError(t, sync(context.Background(), pluginsAndServicesStateFile))
 	reset(t)
 
 	// test that reference to existing global service succeeds via lookup tags.
 	globalServicesStateFile := "testdata/sync/035-lookup-tags-services/global_services.yaml"
-	require.NoError(t, sync(globalServicesStateFile))
+	require.NoError(t, sync(context.Background(), globalServicesStateFile))
 
 	// sync plugins with lookup reference to global services.
 	pluginsLookupServiceStateFile := "testdata/sync/035-lookup-tags-services/plugins_lookup.yaml"
-	require.NoError(t, sync(pluginsLookupServiceStateFile))
+	require.NoError(t, sync(context.Background(), pluginsLookupServiceStateFile))
 	reset(t)
 
 	// test that reference to non-existing global service fails via lookup tags.
-	require.Error(t, sync(pluginsLookupServiceStateFile))
+	require.Error(t, sync(context.Background(), pluginsLookupServiceStateFile))
 	require.EqualError(t, err, "building state: service foo for plugin rate-limiting-advanced: entity not found")
 }
 
@@ -5867,25 +5865,25 @@ func Test_Sync_LookupRoutesTags(t *testing.T) {
 
 	// test that reference to non-existing route fails.
 	pluginsNoLookupStateFile := "testdata/sync/030-lookup-tags-routes/plugins_no_lookup.yaml"
-	err := sync(pluginsNoLookupStateFile)
+	err := sync(context.Background(), pluginsNoLookupStateFile)
 	require.Error(t, err)
 	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to existing local route succeeds.
 	pluginsAndRoutesStateFile := "testdata/sync/030-lookup-tags-routes/plugins_and_routes.yaml"
-	require.NoError(t, sync(pluginsAndRoutesStateFile))
+	require.NoError(t, sync(context.Background(), pluginsAndRoutesStateFile))
 	reset(t)
 
 	// test that reference to existing global route succeeds via lookup tags.
 	globalRoutesStateFile := "testdata/sync/030-lookup-tags-routes/global_routes.yaml"
-	require.NoError(t, sync(globalRoutesStateFile))
+	require.NoError(t, sync(context.Background(), globalRoutesStateFile))
 	// sync plugins with lookup reference to global routes.
 	pluginsLookupStateFile := "testdata/sync/030-lookup-tags-routes/plugins_lookup.yaml"
-	require.NoError(t, sync(pluginsLookupStateFile))
+	require.NoError(t, sync(context.Background(), pluginsLookupStateFile))
 	reset(t)
 
 	// test that reference to non-existing global route fails via lookup tags.
-	require.Error(t, sync(pluginsLookupStateFile))
+	require.Error(t, sync(context.Background(), pluginsLookupStateFile))
 	require.EqualError(t, err, "building state: route foo for plugin rate-limiting-advanced: entity not found")
 }
 
@@ -5905,19 +5903,19 @@ func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
 
 	// test that reference to non-existing service fails.
 	pluginsNoLookupServiceStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_service.yaml"
-	errNoService := sync(pluginsNoLookupServiceStateFile)
+	errNoService := sync(context.Background(), pluginsNoLookupServiceStateFile)
 	require.Error(t, errNoService)
 	require.EqualError(t, errNoService, "building state: service foo for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to non-existing route fails.
 	pluginsNoLookupRouteStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_route.yaml"
-	errNoRoute := sync(pluginsNoLookupRouteStateFile)
+	errNoRoute := sync(context.Background(), pluginsNoLookupRouteStateFile)
 	require.Error(t, errNoRoute)
 	require.EqualError(t, errNoRoute, "building state: route bar for plugin rate-limiting-advanced: entity not found")
 
 	// test that reference to non-existing consumer group fails.
 	pluginsNoLookupConsumergroupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_no_lookup_consumerGroup.yaml" //nolint:lll
-	errNoConsumerGroup := sync(pluginsNoLookupConsumergroupStateFile)
+	errNoConsumerGroup := sync(context.Background(), pluginsNoLookupConsumergroupStateFile)
 	require.Error(t, errNoConsumerGroup)
 	require.EqualError(
 		t,
@@ -5927,22 +5925,22 @@ func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
 
 	// test that reference to existing local service and consumer group succeeds.
 	pluginsAndEntitiesConsumersGroupsStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_and_entities_consumerGroups.yaml" //nolint:lll
-	require.NoError(t, sync(pluginsAndEntitiesConsumersGroupsStateFile))
+	require.NoError(t, sync(context.Background(), pluginsAndEntitiesConsumersGroupsStateFile))
 	reset(t)
 
 	// test that reference to existing global service and consumer group succeeds via lookup tags.
 	globalEntitiesConsumerGroupsStateFile := "testdata/sync/034-lookup-tags-consumerGroups/global_entities_consumerGroups.yaml" //nolint:lll
-	require.NoError(t, sync(globalEntitiesConsumerGroupsStateFile))
+	require.NoError(t, sync(context.Background(), globalEntitiesConsumerGroupsStateFile))
 	// sync plugins with lookup reference to global service.
 	pluginsServiceLookupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_service_lookup.yaml"
-	require.NoError(t, sync(pluginsServiceLookupStateFile))
+	require.NoError(t, sync(context.Background(), pluginsServiceLookupStateFile))
 	// sync plugins with lookup reference to global route.
 	pluginsRouteLookupStateFile := "testdata/sync/034-lookup-tags-consumerGroups/plugins_route_lookup.yaml"
-	require.NoError(t, sync(pluginsRouteLookupStateFile))
+	require.NoError(t, sync(context.Background(), pluginsRouteLookupStateFile))
 	reset(t)
 
 	// test that reference to non-existing global service or consumer groups fails via lookup tags.
-	errServiceNoReference := sync(pluginsServiceLookupStateFile)
+	errServiceNoReference := sync(context.Background(), pluginsServiceLookupStateFile)
 	require.Error(t, errServiceNoReference)
 	require.EqualError(
 		t,
@@ -5951,7 +5949,7 @@ func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
 	)
 
 	// test that reference to non-existing global route or consumer groups fails via lookup tags.
-	errRouteNoReference := sync(pluginsRouteLookupStateFile)
+	errRouteNoReference := sync(context.Background(), pluginsRouteLookupStateFile)
 	require.Error(t, errRouteNoReference)
 	require.EqualError(
 		t,
@@ -6001,12 +5999,12 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 	// - a consumer-group defined with a set of tags, ideally managed by decK
 	// - a consumer defined with another set of tags, ideally managed by an external process
 	// - the consumer -> consumer-group relationship, ideally managed by an external process
-	require.NoError(t, sync("testdata/sync/031-consumer-group-consumers-from-upstream/initial.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/initial.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 
 	// referencing the relationship in a file without the consumer would still work
 	// if default_lookup_tags are defined to pull consumers from upstream.
-	require.NoError(t, sync("testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml")) //nolint:lll
 	testKongState(t, client, false, expectedState, nil)
 }
 
@@ -6046,7 +6044,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	// simulate the following scenario:
 	// - a consumer-group defined with a set of tags, ideally managed by decK
 	// - a consumer and the consumer -> consumer-group managed externally
-	require.NoError(t, sync("testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
 
 	// create the consumer
 	_, err = client.Consumers.Create(
@@ -6067,7 +6065,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	require.NoError(t, err)
 
 	// re-sync again
-	require.NoError(t, sync("testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
 	testKongState(t, client, false, expectedState, nil)
 }
 
@@ -6214,19 +6212,19 @@ func Test_Sync_FilterChains(t *testing.T) {
 				Routes:   []*kong.Route{&route},
 			}
 
-			require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
+			require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))
 
 			testKongState(t, client, false, state, nil)
 
-			require.NoError(t, sync(tc.createFile))
+			require.NoError(t, sync(context.Background(), tc.createFile))
 			tc.createState(&state)
 			testKongState(t, client, false, state, nil)
 
-			require.NoError(t, sync(tc.updateFile))
+			require.NoError(t, sync(context.Background(), tc.updateFile))
 			tc.updateState(&state)
 			testKongState(t, client, false, state, nil)
 
-			require.NoError(t, sync(tc.deleteFile))
+			require.NoError(t, sync(context.Background(), tc.deleteFile))
 			tc.deleteState(&state)
 			testKongState(t, client, false, state, nil)
 		})
@@ -6236,6 +6234,6 @@ func Test_Sync_FilterChains(t *testing.T) {
 func Test_Sync_FilterChainsUnsupported(t *testing.T) {
 	runWhen(t, "kong", "<3.4.0")
 	setup(t)
-	require.NoError(t, sync("testdata/sync/033-filter-chains/init.yaml"))
-	require.Error(t, sync("testdata/sync/033-filter-chains/create.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))
+	require.Error(t, sync(context.Background(), "testdata/sync/033-filter-chains/create.yaml"))
 }
