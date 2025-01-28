@@ -39,6 +39,13 @@ const (
 	modeLocal
 )
 
+type ApplyType int
+
+const (
+	ApplyTypeFull ApplyType = iota
+	ApplyTypePartial
+)
+
 var jsonOutput diff.JSONOutputObject
 
 func getMode(targetContent *file.Content) mode {
@@ -131,7 +138,7 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool, isPartialApply bool,
+	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
 ) error {
 	// read target file
 	if enableJSONOutput {
@@ -157,7 +164,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	cmd := "sync"
-	if isPartialApply {
+	if applyType == ApplyTypePartial {
 		cmd = "apply"
 		dumpConfig.IsPartialApply = true
 	} else {
@@ -382,7 +389,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	totalOps, err := performDiff(
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect,
-		enableJSONOutput, isPartialApply,
+		enableJSONOutput, applyType,
 	)
 	if err != nil {
 		if enableJSONOutput {
@@ -512,8 +519,11 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool, isPartialApply bool,
+	enableJSONOutput bool, applyType ApplyType,
 ) (int, error) {
+
+	shouldSkipDeletes := applyType == ApplyTypePartial
+
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
@@ -521,13 +531,13 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
 		IsKonnect:     isKonnect,
-		NoDeletes:     isPartialApply,
+		NoDeletes:     shouldSkipDeletes,
 	})
 	if err != nil {
 		return 0, err
 	}
 
-	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput, isPartialApply)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput, shouldSkipDeletes)
 	// print stats before error to report completed operations
 	if !enableJSONOutput {
 		printStats(stats)

@@ -18,7 +18,7 @@ var syncCmdKongStateFile []string
 
 func executeSync(cmd *cobra.Command, _ []string) error {
 	return syncMain(cmd.Context(), syncCmdKongStateFile, false,
-		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, false)
+		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
 }
 
 // newSyncCmd represents the sync command
