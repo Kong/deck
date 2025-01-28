@@ -246,9 +246,7 @@ func syncKonnect(ctx context.Context,
 		return err
 	}
 
-	// This is a deprecated Konnect sync command. Default to always performing a full sync
-	// which matches the existing behavior.
-	stats, errs, _ := s.Solve(ctx, parallelism, dry, false, diff.ApplyTypeFull)
+	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
 
 	// print stats before error to report completed operations
 	printStats(stats)

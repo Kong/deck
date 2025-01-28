@@ -521,13 +521,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
 	enableJSONOutput bool, applyType ApplyType,
 ) (int, error) {
-	shouldSkipDeletes := false
-	diffApplyType := diff.ApplyTypeFull
-
-	if applyType == ApplyTypePartial {
-		shouldSkipDeletes = true
-		diffApplyType = diff.ApplyTypePartial
-	}
+	shouldSkipDeletes := applyType == ApplyTypePartial
 
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
@@ -542,7 +536,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		return 0, err
 	}
 
-	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput, diffApplyType)
+	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
 	// print stats before error to report completed operations
 	if !enableJSONOutput {
 		printStats(stats)
