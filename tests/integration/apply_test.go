@@ -86,7 +86,7 @@ func Test_Apply_3x(t *testing.T) {
 		runWhen(t, "kong", ">=3.0.0")
 		setup(t)
 
-		apply("testdata/apply/007-update-existing-entity/service-01.yaml")
+		apply(context.Background(), "testdata/apply/007-update-existing-entity/service-01.yaml")
 
 		out, err := dump()
 		require.NoError(t, err)
@@ -95,7 +95,7 @@ func Test_Apply_3x(t *testing.T) {
 
 		assert.Equal(t, expectedOriginal, out)
 
-		apply("testdata/apply/007-update-existing-entity/service-02.yaml")
+		apply(context.Background(), "testdata/apply/007-update-existing-entity/service-02.yaml")
 		expectedChanged, err := readFile("testdata/apply/007-update-existing-entity/expected-state-02.yaml")
 		require.NoError(t, err, "failed to read expected state")
 
