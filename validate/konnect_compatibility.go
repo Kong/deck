@@ -17,6 +17,7 @@ var (
 	errBadVersion         = fmt.Sprintf("[version] decK file version must be '%.1f' or greater", supportedVersion)
 	errPluginIncompatible = "[%s] plugin is not compatible with Konnect"
 	errPluginNoCluster    = "[%s] plugin can't be used with cluster strategy"
+	errCustomEntity       = "[custom entities] not yet supported by deck for konnect"
 )
 
 var supportedVersion = 3.0
@@ -49,6 +50,10 @@ func KonnectCompatibility(targetContent *file.Content, dumpConfig dump.Config) [
 
 	if targetContent.Konnect == nil && dumpConfig.KonnectControlPlane == "" {
 		errs = append(errs, errors.New(errKonnect))
+	}
+
+	if targetContent.CustomEntities != nil {
+		errs = append(errs, errors.New(errCustomEntity))
 	}
 
 	versionNumber, err := strconv.ParseFloat(targetContent.FormatVersion, 32)

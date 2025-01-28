@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/kong/go-apiops/deckformat"
+	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -21,10 +22,15 @@ const (
 	defaultKonnectURL = "https://us.api.konghq.com"
 )
 
+var supportedCustomEntityTypes = []string{
+	"degraphql_routes",
+}
+
 var (
 	cfgFile       string
 	rootConfig    utils.KongClientConfig
 	konnectConfig utils.KonnectConfig
+	dumpConfig    dump.Config
 
 	disableAnalytics         bool
 	konnectConnectionDesired bool
@@ -375,6 +381,8 @@ func initConfig() {
 
 	// cookie-jar support
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
+
+	dumpConfig.CustomEntityTypes = supportedCustomEntityTypes
 
 	if viper.IsSet("no-color") {
 		color.NoColor = viper.GetBool("no-color")

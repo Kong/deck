@@ -1,0 +1,5 @@
+_format_version: "3.0"
+custom_entities:
+- type: fake-entity
+  fields:
+    foo: bar
