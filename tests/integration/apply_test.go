@@ -88,21 +88,19 @@ func Test_Apply_3x(t *testing.T) {
 
 		apply("testdata/apply/007-update-existing-entity/service-01.yaml")
 
-		out, _ := dump()
+		out, err := dump()
+		require.NoError(t, err)
 		expectedOriginal, err := readFile("testdata/apply/007-update-existing-entity/expected-state-01.yaml")
-		if err != nil {
-			t.Fatalf("failed to read expected state: %v", err)
-		}
+		require.NoError(t, err, "failed to read expected state")
 
 		assert.Equal(t, expectedOriginal, out)
 
 		apply("testdata/apply/007-update-existing-entity/service-02.yaml")
 		expectedChanged, err := readFile("testdata/apply/007-update-existing-entity/expected-state-02.yaml")
-		if err != nil {
-			t.Fatalf("failed to read expected state: %v", err)
-		}
+		require.NoError(t, err, "failed to read expected state")
 
-		outChanged, _ := dump()
+		outChanged, err := dump()
+		require.NoError(t, err)
 		assert.Equal(t, expectedChanged, outChanged)
 	})
 }
