@@ -3,9 +3,11 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_Apply_3x(t *testing.T) {
@@ -51,8 +53,9 @@ func Test_Apply_3x(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			runWhen(t, tc.runWhen, ">=3.0.0")
 			setup(t)
-			apply(tc.firstFile)
-			apply(tc.secondFile)
+			ctx := context.Background()
+			require.NoError(t, apply(ctx, tc.firstFile))
+			require.NoError(t, apply(ctx, tc.secondFile))
 
 			out, _ := dump()
 
