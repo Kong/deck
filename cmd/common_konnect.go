@@ -91,9 +91,7 @@ func GetKongClientForKonnectMode(
 
 	// set the kong control plane ID in the client
 	konnectClient.SetRuntimeGroupID(cpID)
-	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + cpID
-	// TODO: replace the above with the following once the Konnect API is updated
-	// konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID
+	konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID + "/core-entities"
 
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
