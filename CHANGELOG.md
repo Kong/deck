@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.43.1](#v1431)
 - [v1.43.0](#v1430)
 - [v1.42.1](#v1421)
 - [v1.42.0](#v1420)
@@ -103,6 +104,18 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.43.1]
+> Release date: 2025/01/29
+
+### Fixed
+- The `deck gateway apply` command added in v1.43.0 added additional
+HTTP calls to discover which functions are enabled. This does not work 
+well when using an RBAC user with restricted permissions. This change 
+removes those additional checks and delegates the lookup of foreign 
+keys for partial applications to `go-database-reconciler`.
+[#1508](https://github.com/Kong/deck/pull/1508)
+[go-database-reconciler #182](https://github.com/Kong/go-database-reconciler/pull/182)
 
 ## [v1.43.0]
 > Release date: 2025/01/23
@@ -1965,6 +1978,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.43.1]: https://github.com/Kong/deck/compare/v1.43.0...v1.43.1
 [v1.43.0]: https://github.com/Kong/deck/compare/v1.42.1...v1.43.0
 [v1.42.1]: https://github.com/Kong/deck/compare/v1.42.0...v1.42.1
 [v1.42.0]: https://github.com/Kong/deck/compare/v1.41.4...v1.42.0
