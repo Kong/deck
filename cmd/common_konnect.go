@@ -127,7 +127,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, false)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
 	if err != nil {
 		return err
 	}
@@ -247,6 +247,7 @@ func syncKonnect(ctx context.Context,
 	}
 
 	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
+
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {
