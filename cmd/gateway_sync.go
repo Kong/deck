@@ -96,6 +96,8 @@ to get Kong's state in sync with the input state.`,
 			"See `db_update_propagation` in kong.conf.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
+	syncCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
+		false, "allow deck to sync consumer-group policy overrides.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(syncCmd.Flags())
