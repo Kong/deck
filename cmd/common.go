@@ -25,7 +25,6 @@ import (
 const exitCodeDiffDetection = 2
 
 var (
-	dumpConfig   dump.Config
 	assumeYes    bool
 	noMaskValues bool
 )

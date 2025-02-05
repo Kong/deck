@@ -13,6 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/require"
@@ -187,7 +188,9 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 
 	// Get entities from Kong
 	ctx := context.Background()
-	dumpConfig := deckDump.Config{}
+	dumpConfig := deckDump.Config{
+		CustomEntityTypes: []string{"degraphql_routes"},
+	}
 	if expectedState.RBACEndpointPermissions != nil {
 		dumpConfig.RBACResourcesOnly = true
 	}
@@ -231,6 +234,23 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
 		t.Errorf("unexpected diff:\n%s", diff)
 	}
+}
+
+func fetchCurrentState(ctx context.Context, client *kong.Client,
+	dumpConfig deckDump.Config, t *testing.T,
+) (*state.KongState, error) {
+	t.Helper()
+
+	rawState, err := deckDump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	currentState, err := state.Get(rawState)
+	if err != nil {
+		return nil, err
+	}
+	return currentState, nil
 }
 
 func reset(t *testing.T, opts ...string) {
