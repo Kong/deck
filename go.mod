@@ -13,7 +13,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/google/go-cmp v0.6.0
 	github.com/kong/go-apiops v0.1.41
-	github.com/kong/go-database-reconciler v1.19.2
+	github.com/kong/go-database-reconciler v1.19.3
 	github.com/kong/go-kong v0.63.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
@@ -81,7 +81,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.47.0 // indirect
+	github.com/samber/lo v1.49.1 // indirect
 	github.com/sethvargo/go-password v0.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect

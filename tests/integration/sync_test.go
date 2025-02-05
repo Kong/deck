@@ -1916,6 +1916,15 @@ var (
 	}
 )
 
+const complexQueryForDegraphqlRoute = `query SearchPosts($filters: PostsFilters) {
+  posts(filter: $filters) {
+    id
+    title
+    author
+  }
+}
+`
+
 // test scope:
 //   - 1.4.3
 func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
@@ -6236,4 +6245,64 @@ func Test_Sync_FilterChainsUnsupported(t *testing.T) {
 	setup(t)
 	require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))
 	require.Error(t, sync(context.Background(), "testdata/sync/033-filter-chains/create.yaml"))
+}
+
+func Test_Sync_DegraphqlRoutes(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"degraphql_routes"}}
+
+	t.Run("create degraphql route", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/036-degraphql-routes/kong.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, len(degraphqlRoutes))
+
+		d := degraphqlRoutes[0]
+		assert.Equal(t, "/foo", *d.URI)
+		assert.Equal(t, "query{ foo { bar } }", *d.Query)
+
+		expectedMethods := kong.StringSlice("GET")
+		assert.Equal(t, expectedMethods, d.Methods)
+	})
+
+	t.Run("create degraphql route - complex query", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/036-degraphql-routes/kong-complex-query.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, len(degraphqlRoutes))
+
+		d := degraphqlRoutes[0]
+
+		assert.Equal(t, "/search/posts", *d.URI)
+		expectedQuery := kong.String(complexQueryForDegraphqlRoute)
+		assert.Equal(t, expectedQuery, d.Query)
+
+		expectedMethods := kong.StringSlice("POST", "GET")
+		assert.Equal(t, expectedMethods, d.Methods)
+	})
+}
+
+func Test_Sync_CustomEntitiesFake(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+	ctx := context.Background()
+	err := sync(ctx, "testdata/sync/036-degraphql-routes/kong-fake.yaml")
+	require.Error(t, err)
+	assert.ErrorContains(t, err, "unknown entity type: fake-entity")
 }
