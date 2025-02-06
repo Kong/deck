@@ -6281,7 +6281,7 @@ func Test_Sync_LookupConsumerTags(t *testing.T) {
 // test scope:
 //   - 3.0.0+
 func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
-	runWhen(t, "kong", ">=3.0.0")
+	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -6568,7 +6568,7 @@ func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
 // test scope:
 //   - 3.5.0+
 func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
-	runWhen(t, "kong", ">=3.4.0")
+	runWhen(t, "enterprise", ">=3.4.0")
 	setup(t)
 
 	client, err := getTestClient()
