@@ -242,6 +242,12 @@ func fetchCurrentState(ctx context.Context, client *kong.Client,
 	dumpConfig deckDump.Config, t *testing.T,
 ) (*state.KongState, error) {
 	t.Helper()
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	controlPlaneName := os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+
+	if controlPlaneName != "" {
+		dumpConfig.KonnectControlPlane = controlPlaneName
+	}
 
 	rawState, err := deckDump.Get(ctx, client, dumpConfig)
 	if err != nil {

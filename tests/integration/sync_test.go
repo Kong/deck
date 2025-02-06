@@ -6944,7 +6944,6 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 }
 
 func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
-	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
 	runWhen(t, "konnect", "")
 	setup(t)
 
