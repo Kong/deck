@@ -1925,6 +1925,11 @@ const complexQueryForDegraphqlRoute = `query SearchPosts($filters: PostsFilters)
 }
 `
 
+const errorConsumerGroupPolicies = "a rate-limiting-advanced plugin with config.consumer_groups\n" +
+	"and/or config.enforce_consumer_groups was found. Please use Consumer Groups scoped\n" +
+	"Plugins when running against Kong Enterprise 3.4.0 and above.\n\n" +
+	"Check https://docs.konghq.com/gateway/latest/kong-enterprise/consumer-groups/ for more information"
+
 // test scope:
 //   - 1.4.3
 func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
@@ -1964,7 +1969,7 @@ func Test_Sync_ServicesRoutes_Till_1_4_3(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -2004,7 +2009,7 @@ func Test_Sync_ServicesRoutes_Till_1_5_1(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2044,7 +2049,7 @@ func Test_Sync_ServicesRoutes_From_2_0_5_To_2_1_4(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2091,7 +2096,7 @@ func Test_Sync_ServicesRoutes_From_2_2_1_to_2_6_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2133,7 +2138,7 @@ func Test_Sync_ServicesRoutes_From_2_6_9_Till_2_8_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2172,7 +2177,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2211,7 +2216,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2243,7 +2248,7 @@ func Test_Sync_BasicAuth_Plugin_1_4_3(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2275,7 +2280,7 @@ func Test_Sync_BasicAuth_Plugin_Earlier_Than_1_5_1(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2307,7 +2312,7 @@ func Test_Sync_BasicAuth_Plugin_1_5_1(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2354,7 +2359,7 @@ func Test_Sync_BasicAuth_Plugin_From_2_0_5_Till_2_8_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2386,7 +2391,7 @@ func Test_Sync_BasicAuth_Plugin_From_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2418,7 +2423,7 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2458,7 +2463,7 @@ func Test_Sync_Upstream_Target_Till_1_5_2(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -2506,7 +2511,7 @@ func Test_Sync_Upstream_Target_From_2x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2539,7 +2544,7 @@ func Test_Sync_Upstream_Target_From_30(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2572,7 +2577,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2605,7 +2610,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2646,7 +2651,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_2x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2679,7 +2684,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_30(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2712,7 +2717,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2745,7 +2750,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2782,7 +2787,7 @@ func Test_Sync_RateLimitingPlugin(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2823,7 +2828,7 @@ func Test_Sync_FillDefaults_Earlier_Than_1_5_1(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, ignoreFields)
+			testKongState(t, client, false, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -2859,7 +2864,7 @@ func Test_Sync_FillDefaults_From_2_0_5_To_2_1_4(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2902,7 +2907,7 @@ func Test_Sync_FillDefaults_From_2_2_1_to_2_6_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2940,7 +2945,7 @@ func Test_Sync_FillDefaults_From_2_6_9(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2974,7 +2979,7 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3008,7 +3013,7 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3111,7 +3116,7 @@ func Test_Sync_RBAC_2x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, "--rbac-resources-only"))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3214,7 +3219,7 @@ func Test_Sync_RBAC_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, "--rbac-resources-only"))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3245,7 +3250,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_2x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3276,7 +3281,7 @@ func Test_Sync_Create_Route_With_Service_Name_Reference_3x(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3312,7 +3317,7 @@ func Test_Sync_PluginsOnEntitiesTill_3_0_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3360,7 +3365,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3395,7 +3400,7 @@ func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3451,7 +3456,7 @@ func Test_Sync_PluginOrdering(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3625,7 +3630,7 @@ func Test_Sync_Vault(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
 			time.Sleep(time.Second * 5)
@@ -3714,7 +3719,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID(t *testing.T) {
 			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3756,7 +3761,7 @@ func Test_Sync_UpdateConsumerWithCustomID(t *testing.T) {
 			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3798,7 +3803,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3840,7 +3845,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3878,7 +3883,7 @@ func Test_Sync_ConsumerGroupsTill30(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3923,7 +3928,7 @@ func Test_Sync_ConsumerGroups_31(t *testing.T) {
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4006,7 +4011,7 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
 			time.Sleep(time.Second * 10)
@@ -4096,7 +4101,7 @@ func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 
-			testKongState(t, client, true, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4174,7 +4179,7 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4222,7 +4227,7 @@ func Test_Sync_SkipConsumers(t *testing.T) {
 			} else {
 				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4441,7 +4446,7 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 			} else {
 				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4612,7 +4617,7 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 			} else {
 				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4742,7 +4747,7 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 			require.NoError(t, err)
 
 			// Finally, check that the all entities exist and have the expected IDs.
-			testKongState(t, client, false, utils.KongRawState{
+			testKongState(t, client, false, false, utils.KongRawState{
 				Services:  []*kong.Service{expectedService},
 				Routes:    []*kong.Route{expectedRoute},
 				Consumers: []*kong.Consumer{expectedConsumer},
@@ -4776,7 +4781,7 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 	require.NoError(t, err)
 
 	// Finally, verify that the update was successful.
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Services: []*kong.Service{
 			{
 				Name: kong.String("s1"),
@@ -4825,7 +4830,7 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 	require.NoError(t, sync(context.Background(), afterConfig))
 
 	// Finally, verify that the update was successful.
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Services: []*kong.Service{
 			{
 				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
@@ -4866,7 +4871,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 		),
 	}
 
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Certificates: []*kong.Certificate{
 			{
 				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
@@ -4886,7 +4891,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 	err = sync(context.Background(), "testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
 	require.NoError(t, err)
 
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Certificates: []*kong.Certificate{
 			{
 				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
@@ -4917,7 +4922,7 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
 	require.NoError(t, err)
 
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Consumers: []*kong.Consumer{
 			{
 				ID:       kong.String("ce49186d-7670-445d-a218-897631b29ada"),
@@ -4943,7 +4948,7 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x-reverse-order.yaml")
 	require.NoError(t, err)
 
-	testKongState(t, client, false, utils.KongRawState{
+	testKongState(t, client, false, false, utils.KongRawState{
 		Consumers: []*kong.Consumer{
 			{
 				Username: kong.String("TestUser"),
@@ -5053,7 +5058,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
 			time.Sleep(time.Second * 10)
@@ -5347,7 +5352,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 
 			// Kong proxy may need a bit to be ready.
 			time.Sleep(time.Second * 10)
@@ -5517,7 +5522,7 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, true, tc.expectedState, ignoreFields)
+			testKongState(t, client, true, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
@@ -5618,7 +5623,7 @@ func Test_Sync_KonnectRename(t *testing.T) {
 			require.NoError(t, err)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, tc.flags...))
-			testKongState(t, client, true, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -5816,7 +5821,7 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 		},
 	}
 	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
-	testKongState(t, client, false, expectedState, nil)
+	testKongState(t, client, false, false, expectedState, nil)
 }
 
 // Test_Sync_LookupServicesTags tests that existing behavior when referencing
@@ -6009,12 +6014,12 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 	// - a consumer defined with another set of tags, ideally managed by an external process
 	// - the consumer -> consumer-group relationship, ideally managed by an external process
 	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/initial.yaml"))
-	testKongState(t, client, false, expectedState, nil)
+	testKongState(t, client, false, false, expectedState, nil)
 
 	// referencing the relationship in a file without the consumer would still work
 	// if default_lookup_tags are defined to pull consumers from upstream.
 	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml")) //nolint:lll
-	testKongState(t, client, false, expectedState, nil)
+	testKongState(t, client, false, false, expectedState, nil)
 }
 
 // test scope:
@@ -6075,7 +6080,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 
 	// re-sync again
 	require.NoError(t, sync(context.Background(), "testdata/sync/032-consumer-group-consumers-with-tags/initial.yaml"))
-	testKongState(t, client, false, expectedState, nil)
+	testKongState(t, client, false, false, expectedState, nil)
 }
 
 func Test_Sync_FilterChains(t *testing.T) {
@@ -6223,19 +6228,19 @@ func Test_Sync_FilterChains(t *testing.T) {
 
 			require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))
 
-			testKongState(t, client, false, state, nil)
+			testKongState(t, client, false, false, state, nil)
 
 			require.NoError(t, sync(context.Background(), tc.createFile))
 			tc.createState(&state)
-			testKongState(t, client, false, state, nil)
+			testKongState(t, client, false, false, state, nil)
 
 			require.NoError(t, sync(context.Background(), tc.updateFile))
 			tc.updateState(&state)
-			testKongState(t, client, false, state, nil)
+			testKongState(t, client, false, false, state, nil)
 
 			require.NoError(t, sync(context.Background(), tc.deleteFile))
 			tc.deleteState(&state)
-			testKongState(t, client, false, state, nil)
+			testKongState(t, client, false, false, state, nil)
 		})
 	}
 }
@@ -6305,4 +6310,369 @@ func Test_Sync_CustomEntitiesFake(t *testing.T) {
 	err := sync(ctx, "testdata/sync/036-degraphql-routes/kong-fake.yaml")
 	require.Error(t, err)
 	assert.ErrorContains(t, err, "unknown entity type: fake-entity")
+}
+
+// test scope:
+// Kong enterprise: >=3.4.0 <3.8.0
+func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_34x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.4.0 <3.8.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	expectedState := utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("foo"),
+			},
+		},
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					Name: kong.String("test-group"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("foo"),
+					},
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"limit":                  []any{float64(100)},
+							"retry_after_jitter_max": float64(0),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("fixed"),
+						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("776df478-37a9-4660-81b4-b4e951d76340"),
+						},
+					},
+				},
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Protocols: kong.StringSlice(
+					"grpc",
+					"grpcs",
+					"http",
+					"https",
+				),
+				Config: kong.Configuration{
+					"consumer_groups":         []any{string("test-group")},
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(true),
+					"error_code":              float64(429),
+					"error_message":           "API rate limit exceeded",
+					"header_name":             nil,
+					"hide_client_headers":     false,
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"namespace":               string("ZEz47TWgUrv01HenyQBQa8io06MWsp0L"),
+					"path":                    nil,
+					"redis": map[string]any{
+						"cluster_addresses":   nil,
+						"connect_timeout":     float64(2000),
+						"database":            float64(0),
+						"host":                string("127.0.0.1"),
+						"keepalive_backlog":   nil,
+						"keepalive_pool_size": float64(256),
+						"password":            nil,
+						"port":                float64(6379),
+						"read_timeout":        float64(2000),
+						"send_timeout":        float64(2000),
+						"sentinel_addresses":  nil,
+						"sentinel_master":     nil,
+						"sentinel_password":   nil,
+						"sentinel_role":       nil,
+						"sentinel_username":   nil,
+						"server_name":         nil,
+						"ssl":                 bool(false),
+						"ssl_verify":          bool(false),
+						"timeout":             float64(2000),
+						"username":            nil,
+					},
+					"retry_after_jitter_max": float64(0),
+					"strategy":               string("redis"),
+					"sync_rate":              float64(10),
+					"window_size":            []any{float64(60)},
+					"window_type":            string("fixed"),
+				},
+			},
+		},
+	}
+
+	t.Run("consumer-group policy overrides with info block in yaml file", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x.yaml"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = true", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml",
+			"--consumer-group-policy-overrides"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = false", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+}
+
+// test scope:
+// Kong enterprise: >=3.8.0 <3.9.0
+func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_38x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.8.0 <3.9.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	expectedState := utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("foo"),
+			},
+		},
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					Name: kong.String("test-group"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("foo"),
+					},
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"limit":                  []any{float64(100)},
+							"retry_after_jitter_max": float64(0),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("fixed"),
+						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("776df478-37a9-4660-81b4-b4e951d76340"),
+						},
+					},
+				},
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Protocols: kong.StringSlice(
+					"grpc",
+					"grpcs",
+					"http",
+					"https",
+				),
+				Config: kong.Configuration{
+					"consumer_groups":         []any{string("test-group")},
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(true),
+					"error_code":              float64(429),
+					"error_message":           "API rate limit exceeded",
+					"header_name":             nil,
+					"hide_client_headers":     false,
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"namespace":               string("ZEz47TWgUrv01HenyQBQa8io06MWsp0L"),
+					"path":                    nil,
+					"redis": map[string]any{
+						"cluster_addresses":        nil,
+						"cluster_max_redirections": float64(5),
+						"cluster_nodes":            nil,
+						"connect_timeout":          float64(2000),
+						"connection_is_proxied":    bool(false),
+						"database":                 float64(0),
+						"host":                     string("127.0.0.1"),
+						"keepalive_backlog":        nil,
+						"keepalive_pool_size":      float64(256),
+						"password":                 nil,
+						"port":                     float64(6379),
+						"read_timeout":             float64(2000),
+						"send_timeout":             float64(2000),
+						"sentinel_addresses":       nil,
+						"sentinel_master":          nil,
+						"sentinel_nodes":           nil,
+						"sentinel_password":        nil,
+						"sentinel_role":            nil,
+						"sentinel_username":        nil,
+						"server_name":              nil,
+						"ssl":                      bool(false),
+						"ssl_verify":               bool(false),
+						"timeout":                  float64(2000),
+						"username":                 nil,
+					},
+					"retry_after_jitter_max": float64(0),
+					"strategy":               string("redis"),
+					"sync_rate":              float64(10),
+					"window_size":            []any{float64(60)},
+					"window_type":            string("fixed"),
+				},
+			},
+		},
+	}
+
+	t.Run("consumer-group policy overrides with info block in yaml file", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x.yaml"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = true", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml",
+			"--consumer-group-policy-overrides"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = false", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+}
+
+// test scope:
+// Kong enterprise: >=3.9.0
+func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.9.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	expectedState := utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("foo"),
+			},
+		},
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					Name: kong.String("test-group"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("foo"),
+					},
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"limit":                  []any{float64(100)},
+							"retry_after_jitter_max": float64(0),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("fixed"),
+						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("776df478-37a9-4660-81b4-b4e951d76340"),
+						},
+					},
+				},
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Protocols: kong.StringSlice(
+					"grpc",
+					"grpcs",
+					"http",
+					"https",
+				),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         []any{string("test-group")},
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(true),
+					"error_code":              float64(429),
+					"error_message":           "API rate limit exceeded",
+					"header_name":             nil,
+					"hide_client_headers":     false,
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("ZEz47TWgUrv01HenyQBQa8io06MWsp0L"),
+					"path":                    nil,
+					"redis": map[string]any{
+						"cluster_addresses":        nil,
+						"cluster_max_redirections": float64(5),
+						"cluster_nodes":            nil,
+						"connect_timeout":          float64(2000),
+						"connection_is_proxied":    bool(false),
+						"database":                 float64(0),
+						"host":                     string("127.0.0.1"),
+						"keepalive_backlog":        nil,
+						"keepalive_pool_size":      float64(256),
+						"password":                 nil,
+						"port":                     float64(6379),
+						"read_timeout":             float64(2000),
+						"redis_proxy_type":         nil,
+						"send_timeout":             float64(2000),
+						"sentinel_addresses":       nil,
+						"sentinel_master":          nil,
+						"sentinel_nodes":           nil,
+						"sentinel_password":        nil,
+						"sentinel_role":            nil,
+						"sentinel_username":        nil,
+						"server_name":              nil,
+						"ssl":                      bool(false),
+						"ssl_verify":               bool(false),
+						"timeout":                  float64(2000),
+						"username":                 nil,
+					},
+					"retry_after_jitter_max": float64(0),
+					"strategy":               string("redis"),
+					"sync_rate":              float64(10),
+					"window_size":            []any{float64(60)},
+					"window_type":            string("fixed"),
+				},
+			},
+		},
+	}
+
+	t.Run("consumer-group policy overrides with info block in yaml file", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = true", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = false", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
 }

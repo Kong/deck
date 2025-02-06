@@ -182,14 +182,16 @@ func sortSlices(x, y interface{}) bool {
 }
 
 func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
-	expectedState utils.KongRawState, ignoreFields []cmp.Option,
+	isConsumerGroupPolicyOverrideSet bool, expectedState utils.KongRawState,
+	ignoreFields []cmp.Option,
 ) {
 	t.Helper()
 
 	// Get entities from Kong
 	ctx := context.Background()
 	dumpConfig := deckDump.Config{
-		CustomEntityTypes: []string{"degraphql_routes"},
+		CustomEntityTypes:                []string{"degraphql_routes"},
+		IsConsumerGroupPolicyOverrideSet: isConsumerGroupPolicyOverrideSet,
 	}
 	if expectedState.RBACEndpointPermissions != nil {
 		dumpConfig.RBACResourcesOnly = true
