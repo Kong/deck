@@ -200,7 +200,9 @@ configure Kong.`,
 			"If set to true, deck skips listing consumers with consumer-groups,\n"+
 			"thus gaining some performance with large configs. This flag is not valid with Konnect.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
-		false, "allow deck to dump consumer-group policy overrides.")
+		false, "allow deck to dump consumer-group policy overrides.\n"+
+			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
+			"Warning: do not mix with consumer-group scoped plugins")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+
