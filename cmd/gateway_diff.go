@@ -101,6 +101,10 @@ that will be created, updated, or deleted.
 		false, "do not diff CA certificates.")
 	diffCmd.Flags().BoolVar(&diffJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	diffCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
+		false, "allow deck to diff consumer-group policy overrides.\n"+
+			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
+			"Warning: do not mix with consumer-group scoped plugins")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }
