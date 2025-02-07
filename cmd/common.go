@@ -257,6 +257,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
+	dumpConfig.IsConsumerGroupPolicyOverrideSet = determinePolicyOverride(*targetContent, dumpConfig)
+
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
 		return err
@@ -418,6 +420,18 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
+}
+
+func determinePolicyOverride(targetContent file.Content, config dump.Config) bool {
+	if config.IsConsumerGroupPolicyOverrideSet {
+		return true
+	}
+
+	if targetContent.Info != nil && targetContent.Info.ConsumerGroupPolicyOverrides {
+		return targetContent.Info.ConsumerGroupPolicyOverrides
+	}
+
+	return false
 }
 
 func determineLookUpSelectorTagsConsumerGroups(targetContent file.Content) ([]string, error) {
