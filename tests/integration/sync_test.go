@@ -2173,7 +2173,7 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -2216,7 +2216,7 @@ func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, false, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2419,11 +2419,43 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.6.0")
+			runWhen(t, "kong", ">=3.6.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin",
+			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: plugin36,
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2573,7 +2605,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.1.0")
+			runWhen(t, "kong", ">=3.1.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -2610,7 +2642,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, false, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2713,7 +2745,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.1.0")
+			runWhen(t, "kong", ">=3.1.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -2750,7 +2782,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, false, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -2984,6 +3016,8 @@ func Test_Sync_SkipCACert_2x(t *testing.T) {
 	}
 }
 
+// test scope:
+// - >=3.0.0
 func Test_Sync_SkipCACert_3x(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -3009,11 +3043,47 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 			// ca_certificates first appeared in 1.3, but we limit to 2.7+
 			// here because the schema changed and the entities aren't the same
 			// across all versions, even though the skip functionality works the same.
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+// - konnect
+func Test_Sync_SkipCACert_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "syncing with --skip-ca-certificates should ignore CA certs",
+			kongFile: "testdata/sync/009-skip-ca-cert/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Services:       svc1_207,
+				CACertificates: []*kong.CACertificate{},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// ca_certificates first appeared in 1.3, but we limit to 2.7+
+			// here because the schema changed and the entities aren't the same
+			// across all versions, even though the skip functionality works the same.
+			runWhen(t, "konnect", "")
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.kongFile, "--skip-ca-certificates"))
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3400,7 +3470,7 @@ func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
-			testKongState(t, client, false, false, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3796,7 +3866,7 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			setup(t)
 
 			// set up initial state
@@ -3804,6 +3874,48 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_UpdateUsernameInConsumerWithCustomID_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/013-update-username-consumer-with-custom-id/kong3x.yaml",
+			kongFileInitial: "testdata/sync/013-update-username-consumer-with-custom-id/kong3x-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test_new"),
+						CustomID: kong.String("custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			setup(t)
+
+			// set up initial state
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
+			// update with desired final state
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -3838,7 +3950,7 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.0.0")
+			runWhen(t, "kong", ">=3.0.0")
 			setup(t)
 
 			// set up initial state
@@ -3846,6 +3958,48 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 			// update with desired final state
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_UpdateConsumerWithCustomID_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		kongFileInitial string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:            "update username on a consumer with custom_id",
+			kongFile:        "testdata/sync/014-update-consumer-with-custom-id/kong3x.yaml",
+			kongFileInitial: "testdata/sync/014-update-consumer-with-custom-id/kong3x-initial.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("test_consumer_3x"),
+						CustomID: kong.String("test_consumer_3x_custom_test"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			setup(t)
+
+			// set up initial state
+			require.NoError(t, sync(context.Background(), tc.kongFileInitial))
+			// update with desired final state
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4175,11 +4329,89 @@ func Test_Sync_PluginInstanceName(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhenKongOrKonnect(t, ">=3.2.0")
+			runWhen(t, "kong", ">=3.2.0")
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_PluginInstanceName_Konnect(t *testing.T) {
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name            string
+		kongFile        string
+		initialKongFile string
+		expectedState   utils.KongRawState
+	}{
+		{
+			name:     "create a plugin with instance_name",
+			kongFile: "testdata/sync/018-plugin-instance_name/kong-with-instance_name.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name:         kong.String("request-termination"),
+						InstanceName: kong.String("my-plugin"),
+						Protocols: []*string{
+							kong.String("grpc"),
+							kong.String("grpcs"),
+							kong.String("http"),
+							kong.String("https"),
+						},
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"status_code":  float64(200),
+							"echo":         false,
+							"content_type": nil,
+							"body":         nil,
+							"message":      nil,
+							"trigger":      nil,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "create a plugin without instance_name",
+			kongFile: "testdata/sync/018-plugin-instance_name/kong-without-instance_name.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: []*kong.Plugin{
+					{
+						Name: kong.String("request-termination"),
+						Protocols: []*string{
+							kong.String("grpc"),
+							kong.String("grpcs"),
+							kong.String("http"),
+							kong.String("https"),
+						},
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"status_code":  float64(200),
+							"echo":         false,
+							"content_type": nil,
+							"body":         nil,
+							"message":      nil,
+							"trigger":      nil,
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -4660,9 +4892,8 @@ var ignoreFieldsIrrelevantForIDsTests = []cmp.Option{
 
 // test scope:
 //   - 3.0.0+
-//   - konnect
 func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=3.0.0")
+	runWhen(t, "kong", ">=3.0.0")
 
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -4758,10 +4989,107 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 }
 
 // test scope:
-//   - 3.0.0+
 //   - konnect
+func Test_Sync_ChangingIDsWhileKeepingNames_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	// These are the IDs that should be present in Kong after the second sync in all cases.
+	var (
+		expectedServiceID  = kong.String("98076db2-28b6-423b-ba39-a797193017f7")
+		expectedRouteID    = kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b")
+		expectedConsumerID = kong.String("9a1e49a8-2536-41fa-a4e9-605bf218a4fa")
+	)
+
+	// These are the entities that should be present in Kong after the second sync in all cases.
+	var (
+		expectedService = &kong.Service{
+			Name: kong.String("s1"),
+			ID:   expectedServiceID,
+		}
+
+		expectedRoute = &kong.Route{
+			Name: kong.String("r1"),
+			ID:   expectedRouteID,
+			Service: &kong.Service{
+				ID: expectedServiceID,
+			},
+		}
+
+		expectedConsumer = &kong.Consumer{
+			Username: kong.String("c1"),
+			ID:       expectedConsumerID,
+		}
+
+		expectedPlugins = []*kong.Plugin{
+			{
+				Name: kong.String("rate-limiting"),
+				Route: &kong.Route{
+					ID: expectedRouteID,
+				},
+			},
+			{
+				Name: kong.String("rate-limiting"),
+				Service: &kong.Service{
+					ID: expectedServiceID,
+				},
+			},
+			{
+				Name: kong.String("rate-limiting"),
+				Consumer: &kong.Consumer{
+					ID: expectedConsumerID,
+				},
+			},
+		}
+	)
+
+	testCases := []struct {
+		name         string
+		beforeConfig string
+	}{
+		{
+			name:         "all entities have the same names, but different IDs",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/1-before.yaml",
+		},
+		{
+			name:         "service and consumer changed IDs, route did not",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/2-before.yaml",
+		},
+		{
+			name:         "route and consumer changed IDs, service did not",
+			beforeConfig: "testdata/sync/020-same-names-altered-ids/3-before.yaml",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			setup(t)
+
+			// First, create the entities with the original IDs.
+			err = sync(context.Background(), tc.beforeConfig)
+			require.NoError(t, err)
+
+			// Then, sync again with the same names, but different IDs.
+			err = sync(context.Background(), "testdata/sync/020-same-names-altered-ids/desired.yaml")
+			require.NoError(t, err)
+
+			// Finally, check that the all entities exist and have the expected IDs.
+			testKongState(t, client, true, false, utils.KongRawState{
+				Services:  []*kong.Service{expectedService},
+				Routes:    []*kong.Route{expectedRoute},
+				Consumers: []*kong.Consumer{expectedConsumer},
+				Plugins:   expectedPlugins,
+			}, ignoreFieldsIrrelevantForIDsTests)
+		})
+	}
+}
+
+// test scope:
+//   - 3.0.0+
 func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=3.0.0")
+	runWhen(t, "kong", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -4809,10 +5137,59 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 }
 
 // test scope:
-//   - 3.0.0+
 //   - konnect
+func Test_Sync_UpdateWithExplicitIDs_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	const (
+		beforeConfig = "testdata/sync/021-update-with-explicit-ids/before.yaml"
+		afterConfig  = "testdata/sync/021-update-with-explicit-ids/after.yaml"
+	)
+
+	// First, create entities with IDs assigned explicitly.
+	err = sync(context.Background(), beforeConfig)
+	require.NoError(t, err)
+
+	// Then, sync again, adding tags to every entity just to trigger an update.
+	err = sync(context.Background(), afterConfig)
+	require.NoError(t, err)
+
+	// Finally, verify that the update was successful.
+	testKongState(t, client, true, false, utils.KongRawState{
+		Services: []*kong.Service{
+			{
+				Name: kong.String("s1"),
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"),
+			},
+		},
+		Routes: []*kong.Route{
+			{
+				Name: kong.String("r1"),
+				ID:   kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+				Tags: kong.StringSlice("after"),
+				Service: &kong.Service{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("c1"),
+				Tags:     kong.StringSlice("after"),
+			},
+		},
+	}, ignoreFieldsIrrelevantForIDsTests)
+}
+
+// test scope:
+//   - 3.0.0+
 func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=3.0.0")
+	runWhen(t, "kong", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -4850,10 +5227,49 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 }
 
 // test scope:
-//   - 3.0.0+
 //   - konnect
+func Test_Sync_UpdateWithExplicitIDsWithNoNames_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	const (
+		beforeConfig = "testdata/sync/022-update-with-explicit-ids-with-no-names/before.yaml"
+		afterConfig  = "testdata/sync/022-update-with-explicit-ids-with-no-names/after.yaml"
+	)
+
+	// First, create entities with IDs assigned explicitly.
+	require.NoError(t, sync(context.Background(), beforeConfig))
+
+	// Then, sync again, adding tags to every entity just to trigger an update.
+	require.NoError(t, sync(context.Background(), afterConfig))
+
+	// Finally, verify that the update was successful.
+	testKongState(t, client, true, false, utils.KongRawState{
+		Services: []*kong.Service{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"),
+			},
+		},
+		Routes: []*kong.Route{
+			{
+				ID:   kong.String("97b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+				Tags: kong.StringSlice("after"),
+				Service: &kong.Service{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoreFieldsIrrelevantForIDsTests)
+}
+
+// test scope:
+//   - 3.0.0+
 func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=3.0.0")
+	runWhen(t, "kong", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -4910,10 +5326,68 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 }
 
 // test scope:
-//   - 3.0.0+
 //   - konnect
+func Test_Sync_CreateCertificateWithSNIs_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	err = sync(context.Background(), "testdata/sync/023-create-and-update-certificate-with-snis/initial.yaml")
+	require.NoError(t, err)
+
+	// To ignore noise, we ignore the Key and Cert fields because they are not relevant for this test.
+	ignoredFields := []cmp.Option{
+		cmpopts.IgnoreFields(
+			kong.Certificate{},
+			"Key",
+			"Cert",
+		),
+	}
+
+	testKongState(t, client, true, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("before"),
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+
+	err = sync(context.Background(), "testdata/sync/023-create-and-update-certificate-with-snis/update.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, true, false, utils.KongRawState{
+		Certificates: []*kong.Certificate{
+			{
+				ID:   kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				Tags: kong.StringSlice("after"), // Tag should be updated.
+			},
+		},
+		SNIs: []*kong.SNI{
+			{
+				Name: kong.String("example.com"),
+				Certificate: &kong.Certificate{
+					ID: kong.String("c75a775b-3a32-4b73-8e05-f68169c23941"),
+				},
+			},
+		},
+	}, ignoredFields)
+}
+
+// test scope:
+//   - 3.0.0+
 func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=3.0.0")
+	runWhen(t, "kong", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -4949,6 +5423,57 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 	require.NoError(t, err)
 
 	testKongState(t, client, false, false, utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("TestUser"),
+			},
+			{
+				Username: kong.String("OtherUser"),
+				CustomID: kong.String("TestUser"),
+			},
+		},
+	}, nil)
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_ConsumersWithCustomIDAndOrUsername_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, true, false, utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("ce49186d-7670-445d-a218-897631b29ada"),
+				Username: kong.String("Foo"),
+				CustomID: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("7820f383-7b77-4fcc-af7f-14ff3e256693"),
+				Username: kong.String("foo"),
+				CustomID: kong.String("bar"),
+			},
+			{
+				ID:       kong.String("18c62c3c-12cc-429a-8e5a-57f2c3691a6b"),
+				CustomID: kong.String("custom_id_only"),
+			},
+			{
+				ID:       kong.String("8ef278c9-48c1-43e1-b665-e9bc18fab4c8"),
+				Username: kong.String("username_only"),
+			},
+		},
+	}, nil)
+
+	err = sync(context.Background(), "testdata/sync/024-consumers-with-custom_id-and-username/kong3x-reverse-order.yaml")
+	require.NoError(t, err)
+
+	testKongState(t, client, true, false, utils.KongRawState{
 		Consumers: []*kong.Consumer{
 			{
 				Username: kong.String("TestUser"),
@@ -5755,10 +6280,8 @@ func Test_Sync_LookupConsumerTags(t *testing.T) {
 
 // test scope:
 //   - 3.0.0+
-//   - konnect
 func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
-	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -5822,6 +6345,76 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	}
 	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	testKongState(t, client, false, false, expectedState, nil)
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	expectedState := utils.KongRawState{
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("48df7cd3-1cd0-4e53-af73-8f57f257be18"),
+					Name: kong.String("cg1"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("bcb296c3-22bb-46f6-99c8-4828af750b77"),
+						CustomID: kong.String("foo"),
+					},
+				},
+			},
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("1a81dc83-5329-4666-8ae7-8a966e62d076"),
+					Name: kong.String("cg2"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("562bf5c7-a7d9-4338-84dd-2c1064fb7f67"),
+						Username: kong.String("foo"),
+					},
+				},
+			},
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("d140f9cc-227e-4872-8b0b-639f6922dfb0"),
+					Name: kong.String("cg3"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("7906968b-cd89-4a87-8dda-94678e7106b2"),
+						Username: kong.String("bar"),
+						CustomID: kong.String("custom_bar"),
+					},
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("bcb296c3-22bb-46f6-99c8-4828af750b77"),
+				CustomID: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("562bf5c7-a7d9-4338-84dd-2c1064fb7f67"),
+				Username: kong.String("foo"),
+			},
+			{
+				ID:       kong.String("7906968b-cd89-4a87-8dda-94678e7106b2"),
+				Username: kong.String("bar"),
+				CustomID: kong.String("custom_bar"),
+			},
+		},
+	}
+	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	testKongState(t, client, true, false, expectedState, nil)
 }
 
 // Test_Sync_LookupServicesTags tests that existing behavior when referencing
@@ -5974,10 +6567,8 @@ func Test_Sync_LookupConsumerGroupsTags(t *testing.T) {
 
 // test scope:
 //   - 3.5.0+
-//   - konnect
 func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
-	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
-	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
+	runWhen(t, "enterprise", ">=3.4.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -6020,6 +6611,55 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 	// if default_lookup_tags are defined to pull consumers from upstream.
 	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml")) //nolint:lll
 	testKongState(t, client, false, false, expectedState, nil)
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_ConsumerGroupConsumerFromUpstream_Konnect(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	expectedState := utils.KongRawState{
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					ID:   kong.String("c0f6c818-470c-4df7-8515-c8e904765fcc"),
+					Name: kong.String("group-1"),
+					Tags: kong.StringSlice("project:the-project", "managed-by:deck"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+						Username: kong.String("consumer-1"),
+						Tags:     kong.StringSlice("project:the-project", "managed-by:the-background-process"),
+					},
+				},
+			},
+		},
+		Consumers: []*kong.Consumer{
+			{
+				ID:       kong.String("97cab250-1b0a-4119-aa2e-0756e8931034"),
+				Username: kong.String("consumer-1"),
+				Tags:     kong.StringSlice("project:the-project", "managed-by:the-background-process"),
+			},
+		},
+	}
+
+	// simulate the following scenario:
+	// - a consumer-group defined with a set of tags, ideally managed by decK
+	// - a consumer defined with another set of tags, ideally managed by an external process
+	// - the consumer -> consumer-group relationship, ideally managed by an external process
+	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/initial.yaml"))
+	testKongState(t, client, true, false, expectedState, nil)
+
+	// referencing the relationship in a file without the consumer would still work
+	// if default_lookup_tags are defined to pull consumers from upstream.
+	require.NoError(t, sync(context.Background(), "testdata/sync/031-consumer-group-consumers-from-upstream/consumer-groups.yaml")) //nolint:lll
+	testKongState(t, client, true, false, expectedState, nil)
 }
 
 // test scope:
@@ -6253,7 +6893,59 @@ func Test_Sync_FilterChainsUnsupported(t *testing.T) {
 }
 
 func Test_Sync_DegraphqlRoutes(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"degraphql_routes"}}
+
+	t.Run("create degraphql route", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/036-degraphql-routes/kong.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, len(degraphqlRoutes))
+
+		d := degraphqlRoutes[0]
+		assert.Equal(t, "/foo", *d.URI)
+		assert.Equal(t, "query{ foo { bar } }", *d.Query)
+
+		expectedMethods := kong.StringSlice("GET")
+		assert.Equal(t, expectedMethods, d.Methods)
+	})
+
+	t.Run("create degraphql route - complex query", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/036-degraphql-routes/kong-complex-query.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, len(degraphqlRoutes))
+
+		d := degraphqlRoutes[0]
+
+		assert.Equal(t, "/search/posts", *d.URI)
+		expectedQuery := kong.String(complexQueryForDegraphqlRoute)
+		assert.Equal(t, expectedQuery, d.Query)
+
+		expectedMethods := kong.StringSlice("POST", "GET")
+		assert.Equal(t, expectedMethods, d.Methods)
+	})
+}
+
+func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhen(t, "konnect", "")
 	setup(t)
 
 	client, err := getTestClient()
