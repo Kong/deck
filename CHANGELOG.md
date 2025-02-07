@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.44.0](#v1440)
 - [v1.43.1](#v1431)
 - [v1.43.0](#v1430)
 - [v1.42.1](#v1421)
@@ -104,6 +105,24 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.44.0]
+> Release date: 2025/02/07
+
+### Added
+- Added support for consumer-group policy overrides in Kong Gateway
+version 3.4+ (until next major version is released). This is enabled
+via flag `--consumer-group-policy-overrides` in sync, diff and dump
+commands. Consumer-group policy overrides, though supported, are a
+deprecated feature in the Kong Gateway and users should consider
+moving to Consumer-group scoped plugins instead. Mixing of the two
+approaches should be avoided.
+[#1518](https://github.com/Kong/deck/pull/1518)
+[go-database-reconciler #191](https://github.com/Kong/go-database-reconciler/pull/191)
+- Added support for managing `degraphql_routes` via deck for both
+Kong Gateway and Konnect.
+[#1505](https://github.com/Kong/deck/pull/1505)
+[go-database-reconciler #154](https://github.com/Kong/go-database-reconciler/pull/154)
 
 ## [v1.43.1]
 > Release date: 2025/01/29
@@ -1978,6 +1997,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.44.0]: https://github.com/Kong/deck/compare/v1.43.1...v1.44.0
 [v1.43.1]: https://github.com/Kong/deck/compare/v1.43.0...v1.43.1
 [v1.43.0]: https://github.com/Kong/deck/compare/v1.42.1...v1.43.0
 [v1.42.1]: https://github.com/Kong/deck/compare/v1.42.0...v1.42.1
