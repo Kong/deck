@@ -107,7 +107,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.44.0]
-> Release date: 2025/02/07
+> Release date: 2025/02/10
 
 ### Added
 - Added support for consumer-group policy overrides in Kong Gateway
