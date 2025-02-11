@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.44.1](#v1441)
 - [v1.44.0](#v1440)
 - [v1.43.1](#v1431)
 - [v1.43.0](#v1430)
@@ -105,6 +106,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.44.1]
+> Release date: 2025/02/11
+
+### Fixed
+- Fixed issue coming with using deck against open-source Kong 
+gateways where operations were getting stuck due to 
+custom-entities support. Custom Entities are now gated to
+Enterprise gateways only.
+[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/202)
+[#1522](https://github.com/Kong/deck/pull/1522)
 
 ## [v1.44.0]
 > Release date: 2025/02/10
@@ -1997,6 +2009,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
 [v1.44.0]: https://github.com/Kong/deck/compare/v1.43.1...v1.44.0
 [v1.43.1]: https://github.com/Kong/deck/compare/v1.43.0...v1.43.1
 [v1.43.0]: https://github.com/Kong/deck/compare/v1.42.1...v1.43.0
