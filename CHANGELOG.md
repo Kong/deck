@@ -116,7 +116,7 @@ gateways where operations were getting stuck due to
 custom-entities support. Custom Entities are now gated to
 Enterprise gateways only.
 [go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/202)
-[#1522](https://github.com/Kong/deck/pull/1522)
+[#1525](https://github.com/Kong/deck/pull/1525)
 
 ## [v1.44.0]
 > Release date: 2025/02/10
