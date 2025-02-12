@@ -413,8 +413,8 @@ func ensureGetAllMethods() error {
 	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.RBACRoles); err != nil {
 		return err
 	}
-	if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.FilterChains); err != nil {
-		return err
-	}
+	// if _, err := reconcilerUtils.CallGetAll(dummyEmptyState.FilterChains); err != nil {
+	// 	return err
+	// }
 	return nil
 }

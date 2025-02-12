@@ -35,13 +35,13 @@ type ValidatorOpts struct {
 
 // Define a map of entity object field names and their corresponding string names
 var EntityMap = map[string]string{
-	"ACLGroups":               "acls",
-	"BasicAuths":              "basicauth_credentials",
-	"CACertificates":          "ca_certificates",
-	"Certificates":            "certificates",
-	"Consumers":               "consumers",
-	"Documents":               "documents",
-	"FilterChains":            "filter_chains",
+	"ACLGroups":      "acls",
+	"BasicAuths":     "basicauth_credentials",
+	"CACertificates": "ca_certificates",
+	"Certificates":   "certificates",
+	"Consumers":      "consumers",
+	"Documents":      "documents",
+	// "FilterChains":            "filter_chains",
 	"HMACAuths":               "hmacauth_credentials",
 	"JWTAuths":                "jwt_secrets",
 	"KeyAuths":                "keyauth_credentials",
