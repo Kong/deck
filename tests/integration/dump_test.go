@@ -450,3 +450,66 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
+	tests := []struct {
+		name          string
+		stateFile     string
+		expectedFile  string
+		errorExpected bool
+		errorString   string
+		runWhen       func(t *testing.T)
+	}{
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.4.0 <3.8.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong34x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.8.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.8.0 <3.9.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong38x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.8.0 <3.9.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.9.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.stateFile, "--consumer-group-policy-overrides"))
+
+			var (
+				output string
+				err    error
+			)
+
+			output, err = dump(
+				"--consumer-group-policy-overrides",
+				"-o", "-",
+			)
+
+			if tc.errorExpected {
+				assert.Equal(t, err.Error(), tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}

@@ -66,7 +66,7 @@ func Test_Reset_SkipCACert_2x(t *testing.T) {
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			reset(t, "--skip-ca-certificates")
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -100,13 +100,13 @@ func Test_Reset_SkipCACert_3x(t *testing.T) {
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			reset(t, "--skip-ca-certificates")
-			testKongState(t, client, false, tc.expectedState, nil)
+			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
 }
 
 func Test_Reset_ConsumerGroupConsumersWithCustomID(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -114,5 +114,17 @@ func Test_Reset_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 
 	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	reset(t)
-	testKongState(t, client, false, utils.KongRawState{}, nil)
+	testKongState(t, client, false, false, utils.KongRawState{}, nil)
+}
+
+func Test_Reset_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	reset(t)
+	testKongState(t, client, true, false, utils.KongRawState{}, nil)
 }
