@@ -48,6 +48,20 @@ func Test_Apply_3x(t *testing.T) {
 			expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
 			runWhen:       "enterprise",
 		},
+		{
+			name:          "accepts service foreign keys",
+			firstFile:     "testdata/apply/005-foreign-keys-services/service-01.yaml",
+			secondFile:    "testdata/apply/005-foreign-keys-services/plugin-01.yaml",
+			expectedState: "testdata/apply/005-foreign-keys-services/expected-state.yaml",
+			runWhen:       "kong",
+		},
+		{
+			name:          "accepts route foreign keys",
+			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
+			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
+			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
+			runWhen:       "kong",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -67,4 +81,29 @@ func Test_Apply_3x(t *testing.T) {
 			assert.Equal(t, expected, out)
 		})
 	}
+
+	t.Run("updates existing entities", func(t *testing.T) {
+		runWhen(t, "kong", ">=3.0.0")
+		setup(t)
+
+		err := apply(context.Background(), "testdata/apply/007-update-existing-entity/service-01.yaml")
+		require.NoError(t, err, "failed to apply service-01")
+
+		out, err := dump()
+		require.NoError(t, err)
+		expectedOriginal, err := readFile("testdata/apply/007-update-existing-entity/expected-state-01.yaml")
+		require.NoError(t, err, "failed to read expected state")
+
+		assert.Equal(t, expectedOriginal, out)
+
+		err = apply(context.Background(), "testdata/apply/007-update-existing-entity/service-02.yaml")
+		require.NoError(t, err, "failed to apply service-02")
+
+		expectedChanged, err := readFile("testdata/apply/007-update-existing-entity/expected-state-02.yaml")
+		require.NoError(t, err, "failed to read expected state")
+
+		outChanged, err := dump()
+		require.NoError(t, err)
+		assert.Equal(t, expectedChanged, outChanged)
+	})
 }
