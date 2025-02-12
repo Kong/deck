@@ -10,6 +10,7 @@ on:
   push:
     branches:
     - main
+    - check/ci-should-fail
   pull_request: {}
 
 jobs:
