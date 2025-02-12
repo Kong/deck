@@ -1,0 +1,14 @@
+_format_version: "1.1"
+consumer_groups:
+- name: gold
+  tags:
+  - tag1
+  - tag2
+- name: silver
+  tags:
+  - tag1
+  - tag3
+consumers:
+- username: bar
+- username: baz
+- username: foo

@@ -5,10 +5,12 @@ run:
 linters:
   enable:
     - asciicheck
+    - copyloopvar
     - dogsled
     - durationcheck
+    - errcheck
+    - errorlint
     - exhaustive
-    - copyloopvar
     - gci
     - goconst
     - gofmt
@@ -16,24 +18,23 @@ linters:
     - goimports
     - gomodguard
     - gosec
+    - gosimple
     - govet
     - importas
     - lll
-    - gosimple
-    - staticcheck
-    - unused
     - misspell
     - nakedret
     - nilerr
     - nolintlint
-    - predeclared
     - prealloc
+    - predeclared
     - revive
+    - staticcheck
     - stylecheck
     - unconvert
     - unparam
+    - unused
     - wastedassign
-    - errorlint
 issues:
   max-same-issues: 0
   exclude-rules:
@@ -48,10 +49,6 @@ issues:
     - linters:
         - gosec
       text: "weak random number generator"
-      path: _test\.go
-    - linters:
-        - errcheck
-      text: "Error return value" # ignore err not checked in test files
       path: _test\.go
     - linters:
         - gosec
