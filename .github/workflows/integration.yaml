@@ -38,6 +38,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+          cache: false
       - name: Setup Kong
         run: make setup-kong
       - name: Run integration tests
