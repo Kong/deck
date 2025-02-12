@@ -1,0 +1,28 @@
+_format_version: "3.0"
+routes:
+- https_redirect_status_code: 426
+  name: example-route
+  path_handling: v0
+  paths:
+  - /mock
+  plugins:
+  - config:
+      body: null
+      content_type: null
+      echo: false
+      message: null
+      status_code: 404
+      trigger: null
+    enabled: true
+    name: request-termination
+    protocols:
+    - http
+    - https
+  preserve_host: false
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: true
