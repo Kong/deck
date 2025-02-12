@@ -31,6 +31,10 @@ generate-cli-docs:
 setup-kong:
 	bash .ci/setup_kong.sh
 
+.PHONY: setup-kong-new
+setup-kong:
+	bash .ci/setup_kong_check.sh
+
 .PHONY: setup-kong-ee
 setup-kong-ee:
 	bash .ci/setup_kong_ee.sh
