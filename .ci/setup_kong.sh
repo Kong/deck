@@ -24,3 +24,5 @@ docker run \
     "$KONG_IMAGE"
 
 waitContainer "$GATEWAY_CONTAINER_NAME" kong health
+
+waitContainer "$GATEWAY_CONTAINER_NAME" kong version
