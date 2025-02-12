@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -48,6 +49,10 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	if inKonnectMode(nil) {
+		if dumpConfig.SkipConsumersWithConsumerGroups {
+			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
+		}
+
 		_ = sendAnalytics("dump", "", modeKonnect)
 		return dumpKonnectV2(ctx)
 	}
@@ -88,12 +93,13 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 			}
 
 			if err := file.KongStateToFile(ks, file.WriteConfig{
-				SelectTags:  dumpConfig.SelectorTags,
-				Workspace:   workspace,
-				Filename:    workspace,
-				FileFormat:  format,
-				WithID:      dumpWithID,
-				KongVersion: kongVersion,
+				SelectTags:                       dumpConfig.SelectorTags,
+				Workspace:                        workspace,
+				Filename:                         workspace,
+				FileFormat:                       format,
+				WithID:                           dumpWithID,
+				KongVersion:                      kongVersion,
+				IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
 			}); err != nil {
 				return err
 			}
@@ -127,12 +133,13 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("building state: %w", err)
 	}
 	return file.KongStateToFile(ks, file.WriteConfig{
-		SelectTags:  dumpConfig.SelectorTags,
-		Workspace:   dumpWorkspace,
-		Filename:    dumpCmdKongStateFile,
-		FileFormat:  format,
-		WithID:      dumpWithID,
-		KongVersion: kongVersion,
+		SelectTags:                       dumpConfig.SelectorTags,
+		Workspace:                        dumpWorkspace,
+		Filename:                         dumpCmdKongStateFile,
+		FileFormat:                       format,
+		WithID:                           dumpWithID,
+		KongVersion:                      kongVersion,
+		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
 	})
 }
 
@@ -188,6 +195,14 @@ configure Kong.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not dump CA certificates.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
+		false, "do not show the association between consumer and consumer-group.\n"+
+			"If set to true, deck skips listing consumers with consumer-groups,\n"+
+			"thus gaining some performance with large configs. This flag is not valid with Konnect.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
+		false, "allow deck to dump consumer-group policy overrides.\n"+
+			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
+			"Warning: do not mix with consumer-group scoped plugins")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+

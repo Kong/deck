@@ -18,7 +18,7 @@ var syncCmdKongStateFile []string
 
 func executeSync(cmd *cobra.Command, _ []string) error {
 	return syncMain(cmd.Context(), syncCmdKongStateFile, false,
-		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput)
+		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
 }
 
 // newSyncCmd represents the sync command
@@ -96,6 +96,10 @@ to get Kong's state in sync with the input state.`,
 			"See `db_update_propagation` in kong.conf.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not sync CA certificates.")
+	syncCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
+		false, "allow deck to sync consumer-group policy overrides.\n"+
+			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
+			"Warning: do not mix with consumer-group scoped plugins")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(syncCmd.Flags())

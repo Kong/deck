@@ -114,7 +114,7 @@ func populateKICUpstreamPolicy(
 	// Create KongUpstreamPolicy
 	kongUpstreamPolicy := configurationv1beta1.KongUpstreamPolicy{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: KICAPIVersionV1Beta1,
+			APIVersion: ConfigurationKongHQv1beta1,
 			Kind:       UpstreamPolicyKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
@@ -127,7 +127,7 @@ func populateKICUpstreamPolicy(
 	if k8sService.ObjectMeta.Annotations == nil {
 		k8sService.ObjectMeta.Annotations = make(map[string]string)
 	}
-	k8sService.ObjectMeta.Annotations["konghq.com/upstream-policy"] = kongUpstreamPolicy.ObjectMeta.Name
+	k8sService.ObjectMeta.Annotations[KongHQUpstreamPolicy] = kongUpstreamPolicy.ObjectMeta.Name
 
 	// Populate the Upstream Policy Spec
 	populateKongUpstreamPolicySpec(upstream, &kongUpstreamPolicy)
@@ -204,8 +204,8 @@ func populateKICUpstream(
 	// Create KongIngress
 	kongIngress := configurationv1.KongIngress{
 		TypeMeta: metav1.TypeMeta{
-			APIVersion: KICAPIVersion,
-			Kind:       IngressKind,
+			APIVersion: ConfigurationKongHQv1,
+			Kind:       KongIngressKind,
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        calculateSlug(*service.Name + "-upstream"),
@@ -233,7 +233,7 @@ func populateKICUpstream(
 	if k8sService.ObjectMeta.Annotations == nil {
 		k8sService.ObjectMeta.Annotations = make(map[string]string)
 	}
-	k8sService.ObjectMeta.Annotations["konghq.com/override"] = kongIngress.ObjectMeta.Name
+	k8sService.ObjectMeta.Annotations[KongHQOverride] = kongIngress.ObjectMeta.Name
 
 	// Add tags to annotations
 	addTagsToAnnotations(upstream.Tags, kongIngress.ObjectMeta.Annotations)

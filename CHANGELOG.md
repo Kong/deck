@@ -1,5 +1,11 @@
 # Table of Contents
 
+- [v1.44.1](#v1441)
+- [v1.44.0](#v1440)
+- [v1.43.1](#v1431)
+- [v1.43.0](#v1430)
+- [v1.42.1](#v1421)
+- [v1.42.0](#v1420)
 - [v1.41.4](#v1414)
 - [v1.41.3](#v1413)
 - [v1.41.2](#v1412)
@@ -100,6 +106,126 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.44.1]
+> Release date: 2025/02/11
+
+### Fixed
+- Fixed issue coming with using deck against open-source Kong 
+gateways where operations were getting stuck due to 
+custom-entities support. Custom Entities are now gated to
+Enterprise gateways only.
+[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/202)
+[#1525](https://github.com/Kong/deck/pull/1525)
+
+## [v1.44.0]
+> Release date: 2025/02/10
+
+### Added
+- Added support for consumer-group policy overrides in Kong Gateway
+version 3.4+ (until next major version is released). This is enabled
+via flag `--consumer-group-policy-overrides` in sync, diff and dump
+commands. Consumer-group policy overrides, though supported, are a
+deprecated feature in the Kong Gateway and users should consider
+moving to Consumer-group scoped plugins instead. Mixing of the two
+approaches should be avoided.
+[#1518](https://github.com/Kong/deck/pull/1518)
+[go-database-reconciler #191](https://github.com/Kong/go-database-reconciler/pull/191)
+- Added support for managing `degraphql_routes` via deck for both
+Kong Gateway and Konnect.
+[#1505](https://github.com/Kong/deck/pull/1505)
+[go-database-reconciler #154](https://github.com/Kong/go-database-reconciler/pull/154)
+
+## [v1.43.1]
+> Release date: 2025/01/29
+
+### Fixed
+- The `deck gateway apply` command added in v1.43.0 added additional
+HTTP calls to discover which functions are enabled. This does not work 
+well when using an RBAC user with restricted permissions. This change 
+removes those additional checks and delegates the lookup of foreign 
+keys for partial applications to `go-database-reconciler`.
+[#1508](https://github.com/Kong/deck/pull/1508)
+[go-database-reconciler #182](https://github.com/Kong/go-database-reconciler/pull/182)
+
+## [v1.43.0]
+> Release date: 2025/01/23
+
+### Added
+- Added `deck gateway apply` command that allows users 
+to apply partial configuration to a running Gateway instance.
+[#1459](https://github.com/Kong/deck/pull/1459)
+[go-database-reconciler #143](https://github.com/Kong/go-database-reconciler/pull/143)
+- Added support for private link global api endpoint for Konnect.
+[#1500](https://github.com/Kong/deck/pull/1500)
+[go-database-reconciler #165](https://github.com/Kong/go-database-reconciler/pull/165)
+- Added flag `--skip-consumers-with-consumer-groups` for
+`deck gateway dump` command. If set to true, deck skips listing 
+consumers with consumer-groups, thus gaining some performance 
+with large configs. It is not valid for Konnect.
+[#1486](https://github.com/Kong/deck/pull/1486)
+
+### Fixed
+- Adjusted multiline string formatting in terraform resource generation.
+[#1482](https://github.com/Kong/deck/pull/1482)
+- Improved error messaging when mandatory flag is missing in 
+`deck file convert`. [#1487](https://github.com/Kong/deck/pull/1487)
+- Fixed `deck gateway dump` command that was missing associations
+between consumer-groups and consumers.
+[#1486](https://github.com/Kong/deck/pull/1486)
+[go-database-reconciler #159](https://github.com/Kong/go-database-reconciler/pull/159)
+[go-kong #494](https://github.com/Kong/go-kong/pull/494)
+- Added checks for all conflicting nested configs in plugins. 
+A foreign key nested under a plugin of a different scope would error out. 
+This would make sure that a sync does not go through 
+when wrong configurations are passed via deck.
+[go-database-reconciler #157](https://github.com/Kong/go-database-reconciler/pull/157)
+- Fixed req-validator config generation while using 
+`deck file openapi2kong` command when both body and param schema 
+are empty. [#1501](https://github.com/Kong/deck/pull/1501)
+[go-apiops #244](https://github.com/Kong/go-apiops/pull/244)
+- Fixed tags retention on entities while using select-tags.
+[#1500](https://github.com/Kong/deck/pull/1500)
+[go-database-reconciler #156](https://github.com/Kong/go-database-reconciler/pull/156)
+
+
+## [v1.42.1]
+> Release date: 2024/12/24
+
+### Fixed
+- Updated `golang.org/x/net` to version `v0.33.0` to account for
+vulnerability [CVE-2024-45338](https://avd.aquasec.com/nvd/2024/cve-2024-45338/)
+[#1481](https://github.com/Kong/deck/pull/1481)
+
+## [v1.42.0]
+> Release date: 2024/12/13
+
+### Added
+- Added a new flag `--online-entities-list` to validate the specified entities
+via `deck gateway validate` command.
+[#1458](https://github.com/Kong/deck/pull/1458)
+- Added feature to ignore entities tagged with `konnect-managed` during
+deck dump, sync and diff. This is valid for Konnect entities only.
+[#1478](https://github.com/Kong/deck/pull/1478)
+[go-database-reconciler #153](https://github.com/Kong/go-database-reconciler/pull/153)
+- Improved speed for deck sync/diff operations involving consumer-groups 
+for gw 3.9+. The underlying API call to `GET /consumer_group` is called
+with query parameter `list_consumers=false`, making it faster for deck
+to deal with cases where a consumer-group holds many consumers.
+(#1475)[https://github.com/Kong/deck/pull/1475]
+(go-kong #487)[https://github.com/Kong/go-kong/pull/487]
+
+
+### Fixes
+- Fixed issue where tags were not getting propagated to consumer-group plugins.
+[#1478](https://github.com/Kong/deck/pull/1458)
+[go-database-reconciler #151](https://github.com/Kong/go-database-reconciler/pull/151)
+[go-kong #485](https://github.com/Kong/go-kong/pull/485)
+- Enhanced help message for generate-imports-for-control-plane-id flag
+[#1448](https://github.com/Kong/deck/pull/1448)
+- Restored to using Gateway API generation in `deck file kong2kic`, rather than
+Ingress API
+[#1431](https://github.com/Kong/deck/pull/1431)
 
 ## [v1.41.4]
 > Release date: 2024/11/26
@@ -1883,6 +2009,12 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
+[v1.44.0]: https://github.com/Kong/deck/compare/v1.43.1...v1.44.0
+[v1.43.1]: https://github.com/Kong/deck/compare/v1.43.0...v1.43.1
+[v1.43.0]: https://github.com/Kong/deck/compare/v1.42.1...v1.43.0
+[v1.42.1]: https://github.com/Kong/deck/compare/v1.42.0...v1.42.1
+[v1.42.0]: https://github.com/Kong/deck/compare/v1.41.4...v1.42.0
 [v1.41.4]: https://github.com/Kong/deck/compare/v1.41.3...v1.41.4
 [v1.41.3]: https://github.com/Kong/deck/compare/v1.41.2...v1.41.3
 [v1.41.2]: https://github.com/Kong/deck/compare/v1.41.1...v1.41.2

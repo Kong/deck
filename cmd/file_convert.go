@@ -113,6 +113,22 @@ into another compatible format. For example, a configuration for 'kong-gateway-2
 can be converted into a 'kong-gateway-3.x' configuration file.`,
 		Args: validateNoArgs,
 		RunE: execute,
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			validSourceFormats := []string{string(convert.FormatKongGateway), string(convert.FormatKongGateway2x)}
+			validDestinationFormats := []string{string(convert.FormatKonnect), string(convert.FormatKongGateway3x)}
+
+			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats, "")
+			if err != nil {
+				return err
+			}
+
+			err = validateInputFlag("to", convertCmdDestinationFormat, validDestinationFormats, "")
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
 	}
 
 	sourceFormats := []convert.Format{convert.FormatKongGateway, convert.FormatKongGateway2x}

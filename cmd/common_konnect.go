@@ -91,9 +91,7 @@ func GetKongClientForKonnectMode(
 
 	// set the kong control plane ID in the client
 	konnectClient.SetRuntimeGroupID(cpID)
-	konnectAddress = konnectConfig.Address + "/konnect-api/api/runtime_groups/" + cpID
-	// TODO: replace the above with the following once the Konnect API is updated
-	// konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID
+	konnectAddress = konnectConfig.Address + "/v2/control-planes/" + cpID + "/core-entities"
 
 	// initialize kong client
 	return utils.GetKongClient(utils.KongClientConfig{
@@ -127,7 +125,7 @@ func resetKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput)
+	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
 	if err != nil {
 		return err
 	}
@@ -247,6 +245,7 @@ func syncKonnect(ctx context.Context,
 	}
 
 	stats, errs, _ := s.Solve(ctx, parallelism, dry, false)
+
 	// print stats before error to report completed operations
 	printStats(stats)
 	if errs != nil {

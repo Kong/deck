@@ -24,6 +24,7 @@ jobs:
         - 'kong/kong-gateway:3.6'
         - 'kong/kong-gateway:3.7'
         - 'kong/kong-gateway:3.8'
+        - 'kong/kong-gateway:3.9'
         - 'kong/kong-gateway-dev:latest'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
