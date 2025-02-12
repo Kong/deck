@@ -24,6 +24,7 @@ jobs:
         - 'kong:3.6'
         - 'kong:3.7'
         - 'kong:3.8'
+        - 'kong:3.9'
         - 'kong/kong:master'
     env:
       KONG_ANONYMOUS_REPORTS: "off"

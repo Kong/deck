@@ -9,6 +9,8 @@ jobs:
   goreleaser:
     timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +38,8 @@ jobs:
   build-push-images:
     timeout-minutes: 120
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Add standard tags
         run: |
@@ -55,8 +59,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME_JAN_2025 }}
+          password: ${{ secrets.DOCKER_TOKEN_JAN_2025 }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5.6.1

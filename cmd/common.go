@@ -25,7 +25,6 @@ import (
 const exitCodeDiffDetection = 2
 
 var (
-	dumpConfig   dump.Config
 	assumeYes    bool
 	noMaskValues bool
 )
@@ -37,6 +36,13 @@ const (
 	modeKong
 	modeKongEnterprise
 	modeLocal
+)
+
+type ApplyType int
+
+const (
+	ApplyTypeFull ApplyType = iota
+	ApplyTypePartial
 )
 
 var jsonOutput diff.JSONOutputObject
@@ -131,7 +137,7 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 }
 
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool,
+	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
 ) error {
 	// read target file
 	if enableJSONOutput {
@@ -157,6 +163,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	cmd := "sync"
+	if applyType == ApplyTypePartial {
+		cmd = "apply"
+		dumpConfig.IsPartialApply = true
+	} else {
+		// Explicitly set this here as dumpConfig is a global var
+		dumpConfig.IsPartialApply = false
+	}
+
 	if dry {
 		cmd = "diff"
 	}
@@ -242,6 +256,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 	}
+
+	dumpConfig.IsConsumerGroupPolicyOverrideSet = determinePolicyOverride(*targetContent, dumpConfig)
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
@@ -373,7 +389,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	totalOps, err := performDiff(
-		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect, enableJSONOutput)
+		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect,
+		enableJSONOutput, applyType,
+	)
 	if err != nil {
 		if enableJSONOutput {
 			var errs reconcilerUtils.ErrArray
@@ -402,6 +420,18 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
+}
+
+func determinePolicyOverride(targetContent file.Content, config dump.Config) bool {
+	if config.IsConsumerGroupPolicyOverrideSet {
+		return true
+	}
+
+	if targetContent.Info != nil && targetContent.Info.ConsumerGroupPolicyOverrides {
+		return targetContent.Info.ConsumerGroupPolicyOverrides
+	}
+
+	return false
 }
 
 func determineLookUpSelectorTagsConsumerGroups(targetContent file.Content) ([]string, error) {
@@ -502,8 +532,10 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool,
+	enableJSONOutput bool, applyType ApplyType,
 ) (int, error) {
+	shouldSkipDeletes := applyType == ApplyTypePartial
+
 	s, err := diff.NewSyncer(diff.SyncerOpts{
 		CurrentState:  currentState,
 		TargetState:   targetState,
@@ -511,6 +543,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		StageDelaySec: delay,
 		NoMaskValues:  noMaskValues,
 		IsKonnect:     isKonnect,
+		NoDeletes:     shouldSkipDeletes,
 	})
 	if err != nil {
 		return 0, err

@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ func Test_Dump_SelectTags_30(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			output, err := dump(
 				"--select-tag", "managed-by-deck",
@@ -67,7 +68,7 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			output, err := dump(
 				"--select-tag", "managed-by-deck",
@@ -153,7 +154,7 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			tc.runWhen(t)
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -203,7 +204,7 @@ func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -256,7 +257,7 @@ func Test_Dump_KonnectRename(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -279,7 +280,7 @@ func Test_Dump_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
 
-	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 
 	var output string
 	flags := []string{"-o", "-", "--with-id"}
@@ -295,7 +296,7 @@ func Test_Dump_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
 	runWhen(t, "konnect", "")
 	setup(t)
 
-	require.NoError(t, sync("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
+	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 
 	var output string
 	flags := []string{"-o", "-", "--with-id"}
@@ -331,7 +332,7 @@ func Test_Dump_FilterChains(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.version, func(t *testing.T) {
 			runWhen(t, "kong", tc.version)
-			require.NoError(t, sync(tc.input))
+			require.NoError(t, sync(context.Background(), tc.input))
 
 			var output string
 			flags := []string{"-o", "-"}
@@ -419,7 +420,7 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 			tc.runWhen(t)
 			setup(t)
 
-			assert.NoError(t, sync(tc.stateFile))
+			assert.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -445,6 +446,69 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 
 			expected, err := readFile(tc.expectedFile)
 			assert.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
+	tests := []struct {
+		name          string
+		stateFile     string
+		expectedFile  string
+		errorExpected bool
+		errorString   string
+		runWhen       func(t *testing.T)
+	}{
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.4.0 <3.8.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong34x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.8.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.8.0 <3.9.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong38x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.8.0 <3.9.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.9.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.stateFile, "--consumer-group-policy-overrides"))
+
+			var (
+				output string
+				err    error
+			)
+
+			output, err = dump(
+				"--consumer-group-policy-overrides",
+				"-o", "-",
+			)
+
+			if tc.errorExpected {
+				assert.Equal(t, err.Error(), tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}

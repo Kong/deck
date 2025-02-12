@@ -13,6 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/require"
@@ -181,13 +182,17 @@ func sortSlices(x, y interface{}) bool {
 }
 
 func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
-	expectedState utils.KongRawState, ignoreFields []cmp.Option,
+	isConsumerGroupPolicyOverrideSet bool, expectedState utils.KongRawState,
+	ignoreFields []cmp.Option,
 ) {
 	t.Helper()
 
 	// Get entities from Kong
 	ctx := context.Background()
-	dumpConfig := deckDump.Config{}
+	dumpConfig := deckDump.Config{
+		CustomEntityTypes:                []string{"degraphql_routes"},
+		IsConsumerGroupPolicyOverrideSet: isConsumerGroupPolicyOverrideSet,
+	}
 	if expectedState.RBACEndpointPermissions != nil {
 		dumpConfig.RBACResourcesOnly = true
 	}
@@ -233,6 +238,28 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	}
 }
 
+func fetchCurrentState(ctx context.Context, client *kong.Client,
+	dumpConfig deckDump.Config, t *testing.T,
+) (*state.KongState, error) {
+	t.Helper()
+	controlPlaneName := os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME")
+
+	if controlPlaneName != "" {
+		dumpConfig.KonnectControlPlane = controlPlaneName
+	}
+
+	rawState, err := deckDump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	currentState, err := state.Get(rawState)
+	if err != nil {
+		return nil, err
+	}
+	return currentState, nil
+}
+
 func reset(t *testing.T, opts ...string) {
 	t.Helper()
 
@@ -266,14 +293,24 @@ func setup(t *testing.T) {
 	})
 }
 
-func sync(kongFile string, opts ...string) error {
+func apply(ctx context.Context, kongFile string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "apply", kongFile}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(ctx)
+}
+
+func sync(ctx context.Context, kongFile string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "sync", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}
 	deckCmd.SetArgs(args)
-	return deckCmd.ExecuteContext(context.Background())
+	return deckCmd.ExecuteContext(ctx)
 }
 
 func diff(kongFile string, opts ...string) (string, error) {

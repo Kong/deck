@@ -97,7 +97,7 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 		if err != nil {
 			return err
 		}
-		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false, resetJSONOutput)
+		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false, resetJSONOutput, ApplyTypeFull)
 		if err != nil {
 			return err
 		}

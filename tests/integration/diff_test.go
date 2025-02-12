@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -538,7 +539,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile)
 			assert.NoError(t, err)
@@ -555,7 +556,7 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
 			assert.NoError(t, err)
@@ -590,7 +591,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile)
 			assert.NoError(t, err)
@@ -606,7 +607,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
 			assert.NoError(t, err)
@@ -622,7 +623,7 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
 			assert.NoError(t, err)
@@ -657,7 +658,7 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value")
 			assert.NoError(t, err)
@@ -673,7 +674,7 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
 			assert.NoError(t, err)
@@ -708,7 +709,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value")
 			assert.NoError(t, err)
@@ -724,7 +725,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
 			assert.NoError(t, err)
@@ -740,7 +741,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(tc.initialStateFile))
+			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
 			assert.NoError(t, err)
@@ -775,7 +776,7 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 
 			// test that the diff command does not return any changes when
 			// array fields are not sorted.
-			assert.NoError(t, sync(tc.stateFile, "--timeout", "60"))
+			assert.NoError(t, sync(context.Background(), tc.stateFile, "--timeout", "60"))
 
 			out, err := diff(tc.stateFile)
 			assert.NoError(t, err)
@@ -794,7 +795,7 @@ func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
 	// test that the diff command does not return any changes when
 	// target is a compressed IPv6.
 	stateFile := "testdata/diff/005-no-diff-target/kong.yaml"
-	assert.NoError(t, sync(stateFile))
+	assert.NoError(t, sync(context.Background(), stateFile))
 
 	out, err := diff(stateFile)
 	assert.NoError(t, err)
