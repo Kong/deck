@@ -116,7 +116,6 @@
 vulnerability [CVE-2022-28948](https://github.com/advisories/GHSA-hp87-p4gw-j4gq)
 [#1497](https://github.com/Kong/deck/pull/1497)
 
-
 ## [v1.44.1]
 > Release date: 2025/02/11
 
