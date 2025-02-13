@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.44.2](#v1442)
 - [v1.44.1](#v1441)
 - [v1.44.0](#v1440)
 - [v1.43.1](#v1431)
@@ -106,6 +107,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.44.2]
+> Release date: 2025/02/13
+
+### Fixed
+- Updated `golang` to version `v1.23.5` to account for
+vulnerability [CVE-2022-28948](https://github.com/advisories/GHSA-hp87-p4gw-j4gq)
+[#1497](https://github.com/Kong/deck/pull/1497)
+
 
 ## [v1.44.1]
 > Release date: 2025/02/11
@@ -2009,6 +2019,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.44.2]: https://github.com/Kong/deck/compare/v1.44.1...v1.44.2
 [v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
 [v1.44.0]: https://github.com/Kong/deck/compare/v1.43.1...v1.44.0
 [v1.43.1]: https://github.com/Kong/deck/compare/v1.43.0...v1.43.1
