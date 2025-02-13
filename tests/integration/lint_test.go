@@ -7,8 +7,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	"github.com/stretchr/testify/assert"
 	"sigs.k8s.io/yaml"
@@ -152,13 +150,9 @@ func Test_LintStructured(t *testing.T) {
 				assert.NoError(t, err)
 			}
 
-			cmpOpts := []cmp.Option{
-				cmpopts.SortSlices(func(a, b cmd.LintResult) bool { return a.Line < b.Line }),
-				cmpopts.EquateEmpty(),
-			}
-			if diff := cmp.Diff(outputErrors, expectedErrors, cmpOpts...); diff != "" {
-				t.Errorf("got unexpected diff\n:%s", diff)
-			}
+			assert.ElementsMatch(t, outputErrors.Results, expectedErrors.Results)
+			assert.Equal(t, outputErrors.TotalCount, expectedErrors.TotalCount)
+			assert.Equal(t, outputErrors.FailCount, expectedErrors.FailCount)
 		})
 	}
 }
