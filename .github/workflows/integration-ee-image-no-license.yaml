@@ -1,0 +1,57 @@
+name: Integration Test (EE Image, No License)
+
+concurrency:
+  # Run only for most recent commit in PRs but for all tags and commits on main
+  # Ref: https://docs.github.com/en/actions/using-jobs/using-concurrency
+  group: ${{ github.workflow }}-${{ github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+    - main
+  pull_request: {}
+
+jobs:
+  integration:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    strategy:
+      matrix:
+        kong_image:
+        - 'kong/kong-gateway:2.8'
+        - 'kong/kong-gateway:3.4'
+        - 'kong/kong-gateway:3.5'
+        - 'kong/kong-gateway:3.6'
+        - 'kong/kong-gateway:3.7'
+        - 'kong/kong-gateway:3.8'
+        - 'kong/kong-gateway:3.9'
+        - 'kong/kong-gateway-dev:latest'
+    env:
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_IMAGE: ${{ matrix.kong_image }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKERHUB_PULL_USERNAME}}
+          password: ${{secrets.DOCKERHUB_PULL_TOKEN}}
+      - name: Setup Kong
+        env:
+        # adding blank license here
+        # we are deliberately checking an ee image against no license
+        # to check for errors when users use it as an OSS alternative
+          KONG_LICENSE_DATA: ""
+        run: make setup-kong-ee
+      - name: Run integration tests
+        env:
+          KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
+        run: make test-integration
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}
