@@ -393,6 +393,75 @@ var (
 		},
 	}
 
+	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive,stylecheck
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
 	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
@@ -3417,7 +3486,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 			runWhen: ">=3.0.0 <3.8.0",
 		},
 		{
-			name:     "create plugins on services, routes and consumers >=3.8.0",
+			name:     "create plugins on services, routes and consumers >=3.8.0 <3.10.0",
 			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1_207,
@@ -3425,7 +3494,18 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities381x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.8.0",
+			runWhen: ">=3.8.0 <3.10.0",
+		},
+		{
+			name:     "create plugins on services, routes and consumers >=3.10.0",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities310x,
+				Consumers: consumer,
+			},
+			runWhen: ">=3.10.0",
 		},
 	}
 

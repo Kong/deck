@@ -57,10 +57,16 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 			runWhen:      ">=3.1.0 <3.8.0",
 		},
 		{
-			name:         "dump with select-tags 3.8.0",
+			name:         "dump with select-tags >=3.8.0 <3.10.0",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected381.yaml",
-			runWhen:      ">=3.8.0",
+			runWhen:      ">=3.8.0 <3.10.0",
+		},
+		{
+			name:         "dump with select-tags >=3.10.0",
+			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
+			expectedFile: "testdata/dump/001-entities-with-tags/expected310.yaml",
+			runWhen:      ">=3.10.0",
 		},
 	}
 	for _, tc := range tests {
