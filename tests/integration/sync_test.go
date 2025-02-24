@@ -7448,3 +7448,31 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
 	})
 }
+
+func Test_Sync_SkipConsumersWithConsumerGroups(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	t.Run("--skip-consumers-with-consumer-groups flag set", func(t *testing.T) {
+		// Ensure that sync goes through without any errors
+		// We aren't checking for expected state as that is not the prime motive of the test
+		// We just want to ensure that sync runs without errors in case consumers are synced separately.
+		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
+		require.NoError(t, err)
+
+		err = sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/consumers.yaml")
+		require.NoError(t, err)
+
+		// second sync to ensure it goes through successfully too without any errors
+		err = sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
+		require.NoError(t, err)
+	})
+
+	t.Run("--skip-consumers-with-consumer-groups flag set with consumers.group present in file", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/consumers.yaml", "--skip-consumers-with-consumer-groups")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "can not use --skip-consumers-with-consumer-groups while adding consumers.groups")
+	})
+}

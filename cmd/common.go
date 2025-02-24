@@ -11,6 +11,7 @@ import (
 	"sort"
 
 	"github.com/blang/semver/v4"
+	"github.com/fatih/color"
 	"github.com/kong/deck/utils"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
@@ -178,6 +179,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
 	if mode == modeKonnect {
+		if dumpConfig.SkipConsumersWithConsumerGroups {
+			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
+		}
+
 		if targetContent.Workspace != "" {
 			return fmt.Errorf("_workspace set in config file.\n"+
 				"Workspaces are not supported in Konnect. "+
@@ -262,6 +267,13 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
 		return err
+	}
+
+	if dumpConfig.SkipConsumersWithConsumerGroups {
+		err := validateSkipConsumersWithConsumerGroups(*targetContent, dumpConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	dumpConfig.LookUpSelectorTagsConsumerGroups, err = determineLookUpSelectorTagsConsumerGroups(*targetContent)
@@ -419,6 +431,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
+	return nil
+}
+
+func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config dump.Config) error {
+	if len(config.SelectorTags) == 0 {
+		printFn := color.New(color.FgYellow, color.Bold).PrintfFunc()
+		printFn("--skip-consumers-with-consumer-groups flag is added, but no select tags are specified.\n" +
+			"This can lead to unintended changes.\n\n")
+	}
+
+	if len(targetContent.Consumers) > 0 {
+		for _, consumer := range targetContent.Consumers {
+			if consumer.Groups != nil {
+				return fmt.Errorf("can not use --skip-consumers-with-consumer-groups while adding consumers.groups")
+			}
+		}
+	}
+
 	return nil
 }
 

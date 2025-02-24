@@ -1,0 +1,30 @@
+_format_version: "3.0"
+_info:
+  select_tags: [base]
+
+services:
+  - name: HTTPBin
+    url: https://httpbin.org
+    routes:
+      - name: All
+        paths:
+          - /
+    plugins:
+      - name: key-auth
+
+consumer_groups:
+  - name: bronze
+    plugins:
+      - name: request-termination
+        config:
+          body: You are a BRONZE consumer
+  - name: silver
+    plugins:
+      - name: request-termination
+        config:
+          body: You are a SILVER consumer
+  - name: gold
+    plugins:
+      - name: request-termination
+        config:
+          body: You are a GOLD consumer
