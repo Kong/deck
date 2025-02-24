@@ -15,16 +15,39 @@ services:
 consumer_groups:
   - name: bronze
     plugins:
-      - name: request-termination
-        config:
-          body: You are a BRONZE consumer
+    - name: rate-limiting-advanced
+      config:
+        namespace: bronze
+        limit:
+        - 5
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1
+      
   - name: silver
     plugins:
-      - name: request-termination
-        config:
-          body: You are a SILVER consumer
+    - name: rate-limiting-advanced
+      config:
+        namespace: silver
+        limit:
+        - 7
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1
+          
   - name: gold
     plugins:
-      - name: request-termination
-        config:
-          body: You are a GOLD consumer
+    - name: rate-limiting-advanced
+      config:
+        namespace: gold
+        limit:
+        - 10
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1
