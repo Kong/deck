@@ -479,6 +479,7 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Service: &kong.Service{
 				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
@@ -500,6 +501,7 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Route: &kong.Route{
 				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
@@ -521,6 +523,7 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Consumer: &kong.Consumer{
 				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
