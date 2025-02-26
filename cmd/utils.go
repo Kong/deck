@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
@@ -46,4 +47,28 @@ func validateInputFlag(flagName string, flagValue string, allowedValues []string
 
 	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",
 		flagValue, flagName, allowedValues)
+}
+
+// confirmPrompt prompts a user for a confirmation with message
+// and returns true with no error if input is "yes" or "y" (case-insensitive),
+// otherwise false.
+func confirmPrompt(message string, assumeYes bool) (bool, error) {
+	if assumeYes {
+		return true, nil
+	}
+
+	fmt.Print(message)
+	validOptions := []string{"yes", "y"}
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return false, err
+	}
+	input = strings.ToLower(input)
+	for _, validOption := range validOptions {
+		if input == validOption {
+			return true, nil
+		}
+	}
+	return false, nil
 }
