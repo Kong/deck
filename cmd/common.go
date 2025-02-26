@@ -271,8 +271,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	if dumpConfig.SkipConsumersWithConsumerGroups {
-		err := validateSkipConsumersWithConsumerGroups(*targetContent, dumpConfig)
-		if err != nil {
+		ok, err := validateSkipConsumersWithConsumerGroups(*targetContent, dumpConfig)
+		if err != nil || !ok {
 			return err
 		}
 	}
@@ -435,7 +435,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
-func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config dump.Config) error {
+func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config dump.Config) (bool, error) {
+	if len(targetContent.Consumers) > 0 {
+		for _, consumer := range targetContent.Consumers {
+			if consumer.Groups != nil {
+				return false, fmt.Errorf("can not use --skip-consumers-with-consumer-groups while adding consumers.groups")
+			}
+		}
+	}
+
 	if len(config.SelectorTags) == 0 {
 		printFn := color.New(color.FgYellow, color.Bold).PrintfFunc()
 		printFn("--skip-consumers-with-consumer-groups flag is added, but no select tags are specified.\n" +
@@ -443,22 +451,14 @@ func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config 
 
 		ok, err := reconcilerUtils.Confirm("> Do you wish to continue? ")
 		if err != nil {
-			return err
+			return false, err
 		}
 		if !ok {
-			return nil
+			return false, nil
 		}
 	}
 
-	if len(targetContent.Consumers) > 0 {
-		for _, consumer := range targetContent.Consumers {
-			if consumer.Groups != nil {
-				return fmt.Errorf("can not use --skip-consumers-with-consumer-groups while adding consumers.groups")
-			}
-		}
-	}
-
-	return nil
+	return true, nil
 }
 
 func determinePolicyOverride(targetContent file.Content, config dump.Config) bool {
