@@ -450,12 +450,14 @@ func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config 
 		printFn("--skip-consumers-with-consumer-groups flag is added, but no select tags are specified.\n" +
 			"This can lead to unintended changes.\n\n")
 
-		ok, err := confirmPrompt("> Do you wish to continue? ", syncCmdAssumeYes)
-		if err != nil {
-			return false, err
-		}
-		if !ok {
-			return false, nil
+		if !syncCmdAssumeYes {
+			ok, err := reconcilerUtils.Confirm("> Do you wish to continue? ")
+			if err != nil {
+				return false, err
+			}
+			if !ok {
+				return false, nil
+			}
 		}
 	}
 
