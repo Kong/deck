@@ -179,6 +179,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
 	if mode == modeKonnect {
+		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
 		if dumpConfig.SkipConsumersWithConsumerGroups {
 			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
 		}
