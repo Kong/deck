@@ -1,0 +1,53 @@
+_format_version: "3.0"
+_info:
+  select_tags: [base]
+
+services:
+  - name: HTTPBin
+    url: https://httpbin.org
+    routes:
+      - name: All
+        paths:
+          - /
+    plugins:
+      - name: key-auth
+
+consumer_groups:
+  - name: bronze
+    plugins:
+    - name: rate-limiting-advanced
+      config:
+        namespace: bronze
+        limit:
+        - 5
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1
+      
+  - name: silver
+    plugins:
+    - name: rate-limiting-advanced
+      config:
+        namespace: silver
+        limit:
+        - 7
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1
+          
+  - name: gold
+    plugins:
+    - name: rate-limiting-advanced
+      config:
+        namespace: gold
+        limit:
+        - 10
+        retry_after_jitter_max: 1
+        window_size:
+        - 60
+        window_type: sliding
+        sync_rate: -1

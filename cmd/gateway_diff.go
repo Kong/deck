@@ -105,6 +105,14 @@ that will be created, updated, or deleted.
 		false, "allow deck to diff consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
 			"Warning: do not mix with consumer-group scoped plugins")
+	diffCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
+		false, "do not show the association between consumer and consumer-group.\n"+
+			"If set to true, deck skips listing consumers with consumer-groups,\n"+
+			"thus gaining some performance with large configs.\n"+
+			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.\n"+
+			"This flag is not valid with Konnect.")
+	diffCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
+		false, "assume `yes` to prompts and run non-interactively.")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }
