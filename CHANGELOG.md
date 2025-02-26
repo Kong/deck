@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.45.0](#v1450)
 - [v1.44.2](#v1442)
 - [v1.44.1](#v1441)
 - [v1.44.0](#v1440)
@@ -107,6 +108,18 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.45.0]
+> Release date: 2025/02/26
+
+### Added
+- Added `--skip-consumers-with-consumer-groups` flag to sync and 
+diff commands. It ensures that list_consumers=false while querying 
+a consumer-group. This is beneficial for enterprise customers who 
+sync consumers separately on a different cadence but require 
+frequent changes in other entity configurations. Not listing 
+consumers leads to a boost in performance in such cases.
+[#1545](https://github.com/Kong/deck/pull/1545)
 
 ## [v1.44.2]
 > Release date: 2025/02/13
@@ -2019,6 +2032,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.45.0]: https://github.com/Kong/deck/compare/v1.44.2...v1.45.0
 [v1.44.2]: https://github.com/Kong/deck/compare/v1.44.1...v1.44.2
 [v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
 [v1.44.0]: https://github.com/Kong/deck/compare/v1.43.1...v1.44.0
