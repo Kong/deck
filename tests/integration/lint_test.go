@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
 
@@ -32,7 +33,7 @@ func Test_LintPlain(t *testing.T) {
 				"-s", tc.stateFile,
 				tc.rulesetFile,
 			)
-			assert.Error(t, err)
+			require.Error(t, err)
 
 			assert.Contains(t, output, "Linting Violations: 2")
 			assert.Contains(t, output, "Failures: 1")
@@ -129,27 +130,27 @@ func Test_LintStructured(t *testing.T) {
 				lintOpts = append(lintOpts, "--fail-severity", tc.failSeverity)
 			}
 			output, err := lint(lintOpts...)
-			assert.Error(t, err)
+			require.Error(t, err)
 
 			var expectedErrors, outputErrors lintErrors
 			// get expected errors from file
 			content, err := os.ReadFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			if tc.format == "yaml" {
 				err = yaml.Unmarshal(content, &expectedErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// parse result errors from lint command
 				err = yaml.Unmarshal([]byte(output), &outputErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			} else {
 				err = json.Unmarshal(content, &expectedErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// parse result errors from lint command
 				err = json.Unmarshal([]byte(output), &outputErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 
 			cmpOpts := []cmp.Option{

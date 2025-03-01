@@ -3636,7 +3636,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 			setup(t)
 
 			err := sync(context.Background(), tc.kongFile)
-			assert.Equal(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
@@ -3794,7 +3794,7 @@ func Test_Sync_Vault(t *testing.T) {
 			// use simple http client with https should result
 			// in a failure due missing certificate.
 			_, err := client.Get("https://localhost:8443/r1")
-			assert.NotNil(t, err)
+			require.Error(t, err)
 
 			// use transport with wrong CA cert this should result
 			// in a failure due to unknown authority.
@@ -3811,7 +3811,7 @@ func Test_Sync_Vault(t *testing.T) {
 			}
 
 			_, err = client.Get("https://localhost:8443/r1")
-			assert.NotNil(t, err)
+			require.Error(t, err)
 
 			// use transport with good CA cert should pass
 			// if referenced secrets are resolved correctly
@@ -3829,8 +3829,8 @@ func Test_Sync_Vault(t *testing.T) {
 			}
 
 			res, err := client.Get("https://localhost:8443/r1")
-			assert.NoError(t, err)
-			assert.Equal(t, res.StatusCode, http.StatusOK)
+			require.NoError(t, err)
+			assert.Equal(t, http.StatusOK, res.StatusCode)
 		})
 	}
 }
@@ -4258,12 +4258,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -4274,12 +4274,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -4290,12 +4290,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5676,12 +5676,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5692,12 +5692,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5708,12 +5708,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5970,12 +5970,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5986,12 +5986,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -6002,12 +6002,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -6044,7 +6044,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 
 			err := sync(context.Background(), tc.kongFile)
 			if tc.expectedError == nil {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tc.expectedError.Error())
 			}
@@ -6275,7 +6275,7 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			err := sync(context.Background(), tc.kongFile, tc.flags...)
-			assert.Equal(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
@@ -6994,7 +6994,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 		assert.Equal(t, "/foo", *d.URI)
@@ -7013,7 +7013,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 
@@ -7046,7 +7046,7 @@ func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 		assert.Equal(t, "/foo", *d.URI)
@@ -7065,7 +7065,7 @@ func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -103,14 +104,14 @@ func Test_Validate_Konnect(t *testing.T) {
 			err := validate(ONLINE, validateOpts...)
 
 			if tc.errorExpected {
-				assert.Error(t, err)
+				require.Error(t, err)
 				if tc.errorString != "" {
 					assert.Contains(t, err.Error(), tc.errorString)
 				}
 				return
 			}
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -159,7 +160,7 @@ func Test_Validate_File(t *testing.T) {
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(OFFLINE, validateOpts...)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -209,7 +210,7 @@ func Test_Validate_Gateway(t *testing.T) {
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -265,7 +266,7 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
