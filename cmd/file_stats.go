@@ -34,10 +34,12 @@ func executeStats(cmd *cobra.Command, _ []string) error {
 		string(stats.CSVFormat):      true,
 		string(stats.HTMLFormat):     true,
 		string(stats.MarkdownFormat): true,
+		string(stats.JsonFormat):     true,
+		string(stats.YamlFormat):     true,
 	}
 
 	if !validFormats[cmdStatsOutputFormat] {
-		return fmt.Errorf("invalid output format '%s'; must be one of: text, csv, html, markdown", cmdStatsOutputFormat)
+		return fmt.Errorf("invalid output format '%s'; must be one of: text, csv, html, markdown, json, yaml", cmdStatsOutputFormat)
 	}
 
 	inputContent, err := file.GetContentFromFiles([]string{cmdStatsInputFilename}, false)
@@ -81,7 +83,7 @@ This command calculates
 - Number of instances for each plugin.
 - Optionally, entity counts by tag
 
-Output in text, csv, html or markdown.`,
+Output in text, csv, html, markdown, json, yaml.`,
 		RunE: executeStats,
 		Args: cobra.NoArgs,
 	}
@@ -91,7 +93,7 @@ Output in text, csv, html or markdown.`,
 	statsCmd.Flags().StringVarP(&cmdStatsOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
 	statsCmd.Flags().StringVarP(&cmdStatsOutputFormat, "render", "r", "txt",
-		"Render as txt, csv, html or md. Default is to render as txt.")
+		"Render as txt, csv, html, md, json or yaml. Default is to render as txt.")
 	statsCmd.Flags().StringSliceVar(&cmdStatsSelectorTags, "select-tag", []string{},
 		"only entities matching specified tags are shown.\n"+
 			"When this setting has multiple tag values, entities must match every tag. Example --select-tag=\"tag1,tag2\"")
