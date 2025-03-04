@@ -49,6 +49,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	if inKonnectMode(nil) {
+		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
 		if dumpConfig.SkipConsumersWithConsumerGroups {
 			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
 		}

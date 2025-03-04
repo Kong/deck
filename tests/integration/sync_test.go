@@ -393,7 +393,7 @@ var (
 		},
 	}
 
-	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -410,6 +410,7 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Service: &kong.Service{
 				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
@@ -431,6 +432,7 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Route: &kong.Route{
 				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
@@ -452,6 +454,76 @@ var (
 				"per_consumer":            false,
 				"status_code_metrics":     false,
 				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
+	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
 			},
 			Consumer: &kong.Consumer{
 				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
@@ -3417,7 +3489,7 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 			runWhen: ">=3.0.0 <3.8.0",
 		},
 		{
-			name:     "create plugins on services, routes and consumers >=3.8.0",
+			name:     "create plugins on services, routes and consumers >=3.8.0 <3.10.0",
 			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
 			expectedState: utils.KongRawState{
 				Services:  svc1_207,
@@ -3425,7 +3497,18 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities381x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.8.0",
+			runWhen: ">=3.8.0 <3.10.0",
+		},
+		{
+			name:     "create plugins on services, routes and consumers >=3.10.0",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities310x,
+				Consumers: consumer,
+			},
+			runWhen: ">=3.10.0",
 		},
 	}
 
@@ -7366,5 +7449,46 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml")
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+}
+
+func Test_Sync_SkipConsumersWithConsumerGroups(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	t.Run("--skip-consumers-with-consumer-groups flag set", func(t *testing.T) {
+		// Ensure that sync goes through without any errors
+		// We aren't checking for expected state as that is not the prime motive of the test
+		// We just want to ensure that sync runs without errors in case consumers are synced separately.
+		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
+		require.NoError(t, err)
+
+		err = sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/consumers.yaml")
+		require.NoError(t, err)
+
+		// second sync to ensure it goes through successfully too without any errors
+		err = sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
+		require.NoError(t, err)
+	})
+
+	t.Run("--skip-consumers-with-consumer-groups flag set with consumers.group present in file", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/consumers.yaml", "--skip-consumers-with-consumer-groups")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "can not use --skip-consumers-with-consumer-groups while adding consumers.groups")
+	})
+}
+
+func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	ctx := context.Background()
+
+	t.Run("--skip-consumers-with-consumer-groups flag set", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
 	})
 }

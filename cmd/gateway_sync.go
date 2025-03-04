@@ -100,6 +100,14 @@ to get Kong's state in sync with the input state.`,
 		false, "allow deck to sync consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
 			"Warning: do not mix with consumer-group scoped plugins")
+	syncCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
+		false, "do not show the association between consumer and consumer-group.\n"+
+			"If set to true, deck skips listing consumers with consumer-groups,\n"+
+			"thus gaining some performance with large configs.\n"+
+			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.\n"+
+			"This flag is not valid with Konnect.")
+	syncCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
+		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(syncCmd.Flags())

@@ -1,0 +1,17 @@
+_format_version: "3.0"
+_info:
+  select_tags: [consumers]
+  default_lookup_tags:
+    consumer_groups:
+      - base
+consumers:
+  - username: alice
+    groups:
+      - name: gold
+    keyauth_credentials:
+      - key: hello
+  - username: bob
+    groups:
+      - name: silver
+    keyauth_credentials:
+      - key: world
