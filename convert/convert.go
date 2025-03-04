@@ -3,6 +3,7 @@ package convert
 import (
 	"context"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
@@ -31,6 +32,7 @@ const (
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 
 	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
+	preFunctionPluginName          = "pre-function"
 	rlaNamespaceDefaultLength      = 32
 )
 
@@ -166,6 +168,11 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 		return nil, err
 	}
 
+	// update the pre-function
+	if err := convertPreFunctions2xTo3x(outputContent); err != nil {
+		return nil, err
+	}
+
 	cprint.UpdatePrintf(
 		"From the '%s' config file,\n"+
 			"the _format_version field has been migrated from '%s' to '%s'.\n"+
@@ -177,6 +184,81 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 	outputContent.FormatVersion = "3.0"
 
 	return outputContent, nil
+}
+
+func convertPreFunctions2xTo3x(content *file.Content) error {
+	err := applyForEachPluginInstance(content, preFunctionPluginName, func(plugin *file.FPlugin) error {
+		if plugin.Config["functions"] == nil {
+			return errors.New("functions field is missing in pre-function plugin")
+		}
+
+		plugin.Config["access"] = plugin.Config["functions"]
+		delete(plugin.Config, "functions")
+
+		return nil
+	})
+
+	// Fix Consumer Group plugins too
+	for _, consumerGroup := range content.ConsumerGroups {
+		for _, plugin := range consumerGroup.Plugins {
+			if *plugin.Name == preFunctionPluginName {
+				if plugin.Config["functions"] == nil {
+					return errors.New("functions field is missing in pre-function plugin")
+				}
+				plugin.Config["access"] = plugin.Config["functions"]
+				delete(plugin.Config, "functions")
+			}
+		}
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func applyForEachPluginInstance(content *file.Content, pluginName string, f func(plugin *file.FPlugin) error) error {
+	for _, plugin := range content.Plugins {
+		if *plugin.Name == pluginName {
+			plugin := plugin
+			if err := f(&plugin); err != nil {
+				return err
+			}
+		}
+	}
+
+	for _, service := range content.Services {
+		for _, plugin := range service.Plugins {
+			if *plugin.Name == pluginName {
+				if err := f(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	for _, route := range content.Routes {
+		for _, plugin := range route.Plugins {
+			if *plugin.Name == pluginName {
+				if err := f(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	for _, consumer := range content.Consumers {
+		for _, plugin := range consumer.Plugins {
+			if *plugin.Name == pluginName {
+				if err := f(plugin); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func generateAutoFields(content *file.Content) error {
