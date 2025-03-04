@@ -8,6 +8,7 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseFormat(t *testing.T) {
@@ -561,7 +562,7 @@ func Test_convertAutoFields(t *testing.T) {
 	}
 
 	got, err := convertKongGateway2xTo3x(content, "-")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	globalPluginConfig := got.Plugins[0].Config
 	assert.NotEmpty(t, globalPluginConfig["namespace"])

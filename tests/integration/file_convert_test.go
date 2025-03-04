@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
 
@@ -50,23 +51,23 @@ func Test_FileConvert(t *testing.T) {
 			)
 
 			if tc.errorExpected {
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Contains(t, err.Error(), tc.errorString)
 
 				return
 			}
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			var expectedOutput interface{}
 			var currentOutput interface{}
 			content, err := os.ReadFile(tc.expectedOutputFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = yaml.Unmarshal(content, &expectedOutput)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			err = yaml.Unmarshal([]byte(output), &currentOutput)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedOutput, currentOutput)
 		})
 	}
