@@ -9,7 +9,7 @@ concurrency:
 on:
   push:
     branches:
-    - main
+    - fix/different-select-tags-replace-entity-when-id-given
   pull_request: {}
 
 jobs:
