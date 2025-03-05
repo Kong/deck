@@ -8,7 +8,10 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
-on: [pull_request]
+on:
+  push:
+    branches:
+    - fix/different-select-tags-replace-entity-when-id-given
 
 jobs:
   integration:
