@@ -1,10 +1,13 @@
 package kong2kic
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 
+	"github.com/gosimple/slug"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
 	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
@@ -75,17 +78,17 @@ func addTagsToAnnotations(tags []*string, annotations map[string]string) {
 			}
 		}
 		if len(tagList) > 0 {
-			annotations["konghq.com/tags"] = strings.Join(tagList, ",")
+			annotations[KongHQTags] = strings.Join(tagList, ",")
 		}
 	}
 }
 
 // Helper function to update the "konghq.com/plugins" annotation
 func addPluginToAnnotations(pluginName string, annotations map[string]string) {
-	if existing, ok := annotations["konghq.com/plugins"]; ok && existing != "" {
-		annotations["konghq.com/plugins"] = existing + "," + pluginName
+	if existing, ok := annotations[KongHQPlugins]; ok && existing != "" {
+		annotations[KongHQPlugins] = existing + "," + pluginName
 	} else {
-		annotations["konghq.com/plugins"] = pluginName
+		annotations[KongHQPlugins] = pluginName
 	}
 }
 
@@ -144,4 +147,65 @@ func createKongPlugin(plugin *file.FPlugin, ownerName string) (*configurationv1.
 	}
 
 	return kongPlugin, nil
+}
+
+// utility function to make sure that objectmeta.name is always
+// compatible with kubernetes naming conventions.
+func calculateSlug(input string) string {
+	// Use the slug library to create a slug
+	slugStr := slug.Make(input)
+
+	// Replace underscores with dashes
+	slugStr = strings.ReplaceAll(slugStr, "_", "-")
+
+	// If the resulting string has more than 63 characters
+	if len(slugStr) > 63 {
+		// Calculate the sha256 sum of the string
+		hash := sha256.Sum256([]byte(slugStr))
+
+		// Truncate the slug to 53 characters
+		slugStr = slugStr[:53]
+
+		// Replace the last 10 characters with the first 10 characters of the sha256 sum
+		slugStr = slugStr[:len(slugStr)-10] + fmt.Sprintf("%x", hash)[:10]
+	}
+
+	return slugStr
+}
+
+// Utility function to process top-level entitites in a file.Content.
+// Find the top-level plugins and routes associated with the service and add them to the service-level entities.
+// Find the top-level plugins associated with the routes and add them to the route-level plugins.
+func processTopLevelEntities(content *file.Content) {
+	for _, route := range content.Routes {
+		// Find the service associated with this route
+		for idx, service := range content.Services {
+			if route.Service != nil && route.Service.Name != nil && service.Name != nil && *route.Service.Name == *service.Name {
+				content.Services[idx].Routes = append(service.Routes, &route)
+				break
+			}
+		}
+	}
+	// Process top-level plugins
+	for _, plugin := range content.Plugins {
+		if plugin.Service != nil {
+			// Find the service associated with this plugin
+			for idx, service := range content.Services {
+				if plugin.Service.ID != nil && service.Name != nil && *plugin.Service.ID == *service.Name {
+					content.Services[idx].Plugins = append(service.Plugins, &plugin)
+					break
+				}
+			}
+		} else if plugin.Route != nil {
+			// Find the route associated with this plugin
+			for idxs, service := range content.Services {
+				for idxr, route := range service.Routes {
+					if plugin.Route.ID != nil && route.Name != nil && *plugin.Route.ID == *route.Name {
+						content.Services[idxs].Routes[idxr].Plugins = append(route.Plugins, &plugin)
+						break
+					}
+				}
+			}
+		}
+	}
 }

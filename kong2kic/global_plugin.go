@@ -21,6 +21,10 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 		if plugin.ConsumerGroup != nil {
 			continue
 		}
+		// skip this plugin instance if it is linked to a service or route
+		if plugin.Service != nil || plugin.Route != nil {
+			continue
+		}
 		var kongClusterPlugin configurationv1.KongClusterPlugin
 		kongClusterPlugin.APIVersion = ConfigurationKongHQv1
 		kongClusterPlugin.Kind = KongClusterPluginKind

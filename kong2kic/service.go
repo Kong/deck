@@ -132,28 +132,48 @@ func addAnnotationsFromService(service *file.FService, annotations map[string]st
 	addTagsToAnnotations(service.Tags, annotations)
 }
 
-// Helper function to add plugins to a service
-func addPluginsToService(service *file.FService, k8sService *k8scorev1.Service, kicContent *KICContent) error {
-	for _, plugin := range service.Plugins {
-		if plugin.Name == nil || service.Name == nil {
-			log.Println("Service name or plugin name is empty. Please provide names for both.")
-			continue
-		}
+// processPlugin is a helper function that processes a single plugin for a service
+func processPlugin(
+	plugin *file.FPlugin,
+	ownerName string,
+	annotations map[string]string,
+	kicContent *KICContent,
+) error {
+	if plugin.Name == nil {
+		log.Println("Plugin name is empty. Please provide a name for the plugin.")
+		return nil
+	}
 
-		// Create a KongPlugin
-		kongPlugin, err := createKongPlugin(plugin, *service.Name)
-		if err != nil {
+	// Create a KongPlugin
+	kongPlugin, err := createKongPlugin(plugin, ownerName)
+	if err != nil {
+		return err
+	}
+	if kongPlugin == nil {
+		return nil
+	}
+
+	// Add the plugin name to the service annotations
+	addPluginToAnnotations(kongPlugin.ObjectMeta.Name, annotations)
+
+	// Append the KongPlugin to KIC content
+	kicContent.KongPlugins = append(kicContent.KongPlugins, *kongPlugin)
+	return nil
+}
+
+// addPluginsToService adds plugins from both service-level and top-level plugin configurations
+func addPluginsToService(service *file.FService, k8sService *k8scorev1.Service, kicContent *KICContent) error {
+	if service.Name == nil {
+		log.Println("Service name is empty. Please provide a name for the service.")
+		return nil
+	}
+	ownerName := *service.Name
+
+	// Process service-level plugins
+	for _, plugin := range service.Plugins {
+		if err := processPlugin(plugin, ownerName, k8sService.ObjectMeta.Annotations, kicContent); err != nil {
 			return err
 		}
-		if kongPlugin == nil {
-			continue
-		}
-
-		// Add the plugin name to the service annotations
-		addPluginToAnnotations(kongPlugin.ObjectMeta.Name, k8sService.ObjectMeta.Annotations)
-
-		// Append the KongPlugin to KIC content
-		kicContent.KongPlugins = append(kicContent.KongPlugins, *kongPlugin)
 	}
 	return nil
 }
