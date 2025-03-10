@@ -44,10 +44,13 @@ type ContentStatistics struct {
 	UniqueTags          []string                 `json:"uniqueTags"`
 	TagStats            map[string]TagStatistics `json:"tagStats"`
 	//RegexRoutesCount    int                      `json:"regexRoutesCount"`
-	PathRoutesCount     int                      `json:"PathRoutesCount"`
+	PathRoutesCount int `json:"PathRoutesCount"`
 	// RegexRoutesPct      float64                  `json:"RegexRoutesPct"`
-	AvgPathsPerRoute    float64                  `json:"AvgPathsPerRoute"`
-	PluginsCountPerName map[string]int           `json:"pluginsCountPerName"`
+	AvgPathsPerRoute    float64        `json:"AvgPathsPerRoute"`
+	PluginsCountPerName map[string]int `json:"pluginsCountPerName"`
+	OSSPluginsCount     int            `json:"ossPluginsCount"`
+	EntPluginsCount     int            `json:"entPluginsCount"`
+	CustomPluginsCount  int            `json:"customPluginsCount"`
 }
 
 type TagStatistics struct {
@@ -176,137 +179,217 @@ func containsTag(tags []*string, tag string) bool {
 	return false
 }
 
+// calculateContentStatistics orchestrates the collection of statistics from a Kong configuration
 func calculateContentStatistics(content *file.Content) ContentStatistics {
-	stats := ContentStatistics{
+	stats := initializeStats(content)
+
+	// Process entities and collect data
+	processEntities(content, &stats)
+
+	// Calculate percentages and other derived metrics
+	calculateDerivedMetrics(&stats)
+
+	return stats
+}
+
+// initializeStats initializes the ContentStatistics struct with basic counts
+func initializeStats(content *file.Content) ContentStatistics {
+	return ContentStatistics{
 		ServicesCount:       len(content.Services),
 		ConsumersCount:      len(content.Consumers),
 		ConsumerGroupsCount: len(content.ConsumerGroups),
 		UpstreamsCount:      len(content.Upstreams),
 		CertificatesCount:   len(content.Certificates),
 		CACertificatesCount: len(content.CACertificates),
+		PluginsCountPerName: make(map[string]int),
+		TagStats:            make(map[string]TagStatistics),
 	}
+}
 
-	// unique tags
+// processEntities processes all entities in the content and updates statistics
+func processEntities(content *file.Content, stats *ContentStatistics) {
 	uniqueTagsMap := make(map[string]struct{})
-	addTags := func(tags []*string) {
-		for _, tag := range tags {
+
+	// Process services and related entities
+	processServices(content.Services, stats, uniqueTagsMap)
+
+	// Process top-level entities
+	processConsumers(content.Consumers, stats, uniqueTagsMap)
+	processConsumerGroups(content.ConsumerGroups, stats, uniqueTagsMap)
+	processPlugins(content.Plugins, stats, uniqueTagsMap)
+	processRoutes(content.Routes, stats, uniqueTagsMap)
+	processUpstreams(content.Upstreams, stats, uniqueTagsMap)
+	processCertificates(content.Certificates, stats, uniqueTagsMap)
+	processCACertificates(content.CACertificates, stats, uniqueTagsMap)
+
+	// Convert uniqueTagsMap to slice
+	stats.UniqueTags = mapKeysToSlice(uniqueTagsMap)
+}
+
+// processServices handles services and their nested entities (routes, plugins)
+func processServices(services []file.FService, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, service := range services {
+		addTagsToMap(service.Tags, uniqueTagsMap)
+		incrementTagCounts(service.Tags, "service", stats)
+
+		// Process routes within service
+		for _, route := range service.Routes {
+			stats.RoutesCount++
+			addTagsToMap(route.Tags, uniqueTagsMap)
+			incrementTagCounts(route.Tags, "route", stats)
+
+			// Process plugins within route
+			for _, plugin := range route.Plugins {
+				stats.PluginsCount++
+				addTagsToMap(plugin.Tags, uniqueTagsMap)
+				incrementTagCounts(plugin.Tags, "plugin", stats)
+				stats.PluginsCountPerName[*plugin.Name]++
+			}
+
+			// Count paths in routes
+			stats.PathRoutesCount += len(route.Paths)
+		}
+
+		// Process plugins within service
+		for _, plugin := range service.Plugins {
+			stats.PluginsCount++
+			addTagsToMap(plugin.Tags, uniqueTagsMap)
+			incrementTagCounts(plugin.Tags, "plugin", stats)
+			stats.PluginsCountPerName[*plugin.Name]++
+		}
+	}
+}
+
+// processConsumers handles consumers and their plugins
+func processConsumers(consumers []file.FConsumer, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, consumer := range consumers {
+		addTagsToMap(consumer.Tags, uniqueTagsMap)
+		incrementTagCounts(consumer.Tags, "consumer", stats)
+
+		// Process plugins within consumer
+		for _, plugin := range consumer.Plugins {
+			stats.PluginsCount++
+			addTagsToMap(plugin.Tags, uniqueTagsMap)
+			incrementTagCounts(plugin.Tags, "plugin", stats)
+			stats.PluginsCountPerName[*plugin.Name]++
+		}
+	}
+}
+
+// Helper functions for other entity types
+func processConsumerGroups(groups []file.FConsumerGroupObject, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, group := range groups {
+		addTagsToMap(group.Tags, uniqueTagsMap)
+		incrementTagCounts(group.Tags, "consumerGroup", stats)
+	}
+}
+
+func processPlugins(plugins []file.FPlugin, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, plugin := range plugins {
+		stats.PluginsCount++
+		addTagsToMap(plugin.Tags, uniqueTagsMap)
+		incrementTagCounts(plugin.Tags, "plugin", stats)
+		stats.PluginsCountPerName[*plugin.Name]++
+	}
+}
+
+func processRoutes(routes []file.FRoute, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, route := range routes {
+		stats.RoutesCount++
+		addTagsToMap(route.Tags, uniqueTagsMap)
+		incrementTagCounts(route.Tags, "route", stats)
+	}
+}
+
+func processUpstreams(upstreams []file.FUpstream, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, upstream := range upstreams {
+		addTagsToMap(upstream.Tags, uniqueTagsMap)
+		incrementTagCounts(upstream.Tags, "upstream", stats)
+	}
+}
+
+func processCertificates(certificates []file.FCertificate, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, certificate := range certificates {
+		addTagsToMap(certificate.Tags, uniqueTagsMap)
+		incrementTagCounts(certificate.Tags, "certificate", stats)
+	}
+}
+
+func processCACertificates(caCertificates []file.FCACertificate, stats *ContentStatistics, uniqueTagsMap map[string]struct{}) {
+	for _, caCertificate := range caCertificates {
+		addTagsToMap(caCertificate.Tags, uniqueTagsMap)
+		incrementTagCounts(caCertificate.Tags, "caCertificate", stats)
+	}
+}
+
+// Helper functions for tag processing
+func addTagsToMap(tags []*string, uniqueTagsMap map[string]struct{}) {
+	for _, tag := range tags {
+		if tag != nil {
 			uniqueTagsMap[*tag] = struct{}{}
 		}
 	}
+}
 
-	// entities per tag
-	tagStats := make(map[string]TagStatistics)
-	incrementCount := func(tags []*string, entity string) {
-		for _, tag := range tags {
-			stats := tagStats[*tag]
-			switch entity {
-			case "service":
-				stats.ServicesCount++
-			case "route":
-				stats.RoutesCount++
-			case "consumer":
-				stats.ConsumersCount++
-			case "consumerGroup":
-				stats.ConsumerGroupsCount++
-			case "plugin":
-				stats.PluginsCount++
-			case "upstream":
-				stats.UpstreamsCount++
-			case "certificate":
-				stats.CertificatesCount++
-			case "caCertificate":
-				stats.CACertificatesCount++
-			}
-			tagStats[*tag] = stats
+func incrementTagCounts(tags []*string, entityType string, stats *ContentStatistics) {
+	for _, tag := range tags {
+		if tag == nil {
+			continue
 		}
-	}
 
-	// plugin count per name
-	stats.PluginsCountPerName = make(map[string]int)
+		tagStat := stats.TagStats[*tag]
 
-	for _, service := range content.Services {
-		addTags(service.Tags)
-		incrementCount(service.Tags, "service")
-		for _, route := range service.Routes {
-			stats.RoutesCount++
-			addTags(route.Tags)
-			incrementCount(route.Tags, "route")
-			for _, plugin := range route.Plugins {
-				stats.PluginsCount++
-				addTags(plugin.Tags)
-				incrementCount(plugin.Tags, "plugin")
-				stats.PluginsCountPerName[*plugin.Name]++
-			}
-			stats.PathRoutesCount += len(route.Paths)
-			//for _, path := range route.Paths {
-				//if strings.HasPrefix(*path, "~") {
-					//stats.RegexRoutesCount++
-				//}
-			//}
+		switch entityType {
+		case "service":
+			tagStat.ServicesCount++
+		case "route":
+			tagStat.RoutesCount++
+		case "consumer":
+			tagStat.ConsumersCount++
+		case "consumerGroup":
+			tagStat.ConsumerGroupsCount++
+		case "plugin":
+			tagStat.PluginsCount++
+		case "upstream":
+			tagStat.UpstreamsCount++
+		case "certificate":
+			tagStat.CertificatesCount++
+		case "caCertificate":
+			tagStat.CACertificatesCount++
 		}
-		for _, plugin := range service.Plugins {
-			stats.PluginsCount++
-			addTags(plugin.Tags)
-			incrementCount(plugin.Tags, "plugin")
-			stats.PluginsCountPerName[*plugin.Name]++
-		}
-		for _, upstream := range content.Upstreams {
-			addTags(upstream.Tags)
-			incrementCount(upstream.Tags, "upstream")
-		}
-	}
-	for _, consumer := range content.Consumers {
-		addTags(consumer.Tags)
-		incrementCount(consumer.Tags, "consumer")
-		for _, plugin := range consumer.Plugins {
-			stats.PluginsCount++
-			addTags(plugin.Tags)
-			incrementCount(plugin.Tags, "plugin")
-			stats.PluginsCountPerName[*plugin.Name]++
-		}
-	}
-	for _, consumerGroup := range content.ConsumerGroups {
-		addTags(consumerGroup.Tags)
-		incrementCount(consumerGroup.Tags, "consumerGroup")
-	}
-	for _, plugin := range content.Plugins {
-		stats.PluginsCount++
-		addTags(plugin.Tags)
-		incrementCount(plugin.Tags, "plugin")
-		stats.PluginsCountPerName[*plugin.Name]++
-	}
-	for _, certificate := range content.Certificates {
-		addTags(certificate.Tags)
-		incrementCount(certificate.Tags, "certificate")
-	}
-	for _, caCertificate := range content.CACertificates {
-		addTags(caCertificate.Tags)
-		incrementCount(caCertificate.Tags, "caCertificate")
-	}
 
-	stats.UniqueTags = make([]string, 0, len(uniqueTagsMap))
-	for tag := range uniqueTagsMap {
-		stats.UniqueTags = append(stats.UniqueTags, tag)
+		stats.TagStats[*tag] = tagStat
 	}
+}
 
-	stats.TagStats = tagStats
+func mapKeysToSlice(m map[string]struct{}) []string {
+	result := make([]string, 0, len(m))
+	for key := range m {
+		result = append(result, key)
+	}
+	return result
+}
 
+// calculateDerivedMetrics calculates percentages and other derived metrics
+func calculateDerivedMetrics(stats *ContentStatistics) {
 	stats.TotalEntities = stats.ServicesCount + stats.RoutesCount + stats.ConsumersCount +
 		stats.ConsumerGroupsCount + stats.PluginsCount + stats.UpstreamsCount +
 		stats.CertificatesCount + stats.CACertificatesCount
 
-	stats.ServicesPct = float64(stats.ServicesCount) / float64(stats.TotalEntities) * 100
-	stats.RoutesPct = float64(stats.RoutesCount) / float64(stats.TotalEntities) * 100
-	stats.ConsumersPct = float64(stats.ConsumersCount) / float64(stats.TotalEntities) * 100
-	stats.ConsumerGroupsPct = float64(stats.ConsumerGroupsCount) / float64(stats.TotalEntities) * 100
-	stats.PluginsPct = float64(stats.PluginsCount) / float64(stats.TotalEntities) * 100
-	stats.UpstreamsPct = float64(stats.UpstreamsCount) / float64(stats.TotalEntities) * 100
-	stats.CertificatesPct = float64(stats.CertificatesCount) / float64(stats.TotalEntities) * 100
-	stats.CACertificatesPct = float64(stats.CACertificatesCount) / float64(stats.TotalEntities) * 100
-	//stats.RegexRoutesPct = float64(stats.RegexRoutesCount) / float64(stats.PathRoutesCount) * 100
-	stats.AvgPathsPerRoute = float64(stats.PathRoutesCount) / float64(stats.RoutesCount)
+	if stats.TotalEntities > 0 {
+		stats.ServicesPct = float64(stats.ServicesCount) / float64(stats.TotalEntities) * 100
+		stats.RoutesPct = float64(stats.RoutesCount) / float64(stats.TotalEntities) * 100
+		stats.ConsumersPct = float64(stats.ConsumersCount) / float64(stats.TotalEntities) * 100
+		stats.ConsumerGroupsPct = float64(stats.ConsumerGroupsCount) / float64(stats.TotalEntities) * 100
+		stats.PluginsPct = float64(stats.PluginsCount) / float64(stats.TotalEntities) * 100
+		stats.UpstreamsPct = float64(stats.UpstreamsCount) / float64(stats.TotalEntities) * 100
+		stats.CertificatesPct = float64(stats.CertificatesCount) / float64(stats.TotalEntities) * 100
+		stats.CACertificatesPct = float64(stats.CACertificatesCount) / float64(stats.TotalEntities) * 100
+	}
 
-	return stats
+	if stats.RoutesCount > 0 {
+		stats.AvgPathsPerRoute = float64(stats.PathRoutesCount) / float64(stats.RoutesCount)
+	}
 }
 
 func getTableStyle(styleName string) table.Style {
@@ -426,6 +509,105 @@ func PrintContentStatistics(content *file.Content, style string, format string, 
 }
 
 func generatePluginCountReport(style string, stats ContentStatistics) (*bytes.Buffer, table.Writer) {
+	var EnterprisePluginsMap = map[string]bool{
+		"ai-azure-content-safety":        true,
+		"ai-proxy-advanced":              true,
+		"ai-rate-limiting-advanced":      true,
+		"ai-semantic-cache":              true,
+		"ai-semantic-prompt-guard":       true,
+		"app-dynamics":                   true,
+		"application-registration":       true,
+		"canary":                         true,
+		"confluent":                      true,
+		"degraphql":                      true,
+		"exit-transformer":               true,
+		"forward-proxy":                  true,
+		"graphql-proxy-cache-advanced":   true,
+		"graphql-rate-limiting-advanced": true,
+		"header-cert-auth":               true,
+		"injection-protection":           true,
+		"jwe-decrypt":                    true,
+		"jq":                             true,
+		"json-threat-protection":         true,
+		"jwt-signer":                     true,
+		"kafka-log":                      true,
+		"kafka-upstream":                 true,
+		"key-auth-enc":                   true,
+		"ldap-auth-advanced":             true,
+		"mocking":                        true,
+		"mtls-auth":                      true,
+		"oauth2-introspection":           true,
+		"oas-validation":                 true,
+		"opa":                            true,
+		"openid-connect":                 true,
+		"proxy-cache-advanced":           true,
+		"rate-limiting-advanced":         true,
+		"request-transformer-advanced":   true,
+		"request-validator":              true,
+		"response-transformer-advanced":  true,
+		"route-by-header":                true,
+		"route-transformer-advanced":     true,
+		"saml":                           true,
+		"service-protection":             true,
+		"statsd-advanced":                true,
+		"tls-handshake-modifier":         true,
+		"tls-metadata-headers":           true,
+		"upstream-oauth":                 true,
+		"upstream-timeout":               true,
+		"vault-auth":                     true,
+		"websocket-size-limit":           true,
+		"websocket-validator":            true,
+		"xml-threat-protection":          true,
+	}
+
+	var OSSPluginsMap = map[string]bool{
+		"ai-proxy":                true,
+		"ai-prompt-decorator":     true,
+		"ai-prompt-guard":         true,
+		"ai-prompt-template":      true,
+		"ai-request-transformer":  true,
+		"ai-response-transformer": true,
+		"basic-auth":              true,
+		"hmac-auth":               true,
+		"jwt":                     true,
+		"key-auth":                true,
+		"ldap-auth":               true,
+		"oauth2":                  true,
+		"session":                 true,
+		"acme":                    true,
+		"bot-detection":           true,
+		"cors":                    true,
+		"ip-restriction":          true,
+		"acl":                     true,
+		"proxy-cache":             true,
+		"rate-limiting":           true,
+		"redirect":                true,
+		"request-size-limiting":   true,
+		"request-termination":     true,
+		"response-ratelimiting":   true,
+		"standard-webhooks":       true,
+		"aws-lambda":              true,
+		"azure-functions":         true,
+		"pre-function":            true,
+		"post-function":           true,
+		"datadog":                 true,
+		"opentelemetry":           true,
+		"prometheus":              true,
+		"statsd":                  true,
+		"zipkin":                  true,
+		"correlation-id":          true,
+		"request-transformer":     true,
+		"response-transformer":    true,
+		"grpc-web":                true,
+		"grpc-gateway":            true,
+		"file-log":                true,
+		"http-log":                true,
+		"loggly":                  true,
+		"syslog":                  true,
+		"tcp-log":                 true,
+		"udp-log":                 true,
+	}
+
 	pluginsBuf := new(bytes.Buffer)
 	pluginsTable := table.NewWriter()
 	pluginsTable.SetStyle(getTableStyle(style))
@@ -435,11 +617,27 @@ func generatePluginCountReport(style string, stats ContentStatistics) (*bytes.Bu
 		{Name: "Count", Mode: table.DscNumeric},
 	})
 	pluginsTable.SetTitle("Plugin count per type")
-	pluginsTable.AppendHeader(table.Row{"PluginName", "Count"})
+	pluginsTable.AppendHeader(table.Row{"PluginName", "Count", "Ent", "OSS", "Custom"})
 	for pluginName, count := range stats.PluginsCountPerName {
-		pluginsTable.AppendRow(table.Row{pluginName, count})
+		// if the plugin name is in the EnterprisePlugins list, mark it as Enterprise
+		enterprise := ""
+		oss := ""
+		custom := ""
+		if OSSPluginsMap[pluginName] {
+			oss = "*"
+			stats.OSSPluginsCount++
+		}
+		if EnterprisePluginsMap[pluginName] {
+			enterprise = "*"
+			stats.EntPluginsCount++
+		}
+		if enterprise == "" && oss == "" {
+			custom = "*"
+			stats.CustomPluginsCount++
+		}
+		pluginsTable.AppendRow(table.Row{pluginName, count, enterprise, oss, custom})
 	}
-	pluginsTable.AppendFooter(table.Row{"Total Plugins", stats.PluginsCount})
+	pluginsTable.AppendFooter(table.Row{"Total Plugins", stats.PluginsCount, stats.EntPluginsCount, stats.OSSPluginsCount, stats.CustomPluginsCount})
 	return pluginsBuf, pluginsTable
 }
 
@@ -472,16 +670,16 @@ func generateTagBasedReport(style string, stats ContentStatistics) (*bytes.Buffe
 }
 
 //func generateRegexCountReport(style string, stats ContentStatistics) table.Writer {
-	//regexCountsBuf := new(bytes.Buffer)
-	//regexCountsTable := table.NewWriter()
-	//regexCountsTable.SetStyle(getTableStyle(style))
-	//regexCountsTable.SetOutputMirror(regexCountsBuf)
-	//regexCountsTable.SetTitle("Paths with regex count and percentatge")
-	//regexCountsTable.AppendRow(table.Row{"Total paths in routes", stats.PathRoutesCount})
-	//regexCountsTable.AppendRow(table.Row{"Average paths per route", fmt.Sprintf("%.2f", stats.AvgPathsPerRoute)})
-	//regexCountsTable.AppendRow(table.Row{"Total paths with regular expressions in routes", stats.RegexRoutesCount})
-	//regexCountsTable.AppendFooter(table.Row{"Percentage of paths with regular expressions in routes", fmt.Sprintf("%.2f%%", stats.RegexRoutesPct)})
-	//return regexCountsTable
+//regexCountsBuf := new(bytes.Buffer)
+//regexCountsTable := table.NewWriter()
+//regexCountsTable.SetStyle(getTableStyle(style))
+//regexCountsTable.SetOutputMirror(regexCountsBuf)
+//regexCountsTable.SetTitle("Paths with regex count and percentatge")
+//regexCountsTable.AppendRow(table.Row{"Total paths in routes", stats.PathRoutesCount})
+//regexCountsTable.AppendRow(table.Row{"Average paths per route", fmt.Sprintf("%.2f", stats.AvgPathsPerRoute)})
+//regexCountsTable.AppendRow(table.Row{"Total paths with regular expressions in routes", stats.RegexRoutesCount})
+//regexCountsTable.AppendFooter(table.Row{"Percentage of paths with regular expressions in routes", fmt.Sprintf("%.2f%%", stats.RegexRoutesPct)})
+//return regexCountsTable
 //}
 
 func generateEntityCountReport(style string, stats ContentStatistics) (*bytes.Buffer, table.Writer) {

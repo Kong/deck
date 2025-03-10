@@ -94,9 +94,9 @@ Output in text, csv, html, markdown, json, yaml.`,
 		"Output file to write. Use - to write to stdout.")
 	statsCmd.Flags().StringVarP(&cmdStatsOutputFormat, "render", "r", "txt",
 		"Render as txt, csv, html, md, json or yaml. Default is to render as txt.")
-	statsCmd.Flags().StringSliceVar(&cmdStatsSelectorTags, "select-tag", []string{},
-		"only entities matching specified tags are shown.\n"+
-			"When this setting has multiple tag values, entities must match every tag. Example --select-tag=\"tag1,tag2\"")
+	// statsCmd.Flags().StringSliceVar(&cmdStatsSelectorTags, "select-tag", []string{},
+	// 	"only entities matching specified tags are shown.\n"+
+	// 		"When this setting has multiple tag values, entities must match every tag. Example --select-tag=\"tag1,tag2\"")
 	statsCmd.Flags().BoolVar(&cmdStatsIncludeTags, "with-tags", false,
 		"Include entity count by tag.")
 	statsCmd.Flags().StringVarP(&cmdStatsStyle, "style", "t", "StyleDefault",
