@@ -24,6 +24,7 @@ const (
 )
 
 type ContentStatistics struct {
+	WorspaceOrCPName    string                   `json:"workspaceOrCPName"`
 	ServicesCount       int                      `json:"servicesCount"`
 	RoutesCount         int                      `json:"routesCount"`
 	ConsumersCount      int                      `json:"consumersCount"`
@@ -194,7 +195,16 @@ func calculateContentStatistics(content *file.Content) ContentStatistics {
 
 // initializeStats initializes the ContentStatistics struct with basic counts
 func initializeStats(content *file.Content) ContentStatistics {
+	workspaceOrControlPlaneName := content.Workspace
+	if workspaceOrControlPlaneName == "" {
+		workspaceOrControlPlaneName = content.Konnect.ControlPlaneName
+		if workspaceOrControlPlaneName == "" {
+			workspaceOrControlPlaneName = "unknown"
+		}
+	}
+
 	return ContentStatistics{
+		WorspaceOrCPName:    workspaceOrControlPlaneName,
 		ServicesCount:       len(content.Services),
 		ConsumersCount:      len(content.Consumers),
 		ConsumerGroupsCount: len(content.ConsumerGroups),
@@ -691,7 +701,7 @@ func generateEntityCountReport(style string, stats ContentStatistics) (*bytes.Bu
 	entityCountsTable.SortBy([]table.SortBy{
 		{Name: "Count", Mode: table.DscNumeric},
 	})
-	entityCountsTable.SetTitle("Entity count and percentage")
+	entityCountsTable.SetTitle("Entity count for workspace/CP: " + stats.WorspaceOrCPName)
 	entityCountsTable.AppendHeader(table.Row{"Entity", "Count", "Percentage"})
 	entityCountsTable.AppendRow(table.Row{"Services", stats.ServicesCount, fmt.Sprintf("%.2f%%", stats.ServicesPct)})
 	entityCountsTable.AppendRow(table.Row{"Routes", stats.RoutesCount, fmt.Sprintf("%.2f%%", stats.RoutesPct)})
