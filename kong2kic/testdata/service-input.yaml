@@ -38,3 +38,10 @@ services:
           - cors-complex-service
   - name: simple-service
     port: 8080
+plugins:
+  - name: rate-limiting
+    service: simple-service
+    config:
+      minute: 5
+      limit_by: consumer
+      policy: local

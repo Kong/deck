@@ -25,6 +25,18 @@ metadata:
   name: complex-service-cors
 plugin: cors
 ---
+apiVersion: configuration.konghq.com/v1
+config:
+  limit_by: consumer
+  minute: 5
+  policy: local
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: simple-service-rate-limiting
+plugin: rate-limiting
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -50,6 +62,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    konghq.com/plugins: simple-service-rate-limiting
   name: simple-service
 spec:
   ports:

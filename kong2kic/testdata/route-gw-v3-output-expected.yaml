@@ -1,5 +1,17 @@
 apiVersion: configuration.konghq.com/v1
 config:
+  limit_by: consumer
+  minute: 5
+  policy: local
+kind: KongPlugin
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: kong
+  name: simple-service-simple-route-rate-limiting
+plugin: rate-limiting
+---
+apiVersion: configuration.konghq.com/v1
+config:
   aws_key: my_key
   aws_region: us-west-2
   aws_secret: my_secret
@@ -22,6 +34,12 @@ spec:
   - backendRefs:
     - name: simple-service
       port: 8080
+    filters:
+    - extensionRef:
+        group: configuration.konghq.com
+        kind: KongPlugin
+        name: simple-service-simple-route-rate-limiting
+      type: ExtensionRef
     matches:
     - path:
         type: PathPrefix
@@ -172,6 +190,22 @@ spec:
       path:
         type: PathPrefix
         value: /v1/yet-another-example
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: simple-service-top-route
+spec:
+  parentRefs:
+  - name: kong
+  rules:
+  - backendRefs:
+    - name: simple-service
+      port: 8080
+    matches:
+    - path:
+        type: PathPrefix
+        value: /tr1
 ---
 apiVersion: v1
 kind: Service
