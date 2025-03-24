@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-kong/kong"
 	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
 	k8snetv1 "k8s.io/api/networking/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -515,6 +516,12 @@ func processGatewayAPIPlugin(
 	}
 	if plugin.RunOn != nil {
 		kongPlugin.RunOn = *plugin.RunOn
+	}
+	if plugin.Ordering != nil {
+		kongPlugin.Ordering = &kong.PluginOrdering{
+			Before: plugin.Ordering.Before,
+			After:  plugin.Ordering.After,
+		}
 	}
 	if plugin.Protocols != nil {
 		var protocols []string

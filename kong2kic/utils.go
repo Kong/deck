@@ -178,9 +178,12 @@ func calculateSlug(input string) string {
 // Find the top-level plugins associated with the routes and add them to the route-level plugins.
 func processTopLevelEntities(content *file.Content) {
 	for _, route := range content.Routes {
+		if route.Service == nil || (route.Service != nil && route.Service.Name == nil) {
+			continue 
+		}
 		// Find the service associated with this route
 		for idx, service := range content.Services {
-			if route.Service != nil && route.Service.Name != nil && service.Name != nil && *route.Service.Name == *service.Name {
+			if service.Name != nil && *route.Service.Name == *service.Name {
 				content.Services[idx].Routes = append(service.Routes, &route)
 				break
 			}
@@ -188,19 +191,19 @@ func processTopLevelEntities(content *file.Content) {
 	}
 	// Process top-level plugins
 	for _, plugin := range content.Plugins {
-		if plugin.Service != nil {
+		if plugin.Service != nil && plugin.Service.ID != nil {
 			// Find the service associated with this plugin
 			for idx, service := range content.Services {
-				if plugin.Service.ID != nil && service.Name != nil && *plugin.Service.ID == *service.Name {
+				if service.Name != nil && *plugin.Service.ID == *service.Name {
 					content.Services[idx].Plugins = append(service.Plugins, &plugin)
 					break
 				}
 			}
-		} else if plugin.Route != nil {
+		} else if plugin.Route != nil && plugin.Route.ID != nil{
 			// Find the route associated with this plugin
 			for idxs, service := range content.Services {
 				for idxr, route := range service.Routes {
-					if plugin.Route.ID != nil && route.Name != nil && *plugin.Route.ID == *route.Name {
+					if route.Name != nil && *plugin.Route.ID == *route.Name {
 						content.Services[idxs].Routes[idxr].Plugins = append(route.Plugins, &plugin)
 						break
 					}
