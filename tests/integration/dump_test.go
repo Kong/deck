@@ -155,7 +155,7 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0 <3.10.0") },
 		},
 		{
-			name:          "3.9.0 dump with no skip-consumers",
+			name:          "3.10.0 dump with no skip-consumers",
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-310.yaml",
 			skipConsumers: false,
