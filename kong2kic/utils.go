@@ -179,7 +179,7 @@ func calculateSlug(input string) string {
 func processTopLevelEntities(content *file.Content) {
 	for _, route := range content.Routes {
 		if route.Service == nil || (route.Service != nil && route.Service.Name == nil) {
-			continue 
+			continue
 		}
 		// Find the service associated with this route
 		for idx, service := range content.Services {
@@ -199,7 +199,7 @@ func processTopLevelEntities(content *file.Content) {
 					break
 				}
 			}
-		} else if plugin.Route != nil && plugin.Route.ID != nil{
+		} else if plugin.Route != nil && plugin.Route.ID != nil {
 			// Find the route associated with this plugin
 			for idxs, service := range content.Services {
 				for idxr, route := range service.Routes {
