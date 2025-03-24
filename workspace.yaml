@@ -1,0 +1,16 @@
+_format_version: "3.0"
+_workspace: AIGW
+_info:
+  defaults: {}
+  select_tags:
+    - aigw-workspace
+
+services:
+  - name: llm-proxy
+    host: localhost
+    id: 8b30bd3a-d550-4e34-987a-67be337585c5
+    path: "/"
+    protocol: http
+    read_timeout: 30000
+    write_timeout: 30000
+    connect_timeout: 30000

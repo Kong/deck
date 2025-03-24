@@ -1,0 +1,17 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+    - aigw-prism-ai-core-azure
+  default_lookup_tags:
+    consumers:
+      - aigw-workspace-consumers
+    consumer_groups:
+      - aigw-workspace-consumers
+
+consumers:
+  - username: prism-ai-core-azure-3
+    acls:
+      - group: AIGW/azure/prism-ai-core/owner-team
+    groups:
+      - name: aigw-main-tier1

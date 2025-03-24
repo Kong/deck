@@ -1,0 +1,16 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+    - aigw-workspace-consumers
+
+consumer_groups:
+  - name: aigw-main-tier1
+
+consumers:
+  - username: prism-ai-core-tester
+    acls:
+      - group: AIGW/prism-ai-core-tester/owner-team
+    groups:
+      - name: aigw-main-tier1
+

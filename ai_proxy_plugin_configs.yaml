@@ -1,0 +1,19 @@
+_format_version: "3.0"
+
+_plugin_configs:
+  azure:
+    route_type: llm/v1/chat
+    auth:
+      header_name: api-key
+      header_value: my-api-key
+    logging:
+      log_statistics: true
+      log_payloads: false
+    model:
+      provider: azure
+      name: "$(uri_captures.azure_instance)"
+      options:
+        azure_instance: test-instance
+        azure_deployment_id: "$(uri_captures.azure_instance)"
+        azure_api_version: "2024-08-01-preview"
+        max_tokens: 4096
