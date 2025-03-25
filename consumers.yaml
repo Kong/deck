@@ -6,6 +6,9 @@ _info:
 
 consumer_groups:
   - name: aigw-main-tier1
+    tags:
+      - aigw-workspace-consumers
+      - aigw-prism-ai-core-azure
 
 consumers:
   - username: prism-ai-core-tester

@@ -1,0 +1,63 @@
+_format_version: "3.0"
+_workspace: AIGW
+_info:
+  defaults: {}
+  select_tags:
+    - aigw-prism-ai-core-azure
+  default_lookup_tags:
+    services:
+      - aigw-workspace
+    consumer_groups:
+      - aigw-workspace-consumers
+
+consumers:
+  - username: prism-ai-core-azure
+    acls:
+      - group: AIGW/azure/prism-ai-core/owner-team
+    groups:
+      - name: aigw-main-tier1
+
+routes:
+  - name: prism-ai-core-azure
+    service:
+      name: llm-proxy
+    paths:
+      - ~/prism-ai-core-azure/openai/deployments/(?<azure_instance>[^#?/]+)/chat/completions$
+    methods:
+      - POST
+    plugins:
+      - name: acl
+        enabled: true
+        instance_name: acl-prism-ai-core-azure
+        config:
+          allow:
+            - AIGW/azure/prism-ai-core/owner-team
+            - AIGW/prism-ai-core-tester/owner-team
+          hide_groups_header: true
+      - name: post-function
+        config:
+          access:
+            - |
+              local skip = {
+                ["x-consumer-username"] = true,
+                ["x-consumer-identifier"] = true,
+              }
+
+              local headers = kong.request.get_headers(1000)
+
+              if headers then
+                for k, v in pairs(headers) do
+                  if (k:sub(0, 2) == "x-" or k:sub(0, 3) == "cf-") then
+                    if not skip[k] then
+                      kong.service.request.clear_header(k)
+                    end
+                  end
+                end
+              end
+      - name: ai-proxy
+        instance_name: ai-proxy-prism-ai-core-azure
+        _config: azure
+        config:
+          auth:
+            header_name: api-key
+            header_value: test-key

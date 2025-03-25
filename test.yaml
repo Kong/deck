@@ -2,10 +2,11 @@ _format_version: "3.0"
 _info:
   defaults: {}
   select_tags:
-    - aigw-prism-ai-core-azure
+    - a1
   default_lookup_tags:
     consumer_groups:
-      - aigw-workspace-consumers
+      - a2
+
 
 consumers:
   - username: prism-ai-core-azure-3
@@ -13,3 +14,6 @@ consumers:
       - group: AIGW/azure/prism-ai-core/owner-team
     groups:
       - name: aigw-main-tier1
+    tags:
+    - a1
+    # - a2

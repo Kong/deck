@@ -1,0 +1,6 @@
+_format_version: "3.0"
+
+consumer_groups:
+  - name: aigw-main-tier1
+    tags:
+      - a2
