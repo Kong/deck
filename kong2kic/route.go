@@ -190,73 +190,16 @@ func addPluginsToRoute(
 	ingress *k8snetv1.Ingress,
 	kicContent *KICContent,
 ) error {
+	ownerName := *service.Name + "-" + *route.Name
 	for _, plugin := range route.Plugins {
 		if plugin.Name == nil {
 			log.Println("Plugin name is empty. Please provide a name for the plugin.")
 			continue
 		}
-		pluginName := *plugin.Name
-		kongPlugin := configurationv1.KongPlugin{
-			TypeMeta: metav1.TypeMeta{
-				APIVersion: ConfigurationKongHQv1,
-				Kind:       KongPluginKind,
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Name:        calculateSlug(*service.Name + "-" + *route.Name + "-" + pluginName),
-				Annotations: map[string]string{IngressClass: ClassName},
-			},
-			PluginName: pluginName,
-		}
 
-		// Populate plugin fields
-		if plugin.Enabled != nil {
-			kongPlugin.Disabled = !*plugin.Enabled
-		}
-		if plugin.RunOn != nil {
-			kongPlugin.RunOn = *plugin.RunOn
-		}
-		if plugin.Ordering != nil {
-			kongPlugin.Ordering = &kong.PluginOrdering{
-				Before: plugin.Ordering.Before,
-				After:  plugin.Ordering.After,
-			}
-		}
-		if plugin.Protocols != nil {
-			var protocols []string
-			for _, protocol := range plugin.Protocols {
-				if protocol != nil {
-					protocols = append(protocols, *protocol)
-				}
-			}
-			kongPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
-		}
-		if plugin.Tags != nil {
-			var tags []string
-			for _, tag := range plugin.Tags {
-				if tag != nil {
-					tags = append(tags, *tag)
-				}
-			}
-			kongPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
-		}
-
-		configJSON, err := json.Marshal(plugin.Config)
-		if err != nil {
+		if err := processPlugin(plugin, ownerName, ingress.ObjectMeta.Annotations, kicContent); err != nil {
 			return err
 		}
-		kongPlugin.Config = apiextensionsv1.JSON{
-			Raw: configJSON,
-		}
-
-		// Add plugin reference to ingress annotations
-		pluginsAnnotation := ingress.ObjectMeta.Annotations[KongHQPlugins]
-		if pluginsAnnotation == "" {
-			ingress.ObjectMeta.Annotations[KongHQPlugins] = kongPlugin.ObjectMeta.Name
-		} else {
-			ingress.ObjectMeta.Annotations[KongHQPlugins] = pluginsAnnotation + "," + kongPlugin.ObjectMeta.Name
-		}
-
-		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 	}
 	return nil
 }
@@ -518,43 +461,103 @@ func addBackendRefs(httpRoute *k8sgwapiv1.HTTPRoute, service file.FService, rout
 }
 
 func addPluginsToGatewayAPIRoute(
-	service file.FService, route *file.FRoute, httpRoute k8sgwapiv1.HTTPRoute, kicContent *KICContent,
+	service file.FService,
+	route *file.FRoute,
+	httpRoute k8sgwapiv1.HTTPRoute,
+	kicContent *KICContent,
 ) error {
+	// Process route-level plugins
 	for _, plugin := range route.Plugins {
-		var kongPlugin configurationv1.KongPlugin
-		kongPlugin.APIVersion = ConfigurationKongHQv1
-		kongPlugin.Kind = KongPluginKind
-		if plugin.Name != nil && route.Name != nil && service.Name != nil {
-			kongPlugin.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name + "-" + *plugin.Name)
-		} else {
-			log.Println("Service name, route name or plugin name is empty. This is not recommended." +
-				"Please, provide a name for the service, route and the plugin before generating Kong Ingress Controller manifests.")
-			continue
-		}
-		kongPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
-		kongPlugin.PluginName = *plugin.Name
-
-		var configJSON apiextensionsv1.JSON
-		var err error
-		configJSON.Raw, err = json.Marshal(plugin.Config)
-		if err != nil {
+		if err := processGatewayAPIPlugin(plugin, service, route, &httpRoute, kicContent); err != nil {
 			return err
 		}
-		kongPlugin.Config = configJSON
-
-		// add plugins as extensionRef under filters for every rule
-		for i := range httpRoute.Spec.Rules {
-			httpRoute.Spec.Rules[i].Filters = append(httpRoute.Spec.Rules[i].Filters, k8sgwapiv1.HTTPRouteFilter{
-				ExtensionRef: &k8sgwapiv1.LocalObjectReference{
-					Name:  k8sgwapiv1.ObjectName(kongPlugin.ObjectMeta.Name),
-					Kind:  KongPluginKind,
-					Group: ConfigurationKongHQ,
-				},
-				Type: k8sgwapiv1.HTTPRouteFilterExtensionRef,
-			})
-		}
-
-		kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 	}
+	return nil
+}
+
+// processGatewayAPIPlugin handles creating and configuring a KongPlugin for Gateway API routes
+func processGatewayAPIPlugin(
+	plugin *file.FPlugin,
+	service file.FService,
+	route *file.FRoute,
+	httpRoute *k8sgwapiv1.HTTPRoute,
+	kicContent *KICContent,
+) error {
+	// Skip plugins without a name
+	if plugin.Name == nil || route.Name == nil || service.Name == nil {
+		log.Println("Service name, route name or plugin name is empty. This is not recommended. " +
+			"Please provide a name for the service, route and the plugin before generating Kong Ingress Controller manifests.")
+		return nil
+	}
+
+	// Create the KongPlugin
+	kongPlugin := configurationv1.KongPlugin{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: ConfigurationKongHQv1,
+			Kind:       KongPluginKind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        calculateSlug(*service.Name + "-" + *route.Name + "-" + *plugin.Name),
+			Annotations: map[string]string{IngressClass: ClassName},
+		},
+		PluginName: *plugin.Name,
+	}
+
+	// Set plugin configuration
+	configJSON, err := json.Marshal(plugin.Config)
+	if err != nil {
+		return err
+	}
+	kongPlugin.Config = apiextensionsv1.JSON{Raw: configJSON}
+
+	// Populate additional plugin fields if they exist
+	if plugin.Enabled != nil {
+		kongPlugin.Disabled = !*plugin.Enabled
+	}
+	if plugin.RunOn != nil {
+		kongPlugin.RunOn = *plugin.RunOn
+	}
+	if plugin.Ordering != nil {
+		kongPlugin.Ordering = &kong.PluginOrdering{
+			Before: plugin.Ordering.Before,
+			After:  plugin.Ordering.After,
+		}
+	}
+	if plugin.Protocols != nil {
+		var protocols []string
+		for _, protocol := range plugin.Protocols {
+			if protocol != nil {
+				protocols = append(protocols, *protocol)
+			}
+		}
+		kongPlugin.Protocols = configurationv1.StringsToKongProtocols(protocols)
+	}
+	if plugin.Tags != nil {
+		var tags []string
+		for _, tag := range plugin.Tags {
+			if tag != nil {
+				tags = append(tags, *tag)
+			}
+		}
+		if kongPlugin.ObjectMeta.Annotations == nil {
+			kongPlugin.ObjectMeta.Annotations = make(map[string]string)
+		}
+		kongPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+	}
+
+	// Add plugins as extensionRef under filters for every rule
+	for i := range httpRoute.Spec.Rules {
+		httpRoute.Spec.Rules[i].Filters = append(httpRoute.Spec.Rules[i].Filters, k8sgwapiv1.HTTPRouteFilter{
+			ExtensionRef: &k8sgwapiv1.LocalObjectReference{
+				Name:  k8sgwapiv1.ObjectName(kongPlugin.ObjectMeta.Name),
+				Kind:  KongPluginKind,
+				Group: ConfigurationKongHQ,
+			},
+			Type: k8sgwapiv1.HTTPRouteFilterExtensionRef,
+		})
+	}
+
+	// Add the KongPlugin to the content
+	kicContent.KongPlugins = append(kicContent.KongPlugins, kongPlugin)
 	return nil
 }
