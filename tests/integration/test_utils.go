@@ -65,7 +65,6 @@ func runWhenKonnect(t *testing.T) {
 		os.Getenv("DECK_KONNECT_TOKEN") == "" {
 		t.Skip("non-Konnect test instance, skipping")
 	}
-	setDefaultKonnectControlPlane(t)
 }
 
 func skipWhenKonnect(t *testing.T) {
