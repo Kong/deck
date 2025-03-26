@@ -1,0 +1,14 @@
+_format_version: "3.0"
+consumers:
+- custom_id: consumer-1
+  id: 3a2fd429-9635-4b52-8e04-cdd7e38f1947
+  oauth2_credentials:
+  - client_id: myclientID
+    client_secret: myClientSecret
+    client_type: public
+    hash_secret: false
+    id: f3c51133-2e0c-4049-b45d-fd9309dcba9a
+    name: oauth1setting
+    tags:
+    - before
+  username: consumer1

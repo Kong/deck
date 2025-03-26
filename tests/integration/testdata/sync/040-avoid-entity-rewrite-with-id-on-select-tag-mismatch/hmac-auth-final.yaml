@@ -1,0 +1,11 @@
+_format_version: "3.0"
+consumers:
+- custom_id: consumer-2
+  hmacauth_credentials:
+  - id: 172e4a82-5446-4b91-ab9f-5173478ed241
+    secret: asdfghdssa
+    tags:
+    - after
+    username: username2
+  id: 8c0f9f90-b095-41ff-8697-6abcff30a018
+  username: consumer2

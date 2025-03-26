@@ -1,0 +1,10 @@
+_format_version: "3.0"
+partials:
+- config:
+    read_timeout: 3001
+    send_timeout: 2004
+  name: my-ee-partial
+  type: redis-ee
+  id: 13dc230d-d65e-439a-9f05-9fd71abfee4d
+  tags:
+  - before
