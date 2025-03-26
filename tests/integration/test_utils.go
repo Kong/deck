@@ -3,7 +3,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -66,7 +65,6 @@ func runWhenKonnect(t *testing.T) {
 		os.Getenv("DECK_KONNECT_TOKEN") == "" {
 		t.Skip("non-Konnect test instance, skipping")
 	}
-	setDefaultKonnectControlPlane(t)
 }
 
 func skipWhenKonnect(t *testing.T) {
@@ -97,7 +95,6 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") != "" {
-		fmt.Println("here??")
 		setDefaultKonnectControlPlane(t)
 		return
 	}
