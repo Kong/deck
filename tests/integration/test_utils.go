@@ -3,6 +3,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"testing"
@@ -49,6 +50,14 @@ func getTestClient() (*kong.Client, error) {
 	})
 }
 
+func setDefaultKonnectControlPlane(t *testing.T) {
+	t.Helper()
+	if os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME") == "" ||
+		os.Getenv("DECK_KONNECT_RUNTIME_GROUP_NAME") == "" {
+		t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	}
+}
+
 func runWhenKonnect(t *testing.T) {
 	t.Helper()
 
@@ -57,6 +66,7 @@ func runWhenKonnect(t *testing.T) {
 		os.Getenv("DECK_KONNECT_TOKEN") == "" {
 		t.Skip("non-Konnect test instance, skipping")
 	}
+	setDefaultKonnectControlPlane(t)
 }
 
 func skipWhenKonnect(t *testing.T) {
@@ -75,6 +85,7 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		setDefaultKonnectControlPlane(t)
 		return
 	}
 	kong.RunWhenKong(t, kongSemverRange)
@@ -86,6 +97,8 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		fmt.Println("here??")
+		setDefaultKonnectControlPlane(t)
 		return
 	}
 	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
