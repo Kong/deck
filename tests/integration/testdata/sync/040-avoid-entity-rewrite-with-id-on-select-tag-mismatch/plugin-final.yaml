@@ -1,0 +1,11 @@
+_format_version: "3.0"
+plugins:
+- name: prometheus
+  id: 5a1e49a8-2536-41fa-a4e9-605bf218a4fa
+  enabled: true
+  run_on: first
+  tags:
+  - after
+  protocols:
+  - http
+  - https
