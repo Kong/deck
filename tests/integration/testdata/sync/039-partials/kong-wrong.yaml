@@ -1,0 +1,14 @@
+_format_version: "3.0"
+plugins:
+- config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    window_type: fixed
+    namespace: test-ns
+    sync_rate: -1
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - name: non-existent-partial
