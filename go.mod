@@ -13,7 +13,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.41
-	github.com/kong/go-database-reconciler v1.21.0
+	github.com/kong/go-database-reconciler v1.22.0
 	github.com/kong/go-kong v0.64.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
@@ -58,7 +58,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
-	github.com/hashicorp/go-memdb v1.3.4 // indirect
+	github.com/hashicorp/go-memdb v1.3.5 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect

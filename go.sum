@@ -209,11 +209,10 @@ github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9n
 github.com/hashicorp/go-cleanhttp v0.5.2/go.mod h1:kO/YDlP8L1346E6Sodw+PrpBSV4/SoxCXGY6BqNFT48=
 github.com/hashicorp/go-hclog v1.6.3 h1:Qr2kF+eVWjTiYmU7Y31tYlP1h0q/X3Nl3tPGdaB11/k=
 github.com/hashicorp/go-hclog v1.6.3/go.mod h1:W4Qnvbt70Wk/zYJryRzDRU/4r0kIg0PVHBcfoyhpF5M=
-github.com/hashicorp/go-immutable-radix v1.3.0/go.mod h1:0y9vanUI8NX6FsYoO3zeMjhV/C5i9g4Q3DwcSNZ4P60=
 github.com/hashicorp/go-immutable-radix v1.3.1 h1:DKHmCUm2hRBK510BaiZlwvpD40f8bJFeZnpfm2KLowc=
 github.com/hashicorp/go-immutable-radix v1.3.1/go.mod h1:0y9vanUI8NX6FsYoO3zeMjhV/C5i9g4Q3DwcSNZ4P60=
-github.com/hashicorp/go-memdb v1.3.4 h1:XSL3NR682X/cVk2IeV0d70N4DZ9ljI885xAEU8IoK3c=
-github.com/hashicorp/go-memdb v1.3.4/go.mod h1:uBTr1oQbtuMgd1SSGoR8YV27eT3sBHbYiNm53bMpgSg=
+github.com/hashicorp/go-memdb v1.3.5 h1:b3taDMxCBCBVgyRrS1AZVHO14ubMYZB++QpNhBg+Nyo=
+github.com/hashicorp/go-memdb v1.3.5/go.mod h1:8IVKKBkVe+fxFgdFOYxzQQNjz+sWCyHCdIC/+5+Vy1Y=
 github.com/hashicorp/go-retryablehttp v0.7.7 h1:C8hUCYzor8PIfXHa4UrZkU4VvK8o9ISHxT2Q8+VepXU=
 github.com/hashicorp/go-retryablehttp v0.7.7/go.mod h1:pkQpWZeYWskR+D1tR2O5OcBFOxfA7DoAO6xtkuQnHTk=
 github.com/hashicorp/go-uuid v1.0.0/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
@@ -247,8 +246,8 @@ github.com/klauspost/cpuid/v2 v2.2.5 h1:0E5MSMDEoAulmXNFquVs//DdoomxaoTY1kUhbc/q
 github.com/klauspost/cpuid/v2 v2.2.5/go.mod h1:Lcz8mBdAVJIBVzewtcLocK12l3Y+JytZYpaMropDUws=
 github.com/kong/go-apiops v0.1.41 h1:1KXbQqyhO2E4nEnXJNqUDmHZU/LQ1U7Zoi+MAlcM2P0=
 github.com/kong/go-apiops v0.1.41/go.mod h1:sATq9Tz+ivzHKZU+tDXkRtEZnf64xroU3lgv3yXqP4I=
-github.com/kong/go-database-reconciler v1.21.0 h1:KoO63asW0uk/si+JvIpa/GHoov5vHwx4i7d+Eazc2hY=
-github.com/kong/go-database-reconciler v1.21.0/go.mod h1:AmYOR/Og7CHT8bB9zpbQCINpTT+C+WVNDjqfVxQT5V0=
+github.com/kong/go-database-reconciler v1.22.0 h1:xkcGFqjk1QattePNXHI2PYtQ4qh6Ibhkj+8aMBPQLZs=
+github.com/kong/go-database-reconciler v1.22.0/go.mod h1:emf04E6FSd5y9OKCMB+kNQ0NCTauSaEeCUNRCUgymSY=
 github.com/kong/go-kong v0.64.1 h1:HQssErFchbyYoDVQL7kR8x2naaY9mFgmDu/dXF0NZSo=
 github.com/kong/go-kong v0.64.1/go.mod h1:sqdysTKrXIJ6mpxHwTwjgZhLW7jR1/puczTXHLUwJaE=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
