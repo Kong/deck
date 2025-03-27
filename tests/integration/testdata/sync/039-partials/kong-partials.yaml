@@ -1,0 +1,18 @@
+_format_version: "3.0"
+partials:
+- config:
+    read_timeout: 3001
+    send_timeout: 2004
+  name: my-ee-partial
+  type: redis-ee
+  tags:
+  - tag1
+  - tag2
+- config:
+    timeout: 2003
+    port: 7004
+  name: my-ce-partial
+  type: redis-ce
+  tags:
+  - tag1
+  - tag2

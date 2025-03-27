@@ -1,0 +1,24 @@
+_format_version: "3.0"
+partials:
+- config:
+    read_timeout: 3001
+    send_timeout: 2004
+  name: my-ee-partial
+  type: redis-ee
+  tags:
+  - tag1
+  - tag2
+  - new-tag
+plugins:
+- config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    window_type: fixed
+    namespace: test-ns
+    sync_rate: -1
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - name: my-ee-partial

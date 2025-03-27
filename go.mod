@@ -11,10 +11,10 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.9.15
 	github.com/fatih/color v1.18.0
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.41
-	github.com/kong/go-database-reconciler v1.20.3
-	github.com/kong/go-kong v0.63.0
+	github.com/kong/go-database-reconciler v1.21.0
+	github.com/kong/go-kong v0.64.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.6
@@ -23,9 +23,9 @@ require (
 	golang.org/x/sync v0.11.0
 	k8s.io/api v0.32.1
 	k8s.io/apiextensions-apiserver v0.32.1
-	k8s.io/apimachinery v0.32.1
+	k8s.io/apimachinery v0.32.3
 	k8s.io/client-go v0.32.1
-	k8s.io/code-generator v0.32.1
+	k8s.io/code-generator v0.32.3
 	sigs.k8s.io/gateway-api v1.2.1
 	sigs.k8s.io/yaml v1.4.0
 )
