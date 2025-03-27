@@ -69,7 +69,6 @@ initMigrations "${KONG_IMAGE}" \
 
 # Start Kong Gateway EE
 docker run \
-    --vv \
     --detach \
     --name $GATEWAY_CONTAINER_NAME \
     "${DOCKER_ARGS[@]}" \
@@ -89,4 +88,4 @@ docker run \
     -p 8004:8004 \
     "$KONG_IMAGE"
 
-waitContainer "${GATEWAY_CONTAINER_NAME}" kong health
+waitContainer "${GATEWAY_CONTAINER_NAME}" kong health -v
