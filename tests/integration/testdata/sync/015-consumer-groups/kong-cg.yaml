@@ -1,0 +1,5 @@
+_format_version: "3.0"
+consumer_groups:
+  - name: foo-group
+    tags:
+      - group-tag

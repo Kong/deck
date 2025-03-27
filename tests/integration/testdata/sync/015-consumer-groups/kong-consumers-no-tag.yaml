@@ -1,0 +1,11 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  default_lookup_tags:
+    consumer_groups:
+      - group-tag
+
+consumers:
+  - username: user-1
+    groups:
+      - name: foo-group
