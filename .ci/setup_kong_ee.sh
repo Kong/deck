@@ -69,6 +69,7 @@ initMigrations "${KONG_IMAGE}" \
 
 # Start Kong Gateway EE
 docker run \
+    --vv \
     --detach \
     --name $GATEWAY_CONTAINER_NAME \
     "${DOCKER_ARGS[@]}" \
