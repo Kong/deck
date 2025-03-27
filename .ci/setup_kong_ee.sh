@@ -88,4 +88,4 @@ docker run \
     -p 8004:8004 \
     "$KONG_IMAGE"
 
-waitContainer "${GATEWAY_CONTAINER_NAME}" kong health -v
+waitContainer "${GATEWAY_CONTAINER_NAME}" kong health
