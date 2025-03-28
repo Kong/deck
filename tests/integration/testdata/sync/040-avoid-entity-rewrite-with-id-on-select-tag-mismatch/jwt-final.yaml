@@ -1,0 +1,12 @@
+_format_version: "3.0"
+consumers:
+- custom_id: consumer-2
+  id: 96bd4668-ca36-4ad3-86de-fcde1a87a1e3
+  jwt_secrets:
+  - algorithm: HS256
+    id: 955382ce-98b0-4719-98ba-40ecd2db06de
+    key: poiuytr
+    secret: zxcvbn
+    tags:
+    - after
+  username: consumer2

@@ -1,0 +1,10 @@
+_format_version: "3.0"
+vaults:
+- config:
+    prefix: MY_SECRET_
+  description: ENV vault for secrets
+  id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+  name: env
+  prefix: my-env-vault
+  tags:
+  - before

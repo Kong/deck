@@ -1,0 +1,10 @@
+_format_version: "3.0"
+consumers:
+- custom_id: consumer-2
+  id: 65469fc9-bd54-4df7-b9ad-e011036e8b58
+  keyauth_credentials:
+  - id: 6307cfb6-a9d9-4968-95ce-3937fcdd2359
+    key: qwertyuiop
+    tags:
+    - after
+  username: consumer2
