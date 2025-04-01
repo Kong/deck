@@ -2,6 +2,8 @@ module github.com/kong/deck
 
 go 1.23.5
 
+toolchain go1.24.1
+
 replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
@@ -16,7 +18,7 @@ require (
 	github.com/kong/go-database-reconciler v1.22.1
 	github.com/kong/go-kong v0.65.0
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
