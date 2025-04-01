@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.46.0](#v1460)
 - [v1.45.0](#v1450)
 - [v1.44.2](#v1442)
 - [v1.44.1](#v1441)
@@ -108,6 +109,27 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.46.0]
+> Release date: 2025/04/01
+
+### Added
+- Added support for `partials` entity in deck.
+[#1570](https://github.com/Kong/deck/pull/1570)
+[go-database-reconciler #](https://github.com/Kong/go-database-reconciler/pull/215)
+[go-kong #](https://github.com/Kong/go-kong/pull/507)
+
+### Fixed
+- Updated `golang.org/x/net` from 0.34.0 to 0.36.0 to
+account for vulnerability [CVE-2025-22870](https://github.com/advisories/GHSA-qxp5-gwg8-xv66)
+- Fixed false errors coming for consumer creation while using
+default_lookup_tags for consumer_groups, specifically when tags
+on the consumer_group and consumer didn't match.
+[#1576](https://github.com/Kong/deck/pull/1576)
+[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/228)
+- Fixed `deck file kong2kic` command to correctly process
+top-level plugin and route entities.
+[#1555](https://github.com/Kong/deck/pull/1555)
 
 ## [v1.45.0]
 > Release date: 2025/02/26
@@ -2032,6 +2054,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.46.0]: https://github.com/Kong/deck/compare/v1.45.0...v1.46.0
 [v1.45.0]: https://github.com/Kong/deck/compare/v1.44.2...v1.45.0
 [v1.44.2]: https://github.com/Kong/deck/compare/v1.44.1...v1.44.2
 [v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
