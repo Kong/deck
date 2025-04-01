@@ -8026,6 +8026,7 @@ func Test_Sync_Avoid_Overwrite_On_Select_Tag_Mismatch_With_ID(t *testing.T) {
 			require.NoError(t, err)
 
 			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
 			assert.ErrorContains(t, err, tc.errorExpected)
 		})
 	}
@@ -8123,6 +8124,24 @@ func Test_Sync_Avoid_Overwrite_On_Select_Tag_Mismatch_With_ID_Konnect(t *testing
 			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/upstream-final.yaml",
 			errorExpected:    "error: upstream with ID 87b6a97e-f3f7-4c47-857a-7464cb9e202b already exists",
 		},
+		{
+			name:             "partial",
+			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/partial-initial.yaml",
+			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/partial-final.yaml",
+			errorExpected:    "error: partial with ID 13dc230d-d65e-439a-9f05-9fd71abfee4d already exists",
+		},
+		{
+			name:             "consumer-group",
+			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/consumer-group-initial.yaml", //nolint:lll
+			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/consumer-group-final.yaml",
+			errorExpected:    "error: consumer-group with ID 5a1e49a8-2536-41fa-a4e9-605bf218a4fa already exists",
+		},
+		{
+			name:             "vault",
+			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/vault-initial.yaml",
+			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/vault-final.yaml",
+			errorExpected:    "error: vault with ID 87b6a97e-f3f7-4c47-857a-7464cb9e202b already exists",
+		},
 	}
 
 	for _, tc := range tests {
@@ -8132,6 +8151,7 @@ func Test_Sync_Avoid_Overwrite_On_Select_Tag_Mismatch_With_ID_Konnect(t *testing
 			require.NoError(t, err)
 
 			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
 			assert.ErrorContains(t, err, tc.errorExpected)
 		})
 	}
@@ -8169,6 +8189,7 @@ func Test_Sync_Avoid_Vault_Overwrite_On_Select_Tag_Mismatch_With_ID(t *testing.T
 			require.NoError(t, err)
 
 			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
 			assert.ErrorContains(t, err, tc.errorExpected)
 		})
 	}
@@ -8204,40 +8225,7 @@ func Test_Sync_Avoid_Overwrite_for_Partial_On_Select_Tag_Mismatch_With_ID_Enterp
 			require.NoError(t, err)
 
 			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
-			assert.ErrorContains(t, err, tc.errorExpected)
-		})
-	}
-}
-
-// test scope
-//   - konnect
-func Test_Sync_Avoid_Overwrite_for_Partial_On_Select_Tag_Mismatch_With_ID_Konnect(t *testing.T) {
-	runWhenKonnect(t)
-	setup(t)
-
-	ctx := context.Background()
-
-	tests := []struct {
-		name             string
-		initialStateFile string
-		targetStateFile  string
-		errorExpected    string
-	}{
-		{
-			name:             "partial",
-			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/partial-initial.yaml",
-			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/partial-final.yaml",
-			errorExpected:    "error: partial with ID 13dc230d-d65e-439a-9f05-9fd71abfee4d already exists",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			reset(t)
-			err := sync(ctx, tc.initialStateFile)
-			require.NoError(t, err)
-
-			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
 			assert.ErrorContains(t, err, tc.errorExpected)
 		})
 	}
@@ -8273,40 +8261,7 @@ func Test_Sync_Avoid_Consumer_Group_Overwrite_On_Select_Tag_Mismatch_With_ID_Ent
 			require.NoError(t, err)
 
 			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
-			assert.ErrorContains(t, err, tc.errorExpected)
-		})
-	}
-}
-
-// test scope:
-//   - konnect
-func Test_Sync_Avoid_Consumer_Group_Overwrite_On_Select_Tag_Mismatch_With_ID_Konnect(t *testing.T) {
-	runWhenKonnect(t)
-	setup(t)
-
-	ctx := context.Background()
-
-	tests := []struct {
-		name             string
-		initialStateFile string
-		targetStateFile  string
-		errorExpected    string
-	}{
-		{
-			name:             "consumer-group",
-			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/consumer-group-initial.yaml", //nolint:lll
-			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/consumer-group-final.yaml",
-			errorExpected:    "error: consumer-group with ID 5a1e49a8-2536-41fa-a4e9-605bf218a4fa already exists",
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			reset(t)
-			err := sync(ctx, tc.initialStateFile)
-			require.NoError(t, err)
-
-			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
 			assert.ErrorContains(t, err, tc.errorExpected)
 		})
 	}
