@@ -1,0 +1,12 @@
+_format_version: "3.0"
+consumers:
+- acls:
+  - group: consumers ACL
+    id: f2be545c-45c5-46e2-8acf-00ff2d899073
+    tags:
+    - before
+  custom_id: custom_id_1
+  id: 27d847fb-7aeb-4cb7-adb5-eccdd0ff1d42
+  username: consumer1
+  tags:
+  - before
