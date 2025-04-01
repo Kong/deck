@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.46.1](#v1461)
 - [v1.46.0](#v1460)
 - [v1.45.0](#v1450)
 - [v1.44.2](#v1442)
@@ -109,6 +110,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.46.1]
+> Release date: 2025/04/02
+
+### Fixed
+- Fixed an issue where entities were replaced silently when ID was present in input files and select_tags didn't match.
+[#1572](https://github.com/Kong/deck/pull/1572)
+[go-database-reconciler #](https://github.com/Kong/go-database-reconciler/pull/214)
+[go-kong #](https://github.com/Kong/go-kong/pull/526)
 
 ## [v1.46.0]
 > Release date: 2025/04/01
@@ -2054,6 +2064,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.46.1]: https://github.com/Kong/deck/compare/v1.46.0...v1.46.1
 [v1.46.0]: https://github.com/Kong/deck/compare/v1.45.0...v1.46.0
 [v1.45.0]: https://github.com/Kong/deck/compare/v1.44.2...v1.45.0
 [v1.44.2]: https://github.com/Kong/deck/compare/v1.44.1...v1.44.2
