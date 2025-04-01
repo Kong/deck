@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [v1.46.0](#v1450)
+- [v1.46.0](#v1460)
 - [v1.45.0](#v1450)
 - [v1.44.2](#v1442)
 - [v1.44.1](#v1441)
@@ -111,7 +111,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.46.0]
-> Release date: 2025/03/27
+> Release date: 2025/04/01
 
 ### Added
 - Added support for `partials` entity in deck.
