@@ -117,8 +117,8 @@
 ### Fixed
 - Fixed an issue where entities were replaced silently when ID was present in input files and select_tags didn't match.
 [#1572](https://github.com/Kong/deck/pull/1572)
-[go-database-reconciler #](https://github.com/Kong/go-database-reconciler/pull/214)
-[go-kong #](https://github.com/Kong/go-kong/pull/526)
+[go-database-reconciler #214](https://github.com/Kong/go-database-reconciler/pull/214)
+[go-kong #526](https://github.com/Kong/go-kong/pull/526)
 
 ## [v1.46.0]
 > Release date: 2025/04/01
