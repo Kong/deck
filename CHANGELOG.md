@@ -116,8 +116,8 @@
 ### Added
 - Added support for `partials` entity in deck.
 [#1570](https://github.com/Kong/deck/pull/1570)
-[go-database-reconciler #](https://github.com/Kong/go-database-reconciler/pull/215)
-[go-kong #](https://github.com/Kong/go-kong/pull/507)
+[go-database-reconciler #215](https://github.com/Kong/go-database-reconciler/pull/215)
+[go-kong #507](https://github.com/Kong/go-kong/pull/507)
 
 ### Fixed
 - Updated `golang.org/x/net` from 0.34.0 to 0.36.0 to
@@ -126,7 +126,7 @@ account for vulnerability [CVE-2025-22870](https://github.com/advisories/GHSA-qx
 default_lookup_tags for consumer_groups, specifically when tags
 on the consumer_group and consumer didn't match.
 [#1576](https://github.com/Kong/deck/pull/1576)
-[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/228)
+[go-database-reconciler #228](https://github.com/Kong/go-database-reconciler/pull/228)
 - Fixed `deck file kong2kic` command to correctly process
 top-level plugin and route entities.
 [#1555](https://github.com/Kong/deck/pull/1555)
@@ -160,7 +160,7 @@ vulnerability [CVE-2022-28948](https://github.com/advisories/GHSA-hp87-p4gw-j4gq
 gateways where operations were getting stuck due to 
 custom-entities support. Custom Entities are now gated to
 Enterprise gateways only.
-[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/202)
+[go-database-reconciler #202](https://github.com/Kong/go-database-reconciler/pull/202)
 [#1525](https://github.com/Kong/deck/pull/1525)
 
 ## [v1.44.0]
