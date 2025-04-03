@@ -112,7 +112,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.46.1]
-> Release date: 2025/04/02
+> Release date: 2025/04/03
 
 ### Fixed
 - Fixed an issue where entities were replaced silently when ID was present in input files and select_tags didn't match.
