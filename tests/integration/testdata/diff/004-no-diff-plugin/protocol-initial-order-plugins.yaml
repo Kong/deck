@@ -1,0 +1,23 @@
+_format_version: "3.0"
+services:
+- host: a0955.spucs.apip_self-service_api_-_external.v1.stream
+  name: a0955.spucs.apip_self-service_api_-_external.v1
+  port: 443
+  protocol: https
+  plugins:
+  - config:
+      allow:
+      - 54.93.116.152/32
+    name: ip-restriction
+    protocols:
+    - grpc
+    - https
+  - name: prometheus
+    service: a0955.spucs.apip_self-service_api_-_external.v1
+    tags:
+    - o11y
+    config:
+      per_consumer: false
+    protocols:
+    - grpc
+    - https
