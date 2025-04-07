@@ -6,12 +6,16 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
@@ -7441,6 +7445,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_34x(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
 	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
 }
 
 // test scope:
@@ -7562,6 +7604,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_38x(t *testing.T) {
 		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml")
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
 	})
 }
 
@@ -7687,6 +7767,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml")
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
 	})
 }
 
