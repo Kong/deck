@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.46.2](#v1462)
 - [v1.46.1](#v1461)
 - [v1.46.0](#v1460)
 - [v1.45.0](#v1450)
@@ -110,6 +111,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.46.2]
+> Release date: 2025/04/07
+
+### Fixed
+- Fixed false diff for ip-restriction plugin.
+[#1585](https://github.com/Kong/deck/pull/1585)
+[go-database-reconciler #240](https://github.com/Kong/go-database-reconciler/pull/240)
+- Fixed an issue where invalid json was sent to stdout even if --json-output flag was used
+[#1589](https://github.com/Kong/deck/pull/1589)
+[go-database-reconciler #242](https://github.com/Kong/go-database-reconciler/pull/242)
 
 ## [v1.46.1]
 > Release date: 2025/04/03
@@ -2064,6 +2076,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.46.2]: https://github.com/Kong/deck/compare/v1.46.1...v1.46.2
 [v1.46.1]: https://github.com/Kong/deck/compare/v1.46.0...v1.46.1
 [v1.46.0]: https://github.com/Kong/deck/compare/v1.45.0...v1.46.0
 [v1.45.0]: https://github.com/Kong/deck/compare/v1.44.2...v1.45.0
