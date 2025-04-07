@@ -787,6 +787,42 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 	}
 }
 
+func Test_Diff_Plugin_Protocol_Order_Change(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name             string
+		initialStateFile string
+		stateFile        string
+		expectedDiff     string
+	}{
+		{
+			name:             "syncing and then diffing same file should not show false diff",
+			initialStateFile: "testdata/diff/004-no-diff-plugin/initial-ip-restriction.yaml",
+			stateFile:        "testdata/diff/004-no-diff-plugin/initial-ip-restriction.yaml",
+			expectedDiff:     emptyOutput,
+		},
+		{
+			name:             "changing protocol order should not show diff",
+			initialStateFile: "testdata/diff/004-no-diff-plugin/protocol-initial-order-plugins.yaml",
+			stateFile:        "testdata/diff/004-no-diff-plugin/protocol-reordered-plugins.yaml",
+			expectedDiff:     emptyOutput,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// initialize state
+			require.NoError(t, sync(ctx, tc.initialStateFile))
+
+			out, err := diff(tc.stateFile)
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedDiff, out)
+		})
+	}
+}
+
 // test scope:
 //   - 3.5
 func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
