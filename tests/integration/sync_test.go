@@ -8338,7 +8338,7 @@ func Test_Sync_Avoid_Consumer_Group_Overwrite_On_Select_Tag_Mismatch_With_ID_Ent
 //
 // - >=2.8.0 <3.0.0
 func Test_Sync_Plugins_Nested_Foreign_Keys(t *testing.T) {
-	runWhenKongOrKonnect(t, ">=2.8.0 <3.0.0")
+	runWhen(t, "kong", ">=2.8.0 <3.0.0")
 	setup(t)
 
 	ctx := context.Background()
