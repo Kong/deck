@@ -13,7 +13,6 @@ services:
     - grpc
     - https
   - name: prometheus
-    service: mockbin
     tags:
     - o11y
     config:

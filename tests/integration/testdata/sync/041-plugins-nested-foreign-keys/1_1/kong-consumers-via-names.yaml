@@ -1,0 +1,44 @@
+_format_version: "1.1"
+
+consumers:
+  - username: alice
+    id: 8ca63651-4068-4baa-b2b9-08dc99c296e0
+  - username: bob
+    id: 8ca63651-4068-4baa-b2b9-08dc99c29666
+
+services:
+- name: example-service
+  port: 3200
+  protocol: http
+  host: localhost
+  routes:
+  - name: example-route-1
+    paths:
+    - /r1
+    plugins:
+      - config:
+          limit_by: consumer
+          minute: 6
+          policy: local
+        consumer: alice
+        enabled: true
+        name: rate-limiting
+        protocols:
+          - http
+
+routes:
+- name: example-route-2
+  paths:
+  - /r2
+  service:
+    name: example-service
+  plugins:
+      - config:
+          limit_by: consumer
+          minute: 6
+          policy: local
+        consumer: bob
+        enabled: true
+        name: rate-limiting
+        protocols:
+          - http
