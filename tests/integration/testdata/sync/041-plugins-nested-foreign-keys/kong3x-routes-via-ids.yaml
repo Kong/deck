@@ -1,0 +1,38 @@
+_format_version: "3.0"
+
+services:
+- name: example-service
+  port: 3200
+  protocol: http
+  host: localhost
+  plugins:
+    - config:
+        minute: 100
+        policy: local
+      route: 8ca63651-4068-4baa-b2b9-08dc99c296e0 # example-route-1
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+    - config:
+        minute: 200
+        policy: local
+      route: 8ca63651-4068-4baa-b2b9-08dc99c29666 # example-route-2
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+
+routes:
+- name: example-route-1
+  id: 8ca63651-4068-4baa-b2b9-08dc99c296e0
+  paths:
+  - ~/r1
+  service:
+    name: example-service
+- name: example-route-2
+  id: 8ca63651-4068-4baa-b2b9-08dc99c29666
+  paths:
+  - ~/r2
+  service:
+    name: example-service
