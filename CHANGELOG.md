@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.46.3](#v1463)
 - [v1.46.2](#v1462)
 - [v1.46.1](#v1461)
 - [v1.46.0](#v1460)
@@ -111,6 +112,22 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.46.3]
+> Release date: 2025/04/10
+
+### Fixed
+- Plugin configurations with foreign references
+now work correctly, both via name and IDs.
+[#1597](https://github.com/Kong/deck/pull/1597)
+[go-database-reconciler #250](https://github.com/Kong/go-database-reconciler/pull/250)
+- Scoped plugins with a nested entity of the same
+type would return an error.
+[go-database-reconciler #249](https://github.com/Kong/go-database-reconciler/pull/249)
+- RBAC endpoint permissions are now paginated and not
+limited to the first 100 endpoints.
+[go-database-reconciler #248](https://github.com/Kong/go-database-reconciler/pull/248)
+[go-kong #533](https://github.com/Kong/go-kong/pull/533)
 
 ## [v1.46.2]
 > Release date: 2025/04/07
@@ -2076,6 +2093,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3
 [v1.46.2]: https://github.com/Kong/deck/compare/v1.46.1...v1.46.2
 [v1.46.1]: https://github.com/Kong/deck/compare/v1.46.0...v1.46.1
 [v1.46.0]: https://github.com/Kong/deck/compare/v1.45.0...v1.46.0
