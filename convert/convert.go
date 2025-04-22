@@ -2,9 +2,7 @@ package convert
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"strings"
 
 	"github.com/blang/semver/v4"
@@ -29,9 +27,6 @@ const (
 	FormatKongGateway2x Format = "kong-gateway-2.x"
 	// FormatKongGateway3x represents the Kong gateway 3.x format.
 	FormatKongGateway3x Format = "kong-gateway-3.x"
-
-	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
-	rlaNamespaceDefaultLength      = 32
 )
 
 // AllFormats contains all available formats.
@@ -105,22 +100,6 @@ func Convert(
 	return err
 }
 
-func randomString(n int) (string, error) {
-	const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzj"
-	charsetLength := big.NewInt(int64(len(charset)))
-
-	ret := make([]byte, n)
-	for i := 0; i < n; i++ {
-		num, err := rand.Int(rand.Reader, charsetLength)
-		if err != nil {
-			return "", fmt.Errorf("error generating random string: %w", err)
-		}
-		ret[i] = charset[num.Int64()]
-	}
-
-	return string(ret), nil
-}
-
 func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Content, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input content is nil")
@@ -179,100 +158,6 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 	return outputContent, nil
 }
 
-func generateAutoFields(content *file.Content) error {
-	for _, plugin := range content.Plugins {
-		if *plugin.Name == rateLimitingAdvancedPluginName {
-			plugin := plugin
-			if err := autoGenerateNamespaceForRLAPlugin(&plugin); err != nil {
-				return err
-			}
-		}
-	}
-
-	for _, service := range content.Services {
-		for _, plugin := range service.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, route := range content.Routes {
-		for _, plugin := range route.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, consumer := range content.Consumers {
-		for _, plugin := range consumer.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, consumerGroup := range content.ConsumerGroups {
-		for _, plugin := range consumerGroup.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPluginConsumerGroups(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func autoGenerateNamespaceForRLAPlugin(plugin *file.FPlugin) error {
-	if plugin.Config != nil {
-		ns, ok := plugin.Config["namespace"]
-		if !ok || ns == nil {
-			// namespace is not set, generate one.
-			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
-			if err != nil {
-				return fmt.Errorf("error generating random namespace: %w", err)
-			}
-			plugin.Config["namespace"] = randomNamespace
-		}
-	}
-	return nil
-}
-
-func autoGenerateNamespaceForRLAPluginConsumerGroups(plugin *kong.ConsumerGroupPlugin) error {
-	if plugin.Config != nil {
-		ns, ok := plugin.Config["namespace"]
-		if !ok || ns == nil {
-			// namespace is not set, generate one.
-			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
-			if err != nil {
-				return fmt.Errorf("error generating random namespace: %w", err)
-			}
-			plugin.Config["namespace"] = randomNamespace
-		}
-	}
-	return nil
-}
-
-func migrateRoutesPathFieldPre300(route *file.FRoute) (*file.FRoute, bool) {
-	var hasChanged bool
-	for _, path := range route.Paths {
-		if !strings.HasPrefix(*path, "~/") && utils.IsPathRegexLike(*path) {
-			*path = "~" + *path
-			hasChanged = true
-		}
-	}
-	return route, hasChanged
-}
-
 func convertKongGatewayToKonnect(input *file.Content) (*file.Content, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input content is nil")
@@ -321,13 +206,6 @@ func kongServiceToKonnectServicePackage(service file.FService) (file.FServicePac
 			},
 		},
 	}, nil
-}
-
-func removeServiceName(service *file.FService) *file.FService {
-	serviceCopy := service.DeepCopy()
-	serviceCopy.Name = nil
-	serviceCopy.ID = kong.String(utils.UUID())
-	return serviceCopy
 }
 
 // convertDistributedToKong is used to convert one or many distributed format
