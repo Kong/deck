@@ -29,7 +29,7 @@ func Test_LintPlain(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			output, err := file_lint(
+			output, err := fileLint(
 				"-s", tc.stateFile,
 				tc.rulesetFile,
 			)
@@ -129,7 +129,7 @@ func Test_LintStructured(t *testing.T) {
 			if tc.failSeverity != "" {
 				lintOpts = append(lintOpts, "--fail-severity", tc.failSeverity)
 			}
-			output, err := file_lint(lintOpts...)
+			output, err := fileLint(lintOpts...)
 			require.Error(t, err)
 
 			var expectedErrors, outputErrors lintErrors
