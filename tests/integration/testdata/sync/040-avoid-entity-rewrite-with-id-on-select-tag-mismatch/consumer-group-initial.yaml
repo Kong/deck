@@ -1,6 +1,0 @@
-_format_version: "3.0"
-consumer_groups:
-  - name: example-consumer-group
-    id: 5a1e49a8-2536-41fa-a4e9-605bf218a4fa
-    tags:
-    - before
