@@ -74,7 +74,15 @@ func Test_FileConvert(t *testing.T) {
 	}
 }
 
-func Test_convertKongGateway28xTo34x(t *testing.T) {
+func Test_FileConvert_28xTo34x(t *testing.T) {
+	originalCwd, err := os.Getwd()
+	require.NoError(t, err)
+	defer func() {
+		// Restore the original working directory after the test
+		err := os.Chdir(originalCwd)
+		require.NoError(t, err)
+	}()
+
 	tests := []struct {
 		name               string
 		inputFile          string
@@ -104,7 +112,7 @@ func Test_convertKongGateway28xTo34x(t *testing.T) {
 	// rulesets relative to the test file location.
 	cwd, _ := os.Getwd()
 	projectRoot := filepath.Join(cwd, "../../")
-	err := os.Chdir(projectRoot)
+	err = os.Chdir(projectRoot)
 	require.NoError(t, err)
 
 	for _, tc := range tests {
