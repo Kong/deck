@@ -7049,6 +7049,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 }
 
 func Test_Sync_FilterChains(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
 
@@ -7211,6 +7212,7 @@ func Test_Sync_FilterChains(t *testing.T) {
 }
 
 func Test_Sync_FilterChainsUnsupported(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", "<3.4.0")
 	setup(t)
 	require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))

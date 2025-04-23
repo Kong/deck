@@ -322,6 +322,7 @@ func Test_Dump_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
 }
 
 func Test_Dump_FilterChains(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
 
