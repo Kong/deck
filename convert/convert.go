@@ -105,7 +105,7 @@ func Convert(
 		if len(inputFilenames) > 1 {
 			return fmt.Errorf("only one input file can be provided when converting from Kong 2.x to Kong 3.x format")
 		}
-		outputContent, err = convertKongGateway280To340(inputContent, inputFilenames[0])
+		outputContent, err = convertKongGateway28xTo34x(inputContent, inputFilenames[0])
 		if err != nil {
 			return err
 		}
@@ -280,7 +280,12 @@ func convertDistributedToKong(
 	})
 }
 
-func convertKongGateway280To340(input *file.Content, filename string) (*file.Content, error) {
+// convertKongGateway28xTo34x is used to convert a Kong Gateway 2.8.x config
+// to a Kong Gateway 3.4.x config. It can be used as a migration utility
+// between the two LTS versions. It auto-fixes some configuration. The
+// configuration that can't be autofixed is left as is and the user is shown
+// warnings/errors about the same.
+func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Content, error) {
 	preprocessContent, err := convertKongGateway2xTo3x(input, filename, false)
 	if err != nil {
 		return nil, err
