@@ -114,8 +114,10 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		Args: validateNoArgs,
 		RunE: execute,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
-			validSourceFormats := []string{string(convert.FormatKongGateway), string(convert.FormatKongGateway2x)}
-			validDestinationFormats := []string{string(convert.FormatKonnect), string(convert.FormatKongGateway3x)}
+			validSourceFormats := []string{string(convert.FormatKongGateway), string(convert.FormatKongGateway2x),
+				string(convert.FormatKongGatewayVersion28x)}
+			validDestinationFormats := []string{string(convert.FormatKonnect), string(convert.FormatKongGateway3x),
+				string(convert.FormatKongGatewayVersion34x)}
 
 			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats, "")
 			if err != nil {

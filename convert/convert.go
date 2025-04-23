@@ -30,8 +30,8 @@ const (
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 
 	// Adding LTS version strings
-	FormatKongGatewayVersion280 Format = "2.8"
-	FormatKongGatewayVersion340 Format = "3.4"
+	FormatKongGatewayVersion28x Format = "2.8"
+	FormatKongGatewayVersion34x Format = "3.4"
 )
 
 // AllFormats contains all available formats.
@@ -50,10 +50,10 @@ func ParseFormat(key string) (Format, error) {
 		return FormatKongGateway3x, nil
 	case FormatDistributed:
 		return FormatDistributed, nil
-	case FormatKongGatewayVersion280:
-		return FormatKongGatewayVersion280, nil
-	case FormatKongGatewayVersion340:
-		return FormatKongGatewayVersion340, nil
+	case FormatKongGatewayVersion28x:
+		return FormatKongGatewayVersion28x, nil
+	case FormatKongGatewayVersion34x:
+		return FormatKongGatewayVersion34x, nil
 	default:
 		return "", fmt.Errorf("invalid format: '%v'", key)
 	}
@@ -101,7 +101,7 @@ func Convert(
 			return err
 		}
 
-	case from == FormatKongGatewayVersion280 && to == FormatKongGatewayVersion340:
+	case from == FormatKongGatewayVersion28x && to == FormatKongGatewayVersion34x:
 		if len(inputFilenames) > 1 {
 			return fmt.Errorf("only one input file can be provided when converting from Kong 2.x to Kong 3.x format")
 		}
@@ -175,8 +175,8 @@ func convertKongGateway2xTo3x(input *file.Content, filename string, printFinalWa
 
 	cprint.UpdatePrintf(
 		"From the '%s' config file,\n"+
-			"the _format_version field has been migrated from '%s' to '%s'.\n\n"+
-			filename, outputContent.FormatVersion, "3.0")
+			"the _format_version field has been migrated from '%s' to '%s'.\n\n",
+		filename, outputContent.FormatVersion, "3.0")
 	outputContent.FormatVersion = "3.0"
 
 	if printFinalWarning {

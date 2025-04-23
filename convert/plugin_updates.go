@@ -138,7 +138,7 @@ func updatePlugins(content *file.Content) {
 }
 
 func updateLegacyPluginConfig(plugin *file.FPlugin) {
-	if plugin.Config != nil {
+	if plugin != nil && plugin.Config != nil {
 		config := plugin.Config.DeepCopy()
 
 		config = updateLegacyFieldToNewField(config, "blacklist", "deny", "")

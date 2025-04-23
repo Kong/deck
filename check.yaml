@@ -1,0 +1,63 @@
+_format_version: "1.1"
+
+# plugins with legacy or deprecated config options
+plugins:
+- config:
+    # legacy field
+    whitelist:
+    - goodEntryOne
+    - goodEntryTwo
+  enabled: true
+  name: acl
+
+- config:
+    aws_imds_protocol_version: v1
+    aws_role_session_name: kong
+    invocation_type: RequestResponse
+    is_proxy_integration: false
+    keepalive: 60000
+    log_type: Tail
+    port: 443
+    # legacy field
+    proxy_scheme: http
+    timeout: 60000
+  enabled: true
+  name: aws-lambda
+
+- config:
+    # legacy field
+    functions:
+    - kong.log.err("foo")       kong.response.exit(418)
+  enabled: true
+  name: post-function
+
+- config:
+    # legacy field
+    functions:
+    - kong.log.err("foo")       kong.response.exit(418)
+  enabled: true
+  name: pre-function
+
+# scoped plugins with legacy or deprecated config options
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: mockbin
+  plugins:
+  - config:
+      # legacy field
+      blacklist:
+      - badEntryOne
+      - badEntryTwo
+    enabled: true
+    name: acl
+
+- name: svc1
+  host: mockbin.org
+  path: /status/200
+  routes:
+  - name: r1
+    paths:
+    - /status/\d+
+    - /code/\d+
