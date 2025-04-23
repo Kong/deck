@@ -1,0 +1,3 @@
+extends:
+  - convert/rulesets/280-to-340/routes.yaml
+  - convert/rulesets/280-to-340/plugins.yaml
