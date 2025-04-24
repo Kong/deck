@@ -171,7 +171,7 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 		delete(pluginConfig, oldField)
 
 		cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
-			"to the new field \"%s\" in plugin %s\n",
+			" to the new field \"%s\" in plugin %s\n",
 			oldField, newField, pluginName)
 	}
 	return pluginConfig
