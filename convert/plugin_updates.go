@@ -141,12 +141,16 @@ func updateLegacyPluginConfig(plugin *file.FPlugin) {
 	if plugin != nil && plugin.Config != nil {
 		config := plugin.Config.DeepCopy()
 
-		config = updateLegacyFieldToNewField(config, "blacklist", "deny", "")
-
-		config = updateLegacyFieldToNewField(config, "whitelist", "allow", "")
-
+		var pluginName string
 		if plugin.Name != nil {
-			pluginName := *plugin.Name
+			pluginName = *plugin.Name
+		}
+
+		config = updateLegacyFieldToNewField(config, "blacklist", "deny", pluginName)
+
+		config = updateLegacyFieldToNewField(config, "whitelist", "allow", pluginName)
+
+		if pluginName != "" {
 			if pluginName == awsLambdaPluginName {
 				config = removeDeprecatedFields3x(config, "proxy_scheme", pluginName)
 			}
@@ -162,26 +166,20 @@ func updateLegacyPluginConfig(plugin *file.FPlugin) {
 func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	oldField, newField, pluginName string,
 ) kong.Configuration {
-	var changes int
 	if _, ok := pluginConfig[oldField]; ok {
 		pluginConfig[newField] = pluginConfig[oldField]
 		delete(pluginConfig, oldField)
-		changes++
-	}
-	if changes > 0 {
-		cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\" to the new field %s in plugin %s\n",
+
+		cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
+			"to the new field \"%s\" in plugin %s\n",
 			oldField, newField, pluginName)
 	}
 	return pluginConfig
 }
 
 func removeDeprecatedFields3x(pluginConfig kong.Configuration, fieldName, pluginName string) kong.Configuration {
-	var changes int
-	if pluginConfig != nil {
+	if _, ok := pluginConfig[fieldName]; ok {
 		delete(pluginConfig, fieldName)
-		changes++
-	}
-	if changes > 0 {
 		cprint.UpdatePrintf("Automatically removed deprecated config field \"%s\" from plugin %s\n", fieldName, pluginName)
 	}
 	return pluginConfig
