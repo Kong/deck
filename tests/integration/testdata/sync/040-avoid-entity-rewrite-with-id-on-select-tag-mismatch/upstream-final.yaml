@@ -1,9 +1,0 @@
-_format_version: "3.0"
-upstreams:
-- name: upstream2
-  id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
-  algorithm: round-robin
-  targets:
-  - target: "::1"
-  tags:
-  - after
