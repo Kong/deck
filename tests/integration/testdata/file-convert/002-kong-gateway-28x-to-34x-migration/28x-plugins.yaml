@@ -40,6 +40,7 @@ plugins:
   name: pre-function
 
 # scoped plugins with legacy or deprecated config options
+# service-scoped plugins
 services:
 - connect_timeout: 60000
   enabled: true
@@ -53,3 +54,51 @@ services:
       - badEntryTwo
     enabled: true
     name: acl
+  # service and route-scoped plugin inside a service
+  routes:
+  - name: r2
+    https_redirect_status_code: 301
+    paths:
+    - /r2
+    plugins:
+    - config:
+        # legacy field
+        functions:
+        - kong.log.err("foo")       kong.response.exit(418)
+      enabled: true
+      name: post-function
+
+# route-scoped plugins
+routes:
+- name: r1
+  https_redirect_status_code: 301
+  paths:
+  - /r1
+  service: 
+   name: mockbin
+  plugins:
+  - config:
+    # legacy field
+      functions:
+      - kong.log.err("foo")       kong.response.exit(418)
+    enabled: true
+    name: pre-function
+
+# consumer-scoped plugins
+consumers:
+- plugins:
+  - config:
+      aws_imds_protocol_version: v1
+      aws_region: us-east-1
+      aws_role_session_name: kong
+      invocation_type: RequestResponse
+      is_proxy_integration: false
+      keepalive: 60000
+      log_type: Tail
+      port: 443
+      # legacy field
+      proxy_scheme: http
+      timeout: 60000
+    enabled: true
+    name: aws-lambda
+  username: consumer1

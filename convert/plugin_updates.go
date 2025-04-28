@@ -110,6 +110,12 @@ func updatePlugins(content *file.Content) {
 		for _, plugin := range service.Plugins {
 			updateLegacyPluginConfig(plugin)
 		}
+
+		for _, route := range service.Routes {
+			for _, plugin := range route.Plugins {
+				updateLegacyPluginConfig(plugin)
+			}
+		}
 	}
 
 	for _, route := range content.Routes {
