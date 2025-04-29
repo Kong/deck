@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.47.0](#v1470)
 - [v1.46.3](#v1463)
 - [v1.46.2](#v1462)
 - [v1.46.1](#v1461)
@@ -112,6 +113,31 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.47.0]
+> Release date: 2025/04/29
+
+### Added
+- Extended `deck file convert` command to be used for configuration
+migrations between LTS versions `2.8` and `3.4`. The command can
+auto-fix the possible configurations and gives appropriate errors
+or warnings for the others.
+This is how it can be used: `deck file convert --from 2.8 --to 3.4
+--input-file kong-28x.yaml -o kong-34x.yaml`
+[#1610](https://github.com/Kong/deck/pull/1610)
+- `_format_version` string can be parametrised now and works well with
+`deck file merge` command as well as others.
+[#1605](https://github.com/Kong/deck/pull/1605)
+[go-apiops #259](https://github.com/Kong/go-apiops/pull/259)
+
+### Fixed
+- ID existence checks are limited to certificates now,
+restoring sync performance.
+[#1608](https://github.com/Kong/deck/pull/1608)
+[go-database-reconciler #254](https://github.com/Kong/go-database-reconciler/pull/254)
+- Bumped `golang.org/x/net` from 0.36.0 to 0.38.0 to account
+for [CVE-2025-22872](https://github.com/advisories/GHSA-vvgc-356p-c3xw)
+[#1601](https://github.com/Kong/deck/pull/1601)
 
 ## [v1.46.3]
 > Release date: 2025/04/10
@@ -2093,6 +2119,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
 [v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3
 [v1.46.2]: https://github.com/Kong/deck/compare/v1.46.1...v1.46.2
 [v1.46.1]: https://github.com/Kong/deck/compare/v1.46.0...v1.46.1
