@@ -3,6 +3,7 @@ package convert
 import (
 	"fmt"
 
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
 )
@@ -10,6 +11,10 @@ import (
 const (
 	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
 	rlaNamespaceDefaultLength      = 32
+	awsLambdaPluginName            = "aws-lambda"
+	httpLogPluginName              = "http-log"
+	prefunctionPluginName          = "pre-function"
+	postfunctionPluginName         = "post-function"
 )
 
 func generateAutoFields(content *file.Content) error {
@@ -93,4 +98,95 @@ func autoGenerateNamespaceForRLAPluginConsumerGroups(plugin *kong.ConsumerGroupP
 		}
 	}
 	return nil
+}
+
+func updatePlugins(content *file.Content) {
+	for idx := range content.Plugins {
+		plugin := &content.Plugins[idx]
+		updateLegacyPluginConfig(plugin)
+	}
+
+	for _, service := range content.Services {
+		for _, plugin := range service.Plugins {
+			updateLegacyPluginConfig(plugin)
+		}
+
+		for _, route := range service.Routes {
+			for _, plugin := range route.Plugins {
+				updateLegacyPluginConfig(plugin)
+			}
+		}
+	}
+
+	for _, route := range content.Routes {
+		for _, plugin := range route.Plugins {
+			updateLegacyPluginConfig(plugin)
+		}
+	}
+
+	for _, consumer := range content.Consumers {
+		for _, plugin := range consumer.Plugins {
+			updateLegacyPluginConfig(plugin)
+		}
+	}
+
+	for _, consumerGroup := range content.ConsumerGroups {
+		for _, plugin := range consumerGroup.Plugins {
+			updateLegacyPluginConfig(&file.FPlugin{
+				Plugin: kong.Plugin{
+					ID:     plugin.ID,
+					Name:   plugin.Name,
+					Config: plugin.Config,
+				},
+			})
+		}
+	}
+}
+
+func updateLegacyPluginConfig(plugin *file.FPlugin) {
+	if plugin != nil && plugin.Config != nil {
+		config := plugin.Config.DeepCopy()
+
+		var pluginName string
+		if plugin.Name != nil {
+			pluginName = *plugin.Name
+		}
+
+		config = updateLegacyFieldToNewField(config, "blacklist", "deny", pluginName)
+
+		config = updateLegacyFieldToNewField(config, "whitelist", "allow", pluginName)
+
+		if pluginName != "" {
+			if pluginName == awsLambdaPluginName {
+				config = removeDeprecatedFields3x(config, "proxy_scheme", pluginName)
+			}
+			if pluginName == prefunctionPluginName || pluginName == postfunctionPluginName {
+				config = updateLegacyFieldToNewField(config, "functions", "access", pluginName)
+			}
+		}
+
+		plugin.Config = config
+	}
+}
+
+func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
+	oldField, newField, pluginName string,
+) kong.Configuration {
+	if _, ok := pluginConfig[oldField]; ok {
+		pluginConfig[newField] = pluginConfig[oldField]
+		delete(pluginConfig, oldField)
+
+		cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
+			" to the new field \"%s\" in plugin %s\n",
+			oldField, newField, pluginName)
+	}
+	return pluginConfig
+}
+
+func removeDeprecatedFields3x(pluginConfig kong.Configuration, fieldName, pluginName string) kong.Configuration {
+	if _, ok := pluginConfig[fieldName]; ok {
+		delete(pluginConfig, fieldName)
+		cprint.UpdatePrintf("Automatically removed deprecated config field \"%s\" from plugin %s\n", fieldName, pluginName)
+	}
+	return pluginConfig
 }
