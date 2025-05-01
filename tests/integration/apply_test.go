@@ -62,6 +62,20 @@ func Test_Apply_3x(t *testing.T) {
 			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
 			runWhen:       "kong",
 		},
+		{
+			name:          "accepts route foreign keys",
+			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
+			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
+			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
+			runWhen:       "kong",
+		},
+		{
+			name:          "accepts route updates",
+			firstFile:     "testdata/apply/008-update-existing-entity-route/route-01.yaml",
+			secondFile:    "testdata/apply/008-update-existing-entity-route/route-02.yaml",
+			expectedState: "testdata/apply/008-update-existing-entity-route/expected-state.yaml",
+			runWhen:       "kong",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
