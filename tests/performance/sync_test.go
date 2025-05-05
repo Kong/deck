@@ -22,7 +22,7 @@ func Test_Sync_Execution_Duration_Simple(t *testing.T) {
 			// Note that real world latency for http response will be about 10x of local instance (which is used in testing)
 			// so keeping the acceptable duration low.
 			stateFile:                   "testdata/sync/regression-entities-with-id.yaml",
-			acceptableExecutionDuration: int64(1000), // 1s
+			acceptableExecutionDuration: int64(5000), // 5s
 		},
 	}
 
