@@ -9,7 +9,7 @@ concurrency:
 on:
   push:
     branches:
-    - main
+    - test/fail-perf-test-v1.46.1
   pull_request: {}
 
 jobs:
