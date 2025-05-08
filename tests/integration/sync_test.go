@@ -8074,3 +8074,146 @@ func Test_Sync_Avoid_Overwrite_On_Select_Tag_Mismatch_With_ID(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//
+// - >=2.8.0 <3.0.0
+func Test_Sync_Plugins_Nested_Foreign_Keys(t *testing.T) {
+	runWhen(t, "kong", ">=2.8.0 <3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-via-ids.yaml",
+		},
+		{
+			name:      "plugins with route reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-via-names.yaml",
+		},
+		{
+			name:      "plugins with route reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.0.0
+// - konnect
+func Test_Sync_Plugins_Nested_Foreign_Keys_3x(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-via-ids.yaml",
+		},
+		{
+			name:      "plugins with route reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-via-names.yaml",
+		},
+		{
+			name:      "plugins with route reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.0.0+enterprise
+// - konnect
+func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
+	// prior versions don't support a consumer_group foreign key with a value
+	runWhenEnterpriseOrKonnect(t, ">=3.6.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer-group reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer-group reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
