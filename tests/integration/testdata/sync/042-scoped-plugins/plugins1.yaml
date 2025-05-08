@@ -1,0 +1,18 @@
+_format_version: "3.0"
+plugins:
+- config:
+    body: null
+    content_type: null
+    echo: false
+    message: null
+    status_code: 503
+    trigger: null
+  enabled: true
+  name: request-termination
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - tag1

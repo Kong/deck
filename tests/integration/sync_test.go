@@ -8217,3 +8217,76 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//
+// - >=2.8.0
+func Test_Sync_Scoped_Plugins_Check_Conflicts(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=2.8.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	stateFiles := []string{
+		"testdata/sync/042-scoped-plugins/plugins1.yaml",
+		"testdata/sync/042-scoped-plugins/plugins2.yaml",
+	}
+
+	tests := []struct {
+		name       string
+		multiSync  bool
+		emptyState bool
+	}{
+		{
+			name:       "sync plugin files one by one, existing state: empty",
+			multiSync:  false,
+			emptyState: true,
+		},
+		{
+			name:       "sync plugin files one by one, existing state: non-empty",
+			multiSync:  false,
+			emptyState: false,
+		},
+		{
+			name:       "sync plugin files together, existing state: empty",
+			multiSync:  true,
+			emptyState: true,
+		},
+		{
+			name:       "sync plugin files together, existing state: non-empty",
+			multiSync:  true,
+			emptyState: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if !tc.emptyState {
+				// syncing first state file to create initial state
+				err := sync(ctx, stateFiles[0])
+				require.NoError(t, err)
+			}
+
+			if tc.multiSync {
+				err := multiFileSync(ctx, stateFiles)
+				require.NoError(t, err)
+
+				// re-sync with no error
+				err = multiFileSync(ctx, stateFiles)
+				require.NoError(t, err)
+
+				return
+			}
+
+			for _, s := range stateFiles {
+				err := sync(ctx, s)
+				require.NoError(t, err)
+
+				// re-sync with no error
+				err = sync(ctx, s)
+				require.NoError(t, err)
+			}
+		})
+	}
+}

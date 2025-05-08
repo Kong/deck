@@ -13,14 +13,14 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.42
-	github.com/kong/go-database-reconciler v1.22.5
+	github.com/kong/go-database-reconciler v1.22.6
 	github.com/kong/go-kong v0.65.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/sync v0.12.0
+	golang.org/x/sync v0.14.0
 	k8s.io/api v0.32.1
 	k8s.io/apiextensions-apiserver v0.32.1
 	k8s.io/apimachinery v0.32.3
