@@ -1,0 +1,28 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: httpbin.org
+  name: anything-tag2
+  path: /anything
+  plugins:
+  - config:
+      body: null
+      content_type: null
+      echo: true
+      message: null
+      status_code: 503
+      trigger: null
+    enabled: true
+    name: request-termination
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+    tags:
+    - tag2
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5

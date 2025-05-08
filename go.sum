@@ -246,8 +246,8 @@ github.com/klauspost/cpuid/v2 v2.2.5 h1:0E5MSMDEoAulmXNFquVs//DdoomxaoTY1kUhbc/q
 github.com/klauspost/cpuid/v2 v2.2.5/go.mod h1:Lcz8mBdAVJIBVzewtcLocK12l3Y+JytZYpaMropDUws=
 github.com/kong/go-apiops v0.1.42 h1:GF9KV1D06p/Ux2F5Dc4UJzGKFOeMzynpUWiAZwyEqxE=
 github.com/kong/go-apiops v0.1.42/go.mod h1:hKnHJ3UyeuG932SkI/yMpuT/PqSqGXNTS1zhno1lDqg=
-github.com/kong/go-database-reconciler v1.22.5 h1:QHfGnNgnn8WFb+k7m5sfr+1+YIEXogy1S7dSebHQBqw=
-github.com/kong/go-database-reconciler v1.22.5/go.mod h1:X8IjjS23H44Kzp9KjfCNM6WaQHnPhyeVYvntuI7fAkU=
+github.com/kong/go-database-reconciler v1.22.6 h1:G8rjG7057aVHem4q6tyyzEyJo3hH2weL0U9JAZk4H/0=
+github.com/kong/go-database-reconciler v1.22.6/go.mod h1:hLtPRsuxqTYv1rt6h/YrimjDQzkxlAFSIWoG1jEjWKE=
 github.com/kong/go-kong v0.65.1 h1:CM+8NlF+VbJckTxP2hGmSPKhA1GMliitXjQ7vJiPkaE=
 github.com/kong/go-kong v0.65.1/go.mod h1:sqdysTKrXIJ6mpxHwTwjgZhLW7jR1/puczTXHLUwJaE=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
@@ -536,8 +536,8 @@ golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJ
 golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
-golang.org/x/sync v0.12.0 h1:MHc5BpPuC30uJk597Ri8TV3CNZcTLu6B6z4lJy+g6Jw=
-golang.org/x/sync v0.12.0/go.mod h1:1dzgHSNfp02xaA81J2MS99Qcpr2w7fw1gpm99rleRqA=
+golang.org/x/sync v0.14.0 h1:woo0S4Yywslg6hp4eUFjTVOyKt0RookbpAHG4c1HmhQ=
+golang.org/x/sync v0.14.0/go.mod h1:1dzgHSNfp02xaA81J2MS99Qcpr2w7fw1gpm99rleRqA=
 golang.org/x/sys v0.0.0-20180830151530-49385e6e1522/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20180909124046-d0be0721c37e/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
