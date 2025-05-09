@@ -107,3 +107,37 @@ func Test_Apply_3x(t *testing.T) {
 		assert.Equal(t, expectedChanged, outChanged)
 	})
 }
+
+// test scope:
+//   - enterprise: >=3.0.0
+//   - konnect
+func Test_Apply_Custom_Entities(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name                   string
+		initialStateFile       string
+		targetPartialStateFile string
+	}{
+		{
+			name:                   "degraphql routes",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.initialStateFile)
+			require.NoError(t, err)
+
+			err = apply(ctx, tc.targetPartialStateFile)
+			require.NoError(t, err)
+		})
+	}
+}
