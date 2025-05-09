@@ -127,6 +127,9 @@ plugins.
 - Improved error messaging for unsupported routes
 by adding route IDs in the message.
 [go-database-reconciler #257](https://github.com/Kong/go-database-reconciler/pull/257) 
+- Fixed errors faced during partial apply for custom entities
+[#1625](https://github.com/Kong/deck/pull/1625)
+[go-database-reconciler #267](https://github.com/Kong/go-database-reconciler/pull/267)
 
 ## [v1.47.0]
 > Release date: 2025/04/29
