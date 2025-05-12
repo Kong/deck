@@ -116,7 +116,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.47.1]
-> Release date: 2025/05/09
+> Release date: 2025/05/12
 
 ### Fixed
 - Fixed syncing errors faced during plugin creation
@@ -130,6 +130,8 @@ by adding route IDs in the message.
 - Fixed errors faced during partial apply for custom entities
 [#1625](https://github.com/Kong/deck/pull/1625)
 [go-database-reconciler #267](https://github.com/Kong/go-database-reconciler/pull/267)
+- Bump Go version to 1.24.3
+  [#1629](https://github.com/Kong/deck/pull/1629)
 
 ## [v1.47.0]
 > Release date: 2025/04/29
