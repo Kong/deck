@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.47.1](#v1471)
 - [v1.47.0](#v1470)
 - [v1.46.3](#v1463)
 - [v1.46.2](#v1462)
@@ -113,6 +114,24 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.47.1]
+> Release date: 2025/05/12
+
+### Fixed
+- Fixed syncing errors faced during plugin creation
+due to conflicts with global or other similarly-scoped
+plugins.
+[#1627](https://github.com/Kong/deck/pull/1627)
+[go-database-reconciler #271](https://github.com/Kong/go-database-reconciler/pull/271)
+- Improved error messaging for unsupported routes
+by adding route IDs in the message.
+[go-database-reconciler #257](https://github.com/Kong/go-database-reconciler/pull/257) 
+- Fixed errors faced during partial apply for custom entities
+[#1625](https://github.com/Kong/deck/pull/1625)
+[go-database-reconciler #267](https://github.com/Kong/go-database-reconciler/pull/267)
+- Bump Go version to 1.24.3
+  [#1629](https://github.com/Kong/deck/pull/1629)
 
 ## [v1.47.0]
 > Release date: 2025/04/29
@@ -2119,6 +2138,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
 [v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
 [v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3
 [v1.46.2]: https://github.com/Kong/deck/compare/v1.46.1...v1.46.2
