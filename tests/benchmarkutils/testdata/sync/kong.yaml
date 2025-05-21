@@ -1,16 +1,430 @@
 _format_version: "3.0"
+_info:
+  select_tags:
+  - "managed-by-deck"
 services:
 - connect_timeout: 60000
-  id: 58076db2-28b6-423b-ba39-a797193017f7
-  host: mockbin.org
-  name: svc1
-  port: 80
-  protocol: http
+  host: "example.com"
+  name: "service1"
+  path: "/api/v1"
+  port: 443
+  protocol: "https"
   read_timeout: 60000
   retries: 5
+  write_timeout: 60000
   routes:
-  - name: r1
-    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
-    https_redirect_status_code: 301
+  - name: "route1-service1"
     paths:
-    - /r1
+    - "/service1/route1"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    plugins:
+    - name: "rate-limiting"
+      config:
+        minute: 100
+        hour: 1000
+        policy: "local"
+      enabled: true
+  - name: "route2-service1"
+    paths:
+    - "/service1/route2"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    plugins:
+    - name: "cors"
+      config:
+        origins:
+        - "*"
+        methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+      enabled: true
+  - name: "route3-service1"
+    paths:
+    - "/service1/route3"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "key-auth"
+      config:
+        key_names: ["apikey"]
+      enabled: true
+  - name: "route4-service1"
+    paths:
+    - "/service1/route4"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "DELETE"
+    plugins:
+    - name: "request-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service: service1"
+      enabled: true
+  - name: "route5-service1"
+    paths:
+    - "/service1/route5"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "response-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service-Version: 1.0"
+      enabled: true
+  plugins:
+  - name: "prometheus"
+    config: {}
+    enabled: true
+  - name: "request-termination"
+    config:
+      status_code: 503
+      message: "Service Temporarily Unavailable"
+    enabled: false
+  - name: "ip-restriction"
+    config:
+      allow:
+      - "127.0.0.1/32"
+      - "192.168.0.0/16"
+    enabled: true
+  - name: "basic-auth"
+    config:
+      hide_credentials: true
+    enabled: false
+  - name: "acl"
+    config:
+      allow:
+      - "admin"
+      hide_groups_header: true
+    enabled: true
+  tags:
+  - "production"
+  - "managed-by-deck"
+
+- connect_timeout: 60000
+  host: "api.example.org"
+  name: "service2"
+  path: "/api/v2"
+  port: 443
+  protocol: "https"
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: "route1-service2"
+    paths:
+    - "/service2/route1"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    plugins:
+    - name: "rate-limiting"
+      config:
+        minute: 200
+        hour: 2000
+        policy: "local"
+      enabled: true
+  - name: "route2-service2"
+    paths:
+    - "/service2/route2"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    plugins:
+    - name: "cors"
+      config:
+        origins:
+        - "*"
+        methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+      enabled: true
+  - name: "route3-service2"
+    paths:
+    - "/service2/route3"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "key-auth"
+      config:
+        key_names: ["apikey"]
+      enabled: true
+  - name: "route4-service2"
+    paths:
+    - "/service2/route4"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "DELETE"
+    plugins:
+    - name: "request-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service: service2"
+      enabled: true
+  - name: "route5-service2"
+    paths:
+    - "/service2/route5"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "response-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service-Version: 2.0"
+      enabled: true
+  plugins:
+  - name: "prometheus"
+    config: {}
+    enabled: true
+  - name: "ip-restriction"
+    config:
+      allow:
+      - "127.0.0.1/32"
+      - "10.0.0.0/8"
+    enabled: true
+  tags:
+  - "production"
+  - "managed-by-deck"
+
+- connect_timeout: 60000
+  host: "data.example.net"
+  name: "service3"
+  path: "/api/v3"
+  port: 443
+  protocol: "https"
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  routes:
+  - name: "route1-service3"
+    paths:
+    - "/service3/route1"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    plugins:
+    - name: "rate-limiting"
+      config:
+        minute: 300
+        hour: 3000
+        policy: "local"
+      enabled: true
+  - name: "route2-service3"
+    paths:
+    - "/service3/route2"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    plugins:
+    - name: "cors"
+      config:
+        origins:
+        - "*"
+        methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+      enabled: true
+  - name: "route3-service3"
+    paths:
+    - "/service3/route3"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "key-auth"
+      config:
+        key_names: ["apikey"]
+      enabled: true
+  - name: "route4-service3"
+    paths:
+    - "/service3/route4"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    - "POST"
+    - "DELETE"
+    plugins:
+    - name: "request-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service: service3"
+      enabled: true
+  - name: "route5-service3"
+    paths:
+    - "/service3/route5"
+    strip_path: true
+    preserve_host: false
+    protocols:
+    - "http"
+    - "https"
+    methods:
+    - "GET"
+    plugins:
+    - name: "response-transformer"
+      config:
+        add:
+          headers:
+          - "X-Service-Version: 3.0"
+      enabled: true
+  plugins:
+  - name: "prometheus"
+    config: {}
+    enabled: true
+  - name: "ip-restriction"
+    config:
+      allow:
+      - "127.0.0.1/32"
+      - "172.16.0.0/12"
+    enabled: true
+  tags:
+  - "production"
+  - "managed-by-deck"
+
+
+plugins:
+- name: "correlation-id"
+  config:
+    header_name: "X-Correlation-ID"
+    generator: "uuid"
+    echo_downstream: true
+  enabled: true
+- name: "prometheus"
+  config: {}
+  enabled: true
+- name: "rate-limiting"
+  config:
+    second: 5000
+    minute: 100000
+    hour: 1000000
+    policy: "local"
+  enabled: true
+- name: "ip-restriction"
+  config:
+    deny:
+    - "1.2.3.4/32"
+  enabled: true
+- name: "bot-detection"
+  config: {}
+  enabled: true
+- name: "cors"
+  config:
+    origins:
+    - "*"
+    methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+    - "PATCH"
+    headers:
+    - "Accept"
+    - "Accept-Version"
+    - "Content-Length"
+    - "Content-MD5"
+    - "Content-Type"
+    - "Date"
+    - "X-Auth-Token"
+    max_age: 3600
+    credentials: true
+  enabled: true
+- name: "request-transformer"
+  config:
+    add:
+      headers:
+      - "X-Kong-Gateway: kong-oss"
+  enabled: true
+- name: "response-transformer"
+  config:
+    add:
+      headers:
+      - "X-Powered-By: Kong"
+  enabled: true
+- name: "request-size-limiting"
+  config:
+    allowed_payload_size: 10
+    size_unit: "megabytes"
+  enabled: true
