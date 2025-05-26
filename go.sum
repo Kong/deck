@@ -248,6 +248,8 @@ github.com/kong/go-apiops v0.1.43 h1:0CYgjJnKbyQQf3j3kGTBXmeo6AoPXl4cgKl67SI16Ks
 github.com/kong/go-apiops v0.1.43/go.mod h1:hKnHJ3UyeuG932SkI/yMpuT/PqSqGXNTS1zhno1lDqg=
 github.com/kong/go-database-reconciler v1.22.8-0.20250521081208-55316a063030 h1:HNePCQGQPvUq7tpRpY4g6zUxYEELeOmLutLJTfOrzzg=
 github.com/kong/go-database-reconciler v1.22.8-0.20250521081208-55316a063030/go.mod h1:E0WnCJVXb4ifZltLL48Y7A4aGFVlfMuWsB4eS4pRME8=
+github.com/kong/go-database-reconciler v1.22.8-0.20250526052520-9def7caa1aff h1:wp/U2yvIXwPQa1VkbZjQn4616EowTApIpAJY0urjUlY=
+github.com/kong/go-database-reconciler v1.22.8-0.20250526052520-9def7caa1aff/go.mod h1:E0WnCJVXb4ifZltLL48Y7A4aGFVlfMuWsB4eS4pRME8=
 github.com/kong/go-kong v0.66.1 h1:UVdemzcCpfXEl6O/VHdf0rT2bXdIO5ykuJbf2z1JTko=
 github.com/kong/go-kong v0.66.1/go.mod h1:wRMPAXGOB3kn53TF6zN4l2JhIWPUfXDFKNHkMHBB3iQ=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
