@@ -187,7 +187,16 @@ func sortSlices(x, y interface{}) bool {
 		if yEntity.ConsumerGroup != nil {
 			yName += *yEntity.ConsumerGroup.ID
 		}
+	case *kong.Key:
+		yEntity := y.(*kong.Key)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case *kong.KeySet:
+		yEntity := y.(*kong.KeySet)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
 	}
+
 	return xName < yName
 }
 
@@ -237,6 +246,8 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID"),
 		cmpopts.IgnoreFields(kong.KeyAuth{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.FilterChain{}, "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Key{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.KeySet{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
