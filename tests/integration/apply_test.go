@@ -245,7 +245,7 @@ func Test_Apply_KeysAndKeySets_Konnect(t *testing.T) {
 		{
 			name:             "keys and key_sets",
 			initialStateFile: "testdata/apply/009-keys-and-key_sets/initial.yaml",
-			updateStateFile:  "testdata/apply/009-keys-and-key_sets/update-konnect.yaml",
+			updateStateFile:  "testdata/apply/009-keys-and-key_sets/update.yaml",
 			expectedState: utils.KongRawState{
 				Keys: []*kong.Key{
 					{
@@ -256,6 +256,15 @@ func Test_Apply_KeysAndKeySets_Konnect(t *testing.T) {
 							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
 						},
 						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("d7cef208-23c3-46f8-94e8-fa1eddf43f0a"),
+						Name: kong.String("baz"),
+						KID:  kong.String("IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935345"),
+						},
+						JWK: kong.String("{\"kid\":\"IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ\",\"kty\":\"RSA\",\"use\":\"sig\",\"alg\":\"RS256\",\"n\":\"1Sn1X_y-RUzGna0hR00Wu64ZtY5N5BVzpRIby9wQ5EZVyWL9DRhU5PXqM3Y5gzgUVEQu548qQcMKOfs46PhOQudz-HPbwKWzcJCDUeNQsxdAEhW1uJR0EEV_SGJ-jTuKGqoEQc7bNrmhyXBMIeMkTeE_-ys75iiwvNjYphiOhsokC_vRTf_7TOPTe1UQasgxEVSLlTsen0vtK_FXcpbwdxZt02IysICcX5TcWX_XBuFP4cpwI9AS3M-imc01awc1t7FE5UWp62H5Ro2S5V9YwdxSjf4lX87AxYmawaWAjyO595XLuIXA3qt8-irzbCeglR1-cTB7a4I7_AclDmYrpw\",\"e\":\"AQAB\"}"), //nolint:lll
 					},
 					{
 						ID:   kong.String("03ad4618-82bb-4375-b9d1-edeefced868d"),

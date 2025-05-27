@@ -47,3 +47,4 @@ keys:
       -----END PUBLIC KEY-----
   set:
     id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+    name: bar
