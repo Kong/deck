@@ -528,6 +528,9 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 	}
 }
 
+// test scope:
+//
+// - >=3.1.0
 func Test_Dump_KeysAndKeySets(t *testing.T) {
 	runWhen(t, "kong", ">=3.1.0")
 	setup(t)
@@ -563,6 +566,9 @@ func Test_Dump_KeysAndKeySets(t *testing.T) {
 	}
 }
 
+// test scope:
+//
+// - konnect
 func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
