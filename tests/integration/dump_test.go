@@ -527,3 +527,79 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Dump_KeysAndKeySets(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump keys and key-sets - jwk keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+		},
+		{
+			name:         "dump keys and key-sets - pem keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump keys and key-sets - jwk keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/konnect-jwk.yaml",
+		},
+		{
+			name:         "dump keys and key-sets - pem keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/konnect-pem.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
