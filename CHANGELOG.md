@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.48.0](#v1480)
 - [v1.47.1](#v1471)
 - [v1.47.0](#v1470)
 - [v1.46.3](#v1463)
@@ -114,6 +115,35 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.48.0]
+> Release date: 2025/05/30
+
+### Added
+- Added support for keys and key_sets in deck
+[#1645](https://github.com/Kong/deck/pull/1645)
+[go-database-reconciler #274](https://github.com/Kong/go-database-reconciler/pull/274)
+[go-database-reconciler #279](https://github.com/Kong/go-database-reconciler/pull/279)
+[go-database-reconciler #283](https://github.com/Kong/go-database-reconciler/pull/283)
+[go-database-reconciler #286](https://github.com/Kong/go-database-reconciler/pull/286)
+[go-database-reconciler #287](https://github.com/Kong/go-database-reconciler/pull/287)
+
+### Fixed
+- Gained performance boost during sync and diff operations
+by caching schemas for plugins and partials.
+[go-database-reconciler #285](https://github.com/Kong/go-database-reconciler/pull/285)
+- Corrected request body for ConsumerGroupConsumer creation.
+[go-kong #545](https://github.com/Kong/go-kong/pull/545)
+- Fixed `deck file openapi2kong` command tovfail fast if no 
+paths are provided in OAS document, give a warning if 
+explicitly set to empty.
+[#1631](https://github.com/Kong/deck/pull/1631)
+[go-apiops #263](https://github.com/Kong/go-apiops/pull/263)
+
+### Chores
+- Upgraded underlying alpine version for docker images to
+v3.21.3
+[1541](https://github.com/Kong/deck/pull/1541)
 
 ## [v1.47.1]
 > Release date: 2025/05/12
@@ -2138,6 +2168,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.48.0]: https://github.com/Kong/deck/compare/v1.47.1...v1.48.0
 [v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
 [v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
 [v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3
