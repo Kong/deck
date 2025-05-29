@@ -6,12 +6,16 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
@@ -1618,6 +1622,7 @@ var (
 			Config: kong.Configuration{
 				"anonymous":        nil,
 				"hide_credentials": false,
+				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
 				"key_in_body":      false,
 				"key_in_header":    true,
 				"key_in_query":     true,
@@ -1975,6 +1980,190 @@ var (
 			Config: kong.Configuration{
 				"anonymous":        nil,
 				"hide_credentials": false,
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"realm":            nil, // This is present on 3.7.x+
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
+
+	consumerGroupScopedPlugins310x = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
 				"key_in_body":      false,
 				"key_in_header":    true,
 				"key_in_query":     true,
@@ -3636,7 +3825,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 			setup(t)
 
 			err := sync(context.Background(), tc.kongFile)
-			assert.Equal(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
@@ -3794,7 +3983,7 @@ func Test_Sync_Vault(t *testing.T) {
 			// use simple http client with https should result
 			// in a failure due missing certificate.
 			_, err := client.Get("https://localhost:8443/r1")
-			assert.NotNil(t, err)
+			require.Error(t, err)
 
 			// use transport with wrong CA cert this should result
 			// in a failure due to unknown authority.
@@ -3811,7 +4000,7 @@ func Test_Sync_Vault(t *testing.T) {
 			}
 
 			_, err = client.Get("https://localhost:8443/r1")
-			assert.NotNil(t, err)
+			require.Error(t, err)
 
 			// use transport with good CA cert should pass
 			// if referenced secrets are resolved correctly
@@ -3829,8 +4018,8 @@ func Test_Sync_Vault(t *testing.T) {
 			}
 
 			res, err := client.Get("https://localhost:8443/r1")
-			assert.NoError(t, err)
-			assert.Equal(t, res.StatusCode, http.StatusOK)
+			require.NoError(t, err)
+			assert.Equal(t, http.StatusOK, res.StatusCode)
 		})
 	}
 }
@@ -4258,12 +4447,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -4274,12 +4463,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -4290,12 +4479,12 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5676,12 +5865,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5692,12 +5881,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5708,12 +5897,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5901,7 +6090,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.9.0",
+			runWhen:  ">=3.9.0 <3.10.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
@@ -5952,6 +6141,59 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "creates consumer groups scoped plugins",
+			runWhen:  ">=3.10.0",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins310x,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name+"/"+tc.runWhen, func(t *testing.T) {
@@ -5970,12 +6212,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'foo' consumer (part of 'gold' group)
 			req, err := http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-special")
 			n := 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -5986,12 +6228,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'bar' consumer (part of 'silver' group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-not-so-special")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -6002,12 +6244,12 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 
 			// test 'baz' consumer (not part of any group)
 			req, err = http.NewRequest("GET", "http://localhost:8000/r1", nil)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			req.Header.Add("apikey", "i-am-just-average")
 			n = 0
 			for n < 11 {
 				resp, err := client.Do(req)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				defer resp.Body.Close()
 				if resp.StatusCode == http.StatusTooManyRequests {
 					break
@@ -6044,7 +6286,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 
 			err := sync(context.Background(), tc.kongFile)
 			if tc.expectedError == nil {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tc.expectedError.Error())
 			}
@@ -6275,7 +6517,7 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			err := sync(context.Background(), tc.kongFile, tc.flags...)
-			assert.Equal(t, err, tc.expectedError)
+			assert.Equal(t, tc.expectedError, err)
 		})
 	}
 }
@@ -6807,6 +7049,7 @@ func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 }
 
 func Test_Sync_FilterChains(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
 
@@ -6969,6 +7212,7 @@ func Test_Sync_FilterChains(t *testing.T) {
 }
 
 func Test_Sync_FilterChainsUnsupported(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", "<3.4.0")
 	setup(t)
 	require.NoError(t, sync(context.Background(), "testdata/sync/033-filter-chains/init.yaml"))
@@ -6994,7 +7238,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 		assert.Equal(t, "/foo", *d.URI)
@@ -7013,7 +7257,7 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 
@@ -7046,7 +7290,7 @@ func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 		assert.Equal(t, "/foo", *d.URI)
@@ -7065,7 +7309,7 @@ func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
 		degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(degraphqlRoutes))
+		require.Len(t, degraphqlRoutes, 1)
 
 		d := degraphqlRoutes[0]
 
@@ -7203,6 +7447,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_34x(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
 	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong34x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
 }
 
 // test scope:
@@ -7324,6 +7606,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_38x(t *testing.T) {
 		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml")
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong38x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
 	})
 }
 
@@ -7450,6 +7770,44 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
 	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
 }
 
 func Test_Sync_SkipConsumersWithConsumerGroups(t *testing.T) {
@@ -7491,4 +7849,590 @@ func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, "the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
 	})
+}
+
+func Test_Sync_Partials_Plugins(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	dumpConfig := deckDump.Config{}
+
+	partialConfig := kong.Configuration{
+		"cluster_max_redirections": float64(5),
+		"cluster_nodes":            nil,
+		"connect_timeout":          float64(2000),
+		"connection_is_proxied":    bool(false),
+		"database":                 float64(0),
+		"host":                     string("127.0.0.1"),
+		"keepalive_backlog":        nil,
+		"keepalive_pool_size":      float64(256),
+		"password":                 nil,
+		"port":                     float64(6379),
+		"read_timeout":             float64(3001),
+		"send_timeout":             float64(2004),
+		"sentinel_master":          nil,
+		"sentinel_nodes":           nil,
+		"sentinel_password":        nil,
+		"sentinel_role":            nil,
+		"sentinel_username":        nil,
+		"server_name":              nil,
+		"ssl":                      bool(false),
+		"ssl_verify":               bool(false),
+		"username":                 nil,
+	}
+
+	t.Run("create a partial and link to a plugin via name", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "my-ee-partial", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+		assert.IsType(t, kong.Configuration{}, partials[0].Config)
+		assert.Equal(t, partialConfig, partials[0].Config)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, *partials[0].ID, *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+	})
+
+	t.Run("partial id is preserved if passed and linking can be done via id", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong-ids.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "13dc230d-d65e-439a-9f05-9fd71abfee4d", *partials[0].ID)
+		assert.Equal(t, "my-ee-partial", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+		assert.IsType(t, kong.Configuration{}, partials[0].Config)
+		assert.Equal(t, partialConfig, partials[0].Config)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, "13dc230d-d65e-439a-9f05-9fd71abfee4d", *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+	})
+
+	t.Run("linking to a plugin fails in case of non-existent partial", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong-wrong.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "partial non-existent-partial for plugin rate-limiting-advanced: entity not found")
+	})
+}
+
+func Test_Sync_Partials(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	ctx := context.Background()
+
+	t.Run("create partials", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong-partials.yaml")
+		t.Cleanup(func() {
+			reset(t)
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("creating a partial errors out if no type is provided", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong-partials-no-type.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "type is required")
+	})
+
+	t.Run("creating a partial works even if no name or id is provided", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong-partials-no-name.yaml")
+		t.Cleanup(func() {
+			reset(t)
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("partial updates work without errors", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong.yaml")
+		t.Cleanup(func() {
+			reset(t)
+		})
+		require.NoError(t, err)
+
+		err = sync(ctx, "testdata/sync/039-partials/kong-update.yaml")
+		require.NoError(t, err)
+	})
+}
+
+func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
+
+	ctx := context.Background()
+
+	t.Run("no errors occur in case of subsequent syncs with distributed config and defaultLookupTags for consumer-group",
+		func(t *testing.T) {
+			// sync consumer-group file first
+			err := sync(ctx, "testdata/sync/015-consumer-groups/kong-cg.yaml")
+			t.Cleanup(func() {
+				reset(t)
+			})
+			require.NoError(t, err)
+
+			// sync consumers file
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers.yaml")
+			require.NoError(t, err)
+
+			// sync again
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers.yaml")
+			require.NoError(t, err)
+		})
+
+	t.Run("no errors occur in case of with distributed config when consumer is not tagged but consumer-group is",
+		func(t *testing.T) {
+			// sync consumer-group file first
+			err := sync(ctx, "testdata/sync/015-consumer-groups/kong-cg.yaml")
+			t.Cleanup(func() {
+				reset(t)
+			})
+			require.NoError(t, err)
+
+			// sync consumers file
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-no-tag.yaml")
+			require.NoError(t, err)
+
+			// sync again
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-no-tag.yaml")
+			require.NoError(t, err)
+		})
+}
+
+// test scope:
+//
+//   - >=2.8.0
+//   - konnect
+//   - enterprise
+func Test_Sync_Avoid_Overwrite_On_Select_Tag_Mismatch_With_ID(t *testing.T) {
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name             string
+		initialStateFile string
+		targetStateFile  string
+		errorExpected    string
+	}{
+		{
+			name:             "certificate",
+			initialStateFile: "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/certificate-initial.yaml",
+			targetStateFile:  "testdata/sync/040-avoid-entity-rewrite-with-id-on-select-tag-mismatch/certificate-final.yaml",
+			errorExpected:    "error: certificate with ID 13c562a1-191c-4464-9b18-e5222b46035a already exists",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.initialStateFile)
+			require.NoError(t, err)
+
+			err = sync(ctx, tc.targetStateFile, "--select-tag", "after")
+			require.Error(t, err)
+			assert.ErrorContains(t, err, tc.errorExpected)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=2.8.0 <3.0.0
+func Test_Sync_Plugins_Nested_Foreign_Keys(t *testing.T) {
+	runWhen(t, "kong", ">=2.8.0 <3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-via-ids.yaml",
+		},
+		{
+			name:      "plugins with route reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-via-names.yaml",
+		},
+		{
+			name:      "plugins with route reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.0.0
+// - konnect
+func Test_Sync_Plugins_Nested_Foreign_Keys_3x(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-via-ids.yaml",
+		},
+		{
+			name:      "plugins with route reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-via-names.yaml",
+		},
+		{
+			name:      "plugins with route reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-via-ids.yaml",
+		},
+		{
+			name:      "plugins with service reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.0.0+enterprise
+// - konnect
+func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
+	// prior versions don't support a consumer_group foreign key with a value
+	runWhenEnterpriseOrKonnect(t, ">=3.6.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "plugins with consumer-group reference - via name",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-via-names.yaml",
+		},
+		{
+			name:      "plugins with consumer-group reference - via id",
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-via-ids.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=2.8.0
+func Test_Sync_Scoped_Plugins_Check_Conflicts(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=2.8.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	stateFiles := []string{
+		"testdata/sync/042-scoped-plugins/plugins1.yaml",
+		"testdata/sync/042-scoped-plugins/plugins2.yaml",
+	}
+
+	tests := []struct {
+		name       string
+		multiSync  bool
+		emptyState bool
+	}{
+		{
+			name:       "sync plugin files one by one, existing state: empty",
+			multiSync:  false,
+			emptyState: true,
+		},
+		{
+			name:       "sync plugin files one by one, existing state: non-empty",
+			multiSync:  false,
+			emptyState: false,
+		},
+		{
+			name:       "sync plugin files together, existing state: empty",
+			multiSync:  true,
+			emptyState: true,
+		},
+		{
+			name:       "sync plugin files together, existing state: non-empty",
+			multiSync:  true,
+			emptyState: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if !tc.emptyState {
+				// syncing first state file to create initial state
+				err := sync(ctx, stateFiles[0])
+				require.NoError(t, err)
+			}
+
+			if tc.multiSync {
+				err := multiFileSync(ctx, stateFiles)
+				require.NoError(t, err)
+
+				// re-sync with no error
+				err = multiFileSync(ctx, stateFiles)
+				require.NoError(t, err)
+
+				return
+			}
+
+			for _, s := range stateFiles {
+				err := sync(ctx, s)
+				require.NoError(t, err)
+
+				// re-sync with no error
+				err = sync(ctx, s)
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Sync_KeysAndKeySets(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates keys and key_sets",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("f21a7073-1183-4b1c-bd87-4d5b8b18eeb4"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("d7cef208-23c3-46f8-94e8-fa1eddf43f0a"),
+						Name: kong.String("baz"),
+						KID:  kong.String("IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\n      \"kty\": \"RSA\",\n      \"kid\": \"IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ\",\n      \"use\": \"sig\",\n      \"alg\": \"RS256\",\n      \"e\": \"AQAB\",\n      \"n\": \"1Sn1X_y-RUzGna0hR00Wu64ZtY5N5BVzpRIby9wQ5EZVyWL9DRhU5PXqM3Y5gzgUVEQu548qQcMKOfs46PhOQudz-HPbwKWzcJCDUeNQsxdAEhW1uJR0EEV_SGJ-jTuKGqoEQc7bNrmhyXBMIeMkTeE_-ys75iiwvNjYphiOhsokC_vRTf_7TOPTe1UQasgxEVSLlTsen0vtK_FXcpbwdxZt02IysICcX5TcWX_XBuFP4cpwI9AS3M-imc01awc1t7FE5UWp62H5Ro2S5V9YwdxSjf4lX87AxYmawaWAjyO595XLuIXA3qt8-irzbCeglR1-cTB7a4I7_AclDmYrpw\"\n  }"), //nolint:lll
+					},
+					{
+						ID:   kong.String("03ad4618-82bb-4375-b9d1-edeefced868d"),
+						Name: kong.String("my-pem-key"),
+						KID:  kong.String("my-pem-key"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						PEM: &kong.PEM{
+							PublicKey:  kong.String("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqvxMU4LTcHBYmCuLMhMP\nDWlZdcNRXuJkw26MRjLBxXjnPAyDolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMC\nIbDjseruCO+7EaIRY4d6RdpE+XowCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEK\nI51CoZ26LPYQvjIGIY2/pPxq0Ydl9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST\n8vV5Q5HJsZNFLR7Fy61+HHfnQiWIYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHl\nYeoHcP/CqviZnQOf5804qcVpPKbsGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWd\nFQIDAQAB\n-----END PUBLIC KEY-----"),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //nolint:lll
+							PrivateKey: kong.String("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAqvxMU4LTcHBYmCuLMhMPDWlZdcNRXuJkw26MRjLBxXjnPAyD\nolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMCIbDjseruCO+7EaIRY4d6RdpE+Xow\nCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEKI51CoZ26LPYQvjIGIY2/pPxq0Ydl\n9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST8vV5Q5HJsZNFLR7Fy61+HHfnQiWI\nYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHlYeoHcP/CqviZnQOf5804qcVpPKbs\nGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWdFQIDAQABAoIBAEOOqAGfATe9y+Nj\n4P2J9jqQU15qK65XuQRWm2npCBKj8IkTULdGw7cYD6XgeFedqCtcPpbgkRUERYxR\n4oV4I5F4OJ7FegNh5QHUjRZMIw2Sbgo8Mtr0jkt5MycBvIAhJbAaDep/wDWGz8Y1\nPDmx1lW3/umoTjURjA/5594+CWiABYzuIi4WprWe4pIKqSKOMHnCYVAD243mwJ7y\nvsatO3LRKYfLw74ifCYhWNBHaZwfw+OO2P5Ku0AGhY4StOLCHobJ8/KkkmkTlYzv\nrcF4cVdvpBfdTEQed0oD7u3xfnp3GpNU3wZFsZJRSVXouhroaMC7en4uMc+5yguW\nqrPIoEkCgYEAxm1UllY9rRfGV6884hdBFKDjE825BC1VlqcRIUEB4CpJvUF/6+A3\ngx5c4nKDJAFQMrWpr4jOcq3iLiWnJ73e80b+JpWFODdt16g2KCOINs1j8vf2U6Og\nx+Vo8vHek/Uomz1n5W0oXrJ4VedHl9NYa8r/YrVXd4k4WcaA0TXmMhMCgYEA3Jit\nzrEmrQIrLK66RgXF2RafA5c3atRHWBb5ddnGk0bV90cfsTsaDMDvpy7ZYgojBNpw\n7U6AYzqnPro6cHEginV97BFb6oetMvOWvljUob+tpnYOofgwk2hw7PeChViX7iS9\nujgTygi8ZIc2G0r7xntH+v6WHKp4yNQiCAyfGTcCgYAYKgZMDJKUOrn3wapraiON\nzI36wmnOnWq33v6SCyWcU+oI9yoJ4pNAD3mGRiW8Q8CtfDv+2W0ywAQ0VHeHunKl\nM7cNodXIY8+nnJ+Dwdf7vIV4eEPyKZIR5dkjBNtzLz7TsOWvJdzts1Q+Od0ZGy7A\naccyER1mvDo1jJvxXlv7KwKBgQDDBK9TdUVt2eb1X5sJ4HyiiN8XO44ggX55IAZ1\n64skFJGARH5+HnPPJpo3wLEpfTCsT7lZ8faKwwWr7NNRKJHOFkS2eDo8QqoZy0NP\nEBUa0evgp6oUAuheyQxcUgwver0GKbEZeg30pHh4nxh0VHv1YnOmL3/h48tYMEHN\nv+q/TQKBgQCXQmN8cY2K7UfZJ6BYEdguQZS5XISFbLNkG8wXQX9vFiF8TuSWawDN\nTrRHVDGwoMGWxjZBLCsitA6zwrMLJZs4RuetKHFou7MiDQ69YGdfNRlRvD5QCJDc\nY0ICsYjI7VM89Qj/41WQyRHYHm7E9key3avMGdbYtxdc0Ku4LnD4zg==\n-----END RSA PRIVATE KEY-----"), //nolint:lll
+						},
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						Name: kong.String("bar"),
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+
+			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+// Separate test function is added as Konnect has different
+// ordering and spacing for keys.
+func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates keys and key_sets",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("f21a7073-1183-4b1c-bd87-4d5b8b18eeb4"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("d7cef208-23c3-46f8-94e8-fa1eddf43f0a"),
+						Name: kong.String("baz"),
+						KID:  kong.String("IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ\",\"kty\":\"RSA\",\"use\":\"sig\",\"alg\":\"RS256\",\"n\":\"1Sn1X_y-RUzGna0hR00Wu64ZtY5N5BVzpRIby9wQ5EZVyWL9DRhU5PXqM3Y5gzgUVEQu548qQcMKOfs46PhOQudz-HPbwKWzcJCDUeNQsxdAEhW1uJR0EEV_SGJ-jTuKGqoEQc7bNrmhyXBMIeMkTeE_-ys75iiwvNjYphiOhsokC_vRTf_7TOPTe1UQasgxEVSLlTsen0vtK_FXcpbwdxZt02IysICcX5TcWX_XBuFP4cpwI9AS3M-imc01awc1t7FE5UWp62H5Ro2S5V9YwdxSjf4lX87AxYmawaWAjyO595XLuIXA3qt8-irzbCeglR1-cTB7a4I7_AclDmYrpw\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("03ad4618-82bb-4375-b9d1-edeefced868d"),
+						Name: kong.String("my-pem-key"),
+						KID:  kong.String("my-pem-key"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						PEM: &kong.PEM{
+							PublicKey:  kong.String("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqvxMU4LTcHBYmCuLMhMP\nDWlZdcNRXuJkw26MRjLBxXjnPAyDolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMC\nIbDjseruCO+7EaIRY4d6RdpE+XowCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEK\nI51CoZ26LPYQvjIGIY2/pPxq0Ydl9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST\n8vV5Q5HJsZNFLR7Fy61+HHfnQiWIYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHl\nYeoHcP/CqviZnQOf5804qcVpPKbsGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWd\nFQIDAQAB\n-----END PUBLIC KEY-----"),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //nolint:lll
+							PrivateKey: kong.String("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAqvxMU4LTcHBYmCuLMhMPDWlZdcNRXuJkw26MRjLBxXjnPAyD\nolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMCIbDjseruCO+7EaIRY4d6RdpE+Xow\nCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEKI51CoZ26LPYQvjIGIY2/pPxq0Ydl\n9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST8vV5Q5HJsZNFLR7Fy61+HHfnQiWI\nYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHlYeoHcP/CqviZnQOf5804qcVpPKbs\nGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWdFQIDAQABAoIBAEOOqAGfATe9y+Nj\n4P2J9jqQU15qK65XuQRWm2npCBKj8IkTULdGw7cYD6XgeFedqCtcPpbgkRUERYxR\n4oV4I5F4OJ7FegNh5QHUjRZMIw2Sbgo8Mtr0jkt5MycBvIAhJbAaDep/wDWGz8Y1\nPDmx1lW3/umoTjURjA/5594+CWiABYzuIi4WprWe4pIKqSKOMHnCYVAD243mwJ7y\nvsatO3LRKYfLw74ifCYhWNBHaZwfw+OO2P5Ku0AGhY4StOLCHobJ8/KkkmkTlYzv\nrcF4cVdvpBfdTEQed0oD7u3xfnp3GpNU3wZFsZJRSVXouhroaMC7en4uMc+5yguW\nqrPIoEkCgYEAxm1UllY9rRfGV6884hdBFKDjE825BC1VlqcRIUEB4CpJvUF/6+A3\ngx5c4nKDJAFQMrWpr4jOcq3iLiWnJ73e80b+JpWFODdt16g2KCOINs1j8vf2U6Og\nx+Vo8vHek/Uomz1n5W0oXrJ4VedHl9NYa8r/YrVXd4k4WcaA0TXmMhMCgYEA3Jit\nzrEmrQIrLK66RgXF2RafA5c3atRHWBb5ddnGk0bV90cfsTsaDMDvpy7ZYgojBNpw\n7U6AYzqnPro6cHEginV97BFb6oetMvOWvljUob+tpnYOofgwk2hw7PeChViX7iS9\nujgTygi8ZIc2G0r7xntH+v6WHKp4yNQiCAyfGTcCgYAYKgZMDJKUOrn3wapraiON\nzI36wmnOnWq33v6SCyWcU+oI9yoJ4pNAD3mGRiW8Q8CtfDv+2W0ywAQ0VHeHunKl\nM7cNodXIY8+nnJ+Dwdf7vIV4eEPyKZIR5dkjBNtzLz7TsOWvJdzts1Q+Od0ZGy7A\naccyER1mvDo1jJvxXlv7KwKBgQDDBK9TdUVt2eb1X5sJ4HyiiN8XO44ggX55IAZ1\n64skFJGARH5+HnPPJpo3wLEpfTCsT7lZ8faKwwWr7NNRKJHOFkS2eDo8QqoZy0NP\nEBUa0evgp6oUAuheyQxcUgwver0GKbEZeg30pHh4nxh0VHv1YnOmL3/h48tYMEHN\nv+q/TQKBgQCXQmN8cY2K7UfZJ6BYEdguQZS5XISFbLNkG8wXQX9vFiF8TuSWawDN\nTrRHVDGwoMGWxjZBLCsitA6zwrMLJZs4RuetKHFou7MiDQ69YGdfNRlRvD5QCJDc\nY0ICsYjI7VM89Qj/41WQyRHYHm7E9key3avMGdbYtxdc0Ku4LnD4zg==\n-----END RSA PRIVATE KEY-----"), //nolint:lll
+						},
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						Name: kong.String("bar"),
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+
+			testKongState(t, client, true, false, tc.expectedState, nil)
+		})
+	}
 }

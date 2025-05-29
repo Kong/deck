@@ -1,0 +1,98 @@
+rules:
+  # plugins rules
+  http-log-plugin-check:
+    description: >-
+      The `headers` field now only takes a single string per header name, where it
+      previously took an array of values.
+    given:
+      - $.plugins[?(@.name == 'http-log')].config
+      - $.services[*].plugins[?(@.name == 'http-log')].config
+      - $.routes[*].plugins[?(@.name == 'http-log')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'http-log')].config
+      - $.consumers[*].plugins[?(@.name == 'http-log')].config
+    message: >-
+      In 2.8, each header in the `headers` field could be specified as an array. In 
+      3.4, each header specified can only be specified as a string, and no longer
+      supports arrays.
+    severity: error
+    then:
+      field: headers
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          additionalProperties:
+            type: string
+  statsd-advanced-plugin-check:
+    description: >-
+      The StatsD Advanced plugin has been deprecated and will be removed in 4.0. All capabilities
+      are now available in the StatsD plugin.
+    given:
+      - $.plugins[?(@.name == 'statsd-advanced')].enabled
+      - $.services[*].plugins[?(@.name == 'statsd-advanced')].enabled
+      - $.routes[*].plugins[?(@.name == 'statsd-advanced')].enabled
+      - $.services[*].routes[*].plugins[?(@.name == 'statsd-advanced')].enabled
+      - $.consumers[*].plugins[?(@.name == 'statsd-advanced')].enabled
+    message: >-
+      The StatsD Advanced plugin has been deprecated and will be removed in 4.0. All capabilities
+      are now available in the StatsD plugin.
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^true$"
+  # The following rules are warning-level lint to remind users to review their own configurations,
+  # which is hard to do through detection.
+  acme-plugin-check:
+    description: >-
+      The `storage_config.vault.auth_method` configuration parameter now defaults to token. For more
+      details, please visit the official docs: https://docs.konghq.com/hub/kong-inc/acme/changelog/
+    given:
+      - $.plugins[?(@.name == 'acme')].config.storage_config.vault
+      - $.services[*].plugins[?(@.name == 'acme')].config.storage_config.vault
+      - $.routes[*].plugins[?(@.name == 'acme')].config.storage_config.vault
+      - $.services[*].routes[*].plugins[?(@.name == 'acme')].config.storage_config.vault
+      - $.consumers[*].plugins[?(@.name == 'acme')].config.storage_config.vault
+    message: >-
+      The `storage_config.vault.auth_method` configuration parameter now defaults to `token`.
+      For more details, please visit the official docs: 
+      https://docs.konghq.com/hub/kong-inc/acme/changelog/
+    severity: warn
+    then:
+      - field: auth_method
+        function: truthy
+  prometheus-plugin-check:
+    description: >-
+      High cardinality metrics are now disabled by default. For more details, please visit the
+      official docs: https://docs.konghq.com/hub/kong-inc/prometheus/changelog/
+    given:
+      - $.plugins[?(@.name == 'prometheus')].enabled
+      - $.services[*].plugins[?(@.name == 'prometheus')].enabled
+      - $.routes[*].plugins[?(@.name == 'prometheus')].enabled
+      - $.services[*].routes[*].plugins[?(@.name == 'prometheus')].enabled
+      - $.plugins[*].plugins[?(@.name == 'prometheus')].enabled
+    message: >-
+      High cardinality metrics are now disabled by default. You can selectively enable them per 
+      the documentation here: https://docs.konghq.com/hub/kong-inc/prometheus/#metrics-disabled-by-default
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^true$"
+  aws-lambda-plugin-check2:
+    description: >-
+      The AWS region is now required. You can set it through the plugin configuration with the
+      `aws_region` field parameter, or with environment variables.
+    given:
+      - $.plugins[?(@.name == 'aws-lambda')].config
+      - $.services[*].plugins[?(@.name == 'aws-lambda')].config
+      - $.routes[*].plugins[?(@.name == 'aws-lambda')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'aws-lambda')].config
+      - $.consumers[*].plugins[?(@.name == 'aws-lambda')].config
+    message: >-
+      The AWS region is now required. You can set it through the plugin configuration with the
+      `aws_region` field parameter, or with environment variables.
+    severity: warn
+    then:
+      - field: aws_region
+        function: defined

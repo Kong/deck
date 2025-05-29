@@ -8,6 +8,7 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -484,7 +485,7 @@ func Test_Diff_Workspace_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			_, err := diff(tc.stateFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -508,7 +509,7 @@ func Test_Diff_Workspace_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			_, err := diff(tc.stateFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -539,10 +540,10 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedOutputMasked, out)
 		})
 	}
@@ -556,11 +557,11 @@ func Test_Diff_Masked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputMaskedJSON, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputMaskedJSON, out)
 		})
 	}
 }
@@ -591,10 +592,10 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedOutputMasked, out)
 		})
 	}
@@ -607,11 +608,11 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputMaskedJSON30x, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputMaskedJSON30x, out)
 		})
 	}
 	for _, tc := range tests {
@@ -623,11 +624,11 @@ func Test_Diff_Masked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputMaskedJSON, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputMaskedJSON, out)
 		})
 	}
 }
@@ -658,10 +659,10 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value")
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedOutputUnMasked, out)
 		})
 	}
@@ -674,11 +675,11 @@ func Test_Diff_Unmasked_OlderThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputUnMaskedJSON, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputUnMaskedJSON, out)
 		})
 	}
 }
@@ -709,10 +710,10 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value")
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expectedOutputUnMasked, out)
 		})
 	}
@@ -725,11 +726,11 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputUnMaskedJSON30x, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputUnMaskedJSON30x, out)
 		})
 	}
 	for _, tc := range tests {
@@ -741,11 +742,11 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 			setup(t)
 
 			// initialize state
-			assert.NoError(t, sync(context.Background(), tc.initialStateFile))
+			require.NoError(t, sync(context.Background(), tc.initialStateFile))
 
 			out, err := diff(tc.stateFile, "--no-mask-deck-env-vars-value", "--json-output")
-			assert.NoError(t, err)
-			assert.Equal(t, expectedOutputUnMaskedJSON, out)
+			require.NoError(t, err)
+			assert.JSONEq(t, expectedOutputUnMaskedJSON, out)
 		})
 	}
 }
@@ -776,12 +777,48 @@ func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 
 			// test that the diff command does not return any changes when
 			// array fields are not sorted.
-			assert.NoError(t, sync(context.Background(), tc.stateFile, "--timeout", "60"))
+			require.NoError(t, sync(context.Background(), tc.stateFile, "--timeout", "60"))
 
 			out, err := diff(tc.stateFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, emptyOutput, out)
 			reset(t)
+		})
+	}
+}
+
+func Test_Diff_Plugin_Protocol_Order_Change(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name             string
+		initialStateFile string
+		stateFile        string
+		expectedDiff     string
+	}{
+		{
+			name:             "syncing and then diffing same file should not show false diff",
+			initialStateFile: "testdata/diff/004-no-diff-plugin/initial-ip-restriction.yaml",
+			stateFile:        "testdata/diff/004-no-diff-plugin/initial-ip-restriction.yaml",
+			expectedDiff:     emptyOutput,
+		},
+		{
+			name:             "changing protocol order should not show diff",
+			initialStateFile: "testdata/diff/004-no-diff-plugin/protocol-initial-order-plugins.yaml",
+			stateFile:        "testdata/diff/004-no-diff-plugin/protocol-reordered-plugins.yaml",
+			expectedDiff:     emptyOutput,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// initialize state
+			require.NoError(t, sync(ctx, tc.initialStateFile))
+
+			out, err := diff(tc.stateFile)
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedDiff, out)
 		})
 	}
 }
@@ -795,10 +832,10 @@ func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
 	// test that the diff command does not return any changes when
 	// target is a compressed IPv6.
 	stateFile := "testdata/diff/005-no-diff-target/kong.yaml"
-	assert.NoError(t, sync(context.Background(), stateFile))
+	require.NoError(t, sync(context.Background(), stateFile))
 
 	out, err := diff(stateFile)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, emptyOutput, out)
 	reset(t)
 }

@@ -1,0 +1,81 @@
+_format_version: "3.0"
+consumers:
+- plugins:
+  - config:
+      aws_imds_protocol_version: v1
+      aws_region: us-east-1
+      aws_role_session_name: kong
+      invocation_type: RequestResponse
+      is_proxy_integration: false
+      keepalive: 60000
+      log_type: Tail
+      port: 443
+      timeout: 60000
+    enabled: true
+    name: aws-lambda
+  username: consumer1
+plugins:
+- config:
+    allow:
+    - goodEntryOne
+    - goodEntryTwo
+  enabled: true
+  name: acl
+- config:
+    aws_imds_protocol_version: v1
+    aws_region: us-east-1
+    aws_role_session_name: kong
+    invocation_type: RequestResponse
+    is_proxy_integration: false
+    keepalive: 60000
+    log_type: Tail
+    port: 443
+    timeout: 60000
+  enabled: true
+  name: aws-lambda
+- config:
+    access:
+    - kong.log.err("foo")       kong.response.exit(418)
+  enabled: true
+  name: post-function
+- config:
+    access:
+    - kong.log.err("foo")       kong.response.exit(418)
+  enabled: true
+  name: pre-function
+routes:
+- https_redirect_status_code: 301
+  name: r1
+  paths:
+  - /r1
+  plugins:
+  - config:
+      access:
+      - kong.log.err("foo")       kong.response.exit(418)
+    enabled: true
+    name: pre-function
+  service:
+    name: mockbin
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: mockbin
+  plugins:
+  - config:
+      deny:
+      - badEntryOne
+      - badEntryTwo
+    enabled: true
+    name: acl
+  routes:
+  - https_redirect_status_code: 301
+    name: r2
+    paths:
+    - /r2
+    plugins:
+    - config:
+        access:
+        - kong.log.err("foo")       kong.response.exit(418)
+      enabled: true
+      name: post-function

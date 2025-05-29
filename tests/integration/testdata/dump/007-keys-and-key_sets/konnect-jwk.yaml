@@ -1,0 +1,14 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+key_sets:
+- id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+  name: bar
+keys:
+- id: f21a7073-1183-4b1c-bd87-4d5b8b18eeb4
+  jwk: '{"kid":"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4","kty":"RSA","alg":"A256GCM","n":"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ","e":"AQAB"}'
+  kid: vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4
+  name: foo
+  set:
+    id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+    name: bar

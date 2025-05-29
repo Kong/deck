@@ -9,8 +9,9 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kong/deck/cmd"
+	"github.com/kong/deck/lint"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
 
@@ -28,11 +29,11 @@ func Test_LintPlain(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			output, err := lint(
+			output, err := fileLint(
 				"-s", tc.stateFile,
 				tc.rulesetFile,
 			)
-			assert.Error(t, err)
+			require.Error(t, err)
 
 			assert.Contains(t, output, "Linting Violations: 2")
 			assert.Contains(t, output, "Failures: 1")
@@ -45,7 +46,7 @@ func Test_LintPlain(t *testing.T) {
 type lintErrors struct {
 	TotalCount int
 	FailCount  int
-	Results    []cmd.LintResult
+	Results    []lint.Result
 }
 
 func Test_LintStructured(t *testing.T) {
@@ -128,32 +129,32 @@ func Test_LintStructured(t *testing.T) {
 			if tc.failSeverity != "" {
 				lintOpts = append(lintOpts, "--fail-severity", tc.failSeverity)
 			}
-			output, err := lint(lintOpts...)
-			assert.Error(t, err)
+			output, err := fileLint(lintOpts...)
+			require.Error(t, err)
 
 			var expectedErrors, outputErrors lintErrors
 			// get expected errors from file
 			content, err := os.ReadFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			if tc.format == "yaml" {
 				err = yaml.Unmarshal(content, &expectedErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// parse result errors from lint command
 				err = yaml.Unmarshal([]byte(output), &outputErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			} else {
 				err = json.Unmarshal(content, &expectedErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				// parse result errors from lint command
 				err = json.Unmarshal([]byte(output), &outputErrors)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 
 			cmpOpts := []cmp.Option{
-				cmpopts.SortSlices(func(a, b cmd.LintResult) bool { return a.Line < b.Line }),
+				cmpopts.SortSlices(func(a, b lint.Result) bool { return a.Line < b.Line }),
 				cmpopts.EquateEmpty(),
 			}
 			if diff := cmp.Diff(outputErrors, expectedErrors, cmpOpts...); diff != "" {

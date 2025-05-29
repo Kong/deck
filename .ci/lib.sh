@@ -24,8 +24,6 @@ readonly DOCKER_ARGS=(
     -e "KONG_ADMIN_ERROR_LOG=/dev/stderr"
     -e "KONG_LOG_LEVEL=${KONG_LOG_LEVEL:-notice}"
     -e "KONG_CASSANDRA_CONTACT_POINTS=kong-database"
-    -e "KONG_WASM_FILTERS_PATH=/filters"
-    -e "KONG_WASM=on"
 )
 
 waitContainer() {

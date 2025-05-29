@@ -27,18 +27,18 @@ func Test_Dump_SelectTags_30(t *testing.T) {
 			runWhen(t, "kong", ">=3.0.0 <3.1.0")
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			output, err := dump(
 				"--select-tag", "managed-by-deck",
 				"--select-tag", "org-unit-42",
 				"-o", "-",
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
-			assert.Equal(t, output, expected)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }
@@ -74,18 +74,18 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			output, err := dump(
 				"--select-tag", "managed-by-deck",
 				"--select-tag", "org-unit-42",
 				"-o", "-",
 			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
-			assert.Equal(t, output, expected)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }
@@ -152,7 +152,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-39.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0 <3.10.0") },
+		},
+		{
+			name:          "3.10.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-310.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -160,7 +167,7 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			tc.runWhen(t)
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -176,10 +183,10 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 					"-o", "-",
 				)
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}
@@ -210,7 +217,7 @@ func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -226,10 +233,10 @@ func Test_Dump_SkipConsumers_Konnect(t *testing.T) {
 					"-o", "-",
 				)
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}
@@ -263,7 +270,7 @@ func Test_Dump_KonnectRename(t *testing.T) {
 			runWhenKonnect(t)
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -273,10 +280,10 @@ func Test_Dump_KonnectRename(t *testing.T) {
 			flags = append(flags, tc.flags...)
 			output, err = dump(flags...)
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}
@@ -291,10 +298,10 @@ func Test_Dump_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	var output string
 	flags := []string{"-o", "-", "--with-id"}
 	output, err := dump(flags...)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	expected, err := readFile("testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expected, output)
 }
 
@@ -307,14 +314,15 @@ func Test_Dump_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
 	var output string
 	flags := []string{"-o", "-", "--with-id"}
 	output, err := dump(flags...)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	expected, err := readFile("testdata/dump/003-consumer-group-consumers-custom_id/konnect.yaml")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, expected, output)
 }
 
 func Test_Dump_FilterChains(t *testing.T) {
+	t.Skip("Skipping test till wasm/filter-chains issue is not resolved at gateway level")
 	runWhen(t, "kong", ">=3.4.0")
 	setup(t)
 
@@ -343,10 +351,10 @@ func Test_Dump_FilterChains(t *testing.T) {
 			var output string
 			flags := []string{"-o", "-"}
 			output, err := dump(flags...)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expected)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}
@@ -426,7 +434,7 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 			tc.runWhen(t)
 			setup(t)
 
-			assert.NoError(t, sync(context.Background(), tc.stateFile))
+			require.NoError(t, sync(context.Background(), tc.stateFile))
 
 			var (
 				output string
@@ -448,10 +456,10 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 				return
 			}
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}
@@ -511,6 +519,82 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 				return
 			}
 
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Dump_KeysAndKeySets(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump keys and key-sets - jwk keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+		},
+		{
+			name:         "dump keys and key-sets - pem keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump keys and key-sets - jwk keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/konnect-jwk.yaml",
+		},
+		{
+			name:         "dump keys and key-sets - pem keys",
+			stateFile:    "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			expectedFile: "testdata/dump/007-keys-and-key_sets/konnect-pem.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump("-o", "-", "--with-id")
 			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)

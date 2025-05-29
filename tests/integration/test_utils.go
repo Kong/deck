@@ -49,6 +49,14 @@ func getTestClient() (*kong.Client, error) {
 	})
 }
 
+func setDefaultKonnectControlPlane(t *testing.T) {
+	t.Helper()
+	if os.Getenv("DECK_KONNECT_CONTROL_PLANE_NAME") == "" ||
+		os.Getenv("DECK_KONNECT_RUNTIME_GROUP_NAME") == "" {
+		t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	}
+}
+
 func runWhenKonnect(t *testing.T) {
 	t.Helper()
 
@@ -75,6 +83,7 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		setDefaultKonnectControlPlane(t)
 		return
 	}
 	kong.RunWhenKong(t, kongSemverRange)
@@ -86,6 +95,7 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 	if os.Getenv("DECK_KONNECT_EMAIL") != "" &&
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" &&
 		os.Getenv("DECK_KONNECT_TOKEN") != "" {
+		setDefaultKonnectControlPlane(t)
 		return
 	}
 	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
@@ -177,7 +187,16 @@ func sortSlices(x, y interface{}) bool {
 		if yEntity.ConsumerGroup != nil {
 			yName += *yEntity.ConsumerGroup.ID
 		}
+	case *kong.Key:
+		yEntity := y.(*kong.Key)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case *kong.KeySet:
+		yEntity := y.(*kong.KeySet)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
 	}
+
 	return xName < yName
 }
 
@@ -227,6 +246,8 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID"),
 		cmpopts.IgnoreFields(kong.KeyAuth{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.FilterChain{}, "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Key{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.KeySet{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
@@ -313,6 +334,17 @@ func sync(ctx context.Context, kongFile string, opts ...string) error {
 	return deckCmd.ExecuteContext(ctx)
 }
 
+func multiFileSync(ctx context.Context, kongFiles []string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "sync"}
+	args = append(args, kongFiles...)
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(ctx)
+}
+
 func diff(kongFile string, opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"diff", "-s", kongFile}
@@ -357,7 +389,7 @@ func dump(opts ...string) (string, error) {
 	return stripansi.Strip(string(out)), cmdErr
 }
 
-func lint(opts ...string) (string, error) {
+func fileLint(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"file", "lint"}
 	if len(opts) > 0 {

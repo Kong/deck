@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RenderPlain(t *testing.T) {
@@ -60,10 +61,10 @@ func Test_RenderPlain(t *testing.T) {
 			}
 
 			output, err := render(renderOpts...)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, expected, output)
 		})
 	}

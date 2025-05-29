@@ -1,0 +1,44 @@
+_format_version: "3.0"
+
+consumer_groups:
+  - name: group-1
+    id: 8ca63651-4068-4baa-b2b9-08dc99c296e0
+  - name: group-2
+    id: 8ca63651-4068-4baa-b2b9-08dc99c29666
+
+services:
+- name: example-service
+  port: 3200
+  protocol: http
+  host: localhost
+  routes:
+  - name: example-route-1
+    paths:
+    - ~/r1
+    plugins:
+      - config:
+          limit_by: consumer
+          minute: 6
+          policy: local
+        consumer_group: group-1
+        enabled: true
+        name: rate-limiting
+        protocols:
+          - http
+
+routes:
+- name: example-route-2
+  paths:
+  - ~/r2
+  service:
+    name: example-service
+  plugins:
+      - config:
+          limit_by: consumer
+          minute: 6
+          policy: local
+        consumer_group: group-2
+        enabled: true
+        name: rate-limiting
+        protocols:
+          - http

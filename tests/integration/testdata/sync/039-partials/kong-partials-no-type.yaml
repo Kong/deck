@@ -1,0 +1,6 @@
+_format_version: "3.0"
+partials:
+- config:
+    read_timeout: 3001
+    send_timeout: 2004
+  name: my-ee-partial

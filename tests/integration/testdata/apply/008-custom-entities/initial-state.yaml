@@ -1,0 +1,23 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: example.com
+  name: example
+  plugins:
+  - config:
+      graphql_server_path: /graphql
+    enabled: true
+    name: degraphql
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+  tags:
+    - foo' 

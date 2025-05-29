@@ -45,3 +45,16 @@ services:
               aws_secret: my_secret
               function_name: my_function
               aws_region: us-west-2
+plugins:
+  - name: rate-limiting
+    route: simple-route
+    config:
+      minute: 5
+      limit_by: consumer
+      policy: local
+routes:
+  - name: top-route
+    service: 
+      name: simple-service
+    paths:
+      - /tr1
