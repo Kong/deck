@@ -2,6 +2,7 @@ package integration
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func Test_FileConvert(t *testing.T) {
 			convertCmdDestinationFormat: "kong-gateway-3.x",
 			errorExpected:               true,
 			errorString: "invalid value 'random-value' found for the 'from' flag." +
-				" Allowed values: [kong-gateway kong-gateway-2.x]",
+				" Allowed values: [kong-gateway kong-gateway-2.x 2.8]",
 		},
 		{
 			name:                        "Invalid destination format",
@@ -39,7 +40,7 @@ func Test_FileConvert(t *testing.T) {
 			convertCmdDestinationFormat: "random-value",
 			errorExpected:               true,
 			errorString: "invalid value 'random-value' found for the 'to' flag." +
-				" Allowed values: [konnect kong-gateway-3.x]",
+				" Allowed values: [konnect kong-gateway-3.x 3.4]",
 		},
 	}
 	for _, tc := range tests {
@@ -69,6 +70,72 @@ func Test_FileConvert(t *testing.T) {
 			err = yaml.Unmarshal([]byte(output), &currentOutput)
 			require.NoError(t, err)
 			assert.Equal(t, expectedOutput, currentOutput)
+		})
+	}
+}
+
+func Test_FileConvert_28xTo34x(t *testing.T) {
+	originalCwd, err := os.Getwd()
+	require.NoError(t, err)
+	defer func() {
+		// Restore the original working directory after the test
+		err := os.Chdir(originalCwd)
+		require.NoError(t, err)
+	}()
+
+	tests := []struct {
+		name               string
+		inputFile          string
+		expectedOutputFile string
+		errorExpected      bool
+		errorString        string
+	}{
+		{
+			name:               "auto-fixes plugin configuration for 2.8x",
+			inputFile:          "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-plugins.yaml",
+			errorExpected:      false,
+			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-plugins.yaml",
+		},
+		{
+			name:               "auto-fixes route configuration for 2.8x",
+			inputFile:          "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-routes.yaml",
+			errorExpected:      false,
+			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-routes.yaml",
+		},
+	}
+
+	// This is required to create the full testfile names.
+	// We are using pre-defined linting rulesets for conversion,
+	// and they are relative to the project root.
+	// Thus, we are ensuring that the working directory is set to the project root.
+	// Otherwise, linting would fail as tests would try to resolve the
+	// rulesets relative to the test file location.
+	cwd, _ := os.Getwd()
+	projectRoot := filepath.Join(cwd, "../../")
+	err = os.Chdir(projectRoot)
+	require.NoError(t, err)
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fileName := filepath.Join(projectRoot, "tests/integration", tc.inputFile)
+			output, err := fileConvert(
+				"--from", "2.8",
+				"--to", "3.4",
+				"--input-file", fileName,
+			)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorString)
+
+				return
+			}
+
+			require.NoError(t, err)
+			outputFileName := filepath.Join(projectRoot + "/tests/integration/" + tc.expectedOutputFile)
+			expected, err := readFile(outputFileName)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }

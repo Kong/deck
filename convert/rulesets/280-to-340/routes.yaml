@@ -1,0 +1,54 @@
+rules:
+  # routes rules
+  route-paths-look-around-check:
+    description: >-
+      We removed regex look-around and backreferences support in the the atc-router.
+      If your current regexes use look-around or backreferences you will receive an
+      error when attempting to start Kong, showing exactly what regex is incompatible.
+      You can either switch to the traditional router flavor or change the regex to
+      remove look-around / backreferences. For more details, please visit the official
+      docs: https://docs.konghq.com/gateway/changelog/#breaking-changes-and-deprecations-1
+    given: $.services[*].routes[*].paths[*]
+    message: >-
+      Look around and backreference regex definitions are only supported in the `traditional`
+      router mode. If you rely on these features consider upgrading to 3.4 and using the 
+      `traditional` router mode until you are able to upgrade to the atc-router. If you want
+      to use the `traditional` router in the 3.x series it must be explicitly set as the new
+      default in 3.x is `traditional_compatible`.
+    severity: error
+    then:
+      # Positive Lookahead
+      - function: pattern
+        functionOptions:
+          notMatch: '\(\?\=.+\)'
+      # Negative Lookahead
+      - function: pattern
+        functionOptions:
+          notMatch: '\(\?\!.+\)'
+      # Positive Lookbehind
+      - function: pattern
+        functionOptions:
+          notMatch: '\(\?\<\=.+\)'
+      # Negative Lookbehind
+      - function: pattern
+        functionOptions:
+          notMatch: '\(\?\<\!.+\)'
+  route-path_handling-check:
+    description: >-
+      Path handling algorithm "v1" was deprecated in Kong 3.0. From Kong 3.0, when
+      `router_flavor` is set to `expressions`, `route.path_handling` will be
+      unconfigurable and the path handling behavior will be "v0"; when `router_flavor`
+      is set to `traditional_compatible`, the path handling behavior will be "v0"
+      regardless of the value of `route.path_handling`. Only `router_flavor` = `traditional`
+      will support `path_handling` "v1' behavior.
+    given: $.services[*].routes[*].path_handling
+    message: >-
+      Path handling algorithms "v1" was deprecated in Kong 3.0. You can either switch to the
+      `traditional` router flavor or change the path_handling to "v0".  If you want
+      to use the `traditional` router in the 3.x series it must be explicitly set as the new
+      default in 3.x is `traditional_compatible`.
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: '^v1$'

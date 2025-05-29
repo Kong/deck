@@ -1,0 +1,36 @@
+_format_version: "1.1"
+
+services:
+- name: example-service
+  port: 3200
+  protocol: http
+  host: localhost
+  plugins:
+    - config:
+        minute: 100
+        policy: local
+      route: example-route-1
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+    - config:
+        minute: 200
+        policy: local
+      route: example-route-2
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+
+routes:
+- name: example-route-1
+  paths:
+  - /r1
+  service:
+    name: example-service
+- name: example-route-2
+  paths:
+  - /r2
+  service:
+    name: example-service

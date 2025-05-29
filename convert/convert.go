@@ -2,12 +2,11 @@ package convert
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"strings"
 
 	"github.com/blang/semver/v4"
+	"github.com/kong/deck/lint"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -30,8 +29,9 @@ const (
 	// FormatKongGateway3x represents the Kong gateway 3.x format.
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 
-	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
-	rlaNamespaceDefaultLength      = 32
+	// Adding LTS version strings
+	FormatKongGatewayVersion28x Format = "2.8"
+	FormatKongGatewayVersion34x Format = "3.4"
 )
 
 // AllFormats contains all available formats.
@@ -50,6 +50,10 @@ func ParseFormat(key string) (Format, error) {
 		return FormatKongGateway3x, nil
 	case FormatDistributed:
 		return FormatDistributed, nil
+	case FormatKongGatewayVersion28x:
+		return FormatKongGatewayVersion28x, nil
+	case FormatKongGatewayVersion34x:
+		return FormatKongGatewayVersion34x, nil
 	default:
 		return "", fmt.Errorf("invalid format: '%v'", key)
 	}
@@ -84,7 +88,7 @@ func Convert(
 		if len(inputFilenames) > 1 {
 			return fmt.Errorf("only one input file can be provided when converting from Kong 2.x to Kong 3.x format")
 		}
-		outputContent, err = convertKongGateway2xTo3x(inputContent, inputFilenames[0])
+		outputContent, err = convertKongGateway2xTo3x(inputContent, inputFilenames[0], true)
 		if err != nil {
 			return err
 		}
@@ -97,6 +101,25 @@ func Convert(
 			return err
 		}
 
+	case from == FormatKongGatewayVersion28x && to == FormatKongGatewayVersion34x:
+		if len(inputFilenames) > 1 {
+			return fmt.Errorf("only one input file can be provided when converting from Kong 2.x to Kong 3.x format")
+		}
+		outputContent, err = convertKongGateway28xTo34x(inputContent, inputFilenames[0])
+		if err != nil {
+			return err
+		}
+
+		lintErrs, err := lint.Lint(inputFilenames[0], "convert/rulesets/280-to-340/entrypoint.yaml", "error", false)
+		if err != nil {
+			return err
+		}
+
+		_, err = lint.GetLintOutput(lintErrs, "plain", "-")
+		if err != nil {
+			return err
+		}
+
 	default:
 		return fmt.Errorf("cannot convert from '%s' to '%s' format", from, to)
 	}
@@ -105,23 +128,7 @@ func Convert(
 	return err
 }
 
-func randomString(n int) (string, error) {
-	const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzj"
-	charsetLength := big.NewInt(int64(len(charset)))
-
-	ret := make([]byte, n)
-	for i := 0; i < n; i++ {
-		num, err := rand.Int(rand.Reader, charsetLength)
-		if err != nil {
-			return "", fmt.Errorf("error generating random string: %w", err)
-		}
-		ret[i] = charset[num.Int64()]
-	}
-
-	return string(ret), nil
-}
-
-func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Content, error) {
+func convertKongGateway2xTo3x(input *file.Content, filename string, printFinalWarning bool) (*file.Content, error) {
 	if input == nil {
 		return nil, fmt.Errorf("input content is nil")
 	}
@@ -168,109 +175,19 @@ func convertKongGateway2xTo3x(input *file.Content, filename string) (*file.Conte
 
 	cprint.UpdatePrintf(
 		"From the '%s' config file,\n"+
-			"the _format_version field has been migrated from '%s' to '%s'.\n"+
-			"These automatic changes may not be correct or exhaustive enough, please\n"+
-			"perform a manual audit of the config file.\n\n"+
-			"For related information, please visit:\n"+
-			"https://docs.konghq.com/deck/latest/3.0-upgrade\n\n",
+			"the _format_version field has been migrated from '%s' to '%s'.\n\n",
 		filename, outputContent.FormatVersion, "3.0")
 	outputContent.FormatVersion = "3.0"
 
+	if printFinalWarning {
+		cprint.UpdatePrintf(
+			"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
+				"perform a manual audit of the config file.\n\n" +
+				"For related information, please visit:\n" +
+				"https://docs.konghq.com/deck/latest/3.0-upgrade\n\n")
+	}
+
 	return outputContent, nil
-}
-
-func generateAutoFields(content *file.Content) error {
-	for _, plugin := range content.Plugins {
-		if *plugin.Name == rateLimitingAdvancedPluginName {
-			plugin := plugin
-			if err := autoGenerateNamespaceForRLAPlugin(&plugin); err != nil {
-				return err
-			}
-		}
-	}
-
-	for _, service := range content.Services {
-		for _, plugin := range service.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, route := range content.Routes {
-		for _, plugin := range route.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, consumer := range content.Consumers {
-		for _, plugin := range consumer.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPlugin(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	for _, consumerGroup := range content.ConsumerGroups {
-		for _, plugin := range consumerGroup.Plugins {
-			if *plugin.Name == rateLimitingAdvancedPluginName {
-				if err := autoGenerateNamespaceForRLAPluginConsumerGroups(plugin); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
-func autoGenerateNamespaceForRLAPlugin(plugin *file.FPlugin) error {
-	if plugin.Config != nil {
-		ns, ok := plugin.Config["namespace"]
-		if !ok || ns == nil {
-			// namespace is not set, generate one.
-			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
-			if err != nil {
-				return fmt.Errorf("error generating random namespace: %w", err)
-			}
-			plugin.Config["namespace"] = randomNamespace
-		}
-	}
-	return nil
-}
-
-func autoGenerateNamespaceForRLAPluginConsumerGroups(plugin *kong.ConsumerGroupPlugin) error {
-	if plugin.Config != nil {
-		ns, ok := plugin.Config["namespace"]
-		if !ok || ns == nil {
-			// namespace is not set, generate one.
-			randomNamespace, err := randomString(rlaNamespaceDefaultLength)
-			if err != nil {
-				return fmt.Errorf("error generating random namespace: %w", err)
-			}
-			plugin.Config["namespace"] = randomNamespace
-		}
-	}
-	return nil
-}
-
-func migrateRoutesPathFieldPre300(route *file.FRoute) (*file.FRoute, bool) {
-	var hasChanged bool
-	for _, path := range route.Paths {
-		if !strings.HasPrefix(*path, "~/") && utils.IsPathRegexLike(*path) {
-			*path = "~" + *path
-			hasChanged = true
-		}
-	}
-	return route, hasChanged
 }
 
 func convertKongGatewayToKonnect(input *file.Content) (*file.Content, error) {
@@ -323,13 +240,6 @@ func kongServiceToKonnectServicePackage(service file.FService) (file.FServicePac
 	}, nil
 }
 
-func removeServiceName(service *file.FService) *file.FService {
-	serviceCopy := service.DeepCopy()
-	serviceCopy.Name = nil
-	serviceCopy.ID = kong.String(utils.UUID())
-	return serviceCopy
-}
-
 // convertDistributedToKong is used to convert one or many distributed format
 // files to create one Kong Gateway declarative config. It also leverages some
 // deck features like the defaults/centralized plugin configurations.
@@ -368,4 +278,28 @@ func convertDistributedToKong(
 		FileFormat:  format,
 		KongVersion: version.String(),
 	})
+}
+
+// convertKongGateway28xTo34x is used to convert a Kong Gateway 2.8.x config
+// to a Kong Gateway 3.4.x config. It can be used as a migration utility
+// between the two LTS versions. It auto-fixes some configuration. The
+// configuration that can't be autofixed is left as is and the user is shown
+// warnings/errors about the same.
+func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Content, error) {
+	preprocessContent, err := convertKongGateway2xTo3x(input, filename, false)
+	if err != nil {
+		return nil, err
+	}
+
+	outputContent := preprocessContent.DeepCopy()
+
+	updatePlugins(outputContent)
+
+	cprint.UpdatePrintf(
+		"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
+			"perform a manual audit of the config file.\n\n" +
+			"For related information, please visit:\n" +
+			"https://docs.konghq.com/deck/latest/3.0-upgrade\n\n")
+
+	return outputContent, nil
 }

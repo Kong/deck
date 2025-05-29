@@ -561,7 +561,7 @@ func Test_convertAutoFields(t *testing.T) {
 		},
 	}
 
-	got, err := convertKongGateway2xTo3x(content, "-")
+	got, err := convertKongGateway2xTo3x(content, "-", true)
 	require.NoError(t, err)
 
 	globalPluginConfig := got.Plugins[0].Config

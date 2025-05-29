@@ -1,5 +1,11 @@
 # Table of Contents
 
+- [v1.47.1](#v1471)
+- [v1.47.0](#v1470)
+- [v1.46.3](#v1463)
+- [v1.46.2](#v1462)
+- [v1.46.1](#v1461)
+- [v1.46.0](#v1460)
 - [v1.45.0](#v1450)
 - [v1.44.2](#v1442)
 - [v1.44.1](#v1441)
@@ -109,6 +115,106 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.47.1]
+> Release date: 2025/05/12
+
+### Fixed
+- Fixed syncing errors faced during plugin creation
+due to conflicts with global or other similarly-scoped
+plugins.
+[#1627](https://github.com/Kong/deck/pull/1627)
+[go-database-reconciler #271](https://github.com/Kong/go-database-reconciler/pull/271)
+- Improved error messaging for unsupported routes
+by adding route IDs in the message.
+[go-database-reconciler #257](https://github.com/Kong/go-database-reconciler/pull/257) 
+- Fixed errors faced during partial apply for custom entities
+[#1625](https://github.com/Kong/deck/pull/1625)
+[go-database-reconciler #267](https://github.com/Kong/go-database-reconciler/pull/267)
+- Bump Go version to 1.24.3
+  [#1629](https://github.com/Kong/deck/pull/1629)
+
+## [v1.47.0]
+> Release date: 2025/04/29
+
+### Added
+- Extended `deck file convert` command to be used for configuration
+migrations between LTS versions `2.8` and `3.4`. The command can
+auto-fix the possible configurations and gives appropriate errors
+or warnings for the others.
+This is how it can be used: `deck file convert --from 2.8 --to 3.4
+--input-file kong-28x.yaml -o kong-34x.yaml`
+[#1610](https://github.com/Kong/deck/pull/1610)
+- `_format_version` string can be parametrised now and works well with
+`deck file merge` command as well as others.
+[#1605](https://github.com/Kong/deck/pull/1605)
+[go-apiops #259](https://github.com/Kong/go-apiops/pull/259)
+
+### Fixed
+- ID existence checks are limited to certificates now,
+restoring sync performance.
+[#1608](https://github.com/Kong/deck/pull/1608)
+[go-database-reconciler #254](https://github.com/Kong/go-database-reconciler/pull/254)
+- Bumped `golang.org/x/net` from 0.36.0 to 0.38.0 to account
+for [CVE-2025-22872](https://github.com/advisories/GHSA-vvgc-356p-c3xw)
+[#1601](https://github.com/Kong/deck/pull/1601)
+
+## [v1.46.3]
+> Release date: 2025/04/10
+
+### Fixed
+- Plugin configurations with foreign references
+now work correctly, both via name and IDs.
+[#1597](https://github.com/Kong/deck/pull/1597)
+[go-database-reconciler #250](https://github.com/Kong/go-database-reconciler/pull/250)
+- Scoped plugins with a nested entity of the same
+type would return an error.
+[go-database-reconciler #249](https://github.com/Kong/go-database-reconciler/pull/249)
+- RBAC endpoint permissions are now paginated and not
+limited to the first 100 endpoints.
+[go-database-reconciler #248](https://github.com/Kong/go-database-reconciler/pull/248)
+[go-kong #533](https://github.com/Kong/go-kong/pull/533)
+
+## [v1.46.2]
+> Release date: 2025/04/07
+
+### Fixed
+- Fixed false diff for ip-restriction plugin.
+[#1585](https://github.com/Kong/deck/pull/1585)
+[go-database-reconciler #240](https://github.com/Kong/go-database-reconciler/pull/240)
+- Fixed an issue where invalid json was sent to stdout even if --json-output flag was used
+[#1589](https://github.com/Kong/deck/pull/1589)
+[go-database-reconciler #242](https://github.com/Kong/go-database-reconciler/pull/242)
+
+## [v1.46.1]
+> Release date: 2025/04/03
+
+### Fixed
+- Fixed an issue where entities were replaced silently when ID was present in input files and select_tags didn't match.
+[#1572](https://github.com/Kong/deck/pull/1572)
+[go-database-reconciler #214](https://github.com/Kong/go-database-reconciler/pull/214)
+[go-kong #526](https://github.com/Kong/go-kong/pull/526)
+
+## [v1.46.0]
+> Release date: 2025/04/01
+
+### Added
+- Added support for `partials` entity in deck.
+[#1570](https://github.com/Kong/deck/pull/1570)
+[go-database-reconciler #215](https://github.com/Kong/go-database-reconciler/pull/215)
+[go-kong #507](https://github.com/Kong/go-kong/pull/507)
+
+### Fixed
+- Updated `golang.org/x/net` from 0.34.0 to 0.36.0 to
+account for vulnerability [CVE-2025-22870](https://github.com/advisories/GHSA-qxp5-gwg8-xv66)
+- Fixed false errors coming for consumer creation while using
+default_lookup_tags for consumer_groups, specifically when tags
+on the consumer_group and consumer didn't match.
+[#1576](https://github.com/Kong/deck/pull/1576)
+[go-database-reconciler #228](https://github.com/Kong/go-database-reconciler/pull/228)
+- Fixed `deck file kong2kic` command to correctly process
+top-level plugin and route entities.
+[#1555](https://github.com/Kong/deck/pull/1555)
+
 ## [v1.45.0]
 > Release date: 2025/02/26
 
@@ -138,7 +244,7 @@ vulnerability [CVE-2022-28948](https://github.com/advisories/GHSA-hp87-p4gw-j4gq
 gateways where operations were getting stuck due to 
 custom-entities support. Custom Entities are now gated to
 Enterprise gateways only.
-[go-database-reconciler](https://github.com/Kong/go-database-reconciler/pull/202)
+[go-database-reconciler #202](https://github.com/Kong/go-database-reconciler/pull/202)
 [#1525](https://github.com/Kong/deck/pull/1525)
 
 ## [v1.44.0]
@@ -2032,6 +2138,12 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
+[v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
+[v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3
+[v1.46.2]: https://github.com/Kong/deck/compare/v1.46.1...v1.46.2
+[v1.46.1]: https://github.com/Kong/deck/compare/v1.46.0...v1.46.1
+[v1.46.0]: https://github.com/Kong/deck/compare/v1.45.0...v1.46.0
 [v1.45.0]: https://github.com/Kong/deck/compare/v1.44.2...v1.45.0
 [v1.44.2]: https://github.com/Kong/deck/compare/v1.44.1...v1.44.2
 [v1.44.1]: https://github.com/Kong/deck/compare/v1.44.0...v1.44.1
