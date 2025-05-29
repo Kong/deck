@@ -134,7 +134,7 @@ by caching schemas for plugins and partials.
 [go-database-reconciler #285](https://github.com/Kong/go-database-reconciler/pull/285)
 - Corrected request body for ConsumerGroupConsumer creation.
 [go-kong #545](https://github.com/Kong/go-kong/pull/545)
-- Fixed `deck file openapi2kong` command tovfail fast if no 
+- Fixed `deck file openapi2kong` command to fail fast if no 
 paths are provided in OAS document, give a warning if 
 explicitly set to empty.
 [#1631](https://github.com/Kong/deck/pull/1631)
