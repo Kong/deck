@@ -1,0 +1,10 @@
+_format_version: "3.0"
+custom_entities:
+- fields:
+    methods:
+    - GET
+    query: query { viewer { login } }
+    service:
+      name: example
+    uri: /me
+  type: degraphql_routes
