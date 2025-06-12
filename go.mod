@@ -12,7 +12,7 @@ require (
 	github.com/daveshanley/vacuum v0.9.15
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
-	github.com/kong/go-apiops v0.1.43
+	github.com/kong/go-apiops v0.1.44-0.20250612062751-c58866265f08
 	github.com/kong/go-database-reconciler v1.23.0
 	github.com/kong/go-kong v0.66.1
 	github.com/mitchellh/go-homedir v1.1.0
