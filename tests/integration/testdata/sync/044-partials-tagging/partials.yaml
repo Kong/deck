@@ -1,0 +1,31 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+    - redis-partials
+  
+partials:
+- id: b426adc7-7f11-4cda-a862-112ddabae9ef
+  name: redis-ee-sentinel
+  tags:
+  - redis-partials
+  type: redis-ee
+  config:
+    sentinel_master: mymaster
+    sentinel_nodes:
+     - host: redis-node-0
+       port: 26379
+     - host: redis-node-1
+       port: 26379
+     - host: redis-node-2
+       port: 26379
+    sentinel_role: master
+- id: 13dc230d-d65e-439a-9f05-9fd71abfee4d
+  name: redis-ee-common
+  type: redis-ee
+  config:
+    read_timeout: 3001
+    send_timeout: 2004
+  tags:
+  - redis-partials
+  
+  

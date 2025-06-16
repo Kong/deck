@@ -1,0 +1,20 @@
+_format_version: "3.0"
+_info:
+  default_lookup_tags:
+    partials:
+     - non-existent-redis-partials
+     
+# global-plugin
+plugins:
+- config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    window_type: fixed
+    namespace: test-ns
+    sync_rate: -1
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - name: redis-ee-common

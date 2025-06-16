@@ -352,6 +352,24 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 	}
 
+	dumpConfig.LookUpSelectorTagsPartials, err = determineLookUpSelectorTagsPartials(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for partials: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsPartials != nil {
+		partialsGlobal, err := dump.GetAllPartials(ctx, kongClient, dumpConfig.LookUpSelectorTagsPartials)
+		if err != nil {
+			return fmt.Errorf("error retrieving global partials via lookup selector tags: %w", err)
+		}
+		for _, p := range partialsGlobal {
+			targetContent.Partials = append(targetContent.Partials, file.FPartial{Partial: *p})
+			if err != nil {
+				return fmt.Errorf("error adding global partial %v: %w", p.FriendlyName(), err)
+			}
+		}
+	}
+
 	if reconcilerUtils.Kong340Version.LTE(parsedKongVersion) {
 		dumpConfig.IsConsumerGroupScopedPluginSupported = true
 	}
@@ -532,6 +550,21 @@ func determineLookUpSelectorTagsServices(targetContent file.Content) ([]string, 
 		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Services)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Services)
 		return targetContent.Info.LookUpSelectorTags.Services, nil
+
+	}
+	return nil, nil
+}
+
+func determineLookUpSelectorTagsPartials(targetContent file.Content) ([]string, error) {
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.Partials != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Partials) == 0 {
+			return nil, fmt.Errorf("global partials specified but no global tags")
+		}
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Partials)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.Partials)
+		return targetContent.Info.LookUpSelectorTags.Partials, nil
 
 	}
 	return nil, nil
