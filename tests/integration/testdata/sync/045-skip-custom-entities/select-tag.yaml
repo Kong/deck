@@ -1,0 +1,30 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+  - tag-selected-a
+  - tag-selected-b
+
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: example.org
+  name: example-service
+  port: 8080
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: example-route
+    path_handling: v0
+    paths:
+    - /example
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
