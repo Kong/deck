@@ -1,0 +1,46 @@
+_format_version: "3.0"
+_info:
+  default_lookup_tags:
+    partials:
+     - redis-partials
+
+# nested-plugin
+services:
+- host: httpbin.konghq.com
+  name: httpbin-1
+  path: /anything
+  tags: 
+  - "api:partials-test-1"
+  plugins:
+  - config:
+      identifier: ip
+      limit:
+      - 10000
+      namespace: testns
+      strategy: redis
+      sync_rate: 2
+      window_size:
+      - 30
+      window_type: sliding
+    name: rate-limiting-advanced
+    tags: 
+    - "api:partials-test-1"
+    partials:
+    - name: redis-ee-sentinel
+  port: 443
+  protocol: https
+
+# global-plugin
+plugins:
+- config:
+    limit:
+    - 10
+    window_size:
+    - 60
+    window_type: fixed
+    namespace: test-ns
+    sync_rate: -1
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - name: redis-ee-common

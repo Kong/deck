@@ -8436,3 +8436,472 @@ func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//
+// - >=3.10.0+enterprise
+func Test_Sync_Partials_Tagging(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.10.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	expectedStatePostSync := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+							Name: kong.String("redis-ee-common"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+							Name: kong.String("redis-ee-sentinel"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Service{}, "ID"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		errorExpected bool
+		errorString   string
+	}{
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong tags",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong.yaml",
+			errorExpected: true,
+			errorString:   "partial redis-ee-common for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-names.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-name for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-ids.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-id-1234 for plugin rate-limiting-advanced: entity not found",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			// syncing partials
+			err := sync(ctx, "testdata/sync/044-partials-tagging/partials.yaml")
+			require.NoError(t, err)
+
+			// syncing the kong file with partial lookup tags
+			err = sync(ctx, tc.kongFile)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+			testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	expectedStatePostSync := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID: kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID: kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Service{}, "ID"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		errorExpected bool
+		errorString   string
+	}{
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong tags",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong.yaml",
+			errorExpected: true,
+			errorString:   "partial redis-ee-common for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-names.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-name for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-ids.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-id-1234 for plugin rate-limiting-advanced: entity not found",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			// syncing partials
+			err := sync(ctx, "testdata/sync/044-partials-tagging/partials.yaml")
+			require.NoError(t, err)
+
+			// syncing the kong file with partial lookup tags
+			err = sync(ctx, tc.kongFile)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+			testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
+		})
+	}
+}
