@@ -8909,8 +8909,9 @@ func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
 // test scope:
 //
 // - >=3.0.0 enterprise
+// - konnect
 func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.0.0")
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 
 	ctx := context.Background()
 
