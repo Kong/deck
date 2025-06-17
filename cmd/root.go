@@ -383,6 +383,7 @@ func initConfig() {
 	rootConfig.CookieJarPath = viper.GetString("kong-cookie-jar-path")
 
 	dumpConfig.CustomEntityTypes = supportedCustomEntityTypes
+	dumpConfig.SkipCustomEntitiesWithSelectorTags = true
 
 	if viper.IsSet("no-color") {
 		color.NoColor = viper.GetBool("no-color")

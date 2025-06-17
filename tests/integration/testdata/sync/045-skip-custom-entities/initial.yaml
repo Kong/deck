@@ -1,0 +1,37 @@
+_format_version: "3.0"
+custom_entities:
+- fields:
+    methods:
+    - GET
+    query: |-
+      query ($country:ID!) {
+          country(code: $country) {
+            name
+            native
+            capital
+            emoji
+            currency
+            languages {
+              code
+              name
+            }
+          }
+        }
+    service:
+      name: degraphql-service
+    uri: /:country
+  id: a9111915-d3e2-46c5-8b56-f22dda5a1121
+  type: degraphql_routes
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: degraphql-service
+  port: 443
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  tags:
+  - random-tag-a
+  - random-tag-b
+  write_timeout: 60000
