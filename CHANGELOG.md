@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.49.0](#v1490)
 - [v1.48.0](#v1480)
 - [v1.47.1](#v1471)
 - [v1.47.0](#v1470)
@@ -115,6 +116,31 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.49.0]
+> Release date: 2025/06/17
+
+### Added
+- Added default_lookup_tags for partials.
+[#1653](https://github.com/Kong/deck/pull/1653)
+[go-database-reconciler #291](https://github.com/Kong/go-database-reconciler/pull/291)
+
+### Fixed
+- Skipping custom-entities in dump if select tags are set, so
+as to not cause sync failures or undesirable deletions.
+[#1662](https://github.com/Kong/deck/pull/1662)
+[go-database-reconciler #296](https://github.com/Kong/go-database-reconciler/pull/296)
+- Fixed partial linking in case of nested plugins.
+[go-database-reconciler #289](https://github.com/Kong/go-database-reconciler/pull/289)
+- Fixed false diffs due to ca_cert order in service config.
+[go-database-reconciler #288](https://github.com/Kong/go-database-reconciler/pull/288)
+- Allowed empty string as path param if minLength is 0 in
+`deck file openapi2kong`.
+[#1660](https://github.com/Kong/deck/pull/1660)
+[go-apiops #271](https://github.com/Kong/go-apiops/pull/271)
+- Fixed extra service creation in absence of top-level servers block
+in `deck file openapi2kong`.
+[go-apiops #270](https://github.com/Kong/go-apiops/pull/270)
 
 ## [v1.48.0]
 > Release date: 2025/05/30
@@ -2168,6 +2194,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.49.0]: https://github.com/Kong/deck/compare/v1.48.0...v1.49.0
 [v1.48.0]: https://github.com/Kong/deck/compare/v1.47.1...v1.48.0
 [v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
 [v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
