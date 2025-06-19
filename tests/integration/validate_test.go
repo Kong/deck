@@ -282,16 +282,34 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 		name           string
 		stateFile      string
 		additionalArgs []string
+		mode           bool
 		errorExpected  bool
+		errorString    string
 	}{
 		{
 			name:           "validate partials",
 			stateFile:      "testdata/validate/001-partials/partials.yaml",
 			additionalArgs: []string{"--online-entities-list=Partials"},
+			mode:           ONLINE,
 		},
 		{
 			name:      "validate default_lookup_tags with partials",
 			stateFile: "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:      ONLINE,
+		},
+		{
+			name:           "validate partials",
+			stateFile:      "testdata/validate/001-partials/partials.yaml",
+			additionalArgs: []string{"--online-entities-list=Partials"},
+			mode:           OFFLINE,
+		},
+		{
+			name:          "validate default_lookup_tags with partials",
+			stateFile:     "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:          OFFLINE,
+			errorExpected: true,
+			errorString: "[default_lookup_tags] not supported for offline validation, " +
+				"use `deck gateway validate` command instead",
 		},
 	}
 
@@ -304,7 +322,12 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
-			err := validate(ONLINE, validateOpts...)
+			err := validate(tc.mode, validateOpts...)
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorString)
+				return
+			}
 			require.NoError(t, err)
 		})
 	}
