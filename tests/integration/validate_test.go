@@ -325,9 +325,7 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 			err := validate(tc.mode, validateOpts...)
 			if tc.errorExpected {
 				require.Error(t, err)
-				if tc.errorString != "" {
-					assert.Contains(t, err.Error(), tc.errorString)
-				}
+				assert.Contains(t, err.Error(), tc.errorString)
 				return
 			}
 			require.NoError(t, err)
