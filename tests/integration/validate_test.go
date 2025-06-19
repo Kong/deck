@@ -298,10 +298,9 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 			mode:      ONLINE,
 		},
 		{
-			name:           "validate partials",
-			stateFile:      "testdata/validate/001-partials/partials.yaml",
-			additionalArgs: []string{"--online-entities-list=Partials"},
-			mode:           OFFLINE,
+			name:      "validate partials",
+			stateFile: "testdata/validate/001-partials/partials.yaml",
+			mode:      OFFLINE,
 		},
 		{
 			name:          "validate default_lookup_tags with partials",
