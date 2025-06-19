@@ -27,6 +27,10 @@ var (
 	validateParallelism             int
 )
 
+func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
+	return targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil
+}
+
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
@@ -35,6 +39,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
 	if err != nil {
 		return err
+	}
+
+	if lookupSelectorTagsIsSet(targetContent) && !validateOnline {
+		return fmt.Errorf("[default_lookup_tags] not supported for offline validation, " +
+			"use `deck gateway validate` command instead")
 	}
 
 	dummyEmptyState, err := state.NewKongState()
@@ -123,6 +132,24 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 				targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
 				if err != nil {
 					return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
+				}
+			}
+		}
+
+		lookUpSelectorTagsPartials, err := determineLookUpSelectorTagsPartials(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags for partials: %w", err)
+		}
+
+		if lookUpSelectorTagsPartials != nil {
+			partialsGlobal, err := dump.GetAllPartials(ctx, kongClient, lookUpSelectorTagsPartials)
+			if err != nil {
+				return fmt.Errorf("error retrieving global partials via lookup selector tags: %w", err)
+			}
+			for _, p := range partialsGlobal {
+				targetContent.Partials = append(targetContent.Partials, file.FPartial{Partial: *p})
+				if err != nil {
+					return fmt.Errorf("error adding global partial %v: %w", p.FriendlyName(), err)
 				}
 			}
 		}
