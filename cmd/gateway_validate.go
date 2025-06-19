@@ -27,6 +27,10 @@ var (
 	validateParallelism             int
 )
 
+func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
+	return targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil
+}
+
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
@@ -35,6 +39,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
 	if err != nil {
 		return err
+	}
+
+	if lookupSelectorTagsIsSet(targetContent) && !validateOnline {
+		return fmt.Errorf("[default_lookup_tags] not supported for offline validation, " +
+			"use `deck gateway validate` command instead")
 	}
 
 	dummyEmptyState, err := state.NewKongState()
