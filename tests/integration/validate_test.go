@@ -85,8 +85,8 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  true,
 			errorString: "invalid value 'services' for --online-entities-list; it should be a valid " +
 				"Kong entity (case-sensitive). Valid entities: [ACLGroups BasicAuths CACertificates Certificates Consumers " +
-				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Plugins RBACEndpointPermissions RBACRoles " +
-				"Routes SNIs Services Targets Upstreams Vaults]",
+				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Partials Plugins RBACEndpointPermissions " +
+				"RBACRoles Routes SNIs Services Targets Upstreams Vaults]",
 		},
 		{
 			name:           "validate with correct online list, passed via --online-entities-list cli flag",
