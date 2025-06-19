@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -260,6 +261,44 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			validateOpts := []string{
+				tc.stateFile,
+			}
+			validateOpts = append(validateOpts, tc.additionalArgs...)
+
+			err := validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func Test_Validate_PartialLookupTags(t *testing.T) {
+	setup(t)
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		errorExpected  bool
+	}{
+		{
+			name:           "validate partials",
+			stateFile:      "testdata/validate/001-partials/partials.yaml",
+			additionalArgs: []string{"--online-entities-list=Partials"},
+		},
+		{
+			name:      "validate default_lookup_tags with partials",
+			stateFile: "testdata/validate/001-partials/partial-lookup-tags.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, "testdata/validate/001-partials/partials.yaml"))
+
 			validateOpts := []string{
 				tc.stateFile,
 			}
