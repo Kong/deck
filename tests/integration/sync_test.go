@@ -8994,3 +8994,31 @@ func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
 		})
 	}
 }
+
+func Test_Sync_ConsumerCredentials(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "sync consumer credentials with tags",
+			stateFile: "testdata/sync/046-consumer-credentials/creds-initial.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// resync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
