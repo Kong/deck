@@ -46,6 +46,7 @@ var EntityMap = map[string]string{
 	"JWTAuths":                "jwt_secrets",
 	"KeyAuths":                "keyauth_credentials",
 	"Oauth2Creds":             "oauth2_credentials",
+	"Partials":                "partials",
 	"Plugins":                 "plugins",
 	"RBACEndpointPermissions": "rbac-endpointpermission",
 	"RBACRoles":               "rbac-role",

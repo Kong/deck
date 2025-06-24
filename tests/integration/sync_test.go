@@ -3916,9 +3916,10 @@ func Test_Sync_Vault(t *testing.T) {
 		kongFile        string
 		initialKongFile string
 		expectedState   utils.KongRawState
+		runWhen         string
 	}{
 		{
-			name:     "create an SSL service/route using an ENV vault",
+			name:     "create an SSL service/route using an ENV vault <3.11.0",
 			kongFile: "testdata/sync/012-vaults/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Vaults: []*kong.Vault{
@@ -3964,11 +3965,62 @@ func Test_Sync_Vault(t *testing.T) {
 					},
 				},
 			},
+			runWhen: ">=3.0.0 <3.11.0",
+		},
+		{
+			name:     "create an SSL service/route using an ENV vault >=3.11.0",
+			kongFile: "testdata/sync/012-vaults/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Vaults: []*kong.Vault{
+					{
+						Name:        kong.String("env"),
+						Prefix:      kong.String("my-env-vault"),
+						Description: kong.String("ENV vault for secrets"),
+						Config: kong.Configuration{
+							"base64_decode": false,
+							"prefix":        "MY_SECRET_",
+						},
+					},
+				},
+				Services: []*kong.Service{
+					{
+						ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+						Name:           kong.String("svc1"),
+						ConnectTimeout: kong.Int(60000),
+						Host:           kong.String("httpbin.org"),
+						Port:           kong.Int(80),
+						Path:           kong.String("/status/200"),
+						Protocol:       kong.String("http"),
+						ReadTimeout:    kong.Int(60000),
+						Retries:        kong.Int(5),
+						WriteTimeout:   kong.Int(60000),
+						Tags:           nil,
+						Enabled:        kong.Bool(true),
+					},
+				},
+				Routes: route1_20x,
+				Certificates: []*kong.Certificate{
+					{
+						ID:   kong.String("13c562a1-191c-4464-9b18-e5222b46035b"),
+						Cert: kong.String("{vault://my-env-vault/cert}"),
+						Key:  kong.String("{vault://my-env-vault/key}"),
+					},
+				},
+				SNIs: []*kong.SNI{
+					{
+						Name: kong.String("localhost"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("13c562a1-191c-4464-9b18-e5222b46035b"),
+						},
+					},
+				},
+			},
+			runWhen: ">=3.11.0",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.0.0")
+			runWhen(t, "enterprise", tc.runWhen)
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))

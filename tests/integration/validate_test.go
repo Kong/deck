@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,8 +85,8 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  true,
 			errorString: "invalid value 'services' for --online-entities-list; it should be a valid " +
 				"Kong entity (case-sensitive). Valid entities: [ACLGroups BasicAuths CACertificates Certificates Consumers " +
-				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Plugins RBACEndpointPermissions RBACRoles " +
-				"Routes SNIs Services Targets Upstreams Vaults]",
+				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Partials Plugins RBACEndpointPermissions " +
+				"RBACRoles Routes SNIs Services Targets Upstreams Vaults]",
 		},
 		{
 			name:           "validate with correct online list, passed via --online-entities-list cli flag",
@@ -266,6 +267,66 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func Test_Validate_PartialLookupTags(t *testing.T) {
+	setup(t)
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		mode           bool
+		errorExpected  bool
+		errorString    string
+	}{
+		{
+			name:           "validate partials",
+			stateFile:      "testdata/validate/001-partials/partials.yaml",
+			additionalArgs: []string{"--online-entities-list=Partials"},
+			mode:           ONLINE,
+		},
+		{
+			name:      "validate default_lookup_tags with partials",
+			stateFile: "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:      ONLINE,
+		},
+		{
+			name:      "validate partials",
+			stateFile: "testdata/validate/001-partials/partials.yaml",
+			mode:      OFFLINE,
+		},
+		{
+			name:          "validate default_lookup_tags with partials",
+			stateFile:     "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:          OFFLINE,
+			errorExpected: true,
+			errorString: "[default_lookup_tags] not supported for offline validation, " +
+				"use `deck gateway validate` command instead",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, "testdata/validate/001-partials/partials.yaml"))
+
+			validateOpts := []string{
+				tc.stateFile,
+			}
+			validateOpts = append(validateOpts, tc.additionalArgs...)
+
+			err := validate(tc.mode, validateOpts...)
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorString)
+				return
+			}
 			require.NoError(t, err)
 		})
 	}
