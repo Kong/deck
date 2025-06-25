@@ -8403,6 +8403,27 @@ func Test_Sync_KeysAndKeySets(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "creates keys and key_sets without name",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -8411,6 +8432,85 @@ func Test_Sync_KeysAndKeySets(t *testing.T) {
 			require.NoError(t, err)
 
 			testKongState(t, client, false, false, tc.expectedState, nil)
+
+			// re-sync with no error
+			err = sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Sync_KeysAndKeySets_Update(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		kongFile     string
+		initialState utils.KongRawState
+		updateFile   string
+		updatedState utils.KongRawState
+	}{
+		{
+			name:     "name addition post creation works without errors",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name.yaml",
+			initialState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+			updateFile: "testdata/sync/043-keys-and-key_sets/kong-name-update.yaml",
+			updatedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+			testKongState(t, client, false, false, tc.initialState, nil)
+
+			// update
+			err = sync(ctx, tc.updateFile)
+			require.NoError(t, err)
+			testKongState(t, client, false, false, tc.updatedState, nil)
 		})
 	}
 }
@@ -8485,6 +8585,83 @@ func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
 			require.NoError(t, err)
 
 			testKongState(t, client, true, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+// TODO: Update test once konnect supports key_set creation without names.
+func Test_Sync_KeysAndKeySets_Konnect_Update(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		kongFile     string
+		initialState utils.KongRawState
+		updateFile   string
+		updatedState utils.KongRawState
+	}{
+		{
+			name:     "name addition post creation works without errors",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name-konnect.yaml",
+			initialState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+			updateFile: "testdata/sync/043-keys-and-key_sets/kong-name-update.yaml",
+			updatedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+			testKongState(t, client, true, false, tc.initialState, nil)
+
+			// update
+			err = sync(ctx, tc.updateFile)
+			require.NoError(t, err)
+			testKongState(t, client, true, false, tc.updatedState, nil)
 		})
 	}
 }
