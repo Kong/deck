@@ -6565,6 +6565,13 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 			expectedError: errors.New(`warning: control plane 'cp1' specified via ` +
 				`--konnect-[control-plane|runtime-group]-name flag is different from 'default' found in state file(s)`),
 		},
+		{
+			name:     "different control plane ids fail",
+			kongFile: "testdata/sync/047-konnect-cp-id/konnect_test_cp.yaml",
+			flags:    []string{"--konnect-control-plane-id", "f313df74-5479-487e-966c-6d999e60ff21"},
+			expectedError: errors.New(`control plane ID 'f313df74-5479-487e-966c-6d999e60ff21' specified via ` +
+				`--konnect-control-plane-id flag is different from 'a998e247-8889-4d49-818b-883cab519675' found in state file(s)`),
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

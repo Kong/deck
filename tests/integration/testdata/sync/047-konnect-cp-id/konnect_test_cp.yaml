@@ -1,0 +1,14 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_id: a998e247-8889-4d49-818b-883cab519675
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin-test.org
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  name: test
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
