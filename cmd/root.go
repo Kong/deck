@@ -35,8 +35,9 @@ var (
 	disableAnalytics         bool
 	konnectConnectionDesired bool
 
-	konnectRuntimeGroup string
-	konnectControlPlane string
+	konnectRuntimeGroup   string
+	konnectControlPlane   string
+	konnectControlPlaneID string
 )
 
 // NewRootCmd represents the base command when called without any subcommands
@@ -222,7 +223,14 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-control-plane-name",
 		rootCmd.PersistentFlags().Lookup("konnect-control-plane-name"))
 
+	rootCmd.PersistentFlags().String("konnect-control-plane-id", "",
+		"Konnect Control Plane ID.")
+	viper.BindPFlag("konnect-control-plane-id",
+		rootCmd.PersistentFlags().Lookup("konnect-control-plane-id"))
+	rootCmd.PersistentFlags().MarkHidden("konnect-control-plane-id")
+
 	rootCmd.MarkFlagsMutuallyExclusive("konnect-runtime-group-name", "konnect-control-plane-name")
+	rootCmd.MarkFlagsMutuallyExclusive("konnect-control-plane-id", "konnect-control-plane-name")
 
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newCompletionCmd())
@@ -441,6 +449,7 @@ func initKonnectConfig() error {
 	konnectConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
 	konnectControlPlane = viper.GetString("konnect-control-plane-name")
 	konnectRuntimeGroup = viper.GetString("konnect-runtime-group-name")
+	konnectControlPlaneID = viper.GetString("konnect-control-plane-id")
 	return nil
 }
 
