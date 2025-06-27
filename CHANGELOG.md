@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.49.1](#v1491)
 - [v1.49.0](#v1490)
 - [v1.48.0](#v1480)
 - [v1.47.1](#v1471)
@@ -116,6 +117,24 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.49.1]
+> Release date: 2025/06/27
+
+### Fixed
+- Sync failures due to missing names for keys, keysets.
+[#1675](https://github.com/Kong/deck/pull/1675)
+[go-database-reconciler #301](https://github.com/Kong/go-database-reconciler/pull/301)
+- Fixed online validation for partials.
+[#1666](https://github.com/Kong/deck/pull/1666)
+- Fixed error message passed to end-users while using
+offline (file) validation with default_lookup_tags.
+[#1669](https://github.com/Kong/deck/pull/1669)
+- Fixed service configuration generation when no servers
+are present in an OAS document while using `deck file
+openapi2kong` command.
+[#1676](https://github.com/Kong/deck/pull/1676)
+[go-apiops #273](https://github.com/Kong/go-apiops/pull/273)
 
 ## [v1.49.0]
 > Release date: 2025/06/17
@@ -2194,6 +2213,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.49.1]: https://github.com/Kong/deck/compare/v1.49.0...v1.49.1
 [v1.49.0]: https://github.com/Kong/deck/compare/v1.48.0...v1.49.0
 [v1.48.0]: https://github.com/Kong/deck/compare/v1.47.1...v1.48.0
 [v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
