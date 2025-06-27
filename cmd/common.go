@@ -292,9 +292,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		for _, c := range consumerGroupsGlobal {
 			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
 				file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
-			if err != nil {
-				return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
-			}
 		}
 	}
 
@@ -310,9 +307,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, c := range consumersGlobal {
 			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
-			if err != nil {
-				return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
-			}
 		}
 	}
 
@@ -328,9 +322,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, r := range routesGlobal {
 			targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
-			if err != nil {
-				return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
-			}
 		}
 	}
 
@@ -346,9 +337,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, r := range servicesGlobal {
 			targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
-			if err != nil {
-				return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
-			}
 		}
 	}
 
@@ -364,9 +352,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, p := range partialsGlobal {
 			targetContent.Partials = append(targetContent.Partials, file.FPartial{Partial: *p})
-			if err != nil {
-				return fmt.Errorf("error adding global partial %v: %w", p.FriendlyName(), err)
-			}
 		}
 	}
 
