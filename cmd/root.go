@@ -218,7 +218,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("konnect-runtime-group-name",
 		rootCmd.PersistentFlags().Lookup("konnect-runtime-group-name"))
 
-	rootCmd.PersistentFlags().String("konnect-control-plane-name", "",
+	rootCmd.PersistentFlags().String("konnect-control-plane-name", defaultControlPlaneName,
 		"Konnect Control Plane name.")
 	viper.BindPFlag("konnect-control-plane-name",
 		rootCmd.PersistentFlags().Lookup("konnect-control-plane-name"))
