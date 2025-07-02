@@ -21,6 +21,10 @@ jobs:
       KONG_IMAGE: ${{ inputs.kong_image }}
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
       - name: Execution Information
         run: |
           echo "Kong Gateway Image = ${{ inputs.kong_image }}"
