@@ -117,10 +117,11 @@ func Test_LintStructured(t *testing.T) {
 		},
 		{
 			name:         "lint OAS with invalid ruleset",
-			stateFile:    "testdata/lint/002-extends/oas.yaml",
+			stateFile:    "testdata/lint/002-extends/oas-with-query.yaml",
 			rulesetFile:  "testdata/lint/002-extends/ruleset-invalid.yaml",
 			expectedFile: "testdata/lint/002-extends/expected-ruleset-invalid.yaml",
 			format:       "yaml",
+			failSeverity: "info",
 		},
 	}
 	for _, tc := range tests {
@@ -137,6 +138,7 @@ func Test_LintStructured(t *testing.T) {
 				lintOpts = append(lintOpts, "--fail-severity", tc.failSeverity)
 			}
 			output, err := fileLint(lintOpts...)
+			//fmt.Printf(output)
 			require.Error(t, err)
 
 			var expectedErrors, outputErrors lintErrors
