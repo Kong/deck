@@ -115,6 +115,13 @@ func Test_LintStructured(t *testing.T) {
 			format:       "yaml",
 			failSeverity: "error",
 		},
+		{
+			name:         "lint OAS with invalid ruleset",
+			stateFile:    "testdata/lint/002-extends/oas.yaml",
+			rulesetFile:  "testdata/lint/002-extends/ruleset-invalid.yaml",
+			expectedFile: "testdata/lint/002-extends/expected-ruleset-invalid.yaml",
+			format:       "yaml",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

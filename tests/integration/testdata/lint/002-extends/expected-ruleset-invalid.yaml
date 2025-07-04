@@ -1,0 +1,10 @@
+fail_count: 1
+results:
+- Character: 0
+  Column: 0
+  Line: 0
+  Message: '''enumerate'' needs ''values'' to operate. A valid example of ''values''
+    are: ''cake, egg, milk'': maximum number (10) of properties exceeded. ''11'' provided.'
+  Path: $.paths[*][*].parameters[?(@.in == 'query')]
+  Severity: error
+total_count: 1
