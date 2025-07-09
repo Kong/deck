@@ -1,0 +1,29 @@
+_format_version: "3.0"
+services:
+  - connect_timeout: 60000
+    enabled: true
+    id: c34277f2-b3f0-4778-aa6a-7701fc67f65b
+    host: httpbin.konghq.com
+    name: test_svc
+    path: /anything
+    port: 80
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    routes:
+      - https_redirect_status_code: 426
+        name: test_rt
+        id: d533e04a-9136-4439-8522-caed769aa158
+        path_handling: v0
+        paths:
+          - /test
+          - /test/abc
+        preserve_host: false
+        protocols:
+          - http
+          - https
+        regex_priority: 0
+        request_buffering: true
+        response_buffering: true
+        strip_path: true
+    write_timeout: 60000

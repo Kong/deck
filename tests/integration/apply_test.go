@@ -320,3 +320,55 @@ func Test_Apply_KeysAndKeySets_Konnect(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - konnect
+func Test_Apply_NestedEntities_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		firstFile     string
+		secondFile    string
+		expectedState string
+	}{
+		{
+			name:          "applies multiple of the same entity",
+			firstFile:     "testdata/apply/010-nested-entity/consumer-group-initial.yaml",
+			secondFile:    "testdata/apply/010-nested-entity/consumer-group-update.yaml",
+			expectedState: "testdata/apply/010-nested-entity/consumer-group-update.yaml",
+		},
+		{
+			name:          "applies multiple of the same entity",
+			firstFile:     "testdata/apply/010-nested-entity/route-initial.yaml",
+			secondFile:    "testdata/apply/010-nested-entity/route-update.yaml",
+			expectedState: "testdata/apply/010-nested-entity/route-update.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.firstFile)
+			require.NoError(t, err)
+
+			err = apply(ctx, tc.secondFile)
+			require.NoError(t, err)
+
+			out, _ := dump()
+
+			expected, err := readFile(tc.expectedState)
+			if err != nil {
+				t.Fatalf("failed to read expected state: %v", err)
+			}
+
+			assert.Equal(t, expected, out)
+		})
+	}
+}
