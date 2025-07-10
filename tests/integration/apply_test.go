@@ -83,7 +83,7 @@ func Test_Apply_3x(t *testing.T) {
 			firstFile:     "testdata/apply/008-update-existing-nested-entity/consumer-group-01.yaml",
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
 			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
-			runWhen:       "kong",
+			runWhen:       "enterprise",
 		},
 	}
 	for _, tc := range tests {
@@ -347,13 +347,13 @@ func Test_Apply_NestedEntities_Konnect(t *testing.T) {
 			name:          "accepts route updates",
 			firstFile:     "testdata/apply/008-update-existing-nested-entity/route-01.yaml",
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/route-02.yaml",
-			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state-konnect.yaml",
 		},
 		{
 			name:          "accepts consumer group consumer updates",
 			firstFile:     "testdata/apply/008-update-existing-nested-entity/consumer-group-01.yaml",
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
-			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state-konnect.yaml",
 		},
 	}
 
