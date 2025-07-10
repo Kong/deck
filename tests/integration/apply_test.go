@@ -73,9 +73,16 @@ func Test_Apply_3x(t *testing.T) {
 		},
 		{
 			name:          "accepts route updates",
-			firstFile:     "testdata/apply/008-update-existing-entity-route/route-01.yaml",
-			secondFile:    "testdata/apply/008-update-existing-entity-route/route-02.yaml",
-			expectedState: "testdata/apply/008-update-existing-entity-route/expected-state.yaml",
+			firstFile:     "testdata/apply/008-update-existing-nested-entity/route-01.yaml",
+			secondFile:    "testdata/apply/008-update-existing-nested-entity/route-02.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state.yaml",
+			runWhen:       "kong",
+		},
+		{
+			name:          "accepts consumer group consumer updates",
+			firstFile:     "testdata/apply/008-update-existing-nested-entity/consumer-group-01.yaml",
+			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
 			runWhen:       "kong",
 		},
 	}
@@ -328,8 +335,6 @@ func Test_Apply_NestedEntities_Konnect(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
 
-	client, err := getTestClient()
-	require.NoError(t, err)
 	ctx := context.Background()
 
 	tests := []struct {
@@ -339,16 +344,16 @@ func Test_Apply_NestedEntities_Konnect(t *testing.T) {
 		expectedState string
 	}{
 		{
-			name:          "applies multiple of the same entity",
-			firstFile:     "testdata/apply/010-nested-entity/consumer-group-initial.yaml",
-			secondFile:    "testdata/apply/010-nested-entity/consumer-group-update.yaml",
-			expectedState: "testdata/apply/010-nested-entity/consumer-group-update.yaml",
+			name:          "accepts route updates",
+			firstFile:     "testdata/apply/008-update-existing-nested-entity/route-01.yaml",
+			secondFile:    "testdata/apply/008-update-existing-nested-entity/route-02.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state.yaml",
 		},
 		{
-			name:          "applies multiple of the same entity",
-			firstFile:     "testdata/apply/010-nested-entity/route-initial.yaml",
-			secondFile:    "testdata/apply/010-nested-entity/route-update.yaml",
-			expectedState: "testdata/apply/010-nested-entity/route-update.yaml",
+			name:          "accepts consumer group consumer updates",
+			firstFile:     "testdata/apply/008-update-existing-nested-entity/consumer-group-01.yaml",
+			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
+			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
 		},
 	}
 
