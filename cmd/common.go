@@ -113,7 +113,7 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 		targetFromCLI = konnectRuntimeGroup
 	}
 	if targetFromCLI != "" && targetFromFile != targetFromCLI {
-		return fmt.Errorf("warning: control plane '%v' specified via "+
+		return fmt.Errorf("control plane '%v' specified via "+
 			"--konnect-[control-plane|runtime-group]-name flag is "+
 			"different from '%v' found in state file(s)",
 			targetFromCLI, targetFromFile)
@@ -123,6 +123,21 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 	}
 	if targetRuntimeGroup != "" {
 		konnectControlPlane = targetRuntimeGroup
+	}
+	return nil
+}
+
+func evaluateControlPlaneID(targetContent *file.Content) error {
+	idFromFile := targetContent.Konnect.ControlPlaneID
+	if idFromFile != "" && konnectControlPlaneID != "" && idFromFile != konnectControlPlaneID {
+		return fmt.Errorf("control plane ID '%v' specified via "+
+			"--konnect-control-plane-id flag is "+
+			"different from '%v' found in state file(s)",
+			konnectControlPlaneID, idFromFile)
+	}
+	if konnectControlPlaneID == "" && idFromFile != "" {
+		// if no ID specified via flag, use the one from the file
+		konnectControlPlaneID = idFromFile
 	}
 	return nil
 }
@@ -198,6 +213,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			if err := evaluateTargetRuntimeGroupOrControlPlaneName(targetContent); err != nil {
 				return err
 			}
+			if err := evaluateControlPlaneID(targetContent); err != nil {
+				return err
+			}
 		}
 		if konnectRuntimeGroup != "" {
 			konnectControlPlane = konnectRuntimeGroup
@@ -208,6 +226,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 		dumpConfig.KonnectControlPlane = konnectControlPlane
+		dumpConfig.KonnectControlPlaneID = konnectControlPlaneID
 	}
 
 	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)

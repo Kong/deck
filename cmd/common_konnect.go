@@ -84,9 +84,14 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
 	}
-	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
-	if err != nil {
-		return nil, err
+	var cpID string
+	if konnectControlPlaneID != "" {
+		cpID = konnectControlPlaneID
+	} else {
+		cpID, err = fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// set the kong control plane ID in the client
@@ -140,6 +145,10 @@ func dumpKonnectV2(ctx context.Context) error {
 		konnectControlPlane = defaultControlPlaneName
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
+
+	if konnectControlPlaneID != "" {
+		dumpConfig.KonnectControlPlaneID = konnectControlPlaneID
+	}
 	konnectConfig.TLSConfig = rootConfig.TLSConfig
 	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
@@ -153,14 +162,21 @@ func dumpKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("building state: %w", err)
 	}
-	return file.KongStateToFile(ks, file.WriteConfig{
-		SelectTags:       dumpConfig.SelectorTags,
-		Filename:         dumpCmdKongStateFile,
-		FileFormat:       file.Format(strings.ToUpper(dumpCmdStateFormat)),
-		WithID:           dumpWithID,
-		ControlPlaneName: konnectControlPlane,
-		KongVersion:      fetchKonnectKongVersion(),
-	})
+	writeConfig := file.WriteConfig{
+		SelectTags:  dumpConfig.SelectorTags,
+		Filename:    dumpCmdKongStateFile,
+		FileFormat:  file.Format(strings.ToUpper(dumpCmdStateFormat)),
+		WithID:      dumpWithID,
+		KongVersion: fetchKonnectKongVersion(),
+	}
+
+	if konnectControlPlaneID != "" {
+		writeConfig.ControlPlaneID = konnectControlPlaneID
+	} else {
+		writeConfig.ControlPlaneName = konnectControlPlane
+	}
+
+	return file.KongStateToFile(ks, writeConfig)
 }
 
 func syncKonnect(ctx context.Context,

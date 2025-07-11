@@ -289,6 +289,47 @@ func Test_Dump_KonnectRename(t *testing.T) {
 	}
 }
 
+func Test_Dump_KonnectControlPlaneID(t *testing.T) {
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		flags        []string
+	}{
+		{
+			name:         "dump with konnect-control-plane-id",
+			stateFile:    "testdata/sync/047-konnect-cp-id/konnect_test_cp.yaml",
+			expectedFile: "testdata/sync/047-konnect-cp-id/konnect_test_cp.yaml",
+			flags:        []string{"--konnect-control-plane-id", "a998e247-8889-4d49-818b-883cab519675"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t, tc.flags...)
+			})
+			runWhenKonnect(t)
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.stateFile))
+
+			var (
+				output string
+				err    error
+			)
+			flags := []string{"-o", "-", "--with-id"}
+			flags = append(flags, tc.flags...)
+			output, err = dump(flags...)
+
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
 func Test_Dump_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.0.0")
 	setup(t)
