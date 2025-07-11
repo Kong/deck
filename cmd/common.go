@@ -113,7 +113,7 @@ func evaluateTargetRuntimeGroupOrControlPlaneName(targetContent *file.Content) e
 		targetFromCLI = konnectRuntimeGroup
 	}
 	if targetFromCLI != "" && targetFromFile != targetFromCLI {
-		return fmt.Errorf("warning: control plane '%v' specified via "+
+		return fmt.Errorf("control plane '%v' specified via "+
 			"--konnect-[control-plane|runtime-group]-name flag is "+
 			"different from '%v' found in state file(s)",
 			targetFromCLI, targetFromFile)

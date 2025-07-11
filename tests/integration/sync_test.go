@@ -6541,28 +6541,28 @@ func Test_Sync_KonnectRenameErrors(t *testing.T) {
 			name:     "different runtime group names fail",
 			kongFile: "testdata/sync/026-konnect-rename/konnect_default_cp.yaml",
 			flags:    []string{"--konnect-runtime-group-name", "rg1"},
-			expectedError: errors.New(`warning: control plane 'rg1' specified via ` +
+			expectedError: errors.New(`control plane 'rg1' specified via ` +
 				`--konnect-[control-plane|runtime-group]-name flag is different from 'default' found in state file(s)`),
 		},
 		{
 			name:     "different runtime group names fail",
 			kongFile: "testdata/sync/026-konnect-rename/konnect_default_rg.yaml",
 			flags:    []string{"--konnect-runtime-group-name", "rg1"},
-			expectedError: errors.New(`warning: control plane 'rg1' specified via ` +
+			expectedError: errors.New(`control plane 'rg1' specified via ` +
 				`--konnect-[control-plane|runtime-group]-name flag is different from 'default' found in state file(s)`),
 		},
 		{
 			name:     "different control plane names fail",
 			kongFile: "testdata/sync/026-konnect-rename/konnect_default_cp.yaml",
 			flags:    []string{"--konnect-control-plane-name", "cp1"},
-			expectedError: errors.New(`warning: control plane 'cp1' specified via ` +
+			expectedError: errors.New(`control plane 'cp1' specified via ` +
 				`--konnect-[control-plane|runtime-group]-name flag is different from 'default' found in state file(s)`),
 		},
 		{
 			name:     "different control plane names fail",
 			kongFile: "testdata/sync/026-konnect-rename/konnect_default_rg.yaml",
 			flags:    []string{"--konnect-control-plane-name", "cp1"},
-			expectedError: errors.New(`warning: control plane 'cp1' specified via ` +
+			expectedError: errors.New(`control plane 'cp1' specified via ` +
 				`--konnect-[control-plane|runtime-group]-name flag is different from 'default' found in state file(s)`),
 		},
 		{
