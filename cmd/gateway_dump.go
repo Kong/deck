@@ -39,6 +39,36 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 	return res, nil
 }
 
+func getWorkspaceClient(ctx context.Context, workspace string) (*kong.Client, error) {
+	wsConfig := rootConfig.ForWorkspace(workspace)
+	exists, err := workspaceExists(ctx, rootConfig, workspace)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("workspace '%v' does not exist in Kong", workspace)
+	}
+
+	wsClient, err := utils.GetKongClient(wsConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return wsClient, nil
+}
+
+func getKongState(ctx context.Context, wsClient *kong.Client) (*state.KongState, error) {
+	rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+	if err != nil {
+		return nil, fmt.Errorf("reading configuration from Kong: %w", err)
+	}
+	ks, err := state.Get(rawState)
+	if err != nil {
+		return nil, fmt.Errorf("building state: %w", err)
+	}
+	return ks, nil
+}
+
 func executeDump(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 
@@ -71,6 +101,16 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 	_ = sendAnalytics("dump", kongVersion, modeKong)
 
+	writeConfig := file.WriteConfig{
+		SelectTags:                       dumpConfig.SelectorTags,
+		Workspace:                        dumpWorkspace,
+		Filename:                         dumpCmdKongStateFile,
+		FileFormat:                       format,
+		WithID:                           dumpWithID,
+		KongVersion:                      kongVersion,
+		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
+	}
+
 	// Kong Enterprise dump all workspace
 	if dumpAllWorkspaces {
 		workspaces, err := listWorkspaces(ctx, wsClient)
@@ -79,29 +119,20 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		}
 
 		for _, workspace := range workspaces {
-			wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
+			wsClient, err = getWorkspaceClient(ctx, workspace)
 			if err != nil {
-				return err
+				return fmt.Errorf("getting Kong client for workspace '%s': %w", workspace, err)
 			}
 
-			rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+			ks, err := getKongState(ctx, wsClient)
 			if err != nil {
-				return fmt.Errorf("reading configuration from Kong: %w", err)
-			}
-			ks, err := state.Get(rawState)
-			if err != nil {
-				return fmt.Errorf("building state: %w", err)
+				return fmt.Errorf("getting Kong state for workspace '%s': %w", workspace, err)
 			}
 
-			if err := file.KongStateToFile(ks, file.WriteConfig{
-				SelectTags:                       dumpConfig.SelectorTags,
-				Workspace:                        workspace,
-				Filename:                         workspace,
-				FileFormat:                       format,
-				WithID:                           dumpWithID,
-				KongVersion:                      kongVersion,
-				IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
-			}); err != nil {
+			writeConfig.Workspace = workspace
+			writeConfig.Filename = workspace
+
+			if err := file.KongStateToFile(ks, writeConfig); err != nil {
 				return err
 			}
 		}
@@ -111,37 +142,18 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	// Kong OSS
 	// or Kong Enterprise single workspace
 	if dumpWorkspace != "" {
-		wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
-		exists, err := workspaceExists(ctx, rootConfig, dumpWorkspace)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
-		}
-		wsClient, err = utils.GetKongClient(wsConfig)
+		wsClient, err = getWorkspaceClient(ctx, dumpWorkspace)
 		if err != nil {
 			return err
 		}
 	}
 
-	rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+	ks, err := getKongState(ctx, wsClient)
 	if err != nil {
-		return fmt.Errorf("reading configuration from Kong: %w", err)
+		return fmt.Errorf("getting Kong state: %w", err)
 	}
-	ks, err := state.Get(rawState)
-	if err != nil {
-		return fmt.Errorf("building state: %w", err)
-	}
-	return file.KongStateToFile(ks, file.WriteConfig{
-		SelectTags:                       dumpConfig.SelectorTags,
-		Workspace:                        dumpWorkspace,
-		Filename:                         dumpCmdKongStateFile,
-		FileFormat:                       format,
-		WithID:                           dumpWithID,
-		KongVersion:                      kongVersion,
-		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
-	})
+
+	return file.KongStateToFile(ks, writeConfig)
 }
 
 // newDumpCmd represents the dump command

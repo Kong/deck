@@ -153,14 +153,17 @@ func dumpKonnectV2(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("building state: %w", err)
 	}
-	return file.KongStateToFile(ks, file.WriteConfig{
+
+	writeConfig := file.WriteConfig{
 		SelectTags:       dumpConfig.SelectorTags,
 		Filename:         dumpCmdKongStateFile,
 		FileFormat:       file.Format(strings.ToUpper(dumpCmdStateFormat)),
 		WithID:           dumpWithID,
 		ControlPlaneName: konnectControlPlane,
 		KongVersion:      fetchKonnectKongVersion(),
-	})
+	}
+
+	return file.KongStateToFile(ks, writeConfig)
 }
 
 func syncKonnect(ctx context.Context,
