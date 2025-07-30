@@ -54,10 +54,10 @@ func (s *Sanitizer) Sanitize() (*file.Content, error) {
 		if _, exempt := topLevelExemptedFields[fieldName]; exempt {
 			continue
 		}
-		fieldValueSet := content.FieldByName(fieldName)
+		fieldValueSet := content.Field(i)
 
 		if fieldValueSet.IsValid() && fieldValueSet.CanInterface() && !fieldValueSet.IsZero() {
-			s.sanitizeField(content.Field(i))
+			s.sanitizeField(fieldValueSet)
 		}
 	}
 
