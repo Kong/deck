@@ -102,6 +102,9 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			// if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
 			// 	// handle configs - tba
 			// }
+			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
+				// handle configs - tba
+			}
 
 			s.sanitizeField(fieldValue)
 		}
