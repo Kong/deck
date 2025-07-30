@@ -161,6 +161,11 @@ func dumpKonnectV2(ctx context.Context) error {
 		WithID:           dumpWithID,
 		ControlPlaneName: konnectControlPlane,
 		KongVersion:      fetchKonnectKongVersion(),
+		SanitizeContent:  dumpConfig.SanitizeContent,
+	}
+
+	if dumpConfig.SanitizeContent {
+		return sanitiseContent(ctx, client, ks, writeConfig, true)
 	}
 
 	return file.KongStateToFile(ks, writeConfig)
