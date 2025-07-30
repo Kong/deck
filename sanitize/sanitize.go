@@ -2,6 +2,7 @@ package sanitize
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -64,7 +65,93 @@ func (s *Sanitizer) Sanitize() (*file.Content, error) {
 	return s.content, nil
 }
 
-func (s *Sanitizer) sanitizeField(_ reflect.Value) {
-	// sanitize the field based on type
-	// to be added in next commit
+func (s *Sanitizer) sanitizeField(field reflect.Value) {
+	if !field.IsValid() {
+		return
+	}
+
+	//nolint:exhaustive
+	switch field.Kind() {
+	case reflect.Ptr:
+		if field.IsNil() {
+			return
+		}
+		s.sanitizeField(field.Elem())
+	case reflect.Struct:
+		t := field.Type()
+		entityName := t.Name()
+
+		entitySkipFields, hasEntitySkips := entityLevelExemptedFields[entityName]
+		for i := 0; i < field.NumField(); i++ {
+			fieldValue := field.Field(i)
+			fieldName := t.Field(i).Name
+
+			if hasEntitySkips && s.shouldSkipSanitization(fieldName, entitySkipFields) {
+				continue
+			}
+
+			if s.shouldSkipSanitization(fieldName, nil) {
+				continue
+			}
+
+			// needs special handling for configs as they are not pointers to structs
+			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
+				// handle configs - tba
+			}
+
+			s.sanitizeField(fieldValue)
+		}
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < field.Len(); i++ {
+			s.sanitizeField(field.Index(i))
+		}
+	case reflect.Map:
+		iter := field.MapRange()
+		for iter.Next() {
+			mapKey := iter.Key().String()
+			if s.shouldSkipSanitization(mapKey, nil) {
+				continue
+			}
+			mapValue := iter.Value()
+			if mapValue.Kind() == reflect.Ptr {
+				mapValue = mapValue.Elem()
+			}
+			s.sanitizeField(mapValue)
+		}
+	case reflect.Interface:
+		if field.IsNil() {
+			return
+		}
+		s.sanitizeField(field.Elem())
+	case reflect.String:
+		originalValue := field.String()
+		sanitizedValue, exists := s.sanitisedMap[originalValue]
+		if !exists {
+			sanitizedValue = s.sanitiseValue(originalValue)
+			s.sanitisedMap[originalValue] = sanitizedValue
+		}
+
+		if field.CanSet() {
+			field.SetString(sanitizedValue.(string))
+		} else {
+			fmt.Println("Cannot set sanitized value for field:", field.Type(), "with value:", originalValue)
+		}
+	default:
+		// No operation needed for other kinds
+	}
+}
+
+func (s *Sanitizer) shouldSkipSanitization(fieldName string, exemptionMap map[string]struct{}) bool {
+	if exemptionMap != nil {
+		if _, exempt := exemptionMap[fieldName]; exempt {
+			return true
+		}
+	}
+
+	// checking for config-level exemptions
+	if _, exempt := configLevelExemptedFields[fieldName]; exempt {
+		return true
+	}
+
+	return false
 }
