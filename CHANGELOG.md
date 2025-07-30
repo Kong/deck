@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.49.2](#v1492)
 - [v1.49.1](#v1491)
 - [v1.49.0](#v1490)
 - [v1.48.0](#v1480)
@@ -117,6 +118,23 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.49.2]
+> Release date: 2025/07/30
+
+### Fixed
+- Fixed partial apply failure for nested routes, consumers.
+[#1691](https://github.com/Kong/deck/pull/1691)
+[go-database-reconciler #309](https://github.com/Kong/go-database-reconciler/pull/309)
+- Fixed panic while running `deck file openapi2kong` command with `--generate-security` flag.
+[#1695](https://github.com/Kong/deck/pull/1695)
+[go-apiops #274](https://github.com/Kong/go-apiops/pull/274)
+- Fixed false diff on consumer_groups created via AdminAPI/Kong Manager.
+[go-database-reconciler #307](https://github.com/Kong/go-database-reconciler/pull/307)
+
+### Chores
+- Bump golang version to v1.24.4 to resolve CVE-2025-228774
+[#1705](https://github.com/Kong/deck/pull/1705)
 
 ## [v1.49.1]
 > Release date: 2025/06/27
@@ -2213,6 +2231,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.49.2]: https://github.com/Kong/deck/compare/v1.49.1...v1.49.2
 [v1.49.1]: https://github.com/Kong/deck/compare/v1.49.0...v1.49.1
 [v1.49.0]: https://github.com/Kong/deck/compare/v1.48.0...v1.49.0
 [v1.48.0]: https://github.com/Kong/deck/compare/v1.47.1...v1.48.0
