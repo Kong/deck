@@ -13,15 +13,16 @@ import (
 )
 
 var (
-	cmdO2KinputFilename       string
-	cmdO2KoutputFilename      string
-	cmdO2KdocName             string
-	cmdO2KoutputFormat        string
-	cmdO2KentityTags          []string
-	cmdO2KskipID              bool
-	cmdO2KinsoCompat          bool
-	cmdO2Ksecurity            bool
-	cmdO2KignoreSecurityError bool
+	   cmdO2KinputFilename         string
+	   cmdO2KoutputFilename        string
+	   cmdO2KdocName               string
+	   cmdO2KoutputFormat          string
+	   cmdO2KentityTags            []string
+	   cmdO2KskipID                bool
+	   cmdO2KinsoCompat            bool
+	   cmdO2Ksecurity              bool
+	   cmdO2KignoreSecurityError   bool
+	   cmdO2KignoreCircularRefs    bool
 )
 
 // Executes the CLI command "openapi2kong"
@@ -39,14 +40,15 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 	if cmdO2KinsoCompat {
 		cmdO2KskipID = true // this is implicit in inso compatibility mode
 	}
-	options := openapi2kong.O2kOptions{
-		Tags:                 cmdO2KentityTags,
-		DocName:              cmdO2KdocName,
-		SkipID:               cmdO2KskipID,
-		InsoCompat:           cmdO2KinsoCompat,
-		OIDC:                 cmdO2Ksecurity,
-		IgnoreSecurityErrors: cmdO2KignoreSecurityError,
-	}
+	   options := openapi2kong.O2kOptions{
+			   Tags:                 cmdO2KentityTags,
+			   DocName:              cmdO2KdocName,
+			   SkipID:               cmdO2KskipID,
+			   InsoCompat:           cmdO2KinsoCompat,
+			   OIDC:                 cmdO2Ksecurity,
+			   IgnoreSecurityErrors: cmdO2KignoreSecurityError,
+			   IgnoreCircularRefs:   cmdO2KignoreCircularRefs,
+	   }
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
 	trackInfo["input"] = cmdO2KinputFilename
@@ -109,8 +111,12 @@ The output will be targeted at Kong version 3.x.
 			"the same, and no 'id' fields will be generated.")
 	openapi2kongCmd.Flags().BoolVarP(&cmdO2Ksecurity, "generate-security", "", false, "generate OpenIDConnect plugins "+
 		"from the security directives")
-	openapi2kongCmd.Flags().BoolVarP(&cmdO2KignoreSecurityError, "ignore-security-errors", "", false,
-		"ignore errors for unsupported security schemes")
+
+	   openapi2kongCmd.Flags().BoolVarP(&cmdO2KignoreSecurityError, "ignore-security-errors", "", false,
+			   "ignore errors for unsupported security schemes")
+
+	   openapi2kongCmd.Flags().BoolVar(&cmdO2KignoreCircularRefs, "ignore-circular-refs", false,
+			   "ignore circular $ref errors in the OpenAPI spec (dangerous, use with caution)")
 
 	return openapi2kongCmd
 }
