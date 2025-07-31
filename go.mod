@@ -14,7 +14,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.47
 	github.com/kong/go-database-reconciler v1.24.3
-	github.com/kong/go-kong v0.66.1
+	github.com/kong/go-kong v0.67.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
@@ -27,7 +27,7 @@ require (
 	k8s.io/client-go v0.33.2
 	k8s.io/code-generator v0.33.3
 	sigs.k8s.io/gateway-api v1.3.0
-	sigs.k8s.io/yaml v1.4.0
+	sigs.k8s.io/yaml v1.5.0
 )
 
 require (
@@ -97,6 +97,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.33.0 // indirect
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.starlark.net v0.0.0-20230525235612-a134d8f9ddca // indirect
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	go.yaml.in/yaml/v3 v3.0.3 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
