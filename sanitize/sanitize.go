@@ -95,9 +95,10 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			}
 
 			// needs special handling for configs as they are not pointers to structs
-			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
-				// handle configs - tba
-			}
+			// commented for now to satisfy linter
+			// if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
+			// 	// handle configs - tba
+			// }
 
 			s.sanitizeField(fieldValue)
 		}
