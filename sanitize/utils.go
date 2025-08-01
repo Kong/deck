@@ -12,7 +12,7 @@ func (s *Sanitizer) hashValue(value string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func (s *Sanitizer) sanitiseValue(value string) string {
+func (s *Sanitizer) sanitizeValue(value string) string {
 	hashedPath := s.hashValue(value)
 	if !strings.Contains(value, "/") {
 		return hashedPath
