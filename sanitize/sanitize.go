@@ -15,7 +15,7 @@ type Sanitizer struct {
 	content      *file.Content
 	isKonnect    bool
 	salt         string
-	sanitisedMap map[string]interface{}
+	sanitizedMap map[string]interface{}
 }
 
 type SanitizerOptions struct {
@@ -38,7 +38,7 @@ func NewSanitizer(opts *SanitizerOptions) *Sanitizer {
 		content:      opts.Content,
 		isKonnect:    opts.IsKonnect,
 		salt:         saltToUse,
-		sanitisedMap: make(map[string]interface{}),
+		sanitizedMap: make(map[string]interface{}),
 	}
 }
 
