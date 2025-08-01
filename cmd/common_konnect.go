@@ -165,7 +165,7 @@ func dumpKonnectV2(ctx context.Context) error {
 	}
 
 	if dumpConfig.SanitizeContent {
-		return sanitiseContent(ctx, client, ks, writeConfig, true)
+		return sanitizeContent(ctx, client, ks, writeConfig, true)
 	}
 
 	return file.KongStateToFile(ks, writeConfig)
