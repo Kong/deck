@@ -126,10 +126,10 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		s.sanitizeField(field.Elem())
 	case reflect.String:
 		originalValue := field.String()
-		sanitizedValue, exists := s.sanitisedMap[originalValue]
+		sanitizedValue, exists := s.sanitizedMap[originalValue]
 		if !exists {
-			sanitizedValue = s.sanitiseValue(originalValue)
-			s.sanitisedMap[originalValue] = sanitizedValue
+			sanitizedValue = s.sanitizeValue(originalValue)
+			s.sanitizedMap[originalValue] = sanitizedValue
 		}
 
 		if field.CanSet() {
