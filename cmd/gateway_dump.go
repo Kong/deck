@@ -70,7 +70,7 @@ func getKongState(ctx context.Context, wsClient *kong.Client) (*state.KongState,
 	return ks, nil
 }
 
-func sanitiseContent(ctx context.Context, client *kong.Client,
+func sanitizeContent(ctx context.Context, client *kong.Client,
 	ks *state.KongState, writeConfig file.WriteConfig, isKonnect bool,
 ) error {
 	writeConfig.WithID = true // always write IDs for sanitization
@@ -159,7 +159,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 			writeConfig.Filename = workspace
 
 			if dumpConfig.SanitizeContent {
-				if err := sanitiseContent(ctx, wsClient, ks, writeConfig, false); err != nil {
+				if err := sanitizeContent(ctx, wsClient, ks, writeConfig, false); err != nil {
 					return fmt.Errorf("sanitizing content for workspace '%s': %w", workspace, err)
 				}
 			} else {
@@ -186,7 +186,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	if dumpConfig.SanitizeContent {
-		return sanitiseContent(ctx, wsClient, ks, writeConfig, false)
+		return sanitizeContent(ctx, wsClient, ks, writeConfig, false)
 	}
 
 	return file.KongStateToFile(ks, writeConfig)
