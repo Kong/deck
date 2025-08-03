@@ -15,6 +15,7 @@ type ITerraformBuilder interface {
 	buildCACertificates(*file.Content, *string)
 	buildCertificates(*file.Content, *string)
 	buildVaults(*file.Content, *string)
+	buildPartials(*file.Content, *string)
 	getContent() string
 }
 
@@ -47,5 +48,6 @@ func (d *Director) builTerraformResources(
 	d.builder.buildCACertificates(content, generateImportsForControlPlaneID)
 	d.builder.buildCertificates(content, generateImportsForControlPlaneID)
 	d.builder.buildVaults(content, generateImportsForControlPlaneID)
+	d.builder.buildPartials(content, generateImportsForControlPlaneID)
 	return d.builder.getContent()
 }
