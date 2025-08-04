@@ -9,7 +9,7 @@ replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.17.7
+	github.com/daveshanley/vacuum v0.17.2
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.47
