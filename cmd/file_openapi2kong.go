@@ -22,6 +22,7 @@ var (
 	cmdO2KinsoCompat          bool
 	cmdO2Ksecurity            bool
 	cmdO2KignoreSecurityError bool
+	cmdO2KignoreCircularRefs  bool
 )
 
 // Executes the CLI command "openapi2kong"
@@ -46,6 +47,7 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		InsoCompat:           cmdO2KinsoCompat,
 		OIDC:                 cmdO2Ksecurity,
 		IgnoreSecurityErrors: cmdO2KignoreSecurityError,
+		IgnoreCircularRefs:   cmdO2KignoreCircularRefs,
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
@@ -111,6 +113,8 @@ The output will be targeted at Kong version 3.x.
 		"from the security directives")
 	openapi2kongCmd.Flags().BoolVarP(&cmdO2KignoreSecurityError, "ignore-security-errors", "", false,
 		"ignore errors for unsupported security schemes")
+	openapi2kongCmd.Flags().BoolVar(&cmdO2KignoreCircularRefs, "ignore-circular-refs", false,
+		"ignore circular $ref errors in the OpenAPI spec (dangerous, use with caution)")
 
 	return openapi2kongCmd
 }
