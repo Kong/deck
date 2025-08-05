@@ -19,7 +19,16 @@ func generateResource(
 	imports importConfig,
 	lifecycle []string,
 ) string {
-	return generateResourceWithCustomizations(entityType, name, entity, parents, map[string]string{}, imports, lifecycle)
+	return generateResourceWithCustomizations(
+		entityType,
+		name,
+		entity,
+		parents,
+		map[string]string{},
+		imports,
+		lifecycle,
+		map[string][]string{},
+	)
 }
 
 func generateResourceWithCustomizations(
@@ -30,6 +39,7 @@ func generateResourceWithCustomizations(
 	customizations map[string]string,
 	imports importConfig,
 	lifecycle []string,
+	oneOfFields map[string][]string,
 ) string {
 	// Cache ID in case we need to use it for imports
 	entityID := ""
@@ -104,7 +114,7 @@ resource "konnect_%s" "%s" {
 }
 `,
 		entityType, name,
-		strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations), "\n"),
+		strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
 		generateParents(parents),
 		generateLifecycle(lifecycle))
 
@@ -276,6 +286,7 @@ func output(
 	isRoot bool,
 	eol string,
 	customizations map[string]string,
+	oneOfFields map[string][]string,
 ) string {
 	var result []string
 
@@ -287,8 +298,15 @@ func output(
 
 	sort.Strings(keys)
 
-	// Move the most common keys to the front
+	// If there are any oneOfs, prioritise those first
 	var prioritizedKeys []string
+	for k := range oneOfFields {
+		if _, exists := object[k]; exists {
+			prioritizedKeys = append(prioritizedKeys, k)
+		}
+	}
+
+	// Move the most common keys to the front
 	for _, k := range []string{"enabled", "name", "username"} {
 		if _, exists := object[k]; exists {
 			prioritizedKeys = append(prioritizedKeys, k)
@@ -316,11 +334,32 @@ func output(
 
 		switch v := v.(type) {
 		case map[string]interface{}:
-			result = append(result, outputHash(entityType, k, v, depth, isRoot, eol, customizations))
+			result = append(result, outputHash(entityType, k, v, depth, isRoot, eol, customizations, oneOfFields))
 		case []interface{}:
 			result = append(result, outputList(entityType, k, v, depth))
 		default:
-			result = append(result, line(fmt.Sprintf("%s = %s", k, quote(v)), depth, eol))
+			if oneOfFields[k] != nil {
+				snakeCaseKey := strings.ReplaceAll(strings.ToLower(v.(string)), "-", "_")
+				childFields := map[string]interface{}{}
+				for _, child := range oneOfFields[k] {
+					childFields[child] = object[child]
+					object[child] = nil
+				}
+
+				result = append(result, outputHash(
+					entityType,
+					snakeCaseKey,
+					childFields,
+					depth,
+					true,
+					eol,
+					customizations,
+					oneOfFields,
+				))
+
+			} else {
+				result = append(result, line(fmt.Sprintf("%s = %s", k, quote(v)), depth, eol))
+			}
 		}
 	}
 	return strings.Join(result, "")
@@ -335,6 +374,7 @@ func outputHash(
 	isRoot bool,
 	eol string,
 	customizations map[string]string,
+	oneOfFields map[string][]string,
 ) string {
 	s := ""
 	if !isRoot {
@@ -349,7 +389,7 @@ func outputHash(
 		s += line(fmt.Sprintf("%s = {", key), depth, eol)
 	}
 
-	s += output(entityType, input, depth+1, true, eol, customizations)
+	s += output(entityType, input, depth+1, true, eol, customizations, oneOfFields)
 
 	if custom != "" {
 		s += line("})", depth, eol)
@@ -363,7 +403,7 @@ func outputHash(
 func outputHashInList(entityType string, input map[string]interface{}, depth int) string {
 	s := "\n"
 	s += line("{", depth+1, "\n")
-	s += output(entityType, input, depth+2, false, "\n", map[string]string{})
+	s += output(entityType, input, depth+2, false, "\n", map[string]string{}, map[string][]string{})
 	s += line("},", depth+1, "\n")
 	return s
 }
