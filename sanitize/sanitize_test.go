@@ -46,8 +46,9 @@ func Test_Sanitize(t *testing.T) {
 	}
 
 	sanitizer := NewSanitizer(&SanitizerOptions{
-		Ctx:     context.Background(),
-		Content: fileContent,
+		Ctx: context.Background(),
+		// Using DeepCopy to avoid modifying the original content for tests
+		Content: fileContent.DeepCopy(),
 	})
 
 	result, err := sanitizer.Sanitize()
@@ -74,26 +75,26 @@ func Test_Sanitize(t *testing.T) {
 
 		// Verifying that sanitized values are different from original
 		// Service is sanitized
-		assert.NotEqual(t, fileContent.Services[0].Name, *result.Services[0].Name)
-		assert.NotEqual(t, fileContent.Services[0].Host, *result.Services[0].Host)
-		assert.NotEqual(t, fileContent.Services[0].Path, *result.Services[0].Path)
+		assert.NotEqual(t, *fileContent.Services[0].Name, *result.Services[0].Name)
+		assert.NotEqual(t, *fileContent.Services[0].Host, *result.Services[0].Host)
+		assert.NotEqual(t, *fileContent.Services[0].Path, *result.Services[0].Path)
 		for i, tag := range result.Services[0].Tags {
-			assert.NotEqual(t, fileContent.Services[0].Tags[i], *tag)
+			assert.NotEqual(t, *fileContent.Services[0].Tags[i], *tag)
 		}
 
 		// Route is sanitized
-		assert.NotEqual(t, fileContent.Routes[0].Name, *result.Routes[0].Name)
+		assert.NotEqual(t, *fileContent.Routes[0].Name, *result.Routes[0].Name)
 		for i, path := range result.Routes[0].Paths {
-			assert.NotEqual(t, fileContent.Routes[0].Paths[i], *path)
+			assert.NotEqual(t, *fileContent.Routes[0].Paths[i], *path)
 		}
 
 		// Verifying that non-string fields remain unchanged
-		assert.Equal(t, fileContent.Services[0].Port, result.Services[0].Port)
-		assert.Equal(t, fileContent.Services[0].Enabled, result.Services[0].Enabled)
+		assert.Equal(t, *fileContent.Services[0].Port, *result.Services[0].Port)
+		assert.Equal(t, *fileContent.Services[0].Enabled, *result.Services[0].Enabled)
 
 		// Verifying that references to other entities are preserved
 		assert.NotNil(t, result.Routes[0].Service)
-		assert.Equal(t, *fileContent.Routes[0].Service.Name, *result.Routes[0].Service.Name)
+		assert.Equal(t, *result.Services[0].Name, *result.Routes[0].Service.Name)
 	})
 
 	t.Run("identical input strings result in same sanitized strings", func(t *testing.T) {
@@ -186,7 +187,7 @@ func Test_Sanitize(t *testing.T) {
 
 		sanitizer := NewSanitizer(&SanitizerOptions{
 			Ctx:     context.Background(),
-			Content: contentWithID,
+			Content: contentWithID.DeepCopy(),
 		})
 
 		result, err := sanitizer.Sanitize()
@@ -196,6 +197,6 @@ func Test_Sanitize(t *testing.T) {
 		require.NotNil(t, result.Services)
 		require.Len(t, result.Services, 1)
 
-		assert.Equal(t, contentWithID.Services[0].ID, result.Services[0].ID, "ID field should not be sanitized")
+		assert.Equal(t, *contentWithID.Services[0].ID, *result.Services[0].ID, "ID field should not be sanitized")
 	})
 }
