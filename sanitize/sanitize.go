@@ -2,8 +2,11 @@ package sanitize
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -86,11 +89,11 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			fieldValue := field.Field(i)
 			fieldName := t.Field(i).Name
 
-			if hasEntitySkips && s.shouldSkipSanitization(fieldName, entitySkipFields) {
+			if hasEntitySkips && shouldSkipSanitization(fieldName, entitySkipFields) {
 				continue
 			}
 
-			if s.shouldSkipSanitization(fieldName, nil) {
+			if shouldSkipSanitization(fieldName, nil) {
 				continue
 			}
 
@@ -110,7 +113,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		iter := field.MapRange()
 		for iter.Next() {
 			mapKey := iter.Key().String()
-			if s.shouldSkipSanitization(mapKey, nil) {
+			if shouldSkipSanitization(mapKey, nil) {
 				continue
 			}
 			mapValue := iter.Value()
@@ -126,18 +129,48 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		s.sanitizeField(field.Elem())
 	case reflect.String:
 		originalValue := field.String()
-		sanitizedValue, exists := s.sanitizedMap[originalValue]
-		if !exists {
-			sanitizedValue = s.sanitizeValue(originalValue)
-			s.sanitizedMap[originalValue] = sanitizedValue
-		}
-
 		if field.CanSet() {
-			field.SetString(sanitizedValue.(string))
+			field.SetString(s.sanitizeValue(originalValue))
 		} else {
 			fmt.Println("Cannot set sanitized value for field:", field.Type(), "with value:", originalValue)
 		}
 	default:
 		// No operation needed for other kinds
 	}
+}
+
+func (s *Sanitizer) sanitizeValue(value string) string {
+	sanitizedValue, exists := s.sanitizedMap[value]
+	if exists {
+		if str, ok := sanitizedValue.(string); ok {
+			return str
+		}
+	}
+
+	hashedValue := s.hashValue(value)
+	if !strings.Contains(value, "/") {
+		s.sanitizedMap[value] = hashedValue
+		return hashedValue
+	}
+
+	var redactedPath string
+
+	// this means it is a path field
+	if strings.HasPrefix(value, "/") || strings.HasPrefix(value, "~/") {
+		redactedPath = "/redacted/path/"
+	} else {
+		// if it is not a path, but a string with a /, it could be a content-type
+		redactedPath = "redacted/"
+	}
+
+	hashedPath := redactedPath + hashedValue
+
+	s.sanitizedMap[value] = hashedPath
+	return hashedPath
+}
+
+func (s *Sanitizer) hashValue(value string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(s.salt + value))
+	return hex.EncodeToString(hasher.Sum(nil))
 }
