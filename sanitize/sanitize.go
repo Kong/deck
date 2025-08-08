@@ -98,12 +98,14 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			}
 
 			// needs special handling for configs as they are not pointers to structs
-			// commented for now to satisfy linter
-			// if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
-			// 	// handle configs - tba
-			// }
 			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
-				// handle configs - tba
+				sanitizedConfig := s.sanitizeConfig(fieldValue)
+				if fieldValue.CanSet() {
+					fieldValue.Set(reflect.ValueOf(sanitizedConfig))
+				} else {
+					fmt.Println("Cannot set sanitized config for field:", field.Type())
+				}
+				continue
 			}
 
 			s.sanitizeField(fieldValue)
@@ -176,4 +178,60 @@ func (s *Sanitizer) hashValue(value string) string {
 	hasher := sha256.New()
 	hasher.Write([]byte(s.salt + value))
 	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
+	sanitizedConfig := make(map[string]interface{})
+
+	//nolint:exhaustive
+	switch config.Kind() {
+	case reflect.Invalid:
+		return nil
+	case reflect.Ptr:
+		if config.IsNil() {
+			return nil
+		}
+	case reflect.String:
+		configValue := config.String()
+		if configValue == "" {
+			return configValue
+		}
+		return s.sanitizeValue(configValue)
+	case reflect.Map:
+		for _, key := range config.MapKeys() {
+			val := config.MapIndex(key)
+			if !val.IsValid() {
+				continue
+			}
+			k, ok := key.Interface().(string)
+			if !ok {
+				continue
+			}
+
+			if shouldSkipSanitization(k, nil) {
+				sanitizedConfig[k] = val.Interface()
+				continue
+			}
+
+			switch v := val.Interface().(type) {
+			case string:
+				sanitizedVal := s.sanitizeValue(v)
+				sanitizedConfig[k] = sanitizedVal
+			case map[string]interface{}:
+				sanitizedConfig[k] = s.sanitizeConfig(reflect.ValueOf(v))
+			case []interface{}:
+				newSlice := make([]interface{}, len(v))
+				for i, elem := range v {
+					newSlice[i] = s.sanitizeConfig(reflect.ValueOf(elem))
+				}
+				sanitizedConfig[k] = newSlice
+			default:
+				sanitizedConfig[k] = v
+			}
+		}
+	default:
+		return config.Interface()
+	}
+
+	return sanitizedConfig
 }
