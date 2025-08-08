@@ -187,10 +187,6 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 	switch config.Kind() {
 	case reflect.Invalid:
 		return nil
-	case reflect.Ptr:
-		if config.IsNil() {
-			return nil
-		}
 	case reflect.String:
 		configValue := config.String()
 		if configValue == "" {
@@ -230,7 +226,9 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 			}
 		}
 	default:
-		return config.Interface()
+		if config.CanInterface() {
+			return config.Interface()
+		}
 	}
 
 	return sanitizedConfig
