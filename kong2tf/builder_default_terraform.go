@@ -438,19 +438,19 @@ func (b *DefaultTerraformBuider) buildVaults(content *file.Content, controlPlane
 }
 
 func (b *DefaultTerraformBuider) buildPartials(content *file.Content, controlPlaneID *string) {
-	for _, vault := range content.Partials {
-		parentResourceName := strings.ReplaceAll(*vault.Name, "-", "_")
+	for _, partial := range content.Partials {
+		parentResourceName := strings.ReplaceAll(*partial.Name, "-", "_")
 		parents := map[string]string{}
 		b.content += generateResourceWithCustomizations(
 			"gateway_partial",
 			parentResourceName,
-			toMapAny(vault),
+			toMapAny(partial),
 			parents,
 			map[string]string{},
 			importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
-					"id": vault.ID,
+					"id": partial.ID,
 				},
 			},
 			[]string{},
