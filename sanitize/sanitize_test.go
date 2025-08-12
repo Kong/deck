@@ -2,6 +2,7 @@ package sanitize
 
 import (
 	"context"
+	"reflect"
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -199,4 +200,241 @@ func Test_Sanitize(t *testing.T) {
 
 		assert.Equal(t, *contentWithID.Services[0].ID, *result.Services[0].ID, "ID field should not be sanitized")
 	})
+
+	t.Run("sanitizes kong configuration in plugins and partials", func(t *testing.T) {
+		fileContent := &file.Content{
+			Plugins: []file.FPlugin{
+				{
+					Plugin: kong.Plugin{
+						ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"compound_identifier":     nil,
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(10)},
+							"lock_dictionary_name":    string("kong_locks"),
+							"namespace":               string("test-ns"),
+							"path":                    nil,
+							"retry_after_jitter_max":  float64(0),
+							"strategy":                string("local"),
+							"sync_rate":               float64(-1),
+							"throttling":              nil,
+							"window_size":             []any{float64(60)},
+							"window_type":             string("fixed"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+						Partials: []*kong.PartialLink{
+							{
+								Partial: &kong.Partial{
+									ID: kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+								},
+								Path: kong.String("config.redis"),
+							},
+						},
+					},
+				},
+			},
+			Partials: []file.FPartial{
+				{
+					Partial: kong.Partial{
+						ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+						Name: kong.String("redis-ee-common"),
+						Type: kong.String("redis-ee"),
+						Config: kong.Configuration{
+							"cluster_max_redirections": float64(5),
+							"cluster_nodes":            nil,
+							"connect_timeout":          float64(2000),
+							"connection_is_proxied":    bool(false),
+							"database":                 float64(0),
+							"host":                     string("127.0.0.1"),
+							"keepalive_backlog":        nil,
+							"keepalive_pool_size":      float64(256),
+							"password":                 nil,
+							"port":                     float64(6379),
+							"read_timeout":             float64(3001),
+							"send_timeout":             float64(2004),
+							"sentinel_master":          nil,
+							"sentinel_nodes":           nil,
+							"sentinel_password":        nil,
+							"sentinel_role":            nil,
+							"sentinel_username":        nil,
+							"server_name":              nil,
+							"ssl":                      bool(false),
+							"ssl_verify":               bool(false),
+							"username":                 nil,
+						},
+						Tags: kong.StringSlice("redis-partials"),
+					},
+				},
+			},
+		}
+
+		sanitizer := NewSanitizer(&SanitizerOptions{
+			Ctx:     context.Background(),
+			Content: fileContent.DeepCopy(),
+		})
+
+		result, err := sanitizer.Sanitize()
+		require.NoError(t, err)
+		require.NotNil(t, result)
+
+		require.NotNil(t, result.Plugins)
+		require.NotNil(t, result.Partials)
+		require.Len(t, result.Plugins, 1)
+		require.Len(t, result.Partials, 1)
+
+		originalPluginConfigMap := map[string]interface{}(fileContent.Plugins[0].Config)
+		sanitizedPluginConfigMap := map[string]interface{}(result.Plugins[0].Config)
+		verifyConfigSanitization(t, originalPluginConfigMap, sanitizedPluginConfigMap)
+
+		originalPartialConfigMap := map[string]interface{}(fileContent.Partials[0].Config)
+		sanitizedPartialConfigMap := map[string]interface{}(result.Partials[0].Config)
+		verifyConfigSanitization(t, originalPartialConfigMap, sanitizedPartialConfigMap)
+	})
+}
+
+func Test_sanitizeConfig(t *testing.T) {
+	tests := []struct {
+		name         string
+		config       interface{}
+		shouldExempt bool
+	}{
+		{
+			name: "simple kong configuration",
+			config: map[string]interface{}{
+				"request_jq_program": "select(.name == \"James Dean\").name = \"John Doe\"\n",
+				"request_if_media_type": []interface{}{
+					"application/json",
+				},
+				"request_jq_program_options": map[string]interface{}{
+					"ascii_output":   false,
+					"compact_output": true,
+					"join_output":    false,
+					"raw_output":     false,
+					"sort_keys":      false,
+				},
+			},
+		},
+		{
+			name: "kong configuration with multiple nested levels",
+			config: map[string]interface{}{
+				"behavior": map[string]interface{}{
+					"idp_error_response_body_template":  "{ \"code\": \"{{status}}\", \"message\": \"{{message}}\" }",
+					"idp_error_response_content_type":   "application/json; charset=utf-8",
+					"upstream_access_token_header_name": "Authorization",
+				},
+				"oauth": map[string]interface{}{
+					"client_id":      "clientOne",
+					"client_secret":  nil,
+					"password":       "my-password",
+					"scopes":         []interface{}{"openid"},
+					"token_endpoint": "http://example.com",
+					"username":       "userOne",
+				},
+				"cache": map[string]interface{}{
+					"strategy": "memory",
+					"redis": map[string]interface{}{
+						"host":        "127.0.0.1",
+						"port":        6379,
+						"password":    "secret",
+						"server_name": nil,
+					},
+				},
+			},
+		},
+		{
+			name:   "direct string input",
+			config: "sensitive-data",
+		},
+		{
+			name:         "empty string input",
+			config:       "",
+			shouldExempt: true,
+		},
+		{
+			name:         "number input: float",
+			config:       float64(429.0),
+			shouldExempt: true,
+		},
+		{
+			name:         "number input: int",
+			config:       int64(429),
+			shouldExempt: true,
+		},
+		{
+			name:         "boolean input",
+			config:       bool(true),
+			shouldExempt: true,
+		},
+		{
+			name:         "null input",
+			config:       nil,
+			shouldExempt: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			sanitizer := NewSanitizer(&SanitizerOptions{
+				Ctx: context.Background(),
+			})
+			sanitizedConfig := sanitizer.sanitizeConfig(reflect.ValueOf(tc.config))
+
+			if tc.shouldExempt {
+				assert.Equal(t, tc.config, sanitizedConfig, "Exempted field should not be sanitized")
+				return
+			}
+
+			assert.NotEqual(t, sanitizedConfig, tc.config)
+			verifyConfigSanitization(t, tc.config, sanitizedConfig)
+		})
+	}
+}
+
+// Helper function to recursively check that config was sanitized
+func verifyConfigSanitization(t *testing.T, original, sanitized interface{}) {
+	t.Helper()
+
+	switch orig := original.(type) {
+	case map[string]interface{}:
+		sanitizedMap, ok := sanitized.(map[string]interface{})
+		require.True(t, ok, "Sanitized value should be a map")
+
+		for k, v := range orig {
+			if shouldSkipSanitization(k, nil) {
+				assert.Equal(t, v, sanitizedMap[k], "Exempted field %s should not be sanitized", k)
+				continue
+			}
+
+			// Recursively check nested structures
+			if sanitizedVal, ok := sanitizedMap[k]; ok {
+				verifyConfigSanitization(t, v, sanitizedVal)
+			} else {
+				t.Errorf("Key %s missing from sanitized map", k)
+			}
+		}
+	case []interface{}:
+		sanitizedSlice, ok := sanitized.([]interface{})
+		require.True(t, ok, "Sanitized value should be a slice")
+		require.Equal(t, len(orig), len(sanitizedSlice), "Slice length should be preserved")
+
+		for i, v := range orig {
+			verifyConfigSanitization(t, v, sanitizedSlice[i])
+		}
+	case string:
+		sanitizedStr, ok := sanitized.(string)
+		require.True(t, ok, "Sanitized value should be a string")
+		assert.NotEqual(t, orig, sanitizedStr, "String value should be sanitized: %s", orig)
+	default:
+		assert.Equal(t, orig, sanitized, "Non-string primitives should remain unchanged")
+	}
 }
