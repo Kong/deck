@@ -58,7 +58,7 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 
 	// for unit tests, we may have an uninitialized client
 	if s.client == nil {
-		return entityName, nil, fmt.Errorf("kong client is not initialized")
+		return entityName, kong.Schema{}, fmt.Errorf("kong client is not initialized")
 	}
 
 	if entityName == Plugin {

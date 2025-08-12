@@ -2,6 +2,7 @@ package sanitize
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/ettle/strcase"
 	"github.com/kong/go-kong/kong"
@@ -13,6 +14,8 @@ const (
 	typeSet    = "set"
 	typeArray  = "array"
 )
+
+var exemptionsMu sync.Mutex
 
 func shouldSkipSanitization(entityName, fieldName string, exemptionMap map[string]struct{}) bool {
 	if exemptionMap != nil {
@@ -42,6 +45,9 @@ func shouldSkipSanitization(entityName, fieldName string, exemptionMap map[strin
 }
 
 func buildExemptedFieldsFromSchema(entityName string, entitySchema kong.Schema) {
+	exemptionsMu.Lock()
+	defer exemptionsMu.Unlock()
+
 	if entityLevelExemptedFieldsFromSchema == nil {
 		entityLevelExemptedFieldsFromSchema = make(map[string]map[string]bool)
 	}
@@ -51,7 +57,7 @@ func buildExemptedFieldsFromSchema(entityName string, entitySchema kong.Schema) 
 		return
 	}
 
-	exemptedFieldsFromSchema = make(map[string]bool)
+	exemptedFieldsFromSchema := make(map[string]bool)
 
 	jsonb, err := json.Marshal(&entitySchema)
 	if err != nil {

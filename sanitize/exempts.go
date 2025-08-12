@@ -32,7 +32,4 @@ var configLevelExemptedFields = map[string]struct{}{
 }
 
 // dynamically generated maps of exempted fields from schemas
-var (
-	exemptedFieldsFromSchema            = map[string]bool{}
-	entityLevelExemptedFieldsFromSchema = map[string]map[string]bool{}
-)
+var entityLevelExemptedFieldsFromSchema = map[string]map[string]bool{}
