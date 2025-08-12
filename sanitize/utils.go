@@ -77,7 +77,7 @@ func buildExemptedFieldsFromSchema(entityName string, entitySchema kong.Schema) 
 	entityLevelExemptedFieldsFromSchema[entityName] = exemptedFieldsFromSchema
 }
 
-// findRelevantFieldNamesWithKeyMap finds all field names (at any depth) where:
+// findRelevantFieldNamesWithKey finds all field names (at any depth) where:
 // - type is "string" and targetKey is present
 // - type is "set" or "array" and the elements contains targetKey
 // The identified field names are added to the exemptedFieldsFromSchema map.

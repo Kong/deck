@@ -120,6 +120,9 @@ func (s *Sanitizer) getKonnectEntitySchema(entityType string) (kong.Schema, erro
 	if resp == nil {
 		return schema, fmt.Errorf("invalid HTTP response: %w", err)
 	}
+	if err != nil {
+		return schema, fmt.Errorf("failed to fetch schema: %w", err)
+	}
 
 	return schema, nil
 }
