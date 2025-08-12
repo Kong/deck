@@ -8,18 +8,22 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/types"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 )
 
 type Sanitizer struct {
-	ctx          context.Context
-	client       *kong.Client
-	content      *file.Content
-	isKonnect    bool
-	salt         string
-	sanitizedMap map[string]interface{}
+	ctx                 context.Context
+	client              *kong.Client
+	content             *file.Content
+	isKonnect           bool
+	salt                string
+	sanitizedMap        map[string]interface{}
+	pluginSchemasCache  *types.SchemaCache
+	partialSchemasCache *types.SchemaCache
 }
 
 type SanitizerOptions struct {
@@ -43,6 +47,16 @@ func NewSanitizer(opts *SanitizerOptions) *Sanitizer {
 		isKonnect:    opts.IsKonnect,
 		salt:         saltToUse,
 		sanitizedMap: make(map[string]interface{}),
+		pluginSchemasCache: types.NewSchemaCache(func(ctx context.Context,
+			pluginName string,
+		) (map[string]interface{}, error) {
+			return opts.Client.Plugins.GetFullSchema(ctx, &pluginName)
+		}),
+		partialSchemasCache: types.NewSchemaCache(func(ctx context.Context,
+			partialType string,
+		) (map[string]interface{}, error) {
+			return opts.Client.Partials.GetFullSchema(ctx, &partialType)
+		}),
 	}
 }
 
@@ -84,16 +98,29 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		t := field.Type()
 		entityName := t.Name()
 
+		// specificEntityName is used to identify plugin or partial types
+		// it is useful for building exempted fields
+		specificEntityName, entitySchema, err := s.fetchEntitySchema(entityName, field)
+		if err != nil {
+			warningMessage := fmt.Sprintf("Error fetching schema for entity: %s %v\n"+
+				"Some sanitization features may not work as expected.\n", entityName, err)
+			cprint.UpdatePrintlnStdErr(warningMessage)
+		}
+
+		if entitySchema != nil {
+			buildExemptedFieldsFromSchema(specificEntityName, entitySchema)
+		}
+
 		entitySkipFields, hasEntitySkips := entityLevelExemptedFields[entityName]
 		for i := 0; i < field.NumField(); i++ {
 			fieldValue := field.Field(i)
 			fieldName := t.Field(i).Name
 
-			if hasEntitySkips && shouldSkipSanitization(fieldName, entitySkipFields) {
+			if hasEntitySkips && shouldSkipSanitization(specificEntityName, fieldName, entitySkipFields) {
 				continue
 			}
 
-			if shouldSkipSanitization(fieldName, nil) {
+			if shouldSkipSanitization(specificEntityName, fieldName, nil) {
 				continue
 			}
 
@@ -118,7 +145,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		iter := field.MapRange()
 		for iter.Next() {
 			mapKey := iter.Key().String()
-			if shouldSkipSanitization(mapKey, nil) {
+			if shouldSkipSanitization("", mapKey, nil) {
 				continue
 			}
 			mapValue := iter.Value()
@@ -204,7 +231,7 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 				continue
 			}
 
-			if shouldSkipSanitization(k, nil) {
+			if shouldSkipSanitization("", k, nil) {
 				sanitizedConfig[k] = val.Interface()
 				continue
 			}
