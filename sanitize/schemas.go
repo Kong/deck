@@ -55,6 +55,12 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 		schema kong.Schema
 		err    error
 	)
+
+	// for unit tests, we may have an uninitialized client
+	if s.client == nil {
+		return entityName, nil, fmt.Errorf("kong client is not initialized")
+	}
+
 	if entityName == Plugin {
 		pluginName := field.FieldByName("Name").String()
 		schema, err = s.pluginSchemasCache.Get(s.ctx, pluginName)
