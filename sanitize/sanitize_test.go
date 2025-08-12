@@ -387,7 +387,7 @@ func Test_sanitizeConfig(t *testing.T) {
 			sanitizer := NewSanitizer(&SanitizerOptions{
 				Ctx: context.Background(),
 			})
-			sanitizedConfig := sanitizer.sanitizeConfig(reflect.ValueOf(tc.config))
+			sanitizedConfig := sanitizer.sanitizeConfig("", reflect.ValueOf(tc.config))
 
 			if tc.shouldExempt {
 				assert.Equal(t, tc.config, sanitizedConfig, "Exempted field should not be sanitized")

@@ -62,13 +62,13 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 	}
 
 	if entityName == Plugin {
-		pluginName := field.FieldByName("Name").String()
+		pluginName := field.FieldByName("Name").Elem().String()
 		schema, err = s.pluginSchemasCache.Get(s.ctx, pluginName)
 		return pluginName, schema, err
 	}
 
 	if entityName == Partial {
-		partialType := field.FieldByName("Type").String()
+		partialType := field.FieldByName("Type").Elem().String()
 		schema, err = s.partialSchemasCache.Get(s.ctx, partialType)
 		return partialType, schema, err
 	}
@@ -76,7 +76,7 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 	// important so that entities like FPlugin, FService, etc. are not tried for schema fetching
 	entityName, ok := entityMap[entityName]
 	if !ok {
-		return "", nil, fmt.Errorf("unknown entity type %s", entityName)
+		return "", nil, nil
 	}
 
 	if s.isKonnect {

@@ -126,7 +126,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 
 			// needs special handling for configs as they are not pointers to structs
 			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
-				sanitizedConfig := s.sanitizeConfig(fieldValue)
+				sanitizedConfig := s.sanitizeConfig(specificEntityName, fieldValue)
 				if fieldValue.CanSet() {
 					fieldValue.Set(reflect.ValueOf(sanitizedConfig))
 				} else {
@@ -207,7 +207,7 @@ func (s *Sanitizer) hashValue(value string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
+func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) interface{} {
 	sanitizedConfig := make(map[string]interface{})
 
 	//nolint:exhaustive
@@ -231,7 +231,7 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 				continue
 			}
 
-			if shouldSkipSanitization("", k, nil) {
+			if shouldSkipSanitization(entityName, k, nil) {
 				sanitizedConfig[k] = val.Interface()
 				continue
 			}
@@ -241,11 +241,11 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 				sanitizedVal := s.sanitizeValue(v)
 				sanitizedConfig[k] = sanitizedVal
 			case map[string]interface{}:
-				sanitizedConfig[k] = s.sanitizeConfig(reflect.ValueOf(v))
+				sanitizedConfig[k] = s.sanitizeConfig(entityName, reflect.ValueOf(v))
 			case []interface{}:
 				newSlice := make([]interface{}, len(v))
 				for i, elem := range v {
-					newSlice[i] = s.sanitizeConfig(reflect.ValueOf(elem))
+					newSlice[i] = s.sanitizeConfig(entityName, reflect.ValueOf(elem))
 				}
 				sanitizedConfig[k] = newSlice
 			default:

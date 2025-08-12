@@ -3,6 +3,7 @@ package sanitize
 import (
 	"encoding/json"
 
+	"github.com/ettle/strcase"
 	"github.com/kong/go-kong/kong"
 	"github.com/tidwall/gjson"
 )
@@ -27,8 +28,11 @@ func shouldSkipSanitization(entityName, fieldName string, exemptionMap map[strin
 
 	// checking for schema-generated exemptions per entity-type
 	if entityName != "" && entityLevelExemptedFieldsFromSchema != nil {
+		// schemas are stored in snake_case, so we convert the field name
+		// to snake_case before checking against the schema exemptions
+		schemaField := strcase.ToSnake(fieldName)
 		if exemptedFields, exists := entityLevelExemptedFieldsFromSchema[entityName]; exists {
-			if _, exempt := exemptedFields[fieldName]; exempt {
+			if _, exempt := exemptedFields[schemaField]; exempt {
 				return true
 			}
 		}
