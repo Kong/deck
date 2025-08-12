@@ -68,9 +68,14 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 	}
 
 	if entityName == Partial {
-		partialType := field.FieldByName("Type").Elem().String()
-		schema, err = s.partialSchemasCache.Get(s.ctx, partialType)
-		return partialType, schema, err
+		partialType := field.FieldByName("Type").Elem()
+		// A partial linked with a plugin has no type field defined in the config spec.
+		// In that case, we return nil schema and nil error.
+		if !partialType.IsValid() {
+			return "", nil, nil
+		}
+		schema, err = s.partialSchemasCache.Get(s.ctx, partialType.String())
+		return partialType.String(), schema, err
 	}
 
 	// important so that entities like FPlugin, FService, etc. are not tried for schema fetching

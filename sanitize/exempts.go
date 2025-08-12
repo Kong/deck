@@ -14,9 +14,10 @@ var topLevelExemptedFields = map[string]struct{}{
 // or need not be sanitized like plugin.name
 var entityLevelExemptedFields = map[string]map[string]struct{}{
 	// Entity level exemptions
-	"Partial": {"Type": {}},
-	"Plugin":  {"Name": {}},
-	"Route":   {"Methods": {}},
+	"Partial":     {"Type": {}},
+	"PartialLink": {"Path": {}},
+	"Plugin":      {"Name": {}},
+	"Route":       {"Methods": {}},
 
 	// Special handling
 	"CACertificate": {"Cert": {}, "CertDigest": {}},
