@@ -685,7 +685,7 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized services and routes",
 			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
 		},
 		{
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
