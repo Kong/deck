@@ -1,48 +1,5 @@
 _format_version: "3.0"
 consumer_groups:
-- id: 38c0beab-f5fe-4ba1-be39-578b8b0e57b0
-  name: 4953b168252ecb0356979d2ac0b0cbafe43abd0f881f9f437f24db42c4f965b8
-  plugins:
-  - config:
-      day: null
-      error_code: 429
-      error_message: 19874afab7846c1cd7babc161103715662cd7deadbbebfca35f6c2fd3cad88c0
-      fault_tolerant: true
-      header_name: null
-      hide_client_headers: false
-      hour: 2
-      limit_by: consumer
-      minute: null
-      month: null
-      path: null
-      policy: redis
-      redis:
-        database: 0
-        host: 6511b0c09d6075bd984e8dc46b11d76ae41bb760ebc9167096f1e50c48bf2df8
-        password: 3f1c174852d56920e4244efa4510ffb286819945a515d9835bb8e309824f8fd4
-        port: 6379
-        server_name: null
-        ssl: false
-        ssl_verify: false
-        timeout: 2000
-        username: 4a5e70ffb83e465646b2958df41e9ed8e4ecac4abb9b081c3679cee20f1bd5e6
-      redis_database: 0
-      redis_host: 6511b0c09d6075bd984e8dc46b11d76ae41bb760ebc9167096f1e50c48bf2df8
-      redis_password: 3f1c174852d56920e4244efa4510ffb286819945a515d9835bb8e309824f8fd4
-      redis_port: 6379
-      redis_server_name: null
-      redis_ssl: false
-      redis_ssl_verify: false
-      redis_timeout: 2000
-      redis_username: 4a5e70ffb83e465646b2958df41e9ed8e4ecac4abb9b081c3679cee20f1bd5e6
-      second: null
-      sync_rate: -1
-      year: null
-    id: 438908dd-e4dd-40db-9c3e-d181c378101f
-    name: rate-limiting
-  tags:
-  - cbe2fd20f5a2488c30f5fb6604a2efebf8aa1d7647539065fd9c223823346890
-  - b4af8a8c5162bf25ad5a8c1457cf6769482c726a4df165bc0589040c33b06055
 - id: 28fa8375-8ed4-4678-8fdd-1909beefb36f
   name: 6b86b58aa18e1ce01b7d24652f8cf260227543880454c04b79552778e223dee3
   plugins:
@@ -97,11 +54,3 @@ consumers:
   username: 900474b796208023ea49b5966dfdedca1bccd9c6ea6ee5802c6b97a2f462f741
 - id: 9dd504de-919b-4d1b-b607-5d82d8041ba5
   username: 45a12bf92b4071881eb554f67e7426c6b3456cca7804dd77ec5e36874758b52c
-- groups:
-  - id: 38c0beab-f5fe-4ba1-be39-578b8b0e57b0
-    name: 4953b168252ecb0356979d2ac0b0cbafe43abd0f881f9f437f24db42c4f965b8
-    tags:
-    - cbe2fd20f5a2488c30f5fb6604a2efebf8aa1d7647539065fd9c223823346890
-    - b4af8a8c5162bf25ad5a8c1457cf6769482c726a4df165bc0589040c33b06055
-  id: cf1ebb47-388b-4eb6-b796-ed6a218dce39
-  username: 6112060752768f93013e72488fb87d7e08e87753d8bce33951ee628553c49f8a
