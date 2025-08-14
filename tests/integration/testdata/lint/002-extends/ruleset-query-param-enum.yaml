@@ -1,0 +1,22 @@
+rules:
+  standardized-query-parameters:
+    description: Query parameters the endpoints
+    severity: error
+    resolved: true
+    given: $.paths[*][*].parameters[?(@.in == 'query')]
+    then:
+      field: name
+      function: enumeration
+      functionOptions:
+        values:
+          - query1
+          - query2
+          - query3
+          - query4
+          - query5
+          - query6
+          - query7
+          - query8
+          - query9
+          - query10
+          - query11

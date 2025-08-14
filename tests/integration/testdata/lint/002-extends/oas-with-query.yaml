@@ -1,0 +1,35 @@
+openapi: 3.0.2
+info:
+  title: Sample API
+  description: This is a sample API with internal and external routes.
+  version: 1.0.0
+servers:
+  - url: https://internal.api.com/
+  - url: https://external.api.com/
+paths:
+  /internalRoute:
+    servers:
+      - url: https://internal.api.com/
+    get:
+      summary: Internal route
+      operationId: internalRouteOp
+      responses:
+        '200':
+          description: Success
+
+  /externalRoute:
+    servers:
+      - url: https://external.api.com/
+    get:
+      summary: External route
+      operationId: externalRouteOp
+      parameters:
+          - name: user
+            in: query
+            required: false
+            description: Username. Use the same username in the path AND for authorization.
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Success
