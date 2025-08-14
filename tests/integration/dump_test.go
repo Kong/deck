@@ -691,13 +691,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.6.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
 		},
 		{
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.6.0",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.6.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
 		},
 	}
 
