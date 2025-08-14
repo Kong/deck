@@ -387,7 +387,7 @@ func Test_sanitizeConfig(t *testing.T) {
 			sanitizer := NewSanitizer(&SanitizerOptions{
 				Ctx: context.Background(),
 			})
-			sanitizedConfig := sanitizer.sanitizeConfig(reflect.ValueOf(tc.config))
+			sanitizedConfig := sanitizer.sanitizeConfig("", reflect.ValueOf(tc.config))
 
 			if tc.shouldExempt {
 				assert.Equal(t, tc.config, sanitizedConfig, "Exempted field should not be sanitized")
@@ -410,7 +410,7 @@ func verifyConfigSanitization(t *testing.T, original, sanitized interface{}) {
 		require.True(t, ok, "Sanitized value should be a map")
 
 		for k, v := range orig {
-			if shouldSkipSanitization(k, nil) {
+			if shouldSkipSanitization("", "", k) {
 				assert.Equal(t, v, sanitizedMap[k], "Exempted field %s should not be sanitized", k)
 				continue
 			}

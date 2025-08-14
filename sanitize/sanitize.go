@@ -8,18 +8,22 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/types"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 )
 
 type Sanitizer struct {
-	ctx          context.Context
-	client       *kong.Client
-	content      *file.Content
-	isKonnect    bool
-	salt         string
-	sanitizedMap map[string]interface{}
+	ctx                 context.Context
+	client              *kong.Client
+	content             *file.Content
+	isKonnect           bool
+	salt                string
+	sanitizedMap        map[string]interface{}
+	pluginSchemasCache  *types.SchemaCache
+	partialSchemasCache *types.SchemaCache
 }
 
 type SanitizerOptions struct {
@@ -43,6 +47,16 @@ func NewSanitizer(opts *SanitizerOptions) *Sanitizer {
 		isKonnect:    opts.IsKonnect,
 		salt:         saltToUse,
 		sanitizedMap: make(map[string]interface{}),
+		pluginSchemasCache: types.NewSchemaCache(func(ctx context.Context,
+			pluginName string,
+		) (map[string]interface{}, error) {
+			return opts.Client.Plugins.GetFullSchema(ctx, &pluginName)
+		}),
+		partialSchemasCache: types.NewSchemaCache(func(ctx context.Context,
+			partialType string,
+		) (map[string]interface{}, error) {
+			return opts.Client.Partials.GetFullSchema(ctx, &partialType)
+		}),
 	}
 }
 
@@ -84,22 +98,30 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		t := field.Type()
 		entityName := t.Name()
 
-		entitySkipFields, hasEntitySkips := entityLevelExemptedFields[entityName]
+		// specificEntityName is used to identify plugin or partial types
+		// it is useful for building exempted fields
+		specificEntityName, entitySchema, err := s.fetchEntitySchema(entityName, field)
+		if err != nil {
+			warningMessage := fmt.Sprintf("Error fetching schema for entity: %s %v\n"+
+				"Some sanitization features may not work as expected.\n", entityName, err)
+			cprint.UpdatePrintlnStdErr(warningMessage)
+		}
+
+		if entitySchema != nil {
+			buildExemptedFieldsFromSchema(specificEntityName, entitySchema)
+		}
+
 		for i := 0; i < field.NumField(); i++ {
 			fieldValue := field.Field(i)
 			fieldName := t.Field(i).Name
 
-			if hasEntitySkips && shouldSkipSanitization(fieldName, entitySkipFields) {
-				continue
-			}
-
-			if shouldSkipSanitization(fieldName, nil) {
+			if shouldSkipSanitization(entityName, specificEntityName, fieldName) {
 				continue
 			}
 
 			// needs special handling for configs as they are not pointers to structs
 			if fieldValue.Type() == reflect.TypeOf(kong.Configuration{}) {
-				sanitizedConfig := s.sanitizeConfig(fieldValue)
+				sanitizedConfig := s.sanitizeConfig(specificEntityName, fieldValue)
 				if fieldValue.CanSet() {
 					fieldValue.Set(reflect.ValueOf(sanitizedConfig))
 				} else {
@@ -118,7 +140,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		iter := field.MapRange()
 		for iter.Next() {
 			mapKey := iter.Key().String()
-			if shouldSkipSanitization(mapKey, nil) {
+			if shouldSkipSanitization("", "", mapKey) {
 				continue
 			}
 			mapValue := iter.Value()
@@ -180,7 +202,7 @@ func (s *Sanitizer) hashValue(value string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
+func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) interface{} {
 	sanitizedConfig := make(map[string]interface{})
 
 	//nolint:exhaustive
@@ -204,7 +226,7 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 				continue
 			}
 
-			if shouldSkipSanitization(k, nil) {
+			if shouldSkipSanitization("", entityName, k) {
 				sanitizedConfig[k] = val.Interface()
 				continue
 			}
@@ -214,11 +236,11 @@ func (s *Sanitizer) sanitizeConfig(config reflect.Value) interface{} {
 				sanitizedVal := s.sanitizeValue(v)
 				sanitizedConfig[k] = sanitizedVal
 			case map[string]interface{}:
-				sanitizedConfig[k] = s.sanitizeConfig(reflect.ValueOf(v))
+				sanitizedConfig[k] = s.sanitizeConfig(entityName, reflect.ValueOf(v))
 			case []interface{}:
 				newSlice := make([]interface{}, len(v))
 				for i, elem := range v {
-					newSlice[i] = s.sanitizeConfig(reflect.ValueOf(elem))
+					newSlice[i] = s.sanitizeConfig(entityName, reflect.ValueOf(elem))
 				}
 				sanitizedConfig[k] = newSlice
 			default:

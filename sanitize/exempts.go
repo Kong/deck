@@ -9,14 +9,15 @@ var topLevelExemptedFields = map[string]struct{}{
 	"Workspace":     {},
 }
 
-// Fields that should be skipped for specific entities
+// Static fields that should be skipped for specific entities
 // These fields either require special handling (like Keys)
 // or need not be sanitized like plugin.name
 var entityLevelExemptedFields = map[string]map[string]struct{}{
 	// Entity level exemptions
-	"Partial": {"Type": {}},
-	"Plugin":  {"Name": {}},
-	"Route":   {"Methods": {}},
+	"Partial":     {"Type": {}},
+	"PartialLink": {"Path": {}},
+	"Plugin":      {"Name": {}},
+	"Route":       {"Methods": {}},
 
 	// Special handling
 	"CACertificate": {"Cert": {}, "CertDigest": {}},
@@ -29,3 +30,6 @@ var entityLevelExemptedFields = map[string]map[string]struct{}{
 var configLevelExemptedFields = map[string]struct{}{
 	"ID": {},
 }
+
+// dynamically generated maps of exempted fields from schemas
+var entityLevelExemptedFieldsFromSchema = map[string]map[string]bool{}

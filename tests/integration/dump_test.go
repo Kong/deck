@@ -4,8 +4,13 @@ package integration
 
 import (
 	"context"
+	"io"
+	"os"
 	"testing"
 
+	"github.com/acarl005/stripansi"
+	"github.com/kong/deck/sanitize"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -600,6 +605,68 @@ func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
 			expected, err := readFile(tc.expectedFile)
 			require.NoError(t, err)
 			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.10.0
+func Test_Dump_Deterministic_Sanitizer(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.10.0")
+	setup(t)
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump with sanitizer",
+			stateFile:    "testdata/dump/008-sanitizer/kong.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/expected.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(context.Background(), tc.stateFile))
+
+			fileContent, err := file.GetContentFromFiles([]string{tc.stateFile}, false)
+			require.NoError(t, err)
+
+			sanitizer := sanitize.NewSanitizer(&sanitize.SanitizerOptions{
+				Ctx:     ctx,
+				Client:  client,
+				Content: fileContent.DeepCopy(),
+				Salt:    "deterministic-test-salt-12345",
+			})
+
+			sanitizedOutput, err := sanitizer.Sanitize()
+			require.NoError(t, err)
+
+			// capture command output to be used during tests
+			rescueStdout := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			err = file.WriteContentToFile(sanitizedOutput, "-", file.YAML)
+			require.NoError(t, err)
+			w.Close()
+			out, _ := io.ReadAll(r)
+			os.Stdout = rescueStdout
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			require.Equal(t, expected, stripansi.Strip(string(out)))
+
+			// validate file content
+			validateOpts := []string{tc.expectedFile}
+			err = validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
 		})
 	}
 }

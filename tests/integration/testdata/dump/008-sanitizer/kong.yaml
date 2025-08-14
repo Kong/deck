@@ -1,0 +1,84 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 0a1451d7-4ba5-4a72-bd83-3ab775192393
+  name: foo
+consumers:
+- id: 81de9f2b-9a5a-4ccc-ad9c-7f2cd3f7a603
+  tags:
+  - tag1
+  - tag2
+  username: my-consumer
+  groups:
+  - id: 0a1451d7-4ba5-4a72-bd83-3ab775192393
+    name: foo
+partials:
+- config:
+    database: 0
+    host: 127.0.0.1
+    password: my-password
+    port: 6379
+    server_name: my-server
+    ssl: false
+    ssl_verify: false
+    timeout: 2000
+    username: my-user
+  id: 1615ea37-e832-4b78-8594-8a521a36a946
+  name: my-redis-oss
+  tags:
+  - t1
+  type: redis-ce
+plugins:
+- config:
+    day: null
+    error_code: 429
+    error_message: API rate limit exceeded
+    fault_tolerant: true
+    header_name: null
+    hide_client_headers: false
+    hour: 1
+    limit_by: consumer
+    minute: null
+    month: null
+    path: null
+    policy: local
+    second: null
+    sync_rate: -1
+    year: null
+  enabled: true
+  id: d8fb3938-d77a-4f3c-9962-91cc02c57fd4
+  name: rate-limiting
+  partials:
+  - id: 1615ea37-e832-4b78-8594-8a521a36a946
+    name: my-redis-oss
+    path: config.redis
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: 0d23eacf-fa0e-48e1-911b-dddecf0b5adb
+    name: r1
+    path_handling: v0
+    paths:
+    - /r1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
