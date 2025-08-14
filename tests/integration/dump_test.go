@@ -613,7 +613,7 @@ func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
 //
 // - >=3.10.0
 func Test_Dump_Deterministic_Sanitizer(t *testing.T) {
-	runWhen(t, "kong", ">=3.10.0")
+	runWhen(t, "enterprise", ">=3.10.0")
 	setup(t)
 	// setup stage
 	client, err := getTestClient()

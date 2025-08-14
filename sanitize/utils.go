@@ -17,7 +17,10 @@ const (
 
 var exemptionsMu sync.Mutex
 
-func shouldSkipSanitization(entityName, fieldName string) bool {
+// entityName is the name of the entity type (e.g., "Plugin", "Route")
+// specificEntityName is the specific name of the entity (e.g., "rate-limiting", "jq")
+// The latter is used to check for schema-generated exemptions in the case of plugins, partials, etc.
+func shouldSkipSanitization(entityName, specificEntityName, fieldName string) bool {
 	if entityName != "" {
 		exemptionMap, hasEntitySkips := entityLevelExemptedFields[entityName]
 		if hasEntitySkips {
@@ -33,11 +36,11 @@ func shouldSkipSanitization(entityName, fieldName string) bool {
 	}
 
 	// checking for schema-generated exemptions per entity-type
-	if entityName != "" && entityLevelExemptedFieldsFromSchema != nil {
+	if specificEntityName != "" && entityLevelExemptedFieldsFromSchema != nil {
 		// schemas are stored in snake_case, so we convert the field name
 		// to snake_case before checking against the schema exemptions
 		schemaField := strcase.ToSnake(fieldName)
-		if exemptedFields, exists := entityLevelExemptedFieldsFromSchema[entityName]; exists {
+		if exemptedFields, exists := entityLevelExemptedFieldsFromSchema[specificEntityName]; exists {
 			if _, exempt := exemptedFields[schemaField]; exempt {
 				return true
 			}

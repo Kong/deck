@@ -115,7 +115,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			fieldValue := field.Field(i)
 			fieldName := t.Field(i).Name
 
-			if shouldSkipSanitization(specificEntityName, fieldName) {
+			if shouldSkipSanitization(entityName, specificEntityName, fieldName) {
 				continue
 			}
 
@@ -140,7 +140,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		iter := field.MapRange()
 		for iter.Next() {
 			mapKey := iter.Key().String()
-			if shouldSkipSanitization("", mapKey) {
+			if shouldSkipSanitization("", "", mapKey) {
 				continue
 			}
 			mapValue := iter.Value()
@@ -226,7 +226,7 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 				continue
 			}
 
-			if shouldSkipSanitization(entityName, k) {
+			if shouldSkipSanitization("", entityName, k) {
 				sanitizedConfig[k] = val.Interface()
 				continue
 			}
