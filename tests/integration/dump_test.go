@@ -691,7 +691,7 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0") },
 		},
 	}
 
