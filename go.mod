@@ -10,6 +10,7 @@ require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.9.15
+	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.1.47
@@ -21,11 +22,11 @@ require (
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/sync v0.15.0
-	k8s.io/api v0.33.2
-	k8s.io/apiextensions-apiserver v0.33.1
-	k8s.io/apimachinery v0.33.3
-	k8s.io/client-go v0.33.2
-	k8s.io/code-generator v0.33.3
+	k8s.io/api v0.33.4
+	k8s.io/apiextensions-apiserver v0.33.4
+	k8s.io/apimachinery v0.33.4
+	k8s.io/client-go v0.33.4
+	k8s.io/code-generator v0.33.4
 	sigs.k8s.io/gateway-api v1.3.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -46,7 +47,6 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.0 // indirect
 	github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731 // indirect
-	github.com/ettle/strcase v0.2.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20151013193312-d6023ce2651d // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
@@ -94,17 +94,19 @@ require (
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0 // indirect
-	go.opentelemetry.io/otel v1.33.0 // indirect
-	go.opentelemetry.io/otel/metric v1.33.0 // indirect
-	go.opentelemetry.io/otel/trace v1.33.0 // indirect
+	go.opentelemetry.io/otel v1.34.0 // indirect
+	go.opentelemetry.io/otel/metric v1.34.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
+	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.starlark.net v0.0.0-20230525235612-a134d8f9ddca // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20250106144421-5f5ef82da422 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/cli-runtime v0.31.0 // indirect
-	k8s.io/component-base v0.33.1 // indirect
+	k8s.io/component-base v0.33.4 // indirect
 	k8s.io/gengo/v2 v2.0.0-20250207200755-1244d31929d7 // indirect
 	k8s.io/kubectl v0.31.0 // indirect
 	sigs.k8s.io/kind v0.24.0 // indirect
@@ -174,7 +176,7 @@ require (
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/tidwall/gjson v1.18.0 // indirect
+	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
