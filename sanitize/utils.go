@@ -17,10 +17,13 @@ const (
 
 var exemptionsMu sync.Mutex
 
-func shouldSkipSanitization(entityName, fieldName string, exemptionMap map[string]struct{}) bool {
-	if exemptionMap != nil {
-		if _, exempt := exemptionMap[fieldName]; exempt {
-			return true
+func shouldSkipSanitization(entityName, fieldName string) bool {
+	if entityName != "" {
+		exemptionMap, hasEntitySkips := entityLevelExemptedFields[entityName]
+		if hasEntitySkips {
+			if _, exempt := exemptionMap[fieldName]; exempt {
+				return true
+			}
 		}
 	}
 

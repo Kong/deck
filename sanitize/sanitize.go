@@ -111,16 +111,11 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 			buildExemptedFieldsFromSchema(specificEntityName, entitySchema)
 		}
 
-		entitySkipFields, hasEntitySkips := entityLevelExemptedFields[entityName]
 		for i := 0; i < field.NumField(); i++ {
 			fieldValue := field.Field(i)
 			fieldName := t.Field(i).Name
 
-			if hasEntitySkips && shouldSkipSanitization(specificEntityName, fieldName, entitySkipFields) {
-				continue
-			}
-
-			if shouldSkipSanitization(specificEntityName, fieldName, nil) {
+			if shouldSkipSanitization(specificEntityName, fieldName) {
 				continue
 			}
 
@@ -145,7 +140,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		iter := field.MapRange()
 		for iter.Next() {
 			mapKey := iter.Key().String()
-			if shouldSkipSanitization("", mapKey, nil) {
+			if shouldSkipSanitization("", mapKey) {
 				continue
 			}
 			mapValue := iter.Value()
@@ -231,7 +226,7 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 				continue
 			}
 
-			if shouldSkipSanitization(entityName, k, nil) {
+			if shouldSkipSanitization(entityName, k) {
 				sanitizedConfig[k] = val.Interface()
 				continue
 			}
