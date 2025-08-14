@@ -14,10 +14,11 @@ var topLevelExemptedFields = map[string]struct{}{
 // or need not be sanitized like plugin.name
 var entityLevelExemptedFields = map[string]map[string]struct{}{
 	// Entity level exemptions
-	"Partial":     {"Type": {}},
-	"PartialLink": {"Path": {}},
-	"Plugin":      {"Name": {}},
-	"Route":       {"Methods": {}},
+	"ConsumerGroupPlugin": {"Name": {}},
+	"Partial":             {"Type": {}},
+	"PartialLink":         {"Path": {}},
+	"Plugin":              {"Name": {}},
+	"Route":               {"Methods": {}},
 
 	// Special handling
 	"CACertificate": {"Cert": {}, "CertDigest": {}},
@@ -29,6 +30,9 @@ var entityLevelExemptedFields = map[string]map[string]struct{}{
 // Config-level fields that should not be sanitized
 var configLevelExemptedFields = map[string]struct{}{
 	"ID": {},
+
+	// Plugin specific exemptions, that can't be generated from schema
+	"dictionary_name": {}, // present in rla, upstream_oauth
 }
 
 // dynamically generated maps of exempted fields from schemas

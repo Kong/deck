@@ -1,0 +1,111 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 38c0beab-f5fe-4ba1-be39-578b8b0e57b0
+  name: 4953b168252ecb0356979d2ac0b0cbafe43abd0f881f9f437f24db42c4f965b8
+  plugins:
+  - config:
+      consumer_groups: null
+      dictionary_name: kong_rate_limiting_counters
+      disable_penalty: false
+      enforce_consumer_groups: false
+      error_code: 429
+      error_message: 19874afab7846c1cd7babc161103715662cd7deadbbebfca35f6c2fd3cad88c0
+      header_name: null
+      hide_client_headers: false
+      identifier: consumer
+      limit:
+      - 10
+      namespace: 0796e67924359d34bd7e2c5e70c6179581a7a93db160834c332e177cde574b82
+      path: null
+      redis:
+        cluster_addresses: null
+        connect_timeout: null
+        database: 0
+        host: 6511b0c09d6075bd984e8dc46b11d76ae41bb760ebc9167096f1e50c48bf2df8
+        keepalive_backlog: null
+        keepalive_pool_size: 30
+        password: 3f1c174852d56920e4244efa4510ffb286819945a515d9835bb8e309824f8fd4
+        port: 6379
+        read_timeout: null
+        send_timeout: null
+        sentinel_addresses: null
+        sentinel_master: null
+        sentinel_password: null
+        sentinel_role: null
+        sentinel_username: null
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: 4a5e70ffb83e465646b2958df41e9ed8e4ecac4abb9b081c3679cee20f1bd5e6
+      retry_after_jitter_max: 1
+      strategy: local
+      sync_rate: -1
+      window_size:
+      - 60
+      window_type: sliding
+    id: 438908dd-e4dd-40db-9c3e-d181c378101f
+    name: rate-limiting-advanced
+  tags:
+  - cbe2fd20f5a2488c30f5fb6604a2efebf8aa1d7647539065fd9c223823346890
+  - b4af8a8c5162bf25ad5a8c1457cf6769482c726a4df165bc0589040c33b06055
+- id: 28fa8375-8ed4-4678-8fdd-1909beefb36f
+  name: 6b86b58aa18e1ce01b7d24652f8cf260227543880454c04b79552778e223dee3
+  plugins:
+  - config:
+      consumer_groups: null
+      dictionary_name: kong_rate_limiting_counters
+      disable_penalty: false
+      enforce_consumer_groups: false
+      error_code: 429
+      error_message: 19874afab7846c1cd7babc161103715662cd7deadbbebfca35f6c2fd3cad88c0
+      header_name: null
+      hide_client_headers: false
+      identifier: consumer
+      limit:
+      - 10
+      namespace: 22f6ef8a6affab93fe1e6b2f72fbc00932f6fea7fb9ace086157b713dbd8db63
+      path: null
+      redis:
+        cluster_addresses: null
+        connect_timeout: null
+        database: 0
+        host: null
+        keepalive_backlog: null
+        keepalive_pool_size: 30
+        password: null
+        port: null
+        read_timeout: null
+        send_timeout: null
+        sentinel_addresses: null
+        sentinel_master: null
+        sentinel_password: null
+        sentinel_role: null
+        sentinel_username: null
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      retry_after_jitter_max: 1
+      strategy: local
+      sync_rate: -1
+      window_size:
+      - 60
+      window_type: sliding
+    id: e01b2c4c-9378-4f12-80f1-60bb146435f2
+    name: rate-limiting-advanced
+  tags:
+  - cbe2fd20f5a2488c30f5fb6604a2efebf8aa1d7647539065fd9c223823346890
+  - 15824198f2123fa83b55b55618aacfa9b002f865456f155d3a342db3fdd8756e
+consumers:
+- groups:
+  - id: 28fa8375-8ed4-4678-8fdd-1909beefb36f
+    name: 6b86b58aa18e1ce01b7d24652f8cf260227543880454c04b79552778e223dee3
+    tags:
+    - cbe2fd20f5a2488c30f5fb6604a2efebf8aa1d7647539065fd9c223823346890
+    - 15824198f2123fa83b55b55618aacfa9b002f865456f155d3a342db3fdd8756e
+  id: b4e88f37-71ff-483c-af6c-686638d843f6
+  username: 900474b796208023ea49b5966dfdedca1bccd9c6ea6ee5802c6b97a2f462f741
+- id: 9dd504de-919b-4d1b-b607-5d82d8041ba5
+  username: 45a12bf92b4071881eb554f67e7426c6b3456cca7804dd77ec5e36874758b52c

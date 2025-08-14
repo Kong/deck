@@ -25,6 +25,7 @@ var (
 	dumpWorkspace                  string
 	dumpAllWorkspaces              bool
 	dumpWithID                     bool
+	sanitizationSalt               string
 )
 
 func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) {
@@ -84,6 +85,7 @@ func sanitizeContent(ctx context.Context, client *kong.Client,
 		Client:    client,
 		Content:   fileContent,
 		IsKonnect: isKonnect,
+		Salt:      sanitizationSalt,
 	})
 
 	sanitizedContent, err := sanitizer.Sanitize()
@@ -255,6 +257,15 @@ configure Kong.`,
 	dumpCmd.Flags().BoolVar(&dumpConfig.SanitizeContent, "sanitize",
 		false, "dumps a sanitized version of the gateway configuration.\n"+
 			"This feature hashes passwords, keys and other sensitive details.")
+	dumpCmd.Flags().StringVar(&sanitizationSalt, "sanitization-salt",
+		"", "salt used to hash sensitive data in the sanitized dump.\n"+
+			"Use this flag to ensure that the same sensitive data is hashed to the same value.\n"+
+			"If not set, a random salt is used.\n")
+	// This flag is hidden for now. We can mark it as visible in the future
+	// if we decide to expose it to the user. For now, it is used internally
+	// for testing purposes.
+	// Discarding the error as it is not critical
+	_ = dumpCmd.Flags().MarkHidden("sanitization-salt")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+

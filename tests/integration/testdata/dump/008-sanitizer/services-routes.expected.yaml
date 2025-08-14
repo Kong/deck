@@ -1,0 +1,27 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: af14bce87c68e0f1bfde0cbe3dbef089905a462f5413f1731854c9b592b87c24
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  name: 86696acc82c0a7e3f39ceb571f505a9e8200ba770bb2e2687503b11ea4ef81df
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 301
+    id: 87b6a97e-f3f7-4c47-857a-7464cb9e202b
+    name: a8dcc843ba68847475f94457579a5d235d1b5f255259e92aa444a40c13fd6204
+    path_handling: v0
+    paths:
+    - /redacted/path/c4631018429ff6c580bb83c86be3a21bb906eb31a6327e35bd21961791c93ed9
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

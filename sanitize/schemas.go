@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	Plugin  = "Plugin"
-	Partial = "Partial"
+	ConsumerGroupPlugin = "ConsumerGroupPlugin"
+	Plugin              = "Plugin"
+	Partial             = "Partial"
 )
 
 var entityMap = map[string]string{
@@ -61,7 +62,7 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 		return entityName, kong.Schema{}, fmt.Errorf("kong client is not initialized")
 	}
 
-	if entityName == Plugin {
+	if entityName == Plugin || entityName == ConsumerGroupPlugin {
 		pluginName := field.FieldByName("Name").Elem().String()
 		schema, err = s.pluginSchemasCache.Get(s.ctx, pluginName)
 		return pluginName, schema, err
