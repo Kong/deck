@@ -185,6 +185,12 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			outputFilename: "vault-output-expected.tf",
 			wantErr:        false,
 		},
+		{
+			name:           "partial",
+			inputFilename:  "partial-input.yaml",
+			outputFilename: "partial-output-expected.tf",
+			wantErr:        false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
