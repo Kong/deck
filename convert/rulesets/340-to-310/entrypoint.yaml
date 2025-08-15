@@ -1,0 +1,13 @@
+extends:
+  - convert/rulesets/340-to-310/plugins.yaml
+rules:
+  # declarative config rules
+  declarative-version-check:
+    given: $._format_version
+    message: >-
+      Incompatible config format version. Please upgrade the `_format_version` value to `3.0`.
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: '^3\.0$'
