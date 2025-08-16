@@ -39,7 +39,7 @@ func (s *Sanitizer) handleEntity(entityName string, fieldValue reflect.Value) er
 	case Key:
 		return s.handleKey(fieldValue)
 	default:
-		return fmt.Errorf("no specific handler for entity: %s\n", entityName)
+		return fmt.Errorf("no specific handler for entity: %s", entityName)
 	}
 }
 
@@ -230,7 +230,7 @@ func (s *Sanitizer) setFieldValue(fieldValue reflect.Value, sanitizedValue inter
 	if fieldValue.CanSet() {
 		fieldValue.Set(reflect.ValueOf(sanitizedValue))
 	} else {
-		fmt.Println("Cannot sanitize: ", entityName)
+		return fmt.Errorf("cannot sanitize: %s", entityName)
 	}
 	return nil
 }
