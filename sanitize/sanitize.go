@@ -98,6 +98,15 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 		t := field.Type()
 		entityName := t.Name()
 
+		if _, needsSpecialHandling := entitiesToHandleDifferently[entityName]; needsSpecialHandling {
+			err := s.handleEntity(entityName, field)
+			if err != nil {
+				warningMessage := fmt.Sprintf("Error handling entity %s: %v\n"+
+					"Sanitization may not work as expected.", entityName, err)
+				cprint.UpdatePrintlnStdErr(warningMessage)
+			}
+		}
+
 		// specificEntityName is used to identify plugin or partial types
 		// it is useful for building exempted fields
 		specificEntityName, entitySchema, err := s.fetchEntitySchema(entityName, field)

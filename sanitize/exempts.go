@@ -35,5 +35,11 @@ var configLevelExemptedFields = map[string]struct{}{
 	"dictionary_name": {}, // present in rla, upstream_oauth
 }
 
+var entitiesToHandleDifferently = map[string]struct{}{
+	"CACertificate": {},
+	"FCertificate":  {},
+	"Key":           {},
+}
+
 // dynamically generated maps of exempted fields from schemas
 var entityLevelExemptedFieldsFromSchema = map[string]map[string]bool{}
