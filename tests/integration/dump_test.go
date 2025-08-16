@@ -726,3 +726,68 @@ func Test_Dump_Sanitize(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+		runWhen   func(t *testing.T)
+	}{
+		{
+			name:      "dump sanitize keys - jwk",
+			stateFile: "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=3.1.0") },
+		},
+		{
+			name:      "dump sanitize keys - pem",
+			stateFile: "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=3.1.0") },
+		},
+		{
+			name:      "dump sanitize certificates",
+			stateFile: "testdata/dump/008-sanitizer/cert.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
+		{
+			name:      "dump sanitize ca-certificates",
+			stateFile: "testdata/dump/008-sanitizer/ca-cert.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			input, err := readFile(tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-", "--sanitize")
+			require.NoError(t, err)
+
+			require.NotEqual(t, input, output)
+
+			// creating a temp file to write the sanitized output
+			tmpFile, err := os.CreateTemp("", "test-output-*.yaml")
+			require.NoError(t, err)
+			defer os.Remove(tmpFile.Name())
+
+			_, err = tmpFile.WriteString(output)
+			require.NoError(t, err)
+			tmpFile.Close()
+
+			// validate file content
+			validateOpts := []string{tmpFile.Name()}
+			err = validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+
+			// re-syncing to ensure the sanitized content is valid
+			reset(t)
+			require.NoError(t, sync(ctx, tmpFile.Name()))
+		})
+	}
+}
