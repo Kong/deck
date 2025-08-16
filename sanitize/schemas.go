@@ -27,7 +27,7 @@ var entityMap = map[string]string{
 	"License":                "licenses",
 	"Key":                    "keys",
 	"KeyAuth":                "keyauth_credentials",
-	"KeySet":                 "keysets",
+	"KeySet":                 "key_sets",
 	"MTLSAuth":               "mtls_auth_credentials",
 	"Oauth2Cred":             "oauth2_credentials",
 	"Partial":                "partials",
