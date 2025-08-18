@@ -183,6 +183,10 @@ func (s *Sanitizer) sanitizeValue(value string) string {
 		}
 	}
 
+	if strings.HasPrefix(value, "{vault://") {
+		return value
+	}
+
 	hashedValue := s.hashValue(value)
 	if !strings.Contains(value, "/") {
 		s.sanitizedMap[value] = hashedValue
@@ -243,6 +247,10 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 			switch v := val.Interface().(type) {
 			case string:
 				sanitizedVal := s.sanitizeValue(v)
+				if requiresURISanitization(k) {
+					sanitizedVal = hashURI(v, s.salt)
+				}
+
 				sanitizedConfig[k] = sanitizedVal
 			case map[string]interface{}:
 				sanitizedConfig[k] = s.sanitizeConfig(entityName, reflect.ValueOf(v))
