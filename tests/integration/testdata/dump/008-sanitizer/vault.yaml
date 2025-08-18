@@ -1,0 +1,33 @@
+_format_version: "3.0"
+partials:
+- config:
+    cluster_max_redirections: null
+    cluster_nodes: null
+    connect_timeout: 2000
+    connection_is_proxied: false
+    database: 0
+    host: 127.0.0.1
+    keepalive_backlog: 0
+    keepalive_pool_size: 256
+    password: '{vault://env-vault/redis-pass}'
+    port: 6379
+    read_timeout: 2000
+    send_timeout: 2000
+    sentinel_master: null
+    sentinel_nodes: null
+    sentinel_password: null
+    sentinel_role: null
+    sentinel_username: null
+    server_name: null
+    ssl: false
+    ssl_verify: false
+    username: '{vault://env-vault/redis-user}'
+  id: 95902d79-43b1-4cec-a394-dbf25909a7bb
+  name: my-redis
+  type: redis-ee
+vaults:
+- config:
+    base64_decode: false
+    prefix: TEST
+  name: env
+  prefix: env-vault

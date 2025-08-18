@@ -761,6 +761,11 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 			stateFile: "testdata/dump/008-sanitizer/ca-cert.yaml",
 			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
 		},
+		{
+			name:      "dump sanitize vault and vault references",
+			stateFile: "testdata/dump/008-sanitizer/vault.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
 	}
 
 	for _, tc := range tests {
