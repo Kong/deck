@@ -670,3 +670,59 @@ func Test_Dump_Deterministic_Sanitizer(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_Sanitize(t *testing.T) {
+	ctx := context.Background()
+	testSalt := "test-salt-123"
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		runWhen      func(t *testing.T)
+	}{
+		{
+			name:         "dump sanitized services and routes",
+			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.6.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			// checking that the sanitizer is working correctly
+			output, err := dump("-o", "-", "--sanitize", "--sanitization-salt", testSalt)
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			require.Equal(t, expected, output)
+
+			// validate file content
+			validateOpts := []string{tc.expectedFile}
+			err = validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+
+			// re-syncing to ensure the sanitized content is valid
+			reset(t)
+			require.NoError(t, sync(ctx, tc.expectedFile))
+		})
+	}
+}
