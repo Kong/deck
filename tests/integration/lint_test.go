@@ -115,6 +115,14 @@ func Test_LintStructured(t *testing.T) {
 			format:       "yaml",
 			failSeverity: "error",
 		},
+		{
+			name:         "lint OAS with rule on query params using enum",
+			stateFile:    "testdata/lint/002-extends/oas-with-query.yaml",
+			rulesetFile:  "testdata/lint/002-extends/ruleset-query-param-enum.yaml",
+			expectedFile: "testdata/lint/002-extends/expected-ruleset-query-param-enum-out.yaml",
+			format:       "yaml",
+			failSeverity: "info",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

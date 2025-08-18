@@ -1,0 +1,10 @@
+fail_count: 1
+results:
+- Character: 0
+  Column: 13
+  Line: 27
+  Message: 'Query parameters the endpoints: `` must equal to one of: 
+    [query1 query2 query3 query4 query5 query6 query7 query8 query9 query10 query11]'
+  Path: $.paths[*][*].parameters[?(@.in == 'query')]
+  Severity: error
+total_count: 1
