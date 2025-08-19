@@ -62,6 +62,8 @@ KlBs7O9y+fc4AIIn6JD+9tymB1TWEn1B+3Vv6jmtzbztuCQTbJ6rTT3CFcE6TdyJ
 readonly KONG_IMAGE=${KONG_IMAGE:-kong/kong-gateway}
 readonly GATEWAY_CONTAINER_NAME=kong
 
+KONG_ROUTER_FLAVOR=${KONG_ROUTER_FLAVOR:-'traditional_compatible'}
+
 initNetwork
 initDb
 initMigrations "${KONG_IMAGE}" \
@@ -78,6 +80,7 @@ docker run \
     -e "KONG_LICENSE_DATA=$KONG_LICENSE_DATA" \
     -e "MY_SECRET_CERT=$MY_SECRET_CERT" \
     -e "MY_SECRET_KEY=$MY_SECRET_KEY" \
+    -e "KONG_ROUTER_FLAVOR=${KONG_ROUTER_FLAVOR}" \
     -p 8000:8000 \
     -p 8443:8443 \
     -p 8001:8001 \
