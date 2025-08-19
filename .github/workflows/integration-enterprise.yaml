@@ -28,9 +28,13 @@ jobs:
         - 'kong/kong-gateway:3.10'
         - 'kong/kong-gateway:3.11'
         - 'kong/kong-gateway-dev:latest'
+        router_flavor:
+          - 'traditional_compatible'
+          - 'expressions'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
+      KONG_ROUTER_FLAVOR: ${{ matrix.router_flavor }}
 
     runs-on: ubuntu-latest
     steps:
