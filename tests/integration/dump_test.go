@@ -6,6 +6,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/acarl005/stripansi"
@@ -685,6 +686,7 @@ func Test_Dump_Sanitize(t *testing.T) {
 		name         string
 		stateFile    string
 		expectedFile string
+		selectTags   []string
 		runWhen      func(t *testing.T)
 	}{
 		{
@@ -705,6 +707,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
 		},
+		{
+			name:         "dump sanitize with select-tags",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/select-tags.expected.yaml",
+			selectTags:   []string{"tag1", "tag2"},
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+		},
 	}
 
 	for _, tc := range tests {
@@ -713,8 +722,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			setup(t)
 			require.NoError(t, sync(ctx, tc.stateFile))
 
+			dumpArgs := []string{"-o", "-", "--sanitize", "--sanitization-salt", testSalt}
+			if len(tc.selectTags) > 0 {
+				dumpArgs = append(dumpArgs, "--select-tag", strings.Join(tc.selectTags, ","))
+			}
+
 			// checking that the sanitizer is working correctly
-			output, err := dump("-o", "-", "--sanitize", "--sanitization-salt", testSalt)
+			output, err := dump(dumpArgs...)
 			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
