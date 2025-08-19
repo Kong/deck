@@ -33,7 +33,6 @@ plugins:
   name: rate-limiting-advanced
 vaults:
 - config:
-    base64_decode: false
     prefix: TEST
   name: env
   prefix: env-vault
