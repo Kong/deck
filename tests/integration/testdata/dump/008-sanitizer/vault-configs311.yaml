@@ -7,6 +7,7 @@ vaults:
     region: us-west-2
     resurrect_ttl: null
     role_session_name: KongVault
+    sts_endpoint_url: http://example-sts.com
     ttl: null
   name: aws
   prefix: my-vault-aws
@@ -25,6 +26,19 @@ vaults:
   name: azure
   prefix: my-vault-azure
 - config:
+    account: "12345"
+    api_key: api-key
+    auth_method: api_key
+    endpoint_url: http://my-server
+    login: my-workload
+    neg_ttl: null
+    resurrect_ttl: null
+    ttl: null
+  name: conjur
+  prefix: my-vault-conjur
+  tags:
+  - tag4
+- config:
     neg_ttl: null
     project_id: EXAMPLEID
     resurrect_ttl: null
@@ -36,8 +50,17 @@ vaults:
 - config:
     approle_auth_path: approle
     approle_response_wrapping: false
+    approle_role_id: null
+    approle_secret_id: null
+    approle_secret_id_file: null
     auth_method: token
+    cert_auth_cert: null
+    cert_auth_cert_key: null
+    cert_auth_role_name: null
     host: 127.0.0.1
+    kube_api_token_file: null
+    kube_auth_path: kubernetes
+    kube_role: null
     kv: v1
     mount: secret
     namespace: my-namespace

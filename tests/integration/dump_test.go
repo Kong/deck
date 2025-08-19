@@ -769,7 +769,12 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 		{
 			name:      "dump sanitize vault config",
 			stateFile: "testdata/dump/008-sanitizer/vault-configs.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0") },
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.11.0") },
+		},
+		{
+			name:      "dump sanitize vault config >=3.11.0",
+			stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
 		},
 	}
 
