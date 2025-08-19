@@ -32,7 +32,8 @@ var configLevelExemptedFields = map[string]struct{}{
 	"ID": {},
 
 	// Plugin specific exemptions, that can't be generated from schema
-	"dictionary_name": {}, // present in rla, upstream_oauth
+	"dictionary_name":      {}, // present in rla, upstream_oauth
+	"lock_dictionary_name": {}, // present in rla
 
 	// Vault specific exemptions, that can't be generated from schema
 	"prefix": {}, // present in env
