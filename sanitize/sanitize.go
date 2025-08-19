@@ -183,6 +183,8 @@ func (s *Sanitizer) sanitizeValue(value string) string {
 		}
 	}
 
+	// This indicates that the value is a vault reference.
+	// So, we don't want to hash it.
 	if strings.HasPrefix(value, "{vault://") {
 		return value
 	}
