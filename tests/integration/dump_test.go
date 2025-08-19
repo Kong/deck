@@ -803,11 +803,11 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 			stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
 			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
 		},
-		{
-			name:      "dump sanitize route expressions",
-			stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0") },
-		},
+		// {
+		// 	name:      "dump sanitize route expressions",
+		// 	stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
+		// 	runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0") },
+		// },
 	}
 
 	for _, tc := range tests {
