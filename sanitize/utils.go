@@ -128,6 +128,8 @@ func findRelevantFieldNamesWithKey(exemptedFieldsFromSchema map[string]bool,
 
 func requiresURISanitization(fieldName string) bool {
 	fieldName = strings.ToLower(fieldName)
+	// This is not an exhaustive list, but it covers common cases
+	// derived from common config patterns.
 	suffixes := []string{"uri", "url", "endpoint"}
 	for _, suffix := range suffixes {
 		if strings.HasSuffix(fieldName, suffix) {
