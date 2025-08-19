@@ -122,6 +122,7 @@ func runWhen(t *testing.T, mode string, semverRange string) {
 
 func runWhenExpressions(t *testing.T, semverRange string) {
 	t.Helper()
+	skipWhenKonnect(t)
 
 	// limiting to enterprise for now
 	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
