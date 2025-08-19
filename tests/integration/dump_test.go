@@ -806,7 +806,7 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 		{
 			name:      "dump sanitize route expressions",
 			stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise-expressions", ">=3.0.0") },
+			runWhen:   func(t *testing.T) { runWhenExpressions(t, ">=3.0.0") },
 		},
 	}
 

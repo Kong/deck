@@ -87,6 +87,7 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 		return
 	}
 	kong.RunWhenKong(t, kongSemverRange)
+	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
 func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
@@ -99,6 +100,7 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 		return
 	}
 	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
+	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
 func runWhen(t *testing.T, mode string, semverRange string) {
@@ -108,22 +110,22 @@ func runWhen(t *testing.T, mode string, semverRange string) {
 	case "kong":
 		skipWhenKonnect(t)
 		kong.RunWhenKong(t, semverRange)
-		kong.RunWhenKongRouterFlavor(t, "traditional_compatible")
-	case "kong-expressions":
-		skipWhenKonnect(t)
-		kong.RunWhenKong(t, semverRange)
-		kong.RunWhenKongRouterFlavor(t, "expressions")
+		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "enterprise":
 		skipWhenKonnect(t)
 		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
-		kong.RunWhenKongRouterFlavor(t, "traditional_compatible")
-	case "enterprise-expressions":
-		skipWhenKonnect(t)
-		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
-		kong.RunWhenKongRouterFlavor(t, "expressions")
+		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "konnect":
 		runWhenKonnect(t)
 	}
+}
+
+func runWhenExpressions(t *testing.T, semverRange string) {
+	t.Helper()
+
+	// limiting to enterprise for now
+	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+	kong.RunWhenKongRouterFlavor(t, "expressions")
 }
 
 func sortSlices(x, y interface{}) bool {
