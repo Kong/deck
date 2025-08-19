@@ -1,0 +1,28 @@
+_format_version: "3.0"
+plugins:
+- config:
+    limit:
+    - 10
+    namespace: my-namespace
+    window_size: 
+    - 60
+    redis:
+      connect_timeout: 2000
+      database: 0
+      host: 127.0.0.1
+      keepalive_backlog: 0
+      keepalive_pool_size: 256
+      password: '{vault://env-vault/redis-pass}'
+      port: 6379
+      read_timeout: 2000
+      send_timeout: 2000
+      ssl: false
+      ssl_verify: false
+      username: '{vault://env-vault/redis-user}'
+  id: 95902d79-43b1-4cec-a394-dbf25909a7bb
+  name: rate-limiting-advanced
+vaults:
+- config:
+    prefix: TEST
+  name: env
+  prefix: env-vault

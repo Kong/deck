@@ -6,6 +6,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/acarl005/stripansi"
@@ -685,6 +686,7 @@ func Test_Dump_Sanitize(t *testing.T) {
 		name         string
 		stateFile    string
 		expectedFile string
+		selectTags   []string
 		runWhen      func(t *testing.T)
 	}{
 		{
@@ -705,6 +707,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
 		},
+		{
+			name:         "dump sanitize with select-tags",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/select-tags.expected.yaml",
+			selectTags:   []string{"tag1", "tag2"},
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+		},
 	}
 
 	for _, tc := range tests {
@@ -713,8 +722,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			setup(t)
 			require.NoError(t, sync(ctx, tc.stateFile))
 
+			dumpArgs := []string{"-o", "-", "--sanitize", "--sanitization-salt", testSalt}
+			if len(tc.selectTags) > 0 {
+				dumpArgs = append(dumpArgs, "--select-tag", strings.Join(tc.selectTags, ","))
+			}
+
 			// checking that the sanitizer is working correctly
-			output, err := dump("-o", "-", "--sanitize", "--sanitization-salt", testSalt)
+			output, err := dump(dumpArgs...)
 			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
@@ -737,9 +751,10 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name      string
-		stateFile string
-		runWhen   func(t *testing.T)
+		name           string
+		stateFile      string
+		runWhen        func(t *testing.T)
+		skipValidation bool // some
 	}{
 		{
 			name:      "dump sanitize keys - jwk",
@@ -760,6 +775,33 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 			name:      "dump sanitize ca-certificates",
 			stateFile: "testdata/dump/008-sanitizer/ca-cert.yaml",
 			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
+		{
+			name:           "dump sanitize env vault and vault references",
+			stateFile:      "testdata/dump/008-sanitizer/env-vault.yaml",
+			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
+			skipValidation: true, // env vault validation endpoint not available in 3.4.0
+		},
+		{
+			name:      "dump sanitize env vault and vault references",
+			stateFile: "testdata/dump/008-sanitizer/env-vault.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
+		},
+		{
+			name:           "dump sanitize vault config",
+			stateFile:      "testdata/dump/008-sanitizer/vault-configs.yaml",
+			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.7.0") },
+			skipValidation: true, // vault validation endpoint (for vaults other than env) is not available in prior to 3.7.0
+		},
+		{
+			name:      "dump sanitize vault config",
+			stateFile: "testdata/dump/008-sanitizer/vault-configs.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.7.0") },
+		},
+		{
+			name:      "dump sanitize vault config >=3.11.0",
+			stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
 		},
 	}
 
@@ -786,10 +828,12 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 			require.NoError(t, err)
 			tmpFile.Close()
 
-			// validate file content
-			validateOpts := []string{tmpFile.Name()}
-			err = validate(ONLINE, validateOpts...)
-			require.NoError(t, err)
+			if !tc.skipValidation {
+				// validate file content
+				validateOpts := []string{tmpFile.Name()}
+				err = validate(ONLINE, validateOpts...)
+				require.NoError(t, err)
+			}
 
 			// re-syncing to ensure the sanitized content is valid
 			reset(t)

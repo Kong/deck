@@ -79,6 +79,8 @@ func (s *Sanitizer) Sanitize() (*file.Content, error) {
 		}
 	}
 
+	s.sanitizeInfo(s.content.Info)
+
 	return s.content, nil
 }
 
@@ -183,6 +185,12 @@ func (s *Sanitizer) sanitizeValue(value string) string {
 		}
 	}
 
+	// This indicates that the value is a vault reference.
+	// So, we don't want to hash it.
+	if strings.HasPrefix(value, "{vault://") {
+		return value
+	}
+
 	hashedValue := s.hashValue(value)
 	if !strings.Contains(value, "/") {
 		s.sanitizedMap[value] = hashedValue
@@ -243,6 +251,10 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 			switch v := val.Interface().(type) {
 			case string:
 				sanitizedVal := s.sanitizeValue(v)
+				if requiresURISanitization(k) {
+					sanitizedVal = hashURI(v, s.salt)
+				}
+
 				sanitizedConfig[k] = sanitizedVal
 			case map[string]interface{}:
 				sanitizedConfig[k] = s.sanitizeConfig(entityName, reflect.ValueOf(v))
@@ -263,4 +275,24 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 	}
 
 	return sanitizedConfig
+}
+
+func (s *Sanitizer) sanitizeInfo(info *file.Info) {
+	if info == nil {
+		return
+	}
+
+	// Sanitizing selectorTags
+	if info.SelectorTags != nil {
+		sanitizedSelectorTags := make([]string, 0, len(info.SelectorTags))
+		for _, tag := range info.SelectorTags {
+			sanitizedTag, exists := s.sanitizedMap[tag]
+			if !exists {
+				sanitizedTag = s.sanitizeValue(tag)
+				s.sanitizedMap[tag] = sanitizedTag
+			}
+			sanitizedSelectorTags = append(sanitizedSelectorTags, sanitizedTag.(string))
+		}
+		info.SelectorTags = sanitizedSelectorTags
+	}
 }

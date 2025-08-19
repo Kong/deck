@@ -12,6 +12,7 @@ const (
 	ConsumerGroupPlugin = "ConsumerGroupPlugin"
 	Plugin              = "Plugin"
 	Partial             = "Partial"
+	Vault               = "Vault"
 )
 
 var entityMap = map[string]string{
@@ -79,6 +80,15 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 		return partialType.String(), schema, err
 	}
 
+	// @todo: implement caching for vault schemas
+	// For this we need to add a GetFullSchema method for vaults in go-kong
+	// This would be done once we have separate schema endpoints for vault-types for koko
+	if entityName == Vault {
+		vaultType := field.FieldByName("Name").Elem().String()
+		schema, err = s.fetchVaultSchema(vaultType)
+		return vaultType, schema, err
+	}
+
 	// important so that entities like FPlugin, FService, etc. are not tried for schema fetching
 	entityName, ok := entityMap[entityName]
 	if !ok {
@@ -113,6 +123,25 @@ func (s *Sanitizer) getKonnectEntitySchema(entityType string) (kong.Schema, erro
 
 	endpoint := fmt.Sprintf("/v1/schemas/json/%s", entityType)
 
+	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
+	if err != nil {
+		return schema, err
+	}
+	resp, err := s.client.Do(s.ctx, req, &schema)
+	if resp == nil {
+		return schema, fmt.Errorf("invalid HTTP response: %w", err)
+	}
+	if err != nil {
+		return schema, fmt.Errorf("failed to fetch schema: %w", err)
+	}
+
+	return schema, nil
+}
+
+func (s *Sanitizer) fetchVaultSchema(vaultType string) (kong.Schema, error) {
+	var schema map[string]interface{}
+
+	endpoint := fmt.Sprintf("/schemas/vaults/%s", vaultType)
 	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
 		return schema, err
