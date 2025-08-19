@@ -41,18 +41,18 @@ func TestSanitizeExpression(t *testing.T) {
 		},
 		{
 			name:       "Sanitize expression with IPv4 address",
-			expression: `http.host == 192.168.1.1`,
-			expected:   `http.host == 10.54.56.50`,
+			expression: `net.src.ip == 192.168.1.1`,
+			expected:   `net.src.ip == 10.54.56.50`,
 		},
 		{
 			name:       "Sanitize expression with CIDR notation",
-			expression: `http.host == 192.168.1.0/24`,
-			expected:   `http.host == 10.53.51.54/24`,
+			expression: `net.src.ip in 192.168.1.0/24`,
+			expected:   `net.src.ip in 10.53.51.54/24`,
 		},
 		{
 			name:       "Sanitize expression with IPv6 address",
-			expression: `http.host == 2001:db8::1`,
-			expected:   `http.host == fd00:3561:6333:3965:3331:6636:6135:3132`,
+			expression: `net.src.ip == 2001:db8::1`,
+			expected:   `net.src.ip == fd00:3561:6333:3965:3331:6636:6135:3132`,
 		},
 	}
 

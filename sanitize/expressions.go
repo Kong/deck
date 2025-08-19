@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+var (
+	regexPrefix    = "r#\""
+	regexSuffix    = "\"#"
+	regexPrefixLen = len(regexPrefix)
+	regexSuffixLen = len(regexSuffix)
+)
+
 // sanitizeExpression sanitizes a route expression by preserving the structure
 // This ensures that expressions remain functionally intact but sensitive data is protected.
 func (s *Sanitizer) sanitizeExpression(expression string) string {
@@ -74,11 +81,8 @@ func (s *Sanitizer) sanitizeConstantValue(value string) string {
 		strValue := value[1 : len(value)-1]
 
 		// Checking for regex patterns (r#"pattern"#) inside strings
-		if strings.HasPrefix(strValue, "r#\"") && strings.HasSuffix(strValue, "\"#") {
-			// Preserving the regex structure and hashing the pattern inside
-			pattern := strValue[3 : len(strValue)-2]
-			hashedPattern := s.hashValue(pattern)
-			return "r#\"" + hashedPattern + "\"#"
+		if strings.HasPrefix(strValue, regexPrefix) && strings.HasSuffix(strValue, regexSuffix) {
+			return s.sanitizeRegex(strValue)
 		}
 
 		// Hashing the string content but preserve the quotes
@@ -87,27 +91,20 @@ func (s *Sanitizer) sanitizeConstantValue(value string) string {
 	}
 
 	// Checking for regex patterns (r#"pattern"#)
-	if strings.HasPrefix(value, "r#\"") && strings.HasSuffix(value, "\"#") {
-		// Preserving the regex structure and hashing the pattern inside
-		pattern := value[3 : len(value)-2]
-		hashedPattern := s.hashValue(pattern)
-		return "r#\"" + hashedPattern + "\"#"
+	if strings.HasPrefix(value, regexPrefix) && strings.HasSuffix(value, regexSuffix) {
+		return s.sanitizeRegex(value)
 	}
 
-	// Handling IP addresses and CIDR notation
-	ipv4CidrRegex := regexp.MustCompile(`^\d+\.\d+\.\d+\.\d+(/\d+)?$`)
-	ipv6CidrRegex := regexp.MustCompile(`^([0-9a-fA-F]{0,4}:){1,7}([0-9a-fA-F]{0,4}|:)(/\d+)?$|` +
-		`^::(/\d+)?$|` +
-		`^([0-9a-fA-F]{0,4}:){1,6}:([0-9a-fA-F]{0,4})(/\d+)?$`)
+	if ip, _, err := net.ParseCIDR(value); err == nil && ip != nil {
+		// For CIDR notation, sanitize the IP part but keep the prefix length
+		parts := strings.Split(value, "/")
+		hashedIP := s.sanitizeIP(ip, parts[0])
+		return hashedIP + "/" + parts[1]
+	}
 
-	if ipv4CidrRegex.MatchString(value) || ipv6CidrRegex.MatchString(value) {
-		if strings.Contains(value, "/") {
-			// For CIDR notation
-			parts := strings.Split(value, "/")
-			hashedIP := s.sanitizeIP(parts[0])
-			return hashedIP + "/" + parts[1]
-		}
-		return s.sanitizeIP(value)
+	if ip := net.ParseIP(value); ip != nil {
+		// For single IP addresses, just sanitize the IP
+		return s.sanitizeIP(ip, value)
 	}
 
 	// Default handling for other types
@@ -116,16 +113,10 @@ func (s *Sanitizer) sanitizeConstantValue(value string) string {
 }
 
 // sanitizeIP sanitizes an IPv4 or IPv6 address using the provided salt
-func (s *Sanitizer) sanitizeIP(ip string) string {
-	parsedIP := net.ParseIP(ip)
-	if parsedIP == nil {
-		// If it's not a valid IP, return a hashed version
-		return s.hashValue(ip)
-	}
+func (s *Sanitizer) sanitizeIP(ip net.IP, ipString string) string {
+	hashedIP := s.hashValue(ipString)
 
-	hashedIP := s.hashValue(ip)
-
-	if parsedIP.To4() != nil {
+	if ip.To4() != nil {
 		return sanitizeIPv4(hashedIP)
 	}
 
@@ -210,7 +201,9 @@ func sanitizeIPv6(hashedIP string) string {
 
 	// Generating 7 more 16-bit segments from the hash
 	for i := 0; i < 7; i++ {
-		if i*2+1 < len(hashBytes) {
+		// Check if there are enough bytes left to form a 16-bit segment (2 bytes)
+		hasEnoughBytesForSegment := i*2+1 < len(hashBytes)
+		if hasEnoughBytesForSegment {
 			segment := (int(hashBytes[i*2]) << 8) | int(hashBytes[i*2+1])
 			ipv6Parts = append(ipv6Parts, strconv.FormatInt(int64(segment), 16))
 		} else {
@@ -220,4 +213,17 @@ func sanitizeIPv6(hashedIP string) string {
 	}
 
 	return strings.Join(ipv6Parts, ":")
+}
+
+// sanitizeRegex sanitizes a regex string by preserving its structure
+func (s *Sanitizer) sanitizeRegex(regexString string) string {
+	strLen := len(regexString)
+	if strLen >= regexPrefixLen+regexSuffixLen {
+		pattern := regexString[regexPrefixLen : strLen-regexSuffixLen]
+		hashedPattern := s.hashValue(pattern)
+		return regexPrefix + hashedPattern + regexSuffix
+	}
+
+	// fallback: hash the entire string if the lengths mismatch
+	return s.hashValue(regexString)
 }
