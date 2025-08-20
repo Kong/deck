@@ -315,9 +315,11 @@ func (s *Sanitizer) patternBasedSanitization(value string) (string, bool) {
 	}
 
 	// Check for key-value pattern
+	// not checking for URL patterns here
+	// as they are handled separately and after this sanitization in the sanitizeConfig method
 	keyValuePattern := `^[^:]+:.*$`
 	if matched, _ := regexp.MatchString(keyValuePattern, value); matched {
-		sanitizedValue = "redacted:" + hashedValue
+		sanitizedValue = hashedValue + ":redacted"
 		return sanitizedValue, true
 	}
 
