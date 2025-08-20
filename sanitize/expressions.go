@@ -1,6 +1,7 @@
 package sanitize
 
 import (
+	"fmt"
 	"net"
 	"regexp"
 	"strconv"
@@ -27,14 +28,42 @@ func (s *Sanitizer) sanitizeExpression(expression string) string {
 	// We need to sanitize an expression while preserving its structure.
 	// We will only sanitize values, not fields or operators.
 
-	// First, handling parentheses and logical operators to maintain expression structure
+	// First, preserving function calls, regex patterns and quoted string by replacing them
+	// with placeholders, so that spacing doesn't affect parentheses and logical operators
+	// inside the regex, quotes or func calls.
+
+	// preserving function calls
+	var functionCalls map[string]string
+	var protectionOrder []string
+	functionCalls, protectionOrder, expression = preserveFunctionCall(expression)
+
+	protectedValues := make(map[string]string)
+	placeholderCounter := 0
+	// protecting regex patterns
+	regexPattern := regexp.MustCompile(`r#"[^"]*"#`)
+	expression = regexPattern.ReplaceAllStringFunc(expression, func(match string) string {
+		placeholder := fmt.Sprintf("__PROTECTED_REGEX_%d__", placeholderCounter)
+		protectedValues[placeholder] = match
+		placeholderCounter++
+		return placeholder
+	})
+	// protecting quoted strings ("..." or '...')
+	quotedPattern := regexp.MustCompile(`"[^"]*"|'[^']*'`)
+	expression = quotedPattern.ReplaceAllStringFunc(expression, func(match string) string {
+		placeholder := fmt.Sprintf("__PROTECTED_STRING_%d__", placeholderCounter)
+		protectedValues[placeholder] = match
+		placeholderCounter++
+		return placeholder
+	})
+
+	// Second, handling parentheses and logical operators to maintain expression structure
 	parenRegex := regexp.MustCompile(`(\(|\))`)
 	logicalOpRegex := regexp.MustCompile(`(&&|\|\|)`)
 	// Adding spaces around parentheses and logical operators for easier parsing
 	expression = parenRegex.ReplaceAllString(expression, " $1 ")
 	expression = logicalOpRegex.ReplaceAllString(expression, " $1 ")
 
-	// Second, breaking into predicate segments (separated by operators)
+	// Third, breaking into predicate segments (separated by operators)
 	segments := strings.Split(expression, " ")
 	for i := 0; i < len(segments); i++ {
 		segment := segments[i]
@@ -44,31 +73,59 @@ func (s *Sanitizer) sanitizeExpression(expression string) string {
 			continue
 		}
 
-		// Handle "not in" operator (special case with space)
-		if segment == "not" && i+1 < len(segments) && segments[i+1] == "in" {
-			continue
-		}
-
 		// Check if this segment is part of a predicate (field-operator-value)
-		if i+2 < len(segments) && isField(segment) {
-			op := segments[i+1]
+		if isField(segment) {
+			var op string
+			var valueIndex int
 
-			// Check if the segment is a recognized operator
-			if isOperator(op) {
+			// Handle "not in" operator (special case with space)
+			if i+2 < len(segments) && segments[i+1] == "not" && segments[i+2] == "in" {
+				op = "not in"
+				valueIndex = i + 3
+			} else if i+1 < len(segments) {
+				op = segments[i+1]
+				valueIndex = i + 2
+			} else {
+				continue
+			}
+
+			// Check if we have enough segments for the value and if the operator is recognized
+			if valueIndex < len(segments) && isOperator(op) {
 				// value = next segment after the operator
-				value := segments[i+2]
+				value := segments[valueIndex]
 
-				if !shouldPreserveFieldValue(segment) {
-					segments[i+2] = s.sanitizeConstantValue(value)
+				// Restore protected values before sanitizing
+				if restoredValue, exists := protectedValues[value]; exists {
+					value = restoredValue
 				}
 
-				i += 2
+				if !shouldPreserveFieldValue(segment) {
+					segments[valueIndex] = s.sanitizeConstantValue(value)
+				} else {
+					segments[valueIndex] = value
+				}
+
+				// Skip the appropriate number of segments based on operator type
+				if op == "not in" {
+					i += 3
+				} else {
+					i += 2
+				}
 			}
 		}
 	}
 
 	// Reconstruct the expression
-	return strings.Join(segments, " ")
+	result := strings.Join(segments, " ")
+	// Restore original function calls
+	for i := len(protectionOrder) - 1; i >= 0; i-- {
+		placeholder := protectionOrder[i]
+		if original, exists := functionCalls[placeholder]; exists {
+			result = strings.ReplaceAll(result, placeholder, original)
+		}
+	}
+
+	return result
 }
 
 // sanitizeConstantValue sanitizes a 'constant value' in an expression based on its type
@@ -125,6 +182,11 @@ func (s *Sanitizer) sanitizeIP(ip net.IP, ipString string) string {
 
 // isField checks if a string is a valid field identifier in Kong expressions
 func isField(s string) bool {
+	// Check for protected function placeholders
+	if strings.HasPrefix(s, "__PROTECTED_FUNCTION_") {
+		return true
+	}
+
 	// Fields are typically in the format: namespace.field or namespace.field.subfield
 	fieldPattern := regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$`)
 
@@ -143,7 +205,7 @@ func isField(s string) bool {
 // isOperator checks if a string is a valid operator in route expressions
 func isOperator(s string) bool {
 	operators := []string{
-		"==", "!=", ">=", "<=", ">", "<", "^=", "=^", "~",
+		"==", "!=", ">=", "<=", ">", "<", "^=", "=^", "~", "!",
 		"in", "not in", "contains",
 	}
 
@@ -154,6 +216,31 @@ func isOperator(s string) bool {
 	}
 
 	return false
+}
+
+func preserveFunctionCall(expression string) (map[string]string, []string, string) {
+	functionCalls := make(map[string]string)
+	var protectionOrder []string // Track the order of protection
+	functionsCounter := 0
+
+	for {
+		oldExpression := expression
+		functionCallPattern := regexp.MustCompile(`\b(all|any|lower|upper|size|starts_with|ends_with)\s*\([^()]*\)`)
+
+		expression = functionCallPattern.ReplaceAllStringFunc(expression, func(match string) string {
+			placeholder := fmt.Sprintf("__PROTECTED_FUNCTION_%d__", functionsCounter)
+			functionCalls[placeholder] = match
+			protectionOrder = append(protectionOrder, placeholder) // Track order
+			functionsCounter++
+			return placeholder
+		})
+
+		if expression == oldExpression {
+			break
+		}
+	}
+
+	return functionCalls, protectionOrder, expression
 }
 
 // shouldPreserveFieldValue determines if a field's value should be preserved (not hashed)
