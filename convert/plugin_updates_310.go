@@ -73,12 +73,12 @@ func updateLegacyPluginConfigFor310(plugin *file.FPlugin) {
 			}
 		}
 		if isRedisPlugin {
-			config = updateLegacyFieldToNewField(config, "cluster_addresses", "cluster_nodes", pluginName)
-			config = updateLegacyFieldToNewField(config, "sentinel_addresses", "sentinel_nodes", pluginName)
+			config = updateLegacyFieldToNewField(config, "redis.cluster_addresses", "redis.cluster_nodes", pluginName)
+			config = updateLegacyFieldToNewField(config, "redis.sentinel_addresses", "redis.sentinel_nodes", pluginName)
 		}
 
 		if pluginName == aiRateLimitingAdvancedPluginName {
-			config := convertScalarToList(config, "llm_providers.window_size", pluginName)
+			config = convertScalarToList(config, "llm_providers.window_size", pluginName)
 			config = convertScalarToList(config, "llm_providers.limit", pluginName)
 		}
 

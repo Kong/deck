@@ -226,31 +226,31 @@ func removeDeprecatedFields3x(pluginConfig kong.Configuration, fieldName, plugin
 func convertScalarToList(pluginConfig kong.Configuration,
 	fieldName string, pluginName string,
 ) kong.Configuration {
-	if _, ok := pluginConfig[fieldName]; ok {
-		keys := strings.Split(fieldName, ".")
-		current := pluginConfig
-		for i, key := range keys {
-			if i == len(keys)-1 {
-				// Last key, perform the conversion
-				if _, ok := current[key]; ok {
-					switch v := current[key].(type) {
-					case string:
-						current[key] = []string{v}
-					case int:
-						current[key] = []int{v}
-					default:
-						cprint.UpdatePrintf("Unexpected type for field \"%s\" in plugin %s: %T\n", fieldName, pluginName, v)
-					}
+	keys := strings.Split(fieldName, ".")
+	current := pluginConfig
+	for i, key := range keys {
+		if i == len(keys)-1 {
+			// Last key, perform the conversion
+			if _, ok := current[key]; ok {
+				switch v := current[key].(type) {
+				case string:
+					current[key] = []string{v}
+				case int:
+					current[key] = []int{v}
+				case float64:
+					current[key] = []float64{v}
+				default:
+					cprint.DeletePrintf("ERROR: Unexpected type for field \"%s\" in plugin %s: %T\n", fieldName, pluginName, v)
 				}
+			}
+		} else {
+			// Step into the nested map
+			if nested, ok := current[key].(map[string]interface{}); ok {
+				current = nested
+				cprint.UpdatePrintf("Automatically converted configuration field \"%s\" from a single value "+
+					"to a list in plugin %s\n", fieldName, pluginName)
 			} else {
-				// Step into the nested map
-				if nested, ok := current[key].(map[string]interface{}); ok {
-					current = nested
-					cprint.UpdatePrintf("Automatically converted configuration field \"%s\" from a single value "+
-						"to a list in plugin %s\n", fieldName, pluginName)
-				} else {
-					cprint.UpdatePrintf("Field \"%s\" in plugin %s is not a nested object as expected\n", fieldName, pluginName)
-				}
+				cprint.UpdatePrintf("Field \"%s\" in plugin %s is not a nested object as expected\n", fieldName, pluginName)
 			}
 		}
 	}
