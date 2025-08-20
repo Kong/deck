@@ -24,6 +24,7 @@ var (
 	FCertificate  = "FCertificate"
 	CACertificate = "CACertificate"
 	Key           = "Key"
+	Route         = "Route"
 )
 
 func (s *Sanitizer) handleEntity(entityName string, fieldValue reflect.Value) error {
@@ -38,6 +39,8 @@ func (s *Sanitizer) handleEntity(entityName string, fieldValue reflect.Value) er
 		return s.handleCACertificate(fieldValue)
 	case Key:
 		return s.handleKey(fieldValue)
+	case Route:
+		return s.handleRoute(fieldValue)
 	default:
 		return fmt.Errorf("no specific handler for entity: %s", entityName)
 	}
@@ -117,6 +120,23 @@ func (s *Sanitizer) handleKey(fieldValue reflect.Value) error {
 	}
 
 	return s.setFieldValue(fieldValue, *sanitisedKey, Key)
+}
+
+func (s *Sanitizer) handleRoute(fieldValue reflect.Value) error {
+	route := fieldValue.Interface().(kong.Route)
+
+	if route.Expression == nil {
+		// If the route does not have an expression, we can proceed with normal sanitization
+		return nil
+	}
+
+	sanitizedRoute := route.DeepCopy()
+	originalExpression := *route.Expression
+	sanitizedExpression := s.sanitizeExpression(originalExpression)
+	s.sanitizedMap[originalExpression] = sanitizedExpression
+	sanitizedRoute.Expression = &sanitizedExpression
+
+	return s.setFieldValue(fieldValue, *sanitizedRoute, Route)
 }
 
 // generateTestCertAndKey generates a test certificate and key pair.

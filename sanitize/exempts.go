@@ -18,7 +18,7 @@ var entityLevelExemptedFields = map[string]map[string]struct{}{
 	"Partial":             {"Type": {}},
 	"PartialLink":         {"Path": {}},
 	"Plugin":              {"Name": {}},
-	"Route":               {"Methods": {}},
+	"Route":               {"Methods": {}, "Expression": {}},
 
 	// Special handling
 	"CACertificate": {"Cert": {}, "CertDigest": {}},
@@ -53,6 +53,7 @@ var entitiesToHandleDifferently = map[string]struct{}{
 	"CACertificate": {},
 	"FCertificate":  {},
 	"Key":           {},
+	"Route":         {},
 }
 
 // dynamically generated maps of exempted fields from schemas

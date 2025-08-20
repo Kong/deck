@@ -1,0 +1,74 @@
+_format_version: "3.0"
+routes:
+- expression: net.protocol ~ "^https?$" && net.dst.port == 80
+  https_redirect_status_code: 426
+  id: ed6b911d-a0f8-4fc0-b94c-a62cbf1aa2f5
+  name: r1
+  path_handling: v0
+  preserve_host: false
+  priority: 0
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: false
+  response_buffering: false
+  strip_path: true
+- expression: http.path ^= "/path"    &&    http.host
+      == "example.com"
+  https_redirect_status_code: 426
+  name: r2
+  path_handling: v0
+  preserve_host: false
+  priority: 0
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: true
+  tags:
+  - tag1
+- expression: net.src.ip == 192.168.1.0 && net.protocol == "http" && http.method == "GET"
+  https_redirect_status_code: 426
+  name: r4
+  path_handling: v0
+  preserve_host: false
+  priority: 0
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: true
+  tags:
+  - tag1
+
+# checking for nested routes
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - expression: http.path ~ r#"^/foo/?$"#
+    https_redirect_status_code: 426
+    name: r3
+    path_handling: v0
+    preserve_host: false
+    priority: 0
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  
+  write_timeout: 60000
