@@ -68,10 +68,15 @@ func Lint(
 		return nil, fmt.Errorf("error reading ruleset file: %w", err)
 	}
 
-	return LintWithContent(stateFileBytes, ruleSetBytes, cmdLintFailSeverity, cmdLintOnlyFailures)
+	return WithContent(stateFileBytes, ruleSetBytes, cmdLintFailSeverity, cmdLintOnlyFailures)
 }
 
-func LintWithContent(stateFileBytes []byte, rulesetContent []byte, cmdLintFailSeverity string, cmdLintOnlyFailures bool) (map[string]interface{}, error) {
+func WithContent(
+	stateFileBytes []byte,
+	rulesetContent []byte,
+	cmdLintFailSeverity string,
+	cmdLintOnlyFailures bool,
+) (map[string]interface{}, error) {
 	customRuleSet, err := getRuleSet(rulesetContent)
 	if err != nil {
 		return nil, err

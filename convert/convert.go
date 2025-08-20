@@ -8,14 +8,13 @@ import (
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/lint"
+	"github.com/kong/go-apiops/filebasics"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
-
-	"github.com/kong/go-apiops/filebasics"
 )
 
 type Format string
@@ -127,7 +126,7 @@ func Convert(
 			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
 		}
 
-		lintErrs, err := lint.LintWithContent(stateFileBytes, []byte(ruleset28to34), "error", false)
+		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset28to34), "error", false)
 		if err != nil {
 			return err
 		}
@@ -141,17 +140,14 @@ func Convert(
 		if len(inputFilenames) > 1 {
 			return fmt.Errorf("only one input file can be provided when converting from Kong 3.4 to Kong 3.10 format")
 		}
-		outputContent, err = convertKongGateway34xTo310x(inputContent)
-		if err != nil {
-			return err
-		}
+		outputContent = convertKongGateway34xTo310x(inputContent)
 
 		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
 		if err != nil {
 			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
 		}
 
-		lintErrs, err := lint.LintWithContent(stateFileBytes, []byte(ruleset34to310), "error", false)
+		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset34to310), "error", false)
 		if err != nil {
 			return err
 		}
@@ -350,7 +346,7 @@ func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Con
 // between the two LTS versions. It auto-fixes some configuration. The
 // configuration that can't be autofixed is left as is and the user is shown
 // warnings/errors about the same.
-func convertKongGateway34xTo310x(input *file.Content) (*file.Content, error) {
+func convertKongGateway34xTo310x(input *file.Content) *file.Content {
 	outputContent := input.DeepCopy()
 
 	updatePluginsFor310(outputContent)
@@ -361,5 +357,5 @@ func convertKongGateway34xTo310x(input *file.Content) (*file.Content, error) {
 			"For related information, please visit:\n" +
 			"https://docs.konghq.com/deck/latest/3.10-upgrade\n\n")
 
-	return outputContent, nil
+	return outputContent
 }
