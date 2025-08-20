@@ -32,8 +32,18 @@ var configLevelExemptedFields = map[string]struct{}{
 	"ID": {},
 
 	// Plugin specific exemptions, that can't be generated from schema
-	"dictionary_name":      {}, // present in rla, upstream_oauth
-	"lock_dictionary_name": {}, // present in rla
+	"dictionary_name":          {}, // present in rla, upstream_oauth
+	"lock_dictionary_name":     {}, // present in rla
+	"access":                   {}, // present in pre and post-function
+	"request_jq_program":       {}, // present in jq
+	"response_jq_program":      {}, // present in jq
+	"log_by_lua":               {},
+	"shm_name":                 {}, // present in acme
+	"schema_version":           {}, // present in confluent
+	"message_by_lua_functions": {}, // present in confluent
+	"custom_fields_by_lua":     {}, // present in http-log, tcp-log
+	"api_spec":                 {}, // present in oas-validation
+	"anthropic_version":        {}, // present in ai-request-transformer
 
 	// Vault specific exemptions, that can't be generated from schema
 	"prefix": {}, // present in env
