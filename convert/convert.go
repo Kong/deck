@@ -2,6 +2,7 @@ package convert
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"strings"
 
@@ -13,9 +14,17 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
+
+	"github.com/kong/go-apiops/filebasics"
 )
 
 type Format string
+
+//go:embed rulesets/280-to-340/entrypoint.yaml
+var ruleset28to34 string
+
+//go:embed rulesets/340-to-310/entrypoint.yaml
+var ruleset34to310 string
 
 const (
 	// FormatDistributed represents the Deck configuration format.
@@ -30,8 +39,8 @@ const (
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 
 	// Adding LTS version strings
-	FormatKongGatewayVersion28x Format = "2.8"
-	FormatKongGatewayVersion34x Format = "3.4"
+	FormatKongGatewayVersion28x  Format = "2.8"
+	FormatKongGatewayVersion34x  Format = "3.4"
 	FormatKongGatewayVersion310x Format = "3.10"
 )
 
@@ -113,7 +122,12 @@ func Convert(
 			return err
 		}
 
-		lintErrs, err := lint.Lint(inputFilenames[0], "convert/rulesets/280-to-340/entrypoint.yaml", "error", false)
+		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
+		if err != nil {
+			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
+		}
+
+		lintErrs, err := lint.LintWithContent(stateFileBytes, []byte(ruleset28to34), "error", false)
 		if err != nil {
 			return err
 		}
@@ -132,7 +146,12 @@ func Convert(
 			return err
 		}
 
-		lintErrs, err := lint.Lint(inputFilenames[0], "convert/rulesets/340-to-310/entrypoint.yaml", "error", false)
+		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
+		if err != nil {
+			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
+		}
+
+		lintErrs, err := lint.LintWithContent(stateFileBytes, []byte(ruleset34to310), "error", false)
 		if err != nil {
 			return err
 		}

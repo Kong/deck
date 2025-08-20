@@ -37,12 +37,7 @@ type Result struct {
 }
 
 // getRuleSet reads the ruleset file by the provided name and returns a RuleSet object.
-func getRuleSet(ruleSetFile string) (*rulesets.RuleSet, error) {
-	ruleSetBytes, err := filebasics.ReadFile(ruleSetFile)
-	if err != nil {
-		return nil, fmt.Errorf("error reading ruleset file: %w", err)
-	}
-
+func getRuleSet(ruleSetBytes []byte) (*rulesets.RuleSet, error) {
 	customRuleSet, err := rulesets.CreateRuleSetFromData(ruleSetBytes)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ruleset: %w", err)
@@ -63,16 +58,24 @@ func Lint(
 	cmdLintFailSeverity string,
 	cmdLintOnlyFailures bool,
 ) (map[string]interface{}, error) {
-	customRuleSet, err := getRuleSet(ruleSetFileName)
-	if err != nil {
-		return nil, err
-	}
-
 	stateFileBytes, err := filebasics.ReadFile(cmdLintInputFilename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read input file '%s'; %w", cmdLintInputFilename, err)
 	}
 
+	ruleSetBytes, err := filebasics.ReadFile(ruleSetFileName)
+	if err != nil {
+		return nil, fmt.Errorf("error reading ruleset file: %w", err)
+	}
+
+	return LintWithContent(stateFileBytes, ruleSetBytes, cmdLintFailSeverity, cmdLintOnlyFailures)
+}
+
+func LintWithContent(stateFileBytes []byte, rulesetContent []byte, cmdLintFailSeverity string, cmdLintOnlyFailures bool) (map[string]interface{}, error) {
+	customRuleSet, err := getRuleSet(rulesetContent)
+	if err != nil {
+		return nil, err
+	}
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
 		Spec:              stateFileBytes,
