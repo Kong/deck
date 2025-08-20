@@ -45,6 +45,11 @@ func TestSanitizeExpression(t *testing.T) {
 			expected:   `http.path.segments.0_1 == "6112060752768f93013e72488fb87d7e08e87753d8bce33951ee628553c49f8a"`,
 		},
 		{
+			name:       "Sanitize expression with ! operator",
+			expression: `!(http.path == "/api/users")`,
+			expected:   `! ( http.path == "ab1c696d4b37997a1c29a09610f47a7032949190db6c78d06a8d09b050ab91ea" ) `,
+		},
+		{
 			name:       "Sanitize expression with regex",
 			expression: `http.path ~ r#"^/users/\d+$"#`,
 			expected:   `http.path ~ r#"dab30f7e826083df3eee6538650e002873dc7eae7cd8d617fc4dd2de2b97000b"#`,
