@@ -438,3 +438,82 @@ func verifyConfigSanitization(t *testing.T, original, sanitized interface{}) {
 		assert.Equal(t, orig, sanitized, "Non-string primitives should remain unchanged")
 	}
 }
+
+func Test_patternBasedSanitization(t *testing.T) {
+	tests := []struct {
+		name              string
+		input             string
+		expectedSanitized bool
+		expectedString    string
+	}{
+		{
+			name:              "valid email pattern",
+			input:             "user@example.com",
+			expectedSanitized: true,
+			expectedString:    "email@8a9d64f239512378a2e1489bb0efbeb10332495a7e2eb77666105c6b3729df96.redacted",
+		},
+		{
+			name:              "email with numbers and special chars",
+			input:             "test.user+tag@sub.example-domain.org",
+			expectedSanitized: true,
+			expectedString:    "email@d3084511885f5f1a29ffa98ac31daafec44cdf8432cb265ff7be8fec8d45f56f.redacted",
+		},
+		{
+			name:              "key-value pattern",
+			input:             "api_key:secret_value_123",
+			expectedSanitized: true,
+			expectedString:    "4e273576364cff8a703a4cc3b2fb5955c2ab5881e36d2e4f89146fe524791ff8:redacted",
+		},
+		{
+			name:              "key-value pattern with empty value",
+			input:             "empty_key:",
+			expectedSanitized: true,
+			expectedString:    "8f3c26e6f8c696284f251b89be451cb15e27f37d89573a96c00062c41600edaa:redacted",
+		},
+		{
+			name:              "invalid key-value pattern - starts with colon",
+			input:             ":value_without_key",
+			expectedSanitized: false,
+			expectedString:    "",
+		},
+		{
+			name:              "simple string value",
+			input:             "simple_string_value",
+			expectedSanitized: false,
+			expectedString:    "",
+		},
+		{
+			name:              "empty string",
+			input:             "",
+			expectedSanitized: false,
+			expectedString:    "",
+		},
+		{
+			name:              "whitespace only",
+			input:             "   ",
+			expectedSanitized: false,
+			expectedString:    "",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			sanitizer := NewSanitizer(&SanitizerOptions{
+				Ctx:  context.Background(),
+				Salt: "test-salt-123",
+			})
+
+			result, wasSanitized := sanitizer.patternBasedSanitization(tc.input)
+			require.Equal(t, tc.expectedSanitized, wasSanitized)
+
+			if tc.expectedSanitized {
+				require.NotEmpty(t, result)
+				require.Equal(t, tc.expectedString, result)
+				// Verify that original
+				assert.NotContains(t, result, tc.input)
+			} else {
+				require.Empty(t, result)
+			}
+		})
+	}
+}
