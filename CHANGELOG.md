@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.50.0](#v1500)
 - [v1.49.2](#v1492)
 - [v1.49.1](#v1491)
 - [v1.49.0](#v1490)
@@ -118,6 +119,25 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.50.0]
+> Release date: 2025/08/20
+
+### Added
+- Added sanitization for configurations via `deck gateway dump`
+command, using `--sanitize` flag.
+[#1721](https://github.com/Kong/deck/pull/1721)
+[#1719](https://github.com/Kong/deck/pull/1719)
+[#1724](https://github.com/Kong/deck/pull/1724)
+[#1726](https://github.com/Kong/deck/pull/1726)
+[#1728](https://github.com/Kong/deck/pull/1728)
+[#1732](https://github.com/Kong/deck/pull/1732)
+[#1731](https://github.com/Kong/deck/pull/1731)
+[go-database-reconciler #313](https://github.com/Kong/go-database-reconciler/pull/313)
+- Added partial support to `deck file kong2tf` command
+[#1715](https://github.com/Kong/deck/pull/1715)
+- Added sticky sessions' config for upstream entity.
+[go-database-reconciler #328](https://github.com/Kong/go-database-reconciler/pull/328)
 
 ## [v1.49.2]
 > Release date: 2025/07/30
@@ -2231,6 +2251,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.50.0]: https://github.com/Kong/deck/compare/v1.49.2...v1.50.0
 [v1.49.2]: https://github.com/Kong/deck/compare/v1.49.1...v1.49.2
 [v1.49.1]: https://github.com/Kong/deck/compare/v1.49.0...v1.49.1
 [v1.49.0]: https://github.com/Kong/deck/compare/v1.48.0...v1.49.0
