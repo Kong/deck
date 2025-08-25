@@ -2,11 +2,13 @@ package convert
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"strings"
 
 	"github.com/blang/semver/v4"
 	"github.com/kong/deck/lint"
+	"github.com/kong/go-apiops/filebasics"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -16,6 +18,12 @@ import (
 )
 
 type Format string
+
+//go:embed rulesets/280-to-340/entrypoint.yaml
+var ruleset28to34 string
+
+//go:embed rulesets/340-to-310/entrypoint.yaml
+var ruleset34to310 string
 
 const (
 	// FormatDistributed represents the Deck configuration format.
@@ -30,8 +38,9 @@ const (
 	FormatKongGateway3x Format = "kong-gateway-3.x"
 
 	// Adding LTS version strings
-	FormatKongGatewayVersion28x Format = "2.8"
-	FormatKongGatewayVersion34x Format = "3.4"
+	FormatKongGatewayVersion28x  Format = "2.8"
+	FormatKongGatewayVersion34x  Format = "3.4"
+	FormatKongGatewayVersion310x Format = "3.10"
 )
 
 // AllFormats contains all available formats.
@@ -54,6 +63,8 @@ func ParseFormat(key string) (Format, error) {
 		return FormatKongGatewayVersion28x, nil
 	case FormatKongGatewayVersion34x:
 		return FormatKongGatewayVersion34x, nil
+	case FormatKongGatewayVersion310x:
+		return FormatKongGatewayVersion310x, nil
 	default:
 		return "", fmt.Errorf("invalid format: '%v'", key)
 	}
@@ -110,7 +121,33 @@ func Convert(
 			return err
 		}
 
-		lintErrs, err := lint.Lint(inputFilenames[0], "convert/rulesets/280-to-340/entrypoint.yaml", "error", false)
+		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
+		if err != nil {
+			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
+		}
+
+		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset28to34), "error", false)
+		if err != nil {
+			return err
+		}
+
+		_, err = lint.GetLintOutput(lintErrs, "plain", "-")
+		if err != nil {
+			return err
+		}
+
+	case from == FormatKongGatewayVersion34x && to == FormatKongGatewayVersion310x:
+		if len(inputFilenames) > 1 {
+			return fmt.Errorf("only one input file can be provided when converting from Kong 3.4 to Kong 3.10 format")
+		}
+		outputContent = convertKongGateway34xTo310x(inputContent)
+
+		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
+		if err != nil {
+			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
+		}
+
+		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset34to310), "error", false)
 		if err != nil {
 			return err
 		}
@@ -302,4 +339,23 @@ func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Con
 			"https://docs.konghq.com/deck/latest/3.0-upgrade\n\n")
 
 	return outputContent, nil
+}
+
+// convertKongGateway34xTo310x is used to convert a Kong Gateway 3.4.x config
+// to a Kong Gateway 3.4.x config. It can be used as a migration utility
+// between the two LTS versions. It auto-fixes some configuration. The
+// configuration that can't be autofixed is left as is and the user is shown
+// warnings/errors about the same.
+func convertKongGateway34xTo310x(input *file.Content) *file.Content {
+	outputContent := input.DeepCopy()
+
+	updatePluginsFor310(outputContent)
+
+	cprint.UpdatePrintf(
+		"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
+			"perform a manual audit of the config file.\n\n" +
+			"For related information, please visit:\n" +
+			"https://docs.konghq.com/deck/latest/3.10-upgrade\n\n")
+
+	return outputContent
 }

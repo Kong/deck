@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -9,12 +10,7 @@ import (
 )
 
 const (
-	rateLimitingAdvancedPluginName = "rate-limiting-advanced"
-	rlaNamespaceDefaultLength      = 32
-	awsLambdaPluginName            = "aws-lambda"
-	httpLogPluginName              = "http-log"
-	prefunctionPluginName          = "pre-function"
-	postfunctionPluginName         = "post-function"
+	rlaNamespaceDefaultLength = 32
 )
 
 func generateAutoFields(content *file.Content) error {
@@ -172,14 +168,50 @@ func updateLegacyPluginConfig(plugin *file.FPlugin) {
 func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	oldField, newField, pluginName string,
 ) kong.Configuration {
-	if _, ok := pluginConfig[oldField]; ok {
-		pluginConfig[newField] = pluginConfig[oldField]
-		delete(pluginConfig, oldField)
+	oldKeys := strings.Split(oldField, ".")
+	newKeys := strings.Split(newField, ".")
 
-		cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
-			" to the new field \"%s\" in plugin %s\n",
-			oldField, newField, pluginName)
+	// Traverse to the old field's parent map
+	current := pluginConfig
+	for _, key := range oldKeys[:len(oldKeys)-1] {
+		if nested, ok := current[key].(map[string]interface{}); ok {
+			current = nested
+		} else {
+			return pluginConfig
+		}
 	}
+
+	// Get the value of the old field
+	oldKey := oldKeys[len(oldKeys)-1]
+	value, ok := current[oldKey]
+	if !ok {
+		return pluginConfig
+	}
+
+	// Remove the old field
+	delete(current, oldKey)
+
+	// Traverse to the new field's parent map
+	current = pluginConfig
+	for _, key := range newKeys[:len(newKeys)-1] {
+		if nested, ok := current[key].(map[string]interface{}); ok {
+			current = nested
+		} else {
+			// Create nested map if it doesn't exist
+			newMap := make(map[string]interface{})
+			current[key] = newMap
+			current = newMap
+		}
+	}
+
+	// Set the value to the new field
+	newKey := newKeys[len(newKeys)-1]
+	current[newKey] = value
+
+	cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
+		" to the new field \"%s\" in plugin %s\n",
+		oldField, newField, pluginName)
+
 	return pluginConfig
 }
 
@@ -188,5 +220,40 @@ func removeDeprecatedFields3x(pluginConfig kong.Configuration, fieldName, plugin
 		delete(pluginConfig, fieldName)
 		cprint.UpdatePrintf("Automatically removed deprecated config field \"%s\" from plugin %s\n", fieldName, pluginName)
 	}
+	return pluginConfig
+}
+
+func convertScalarToList(pluginConfig kong.Configuration,
+	fieldName string, pluginName string,
+) kong.Configuration {
+	keys := strings.Split(fieldName, ".")
+	current := pluginConfig
+	for i, key := range keys {
+		if i == len(keys)-1 {
+			// Last key, perform the conversion
+			if _, ok := current[key]; ok {
+				switch v := current[key].(type) {
+				case string:
+					current[key] = []string{v}
+				case int:
+					current[key] = []int{v}
+				case float64:
+					current[key] = []float64{v}
+				default:
+					cprint.DeletePrintf("ERROR: Unexpected type for field \"%s\" in plugin %s: %T\n", fieldName, pluginName, v)
+				}
+			}
+		} else {
+			// Step into the nested map
+			if nested, ok := current[key].(map[string]interface{}); ok {
+				current = nested
+				cprint.UpdatePrintf("Automatically converted configuration field \"%s\" from a single value "+
+					"to a list in plugin %s\n", fieldName, pluginName)
+			} else {
+				cprint.UpdatePrintf("Field \"%s\" in plugin %s is not a nested object as expected\n", fieldName, pluginName)
+			}
+		}
+	}
+
 	return pluginConfig
 }
