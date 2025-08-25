@@ -8128,7 +8128,8 @@ func Test_Sync_Partials(t *testing.T) {
 
 func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
-
+	client, err := getTestClient()
+	require.NoError(t, err)
 	ctx := context.Background()
 
 	t.Run("no errors occur in case of subsequent syncs with distributed config and defaultLookupTags for consumer-group",
@@ -8165,6 +8166,45 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 			// sync again
 			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-no-tag.yaml")
 			require.NoError(t, err)
+		})
+	t.Run("no errors occur in case of distributed config when >1 consumers are tagged with different tags",
+		func(t *testing.T) {
+			// sync consumer-group file first
+			err := sync(ctx, "testdata/sync/015-consumer-groups/kong-cg.yaml")
+			t.Cleanup(func() {
+				reset(t)
+			})
+			require.NoError(t, err)
+
+			// sync consumer file 1
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-1.yaml")
+			require.NoError(t, err)
+
+			// sync consumer file 2
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-1.yaml")
+			require.NoError(t, err)
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+			require.NoError(t, err)
+
+			// check number of consumerGroupConsumers
+			currentState, err := fetchCurrentState(ctx, client, deckDump.Config{}, t)
+			require.NoError(t, err)
+
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 2)
+
+			consumerNames := []string{"user1", "user2"}
+
+			for _, consumerGroupConsumer := range consumerGroupConsumers {
+				assert.Contains(t, consumerNames, *consumerGroupConsumer.Consumer.Username)
+				assert.Equal(t, "foo-group", *consumerGroupConsumer.ConsumerGroup.Name)
+			}
 		})
 }
 
