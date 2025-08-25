@@ -284,8 +284,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 
 	if dumpConfig.LookUpSelectorTagsConsumerGroups != nil {
-		consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumerGroups,
-			dump.DefaultLookupTag)
+		consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumerGroups)
 		if err != nil {
 			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 		}
