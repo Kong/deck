@@ -1,7 +1,10 @@
 package sanitize
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"strings"
 	"sync"
 
 	"github.com/ettle/strcase"
@@ -121,4 +124,35 @@ func findRelevantFieldNamesWithKey(exemptedFieldsFromSchema map[string]bool,
 		}
 	}
 	walkSchema(schemaFields, false)
+}
+
+func requiresURISanitization(fieldName string) bool {
+	fieldName = strings.ToLower(fieldName)
+	// This is not an exhaustive list, but it covers common cases
+	// derived from common config patterns.
+	suffixes := []string{"uri", "url", "endpoint"}
+	for _, suffix := range suffixes {
+		if strings.HasSuffix(fieldName, suffix) {
+			return true
+		}
+	}
+	return false
+}
+
+func hashURI(uri string, salt string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(salt + uri))
+	hashedValue := hex.EncodeToString(hasher.Sum(nil))
+
+	schemeSeparator := "://"
+
+	if strings.Contains(uri, schemeSeparator) {
+		schemeParts := strings.SplitN(uri, schemeSeparator, 2)
+		if len(schemeParts) == 2 {
+			scheme := schemeParts[0]
+			return scheme + schemeSeparator + hashedValue
+		}
+	}
+
+	return hashedValue
 }

@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	Plugin  = "Plugin"
-	Partial = "Partial"
+	ConsumerGroupPlugin = "ConsumerGroupPlugin"
+	Plugin              = "Plugin"
+	Partial             = "Partial"
+	Vault               = "Vault"
 )
 
 var entityMap = map[string]string{
@@ -26,7 +28,7 @@ var entityMap = map[string]string{
 	"License":                "licenses",
 	"Key":                    "keys",
 	"KeyAuth":                "keyauth_credentials",
-	"KeySet":                 "keysets",
+	"KeySet":                 "key_sets",
 	"MTLSAuth":               "mtls_auth_credentials",
 	"Oauth2Cred":             "oauth2_credentials",
 	"Partial":                "partials",
@@ -61,7 +63,7 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 		return entityName, kong.Schema{}, fmt.Errorf("kong client is not initialized")
 	}
 
-	if entityName == Plugin {
+	if entityName == Plugin || entityName == ConsumerGroupPlugin {
 		pluginName := field.FieldByName("Name").Elem().String()
 		schema, err = s.pluginSchemasCache.Get(s.ctx, pluginName)
 		return pluginName, schema, err
@@ -76,6 +78,15 @@ func (s *Sanitizer) fetchEntitySchema(entityName string, field reflect.Value) (s
 		}
 		schema, err = s.partialSchemasCache.Get(s.ctx, partialType.String())
 		return partialType.String(), schema, err
+	}
+
+	// @todo: implement caching for vault schemas
+	// For this we need to add a GetFullSchema method for vaults in go-kong
+	// This would be done once we have separate schema endpoints for vault-types for koko
+	if entityName == Vault {
+		vaultType := field.FieldByName("Name").Elem().String()
+		schema, err = s.fetchVaultSchema(vaultType)
+		return vaultType, schema, err
 	}
 
 	// important so that entities like FPlugin, FService, etc. are not tried for schema fetching
@@ -112,6 +123,25 @@ func (s *Sanitizer) getKonnectEntitySchema(entityType string) (kong.Schema, erro
 
 	endpoint := fmt.Sprintf("/v1/schemas/json/%s", entityType)
 
+	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
+	if err != nil {
+		return schema, err
+	}
+	resp, err := s.client.Do(s.ctx, req, &schema)
+	if resp == nil {
+		return schema, fmt.Errorf("invalid HTTP response: %w", err)
+	}
+	if err != nil {
+		return schema, fmt.Errorf("failed to fetch schema: %w", err)
+	}
+
+	return schema, nil
+}
+
+func (s *Sanitizer) fetchVaultSchema(vaultType string) (kong.Schema, error) {
+	var schema map[string]interface{}
+
+	endpoint := fmt.Sprintf("/schemas/vaults/%s", vaultType)
 	req, err := s.client.NewRequest(http.MethodGet, endpoint, nil, nil)
 	if err != nil {
 		return schema, err

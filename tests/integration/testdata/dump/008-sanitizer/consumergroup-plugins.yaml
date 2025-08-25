@@ -1,0 +1,48 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 38c0beab-f5fe-4ba1-be39-578b8b0e57b0
+  name: gold
+  tags:
+    - tag1
+    - tag2
+  plugins:
+  - id: 438908dd-e4dd-40db-9c3e-d181c378101f
+    name: rate-limiting-advanced
+    config:
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+      redis:
+        host: 127.0.0.1
+        password: my-pass
+        port: 6379
+        username: my-user
+      namespace: gold-namespace
+      sync_rate: -1
+- id: 28fa8375-8ed4-4678-8fdd-1909beefb36f
+  name: silver
+  tags:
+    - tag1
+    - tag3
+  plugins:
+  - id: e01b2c4c-9378-4f12-80f1-60bb146435f2
+    name: rate-limiting-advanced
+    config:
+      limit:
+      - 10
+      retry_after_jitter_max: 1
+      window_size:
+      - 60
+      window_type: sliding
+      namespace: silver-namespace
+      sync_rate: -1
+consumers:
+- groups:
+  - name: silver
+  id: b4e88f37-71ff-483c-af6c-686638d843f6
+  username: bar
+- id: 9dd504de-919b-4d1b-b607-5d82d8041ba5
+  username: baz

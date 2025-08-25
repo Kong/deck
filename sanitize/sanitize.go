@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/cprint"
@@ -79,6 +80,8 @@ func (s *Sanitizer) Sanitize() (*file.Content, error) {
 		}
 	}
 
+	s.sanitizeInfo(s.content.Info)
+
 	return s.content, nil
 }
 
@@ -97,6 +100,15 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 	case reflect.Struct:
 		t := field.Type()
 		entityName := t.Name()
+
+		if _, needsSpecialHandling := entitiesToHandleDifferently[entityName]; needsSpecialHandling {
+			err := s.handleEntity(entityName, field)
+			if err != nil {
+				warningMessage := fmt.Sprintf("Error handling entity %s: %v\n"+
+					"Sanitization may not work as expected.", entityName, err)
+				cprint.UpdatePrintlnStdErr(warningMessage)
+			}
+		}
 
 		// specificEntityName is used to identify plugin or partial types
 		// it is useful for building exempted fields
@@ -174,6 +186,17 @@ func (s *Sanitizer) sanitizeValue(value string) string {
 		}
 	}
 
+	// This indicates that the value is a vault reference.
+	// So, we don't want to hash it.
+	if strings.HasPrefix(value, "{vault://") {
+		return value
+	}
+
+	if hashedString, ok := s.patternBasedSanitization(value); ok {
+		s.sanitizedMap[value] = hashedString
+		return hashedString
+	}
+
 	hashedValue := s.hashValue(value)
 	if !strings.Contains(value, "/") {
 		s.sanitizedMap[value] = hashedValue
@@ -234,6 +257,10 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 			switch v := val.Interface().(type) {
 			case string:
 				sanitizedVal := s.sanitizeValue(v)
+				if requiresURISanitization(k) {
+					sanitizedVal = hashURI(v, s.salt)
+				}
+
 				sanitizedConfig[k] = sanitizedVal
 			case map[string]interface{}:
 				sanitizedConfig[k] = s.sanitizeConfig(entityName, reflect.ValueOf(v))
@@ -254,4 +281,47 @@ func (s *Sanitizer) sanitizeConfig(entityName string, config reflect.Value) inte
 	}
 
 	return sanitizedConfig
+}
+
+func (s *Sanitizer) sanitizeInfo(info *file.Info) {
+	if info == nil {
+		return
+	}
+
+	// Sanitizing selectorTags
+	if info.SelectorTags != nil {
+		sanitizedSelectorTags := make([]string, 0, len(info.SelectorTags))
+		for _, tag := range info.SelectorTags {
+			sanitizedTag, exists := s.sanitizedMap[tag]
+			if !exists {
+				sanitizedTag = s.sanitizeValue(tag)
+				s.sanitizedMap[tag] = sanitizedTag
+			}
+			sanitizedSelectorTags = append(sanitizedSelectorTags, sanitizedTag.(string))
+		}
+		info.SelectorTags = sanitizedSelectorTags
+	}
+}
+
+func (s *Sanitizer) patternBasedSanitization(value string) (string, bool) {
+	hashedValue := s.hashValue(value)
+	var sanitizedValue string
+
+	// Check for email patterns based on gateway schema
+	emailPattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+	if matched, _ := regexp.MatchString(emailPattern, value); matched {
+		sanitizedValue = "email@" + hashedValue + ".redacted"
+		return sanitizedValue, true
+	}
+
+	// Check for key-value pattern
+	// not checking for URL patterns here
+	// as they are handled separately and after this sanitization in the sanitizeConfig method
+	keyValuePattern := `^[^:]+:.*$`
+	if matched, _ := regexp.MatchString(keyValuePattern, value); matched {
+		sanitizedValue = hashedValue + ":redacted"
+		return sanitizedValue, true
+	}
+
+	return "", false
 }
