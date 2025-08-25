@@ -341,7 +341,7 @@ func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Con
 	return outputContent, nil
 }
 
-// convertKongGateway28xTo34x is used to convert a Kong Gateway 2.8.x config
+// convertKongGateway34xTo310x is used to convert a Kong Gateway 3.4.x config
 // to a Kong Gateway 3.4.x config. It can be used as a migration utility
 // between the two LTS versions. It auto-fixes some configuration. The
 // configuration that can't be autofixed is left as is and the user is shown
