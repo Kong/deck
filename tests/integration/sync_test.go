@@ -466,6 +466,75 @@ var (
 		},
 	}
 
+	plugin_on_entities312x = []*kong.Plugin{ //nolint:revive,stylecheck
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
 	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
 		{
 			Name: kong.String("prometheus"),
@@ -2231,6 +2300,193 @@ var (
 			Protocols: []*string{kong.String("http"), kong.String("https")},
 		},
 	}
+
+	consumerGroupScopedPlugins312x = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"realm":            nil, // This is present on 3.7.x+
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
 )
 
 const complexQueryForDegraphqlRoute = `query SearchPosts($filters: PostsFilters) {
@@ -3775,7 +4031,18 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities310x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.10.0",
+			runWhen: ">=3.10.0 <3.12.0",
+		},
+		{
+			name:     "create plugins on services, routes and consumers >=3.12.0",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities312x,
+				Consumers: consumer,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 
@@ -6273,7 +6540,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.10.0",
+			runWhen:  ">=3.10.0 <3.12.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
@@ -6300,6 +6567,59 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 					},
 				},
 				Plugins:  consumerGroupScopedPlugins310x,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+		{
+			name:     "creates consumer groups scoped plugins",
+			runWhen:  ">=3.12.0",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins312x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
@@ -7780,7 +8100,7 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_38x(t *testing.T) {
 // test scope:
 // Kong enterprise: >=3.9.0
 func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.9.0")
+	runWhen(t, "enterprise", ">=3.9.0 <3.12.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -7875,6 +8195,170 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 					"retry_after_jitter_max": float64(0),
 					"strategy":               string("redis"),
 					"sync_rate":              float64(10),
+					"window_size":            []any{float64(60)},
+					"window_type":            string("fixed"),
+				},
+			},
+		},
+	}
+
+	t.Run("consumer-group policy overrides with info block in yaml file", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = true", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = false", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+}
+
+// test scope:
+// Kong enterprise: >=3.12.0
+func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_312x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.12.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	expectedState := utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("foo"),
+			},
+		},
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					Name: kong.String("test-group"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("foo"),
+					},
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"limit":                  []any{float64(100)},
+							"retry_after_jitter_max": float64(0),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("fixed"),
+						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("776df478-37a9-4660-81b4-b4e951d76340"),
+						},
+					},
+				},
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Protocols: kong.StringSlice(
+					"grpc",
+					"grpcs",
+					"http",
+					"https",
+				),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         []any{string("test-group")},
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(true),
+					"error_code":              float64(429),
+					"error_message":           "API rate limit exceeded",
+					"header_name":             nil,
+					"hide_client_headers":     false,
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("ZEz47TWgUrv01HenyQBQa8io06MWsp0L"),
+					"path":                    nil,
+					"redis": map[string]any{
+						"cluster_addresses":        nil,
+						"cluster_max_redirections": float64(5),
+						"cluster_nodes":            nil,
+						"connect_timeout":          float64(2000),
+						"connection_is_proxied":    bool(false),
+						"database":                 float64(0),
+						"host":                     string("127.0.0.1"),
+						"keepalive_backlog":        nil,
+						"keepalive_pool_size":      float64(256),
+						"password":                 nil,
+						"port":                     float64(6379),
+						"read_timeout":             float64(2000),
+						"redis_proxy_type":         nil,
+						"send_timeout":             float64(2000),
+						"sentinel_addresses":       nil,
+						"sentinel_master":          nil,
+						"sentinel_nodes":           nil,
+						"sentinel_password":        nil,
+						"sentinel_role":            nil,
+						"sentinel_username":        nil,
+						"server_name":              nil,
+						"ssl":                      bool(false),
+						"ssl_verify":               bool(false),
+						"timeout":                  float64(2000),
+						"username":                 nil,
+					},
+					"retry_after_jitter_max": float64(0),
+					"strategy":               string("redis"),
+					"sync_rate":              float64(10),
+					"throttling":             nil,
 					"window_size":            []any{float64(60)},
 					"window_type":            string("fixed"),
 				},
@@ -8916,6 +9400,169 @@ func Test_Sync_Partials_Tagging(t *testing.T) {
 		},
 	}
 
+	expectedStatePostSync312x := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"throttling":              nil,
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+							Name: kong.String("redis-ee-common"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"throttling":              nil,
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+							Name: kong.String("redis-ee-sentinel"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
 	ignoreFields := []cmp.Option{
 		cmpopts.IgnoreFields(kong.Service{}, "ID"),
 	}
@@ -8923,41 +9570,65 @@ func Test_Sync_Partials_Tagging(t *testing.T) {
 	tests := []struct {
 		name          string
 		kongFile      string
+		expectedState utils.KongRawState
 		errorExpected bool
 		errorString   string
+		runWhen       string
 	}{
 		{
 			name:          "sync partials with default lookup tags - via names",
 			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			expectedState: expectedStatePostSync,
 			errorExpected: false,
+			runWhen:       ">=3.10.0 <3.12.0",
+		},
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			expectedState: expectedStatePostSync312x,
+			errorExpected: false,
+			runWhen:       ">=3.12.0",
 		},
 		{
 			name:          "sync partials with default lookup tags - via ids",
 			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			expectedState: expectedStatePostSync,
 			errorExpected: false,
+			runWhen:       ">=3.10.0 <3.12.0",
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			expectedState: expectedStatePostSync312x,
+			errorExpected: false,
+			runWhen:       ">=3.12.0",
 		},
 		{
 			name:          "syncing partials with default lookup tags errors out with wrong tags",
 			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong.yaml",
 			errorExpected: true,
 			errorString:   "partial redis-ee-common for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
 		},
 		{
 			name:          "syncing partials with default lookup tags errors out with wrong names",
 			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-names.yaml",
 			errorExpected: true,
 			errorString:   "partial fake-name for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
 		},
 		{
 			name:          "syncing partials with default lookup tags errors out with wrong ids",
 			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-ids.yaml",
 			errorExpected: true,
 			errorString:   "partial fake-id-1234 for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
 		},
 	}
 
 	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name+"/"+tc.runWhen, func(t *testing.T) {
+			runWhen(t, "enterprise", tc.runWhen)
 			reset(t)
 
 			// syncing partials
@@ -8974,7 +9645,7 @@ func Test_Sync_Partials_Tagging(t *testing.T) {
 			}
 
 			require.NoError(t, err)
-			testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
+			testKongState(t, client, false, false, tc.expectedState, ignoreFields)
 		})
 	}
 }

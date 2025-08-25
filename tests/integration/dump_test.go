@@ -78,7 +78,13 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 			name:         "dump with select-tags >=3.11.0",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected311.yaml",
-			runWhen:      ">=3.11.0",
+			runWhen:      ">=3.11.0 <3.12.0",
+		},
+		{
+			name:         "dump with select-tags >=3.12.0",
+			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
+			expectedFile: "testdata/dump/001-entities-with-tags/expected312.yaml",
+			runWhen:      ">=3.12.0",
 		},
 	}
 	for _, tc := range tests {
@@ -171,7 +177,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-310.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.12.0") },
+		},
+		{
+			name:          ">=3.12.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-312.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -505,7 +518,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0 <3.12.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.12.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong312x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
 		},
 	}
 
