@@ -44,6 +44,8 @@ var configLevelExemptedFields = map[string]struct{}{
 	"custom_fields_by_lua":     {}, // present in http-log, tcp-log
 	"api_spec":                 {}, // present in oas-validation
 	"anthropic_version":        {}, // present in ai-request-transformer
+	"schema":                   {}, // present in request-validator
+	"by_lua":                   {}, // present in request-callout
 
 	// Vault specific exemptions, that can't be generated from schema
 	"prefix": {}, // present in env
