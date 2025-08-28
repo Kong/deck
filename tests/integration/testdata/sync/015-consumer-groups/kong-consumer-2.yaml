@@ -1,0 +1,15 @@
+# user2.yaml
+_format_version: "3.0"
+_info:
+  default_lookup_tags:
+    consumer_groups:
+     - group-tag 
+  select_tags:
+  - user2
+consumers:
+- custom_id: user2
+  username: user2
+  groups:
+  - name: foo-group
+    tags:
+    - group-tag
