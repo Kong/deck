@@ -116,11 +116,11 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		PreRunE: func(_ *cobra.Command, _ []string) error {
 			validSourceFormats := []string{
 				string(convert.FormatKongGateway), string(convert.FormatKongGateway2x),
-				string(convert.FormatKongGatewayVersion28x),
+				string(convert.FormatKongGatewayVersion28x), string(convert.FormatKongGatewayVersion34x),
 			}
 			validDestinationFormats := []string{
 				string(convert.FormatKonnect), string(convert.FormatKongGateway3x),
-				string(convert.FormatKongGatewayVersion34x),
+				string(convert.FormatKongGatewayVersion34x), string(convert.FormatKongGatewayVersion310x),
 			}
 
 			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats, "")
@@ -139,11 +139,11 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 
 	sourceFormats := []convert.Format{
 		convert.FormatKongGateway, convert.FormatKongGateway2x,
-		convert.FormatKongGatewayVersion28x,
+		convert.FormatKongGatewayVersion28x, convert.FormatKongGatewayVersion34x,
 	}
 	destinationFormats := []convert.Format{
 		convert.FormatKonnect, convert.FormatKongGateway3x,
-		convert.FormatKongGatewayVersion34x,
+		convert.FormatKongGatewayVersion34x, convert.FormatKongGatewayVersion310x,
 	}
 	convertCmd.Flags().StringVar(&convertCmdSourceFormat, "from", "",
 		fmt.Sprintf("format of the source file, allowed formats: %v", sourceFormats))
