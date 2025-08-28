@@ -26,7 +26,7 @@ jobs:
           echo "Kong Gateway Image = ${{ inputs.kong_image }}"
           echo "decK Branch = ${{ inputs.branch }}"
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.branch }}
       - name: Setup go
