@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.51.0](#v1510)
 - [v1.50.0](#v1500)
 - [v1.49.2](#v1492)
 - [v1.49.1](#v1491)
@@ -119,6 +120,30 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.51.0]
+> Release date: 2025/08/28
+
+### Added
+- Added support to migrate configurations
+between LTS versions `3.4` and `3.10`. The `deck file convert` 
+command can auto-fix the possible configurations and gives 
+appropriate errors or warnings for the others.
+This is how it can be used: `deck file convert --from 3.4 --to 3.10
+--input-file kong-34x.yaml -o kong-310x.yaml`
+[#1734](https://github.com/Kong/deck/pull/1734)
+- Added support in `deck file openapi2kong`
+to ignore circular references.
+[#1714](https://github.com/Kong/deck/pull/1714)
+[go-apiops #243](https://github.com/Kong/go-apiops/pull/243)
+
+### Chores
+- Switched to `speakeasy-api/jsonpath` for better
+jsonpath parsing.
+[go-apiops #275](https://github.com/Kong/go-apiops/pull/275)
+- Added additional sanitization exemptions for
+deck dump --sanitize feature.
+[#1738](https://github.com/Kong/deck/pull/1738)
 
 ## [v1.50.0]
 > Release date: 2025/08/20
@@ -2251,6 +2276,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.51.0]: https://github.com/Kong/deck/compare/v1.50.0...v1.51.0
 [v1.50.0]: https://github.com/Kong/deck/compare/v1.49.2...v1.50.0
 [v1.49.2]: https://github.com/Kong/deck/compare/v1.49.1...v1.49.2
 [v1.49.1]: https://github.com/Kong/deck/compare/v1.49.0...v1.49.1
