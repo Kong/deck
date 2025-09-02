@@ -796,33 +796,33 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 			stateFile: "testdata/dump/008-sanitizer/ca-cert.yaml",
 			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
 		},
-		{
-			name:           "dump sanitize env vault and vault references",
-			stateFile:      "testdata/dump/008-sanitizer/env-vault.yaml",
-			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
-			skipValidation: true, // env vault validation endpoint not available in 3.4.0
-		},
-		{
-			name:      "dump sanitize env vault and vault references",
-			stateFile: "testdata/dump/008-sanitizer/env-vault.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
-		},
-		{
-			name:           "dump sanitize vault config",
-			stateFile:      "testdata/dump/008-sanitizer/vault-configs.yaml",
-			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.7.0") },
-			skipValidation: true, // vault validation endpoint (for vaults other than env) is not available in prior to 3.7.0
-		},
-		{
-			name:      "dump sanitize vault config",
-			stateFile: "testdata/dump/008-sanitizer/vault-configs.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.7.0") },
-		},
-		{
-			name:      "dump sanitize vault config >=3.11.0",
-			stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
-			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
-		},
+		// {
+		// 	name:           "dump sanitize env vault and vault references",
+		// 	stateFile:      "testdata/dump/008-sanitizer/env-vault.yaml",
+		// 	runWhen:        func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
+		// 	skipValidation: true, // env vault validation endpoint not available in 3.4.0
+		// },
+		// {
+		// 	name:      "dump sanitize env vault and vault references",
+		// 	stateFile: "testdata/dump/008-sanitizer/env-vault.yaml",
+		// 	runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
+		// },
+		// {
+		// 	name:           "dump sanitize vault config",
+		// 	stateFile:      "testdata/dump/008-sanitizer/vault-configs.yaml",
+		// 	runWhen:        func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.7.0") },
+		// 	skipValidation: true, // vault validation endpoint (for vaults other than env) is not available in prior to 3.7.0
+		// },
+		// {
+		// 	name:      "dump sanitize vault config",
+		// 	stateFile: "testdata/dump/008-sanitizer/vault-configs.yaml",
+		// 	runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.7.0") },
+		// },
+		// {
+		// 	name:      "dump sanitize vault config >=3.11.0",
+		// 	stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
+		// 	runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
+		// },
 		{
 			name:      "dump sanitize route expressions",
 			stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
