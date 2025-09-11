@@ -113,7 +113,7 @@ resource "konnect_%s" "%s" {
 %s  control_plane_id = var.control_plane_id%s
 }
 `,
-		entityType, name,
+		entityType, slugify(name),
 		strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
 		generateParents(parents),
 		generateLifecycle(lifecycle))
@@ -466,4 +466,24 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+// slugify converts a string into a slug using underscores
+func slugify(input string) string {
+	// Replace non-alphanumeric characters with underscores
+	slug := strings.ReplaceAll(input, " ", "_")
+	slug = strings.ReplaceAll(slug, "-", "_")
+	slug = strings.ReplaceAll(slug, ".", "_")
+	slug = strings.ReplaceAll(slug, "/", "_")
+	slug = strings.ReplaceAll(slug, "\\", "_")
+
+	// Remove any consecutive underscores
+	for strings.Contains(slug, "__") {
+		slug = strings.ReplaceAll(slug, "__", "_")
+	}
+
+	// Trim leading and trailing underscores
+	slug = strings.Trim(slug, "_")
+
+	return slug
 }
