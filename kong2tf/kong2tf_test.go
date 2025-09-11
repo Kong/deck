@@ -191,6 +191,12 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			outputFilename: "partial-output-expected.tf",
 			wantErr:        false,
 		},
+		{
+			name:           "handles-periods",
+			inputFilename:  "handles-periods-input.yaml",
+			outputFilename: "handles-periods-expected.tf",
+			wantErr:        false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
