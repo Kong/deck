@@ -291,7 +291,13 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, c := range consumerGroupsGlobal {
 			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
-				file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
+				file.FConsumerGroupObject{
+					ConsumerGroup: *c.ConsumerGroup,
+					Consumers:     c.Consumers,
+				})
+			if len(c.Consumers) > 0 {
+				addUniqueConsumersInTargetContent(targetContent, c.Consumers, c.ConsumerGroup)
+			}
 		}
 	}
 
@@ -389,7 +395,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			}
 		}
 	}
-
 	// read the target state
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 		CurrentState: currentState,
@@ -438,6 +443,34 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cprint.BluePrintLn(jsonOutputString + "\n")
 	}
 	return nil
+}
+
+func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []*kong.Consumer,
+	consumerGroup *kong.ConsumerGroup,
+) {
+	containsConsumerInTargetContent := func(consumer *kong.Consumer) bool {
+		for _, c := range targetContent.Consumers {
+			if c.Consumer.ID != nil && consumer.ID != nil && *c.Consumer.ID == *consumer.ID {
+				return true
+			} else if c.Consumer.Username != nil && consumer.Username != nil && *c.Consumer.Username == *consumer.Username {
+				return true
+			} else if c.Consumer.CustomID != nil && consumer.CustomID != nil && *c.Consumer.CustomID == *consumer.CustomID {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, consumer := range consumers {
+		if !containsConsumerInTargetContent(consumer) {
+			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{
+				Consumer: *consumer,
+				Groups: []*kong.ConsumerGroup{
+					consumerGroup,
+				},
+			})
+		}
+	}
 }
 
 func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config dump.Config) (bool, error) {
