@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 type importConfig struct {
@@ -113,7 +114,7 @@ resource "konnect_%s" "%s" {
 %s  control_plane_id = var.control_plane_id%s
 }
 `,
-		entityType, name,
+		entityType, slugify(name),
 		strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
 		generateParents(parents),
 		generateLifecycle(lifecycle))
@@ -466,4 +467,29 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+// This is a helper function used to convert characters not supported by terraform into underscores
+func keepRuneUnicode(r rune) rune {
+	if unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_' || r == '-' {
+		return r
+	}
+	return '_'
+}
+
+// slugify converts a string into a slug using underscores.
+// This replaces all characters that are not letters, numbers, dashes or underscores
+// based on https://developer.hashicorp.com/terraform/language/syntax/configuration#identifiers
+func slugify(input string) string {
+	slug := strings.Map(keepRuneUnicode, input)
+
+	// Remove any consecutive underscores
+	for strings.Contains(slug, "__") {
+		slug = strings.ReplaceAll(slug, "__", "_")
+	}
+
+	// Trim leading and trailing underscores
+	slug = strings.Trim(slug, "_")
+
+	return slug
 }

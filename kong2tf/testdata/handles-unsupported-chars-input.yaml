@@ -1,0 +1,14 @@
+consumers:
+  - username: my-consumer123@my-org.prod_2.example
+    custom_id: "1234567890"
+    tags:
+      - internal
+  - username: 宮本武蔵@my-org.prod.example # unicode letters
+    custom_id: "1234567891"
+    tags:
+      - internal
+  - username: my-consumer©124@my-org.prod.example #© is not a letter - it is a symbol
+    custom_id: "1234567892"
+    tags:
+      - internal
+  
