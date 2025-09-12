@@ -42,6 +42,13 @@ test-integration:
 		$(GOTESTFLAGS) \
 		./tests/integration/...
 
+.PHONY: test-performance
+test-performance:
+	go test -v -count=1 -tags=performance \
+		-race \
+		$(GOTESTFLAGS) \
+		./tests/performance/...
+
 .PHONY: clean
 clean:
 	bash .ci/clean_kong.sh
