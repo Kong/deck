@@ -65,8 +65,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		}
 
 		if lookUpSelectorTagsConsumerGroups != nil {
-			consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, lookUpSelectorTagsConsumerGroups,
-				dump.DefaultLookupTag)
+			consumerGroupsGlobal, err := dump.GetAllConsumerGroups(ctx, kongClient, lookUpSelectorTagsConsumerGroups)
 			if err != nil {
 				return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 			}
