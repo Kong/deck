@@ -192,9 +192,9 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			wantErr:        false,
 		},
 		{
-			name:           "handles-periods",
-			inputFilename:  "handles-periods-input.yaml",
-			outputFilename: "handles-periods-expected.tf",
+			name:           "handles-unsupported-chars",
+			inputFilename:  "handles-unsupported-chars-input.yaml",
+			outputFilename: "handles-unsupported-chars-expected.tf",
 			wantErr:        false,
 		},
 	}
