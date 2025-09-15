@@ -10,6 +10,7 @@ on:
   push:
     branches:
     - main
+    - tests/gw-3.12-rc-3
   pull_request: {}
 
 jobs:
@@ -27,6 +28,7 @@ jobs:
         - 'kong/kong-gateway:3.9'
         - 'kong/kong-gateway:3.10'
         - 'kong/kong-gateway:3.11'
+        - 'kong/kong-gateway-dev:3.12.0.0-rc.3'
         - 'kong/kong-gateway-dev:latest'
         router_flavor:
           - 'traditional_compatible'
