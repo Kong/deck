@@ -37,6 +37,7 @@ jobs:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
       KONG_ROUTER_FLAVOR: ${{ matrix.router_flavor }}
+      KONG_INCREMENTAL_SYNC: "on"
 
     runs-on: ubuntu-latest
     steps:
