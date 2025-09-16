@@ -841,7 +841,7 @@ func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
 }
 
 func Test_Diff_Consumers_Default_Lookup_Tag(t *testing.T) {
-	runWhen(t, "enterprise", ">=2.8.0")
+	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
 	setup(t)
 
 	ctx := context.Background()
