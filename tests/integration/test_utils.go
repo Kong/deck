@@ -361,7 +361,7 @@ func multiFileSync(ctx context.Context, kongFiles []string, opts ...string) erro
 
 func diff(kongFile string, opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"diff", "-s", kongFile}
+	args := []string{"gateway", "diff", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}

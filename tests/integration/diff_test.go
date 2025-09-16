@@ -839,3 +839,39 @@ func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
 	assert.Equal(t, emptyOutput, out)
 	reset(t)
 }
+
+func Test_Diff_Consumers_Default_Lookup_Tag(t *testing.T) {
+	runWhen(t, "enterprise", ">=2.8.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	expectedDiff := `creating consumer user2
+creating consumer-group-consumer user2
+Summary:
+  Created: 2
+  Updated: 0
+  Deleted: 0
+`
+
+	// sync consumer-group and consumer-1 file
+	require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-cg.yaml"))
+	require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-1.yaml"))
+
+	out, err := diff("testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, expectedDiff, out)
+
+	// sync consumer file 2
+	require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-2.yaml"))
+
+	// diff consumer file 1 again to verify no diff
+	out, err = diff("testdata/sync/015-consumer-groups/kong-consumer-1.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+
+	// finally sync consumer file 2 to verify no diff
+	out, err = diff("testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
