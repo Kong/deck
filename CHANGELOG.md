@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.51.1](#v1511)
 - [v1.51.0](#v1510)
 - [v1.50.0](#v1500)
 - [v1.49.2](#v1492)
@@ -120,6 +121,20 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.51.1]
+> Release date: 2025/09/19
+
+### Fixed
+- Fixed consumer lookups while using default lookup tags for consumer-goups.
+[#1749](https://github.com/Kong/deck/pull/1749)
+[go-database-reconciler #336](https://github.com/Kong/go-database-reconciler/pull/336)
+- Fixed output of `deck file kong2tf` by replacing unsupported characters in resource names with underscores.
+[#1756](https://github.com/Kong/deck/pull/1756)
+
+### Chores
+- Switched to the new API endpoint for updating Upstream Targets.
+[go-database-reconciler #323](https://github.com/Kong/go-database-reconciler/pull/323)
 
 ## [v1.51.0]
 > Release date: 2025/08/28
@@ -2276,6 +2291,7 @@ No breaking changes have been introduced in this release.
 
 Debut release of decK
 
+[v1.51.1]: https://github.com/Kong/deck/compare/v1.51.0...v1.51.1
 [v1.51.0]: https://github.com/Kong/deck/compare/v1.50.0...v1.51.0
 [v1.50.0]: https://github.com/Kong/deck/compare/v1.49.2...v1.50.0
 [v1.49.2]: https://github.com/Kong/deck/compare/v1.49.1...v1.49.2
