@@ -123,7 +123,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.51.1]
-> Release date: 2025/09/19
+> Release date: 2025/09/22
 
 ### Fixed
 - Fixed consumer lookups while using default lookup tags for consumer-goups.
@@ -133,6 +133,8 @@
 [#1756](https://github.com/Kong/deck/pull/1756)
 
 ### Chores
+- Bump golang version to v1.24.6 to resolve CVE-2025-47906
+[#1761](https://github.com/Kong/deck/pull/1761)
 - Switched to the new API endpoint for updating Upstream Targets.
 [go-database-reconciler #323](https://github.com/Kong/go-database-reconciler/pull/323)
 
