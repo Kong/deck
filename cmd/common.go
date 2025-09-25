@@ -177,6 +177,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cmd = "diff"
 	}
 
+	dumpConfig.SkipHashForBasicAuth = determineSkipHashForBasicAuth(*targetContent, dumpConfig)
+
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
 	if mode == modeKonnect {
@@ -208,6 +210,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 		dumpConfig.KonnectControlPlane = konnectControlPlane
+	}
+
+	if dumpConfig.SkipHashForBasicAuth && mode != modeKonnect {
+		return errors.New("skip-hash-for-basic-auth functionality can be used with Konnect only")
 	}
 
 	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
@@ -508,6 +514,18 @@ func determinePolicyOverride(targetContent file.Content, config dump.Config) boo
 
 	if targetContent.Info != nil && targetContent.Info.ConsumerGroupPolicyOverrides {
 		return targetContent.Info.ConsumerGroupPolicyOverrides
+	}
+
+	return false
+}
+
+func determineSkipHashForBasicAuth(targetContent file.Content, config dump.Config) bool {
+	if config.SkipHashForBasicAuth {
+		return true
+	}
+
+	if targetContent.Info != nil && targetContent.Info.SkipHashForBasicAuth {
+		return targetContent.Info.SkipHashForBasicAuth
 	}
 
 	return false
