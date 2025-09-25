@@ -1,0 +1,84 @@
+_format_version: "3.0"
+consumer_groups:
+- id: 0a1451d7-4ba5-4a72-bd83-3ab775192393
+  name: bd9a838f7686d3a0e36d47f65a51602404dea10dfa827508b3eb43275d2309e0
+consumers:
+- groups:
+  - id: 0a1451d7-4ba5-4a72-bd83-3ab775192393
+    name: bd9a838f7686d3a0e36d47f65a51602404dea10dfa827508b3eb43275d2309e0
+  id: 81de9f2b-9a5a-4ccc-ad9c-7f2cd3f7a603
+  tags:
+  - 4cabaeb7634d2d88635ccdbb0108c4e3455ead21c3fe53f38c1694d653210bf4
+  - 92d3463042a04fe54d16b0453962a6e83583cb3266ef5d1167bb06ddf2019691
+  username: e9258fd35da9ed69e86f2c8c206af35e6504ecf65f996dc0ef87650ac6052030
+partials:
+- config:
+    database: 0
+    host: 2c1f04cfa970d7319612b9963e5373d66e5b8de7d16df1867e94a24499736734
+    password: 86a2f586f285ada0101d25edd5fc46dfe7c813a8f89e2c41e724bd60412f0482
+    port: 6379
+    server_name: 4ca00392ad38759712c9bb433a488c50394feb44d342f589ce0182aa2d7caaed
+    ssl: false
+    ssl_verify: false
+    timeout: 2000
+    username: 42fda0e126cc5c991bdd3755bdc6a9e88f0ce092cee0b3d0b218be2d98368a3b
+  id: 1615ea37-e832-4b78-8594-8a521a36a946
+  name: 79f44eba4a37cbb561ac1655b665fe93bd9500b8c39e564d9438d3faa74e30a4
+  tags:
+  - 804be8dabca7e54873322b93ebd90f155be92869c2ff5aadd9efaa005387398a
+  type: redis-ce
+plugins:
+- config:
+    day: null
+    error_code: 429
+    error_message: 93651632986e9a6250dfca230f093625e020ec01f9e9eae4b6442a6ecde1bb11
+    fault_tolerant: true
+    header_name: null
+    hide_client_headers: false
+    hour: 1
+    limit_by: consumer
+    minute: null
+    month: null
+    path: null
+    policy: local
+    second: null
+    sync_rate: -1
+    year: null
+  enabled: true
+  id: d8fb3938-d77a-4f3c-9962-91cc02c57fd4
+  name: rate-limiting
+  partials:
+  - id: 1615ea37-e832-4b78-8594-8a521a36a946
+    name: 79f44eba4a37cbb561ac1655b665fe93bd9500b8c39e564d9438d3faa74e30a4
+    path: config.redis
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: c5a365ab2efb7db06d8569c1c8325719c66f8d35680ffcd13addda553da8257f
+  id: 58076db2-28b6-423b-ba39-a797193017f7
+  name: 046e89f68216c1c85dc0bee5dcd0c61e0d6c2da72f9521bfe4abcd004b204983
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    id: 0d23eacf-fa0e-48e1-911b-dddecf0b5adb
+    name: fc7a1f310efad8046ca8d7759eed43b2a300e396f12cd5da871ef9c8674d1fb6
+    path_handling: v0
+    paths:
+    - /redacted/path/1ea93e706d47f0b0126dbcd911dc0bb9b11294e345195b3744512868351d2a9d
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kong/deck/sanitize"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
@@ -24,6 +25,7 @@ var (
 	dumpWorkspace                  string
 	dumpAllWorkspaces              bool
 	dumpWithID                     bool
+	sanitizationSalt               string
 )
 
 func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) {
@@ -37,6 +39,61 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 	}
 
 	return res, nil
+}
+
+func getWorkspaceClient(ctx context.Context, workspace string) (*kong.Client, error) {
+	wsConfig := rootConfig.ForWorkspace(workspace)
+	exists, err := workspaceExists(ctx, rootConfig, workspace)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, fmt.Errorf("workspace '%v' does not exist in Kong", workspace)
+	}
+
+	wsClient, err := utils.GetKongClient(wsConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return wsClient, nil
+}
+
+func getKongState(ctx context.Context, wsClient *kong.Client) (*state.KongState, error) {
+	rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+	if err != nil {
+		return nil, fmt.Errorf("reading configuration from Kong: %w", err)
+	}
+	ks, err := state.Get(rawState)
+	if err != nil {
+		return nil, fmt.Errorf("building state: %w", err)
+	}
+	return ks, nil
+}
+
+func sanitizeContent(ctx context.Context, client *kong.Client,
+	ks *state.KongState, writeConfig file.WriteConfig, isKonnect bool,
+) error {
+	writeConfig.WithID = true // always write IDs for sanitization
+	fileContent, err := file.KongStateToContent(ks, writeConfig)
+	if err != nil {
+		return fmt.Errorf("sanitizing content: %w", err)
+	}
+
+	sanitizer := sanitize.NewSanitizer(&sanitize.SanitizerOptions{
+		Ctx:       ctx,
+		Client:    client,
+		Content:   fileContent,
+		IsKonnect: isKonnect,
+		Salt:      sanitizationSalt,
+	})
+
+	sanitizedContent, err := sanitizer.Sanitize()
+	if err != nil {
+		return fmt.Errorf("sanitizing content: %w", err)
+	}
+
+	return file.WriteContentToFile(sanitizedContent, writeConfig.Filename, writeConfig.FileFormat)
 }
 
 func executeDump(cmd *cobra.Command, _ []string) error {
@@ -71,6 +128,17 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 	_ = sendAnalytics("dump", kongVersion, modeKong)
 
+	writeConfig := file.WriteConfig{
+		SelectTags:                       dumpConfig.SelectorTags,
+		Workspace:                        dumpWorkspace,
+		Filename:                         dumpCmdKongStateFile,
+		FileFormat:                       format,
+		WithID:                           dumpWithID,
+		KongVersion:                      kongVersion,
+		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
+		SanitizeContent:                  dumpConfig.SanitizeContent,
+	}
+
 	// Kong Enterprise dump all workspace
 	if dumpAllWorkspaces {
 		workspaces, err := listWorkspaces(ctx, wsClient)
@@ -79,30 +147,27 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		}
 
 		for _, workspace := range workspaces {
-			wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
+			wsClient, err = getWorkspaceClient(ctx, workspace)
 			if err != nil {
-				return err
+				return fmt.Errorf("getting Kong client for workspace '%s': %w", workspace, err)
 			}
 
-			rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+			ks, err := getKongState(ctx, wsClient)
 			if err != nil {
-				return fmt.Errorf("reading configuration from Kong: %w", err)
-			}
-			ks, err := state.Get(rawState)
-			if err != nil {
-				return fmt.Errorf("building state: %w", err)
+				return fmt.Errorf("getting Kong state for workspace '%s': %w", workspace, err)
 			}
 
-			if err := file.KongStateToFile(ks, file.WriteConfig{
-				SelectTags:                       dumpConfig.SelectorTags,
-				Workspace:                        workspace,
-				Filename:                         workspace,
-				FileFormat:                       format,
-				WithID:                           dumpWithID,
-				KongVersion:                      kongVersion,
-				IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
-			}); err != nil {
-				return err
+			writeConfig.Workspace = workspace
+			writeConfig.Filename = workspace
+
+			if dumpConfig.SanitizeContent {
+				if err := sanitizeContent(ctx, wsClient, ks, writeConfig, false); err != nil {
+					return fmt.Errorf("sanitizing content for workspace '%s': %w", workspace, err)
+				}
+			} else {
+				if err := file.KongStateToFile(ks, writeConfig); err != nil {
+					return err
+				}
 			}
 		}
 		return nil
@@ -111,37 +176,22 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	// Kong OSS
 	// or Kong Enterprise single workspace
 	if dumpWorkspace != "" {
-		wsConfig := rootConfig.ForWorkspace(dumpWorkspace)
-		exists, err := workspaceExists(ctx, rootConfig, dumpWorkspace)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			return fmt.Errorf("workspace '%v' does not exist in Kong", dumpWorkspace)
-		}
-		wsClient, err = utils.GetKongClient(wsConfig)
+		wsClient, err = getWorkspaceClient(ctx, dumpWorkspace)
 		if err != nil {
 			return err
 		}
 	}
 
-	rawState, err := dump.Get(ctx, wsClient, dumpConfig)
+	ks, err := getKongState(ctx, wsClient)
 	if err != nil {
-		return fmt.Errorf("reading configuration from Kong: %w", err)
+		return fmt.Errorf("getting Kong state: %w", err)
 	}
-	ks, err := state.Get(rawState)
-	if err != nil {
-		return fmt.Errorf("building state: %w", err)
+
+	if dumpConfig.SanitizeContent {
+		return sanitizeContent(ctx, wsClient, ks, writeConfig, false)
 	}
-	return file.KongStateToFile(ks, file.WriteConfig{
-		SelectTags:                       dumpConfig.SelectorTags,
-		Workspace:                        dumpWorkspace,
-		Filename:                         dumpCmdKongStateFile,
-		FileFormat:                       format,
-		WithID:                           dumpWithID,
-		KongVersion:                      kongVersion,
-		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
-	})
+
+	return file.KongStateToFile(ks, writeConfig)
 }
 
 // newDumpCmd represents the dump command
@@ -204,6 +254,18 @@ configure Kong.`,
 		false, "allow deck to dump consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
 			"Warning: do not mix with consumer-group scoped plugins")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SanitizeContent, "sanitize",
+		false, "dumps a sanitized version of the gateway configuration.\n"+
+			"This feature hashes passwords, keys and other sensitive details.")
+	dumpCmd.Flags().StringVar(&sanitizationSalt, "sanitization-salt",
+		"", "salt used to hash sensitive data in the sanitized dump.\n"+
+			"Use this flag to ensure that the same sensitive data is hashed to the same value.\n"+
+			"If not set, a random salt is used.\n")
+	// This flag is hidden for now. We can mark it as visible in the future
+	// if we decide to expose it to the user. For now, it is used internally
+	// for testing purposes.
+	// Discarding the error as it is not critical
+	_ = dumpCmd.Flags().MarkHidden("sanitization-salt")
 	if deprecated {
 		dumpCmd.Flags().StringVarP(&dumpCmdKongStateFileDeprecated, "output-file", "o",
 			fileOutDefault, "file to which to write Kong's configuration."+

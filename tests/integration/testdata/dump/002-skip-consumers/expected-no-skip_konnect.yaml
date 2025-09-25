@@ -49,6 +49,7 @@ consumer_groups:
       retry_after_jitter_max: 0
       strategy: local
       sync_rate: null
+      throttling: null
       window_size:
       - 2628000
       window_type: sliding

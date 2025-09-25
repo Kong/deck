@@ -1,0 +1,8 @@
+_format_version: "3.0"
+consumer_groups:
+- name: gold
+  consumers:
+    - username: alice
+      id: 3401bb32-32b2-4d50-8533-6669b27d5a42
+      tags:
+      - internal-user

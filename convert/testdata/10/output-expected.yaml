@@ -1,0 +1,117 @@
+_format_version: "3.0"
+consumers:
+- plugins:
+  - config:
+      llm_providers:
+        window_size:
+        - 123
+    name: ai-rate-limiting-advanced
+  username: c1
+plugins:
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-proxy
+- config:
+    llm_providers:
+      limit:
+      - 999
+      window_size:
+      - 123
+    redis:
+      cluster_nodes:
+      - localhost
+      sentinel_nodes:
+      - localhost
+  name: ai-rate-limiting-advanced
+- config:
+    redis:
+      cluster_nodes:
+      - localhost
+      sentinel_nodes:
+      - localhost
+  name: graphql-proxy-cache-advanced
+- config:
+    redis:
+      cluster_nodes:
+      - localhost
+      sentinel_nodes:
+      - localhost
+  name: graphql-rate-limiting-advanced
+- config:
+    redis:
+      cluster_nodes:
+      - localhost
+      sentinel_nodes:
+      - localhost
+  name: proxy-cache-advanced
+- config:
+    redis:
+      cluster_nodes:
+      - localhost
+      sentinel_nodes:
+      - localhost
+  name: rate-limiting-advanced
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-proxy
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-proxy-advanced
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-rag-injector
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-request-transformer
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-response-transformer
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+    options:
+      upstream_path: /demo123
+  name: ai-semantic-cache
+- config:
+    model:
+      options:
+        upstream_url: /demo123
+  name: ai-semantic-prompt-guard
+routes:
+- name: r1
+  plugins:
+  - config:
+      llm_providers:
+        window_size:
+        - 123
+    name: ai-rate-limiting-advanced
+services:
+- name: s1
+  plugins:
+  - config:
+      llm_providers:
+        window_size:
+        - 123
+    name: ai-rate-limiting-advanced
+- name: s2
+  routes:
+  - name: r2
+    plugins:
+    - config:
+        llm_providers:
+          window_size:
+          - 123
+      name: ai-rate-limiting-advanced

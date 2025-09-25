@@ -32,7 +32,7 @@ func Test_FileConvert(t *testing.T) {
 			convertCmdDestinationFormat: "kong-gateway-3.x",
 			errorExpected:               true,
 			errorString: "invalid value 'random-value' found for the 'from' flag." +
-				" Allowed values: [kong-gateway kong-gateway-2.x 2.8]",
+				" Allowed values: [kong-gateway kong-gateway-2.x 2.8 3.4]",
 		},
 		{
 			name:                        "Invalid destination format",
@@ -40,7 +40,7 @@ func Test_FileConvert(t *testing.T) {
 			convertCmdDestinationFormat: "random-value",
 			errorExpected:               true,
 			errorString: "invalid value 'random-value' found for the 'to' flag." +
-				" Allowed values: [konnect kong-gateway-3.x 3.4]",
+				" Allowed values: [konnect kong-gateway-3.x 3.4 3.10]",
 		},
 	}
 	for _, tc := range tests {

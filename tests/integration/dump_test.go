@@ -4,8 +4,14 @@ package integration
 
 import (
 	"context"
+	"io"
+	"os"
+	"strings"
 	"testing"
 
+	"github.com/acarl005/stripansi"
+	"github.com/kong/deck/sanitize"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -63,10 +69,22 @@ func Test_Dump_SelectTags_3x(t *testing.T) {
 			runWhen:      ">=3.8.0 <3.10.0",
 		},
 		{
-			name:         "dump with select-tags >=3.10.0",
+			name:         "dump with select-tags >=3.10.0 <3.11.0",
 			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
 			expectedFile: "testdata/dump/001-entities-with-tags/expected310.yaml",
-			runWhen:      ">=3.10.0",
+			runWhen:      ">=3.10.0 <3.11.0",
+		},
+		{
+			name:         "dump with select-tags >=3.11.0",
+			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
+			expectedFile: "testdata/dump/001-entities-with-tags/expected311.yaml",
+			runWhen:      ">=3.11.0 <3.12.0",
+		},
+		{
+			name:         "dump with select-tags >=3.12.0",
+			stateFile:    "testdata/dump/001-entities-with-tags/kong.yaml",
+			expectedFile: "testdata/dump/001-entities-with-tags/expected312.yaml",
+			runWhen:      ">=3.12.0",
 		},
 	}
 	for _, tc := range tests {
@@ -159,7 +177,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-310.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.12.0") },
+		},
+		{
+			name:          ">=3.12.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-312.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -493,7 +518,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0 <3.12.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.12.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong312x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
 		},
 	}
 
@@ -600,6 +632,237 @@ func Test_Dump_KeysAndKeySets_Konnect(t *testing.T) {
 			expected, err := readFile(tc.expectedFile)
 			require.NoError(t, err)
 			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.10.0
+func Test_Dump_Deterministic_Sanitizer(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.10.0")
+	setup(t)
+	// setup stage
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump with sanitizer",
+			stateFile:    "testdata/dump/008-sanitizer/kong.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/expected.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(context.Background(), tc.stateFile))
+
+			fileContent, err := file.GetContentFromFiles([]string{tc.stateFile}, false)
+			require.NoError(t, err)
+
+			sanitizer := sanitize.NewSanitizer(&sanitize.SanitizerOptions{
+				Ctx:     ctx,
+				Client:  client,
+				Content: fileContent.DeepCopy(),
+				Salt:    "deterministic-test-salt-12345",
+			})
+
+			sanitizedOutput, err := sanitizer.Sanitize()
+			require.NoError(t, err)
+
+			// capture command output to be used during tests
+			rescueStdout := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+			err = file.WriteContentToFile(sanitizedOutput, "-", file.YAML)
+			require.NoError(t, err)
+			w.Close()
+			out, _ := io.ReadAll(r)
+			os.Stdout = rescueStdout
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			require.Equal(t, expected, stripansi.Strip(string(out)))
+
+			// validate file content
+			validateOpts := []string{tc.expectedFile}
+			err = validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func Test_Dump_Sanitize(t *testing.T) {
+	ctx := context.Background()
+	testSalt := "test-salt-123"
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		selectTags   []string
+		runWhen      func(t *testing.T)
+	}{
+		{
+			name:         "dump sanitized services and routes",
+			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.6.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+		},
+		{
+			name:         "dump sanitize with select-tags",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/select-tags.expected.yaml",
+			selectTags:   []string{"tag1", "tag2"},
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			dumpArgs := []string{"-o", "-", "--sanitize", "--sanitization-salt", testSalt}
+			if len(tc.selectTags) > 0 {
+				dumpArgs = append(dumpArgs, "--select-tag", strings.Join(tc.selectTags, ","))
+			}
+
+			// checking that the sanitizer is working correctly
+			output, err := dump(dumpArgs...)
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			require.Equal(t, expected, output)
+
+			// validate file content
+			validateOpts := []string{tc.expectedFile}
+			err = validate(ONLINE, validateOpts...)
+			require.NoError(t, err)
+
+			// re-syncing to ensure the sanitized content is valid
+			reset(t)
+			require.NoError(t, sync(ctx, tc.expectedFile))
+		})
+	}
+}
+
+func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		runWhen        func(t *testing.T)
+		skipValidation bool // some
+	}{
+		{
+			name:      "dump sanitize keys - jwk",
+			stateFile: "testdata/dump/007-keys-and-key_sets/kong-jwk.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=3.1.0") },
+		},
+		{
+			name:      "dump sanitize keys - pem",
+			stateFile: "testdata/dump/007-keys-and-key_sets/kong-pem.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=3.1.0") },
+		},
+		{
+			name:      "dump sanitize certificates",
+			stateFile: "testdata/dump/008-sanitizer/cert.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
+		{
+			name:      "dump sanitize ca-certificates",
+			stateFile: "testdata/dump/008-sanitizer/ca-cert.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+		},
+		{
+			name:           "dump sanitize env vault and vault references",
+			stateFile:      "testdata/dump/008-sanitizer/env-vault.yaml",
+			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", "3.4.0") },
+			skipValidation: true, // env vault validation endpoint not available in 3.4.0
+		},
+		{
+			name:      "dump sanitize env vault and vault references",
+			stateFile: "testdata/dump/008-sanitizer/env-vault.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.5.0") },
+		},
+		{
+			name:           "dump sanitize vault config",
+			stateFile:      "testdata/dump/008-sanitizer/vault-configs.yaml",
+			runWhen:        func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0 <3.7.0") },
+			skipValidation: true, // vault validation endpoint (for vaults other than env) is not available in prior to 3.7.0
+		},
+		{
+			name:      "dump sanitize vault config",
+			stateFile: "testdata/dump/008-sanitizer/vault-configs.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.7.0") },
+		},
+		{
+			name:      "dump sanitize vault config >=3.11.0",
+			stateFile: "testdata/dump/008-sanitizer/vault-configs311.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
+		},
+		{
+			name:      "dump sanitize route expressions",
+			stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
+			runWhen:   func(t *testing.T) { runWhenExpressions(t, ">=3.0.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			setup(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			input, err := readFile(tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-", "--sanitize")
+			require.NoError(t, err)
+
+			require.NotEqual(t, input, output)
+
+			// creating a temp file to write the sanitized output
+			tmpFile, err := os.CreateTemp("", "test-output-*.yaml")
+			require.NoError(t, err)
+			defer os.Remove(tmpFile.Name())
+
+			_, err = tmpFile.WriteString(output)
+			require.NoError(t, err)
+			tmpFile.Close()
+
+			if !tc.skipValidation {
+				// validate file content
+				validateOpts := []string{tmpFile.Name()}
+				err = validate(ONLINE, validateOpts...)
+				require.NoError(t, err)
+			}
+
+			// re-syncing to ensure the sanitized content is valid
+			reset(t)
+			require.NoError(t, sync(ctx, tmpFile.Name()))
 		})
 	}
 }

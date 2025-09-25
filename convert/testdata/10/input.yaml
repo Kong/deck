@@ -1,0 +1,121 @@
+_format_version: "3.0"
+
+# Check that plugins at all levels are updated
+# window_size should become a list for all defined plugins
+services:
+  - name: s1
+    plugins:
+      - name: ai-rate-limiting-advanced
+        config:
+          llm_providers:
+            window_size: 123
+
+  - name: s2
+    routes:
+      - name: r2
+        plugins:
+          - name: ai-rate-limiting-advanced
+            config:
+              llm_providers:
+                window_size: 123
+
+routes:
+  - name: r1
+    plugins:
+      - name: ai-rate-limiting-advanced
+        config:
+          llm_providers:
+            window_size: 123
+
+consumers:
+  - username: c1
+    plugins:
+      - name: ai-rate-limiting-advanced
+        config:
+          llm_providers:
+            window_size: 123
+
+# Check that all of the conversions run
+plugins:
+  - name: ai-proxy
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+
+  - name: ai-rate-limiting-advanced
+    config:
+      llm_providers:
+        window_size: 123
+        limit: 999
+      redis:
+        cluster_addresses: [localhost]
+        sentinel_addresses: [localhost]
+
+  - name: graphql-proxy-cache-advanced
+    config:
+      redis:
+        cluster_addresses: [localhost]
+        sentinel_addresses: [localhost]
+
+  - name: graphql-rate-limiting-advanced
+    config:
+      redis:
+        cluster_addresses: [localhost]
+        sentinel_addresses: [localhost]
+
+  - name: proxy-cache-advanced
+    config:
+      redis:
+        cluster_addresses: [localhost]
+        sentinel_addresses: [localhost]
+
+  - name: rate-limiting-advanced
+    config:
+      redis:
+        cluster_addresses: [localhost]
+        sentinel_addresses: [localhost]
+
+  - name: ai-proxy
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+
+  - name: ai-proxy-advanced
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+
+  - name: ai-rag-injector
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+
+  - name: ai-request-transformer
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+
+  - name: ai-response-transformer
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+          
+  - name: ai-semantic-cache
+    config:
+      model:
+        options:
+          upstream_path: /demo123
+      options:
+        upstream_path: /demo123
+
+  - name: ai-semantic-prompt-guard
+    config:
+      model:
+        options:
+          upstream_path: /demo123
