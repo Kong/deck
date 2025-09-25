@@ -242,12 +242,21 @@ github.com/klauspost/cpuid/v2 v2.0.10/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuOb
 github.com/klauspost/cpuid/v2 v2.0.12/go.mod h1:g2LTdtYhdyuGPqyWyv7qRAmj1WBqxuObKfj5c0PQa7c=
 github.com/klauspost/cpuid/v2 v2.2.5 h1:0E5MSMDEoAulmXNFquVs//DdoomxaoTY1kUhbc/qbZg=
 github.com/klauspost/cpuid/v2 v2.2.5/go.mod h1:Lcz8mBdAVJIBVzewtcLocK12l3Y+JytZYpaMropDUws=
+<<<<<<< HEAD
 github.com/kong/go-apiops v0.2.0 h1:QzHmEvl12vr3lxayTuY40dFuQpPECHTvopsILpwuLdE=
 github.com/kong/go-apiops v0.2.0/go.mod h1:yPwbl3P2eQinVGAEA0d3legaYmzPJ+WtJf9fSeGF4b8=
 github.com/kong/go-database-reconciler v1.27.1 h1:a5EyqQsY5BF2p964J2PQW9BMIMvTz30A2FInIAf1TcA=
 github.com/kong/go-database-reconciler v1.27.1/go.mod h1:6EnCqJqkYWwf9UjkiIKXCv29kapPFUBQ2+FVjR9ZslE=
 github.com/kong/go-kong v0.68.0 h1:rQrLYRKXD6/xf41GBXj9Ns+woAH9p6a4VvcXNMiPZPI=
 github.com/kong/go-kong v0.68.0/go.mod h1:J0vGB3wsZ2i99zly1zTRe3v7rOKpkhQZRwbcTFP76qM=
+=======
+github.com/kong/go-apiops v0.1.49 h1:/gjzH31qUUxvmg/lkePrh2b6trI5lrv7jJD2w9I7JPg=
+github.com/kong/go-apiops v0.1.49/go.mod h1:yPwbl3P2eQinVGAEA0d3legaYmzPJ+WtJf9fSeGF4b8=
+github.com/kong/go-database-reconciler v1.27.2-0.20250925064108-ced1d9502922 h1:bFLRax+KendTVyqxJDompMTHInkNZyJ0U5LLQ/WiJZM=
+github.com/kong/go-database-reconciler v1.27.2-0.20250925064108-ced1d9502922/go.mod h1:pwicIaNA6PPAIxnaljI7Qi7V9G762BdDJwXpON4p46g=
+github.com/kong/go-kong v0.68.1-0.20250924112906-1cb978227ba2 h1:OWC18OLFk9vY0Ali3DV5pgRHdcrYFFJM/pkK/nC7kMg=
+github.com/kong/go-kong v0.68.1-0.20250924112906-1cb978227ba2/go.mod h1:J0vGB3wsZ2i99zly1zTRe3v7rOKpkhQZRwbcTFP76qM=
+>>>>>>> 9ef2e7f (tests: added integration tests)
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
 github.com/kong/go-slugify v1.0.0/go.mod h1:dbR2h3J2QKXQ1k0aww6cN7o4cIcwlWflr6RKRdcoaiw=
 github.com/kong/kubernetes-configuration v1.4.2 h1:/OafLbl2NucvgQV7Xf/uneIgjxmPPUeE92BrssfVAQY=
