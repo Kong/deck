@@ -866,3 +866,22 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//
+// - konnect
+func Test_Dump_BasicAuth_SkipHash(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	require.NoError(t, sync(ctx, "testdata/sync/047-basic-auth-skip-hash/kong.yaml", "--skip-hash-for-basic-auth"))
+
+	output, err := dump("-o", "-")
+	require.NoError(t, err)
+
+	expected, err := readFile("testdata/sync/047-basic-auth-skip-hash/expected-dump.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}

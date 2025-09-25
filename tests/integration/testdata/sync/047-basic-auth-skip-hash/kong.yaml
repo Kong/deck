@@ -1,0 +1,8 @@
+_format_version: "3.0"
+consumers:
+- basicauth_credentials:
+  - id: 8db0fe55-e817-417a-860c-deaa736489e2
+    password: 76789880fe1b54caf0875cf1f1fbcfd89202468d
+    username: user1
+  username: foo
+  id: 9efa87d1-0f29-4b8b-bf71-b947ddccf100
