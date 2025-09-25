@@ -1,0 +1,12 @@
+_format_version: "3.0"
+_info:
+  skip_hash_for_basic_auth: true
+consumers:
+- basicauth_credentials:
+  - password: 76789880fe1b54caf0875cf1f1fbcfd89202468d
+    username: user1
+    tags:
+    - tag1
+    - tag2
+  username: foo
+  id: 9efa87d1-0f29-4b8b-bf71-b947ddccf100
