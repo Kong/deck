@@ -34,7 +34,7 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - uses: Kong/kong-license@master
