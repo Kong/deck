@@ -3205,7 +3205,7 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 				Upstreams: upstream,
 				Targets:   target,
 			},
-			runWhen: ">=3.11.0",
+			runWhen: ">=3.11.0 <3.12.0",
 		},
 		{
 			name:     "creates an upstream and target >=3.12.0",
@@ -3365,7 +3365,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 				Upstreams: upstream,
 				Targets:   targetZeroWeight,
 			},
-			runWhen: ">=3.11.0",
+			runWhen: ">=3.11.0 <3.12.0",
 		},
 		{
 			name:     "creates an upstream and target with weight equals to zero >=3.12.0 ",
