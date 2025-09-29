@@ -769,6 +769,17 @@ var (
 		},
 	}
 
+	targetPost312 = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(100),
+			Failover: kong.Bool(false),
+		},
+	}
+
 	targetZeroWeight = []*kong.Target{
 		{
 			Target: kong.String("198.51.100.11:80"),
@@ -776,6 +787,17 @@ var (
 				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
 			},
 			Weight: kong.Int(0),
+		},
+	}
+
+	targetZeroWeightPost312 = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(0),
+			Failover: kong.Bool(false),
 		},
 	}
 
@@ -3183,7 +3205,16 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 				Upstreams: upstream,
 				Targets:   target,
 			},
-			runWhen: ">=3.11.0",
+			runWhen: ">=3.11.0 <3.12.0",
+		},
+		{
+			name:     "creates an upstream and target >=3.12.0",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetPost312,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 
@@ -3334,7 +3365,16 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 				Upstreams: upstream,
 				Targets:   targetZeroWeight,
 			},
-			runWhen: ">=3.11.0",
+			runWhen: ">=3.11.0 <3.12.0",
+		},
+		{
+			name:     "creates an upstream and target with weight equals to zero >=3.12.0 ",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetZeroWeightPost312,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 

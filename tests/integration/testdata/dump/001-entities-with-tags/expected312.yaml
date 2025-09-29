@@ -279,17 +279,20 @@ upstreams:
   - managed-by-deck
   - org-unit-42
   targets:
-  - tags:
+  - failover: false
+    tags:
     - managed-by-deck
     - org-unit-42
     target: 198.51.100.11:80
     weight: 100
-  - tags:
+  - failover: false
+    tags:
     - managed-by-deck
     - org-unit-42
     target: 198.51.100.12:80
     weight: 100
-  - tags:
+  - failover: false
+    tags:
     - managed-by-deck
     - org-unit-42
     target: 198.51.100.13:80
