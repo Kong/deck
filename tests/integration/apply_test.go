@@ -6,6 +6,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
@@ -374,6 +376,144 @@ func Test_Apply_NestedEntities_Konnect(t *testing.T) {
 			}
 
 			assert.Equal(t, expected, out)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Apply_BasicAuth_SkipHash_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		updateFile    string
+		cmdArgs       []string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "skip basic auth hash - via flag",
+			kongFile: "testdata/sync/047-basic-auth-skip-hash/kong.yaml",
+			cmdArgs:  []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "skip basic auth hash - via info in config",
+			kongFile: "testdata/sync/047-basic-auth-skip-hash/kong-with-info.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "update basic auth with skip hash flag",
+			kongFile:   "testdata/sync/047-basic-auth-skip-hash/kong.yaml",
+			updateFile: "testdata/sync/047-basic-auth-skip-hash/kong-update.yaml",
+			cmdArgs:    []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "update basic auth with skip hash in info config",
+			kongFile:   "testdata/sync/047-basic-auth-skip-hash/kong-with-info.yaml",
+			updateFile: "testdata/sync/047-basic-auth-skip-hash/kong-with-info-update.yaml",
+			cmdArgs:    []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			require.NoError(t, apply(ctx, tc.kongFile, tc.cmdArgs...))
+
+			if tc.updateFile != "" {
+				require.NoError(t, apply(ctx, tc.updateFile, tc.cmdArgs...))
+			}
+
+			ignoreFields := []cmp.Option{
+				cmpopts.IgnoreFields(kong.BasicAuthOptions{}, "ID", "CreatedAt"),
+			}
+			testKongState(t, client, true, false, tc.expectedState, ignoreFields)
 		})
 	}
 }
