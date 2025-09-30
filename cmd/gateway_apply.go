@@ -47,6 +47,9 @@ func newApplyCmd() *cobra.Command {
 		0, "artificial delay (in seconds) that is injected between insert operations \n"+
 			"for related entities (usually for Cassandra deployments).\n"+
 			"See `db_update_propagation` in kong.conf.")
+	applyCmd.Flags().BoolVar(&dumpConfig.SkipHashForBasicAuth, "skip-hash-for-basic-auth",
+		false, "do not sync hash for basic auth credentials.\n"+
+			"This flag is only valid with Konnect.")
 	applyCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(applyCmd.Flags())
