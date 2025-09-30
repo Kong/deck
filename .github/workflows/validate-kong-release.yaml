@@ -30,11 +30,11 @@ jobs:
           echo "Kong Gateway Image = ${{ inputs.kong_image }}"
           echo "decK Branch = ${{ inputs.branch }}"
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
         with:
           ref: ${{ inputs.branch }}
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
         with:
           go-version-file: go.mod
       - uses: Kong/kong-license@master
