@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.52.0](#v1520)
 - [v1.51.1](#v1511)
 - [v1.51.0](#v1510)
 - [v1.50.0](#v1500)
@@ -122,11 +123,30 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.52.0]
+> Release date: 2025/09/30
+
+### Added
+- Added skip-hash functionality for basic-auth
+credentials for Konnect. Users can pass flag
+`--skip-hash-for-basic-auth` to sync or apply command to skip 
+hashing of basic-auth passwords or set `skip_hash_for_basic_auth: true`
+in the `_info` field of deck config.
+[#1765](https://github.com/Kong/deck/pull/1765)
+[go-database-reconciler #342](https://github.com/Kong/go-database-reconciler/pull/342)
+[go-kong #576](https://github.com/Kong/go-kong/pull/576)
+- Added support for nested arrays in plugin config.
+[go-database-reconciler #341](https://github.com/Kong/go-database-reconciler/pull/341)
+- Added support for generating routing config based on header values in the OAS spec in `deck file openapi2kong`
+[#1764](https://github.com/Kong/deck/pull/1764)
+[go-apiops #277](https://github.com/Kong/go-apiops/pull/277)
+
+
 ## [v1.51.1]
 > Release date: 2025/09/22
 
 ### Fixed
-- Fixed consumer lookups while using default lookup tags for consumer-goups.
+- Fixed consumer lookups while using default lookup tags for consumer-groups.
 [#1749](https://github.com/Kong/deck/pull/1749)
 [go-database-reconciler #336](https://github.com/Kong/go-database-reconciler/pull/336)
 - Fixed output of `deck file kong2tf` by replacing unsupported characters in resource names with underscores.
@@ -2292,7 +2312,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
-
+[v1.52.0]: https://github.com/Kong/deck/compare/v1.51.1...v1.52.0
 [v1.51.1]: https://github.com/Kong/deck/compare/v1.51.0...v1.51.1
 [v1.51.0]: https://github.com/Kong/deck/compare/v1.50.0...v1.51.0
 [v1.50.0]: https://github.com/Kong/deck/compare/v1.49.2...v1.50.0
