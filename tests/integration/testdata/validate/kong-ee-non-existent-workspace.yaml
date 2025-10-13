@@ -1,0 +1,9 @@
+_workspace: test
+services:
+  - name: svc1
+    host: mockbin.org
+plugins:
+  - name: rate-limiting
+    id: a1368a28-cb5c-4eee-86d8-03a6bdf94b5e
+    config:
+      minute: 123

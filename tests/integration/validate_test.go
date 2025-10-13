@@ -225,6 +225,7 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 		stateFile      string
 		additionalArgs []string
 		errorExpected  bool
+		errorString    string
 	}{
 		{
 			name:           "validate format version 1.1",
@@ -247,6 +248,12 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			additionalArgs: []string{"--workspace=default"},
 		},
 		{
+			name:          "validate with non existent _workspace in state file",
+			stateFile:     "testdata/validate/kong-ee-non-existent-workspace.yaml",
+			errorExpected: true,
+			errorString:   "workspace doesn't exist: test",
+		},
+		{
 			name:           "validate format version 3.0 with --online-entities-list",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
@@ -267,7 +274,15 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
-			require.NoError(t, err)
+
+			if !tc.errorExpected {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				if tc.errorString != "" {
+					assert.Contains(t, err.Error(), tc.errorString)
+				}
+			}
 		})
 	}
 }

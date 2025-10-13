@@ -53,6 +53,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
+		// if workspace is not set via flag, use the one in the state file
+		if validateWorkspace == "" && targetContent.Workspace != "" {
+			validateWorkspace = targetContent.Workspace
+		}
+
 		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
