@@ -1,0 +1,6 @@
+_format_version: "3.0"
+_workspace: notdefault
+consumer_groups:
+  - name: foo-group
+    tags:
+      - group-tag

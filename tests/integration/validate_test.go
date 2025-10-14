@@ -220,8 +220,11 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 	setup(t)
 	runWhen(t, "enterprise", ">=2.8.0")
 
+	ctx := context.Background()
+
 	tests := []struct {
 		name           string
+		priorStateFile string
 		stateFile      string
 		additionalArgs []string
 		errorExpected  bool
@@ -251,7 +254,13 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			name:          "validate with non existent _workspace in state file",
 			stateFile:     "testdata/validate/kong-ee-non-existent-workspace.yaml",
 			errorExpected: true,
-			errorString:   "workspace doesn't exist: test",
+			errorString:   "workspace doesn't exist: nonexistent",
+		},
+		{
+			name:           "validate with non-default _workspace and default_lookup_tags",
+			priorStateFile: "testdata/validate/kong-ee-non-default-workspace-prereq.yaml",
+			stateFile:      "testdata/validate/kong-ee-non-default-workspace-with-lookup-tags.yaml",
+			errorExpected:  false,
 		},
 		{
 			name:           "validate format version 3.0 with --online-entities-list",
@@ -268,6 +277,11 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if tc.priorStateFile != "" {
+				require.NoError(t, sync(ctx, tc.priorStateFile))
+			}
+
 			validateOpts := []string{
 				tc.stateFile,
 			}
