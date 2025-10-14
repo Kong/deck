@@ -1,12 +1,12 @@
 _format_version: "3.0"
 _info:
   default_lookup_tags:
-    consumer_groups:
-    - group-tag
+    services:
+    - service-tag
 _workspace: notdefault
 plugins:
   - name: rate-limiting
     id: a1368a28-cb5c-4eee-86d8-03a6bdf94b5e
-    consumer_group: foo-group
+    service: svc1
     config:
       minute: 123

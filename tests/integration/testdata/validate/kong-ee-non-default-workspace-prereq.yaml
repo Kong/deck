@@ -1,6 +1,7 @@
 _format_version: "3.0"
 _workspace: notdefault
-consumer_groups:
-  - name: foo-group
+services:
+  - name: svc1
+    host: mockbin.org
     tags:
-      - group-tag
+    - service-tag
