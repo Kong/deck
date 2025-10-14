@@ -229,6 +229,7 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 		additionalArgs []string
 		errorExpected  bool
 		errorString    string
+		resetOpts      []string
 	}{
 		{
 			name:           "validate format version 1.1",
@@ -261,6 +262,7 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			priorStateFile: "testdata/validate/kong-ee-non-default-workspace-prereq.yaml",
 			stateFile:      "testdata/validate/kong-ee-non-default-workspace-with-lookup-tags.yaml",
 			errorExpected:  false,
+			resetOpts:      []string{"--workspace=notdefault"},
 		},
 		{
 			name:           "validate format version 3.0 with --online-entities-list",
@@ -296,6 +298,12 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 				if tc.errorString != "" {
 					assert.Contains(t, err.Error(), tc.errorString)
 				}
+			}
+
+			// Clean up if a non-default workspace was used
+			if len(tc.resetOpts) > 0 {
+				reset(t, tc.resetOpts...)
+				require.NoError(t, err)
 			}
 		})
 	}
