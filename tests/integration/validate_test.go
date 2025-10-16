@@ -220,11 +220,16 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 	setup(t)
 	runWhen(t, "enterprise", ">=2.8.0")
 
+	ctx := context.Background()
+
 	tests := []struct {
 		name           string
+		priorStateFile string
 		stateFile      string
 		additionalArgs []string
 		errorExpected  bool
+		errorString    string
+		resetOpts      []string
 	}{
 		{
 			name:           "validate format version 1.1",
@@ -247,6 +252,19 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			additionalArgs: []string{"--workspace=default"},
 		},
 		{
+			name:          "validate with non existent _workspace in state file",
+			stateFile:     "testdata/validate/kong-ee-non-existent-workspace.yaml",
+			errorExpected: true,
+			errorString:   "workspace doesn't exist: nonexistent",
+		},
+		{
+			name:           "validate with non-default _workspace and default_lookup_tags",
+			priorStateFile: "testdata/validate/kong-ee-non-default-workspace-prereq.yaml",
+			stateFile:      "testdata/validate/kong-ee-non-default-workspace-with-lookup-tags.yaml",
+			errorExpected:  false,
+			resetOpts:      []string{"--workspace=notdefault"},
+		},
+		{
 			name:           "validate format version 3.0 with --online-entities-list",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
@@ -261,13 +279,32 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if tc.priorStateFile != "" {
+				require.NoError(t, sync(ctx, tc.priorStateFile))
+			}
+
 			validateOpts := []string{
 				tc.stateFile,
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
-			require.NoError(t, err)
+
+			if !tc.errorExpected {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				if tc.errorString != "" {
+					assert.Contains(t, err.Error(), tc.errorString)
+				}
+			}
+
+			// Clean up if a non-default workspace was used
+			if len(tc.resetOpts) > 0 {
+				reset(t, tc.resetOpts...)
+				require.NoError(t, err)
+			}
 		})
 	}
 }

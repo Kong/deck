@@ -3246,7 +3246,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Upstreams: upstream,
-				Targets:   target,
+				Targets:   targetPost312,
 			},
 		},
 	}
@@ -3406,7 +3406,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Upstreams: upstream,
-				Targets:   targetZeroWeight,
+				Targets:   targetZeroWeightPost312,
 			},
 		},
 	}
