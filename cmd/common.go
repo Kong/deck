@@ -413,7 +413,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	targetState, err := state.Get(rawState)
 	if err != nil {
-		fmt.Println("Error in creating target state from Kong:", err)
 		return err
 	}
 
