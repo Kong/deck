@@ -296,14 +296,13 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 		}
 		for _, c := range consumerGroupsGlobal {
-			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
-				file.FConsumerGroupObject{
-					ConsumerGroup: *c.ConsumerGroup,
-					Consumers:     c.Consumers,
-				})
-			if len(c.Consumers) > 0 {
-				addUniqueConsumersInTargetContent(targetContent, c.Consumers, c.ConsumerGroup)
+			cgo := file.FConsumerGroupObject{
+				ConsumerGroup: *c.ConsumerGroup,
 			}
+			if len(c.Consumers) > 0 {
+				addUniqueConsumersInTargetContent(targetContent, c.Consumers, &cgo)
+			}
+			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, cgo)
 		}
 	}
 
@@ -414,6 +413,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	}
 	targetState, err := state.Get(rawState)
 	if err != nil {
+		fmt.Println("Error in creating target state from Kong:", err)
 		return err
 	}
 
@@ -452,29 +452,48 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 }
 
 func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []*kong.Consumer,
-	consumerGroup *kong.ConsumerGroup,
+	consumerGroupObject *file.FConsumerGroupObject,
 ) {
-	containsConsumerInTargetContent := func(consumer *kong.Consumer) bool {
-		for _, c := range targetContent.Consumers {
+	containsConsumerInTargetContent := func(consumer *kong.Consumer) (bool, int) {
+		for i, c := range targetContent.Consumers {
 			if c.Consumer.ID != nil && consumer.ID != nil && *c.Consumer.ID == *consumer.ID {
-				return true
+				return true, i
 			} else if c.Consumer.Username != nil && consumer.Username != nil && *c.Consumer.Username == *consumer.Username {
-				return true
+				return true, i
 			} else if c.Consumer.CustomID != nil && consumer.CustomID != nil && *c.Consumer.CustomID == *consumer.CustomID {
-				return true
+				return true, i
 			}
 		}
-		return false
+		return false, -1
 	}
 
+	consumerGroup := &consumerGroupObject.ConsumerGroup
+
 	for _, consumer := range consumers {
-		if !containsConsumerInTargetContent(consumer) {
+		found, index := containsConsumerInTargetContent(consumer)
+		if !found {
 			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{
 				Consumer: *consumer,
 				Groups: []*kong.ConsumerGroup{
 					consumerGroup,
 				},
 			})
+			consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+		} else {
+			groups := targetContent.Consumers[index].Groups
+			groupExists := false
+			for _, g := range groups {
+				if g.ID != nil && consumerGroup.ID != nil && *g.ID == *consumerGroup.ID {
+					groupExists = true
+					break
+				} else if g.Name != nil && consumerGroup.Name != nil && *g.Name == *consumerGroup.Name {
+					groupExists = true
+					break
+				}
+			}
+			if groupExists {
+				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+			}
 		}
 	}
 }
