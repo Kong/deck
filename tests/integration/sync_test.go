@@ -8655,6 +8655,7 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 	ctx := context.Background()
+	dumpConfig := deckDump.Config{}
 
 	t.Run("no errors occur in case of subsequent syncs with distributed config and defaultLookupTags for consumer-group",
 		func(t *testing.T) {
@@ -8732,6 +8733,159 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 				assert.Equal(t, "foo-group", *consumerGroupConsumer.ConsumerGroup.Name)
 			}
 		})
+
+	t.Run("no errors occur in case of distributed config when a consumer is a part of >1 consumer-groups",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		})
+
+	t.Run("no errors occur in case of distributed config when a new consumer-group is added for a consumer",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 2)
+
+			// add new consumer-group file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update.yaml"))
+
+			// check groups
+			currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 3)
+
+			expectedGroups := map[string]bool{
+				"consumer-group-1": false,
+				"consumer-group-2": false,
+				"consumer-group-3": false,
+			}
+
+			for _, c := range consumerGroupConsumers {
+				assert.Equal(t, "test-consumer", *c.Consumer.Username)
+				assert.Contains(t, expectedGroups, *c.ConsumerGroup.Name)
+				expectedGroups[*c.ConsumerGroup.Name] = true
+			}
+
+			for g, found := range expectedGroups {
+				assert.True(t, found, "expected consumer group %q to be present", g)
+			}
+		})
+
+	t.Run("no error occurs in case a consumer-group is removed from a consumer", func(t *testing.T) {
+		t.Cleanup(func() {
+			reset(t)
+		})
+		// sync consumer-group file first
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+		// sync consumer file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+		// check groups
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		// add new consumer-group file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-removal.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-removal.yaml"))
+
+		// check groups
+		currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 1)
+
+		for _, c := range consumerGroupConsumers {
+			assert.Equal(t, "test-consumer", *c.Consumer.Username)
+			assert.Equal(t, "consumer-group-1", *c.ConsumerGroup.Name)
+		}
+	})
+
+	t.Run("no error occurs in case a consumer-group is removed and another added for a consumer", func(t *testing.T) {
+		t.Cleanup(func() {
+			reset(t)
+		})
+		// sync consumer-group file first
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+		// sync consumer file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+		// check groups
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		// add new consumer-group file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-replace.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-replace.yaml"))
+
+		// check groups
+		currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		groups := map[string]bool{
+			"consumer-group-1": false,
+			"consumer-group-3": false,
+		}
+
+		for _, c := range consumerGroupConsumers {
+			assert.Equal(t, "test-consumer", *c.Consumer.Username)
+			assert.Contains(t, groups, *c.ConsumerGroup.Name)
+			assert.NotEqual(t, "consumer-group-2", *c.ConsumerGroup.Name) // this group was removed
+			groups[*c.ConsumerGroup.Name] = true
+		}
+
+		for g, found := range groups {
+			assert.True(t, found, "expected group %q to be present", g)
+		}
+	})
 }
 
 // test scope:
