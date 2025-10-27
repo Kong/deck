@@ -254,6 +254,8 @@ configure Kong.`,
 		false, "allow deck to dump consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
 			"Warning: do not mix with consumer-group scoped plugins")
+	dumpCmd.Flags().BoolVar(&dumpConfig.SkipDefaults, "skip-defaults",
+		false, "skip exporting default values.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SanitizeContent, "sanitize",
 		false, "dumps a sanitized version of the gateway configuration.\n"+
 			"This feature hashes passwords, keys and other sensitive details.")
