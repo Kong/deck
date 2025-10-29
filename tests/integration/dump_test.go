@@ -886,3 +886,59 @@ func Test_Dump_BasicAuth_SkipHash(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expected, output)
 }
+
+// test scope:
+//
+// - konnect
+func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump skip-defaults: service, routes, service-scoped plugins",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/service-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/service-scoped.expected.yaml",
+		},
+		{
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/consumer-group-scoped.expected.yaml",
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (rla)",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/plugin-partial.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin-partial.expected.yaml",
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (openid-connect)",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.expected.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			dumpArgs := []string{"-o", "-", "--skip-defaults"}
+			output, err := dump(dumpArgs...)
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+
+			// ensure that dump can sync back without errors
+			require.NoError(t, sync(ctx, tc.stateFile))
+		})
+	}
+}

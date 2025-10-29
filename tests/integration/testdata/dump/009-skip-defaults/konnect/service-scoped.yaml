@@ -1,0 +1,83 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: example.com
+  name: service-1
+  plugins:
+  - config:
+      allow: null
+      always_use_authenticated_groups: true
+      deny:
+      - example
+      hide_groups_header: false
+      include_consumer_groups: false
+    enabled: true
+    name: acl
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  - config:
+      allowed_content_types:
+      - application/json
+      body_schema: '[]'
+      content_type_parameter_validation: true
+      parameter_schema:
+      - explode: true
+        in: query
+        name: param-test
+        required: false
+        schema: '{"type":"string"}'
+        style: form
+      verbose_response: true
+      version: kong
+    enabled: true
+    name: request-validator
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: r1
+    path_handling: v0
+    paths:
+    - /r1/api/v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - tag1
+  - expression: ' net.src.ip == 192.168.1.0 && net.protocol == "http" && http.method
+      == "GET"'
+    https_redirect_status_code: 426
+    name: r2
+    preserve_host: false
+    priority: 0
+    protocols:
+    - http
+    - https
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - tag1
+    - tag2
+  tags:
+  - tag1
+  - tag2
+  write_timeout: 60000
