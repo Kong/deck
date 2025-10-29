@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.52.1](#v1521)
 - [v1.52.0](#v1520)
 - [v1.51.1](#v1511)
 - [v1.51.0](#v1510)
@@ -122,6 +123,19 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.52.1]
+> Release date: 2025/10/29
+
+### Fixed
+- Fixed modification of consumer group membership for consumers when consumer-groups are pulled in via lookup tags.
+[#1787](https://github.com/Kong/deck/pull/1787)
+[go-database-reconciler #350](https://github.com/Kong/go-database-reconciler/pull/350)
+- Added a fix in `deck gateway validate` to run validation using `_workspace` parameter in state file if present, unless overridden using `--workspace` flag.
+[#1783](https://github.com/Kong/deck/pull/1783)
+- Add a fix to include partials associated with a plugin in output of `deck gateway dump` using select-tags.
+[go-database-reconciler #345](https://github.com/Kong/go-database-reconciler/pull/345)
+
 
 ## [v1.52.0]
 > Release date: 2025/09/30
@@ -2312,6 +2326,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.52.1]: https://github.com/Kong/deck/compare/v1.52.0...v1.52.1
 [v1.52.0]: https://github.com/Kong/deck/compare/v1.51.1...v1.52.0
 [v1.51.1]: https://github.com/Kong/deck/compare/v1.51.0...v1.51.1
 [v1.51.0]: https://github.com/Kong/deck/compare/v1.50.0...v1.51.0
