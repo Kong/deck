@@ -1,0 +1,27 @@
+_format_version: "3.0"
+partials:
+- config:
+    host: example.com
+    keepalive_backlog: 0
+    password: redis-pass
+    username: redis-user
+  id: 65a8785d-2e4a-4adb-8805-63e1141219cd
+  name: my-partial-ee
+  tags:
+  - tag1
+  type: redis-ee
+plugins:
+- config:
+    limit:
+    - 10
+    namespace: 1jN8MwEfPOC5LEb4noafwYJEQiafdPnA
+    strategy: redis
+    sync_rate: -1
+    window_size:
+    - 100
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - id: 65a8785d-2e4a-4adb-8805-63e1141219cd
+    name: my-partial-ee
+    path: config.redis

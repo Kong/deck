@@ -1,0 +1,45 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: example.com
+  name: service-1
+  plugins:
+  - config:
+      allow: null
+      always_use_authenticated_groups: true
+      deny:
+      - example
+      hide_groups_header: false
+      include_consumer_groups: false
+    enabled: true
+    name: acl
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 426
+    name: r1
+    path_handling: v0
+    paths:
+    - /r1/api/v1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - tag1
+  tags:
+  - tag1
+  - tag2
+  write_timeout: 60000

@@ -1,0 +1,63 @@
+_format_version: "3.0"
+partials:
+- config:
+    cluster_max_redirections: 5
+    cluster_nodes: null
+    connect_timeout: 2000
+    connection_is_proxied: false
+    database: 0
+    host: example.com
+    keepalive_backlog: 0
+    keepalive_pool_size: 256
+    password: redis-pass
+    port: 6379
+    read_timeout: 2000
+    send_timeout: 2000
+    sentinel_master: null
+    sentinel_nodes: null
+    sentinel_password: null
+    sentinel_role: null
+    sentinel_username: null
+    server_name: null
+    ssl: false
+    ssl_verify: false
+    username: redis-user
+  id: 65a8785d-2e4a-4adb-8805-63e1141219cd
+  name: my-partial-ee
+  tags:
+  - tag1
+  type: redis-ee
+plugins:
+- config:
+    compound_identifier: null
+    consumer_groups: null
+    dictionary_name: kong_rate_limiting_counters
+    disable_penalty: false
+    enforce_consumer_groups: false
+    error_code: 429
+    error_message: API rate limit exceeded
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 10
+    lock_dictionary_name: kong_locks
+    namespace: 1jN8MwEfPOC5LEb4noafwYJEQiafdPnA
+    path: null
+    retry_after_jitter_max: 0
+    strategy: redis
+    sync_rate: -1
+    window_size:
+    - 100
+    window_type: sliding
+  enabled: true
+  name: rate-limiting-advanced
+  partials:
+  - id: 65a8785d-2e4a-4adb-8805-63e1141219cd
+    name: my-partial-ee
+    path: config.redis
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https

@@ -1,0 +1,14 @@
+_format_version: "3.0"
+services:
+- host: example.com
+  name: service-1
+  routes:
+  - expression: ' net.src.ip == 192.168.1.0 && net.protocol == "http" && http.method
+      == "GET"'
+    name: r2
+    tags:
+    - tag1
+    - tag2
+  tags:
+  - tag1
+  - tag2
