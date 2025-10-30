@@ -965,7 +965,7 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: service, routes, service-scoped plugins",
 			stateFile:    "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=2.8.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=2.8.0") },
 		},
 		{
 			name:         "dump skip-defaults: expression routes",
