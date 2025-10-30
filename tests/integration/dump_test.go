@@ -938,7 +938,12 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			assert.Equal(t, expected, output)
 
 			// ensure that dump can sync back without errors
-			require.NoError(t, sync(ctx, tc.stateFile))
+			require.NoError(t, sync(ctx, tc.expectedFile))
+
+			// dump again
+			output, err = dump(dumpArgs...)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }
