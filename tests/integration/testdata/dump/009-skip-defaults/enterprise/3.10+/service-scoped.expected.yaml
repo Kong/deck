@@ -9,6 +9,18 @@ services:
       - example
     enabled: true
     name: acl
+  - config:
+      body_schema: '[]'
+      parameter_schema:
+      - explode: true
+        in: query
+        name: param-test
+        required: false
+        schema: '{"type":"string"}'
+        style: form
+      verbose_response: true
+    enabled: true
+    name: request-validator
   routes:
   - name: r1
     paths:

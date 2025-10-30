@@ -19,10 +19,27 @@ services:
     - grpcs
     - http
     - https
-  port: 80
-  protocol: http
-  read_timeout: 60000
-  retries: 5
+  - config:
+      allowed_content_types:
+      - application/json
+      body_schema: '[]'
+      content_type_parameter_validation: true
+      parameter_schema:
+      - explode: true
+        in: query
+        name: param-test
+        required: false
+        schema: '{"type":"string"}'
+        style: form
+      verbose_response: true
+      version: kong
+    enabled: true
+    name: request-validator
+    protocols:
+    - grpc
+    - grpcs
+    - http
+    - https
   routes:
   - https_redirect_status_code: 426
     name: r1

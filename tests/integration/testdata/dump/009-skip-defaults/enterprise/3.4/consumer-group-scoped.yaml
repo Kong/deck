@@ -1,0 +1,68 @@
+_format_version: "3.0"
+consumer_groups:
+- name: foo
+  plugins:
+  - config:
+      consumer_groups: null
+      dictionary_name: kong_rate_limiting_counters
+      disable_penalty: false
+      enforce_consumer_groups: false
+      error_code: 429
+      error_message: API rate limit exceeded
+      header_name: null
+      hide_client_headers: false
+      identifier: consumer
+      limit:
+      - 10
+      namespace: tPHO9qtcb99zWWUWxSVDQiUpb7kj59ZQ
+      path: null
+      redis:
+        cluster_addresses: null
+        connect_timeout: 2000
+        database: 0
+        host: example.com
+        keepalive_backlog: null
+        keepalive_pool_size: 256
+        password: null
+        port: 9000
+        read_timeout: 2000
+        send_timeout: 2000
+        sentinel_addresses: null
+        sentinel_master: null
+        sentinel_password: null
+        sentinel_role: null
+        sentinel_username: null
+        server_name: null
+        ssl: false
+        ssl_verify: false
+        timeout: 2000
+        username: null
+      retry_after_jitter_max: 0
+      strategy: redis
+      sync_rate: -1
+      window_size:
+      - 100
+      window_type: sliding
+    name: rate-limiting-advanced
+consumers:
+- acls:
+  - group: my-group
+  groups:
+  - name: foo
+  hmacauth_credentials:
+  - secret: abcd
+    username: c1
+  keyauth_credentials:
+  - key: abcd
+  username: c1
+- groups:
+  - name: foo
+  jwt_secrets:
+  - algorithm: HS256
+    key: abc
+    secret: abcd
+    tags:
+    - tag1
+  tags:
+  - tag1
+  username: c2

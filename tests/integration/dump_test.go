@@ -950,7 +950,8 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 
 // test scope:
 //
-// - gateway
+// - gateway enterprise
+// - 3.4 and 3.10+
 func Test_Dump_SkipDefaults(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
@@ -962,33 +963,51 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 		runWhen      func(t *testing.T)
 	}{
 		{
-			name:         "dump skip-defaults: service, routes, service-scoped plugins",
-			stateFile:    "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.yaml",
-			expectedFile: "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.expected.yaml",
+			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.4",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/service-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/service-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{
 			name:         "dump skip-defaults: expression routes",
-			stateFile:    "testdata/dump/009-skip-defaults/enterprise/expression-routes.yaml",
-			expectedFile: "testdata/dump/009-skip-defaults/enterprise/expression-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.10.0") },
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0") },
 		},
 		{
-			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins",
-			stateFile:    "testdata/dump/009-skip-defaults/enterprise/consumer-group-scoped.yaml",
-			expectedFile: "testdata/dump/009-skip-defaults/enterprise/consumer-group-scoped.expected.yaml",
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.4",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/consumer-group-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{
-			name:         "dump skip-defaults: plugins, partials (rla)",
-			stateFile:    "testdata/dump/009-skip-defaults/enterprise/plugin-partial.yaml",
-			expectedFile: "testdata/dump/009-skip-defaults/enterprise/plugin-partial.expected.yaml",
+			name:         "dump skip-defaults: plugins, partials (rla) 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{
-			name:         "dump skip-defaults: plugins, partials (openid-connect)",
-			stateFile:    "testdata/dump/009-skip-defaults/enterprise/plugin-partial-2.yaml",
-			expectedFile: "testdata/dump/009-skip-defaults/enterprise/plugin-partial-2.expected.yaml",
+			name:         "dump skip-defaults: plugins (openid-connect) 3.4+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/plugin.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/plugin.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 	}
