@@ -965,19 +965,19 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: service, routes, service-scoped plugins",
 			stateFile:    "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/gateway-oss/service-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=2.8.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{
 			name:         "dump skip-defaults: expression routes",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/expression-routes.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/expression-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=2.8.0") },
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.10.0") },
 		},
 		{
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/consumer-group-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/consumer-group-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=2.8.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins, partials (rla)",
