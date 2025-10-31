@@ -63,7 +63,7 @@ If you are on macOS, install decK using brew:
 
 ```shell
 $ brew tap kong/deck
-$ brew install deck
+$ brew install kong/deck/deck
 ```
 
 ### Linux
