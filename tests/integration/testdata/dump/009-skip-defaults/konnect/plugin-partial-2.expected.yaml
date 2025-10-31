@@ -1,0 +1,32 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+partials:
+- config:
+    host: example.com
+    keepalive_backlog: 0
+  id: 9e060517-7cae-4425-9ff1-1df11d0e9b5a
+  name: my-partial-ee
+  type: redis-ee
+plugins:
+- config:
+    cache_tokens_salt: MEE3kAXd4Qof7bA3PYulzl26Bk91n23m
+    client_id:
+    - abc-client
+    client_secret:
+    - abc-secret
+    cluster_cache_redis:
+      timeout: 2000
+    issuer: http://example-issuer.com
+    redis:
+      timeout: 2000
+    session_redis_cluster_max_redirections: 5
+    session_redis_connect_timeout: 2000
+    session_redis_host: 127.0.0.1
+    session_redis_port: 6379
+    session_redis_read_timeout: 2000
+    session_redis_send_timeout: 2000
+    session_redis_ssl: false
+    session_redis_ssl_verify: false
+  enabled: true
+  name: openid-connect
