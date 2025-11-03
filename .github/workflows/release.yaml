@@ -69,6 +69,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME_JAN_2025 }}
           password: ${{ secrets.DOCKER_TOKEN_JAN_2025 }}
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+      - name: Extract Go version
+        id: go-version
+        run: echo "version=$(grep '^go ' go.mod | cut -d' ' -f2)" >> $GITHUB_OUTPUT
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
@@ -89,5 +94,6 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
+            GO_VERSION=${{ steps.go-version.outputs.version }}
             TAG=${{ steps.meta.outputs.tags }}
             COMMIT=${{ github.sha }}
