@@ -76,4 +76,4 @@ vaults:
 - config:
     config_store_id: 2f90c7ce-94ef-47f8-b440-4c69b4395dd5
   name: konnect
-  prefix: my-konnect-vault
+  prefix: my-konnect-vault-random1234
