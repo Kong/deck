@@ -827,7 +827,7 @@ func Test_Dump_Sanitize_Special_Entities(t *testing.T) {
 		{
 			name:      "dump sanitize route expressions",
 			stateFile: "testdata/dump/008-sanitizer/route-expressions.yaml",
-			runWhen:   func(t *testing.T) { runWhenExpressions(t, ">=3.0.0") },
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
 		},
 	}
 
@@ -978,7 +978,7 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: expression routes",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0") },
 		},
 		{
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.4",

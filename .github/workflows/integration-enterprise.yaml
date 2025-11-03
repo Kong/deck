@@ -30,7 +30,6 @@ jobs:
         - 'kong/kong-gateway:3.12'
         - 'kong/kong-gateway-dev:latest'
         router_flavor:
-          - 'traditional_compatible'
           - 'expressions'
     env:
       KONG_ANONYMOUS_REPORTS: "off"

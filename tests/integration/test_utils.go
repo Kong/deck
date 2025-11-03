@@ -110,11 +110,9 @@ func runWhen(t *testing.T, mode string, semverRange string) {
 	case "kong":
 		skipWhenKonnect(t)
 		kong.RunWhenKong(t, semverRange)
-		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "enterprise":
 		skipWhenKonnect(t)
 		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
-		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "konnect":
 		runWhenKonnect(t)
 	}
