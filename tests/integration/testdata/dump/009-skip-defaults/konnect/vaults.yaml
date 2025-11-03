@@ -1,0 +1,106 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+vaults:
+- config:
+    base64_decode: false
+    endpoint_url: https://example-aws.com
+    region: us-east-1
+    role_session_name: KongVault
+  name: aws
+  prefix: my-aws-vault
+  tags:
+  - tag1
+- config:
+    base64_decode: false
+    endpoint_url: https://example-aws.com
+    region: ap-south-1
+    role_session_name: KongVault
+  name: aws
+  prefix: my-aws-vault-2
+  tags:
+  - tag1
+- config:
+    base64_decode: false
+    credentials_prefix: AZURE
+    location: test-location
+    type: secrets
+    vault_uri: http://azure-vault.test
+  name: azure
+  prefix: my-azure-vault
+  tags:
+  - tag1
+- config:
+    account: test-ac
+    api_key: test-key
+    auth_method: api_key
+    base64_decode: false
+    endpoint_url: http://example-server.test
+    login: test-id
+  name: conjur
+  prefix: my-conjur-vault
+  tags:
+  - tag1
+- config:
+    base64_decode: false
+    prefix: TEST_
+  name: env
+  prefix: my-env-vault
+  tags:
+  - tag1
+- config:
+    base64_decode: false
+    project_id: test-123
+  name: gcp
+  prefix: my-gcp-vault
+  tags:
+  - tag1
+- config:
+    auth_method: token
+    base64_decode: false
+    host: 127.0.0.1
+    kube_auth_path: kubernetes
+    kv: v1
+    mount: secret
+    port: 8200
+    protocol: http
+    token: example-token
+  name: hcv
+  prefix: my-hcv-vault1
+  tags:
+  - tag1
+- config:
+    auth_method: kubernetes
+    base64_decode: false
+    host: 127.0.0.1
+    kube_api_token_file: test-file
+    kube_auth_path: kubernetes
+    kube_role: test-role
+    kv: v1
+    mount: secret
+    port: 8200
+    protocol: http
+  name: hcv
+  prefix: my-hcv-vault2
+  tags:
+  - tag1
+- config:
+    approle_response_wrapping: true
+    approle_role_id: test-id-123
+    approle_secret_id: test-secret-123
+    auth_method: approle
+    base64_decode: false
+    host: 127.0.0.1
+    kube_auth_path: kubernetes
+    kv: v1
+    mount: secret
+    port: 8200
+    protocol: http
+  name: hcv
+  prefix: my-hcv-vault3
+  tags:
+  - tag2
+- config:
+    config_store_id: 2f90c7ce-94ef-47f8-b440-4c69b4395dd5
+  name: konnect
+  prefix: my-konnect-vault

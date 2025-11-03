@@ -922,6 +922,11 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			stateFile:    "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.expected.yaml",
 		},
+		{
+			name:         "dump skip-defaults: vaults",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/vaults.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/vaults.expected.yaml",
+		},
 	}
 
 	for _, tc := range tests {
@@ -1010,47 +1015,6 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.runWhen(t)
-			reset(t)
-			require.NoError(t, sync(ctx, tc.stateFile))
-
-			dumpArgs := []string{"-o", "-", "--skip-defaults"}
-			output, err := dump(dumpArgs...)
-			require.NoError(t, err)
-
-			expected, err := readFile(tc.expectedFile)
-			require.NoError(t, err)
-			assert.Equal(t, expected, output)
-
-			// ensure that dump can sync back without errors
-			require.NoError(t, sync(ctx, tc.expectedFile))
-
-			// dump again
-			output, err = dump(dumpArgs...)
-			require.NoError(t, err)
-			assert.Equal(t, expected, output)
-		})
-	}
-}
-
-// test scope:
-//
-// - gateway enterprise
-// - 3.4 and 3.10+
-func Test_Dump_SkipDefaults_Vaults(t *testing.T) {
-	setup(t)
-	ctx := context.Background()
-
-	tests := []struct {
-		name         string
-		stateFile    string
-		expectedFile string
-		runWhen      func(t *testing.T)
-	}{
 		{
 			name:         "vaults skip-defaults 3.4",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/vaults.yaml",
