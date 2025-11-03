@@ -52,8 +52,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
         with:
-          username: ${{secrets.DOCKERHUB_PULL_USERNAME}}
-          password: ${{secrets.DOCKERHUB_PULL_TOKEN}}
+          username: ${{secrets.DOCKER_ORG_NAME}}
+          password: ${{secrets.DOCKER_ORG_TOKEN}}
       - uses: Kong/kong-license@master
         id: license
         with:
