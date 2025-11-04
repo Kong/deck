@@ -922,6 +922,11 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			stateFile:    "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.expected.yaml",
 		},
+		{
+			name:         "dump skip-defaults: vaults",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/vaults.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/vaults.expected.yaml",
+		},
 	}
 
 	for _, tc := range tests {
@@ -1009,6 +1014,24 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+		},
+		{
+			name:         "vaults skip-defaults 3.4",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/vaults.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/vaults.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
+		},
+		{
+			name:         "vaults skip-defaults 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/vaults.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/vaults.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+		},
+		{
+			name:         "vaults skip-defaults 3.11+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.11+/vaults.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.11+/vaults.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
 		},
 	}
 
