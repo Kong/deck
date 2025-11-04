@@ -14,7 +14,7 @@ on:
         default: 'main'
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_GW_TIMEOUT) }}
     name: "${{ inputs.kong_image }} against ${{ inputs.branch }}"
     env:
       KONG_ANONYMOUS_REPORTS: "off"
