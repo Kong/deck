@@ -14,7 +14,7 @@ on:
 
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_GW_TIMEOUT) }}
     strategy:
       matrix:
         kong_image:
