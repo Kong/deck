@@ -135,6 +135,10 @@ default or null values present.
 [#1795](https://github.com/Kong/deck/pull/1795)
 [go-database-reconciler #352](https://github.com/Kong/go-database-reconciler/pull/352)
 
+### Chores
+- Upgraded go version to `v1.24.8`
+[#1803](https://github.com/Kong/deck/pull/1803)
+
 ## [v1.52.1]
 > Release date: 2025/10/29
 
