@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.53.0](#v1530)
 - [v1.52.1](#v1521)
 - [v1.52.0](#v1520)
 - [v1.51.1](#v1511)
@@ -123,6 +124,16 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.53.0]
+> Release date: 2025/11/04
+
+### Added
+- Added `--skip-defaults` flag in `deck gateway dump`
+command. This helps to create a concise dump, with no
+default or null values present.
+[#1795](https://github.com/Kong/deck/pull/1795)
+[go-database-reconciler #352](https://github.com/Kong/go-database-reconciler/pull/352)
 
 ## [v1.52.1]
 > Release date: 2025/10/29
@@ -2326,6 +2337,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.53.0]: https://github.com/Kong/deck/compare/v1.52.1...v1.53.0
 [v1.52.1]: https://github.com/Kong/deck/compare/v1.52.0...v1.52.1
 [v1.52.0]: https://github.com/Kong/deck/compare/v1.51.1...v1.52.0
 [v1.51.1]: https://github.com/Kong/deck/compare/v1.51.0...v1.51.1
