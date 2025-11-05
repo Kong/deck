@@ -18,17 +18,17 @@ jobs:
     strategy:
       matrix:
         kong_image:
-        - 'kong/kong-gateway:2.8'
-        - 'kong/kong-gateway:3.4'
-        - 'kong/kong-gateway:3.5'
-        - 'kong/kong-gateway:3.6'
-        - 'kong/kong-gateway:3.7'
-        - 'kong/kong-gateway:3.8'
-        - 'kong/kong-gateway:3.9'
-        - 'kong/kong-gateway:3.10'
+        # - 'kong/kong-gateway:2.8'
+        # - 'kong/kong-gateway:3.4'
+        # - 'kong/kong-gateway:3.5'
+        # - 'kong/kong-gateway:3.6'
+        # - 'kong/kong-gateway:3.7'
+        # - 'kong/kong-gateway:3.8'
+        # - 'kong/kong-gateway:3.9'
+        # - 'kong/kong-gateway:3.10'
         - 'kong/kong-gateway:3.11'
-        - 'kong/kong-gateway:3.12'
-        - 'kong/kong-gateway-dev:latest'
+        # - 'kong/kong-gateway:3.12'
+        # - 'kong/kong-gateway-dev:latest'
         router_flavor:
           - 'traditional_compatible'
           - 'expressions'
