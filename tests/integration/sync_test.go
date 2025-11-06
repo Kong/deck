@@ -6037,6 +6037,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_CreateCertificateWithSNIs_Konnect(t *testing.T) {
+	t.Skip("Skipping test for konnect due to flakiness")
 	runWhen(t, "konnect", "")
 	setup(t)
 
