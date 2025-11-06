@@ -1,0 +1,44 @@
+_format_version: "3.0"
+plugins:
+- config:
+    day: null
+    error_code: 429
+    error_message: API rate limit exceeded
+    fault_tolerant: true
+    header_name: null
+    hide_client_headers: false
+    hour: null
+    limit_by: consumer
+    minute: 10
+    month: null
+    path: null
+    policy: local
+    redis:
+      database: 0
+      host: null
+      password: null
+      port: 6000
+      server_name: null
+      ssl: false
+      ssl_verify: false
+      timeout: 2000
+      username: null
+    redis_database: 0
+    redis_host: null
+    redis_password: null
+    redis_port: 6000
+    redis_server_name: null
+    redis_ssl: false
+    redis_ssl_verify: false
+    redis_timeout: 2000
+    redis_username: null
+    second: null
+    sync_rate: -1
+    year: null
+  enabled: true
+  name: rate-limiting
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https

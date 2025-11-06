@@ -1,0 +1,6 @@
+_format_version: "3.0"
+plugins:
+- config:
+    minute: 10
+  enabled: true
+  name: rate-limiting
