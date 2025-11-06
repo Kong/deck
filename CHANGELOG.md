@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.53.1](#v1531)
 - [v1.53.0](#v1530)
 - [v1.52.1](#v1521)
 - [v1.52.0](#v1520)
@@ -124,6 +125,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.53.1]
+> Release date: 2025/11/06
+
+### Fixed
+- Fixed gateway dump behaviour concerning deprecated shorthand_fields,
+when `--skip-defaults` flag is used. Default values set for the deprecated
+fields would not show up in the dumped config, if a cross-reference path
+to new fields exists in the gateway schema.
+[#1810](https://github.com/Kong/deck/pull/1810)
+[go-database-reconciler #357](https://github.com/Kong/go-database-reconciler/pull/357)
 
 ## [v1.53.0]
 > Release date: 2025/11/04
@@ -2341,6 +2353,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.53.1]: https://github.com/Kong/deck/compare/v1.53.0...v1.53.1
 [v1.53.0]: https://github.com/Kong/deck/compare/v1.52.1...v1.53.0
 [v1.52.1]: https://github.com/Kong/deck/compare/v1.52.0...v1.52.1
 [v1.52.0]: https://github.com/Kong/deck/compare/v1.51.1...v1.52.0
