@@ -923,6 +923,11 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin-partial-2.expected.yaml",
 		},
 		{
+			name:         "dump skip-defaults: plugin  (rate-limiting)",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/plugin.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/plugin.expected.yaml",
+		},
+		{
 			name:         "dump skip-defaults: vaults",
 			stateFile:    "testdata/dump/009-skip-defaults/konnect/vaults.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/konnect/vaults.expected.yaml",
@@ -1013,6 +1018,12 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugin rate-limiting 3.10+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
 		},
 		{

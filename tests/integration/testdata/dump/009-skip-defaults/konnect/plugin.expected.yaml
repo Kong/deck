@@ -1,0 +1,8 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+plugins:
+- config:
+    minute: 10
+  enabled: true
+  name: rate-limiting

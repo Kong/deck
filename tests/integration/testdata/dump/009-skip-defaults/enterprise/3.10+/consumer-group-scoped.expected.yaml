@@ -8,7 +8,6 @@ consumer_groups:
       namespace: tPHO9qtcb99zWWUWxSVDQiUpb7kj59ZQ
       redis:
         host: example.com
-        timeout: 2000
       strategy: redis
       sync_rate: -1
       window_size:
