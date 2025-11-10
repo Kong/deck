@@ -277,6 +277,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
+	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsConsumers != nil {
+		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
+		if err != nil {
+			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
+		}
+		for _, c := range consumersGlobal {
+			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
+		}
+	}
+
 	if dumpConfig.SkipConsumersWithConsumerGroups {
 		ok, err := validateSkipConsumersWithConsumerGroups(*targetContent, dumpConfig)
 		if err != nil || !ok {
@@ -304,21 +319,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 				addUniqueConsumersInTargetContent(targetContent, c.Consumers, &cgo, consumersExistInTargetContent)
 			}
 			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, cgo)
-		}
-	}
-
-	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
-	if err != nil {
-		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
-	}
-
-	if dumpConfig.LookUpSelectorTagsConsumers != nil {
-		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
-		if err != nil {
-			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
-		}
-		for _, c := range consumersGlobal {
-			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
 		}
 	}
 
