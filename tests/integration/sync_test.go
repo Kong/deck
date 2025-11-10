@@ -8887,6 +8887,99 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 			assert.True(t, found, "expected group %q to be present", g)
 		}
 	})
+
+	t.Run("no error occurs in case a group is referenced with other entities, no consumers in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple.yaml"))
+			// sync plugins file - no consumers in targetContent here
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-cg.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-cg.yaml"))
+
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
+		})
+
+	t.Run("no error occurs in case a group is referenced with other entities, consumers present in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync plugins + consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
+		})
+
+	t.Run("no error occurs in case a group is referenced with other entities, consumers modified in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync plugins + consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			// sync changes
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers-removal-replace.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers-removal-replace.yaml"))
+
+			// check groups
+			currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 5)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
+		})
 }
 
 // test scope:

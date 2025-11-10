@@ -1,0 +1,22 @@
+_format_version: "3.0"
+_info:
+  default_lookup_tags:
+    consumer_groups:
+      - consumer-groups
+  select_tags:
+  - plugins
+plugins:
+  - config:
+      identifier: consumer
+      limit:
+        - 2000
+      namespace: test-namespace
+      retry_after_jitter_max: 0
+      strategy: local
+      sync_rate: -1
+      window_size:
+        - 2
+      window_type: fixed
+    enabled: true
+    name: rate-limiting-advanced
+    consumer_group: consumer-group-1

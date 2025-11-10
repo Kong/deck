@@ -1,0 +1,20 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - consumers
+  default_lookup_tags:
+    consumer_groups:
+      - consumer-groups
+consumers:
+- username: test-consumer-1
+  groups:
+  - name: consumer-group-1
+  - name: consumer-group-2
+- username: test-consumer-2
+  groups:
+  - name: consumer-group-1
+  - name: consumer-group-3
+- username: test-consumer-3
+  groups:
+  - name: consumer-group-2
+  - name: consumer-group-3

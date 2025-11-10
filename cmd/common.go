@@ -295,12 +295,13 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if err != nil {
 			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 		}
+		consumersExistInTargetContent := len(targetContent.Consumers) > 0
 		for _, c := range consumerGroupsGlobal {
 			cgo := file.FConsumerGroupObject{
 				ConsumerGroup: *c.ConsumerGroup,
 			}
 			if len(c.Consumers) > 0 {
-				addUniqueConsumersInTargetContent(targetContent, c.Consumers, &cgo)
+				addUniqueConsumersInTargetContent(targetContent, c.Consumers, &cgo, consumersExistInTargetContent)
 			}
 			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, cgo)
 		}
@@ -452,6 +453,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []*kong.Consumer,
 	consumerGroupObject *file.FConsumerGroupObject,
+	consumersExistInTargetContent bool,
 ) {
 	containsConsumerInTargetContent := func(consumer *kong.Consumer) (bool, int) {
 		for i, c := range targetContent.Consumers {
@@ -480,6 +482,15 @@ func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []
 			consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
 		} else {
 			groups := targetContent.Consumers[index].Groups
+
+			if !consumersExistInTargetContent {
+				groups = append(groups, consumerGroup)
+				targetContent.Consumers[index].Groups = groups
+				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+
+				continue
+			}
+
 			groupExists := false
 			for _, g := range groups {
 				if g.ID != nil && consumerGroup.ID != nil && *g.ID == *consumerGroup.ID {
@@ -493,6 +504,11 @@ func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []
 			if groupExists {
 				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
 			}
+			// else {
+			// 	groups = append(groups, consumerGroup)
+			// 	targetContent.Consumers[index].Groups = groups
+			// 	consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+			// }
 		}
 	}
 }
