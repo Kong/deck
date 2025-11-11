@@ -504,11 +504,6 @@ func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []
 			if groupExists {
 				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
 			}
-			// else {
-			// 	groups = append(groups, consumerGroup)
-			// 	targetContent.Consumers[index].Groups = groups
-			// 	consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
-			// }
 		}
 	}
 }
