@@ -457,11 +457,11 @@ func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []
 ) {
 	containsConsumerInTargetContent := func(consumer *kong.Consumer) (bool, int) {
 		for i, c := range targetContent.Consumers {
-			if c.Consumer.ID != nil && consumer.ID != nil && *c.Consumer.ID == *consumer.ID {
+			if c.ID != nil && consumer.ID != nil && *c.ID == *consumer.ID {
 				return true, i
-			} else if c.Consumer.Username != nil && consumer.Username != nil && *c.Consumer.Username == *consumer.Username {
+			} else if c.Username != nil && consumer.Username != nil && *c.Username == *consumer.Username {
 				return true, i
-			} else if c.Consumer.CustomID != nil && consumer.CustomID != nil && *c.Consumer.CustomID == *consumer.CustomID {
+			} else if c.CustomID != nil && consumer.CustomID != nil && *c.CustomID == *consumer.CustomID {
 				return true, i
 			}
 		}

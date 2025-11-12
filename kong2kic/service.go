@@ -23,7 +23,7 @@ func populateKICServicesWithAnnotations(content *file.Content, kicContent *KICCo
 		k8sService := createK8sService(&service, content.Upstreams)
 
 		// Add annotations from the service object
-		addAnnotationsFromService(&service, k8sService.ObjectMeta.Annotations)
+		addAnnotationsFromService(&service, k8sService.Annotations)
 
 		// Populate upstream policies based on KIC version
 		if targetKICVersionAPI == KICV3GATEWAY || targetKICVersionAPI == KICV3INGRESS {
@@ -154,7 +154,7 @@ func processPlugin(
 	}
 
 	// Add the plugin name to the service annotations
-	addPluginToAnnotations(kongPlugin.ObjectMeta.Name, annotations)
+	addPluginToAnnotations(kongPlugin.Name, annotations)
 
 	// Append the KongPlugin to KIC content
 	kicContent.KongPlugins = append(kicContent.KongPlugins, *kongPlugin)
@@ -171,7 +171,7 @@ func addPluginsToService(service *file.FService, k8sService *k8scorev1.Service, 
 
 	// Process service-level plugins
 	for _, plugin := range service.Plugins {
-		if err := processPlugin(plugin, ownerName, k8sService.ObjectMeta.Annotations, kicContent); err != nil {
+		if err := processPlugin(plugin, ownerName, k8sService.Annotations, kicContent); err != nil {
 			return err
 		}
 	}

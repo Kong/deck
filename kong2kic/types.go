@@ -167,12 +167,13 @@ func SerializeObjectDroppingFields(obj interface{}, format string) ([]byte, erro
 		delete(genericObj, "spec")
 	}
 
-	if format == file.JSON {
+	switch format {
+	case file.JSON:
 		result, err = json.MarshalIndent(genericObj, "", "    ")
 		if err != nil {
 			return nil, err
 		}
-	} else if format == file.YAML {
+	case file.YAML:
 		result, err = yaml.Marshal(genericObj)
 		if err != nil {
 			return nil, err

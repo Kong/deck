@@ -163,7 +163,7 @@ var (
 	}
 
 	// has run-on set to 'first'
-	plugin_143_151 = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_143_151 = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("basic-auth"),
 			Protocols: []*string{
@@ -217,7 +217,7 @@ var (
 		},
 	}
 
-	plugin_on_entities = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -268,7 +268,7 @@ var (
 		},
 	}
 
-	plugin_on_entities3x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities3x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -331,7 +331,7 @@ var (
 		},
 	}
 
-	plugin_on_entities381x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities381x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -397,7 +397,7 @@ var (
 		},
 	}
 
-	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -466,7 +466,7 @@ var (
 		},
 	}
 
-	plugin_on_entities312x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities312x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -535,7 +535,7 @@ var (
 		},
 	}
 
-	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -604,7 +604,7 @@ var (
 		},
 	}
 
-	upstream_pre31 = []*kong.Upstream{ //nolint:revive,stylecheck
+	upstream_pre31 = []*kong.Upstream{ //nolint:revive
 		{
 			Name:      kong.String("upstream1"),
 			Algorithm: kong.String("round-robin"),

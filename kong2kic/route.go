@@ -146,7 +146,7 @@ func populateKICIngressesWithAnnotations(content *file.Content, kicContent *KICC
 			ingressClassName := ClassName
 			k8sIngress.Spec.IngressClassName = &ingressClassName
 
-			addAnnotationsFromRoute(route, k8sIngress.ObjectMeta.Annotations)
+			addAnnotationsFromRoute(route, k8sIngress.Annotations)
 
 			pathType := k8snetv1.PathTypeImplementationSpecific
 
@@ -197,7 +197,7 @@ func addPluginsToRoute(
 			continue
 		}
 
-		if err := processPlugin(plugin, ownerName, ingress.ObjectMeta.Annotations, kicContent); err != nil {
+		if err := processPlugin(plugin, ownerName, ingress.Annotations, kicContent); err != nil {
 			return err
 		}
 	}
@@ -264,14 +264,14 @@ func createHTTPRoute(service file.FService, route *file.FRoute) (k8sgwapiv1.HTTP
 		httpRoute.APIVersion = GatewayAPIVersionV1Beta1
 	}
 	if service.Name != nil && route.Name != nil {
-		httpRoute.ObjectMeta.Name = calculateSlug(*service.Name + "-" + *route.Name)
+		httpRoute.Name = calculateSlug(*service.Name + "-" + *route.Name)
 	} else {
 		return httpRoute, errors.New(
 			"service name or route name is empty. Please provide a name for the service" +
 				"and the route before generating HTTPRoute manifests",
 		)
 	}
-	httpRoute.ObjectMeta.Annotations = make(map[string]string)
+	httpRoute.Annotations = make(map[string]string)
 
 	addAnnotations(&httpRoute, route)
 	addHosts(&httpRoute, route)
@@ -283,20 +283,20 @@ func createHTTPRoute(service file.FService, route *file.FRoute) (k8sgwapiv1.HTTP
 
 func addAnnotations(httpRoute *k8sgwapiv1.HTTPRoute, route *file.FRoute) {
 	if route.PreserveHost != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQPreserveHost] = strconv.FormatBool(*route.PreserveHost)
+		httpRoute.Annotations[KongHQPreserveHost] = strconv.FormatBool(*route.PreserveHost)
 	}
 	if route.StripPath != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQStripPath] = strconv.FormatBool(*route.StripPath)
+		httpRoute.Annotations[KongHQStripPath] = strconv.FormatBool(*route.StripPath)
 	}
 	if route.HTTPSRedirectStatusCode != nil {
 		value := strconv.Itoa(*route.HTTPSRedirectStatusCode)
-		httpRoute.ObjectMeta.Annotations[KongHQHTTPSRedirectStatusCode] = value
+		httpRoute.Annotations[KongHQHTTPSRedirectStatusCode] = value
 	}
 	if route.RegexPriority != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQRegexPriority] = strconv.Itoa(*route.RegexPriority)
+		httpRoute.Annotations[KongHQRegexPriority] = strconv.Itoa(*route.RegexPriority)
 	}
 	if route.PathHandling != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQPathHandling] = *route.PathHandling
+		httpRoute.Annotations[KongHQPathHandling] = *route.PathHandling
 	}
 	if route.Tags != nil {
 		var tags []string
@@ -305,7 +305,7 @@ func addAnnotations(httpRoute *k8sgwapiv1.HTTPRoute, route *file.FRoute) {
 				tags = append(tags, *tag)
 			}
 		}
-		httpRoute.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+		httpRoute.Annotations[KongHQTags] = strings.Join(tags, ",")
 	}
 	if route.SNIs != nil {
 		var snis string
@@ -317,13 +317,13 @@ func addAnnotations(httpRoute *k8sgwapiv1.HTTPRoute, route *file.FRoute) {
 			sb.WriteString(*sni)
 		}
 		snis = sb.String()
-		httpRoute.ObjectMeta.Annotations[KongHQSNIs] = snis
+		httpRoute.Annotations[KongHQSNIs] = snis
 	}
 	if route.RequestBuffering != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQRequestBuffering] = strconv.FormatBool(*route.RequestBuffering)
+		httpRoute.Annotations[KongHQRequestBuffering] = strconv.FormatBool(*route.RequestBuffering)
 	}
 	if route.ResponseBuffering != nil {
-		httpRoute.ObjectMeta.Annotations[KongHQResponseBuffering] = strconv.FormatBool(*route.ResponseBuffering)
+		httpRoute.Annotations[KongHQResponseBuffering] = strconv.FormatBool(*route.ResponseBuffering)
 	}
 }
 
@@ -539,17 +539,17 @@ func processGatewayAPIPlugin(
 				tags = append(tags, *tag)
 			}
 		}
-		if kongPlugin.ObjectMeta.Annotations == nil {
-			kongPlugin.ObjectMeta.Annotations = make(map[string]string)
+		if kongPlugin.Annotations == nil {
+			kongPlugin.Annotations = make(map[string]string)
 		}
-		kongPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+		kongPlugin.Annotations[KongHQTags] = strings.Join(tags, ",")
 	}
 
 	// Add plugins as extensionRef under filters for every rule
 	for i := range httpRoute.Spec.Rules {
 		httpRoute.Spec.Rules[i].Filters = append(httpRoute.Spec.Rules[i].Filters, k8sgwapiv1.HTTPRouteFilter{
 			ExtensionRef: &k8sgwapiv1.LocalObjectReference{
-				Name:  k8sgwapiv1.ObjectName(kongPlugin.ObjectMeta.Name),
+				Name:  k8sgwapiv1.ObjectName(kongPlugin.Name),
 				Kind:  KongPluginKind,
 				Group: ConfigurationKongHQ,
 			},
