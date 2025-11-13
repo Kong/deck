@@ -48,7 +48,7 @@ func compareFileContent(t *testing.T, expectedFilename string, actualContent []b
 		actualYAMLs := re.Split(string(actualContent), -1)
 
 		// Ensure both have the same number of YAML documents
-		require.Equal(t, len(expectedYAMLs), len(actualYAMLs), "number of YAML documents do not match")
+		require.Len(t, actualYAMLs, len(expectedYAMLs), "number of YAML documents do not match")
 
 		// Compare each YAML document
 		for i := range expectedYAMLs {

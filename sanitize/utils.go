@@ -113,7 +113,7 @@ func findRelevantFieldNamesWithKey(exemptedFieldsFromSchema map[string]bool,
 					exemptedFieldsFromSchema[key] = true
 				}
 				// Only skip walking into 'array elements' if parent is set and we've already added it
-				if !(skipElements && key == arrayKeyName) {
+				if !skipElements || key != arrayKeyName {
 					walkSchema(value, skipElements)
 				}
 			}

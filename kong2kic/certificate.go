@@ -18,11 +18,11 @@ func populateKICCertificates(content *file.Content, file *KICContent) {
 			secret     k8scorev1.Secret
 			secretName = "cert-" + fmt.Sprintf("%x", digest)
 		)
-		secret.TypeMeta.APIVersion = "v1"
-		secret.TypeMeta.Kind = SecretKind
+		secret.APIVersion = "v1"
+		secret.Kind = SecretKind
 		secret.Type = k8scorev1.SecretTypeTLS
-		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
+		secret.Name = calculateSlug(secretName)
+		secret.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		if cert.Cert != nil && cert.Key != nil {
 			secret.StringData["tls.crt"] = *cert.Cert
@@ -42,7 +42,7 @@ func populateKICCertificates(content *file.Content, file *KICContent) {
 					tags = append(tags, *tag)
 				}
 			}
-			secret.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+			secret.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		file.Secrets = append(file.Secrets, secret)

@@ -207,7 +207,7 @@ func validate3xRoutes(routes *state.RoutesCollection) {
 	unsupportedRoutes := []string{}
 	for _, r := range results {
 		if reconcilerUtils.HasPathsWithRegex300AndAbove(r.Route) {
-			unsupportedRoutes = append(unsupportedRoutes, *r.Route.ID)
+			unsupportedRoutes = append(unsupportedRoutes, *r.ID)
 		}
 	}
 	if len(unsupportedRoutes) > 0 {

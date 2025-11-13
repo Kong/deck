@@ -16,13 +16,14 @@ type IBuilder interface {
 }
 
 func getBuilder(builderType string) IBuilder {
-	if builderType == KICV3GATEWAY {
+	switch builderType {
+	case KICV3GATEWAY:
 		return newKICv3GatewayAPIBuilder()
-	} else if builderType == KICV3INGRESS {
+	case KICV3INGRESS:
 		return newKICv3IngressAPIBuilder()
-	} else if builderType == KICV2GATEWAY {
+	case KICV2GATEWAY:
 		return newKICv2GatewayAPIBuilder()
-	} else if builderType == KICV2INGRESS {
+	case KICV2INGRESS:
 		return newKICv2IngressAPIBuilder()
 	}
 	return nil

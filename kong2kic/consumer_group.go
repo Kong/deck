@@ -65,7 +65,7 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 		}
 
 		// Add tags to annotations
-		addTagsToAnnotations(consumerGroup.Tags, kongConsumerGroup.ObjectMeta.Annotations)
+		addTagsToAnnotations(consumerGroup.Tags, kongConsumerGroup.Annotations)
 
 		// Update the ConsumerGroups field of the KongConsumers
 		for _, consumer := range consumerGroup.Consumers {
@@ -94,7 +94,7 @@ func populateKICConsumerGroups(content *file.Content, kicContent *KICContent) er
 			kicContent.KongPlugins = append(kicContent.KongPlugins, *kongPlugin)
 
 			// Add plugin to kongConsumerGroup annotations
-			addPluginToAnnotations(kongPlugin.ObjectMeta.Name, kongConsumerGroup.ObjectMeta.Annotations)
+			addPluginToAnnotations(kongPlugin.Name, kongConsumerGroup.Annotations)
 		}
 
 		kicContent.KongConsumerGroups = append(kicContent.KongConsumerGroups, kongConsumerGroup)

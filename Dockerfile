@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.24.8
+ARG GO_VERSION=1.25.3
 FROM golang:${GO_VERSION} AS build
 WORKDIR /deck
 COPY go.mod ./

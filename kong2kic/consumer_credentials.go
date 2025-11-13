@@ -49,7 +49,7 @@ func populateKICKeyAuthSecrets(consumer *file.FConsumer, kongConsumer *configura
 			"key": keyAuth.Key,
 		}
 		secret := createCredentialSecret(*consumer.Username, "key-auth", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -61,7 +61,7 @@ func populateKICHMACSecrets(consumer *file.FConsumer, kongConsumer *configuratio
 			"secret":   hmacAuth.Secret,
 		}
 		secret := createCredentialSecret(*consumer.Username, "hmac-auth", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -75,7 +75,7 @@ func populateKICJWTAuthSecrets(consumer *file.FConsumer, kongConsumer *configura
 			"secret":         jwtAuth.Secret,
 		}
 		secret := createCredentialSecret(*consumer.Username, "jwt", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -89,7 +89,7 @@ func populateKICBasicAuthSecrets(
 			"password": basicAuth.Password,
 		}
 		secret := createCredentialSecret(*consumer.Username, "basic-auth", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -109,7 +109,7 @@ func populateKICOAuth2CredSecrets(
 			dataFields["hash_secret"] = &hashSecretStr
 		}
 		secret := createCredentialSecret(*consumer.Username, "oauth2", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -122,7 +122,7 @@ func populateKICACLGroupSecrets(
 			"group": aclGroup.Group,
 		}
 		secret := createCredentialSecret(*consumer.Username, "acl", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }
@@ -139,7 +139,7 @@ func populateKICMTLSAuthSecrets(
 			dataFields["ca_certificate"] = mtlsAuth.CACertificate.Cert
 		}
 		secret := createCredentialSecret(*consumer.Username, "mtls-auth", dataFields)
-		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.ObjectMeta.Name)
+		kongConsumer.Credentials = append(kongConsumer.Credentials, secret.Name)
 		file.Secrets = append(file.Secrets, secret)
 	}
 }

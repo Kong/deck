@@ -425,7 +425,7 @@ func verifyConfigSanitization(t *testing.T, original, sanitized interface{}) {
 	case []interface{}:
 		sanitizedSlice, ok := sanitized.([]interface{})
 		require.True(t, ok, "Sanitized value should be a slice")
-		require.Equal(t, len(orig), len(sanitizedSlice), "Slice length should be preserved")
+		require.Len(t, sanitizedSlice, len(orig), "Slice length should be preserved")
 
 		for i, v := range orig {
 			verifyConfigSanitization(t, v, sanitizedSlice[i])
