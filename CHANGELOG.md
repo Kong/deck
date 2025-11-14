@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.53.2](#v1532)
 - [v1.53.1](#v1531)
 - [v1.53.0](#v1530)
 - [v1.52.1](#v1521)
@@ -125,6 +126,23 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.53.2]
+> Release date: 2025/11/14
+
+### Fixed
+- Fixed consumer addition while using default_lookup_tags
+for consumer-groups to account for other entity references.
+[#1813](https://github.com/Kong/deck/pull/1813)
+- Fixed segmentation-fault panics coming up in 
+`deck file openapi2kong` while using security-schemes.
+Added better error handling to deal with security-schemes.
+[#1814](https://github.com/Kong/deck/pull/1814)
+[go-apiops #279](https://github.com/Kong/go-apiops/pull/279) 
+
+### Chores
+- Upgraded go version to `v1.25.3`
+[#1816](https://github.com/Kong/deck/pull/1816)
 
 ## [v1.53.1]
 > Release date: 2025/11/06
@@ -2353,6 +2371,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.53.2]: https://github.com/Kong/deck/compare/v1.53.1...v1.53.2
 [v1.53.1]: https://github.com/Kong/deck/compare/v1.53.0...v1.53.1
 [v1.53.0]: https://github.com/Kong/deck/compare/v1.52.1...v1.53.0
 [v1.52.1]: https://github.com/Kong/deck/compare/v1.52.0...v1.52.1
