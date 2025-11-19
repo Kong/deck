@@ -1,0 +1,14 @@
+_format_version: "3.0"
+plugins:
+  - name: request-transformer
+    protocols:
+      - grpc
+      - grpcs
+      - http
+      - https
+    id: bc364672-3032-45e3-aac2-7eb921da8515
+    config:
+      rename:
+        headers:
+        - Authorization:something-else
+        - custom-token:Authorization
