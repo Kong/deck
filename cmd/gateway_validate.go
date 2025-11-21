@@ -27,6 +27,10 @@ var (
 	validateParallelism             int
 )
 
+func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
+	return targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil
+}
+
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
@@ -37,6 +41,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
+	if lookupSelectorTagsIsSet(targetContent) && !validateOnline {
+		return fmt.Errorf("[default_lookup_tags] not supported for offline validation, " +
+			"use `deck gateway validate` command instead")
+	}
+
 	dummyEmptyState, err := state.NewKongState()
 	if err != nil {
 		return err
@@ -44,6 +53,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
+		// if workspace is not set via flag, use the one in the state file
+		if validateWorkspace == "" && targetContent.Workspace != "" {
+			validateWorkspace = targetContent.Workspace
+		}
+
 		kongClient, err = getKongClient(ctx, targetContent, mode)
 		if err != nil {
 			return err
@@ -64,9 +78,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 			for _, c := range consumerGroupsGlobal {
 				targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
 					file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
-				if err != nil {
-					return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
-				}
 			}
 		}
 
@@ -83,9 +94,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 			}
 			for _, c := range consumersGlobal {
 				targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
-				if err != nil {
-					return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
-				}
 			}
 		}
 
@@ -102,9 +110,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 			}
 			for _, r := range routesGlobal {
 				targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
-				if err != nil {
-					return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
-				}
 			}
 		}
 
@@ -121,9 +126,21 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 			}
 			for _, r := range servicesGlobal {
 				targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
-				if err != nil {
-					return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
-				}
+			}
+		}
+
+		lookUpSelectorTagsPartials, err := determineLookUpSelectorTagsPartials(*targetContent)
+		if err != nil {
+			return fmt.Errorf("error determining lookup selector tags for partials: %w", err)
+		}
+
+		if lookUpSelectorTagsPartials != nil {
+			partialsGlobal, err := dump.GetAllPartials(ctx, kongClient, lookUpSelectorTagsPartials)
+			if err != nil {
+				return fmt.Errorf("error retrieving global partials via lookup selector tags: %w", err)
+			}
+			for _, p := range partialsGlobal {
+				targetContent.Partials = append(targetContent.Partials, file.FPartial{Partial: *p})
 			}
 		}
 	}

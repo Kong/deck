@@ -1,0 +1,41 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+services:
+- host: example.com
+  name: service-1
+  plugins:
+  - config:
+      always_use_authenticated_groups: true
+      deny:
+      - example
+    enabled: true
+    name: acl
+  - config:
+      body_schema: '[]'
+      parameter_schema:
+      - explode: true
+        in: query
+        name: param-test
+        required: false
+        schema: '{"type":"string"}'
+        style: form
+      verbose_response: true
+    enabled: true
+    name: request-validator
+  routes:
+  - name: r1
+    paths:
+    - /r1/api/v1
+    tags:
+    - tag1
+  - expression: ' net.src.ip == 192.168.1.0 && net.protocol == "http" && http.method
+      == "GET"'
+    name: r2
+    priority: 0
+    tags:
+    - tag1
+    - tag2
+  tags:
+  - tag1
+  - tag2

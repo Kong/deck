@@ -32,7 +32,7 @@ func genMarkdownTreeCustom(cmd *cobra.Command, dir string, filePrepender, linkHa
 		}
 	}
 
-	basename := strings.Replace(cmd.CommandPath(), " ", "_", -1) + ".md"
+	basename := strings.ReplaceAll(cmd.CommandPath(), " ", "_") + ".md"
 	filename := filepath.Join(dir, basename)
 	f, err := os.Create(filename)
 	if err != nil {
@@ -137,19 +137,18 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	buf := new(bytes.Buffer)
 	name := cmd.CommandPath()
 
-	buf.WriteString(fmt.Sprintf("---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name))
+	fmt.Fprintf(buf, "---\ntitle: %s\nsource_url: https://github.com/Kong/deck/tree/main/cmd\n---\n\n", name)
 	buf.WriteString(cmd.Long + "\n\n")
 
 	if cmd.Runnable() {
 		buf.WriteString("## Syntax\n\n")
-		buf.WriteString(
-			fmt.Sprintf("```\n%s [command-specific flags] [global flags]\n```\n\n", name),
-		)
+		fmt.Fprintf(buf,
+			"```\n%s [command-specific flags] [global flags]\n```\n\n", name)
 	}
 
 	if len(cmd.Example) > 0 {
 		buf.WriteString("## Examples\n\n")
-		buf.WriteString(fmt.Sprintf("```\n%s\n```\n\n", cmd.Example))
+		fmt.Fprintf(buf, "```\n%s\n```\n\n", cmd.Example)
 	}
 
 	if err := printFlags(buf, cmd); err != nil {
@@ -162,10 +161,9 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 		if cmd.HasParent() {
 			parent := cmd.Parent()
 			pname := parent.CommandPath()
-			link := strings.Replace(pname, " ", "_", -1)
-			buf.WriteString(
-				fmt.Sprintf("* [%s](%s%s)\t - %s\n", pname, prefix, linkHandler(link), parent.Short),
-			)
+			link := strings.ReplaceAll(pname, " ", "_")
+			fmt.Fprintf(buf,
+				"* [%s](%s%s)\t - %s\n", pname, prefix, linkHandler(link), parent.Short)
 			cmd.VisitParents(func(c *cobra.Command) {
 				if c.DisableAutoGenTag {
 					cmd.DisableAutoGenTag = c.DisableAutoGenTag
@@ -181,10 +179,9 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 				continue
 			}
 			cname := name + " " + child.Name()
-			link := strings.Replace(cname, " ", "_", -1)
-			buf.WriteString(
-				fmt.Sprintf("* [%s](%s%s)\t - %s\n", cname, prefix, linkHandler(link), child.Short),
-			)
+			link := strings.ReplaceAll(cname, " ", "_")
+			fmt.Fprintf(buf,
+				"* [%s](%s%s)\t - %s\n", cname, prefix, linkHandler(link), child.Short)
 		}
 		buf.WriteString("\n")
 	}

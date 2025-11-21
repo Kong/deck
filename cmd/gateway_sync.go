@@ -106,6 +106,9 @@ to get Kong's state in sync with the input state.`,
 			"thus gaining some performance with large configs.\n"+
 			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.\n"+
 			"This flag is not valid with Konnect.")
+	syncCmd.Flags().BoolVar(&dumpConfig.SkipHashForBasicAuth, "skip-hash-for-basic-auth",
+		false, "do not sync hash for basic auth credentials.\n"+
+			"This flag is only valid with Konnect.")
 	syncCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",

@@ -12,7 +12,7 @@ on: [pull_request]
 
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT) }}
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
@@ -21,10 +21,14 @@ jobs:
       DECK_KONNECT_TOKEN : ${{ secrets.DECK_KONNECT_TOKEN }}
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
         with:
           go-version-file: go.mod
       - name: Run integration tests

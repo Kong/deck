@@ -1,0 +1,20 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+partials:
+- config:
+    host: example.com
+    keepalive_backlog: 0
+  id: 9e060517-7cae-4425-9ff1-1df11d0e9b5a
+  name: my-partial-ee
+  type: redis-ee
+plugins:
+- config:
+    cache_tokens_salt: MEE3kAXd4Qof7bA3PYulzl26Bk91n23m
+    client_id:
+    - abc-client
+    client_secret:
+    - abc-secret
+    issuer: http://example-issuer.com
+  enabled: true
+  name: openid-connect

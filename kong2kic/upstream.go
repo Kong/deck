@@ -124,16 +124,16 @@ func populateKICUpstreamPolicy(
 	}
 
 	// Add an annotation to link the upstream policy to the k8s service
-	if k8sService.ObjectMeta.Annotations == nil {
-		k8sService.ObjectMeta.Annotations = make(map[string]string)
+	if k8sService.Annotations == nil {
+		k8sService.Annotations = make(map[string]string)
 	}
-	k8sService.ObjectMeta.Annotations[KongHQUpstreamPolicy] = kongUpstreamPolicy.ObjectMeta.Name
+	k8sService.Annotations[KongHQUpstreamPolicy] = kongUpstreamPolicy.Name
 
 	// Populate the Upstream Policy Spec
 	populateKongUpstreamPolicySpec(upstream, &kongUpstreamPolicy)
 
 	// Add tags to annotations
-	addTagsToAnnotations(upstream.Tags, kongUpstreamPolicy.ObjectMeta.Annotations)
+	addTagsToAnnotations(upstream.Tags, kongUpstreamPolicy.Annotations)
 
 	// Append the KongUpstreamPolicy to KIC content
 	kicContent.KongUpstreamPolicies = append(kicContent.KongUpstreamPolicies, kongUpstreamPolicy)
@@ -230,13 +230,13 @@ func populateKICUpstream(
 	}
 
 	// Add an annotation to link the KongIngress to the k8s service
-	if k8sService.ObjectMeta.Annotations == nil {
-		k8sService.ObjectMeta.Annotations = make(map[string]string)
+	if k8sService.Annotations == nil {
+		k8sService.Annotations = make(map[string]string)
 	}
-	k8sService.ObjectMeta.Annotations[KongHQOverride] = kongIngress.ObjectMeta.Name
+	k8sService.Annotations[KongHQOverride] = kongIngress.Name
 
 	// Add tags to annotations
-	addTagsToAnnotations(upstream.Tags, kongIngress.ObjectMeta.Annotations)
+	addTagsToAnnotations(upstream.Tags, kongIngress.Annotations)
 
 	// Append the KongIngress to KIC content
 	kicContent.KongIngresses = append(kicContent.KongIngresses, kongIngress)

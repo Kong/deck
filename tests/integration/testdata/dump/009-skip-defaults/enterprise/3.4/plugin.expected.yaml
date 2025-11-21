@@ -1,0 +1,13 @@
+_format_version: "3.0"
+plugins:
+- config:
+    auth_methods:
+    - authorization_code
+    cache_tokens_salt: pbRmyO9dubnjPydtGcF7DKOx5PLRM9GI
+    client_id:
+    - abc
+    client_secret:
+    - abcd
+    issuer: http://example.com
+  enabled: true
+  name: openid-connect

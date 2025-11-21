@@ -28,10 +28,10 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 		var kongClusterPlugin configurationv1.KongClusterPlugin
 		kongClusterPlugin.APIVersion = ConfigurationKongHQv1
 		kongClusterPlugin.Kind = KongClusterPluginKind
-		kongClusterPlugin.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
+		kongClusterPlugin.Annotations = map[string]string{IngressClass: ClassName}
 		if plugin.Name != nil {
 			kongClusterPlugin.PluginName = *plugin.Name
-			kongClusterPlugin.ObjectMeta.Name = calculateSlug(*plugin.Name)
+			kongClusterPlugin.Name = calculateSlug(*plugin.Name)
 		} else {
 			log.Println("Global Plugin name is empty. This is not recommended." +
 				"Please, provide a name for the plugin before generating Kong Ingress Controller manifests.")
@@ -69,7 +69,7 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 					tags = append(tags, *tag)
 				}
 			}
-			kongClusterPlugin.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+			kongClusterPlugin.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		// transform the plugin config from map[string]interface{} to apiextensionsv1.JSON

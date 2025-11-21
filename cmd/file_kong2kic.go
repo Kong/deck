@@ -79,9 +79,10 @@ func validateInput(cmdKong2KicOutputFormat string) (
 			err = fmt.Errorf("invalid combination of parameters. Please use --help for more information")
 		}
 
-		if outputFormat == file.YAML {
+		switch outputFormat {
+		case file.YAML:
 			yamlOrJSON = file.YAML
-		} else if outputFormat == file.JSON {
+		case file.JSON:
 			yamlOrJSON = file.JSON
 		}
 	}

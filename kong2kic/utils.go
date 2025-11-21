@@ -112,7 +112,7 @@ func createKongPlugin(plugin *file.FPlugin, ownerName string) (*configurationv1.
 	}
 
 	// Add tags to annotations
-	addTagsToAnnotations(plugin.Tags, kongPlugin.ObjectMeta.Annotations)
+	addTagsToAnnotations(plugin.Tags, kongPlugin.Annotations)
 
 	// Populate enabled, runon, ordering, and protocols
 	if plugin.Enabled != nil {

@@ -1,5 +1,17 @@
 # Table of Contents
 
+- [v1.53.2](#v1532)
+- [v1.53.1](#v1531)
+- [v1.53.0](#v1530)
+- [v1.52.1](#v1521)
+- [v1.52.0](#v1520)
+- [v1.51.1](#v1511)
+- [v1.51.0](#v1510)
+- [v1.50.0](#v1500)
+- [v1.49.2](#v1492)
+- [v1.49.1](#v1491)
+- [v1.49.0](#v1490)
+- [v1.48.0](#v1480)
 - [v1.47.1](#v1471)
 - [v1.47.0](#v1470)
 - [v1.46.3](#v1463)
@@ -114,6 +126,228 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.53.2]
+> Release date: 2025/11/14
+
+### Fixed
+- Fixed consumer addition while using default_lookup_tags
+for consumer-groups to account for other entity references.
+[#1813](https://github.com/Kong/deck/pull/1813)
+- Fixed segmentation-fault panics coming up in 
+`deck file openapi2kong` while using security-schemes.
+Added better error handling to deal with security-schemes.
+[#1814](https://github.com/Kong/deck/pull/1814)
+[go-apiops #279](https://github.com/Kong/go-apiops/pull/279) 
+
+### Chores
+- Upgraded go version to `v1.25.3`
+[#1816](https://github.com/Kong/deck/pull/1816)
+
+## [v1.53.1]
+> Release date: 2025/11/06
+
+### Fixed
+- Fixed gateway dump behaviour concerning deprecated shorthand_fields,
+when `--skip-defaults` flag is used. Default values set for the deprecated
+fields would not show up in the dumped config, if a cross-reference path
+to new fields exists in the gateway schema.
+[#1810](https://github.com/Kong/deck/pull/1810)
+[go-database-reconciler #357](https://github.com/Kong/go-database-reconciler/pull/357)
+
+## [v1.53.0]
+> Release date: 2025/11/04
+
+### Added
+- Added `--skip-defaults` flag in `deck gateway dump`
+command. This helps to create a concise dump, with no
+default or null values present.
+[#1795](https://github.com/Kong/deck/pull/1795)
+[go-database-reconciler #352](https://github.com/Kong/go-database-reconciler/pull/352)
+
+### Chores
+- Upgraded go version to `v1.24.8`
+[#1803](https://github.com/Kong/deck/pull/1803)
+
+## [v1.52.1]
+> Release date: 2025/10/29
+
+### Fixed
+- Fixed modification of consumer group membership for consumers when consumer-groups are pulled in via lookup tags.
+[#1787](https://github.com/Kong/deck/pull/1787)
+[go-database-reconciler #350](https://github.com/Kong/go-database-reconciler/pull/350)
+- Added a fix in `deck gateway validate` to run validation using `_workspace` parameter in state file if present, unless overridden using `--workspace` flag.
+[#1783](https://github.com/Kong/deck/pull/1783)
+- Add a fix to include partials associated with a plugin in output of `deck gateway dump` using select-tags.
+[go-database-reconciler #345](https://github.com/Kong/go-database-reconciler/pull/345)
+
+
+## [v1.52.0]
+> Release date: 2025/09/30
+
+### Added
+- Added skip-hash functionality for basic-auth
+credentials for Konnect. Users can pass flag
+`--skip-hash-for-basic-auth` to sync or apply command to skip 
+hashing of basic-auth passwords or set `skip_hash_for_basic_auth: true`
+in the `_info` field of deck config.
+[#1765](https://github.com/Kong/deck/pull/1765)
+[go-database-reconciler #342](https://github.com/Kong/go-database-reconciler/pull/342)
+[go-kong #576](https://github.com/Kong/go-kong/pull/576)
+- Added support for nested arrays in plugin config.
+[go-database-reconciler #341](https://github.com/Kong/go-database-reconciler/pull/341)
+- Added support for generating routing config based on header values in the OAS spec in `deck file openapi2kong`
+[#1764](https://github.com/Kong/deck/pull/1764)
+[go-apiops #277](https://github.com/Kong/go-apiops/pull/277)
+
+
+## [v1.51.1]
+> Release date: 2025/09/22
+
+### Fixed
+- Fixed consumer lookups while using default lookup tags for consumer-groups.
+[#1749](https://github.com/Kong/deck/pull/1749)
+[go-database-reconciler #336](https://github.com/Kong/go-database-reconciler/pull/336)
+- Fixed output of `deck file kong2tf` by replacing unsupported characters in resource names with underscores.
+[#1756](https://github.com/Kong/deck/pull/1756)
+
+### Chores
+- Bump golang version to v1.24.6 to resolve CVE-2025-47906
+[#1761](https://github.com/Kong/deck/pull/1761)
+- Switched to the new API endpoint for updating Upstream Targets.
+[go-database-reconciler #323](https://github.com/Kong/go-database-reconciler/pull/323)
+
+## [v1.51.0]
+> Release date: 2025/08/28
+
+### Added
+- Added support to migrate configurations
+between LTS versions `3.4` and `3.10`. The `deck file convert` 
+command can auto-fix the possible configurations and gives 
+appropriate errors or warnings for the others.
+This is how it can be used: `deck file convert --from 3.4 --to 3.10
+--input-file kong-34x.yaml -o kong-310x.yaml`
+[#1734](https://github.com/Kong/deck/pull/1734)
+- Added support in `deck file openapi2kong`
+to ignore circular references.
+[#1714](https://github.com/Kong/deck/pull/1714)
+[go-apiops #243](https://github.com/Kong/go-apiops/pull/243)
+
+### Chores
+- Switched to `speakeasy-api/jsonpath` for better
+jsonpath parsing.
+[go-apiops #275](https://github.com/Kong/go-apiops/pull/275)
+- Added additional sanitization exemptions for
+deck dump --sanitize feature.
+[#1738](https://github.com/Kong/deck/pull/1738)
+
+## [v1.50.0]
+> Release date: 2025/08/20
+
+### Added
+- Added sanitization for configurations via `deck gateway dump`
+command, using `--sanitize` flag.
+[#1721](https://github.com/Kong/deck/pull/1721)
+[#1719](https://github.com/Kong/deck/pull/1719)
+[#1724](https://github.com/Kong/deck/pull/1724)
+[#1726](https://github.com/Kong/deck/pull/1726)
+[#1728](https://github.com/Kong/deck/pull/1728)
+[#1732](https://github.com/Kong/deck/pull/1732)
+[#1731](https://github.com/Kong/deck/pull/1731)
+[go-database-reconciler #313](https://github.com/Kong/go-database-reconciler/pull/313)
+- Added partial support to `deck file kong2tf` command
+[#1715](https://github.com/Kong/deck/pull/1715)
+- Added sticky sessions' config for upstream entity.
+[go-database-reconciler #328](https://github.com/Kong/go-database-reconciler/pull/328)
+
+## [v1.49.2]
+> Release date: 2025/07/30
+
+### Fixed
+- Fixed partial apply failure for nested routes, consumers.
+[#1691](https://github.com/Kong/deck/pull/1691)
+[go-database-reconciler #309](https://github.com/Kong/go-database-reconciler/pull/309)
+- Fixed panic while running `deck file openapi2kong` command with `--generate-security` flag.
+[#1695](https://github.com/Kong/deck/pull/1695)
+[go-apiops #274](https://github.com/Kong/go-apiops/pull/274)
+- Fixed false diff on consumer_groups created via AdminAPI/Kong Manager.
+[go-database-reconciler #307](https://github.com/Kong/go-database-reconciler/pull/307)
+
+### Chores
+- Bump golang version to v1.24.4 to resolve CVE-2025-228774
+[#1705](https://github.com/Kong/deck/pull/1705)
+
+## [v1.49.1]
+> Release date: 2025/06/27
+
+### Fixed
+- Sync failures due to missing names for keys, keysets.
+[#1675](https://github.com/Kong/deck/pull/1675)
+[go-database-reconciler #301](https://github.com/Kong/go-database-reconciler/pull/301)
+- Fixed online validation for partials.
+[#1666](https://github.com/Kong/deck/pull/1666)
+- Fixed error message passed to end-users while using
+offline (file) validation with default_lookup_tags.
+[#1669](https://github.com/Kong/deck/pull/1669)
+- Fixed service configuration generation when no servers
+are present in an OAS document while using `deck file
+openapi2kong` command.
+[#1676](https://github.com/Kong/deck/pull/1676)
+[go-apiops #273](https://github.com/Kong/go-apiops/pull/273)
+
+## [v1.49.0]
+> Release date: 2025/06/17
+
+### Added
+- Added default_lookup_tags for partials.
+[#1653](https://github.com/Kong/deck/pull/1653)
+[go-database-reconciler #291](https://github.com/Kong/go-database-reconciler/pull/291)
+
+### Fixed
+- Skipping custom-entities in dump if select tags are set, so
+as to not cause sync failures or undesirable deletions.
+[#1662](https://github.com/Kong/deck/pull/1662)
+[go-database-reconciler #296](https://github.com/Kong/go-database-reconciler/pull/296)
+- Fixed partial linking in case of nested plugins.
+[go-database-reconciler #289](https://github.com/Kong/go-database-reconciler/pull/289)
+- Fixed false diffs due to ca_cert order in service config.
+[go-database-reconciler #288](https://github.com/Kong/go-database-reconciler/pull/288)
+- Allowed empty string as path param if minLength is 0 in
+`deck file openapi2kong`.
+[#1660](https://github.com/Kong/deck/pull/1660)
+[go-apiops #271](https://github.com/Kong/go-apiops/pull/271)
+- Fixed extra service creation in absence of top-level servers block
+in `deck file openapi2kong`.
+[go-apiops #270](https://github.com/Kong/go-apiops/pull/270)
+
+## [v1.48.0]
+> Release date: 2025/05/30
+
+### Added
+- Added support for keys and key_sets in deck
+[#1645](https://github.com/Kong/deck/pull/1645)
+[go-database-reconciler #274](https://github.com/Kong/go-database-reconciler/pull/274)
+[go-database-reconciler #279](https://github.com/Kong/go-database-reconciler/pull/279)
+[go-database-reconciler #283](https://github.com/Kong/go-database-reconciler/pull/283)
+[go-database-reconciler #286](https://github.com/Kong/go-database-reconciler/pull/286)
+[go-database-reconciler #287](https://github.com/Kong/go-database-reconciler/pull/287)
+
+### Fixed
+- Gained performance boost during sync and diff operations
+by caching schemas for plugins and partials.
+[go-database-reconciler #285](https://github.com/Kong/go-database-reconciler/pull/285)
+- Corrected request body for ConsumerGroupConsumer creation.
+[go-kong #545](https://github.com/Kong/go-kong/pull/545)
+- Fixed `deck file openapi2kong` command to fail fast if no 
+paths are provided in OAS document, give a warning if 
+explicitly set to empty.
+[#1631](https://github.com/Kong/deck/pull/1631)
+[go-apiops #263](https://github.com/Kong/go-apiops/pull/263)
+
+### Chores
+- Upgraded underlying alpine version for docker images to
+v3.21.3
+[1541](https://github.com/Kong/deck/pull/1541)
 
 ## [v1.47.1]
 > Release date: 2025/05/12
@@ -2137,7 +2371,18 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
-
+[v1.53.2]: https://github.com/Kong/deck/compare/v1.53.1...v1.53.2
+[v1.53.1]: https://github.com/Kong/deck/compare/v1.53.0...v1.53.1
+[v1.53.0]: https://github.com/Kong/deck/compare/v1.52.1...v1.53.0
+[v1.52.1]: https://github.com/Kong/deck/compare/v1.52.0...v1.52.1
+[v1.52.0]: https://github.com/Kong/deck/compare/v1.51.1...v1.52.0
+[v1.51.1]: https://github.com/Kong/deck/compare/v1.51.0...v1.51.1
+[v1.51.0]: https://github.com/Kong/deck/compare/v1.50.0...v1.51.0
+[v1.50.0]: https://github.com/Kong/deck/compare/v1.49.2...v1.50.0
+[v1.49.2]: https://github.com/Kong/deck/compare/v1.49.1...v1.49.2
+[v1.49.1]: https://github.com/Kong/deck/compare/v1.49.0...v1.49.1
+[v1.49.0]: https://github.com/Kong/deck/compare/v1.48.0...v1.49.0
+[v1.48.0]: https://github.com/Kong/deck/compare/v1.47.1...v1.48.0
 [v1.47.1]: https://github.com/Kong/deck/compare/v1.47.0...v1.47.1
 [v1.47.0]: https://github.com/Kong/deck/compare/v1.46.3...v1.47.0
 [v1.46.3]: https://github.com/Kong/deck/compare/v1.46.2...v1.46.3

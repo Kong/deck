@@ -1,0 +1,7 @@
+_format_version: "3.0"
+_workspace: notdefault
+services:
+  - name: svc1
+    host: mockbin.org
+    tags:
+    - service-tag

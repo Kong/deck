@@ -14,28 +14,27 @@ on:
         default: 'main'
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_GW_TIMEOUT) }}
     name: "${{ inputs.kong_image }} against ${{ inputs.branch }}"
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ inputs.kong_image }}
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
       - name: Execution Information
         run: |
           echo "Kong Gateway Image = ${{ inputs.kong_image }}"
           echo "decK Branch = ${{ inputs.branch }}"
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{secrets.DOCKERHUB_PULL_USERNAME}}
-          password: ${{secrets.DOCKERHUB_PULL_TOKEN}}
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
         with:
           ref: ${{ inputs.branch }}
       - name: Setup go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5
         with:
           go-version-file: go.mod
       - uses: Kong/kong-license@master

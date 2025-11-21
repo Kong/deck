@@ -87,6 +87,7 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 		return
 	}
 	kong.RunWhenKong(t, kongSemverRange)
+	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
 func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
@@ -99,6 +100,7 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 		return
 	}
 	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
+	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
 func runWhen(t *testing.T, mode string, semverRange string) {
@@ -108,12 +110,23 @@ func runWhen(t *testing.T, mode string, semverRange string) {
 	case "kong":
 		skipWhenKonnect(t)
 		kong.RunWhenKong(t, semverRange)
+		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "enterprise":
 		skipWhenKonnect(t)
 		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "konnect":
 		runWhenKonnect(t)
 	}
+}
+
+func runWhenExpressions(t *testing.T, semverRange string) {
+	t.Helper()
+	skipWhenKonnect(t)
+
+	// limiting to enterprise for now
+	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+	kong.RunWhenKongRouterFlavor(t, "expressions")
 }
 
 func sortSlices(x, y interface{}) bool {
@@ -187,7 +200,16 @@ func sortSlices(x, y interface{}) bool {
 		if yEntity.ConsumerGroup != nil {
 			yName += *yEntity.ConsumerGroup.ID
 		}
+	case *kong.Key:
+		yEntity := y.(*kong.Key)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
+	case *kong.KeySet:
+		yEntity := y.(*kong.KeySet)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
 	}
+
 	return xName < yName
 }
 
@@ -237,6 +259,9 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.IgnoreFields(kong.ConsumerGroupPlugin{}, "CreatedAt", "ID"),
 		cmpopts.IgnoreFields(kong.KeyAuth{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.FilterChain{}, "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Key{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.KeySet{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.Partial{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
@@ -336,7 +361,7 @@ func multiFileSync(ctx context.Context, kongFiles []string, opts ...string) erro
 
 func diff(kongFile string, opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"diff", "-s", kongFile}
+	args := []string{"gateway", "diff", kongFile}
 	if len(opts) > 0 {
 		args = append(args, opts...)
 	}

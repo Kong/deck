@@ -1,0 +1,11 @@
+_format_version: "3.0"
+key_sets:
+- id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+keys:
+- id: 1d15274d-76ae-4aec-928e-1b395cc1333f
+  jwk: '{"kty": "RSA", "kid": "vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4", "n":
+    "v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ",
+    "e": "AQAB", "alg": "A256GCM"}'
+  kid: vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4
+  set:
+    id: d46b0e15-ffbc-4b15-ad92-09ef67935453

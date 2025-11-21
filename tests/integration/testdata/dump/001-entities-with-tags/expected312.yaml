@@ -1,0 +1,300 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  select_tags:
+  - managed-by-deck
+  - org-unit-42
+certificates:
+- cert: |
+    -----BEGIN CERTIFICATE-----
+    MIIC1jCCAb4CCQCt23nwvxSCvjANBgkqhkiG9w0BAQsFADAtMRYwFAYDVQQDDA0q
+    LmV4YW1wbGUuY29tMRMwEQYDVQQKDAprb25naHEub3JnMB4XDTE4MTIzMTIwMTkw
+    MVoXDTE5MTIzMTIwMTkwMVowLTEWMBQGA1UEAwwNKi5leGFtcGxlLmNvbTETMBEG
+    A1UECgwKa29uZ2hxLm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+    AKj/2r1AXo9x+2Csrd0SHbpnzuW+xYqgsd+YA9ZrZNV7SZGSbaZymsRMz8wg5OIU
+    iUik2GM1749/lYvojLFStBPy9UY/gd++5f3wLp4xHiI+IU2XQ97otXKGfyh36RmN
+    dKDqPLN8BG3R346s/y1GOulFvLthYmZVYF9ufHiqimfEDSbTt79P5C3X0Rw/afK1
+    GjHEJPCB/XkZ6lkcEyL6LqZI5oBigDqa9hI/nWLxEzfm8pgosiS38p9TAijlOkpm
+    tX2p2b1pktlNIy3rxsqj6IynN9Wc7FpV1N4HoPKV7vQQ08hjwW6WfanVthaaJosj
+    Vr2TBCJ1ltAmsb+5B2VPYVkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAnByTyQfV
+    3LkwuoWS57CWcqbNw/cHnv/ChzmIv+6mIXvDBSvCgrPZIWCpaCfYRG6R51E44fr/
+    8V1AKT0Zt15DjrXEEcIGQgsIDO91/wlL091fTAUzSbL0yt7HTlm8sX6xndPNAZrq
+    cfcIPVMxknfqPy2VqS4IrNC03pHkDKtokphBjVUlkiWsdcq+fHYbS2xL2d1Da/uN
+    hX/iwgo+v5gOF5xtaXx7D7L3Cf+MHb/MOXWPfYXNiTpSBVX8/Kx5RP+QLI16nWvw
+    lrijTlXZFR8NIZBrCo/QZ2cNbUAbN3R0n+/kMFubxBL8WEm6Qhi9jBjbJeDMspd8
+    C+/TZJQMpx5vyA==
+    -----END CERTIFICATE-----
+  id: 13c562a1-191c-4464-9b18-e5222b46035b
+  key: |
+    -----BEGIN PRIVATE KEY-----
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCo/9q9QF6Pcftg
+    rK3dEh26Z87lvsWKoLHfmAPWa2TVe0mRkm2mcprETM/MIOTiFIlIpNhjNe+Pf5WL
+    6IyxUrQT8vVGP4HfvuX98C6eMR4iPiFNl0Pe6LVyhn8od+kZjXSg6jyzfARt0d+O
+    rP8tRjrpRby7YWJmVWBfbnx4qopnxA0m07e/T+Qt19EcP2nytRoxxCTwgf15GepZ
+    HBMi+i6mSOaAYoA6mvYSP51i8RM35vKYKLIkt/KfUwIo5TpKZrV9qdm9aZLZTSMt
+    68bKo+iMpzfVnOxaVdTeB6Dyle70ENPIY8Fuln2p1bYWmiaLI1a9kwQidZbQJrG/
+    uQdlT2FZAgMBAAECggEAVnyRcda2Tcy0K7ZTR9aUlie370VhDN/OB7JhDGNreAEf
+    FjuMl+kAoUL5+OpAmB6QXzfVcXhRv+s4GiCJl9nORINK2Id5rIqiYwF+qgBS/o0z
+    N+UYm8QVz6Va/9fV1/jXXd5h8Cygi58jPH32HTJaxbSlsHNXCy3YIx6E3q/QIueR
+    6ZdSXPqMEqxEU19M9jW8UeiRFrpmcyYxVpfxYIY/+O9lYjSpaeLs7hZeCP9PqWXA
+    Sxz2CnHZ8BcsDxAyuoHoVw+kjMpUMvA3sD4lwkV8BAYzfLmQf6PR83SFNsrE8XYu
+    /8WnQuCuytcl8Zg55R6tGCvf6Wyyf+MDRPwv/43QMQKBgQDbqK9Dq54k+EHgSNnP
+    K6AhNjFd6aqcNC1kom/sSlWBnuA/BEqJMECr8S2dYvzONUPPfX5NNUjB4Vw3Qw7a
+    pUgKuCQoVpzpZs5m1bk78itWDtA84LjkXfdejnUXVw/aVxLCM5QV9aEkm/dEWWMI
+    P1WTYVoWoZCLlEE08q0AvZQcdQKBgQDE9ZCmc6ncmhnQftuRj5PnXG2a79MLCT61
+    sCEBDVvkcUJVqbzwGRLwRkdIzLgvmiuP+SukHgyfr8/RXG99xEW/q7NDrtEcqfXP
+    19QXwOIp5NwDnOXyAlXiyZ50fCE2tSo2wP485+NIhmKj5Zt6y/DL6Qbc5k73XmK4
+    KX5Ej15k1QKBgQCc6KeiIFLMt+Ze78tfORue/dZP7p3oDUGr1Hk9AnCIMlSfz1Hr
+    I+Per17VQaOzLcttyYhSYNDDZld4RlezCkQnHBkAE7bs53pjbSJv1vLr+5L3GdQZ
+    laIiEoNEE/YIExEcVrne4eKlgyAj2/JpLszThcRTzD+z5UibKQs6LzJBDQKBgDVa
+    dAGzCUt57w48nwvyQdWFgydaWef+bB9Zg8c+MCtUxuxfm4/Kqwetcff1hNtYPv60
+    N68weKj1Pi1vhcAi3+YJA/mMrJbAL5dK1uhMVreUiEjuQpfpLAzQIv1Y9sJUFwhY
+    BUbIZhgqVyQguZptDmCeUj6aoL9/sOxESTEXSTG1AoGBAMQ5iJZMsdLCERv0+6Y1
+    F/t/YSW8cugB3vdV9jHZuosoprz48p92pYP8OdQc70H5hZt53hoYNgYFSd+MU6H1
+    hJCaXTsiP4IUmBjiwzSp3o1ctP8lWvnyJpAadYdDhaDaAAoaMjCo9cm5OMwc8t8x
+    hwAPXV2cgWH8fPcT9NLAcwWk
+    -----END PRIVATE KEY-----
+  snis:
+  - name: demo1.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  - name: demo2.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  - name: demo3.example.com
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - cloudops-managed
+  - managed-by-deck
+  - org-unit-42
+consumers:
+- acls:
+  - group: foo-group
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  hmacauth_credentials:
+  - secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
+    tags:
+    - managed-by-deck
+    - org-unit-42
+    username: hmac-user
+  jwt_secrets:
+  - algorithm: HS256
+    key: MKWeR0nu9OAUR9HrjpUG82Hbfz7ZXsIw
+    secret: 6gkrxTKAraykMSpmnLNEGiEE3Yz8XL6U
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  keyauth_credentials:
+  - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
+  username: harry
+plugins:
+- config:
+    ai_metrics: false
+    bandwidth_metrics: false
+    latency_metrics: false
+    per_consumer: false
+    status_code_metrics: false
+    upstream_health_metrics: false
+    wasm_metrics: null
+  enabled: true
+  name: prometheus
+  protocols:
+  - http
+  - https
+  tags:
+  - managed-by-deck
+  - org-unit-42
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 301
+    name: r1
+    path_handling: v0
+    paths:
+    - /r1
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - team-svc1
+  - managed-by-deck
+  - org-unit-42
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc2
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 301
+    name: r2
+    path_handling: v0
+    paths:
+    - /r2
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc3
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - https_redirect_status_code: 301
+    methods:
+    - GET
+    name: r3
+    path_handling: v0
+    paths:
+    - /r3
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+    tags:
+    - managed-by-deck
+    - org-unit-42
+  tags:
+  - managed-by-deck
+  - org-unit-42
+  write_timeout: 60000
+upstreams:
+- algorithm: round-robin
+  hash_fallback: none
+  hash_on: none
+  hash_on_cookie_path: /
+  healthchecks:
+    active:
+      concurrency: 10
+      healthy:
+        http_statuses:
+        - 200
+        - 302
+        interval: 0
+        successes: 0
+      http_path: /
+      https_verify_certificate: true
+      timeout: 1
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 404
+        - 500
+        - 501
+        - 502
+        - 503
+        - 504
+        - 505
+        interval: 0
+        tcp_failures: 0
+        timeouts: 0
+    passive:
+      healthy:
+        http_statuses:
+        - 200
+        - 201
+        - 202
+        - 203
+        - 204
+        - 205
+        - 206
+        - 207
+        - 208
+        - 226
+        - 300
+        - 301
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+        successes: 0
+      type: http
+      unhealthy:
+        http_failures: 0
+        http_statuses:
+        - 429
+        - 500
+        - 503
+        tcp_failures: 0
+        timeouts: 0
+    threshold: 0
+  name: upstream1
+  slots: 10000
+  sticky_sessions_cookie_path: /
+  tags:
+  - managed-by-deck
+  - org-unit-42
+  targets:
+  - failover: false
+    tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.11:80
+    weight: 100
+  - failover: false
+    tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.12:80
+    weight: 100
+  - failover: false
+    tags:
+    - managed-by-deck
+    - org-unit-42
+    target: 198.51.100.13:80
+    weight: 100
+  use_srv_name: false

@@ -1,0 +1,75 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+vaults:
+- config:
+    endpoint_url: https://example-aws.com
+    region: us-east-1
+  name: aws
+  prefix: my-aws-vault
+  tags:
+  - tag1
+- config:
+    endpoint_url: https://example-aws.com
+    region: ap-south-1
+  name: aws
+  prefix: my-aws-vault-2
+  tags:
+  - tag1
+- config:
+    location: test-location
+    vault_uri: http://azure-vault.test
+  name: azure
+  prefix: my-azure-vault
+  tags:
+  - tag1
+- config:
+    account: test-ac
+    api_key: test-key
+    endpoint_url: http://example-server.test
+    login: test-id
+  name: conjur
+  prefix: my-conjur-vault
+  tags:
+  - tag1
+- config:
+    prefix: TEST_
+  name: env
+  prefix: my-env-vault
+  tags:
+  - tag1
+- config:
+    project_id: test-123
+  name: gcp
+  prefix: my-gcp-vault
+  tags:
+  - tag1
+- config:
+    host: 127.0.0.1
+    port: 8200
+    token: example-token
+  name: hcv
+  prefix: my-hcv-vault1
+  tags:
+  - tag1
+- config:
+    auth_method: kubernetes
+    host: 127.0.0.1
+    kube_api_token_file: test-file
+    kube_role: test-role
+    port: 8200
+  name: hcv
+  prefix: my-hcv-vault2
+  tags:
+  - tag1
+- config:
+    approle_response_wrapping: true
+    approle_role_id: test-id-123
+    approle_secret_id: test-secret-123
+    auth_method: approle
+    host: 127.0.0.1
+    port: 8200
+  name: hcv
+  prefix: my-hcv-vault3
+  tags:
+  - tag2

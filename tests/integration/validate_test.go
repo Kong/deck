@@ -3,6 +3,7 @@
 package integration
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -84,8 +85,8 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  true,
 			errorString: "invalid value 'services' for --online-entities-list; it should be a valid " +
 				"Kong entity (case-sensitive). Valid entities: [ACLGroups BasicAuths CACertificates Certificates Consumers " +
-				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Plugins RBACEndpointPermissions RBACRoles " +
-				"Routes SNIs Services Targets Upstreams Vaults]",
+				"Documents FilterChains HMACAuths JWTAuths KeyAuths Oauth2Creds Partials Plugins RBACEndpointPermissions " +
+				"RBACRoles Routes SNIs Services Targets Upstreams Vaults]",
 		},
 		{
 			name:           "validate with correct online list, passed via --online-entities-list cli flag",
@@ -219,11 +220,16 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 	setup(t)
 	runWhen(t, "enterprise", ">=2.8.0")
 
+	ctx := context.Background()
+
 	tests := []struct {
 		name           string
+		priorStateFile string
 		stateFile      string
 		additionalArgs []string
 		errorExpected  bool
+		errorString    string
+		resetOpts      []string
 	}{
 		{
 			name:           "validate format version 1.1",
@@ -246,6 +252,19 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			additionalArgs: []string{"--workspace=default"},
 		},
 		{
+			name:          "validate with non existent _workspace in state file",
+			stateFile:     "testdata/validate/kong-ee-non-existent-workspace.yaml",
+			errorExpected: true,
+			errorString:   "workspace doesn't exist: nonexistent",
+		},
+		{
+			name:           "validate with non-default _workspace and default_lookup_tags",
+			priorStateFile: "testdata/validate/kong-ee-non-default-workspace-prereq.yaml",
+			stateFile:      "testdata/validate/kong-ee-non-default-workspace-with-lookup-tags.yaml",
+			errorExpected:  false,
+			resetOpts:      []string{"--workspace=notdefault"},
+		},
+		{
 			name:           "validate format version 3.0 with --online-entities-list",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
@@ -260,12 +279,91 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if tc.priorStateFile != "" {
+				require.NoError(t, sync(ctx, tc.priorStateFile))
+			}
+
 			validateOpts := []string{
 				tc.stateFile,
 			}
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
+
+			if !tc.errorExpected {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+				if tc.errorString != "" {
+					assert.Contains(t, err.Error(), tc.errorString)
+				}
+			}
+
+			// Clean up if a non-default workspace was used
+			if len(tc.resetOpts) > 0 {
+				reset(t, tc.resetOpts...)
+				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func Test_Validate_PartialLookupTags(t *testing.T) {
+	setup(t)
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		mode           bool
+		errorExpected  bool
+		errorString    string
+	}{
+		{
+			name:           "validate partials",
+			stateFile:      "testdata/validate/001-partials/partials.yaml",
+			additionalArgs: []string{"--online-entities-list=Partials"},
+			mode:           ONLINE,
+		},
+		{
+			name:      "validate default_lookup_tags with partials",
+			stateFile: "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:      ONLINE,
+		},
+		{
+			name:      "validate partials",
+			stateFile: "testdata/validate/001-partials/partials.yaml",
+			mode:      OFFLINE,
+		},
+		{
+			name:          "validate default_lookup_tags with partials",
+			stateFile:     "testdata/validate/001-partials/partial-lookup-tags.yaml",
+			mode:          OFFLINE,
+			errorExpected: true,
+			errorString: "[default_lookup_tags] not supported for offline validation, " +
+				"use `deck gateway validate` command instead",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			require.NoError(t, sync(ctx, "testdata/validate/001-partials/partials.yaml"))
+
+			validateOpts := []string{
+				tc.stateFile,
+			}
+			validateOpts = append(validateOpts, tc.additionalArgs...)
+
+			err := validate(tc.mode, validateOpts...)
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.Contains(t, err.Error(), tc.errorString)
+				return
+			}
 			require.NoError(t, err)
 		})
 	}

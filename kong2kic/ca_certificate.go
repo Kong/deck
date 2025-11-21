@@ -18,11 +18,11 @@ func populateKICCACertificate(content *file.Content, file *KICContent) {
 			secret     k8scorev1.Secret
 			secretName = "ca-cert-" + fmt.Sprintf("%x", digest)
 		)
-		secret.TypeMeta.APIVersion = "v1"
-		secret.TypeMeta.Kind = SecretKind
+		secret.APIVersion = "v1"
+		secret.Kind = SecretKind
 		secret.Type = k8scorev1.SecretTypeOpaque
-		secret.ObjectMeta.Name = calculateSlug(secretName)
-		secret.ObjectMeta.Annotations = map[string]string{IngressClass: ClassName}
+		secret.Name = calculateSlug(secretName)
+		secret.Annotations = map[string]string{IngressClass: ClassName}
 		secret.StringData = make(map[string]string)
 		if caCert.Cert != nil {
 			secret.StringData["ca.crt"] = *caCert.Cert
@@ -43,7 +43,7 @@ func populateKICCACertificate(content *file.Content, file *KICContent) {
 					tags = append(tags, *tag)
 				}
 			}
-			secret.ObjectMeta.Annotations[KongHQTags] = strings.Join(tags, ",")
+			secret.Annotations[KongHQTags] = strings.Join(tags, ",")
 		}
 
 		file.Secrets = append(file.Secrets, secret)

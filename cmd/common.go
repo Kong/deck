@@ -177,6 +177,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		cmd = "diff"
 	}
 
+	dumpConfig.SkipHashForBasicAuth = determineSkipHashForBasicAuth(*targetContent, dumpConfig)
+
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
 	if mode == modeKonnect {
@@ -208,6 +210,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 		dumpConfig.KonnectControlPlane = konnectControlPlane
+	}
+
+	if dumpConfig.SkipHashForBasicAuth && mode != modeKonnect {
+		return errors.New("skip-hash-for-basic-auth functionality can be used with Konnect only")
 	}
 
 	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
@@ -271,6 +277,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
+	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsConsumers != nil {
+		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
+		if err != nil {
+			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
+		}
+		for _, c := range consumersGlobal {
+			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
+		}
+	}
+
 	if dumpConfig.SkipConsumersWithConsumerGroups {
 		ok, err := validateSkipConsumersWithConsumerGroups(*targetContent, dumpConfig)
 		if err != nil || !ok {
@@ -289,30 +310,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if err != nil {
 			return fmt.Errorf("error retrieving global consumer groups via lookup selector tags: %w", err)
 		}
+		consumersExistInTargetContent := len(targetContent.Consumers) > 0
 		for _, c := range consumerGroupsGlobal {
-			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups,
-				file.FConsumerGroupObject{ConsumerGroup: *c.ConsumerGroup})
-			if err != nil {
-				return fmt.Errorf("error adding global consumer group %v: %w", *c.ConsumerGroup.Name, err)
+			cgo := file.FConsumerGroupObject{
+				ConsumerGroup: *c.ConsumerGroup,
 			}
-		}
-	}
-
-	dumpConfig.LookUpSelectorTagsConsumers, err = determineLookUpSelectorTagsConsumers(*targetContent)
-	if err != nil {
-		return fmt.Errorf("error determining lookup selector tags for consumers: %w", err)
-	}
-
-	if dumpConfig.LookUpSelectorTagsConsumers != nil {
-		consumersGlobal, err := dump.GetAllConsumers(ctx, kongClient, dumpConfig.LookUpSelectorTagsConsumers)
-		if err != nil {
-			return fmt.Errorf("error retrieving global consumers via lookup selector tags: %w", err)
-		}
-		for _, c := range consumersGlobal {
-			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{Consumer: *c})
-			if err != nil {
-				return fmt.Errorf("error adding global consumer %v: %w", *c.Username, err)
+			if len(c.Consumers) > 0 {
+				addUniqueConsumersInTargetContent(targetContent, c.Consumers, &cgo, consumersExistInTargetContent)
 			}
+			targetContent.ConsumerGroups = append(targetContent.ConsumerGroups, cgo)
 		}
 	}
 
@@ -328,9 +334,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, r := range routesGlobal {
 			targetContent.Routes = append(targetContent.Routes, file.FRoute{Route: *r})
-			if err != nil {
-				return fmt.Errorf("error adding global route %v: %w", r.FriendlyName(), err)
-			}
 		}
 	}
 
@@ -346,9 +349,21 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		for _, r := range servicesGlobal {
 			targetContent.Services = append(targetContent.Services, file.FService{Service: *r})
-			if err != nil {
-				return fmt.Errorf("error adding global service %v: %w", r.FriendlyName(), err)
-			}
+		}
+	}
+
+	dumpConfig.LookUpSelectorTagsPartials, err = determineLookUpSelectorTagsPartials(*targetContent)
+	if err != nil {
+		return fmt.Errorf("error determining lookup selector tags for partials: %w", err)
+	}
+
+	if dumpConfig.LookUpSelectorTagsPartials != nil {
+		partialsGlobal, err := dump.GetAllPartials(ctx, kongClient, dumpConfig.LookUpSelectorTagsPartials)
+		if err != nil {
+			return fmt.Errorf("error retrieving global partials via lookup selector tags: %w", err)
+		}
+		for _, p := range partialsGlobal {
+			targetContent.Partials = append(targetContent.Partials, file.FPartial{Partial: *p})
 		}
 	}
 
@@ -386,7 +401,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			}
 		}
 	}
-
 	// read the target state
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 		CurrentState: currentState,
@@ -437,6 +451,63 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
+func addUniqueConsumersInTargetContent(targetContent *file.Content, consumers []*kong.Consumer,
+	consumerGroupObject *file.FConsumerGroupObject,
+	consumersExistInTargetContent bool,
+) {
+	containsConsumerInTargetContent := func(consumer *kong.Consumer) (bool, int) {
+		for i, c := range targetContent.Consumers {
+			if c.ID != nil && consumer.ID != nil && *c.ID == *consumer.ID {
+				return true, i
+			} else if c.Username != nil && consumer.Username != nil && *c.Username == *consumer.Username {
+				return true, i
+			} else if c.CustomID != nil && consumer.CustomID != nil && *c.CustomID == *consumer.CustomID {
+				return true, i
+			}
+		}
+		return false, -1
+	}
+
+	consumerGroup := &consumerGroupObject.ConsumerGroup
+
+	for _, consumer := range consumers {
+		found, index := containsConsumerInTargetContent(consumer)
+		if !found {
+			targetContent.Consumers = append(targetContent.Consumers, file.FConsumer{
+				Consumer: *consumer,
+				Groups: []*kong.ConsumerGroup{
+					consumerGroup,
+				},
+			})
+			consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+		} else {
+			groups := targetContent.Consumers[index].Groups
+
+			if !consumersExistInTargetContent {
+				groups = append(groups, consumerGroup)
+				targetContent.Consumers[index].Groups = groups
+				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+
+				continue
+			}
+
+			groupExists := false
+			for _, g := range groups {
+				if g.ID != nil && consumerGroup.ID != nil && *g.ID == *consumerGroup.ID {
+					groupExists = true
+					break
+				} else if g.Name != nil && consumerGroup.Name != nil && *g.Name == *consumerGroup.Name {
+					groupExists = true
+					break
+				}
+			}
+			if groupExists {
+				consumerGroupObject.Consumers = append(consumerGroupObject.Consumers, consumer)
+			}
+		}
+	}
+}
+
 func validateSkipConsumersWithConsumerGroups(targetContent file.Content, config dump.Config) (bool, error) {
 	if len(targetContent.Consumers) > 0 {
 		for _, consumer := range targetContent.Consumers {
@@ -472,6 +543,18 @@ func determinePolicyOverride(targetContent file.Content, config dump.Config) boo
 
 	if targetContent.Info != nil && targetContent.Info.ConsumerGroupPolicyOverrides {
 		return targetContent.Info.ConsumerGroupPolicyOverrides
+	}
+
+	return false
+}
+
+func determineSkipHashForBasicAuth(targetContent file.Content, config dump.Config) bool {
+	if config.SkipHashForBasicAuth {
+		return true
+	}
+
+	if targetContent.Info != nil && targetContent.Info.SkipHashForBasicAuth {
+		return targetContent.Info.SkipHashForBasicAuth
 	}
 
 	return false
@@ -532,6 +615,21 @@ func determineLookUpSelectorTagsServices(targetContent file.Content) ([]string, 
 		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Services)
 		sort.Strings(targetContent.Info.LookUpSelectorTags.Services)
 		return targetContent.Info.LookUpSelectorTags.Services, nil
+
+	}
+	return nil, nil
+}
+
+func determineLookUpSelectorTagsPartials(targetContent file.Content) ([]string, error) {
+	if targetContent.Info != nil &&
+		targetContent.Info.LookUpSelectorTags != nil &&
+		targetContent.Info.LookUpSelectorTags.Partials != nil {
+		if len(targetContent.Info.LookUpSelectorTags.Partials) == 0 {
+			return nil, fmt.Errorf("global partials specified but no global tags")
+		}
+		reconcilerUtils.RemoveDuplicates(&targetContent.Info.LookUpSelectorTags.Partials)
+		sort.Strings(targetContent.Info.LookUpSelectorTags.Partials)
+		return targetContent.Info.LookUpSelectorTags.Partials, nil
 
 	}
 	return nil, nil

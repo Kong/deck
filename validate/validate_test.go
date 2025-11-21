@@ -179,6 +179,15 @@ func Test_getEntityNameOrID(t *testing.T) {
 			},
 			expected: "4bfcb11f-c962-4817-83e5-9433cf20b663",
 		},
+		{
+			name: "get partial Name",
+			entity: &kong.Partial{
+				ID:   kong.String("4bfcb11f-c962-4817-83e5-9433cf20b663"),
+				Name: kong.String("partial-name"),
+				Type: kong.String("partial-type"),
+			},
+			expected: "partial-name",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

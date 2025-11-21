@@ -1,0 +1,63 @@
+rules:
+  # declarative config rules
+  declarative-version-check:
+    given: $._format_version
+    message: >-
+      Incompatible config format version. Please upgrade the `_format_version` value to `3.0`.
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: '^3\.0$'
+
+  # plugins rules
+  session-plugin-check:
+    description: >-
+      New configuration field
+    given:
+      - $.plugins[?(@.name == 'session')].config
+      - $.services[*].plugins[?(@.name == 'session')].config
+      - $.routes[*].plugins[?(@.name == 'session')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'session')].config
+      - $.consumers[*].plugins[?(@.name == 'session')].config
+    message: >-
+      Kong Gateway 3.5.x introduced the new configuration field read_body_for_logout with a
+      default value of false. This change alters the behavior of logout_post_arg in such a way
+      that it is no longer considered, unless read_body_for_logout is explicitly set to true.
+      This adjustment prevents the Session plugin from automatically reading request bodies for
+      logout detection, particularly on POST requests.
+    severity: warn
+    then:
+      - field: read_body_for_logout
+        function: defined
+  azure-functions-plugin-check:
+    description: >-
+      New configuration field
+    given:
+      - $.plugins[?(@.name == 'azure-functions')].config
+      - $.services[*].plugins[?(@.name == 'azure-functions')].config
+      - $.routes[*].plugins[?(@.name == 'azure-functions')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'azure-functions')].config
+      - $.consumers[*].plugins[?(@.name == 'azure-functions')].config
+    message: >-
+      The Azure Functions plugin now eliminates the upstream/request URI and only uses the routeprefix
+      configuration field to construct the request path when requesting the Azure API.
+    severity: warn
+    then:
+      - field: routeprefix
+        function: defined
+  redis-timeout-config-plugin-check:
+    description: >-
+      Redis schema field timeout is deprecated, use connect_timeout, send_timeout and read_timeout instead.
+    given:
+      - $.plugins[?(@.name == 'ai-rate-limiting-advanced' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting-advanced')].config.redis
+      - $.services[*].plugins[?(@.name == 'ai-rate-limiting-advanced' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting-advanced')].config.redis
+      - $.routes[*].plugins[?(@.name == 'ai-rate-limiting-advanced' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting-advanced')].config.redis
+      - $.services[*].routes[*].plugins[?(@.name == 'ai-rate-limiting-advanced' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting-advanced')].config.redis
+      - $.consumers[*].plugins[?(@.name == 'ai-rate-limiting-advanced' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting-advanced')].config.redis
+    message: >-
+      Redis schema field timeout is deprecated, use connect_timeout, send_timeout and read_timeout instead.
+    severity: warn
+    then:
+      - field: timeout
+        function: falsy

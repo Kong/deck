@@ -63,7 +63,7 @@ If you are on macOS, install decK using brew:
 
 ```shell
 $ brew tap kong/deck
-$ brew install deck
+$ brew install kong/deck/deck
 ```
 
 ### Linux
@@ -73,7 +73,7 @@ the GitHub [release page](https://github.com/kong/deck/releases)
 or install by downloading the binary:
 
 ```shell
-$ curl -sL https://github.com/kong/deck/releases/download/v1.47.1/deck_1.47.1_linux_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/kong/deck/releases/download/v1.53.2/deck_1.53.2_linux_amd64.tar.gz -o deck.tar.gz
 $ tar -xf deck.tar.gz -C /tmp
 $ sudo cp /tmp/deck /usr/local/bin/
 ```
@@ -84,7 +84,7 @@ If you are on Windows, you can download the binary from the GitHub
 [release page](https://github.com/kong/deck/releases) or via PowerShell:
 
 ```shell
-$ curl -sL https://github.com/kong/deck/releases/download/v1.47.1/deck_1.47.1_windows_amd64.tar.gz -o deck.tar.gz
+$ curl -sL https://github.com/kong/deck/releases/download/v1.53.2/deck_1.53.2_windows_amd64.tar.gz -o deck.tar.gz
 $ tar -xzvf deck.tar.gz
 ```
 

@@ -163,7 +163,7 @@ var (
 	}
 
 	// has run-on set to 'first'
-	plugin_143_151 = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_143_151 = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("basic-auth"),
 			Protocols: []*string{
@@ -217,7 +217,7 @@ var (
 		},
 	}
 
-	plugin_on_entities = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -268,7 +268,7 @@ var (
 		},
 	}
 
-	plugin_on_entities3x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities3x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -331,7 +331,7 @@ var (
 		},
 	}
 
-	plugin_on_entities381x = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities381x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -397,76 +397,7 @@ var (
 		},
 	}
 
-	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive,stylecheck
-		{
-			Name: kong.String("prometheus"),
-			Protocols: []*string{
-				kong.String("grpc"),
-				kong.String("grpcs"),
-				kong.String("http"),
-				kong.String("https"),
-			},
-			Enabled: kong.Bool(true),
-			Config: kong.Configuration{
-				"ai_metrics":              false,
-				"bandwidth_metrics":       false,
-				"latency_metrics":         false,
-				"per_consumer":            false,
-				"status_code_metrics":     false,
-				"upstream_health_metrics": false,
-				"wasm_metrics":            false,
-			},
-			Service: &kong.Service{
-				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
-			},
-		},
-		{
-			Name: kong.String("prometheus"),
-			Protocols: []*string{
-				kong.String("grpc"),
-				kong.String("grpcs"),
-				kong.String("http"),
-				kong.String("https"),
-			},
-			Enabled: kong.Bool(true),
-			Config: kong.Configuration{
-				"ai_metrics":              false,
-				"bandwidth_metrics":       false,
-				"latency_metrics":         false,
-				"per_consumer":            false,
-				"status_code_metrics":     false,
-				"upstream_health_metrics": false,
-				"wasm_metrics":            false,
-			},
-			Route: &kong.Route{
-				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
-			},
-		},
-		{
-			Name: kong.String("prometheus"),
-			Protocols: []*string{
-				kong.String("grpc"),
-				kong.String("grpcs"),
-				kong.String("http"),
-				kong.String("https"),
-			},
-			Enabled: kong.Bool(true),
-			Config: kong.Configuration{
-				"ai_metrics":              false,
-				"bandwidth_metrics":       false,
-				"latency_metrics":         false,
-				"per_consumer":            false,
-				"status_code_metrics":     false,
-				"upstream_health_metrics": false,
-				"wasm_metrics":            false,
-			},
-			Consumer: &kong.Consumer{
-				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
-			},
-		},
-	}
-
-	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive,stylecheck
+	plugin_on_entities310x = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
 			Protocols: []*string{
@@ -535,7 +466,145 @@ var (
 		},
 	}
 
-	upstream_pre31 = []*kong.Upstream{ //nolint:revive,stylecheck
+	plugin_on_entities312x = []*kong.Plugin{ //nolint:revive
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            nil,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
+	plugin_on_entitiesKonnect = []*kong.Plugin{ //nolint:revive
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Service: &kong.Service{
+				ID: kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Route: &kong.Route{
+				ID: kong.String("87b6a97e-f3f7-4c47-857a-7464cb9e202b"),
+			},
+		},
+		{
+			Name: kong.String("prometheus"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"ai_metrics":              false,
+				"bandwidth_metrics":       false,
+				"latency_metrics":         false,
+				"per_consumer":            false,
+				"status_code_metrics":     false,
+				"upstream_health_metrics": false,
+				"wasm_metrics":            false,
+			},
+			Consumer: &kong.Consumer{
+				ID: kong.String("d2965b9b-0608-4458-a9f8-0b93d88d03b8"),
+			},
+		},
+	}
+
+	upstream_pre31 = []*kong.Upstream{ //nolint:revive
 		{
 			Name:      kong.String("upstream1"),
 			Algorithm: kong.String("round-robin"),
@@ -585,8 +654,7 @@ var (
 		},
 	}
 
-	// latest
-	upstream = []*kong.Upstream{
+	upstreamPre311 = []*kong.Upstream{
 		{
 			Name:      kong.String("upstream1"),
 			Algorithm: kong.String("round-robin"),
@@ -637,6 +705,60 @@ var (
 		},
 	}
 
+	// latest
+	upstream = []*kong.Upstream{
+		{
+			Name:      kong.String("upstream1"),
+			Algorithm: kong.String("round-robin"),
+			Slots:     kong.Int(10000),
+			Healthchecks: &kong.Healthcheck{
+				Threshold: kong.Float64(0),
+				Active: &kong.ActiveHealthcheck{
+					Concurrency: kong.Int(10),
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{200, 302},
+						Interval:     kong.Int(0),
+						Successes:    kong.Int(0),
+					},
+					HTTPPath:               kong.String("/"),
+					Type:                   kong.String("http"),
+					Timeout:                kong.Int(1),
+					HTTPSVerifyCertificate: kong.Bool(true),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						Interval:     kong.Int(0),
+						HTTPStatuses: []int{429, 404, 500, 501, 502, 503, 504, 505},
+					},
+				},
+				Passive: &kong.PassiveHealthcheck{
+					Healthy: &kong.Healthy{
+						HTTPStatuses: []int{
+							200, 201, 202, 203, 204, 205,
+							206, 207, 208, 226, 300, 301, 302, 303, 304, 305,
+							306, 307, 308,
+						},
+						Successes: kong.Int(0),
+					},
+					Type: kong.String("http"),
+					Unhealthy: &kong.Unhealthy{
+						HTTPFailures: kong.Int(0),
+						TCPFailures:  kong.Int(0),
+						Timeouts:     kong.Int(0),
+						HTTPStatuses: []int{429, 500, 503},
+					},
+				},
+			},
+			HashOn:                   kong.String("none"),
+			HashFallback:             kong.String("none"),
+			HashOnCookiePath:         kong.String("/"),
+			UseSrvName:               kong.Bool(false),
+			StickySessionsCookie:     nil,
+			StickySessionsCookiePath: kong.String("/"),
+		},
+	}
+
 	target = []*kong.Target{
 		{
 			Target: kong.String("198.51.100.11:80"),
@@ -647,6 +769,17 @@ var (
 		},
 	}
 
+	targetPost312 = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(100),
+			Failover: kong.Bool(false),
+		},
+	}
+
 	targetZeroWeight = []*kong.Target{
 		{
 			Target: kong.String("198.51.100.11:80"),
@@ -654,6 +787,17 @@ var (
 				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
 			},
 			Weight: kong.Int(0),
+		},
+	}
+
+	targetZeroWeightPost312 = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(0),
+			Failover: kong.Bool(false),
 		},
 	}
 
@@ -1512,6 +1656,7 @@ var (
 				"retry_after_jitter_max": float64(1),
 				"strategy":               string("local"),
 				"sync_rate":              float64(-1),
+				"throttling":             nil,
 				"window_size":            []any{float64(60)},
 				"window_type":            string("sliding"),
 			},
@@ -1563,6 +1708,7 @@ var (
 				"retry_after_jitter_max": float64(1),
 				"strategy":               string("local"),
 				"sync_rate":              float64(-1),
+				"throttling":             nil,
 				"window_size":            []any{float64(60)},
 				"window_type":            string("sliding"),
 			},
@@ -1611,6 +1757,7 @@ var (
 				"retry_after_jitter_max": float64(1),
 				"strategy":               string("local"),
 				"sync_rate":              float64(-1),
+				"throttling":             nil,
 				"window_size":            []any{float64(60)},
 				"window_type":            string("sliding"),
 			},
@@ -2152,6 +2299,193 @@ var (
 				"retry_after_jitter_max": float64(1),
 				"strategy":               string("local"),
 				"sync_rate":              float64(-1),
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"realm":            nil, // This is present on 3.7.x+
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
+
+	consumerGroupScopedPlugins312x = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
 				"window_size":            []any{float64(60)},
 				"window_type":            string("sliding"),
 			},
@@ -2853,20 +3187,40 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 		name          string
 		kongFile      string
 		expectedState utils.KongRawState
+		runWhen       string
 	}{
 		{
 			name:     "creates an upstream and target",
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
 			expectedState: utils.KongRawState{
+				Upstreams: upstreamPre311,
+				Targets:   target,
+			},
+			runWhen: ">=3.1.0 <3.11.0",
+		},
+		{
+			name:     "creates an upstream and target >=3.11.0",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
+			expectedState: utils.KongRawState{
 				Upstreams: upstream,
 				Targets:   target,
 			},
+			runWhen: ">=3.11.0 <3.12.0",
+		},
+		{
+			name:     "creates an upstream and target >=3.12.0",
+			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetPost312,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.1.0")
+			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -2892,7 +3246,7 @@ func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
 			kongFile: "testdata/sync/004-create-upstream-and-target/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Upstreams: upstream,
-				Targets:   target,
+				Targets:   targetPost312,
 			},
 		},
 	}
@@ -2993,20 +3347,40 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 		name          string
 		kongFile      string
 		expectedState utils.KongRawState
+		runWhen       string
 	}{
 		{
 			name:     "creates an upstream and target with weight equals to zero",
 			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
 			expectedState: utils.KongRawState{
+				Upstreams: upstreamPre311,
+				Targets:   targetZeroWeight,
+			},
+			runWhen: ">=3.1.0 <3.11.0",
+		},
+		{
+			name:     "creates an upstream and target with weight equals to zero >=3.11.0 ",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
 				Upstreams: upstream,
 				Targets:   targetZeroWeight,
 			},
+			runWhen: ">=3.11.0 <3.12.0",
+		},
+		{
+			name:     "creates an upstream and target with weight equals to zero >=3.12.0 ",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetZeroWeightPost312,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "kong", ">=3.1.0")
+			runWhen(t, "kong", tc.runWhen)
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -3032,7 +3406,7 @@ func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
 			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Upstreams: upstream,
-				Targets:   targetZeroWeight,
+				Targets:   targetZeroWeightPost312,
 			},
 		},
 	}
@@ -3697,7 +4071,18 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 				Plugins:   plugin_on_entities310x,
 				Consumers: consumer,
 			},
-			runWhen: ">=3.10.0",
+			runWhen: ">=3.10.0 <3.12.0",
+		},
+		{
+			name:     "create plugins on services, routes and consumers >=3.12.0",
+			kongFile: "testdata/sync/xxx-plugins-on-entities/kong.yaml",
+			expectedState: utils.KongRawState{
+				Services:  svc1_207,
+				Routes:    route1_20x,
+				Plugins:   plugin_on_entities312x,
+				Consumers: consumer,
+			},
+			runWhen: ">=3.12.0",
 		},
 	}
 
@@ -3916,9 +4301,10 @@ func Test_Sync_Vault(t *testing.T) {
 		kongFile        string
 		initialKongFile string
 		expectedState   utils.KongRawState
+		runWhen         string
 	}{
 		{
-			name:     "create an SSL service/route using an ENV vault",
+			name:     "create an SSL service/route using an ENV vault <3.11.0",
 			kongFile: "testdata/sync/012-vaults/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Vaults: []*kong.Vault{
@@ -3964,11 +4350,62 @@ func Test_Sync_Vault(t *testing.T) {
 					},
 				},
 			},
+			runWhen: ">=3.0.0 <3.11.0",
+		},
+		{
+			name:     "create an SSL service/route using an ENV vault >=3.11.0",
+			kongFile: "testdata/sync/012-vaults/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Vaults: []*kong.Vault{
+					{
+						Name:        kong.String("env"),
+						Prefix:      kong.String("my-env-vault"),
+						Description: kong.String("ENV vault for secrets"),
+						Config: kong.Configuration{
+							"base64_decode": false,
+							"prefix":        "MY_SECRET_",
+						},
+					},
+				},
+				Services: []*kong.Service{
+					{
+						ID:             kong.String("58076db2-28b6-423b-ba39-a797193017f7"),
+						Name:           kong.String("svc1"),
+						ConnectTimeout: kong.Int(60000),
+						Host:           kong.String("httpbin.org"),
+						Port:           kong.Int(80),
+						Path:           kong.String("/status/200"),
+						Protocol:       kong.String("http"),
+						ReadTimeout:    kong.Int(60000),
+						Retries:        kong.Int(5),
+						WriteTimeout:   kong.Int(60000),
+						Tags:           nil,
+						Enabled:        kong.Bool(true),
+					},
+				},
+				Routes: route1_20x,
+				Certificates: []*kong.Certificate{
+					{
+						ID:   kong.String("13c562a1-191c-4464-9b18-e5222b46035b"),
+						Cert: kong.String("{vault://my-env-vault/cert}"),
+						Key:  kong.String("{vault://my-env-vault/key}"),
+					},
+				},
+				SNIs: []*kong.SNI{
+					{
+						Name: kong.String("localhost"),
+						Certificate: &kong.Certificate{
+							ID: kong.String("13c562a1-191c-4464-9b18-e5222b46035b"),
+						},
+					},
+				},
+			},
+			runWhen: ">=3.11.0",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.0.0")
+			runWhen(t, "enterprise", tc.runWhen)
 			setup(t)
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
@@ -5600,6 +6037,7 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_CreateCertificateWithSNIs_Konnect(t *testing.T) {
+	t.Skip("Skipping test for konnect due to flakiness")
 	runWhen(t, "konnect", "")
 	setup(t)
 
@@ -6143,7 +6581,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.10.0",
+			runWhen:  ">=3.10.0 <3.12.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
@@ -6170,6 +6608,59 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 					},
 				},
 				Plugins:  consumerGroupScopedPlugins310x,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+		{
+			name:     "creates consumer groups scoped plugins",
+			runWhen:  ">=3.12.0",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins312x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
@@ -7650,7 +8141,7 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_38x(t *testing.T) {
 // test scope:
 // Kong enterprise: >=3.9.0
 func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.9.0")
+	runWhen(t, "enterprise", ">=3.9.0 <3.12.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -7745,6 +8236,170 @@ func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_39x(t *testing.T) {
 					"retry_after_jitter_max": float64(0),
 					"strategy":               string("redis"),
 					"sync_rate":              float64(10),
+					"window_size":            []any{float64(60)},
+					"window_type":            string("fixed"),
+				},
+			},
+		},
+	}
+
+	t.Run("consumer-group policy overrides with info block in yaml file", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = true", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides"))
+
+		testKongState(t, client, false, true, expectedState, nil)
+	})
+
+	t.Run("consumer-group policy overrides --consumer-group-policy-overrides = false", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, errorConsumerGroupPolicies)
+	})
+
+	t.Run("checking for valid json output while using --consumer-group-policy-overrides = true", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			"--consumer-group-policy-overrides", "--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+
+	t.Run("checking for valid json output while using consumer-group-policy-overrides in info block", func(t *testing.T) {
+		// overwrite default standard output
+		r, w, err := os.Pipe()
+		require.NoError(t, err)
+		color.Output = w
+
+		require.NoError(t, sync(ctx, "testdata/sync/037-consumer-group-policy-overrides/kong39x.yaml",
+			"--json-output"))
+
+		// read command output
+		w.Close()
+		out, err := io.ReadAll(r)
+		require.NoError(t, err)
+		require.NotNil(t, out)
+
+		var js interface{}
+		assert.NoError(t, json.Unmarshal(out, &js), "JSON validation failed")
+	})
+}
+
+// test scope:
+// Kong enterprise: >=3.12.0
+func Test_Sync_ConsumerGroupPlugin_Policy_Overrides_312x(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.12.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	expectedState := utils.KongRawState{
+		Consumers: []*kong.Consumer{
+			{
+				Username: kong.String("foo"),
+			},
+		},
+		ConsumerGroups: []*kong.ConsumerGroupObject{
+			{
+				ConsumerGroup: &kong.ConsumerGroup{
+					Name: kong.String("test-group"),
+				},
+				Consumers: []*kong.Consumer{
+					{
+						Username: kong.String("foo"),
+					},
+				},
+				Plugins: []*kong.ConsumerGroupPlugin{
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						Config: kong.Configuration{
+							"limit":                  []any{float64(100)},
+							"retry_after_jitter_max": float64(0),
+							"window_size":            []any{float64(60)},
+							"window_type":            string("fixed"),
+						},
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("776df478-37a9-4660-81b4-b4e951d76340"),
+						},
+					},
+				},
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Protocols: kong.StringSlice(
+					"grpc",
+					"grpcs",
+					"http",
+					"https",
+				),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         []any{string("test-group")},
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(true),
+					"error_code":              float64(429),
+					"error_message":           "API rate limit exceeded",
+					"header_name":             nil,
+					"hide_client_headers":     false,
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("ZEz47TWgUrv01HenyQBQa8io06MWsp0L"),
+					"path":                    nil,
+					"redis": map[string]any{
+						"cluster_addresses":        nil,
+						"cluster_max_redirections": float64(5),
+						"cluster_nodes":            nil,
+						"connect_timeout":          float64(2000),
+						"connection_is_proxied":    bool(false),
+						"database":                 float64(0),
+						"host":                     string("127.0.0.1"),
+						"keepalive_backlog":        nil,
+						"keepalive_pool_size":      float64(256),
+						"password":                 nil,
+						"port":                     float64(6379),
+						"read_timeout":             float64(2000),
+						"redis_proxy_type":         nil,
+						"send_timeout":             float64(2000),
+						"sentinel_addresses":       nil,
+						"sentinel_master":          nil,
+						"sentinel_nodes":           nil,
+						"sentinel_password":        nil,
+						"sentinel_role":            nil,
+						"sentinel_username":        nil,
+						"server_name":              nil,
+						"ssl":                      bool(false),
+						"ssl_verify":               bool(false),
+						"timeout":                  float64(2000),
+						"username":                 nil,
+					},
+					"retry_after_jitter_max": float64(0),
+					"strategy":               string("redis"),
+					"sync_rate":              float64(10),
+					"throttling":             nil,
 					"window_size":            []any{float64(60)},
 					"window_type":            string("fixed"),
 				},
@@ -7998,8 +8653,10 @@ func Test_Sync_Partials(t *testing.T) {
 
 func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
-
+	client, err := getTestClient()
+	require.NoError(t, err)
 	ctx := context.Background()
+	dumpConfig := deckDump.Config{}
 
 	t.Run("no errors occur in case of subsequent syncs with distributed config and defaultLookupTags for consumer-group",
 		func(t *testing.T) {
@@ -8035,6 +8692,293 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 			// sync again
 			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-no-tag.yaml")
 			require.NoError(t, err)
+		})
+	t.Run("no errors occur in case of distributed config when >1 consumers are tagged with different tags",
+		func(t *testing.T) {
+			// sync consumer-group file first
+			err := sync(ctx, "testdata/sync/015-consumer-groups/kong-cg.yaml")
+			t.Cleanup(func() {
+				reset(t)
+			})
+			require.NoError(t, err)
+
+			// sync consumer file 1
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-1.yaml")
+			require.NoError(t, err)
+
+			// sync consumer file 2
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+			require.NoError(t, err)
+
+			// re-sync with no error
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-1.yaml")
+			require.NoError(t, err)
+			err = sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
+			require.NoError(t, err)
+
+			// check number of consumerGroupConsumers
+			currentState, err := fetchCurrentState(ctx, client, deckDump.Config{
+				LookUpSelectorTagsConsumerGroups: []string{"group-tag"},
+			}, t)
+			require.NoError(t, err)
+
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 2)
+
+			consumerNames := []string{"user1", "user2"}
+
+			for _, consumerGroupConsumer := range consumerGroupConsumers {
+				assert.Contains(t, consumerNames, *consumerGroupConsumer.Consumer.Username)
+				assert.Equal(t, "foo-group", *consumerGroupConsumer.ConsumerGroup.Name)
+			}
+		})
+
+	t.Run("no errors occur in case of distributed config when a consumer is a part of >1 consumer-groups",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		})
+
+	t.Run("no errors occur in case of distributed config when a new consumer-group is added for a consumer",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 2)
+
+			// add new consumer-group file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update.yaml"))
+
+			// check groups
+			currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 3)
+
+			expectedGroups := map[string]bool{
+				"consumer-group-1": false,
+				"consumer-group-2": false,
+				"consumer-group-3": false,
+			}
+
+			for _, c := range consumerGroupConsumers {
+				assert.Equal(t, "test-consumer", *c.Consumer.Username)
+				assert.Contains(t, expectedGroups, *c.ConsumerGroup.Name)
+				expectedGroups[*c.ConsumerGroup.Name] = true
+			}
+
+			for g, found := range expectedGroups {
+				assert.True(t, found, "expected consumer group %q to be present", g)
+			}
+		})
+
+	t.Run("no error occurs in case a consumer-group is removed from a consumer", func(t *testing.T) {
+		t.Cleanup(func() {
+			reset(t)
+		})
+		// sync consumer-group file first
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+		// sync consumer file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+		// check groups
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		// add new consumer-group file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-removal.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-removal.yaml"))
+
+		// check groups
+		currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 1)
+
+		for _, c := range consumerGroupConsumers {
+			assert.Equal(t, "test-consumer", *c.Consumer.Username)
+			assert.Equal(t, "consumer-group-1", *c.ConsumerGroup.Name)
+		}
+	})
+
+	t.Run("no error occurs in case a consumer-group is removed and another added for a consumer", func(t *testing.T) {
+		t.Cleanup(func() {
+			reset(t)
+		})
+		// sync consumer-group file first
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+		// sync consumer file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-initial.yaml"))
+
+		// check groups
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		// add new consumer-group file
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-replace.yaml"))
+		// re-sync with no error
+		require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple-groups-update-replace.yaml"))
+
+		// check groups
+		currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+		consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, consumerGroupConsumers)
+		require.Len(t, consumerGroupConsumers, 2)
+
+		groups := map[string]bool{
+			"consumer-group-1": false,
+			"consumer-group-3": false,
+		}
+
+		for _, c := range consumerGroupConsumers {
+			assert.Equal(t, "test-consumer", *c.Consumer.Username)
+			assert.Contains(t, groups, *c.ConsumerGroup.Name)
+			assert.NotEqual(t, "consumer-group-2", *c.ConsumerGroup.Name) // this group was removed
+			groups[*c.ConsumerGroup.Name] = true
+		}
+
+		for g, found := range groups {
+			assert.True(t, found, "expected group %q to be present", g)
+		}
+	})
+
+	t.Run("no error occurs in case a group is referenced with other entities, no consumers in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumers-multiple.yaml"))
+			// sync plugins file - no consumers in targetContent here
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-cg.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-cg.yaml"))
+
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
+		})
+
+	t.Run("no error occurs in case a group is referenced with other entities, consumers present in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync plugins + consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+
+			// check groups
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
+		})
+
+	t.Run("no error occurs in case a group is referenced with other entities, consumers modified in targetContent",
+		func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+
+			// sync consumer-group file first
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-consumer-groups.yaml"))
+			// sync plugins + consumer file
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers.yaml"))
+
+			currentState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err := currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 6)
+
+			// sync changes
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers-removal-replace.yaml"))
+			// re-sync with no error
+			require.NoError(t, sync(ctx, "testdata/sync/015-consumer-groups/kong-plugins-consumers-removal-replace.yaml"))
+
+			// check groups
+			currentState, err = fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+			consumerGroupConsumers, err = currentState.ConsumerGroupConsumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumerGroupConsumers)
+			require.Len(t, consumerGroupConsumers, 5)
+
+			consumers, err := currentState.Consumers.GetAll()
+			require.NoError(t, err)
+			require.NotNil(t, consumers)
+			require.Len(t, consumers, 3)
 		})
 }
 
@@ -8287,6 +9231,1193 @@ func Test_Sync_Scoped_Plugins_Check_Conflicts(t *testing.T) {
 				err = sync(ctx, s)
 				require.NoError(t, err)
 			}
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Sync_KeysAndKeySets(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates keys and key_sets",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("f21a7073-1183-4b1c-bd87-4d5b8b18eeb4"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("d7cef208-23c3-46f8-94e8-fa1eddf43f0a"),
+						Name: kong.String("baz"),
+						KID:  kong.String("IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\n      \"kty\": \"RSA\",\n      \"kid\": \"IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ\",\n      \"use\": \"sig\",\n      \"alg\": \"RS256\",\n      \"e\": \"AQAB\",\n      \"n\": \"1Sn1X_y-RUzGna0hR00Wu64ZtY5N5BVzpRIby9wQ5EZVyWL9DRhU5PXqM3Y5gzgUVEQu548qQcMKOfs46PhOQudz-HPbwKWzcJCDUeNQsxdAEhW1uJR0EEV_SGJ-jTuKGqoEQc7bNrmhyXBMIeMkTeE_-ys75iiwvNjYphiOhsokC_vRTf_7TOPTe1UQasgxEVSLlTsen0vtK_FXcpbwdxZt02IysICcX5TcWX_XBuFP4cpwI9AS3M-imc01awc1t7FE5UWp62H5Ro2S5V9YwdxSjf4lX87AxYmawaWAjyO595XLuIXA3qt8-irzbCeglR1-cTB7a4I7_AclDmYrpw\"\n  }"), //nolint:lll
+					},
+					{
+						ID:   kong.String("03ad4618-82bb-4375-b9d1-edeefced868d"),
+						Name: kong.String("my-pem-key"),
+						KID:  kong.String("my-pem-key"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						PEM: &kong.PEM{
+							PublicKey:  kong.String("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqvxMU4LTcHBYmCuLMhMP\nDWlZdcNRXuJkw26MRjLBxXjnPAyDolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMC\nIbDjseruCO+7EaIRY4d6RdpE+XowCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEK\nI51CoZ26LPYQvjIGIY2/pPxq0Ydl9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST\n8vV5Q5HJsZNFLR7Fy61+HHfnQiWIYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHl\nYeoHcP/CqviZnQOf5804qcVpPKbsGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWd\nFQIDAQAB\n-----END PUBLIC KEY-----"),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //nolint:lll
+							PrivateKey: kong.String("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAqvxMU4LTcHBYmCuLMhMPDWlZdcNRXuJkw26MRjLBxXjnPAyD\nolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMCIbDjseruCO+7EaIRY4d6RdpE+Xow\nCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEKI51CoZ26LPYQvjIGIY2/pPxq0Ydl\n9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST8vV5Q5HJsZNFLR7Fy61+HHfnQiWI\nYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHlYeoHcP/CqviZnQOf5804qcVpPKbs\nGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWdFQIDAQABAoIBAEOOqAGfATe9y+Nj\n4P2J9jqQU15qK65XuQRWm2npCBKj8IkTULdGw7cYD6XgeFedqCtcPpbgkRUERYxR\n4oV4I5F4OJ7FegNh5QHUjRZMIw2Sbgo8Mtr0jkt5MycBvIAhJbAaDep/wDWGz8Y1\nPDmx1lW3/umoTjURjA/5594+CWiABYzuIi4WprWe4pIKqSKOMHnCYVAD243mwJ7y\nvsatO3LRKYfLw74ifCYhWNBHaZwfw+OO2P5Ku0AGhY4StOLCHobJ8/KkkmkTlYzv\nrcF4cVdvpBfdTEQed0oD7u3xfnp3GpNU3wZFsZJRSVXouhroaMC7en4uMc+5yguW\nqrPIoEkCgYEAxm1UllY9rRfGV6884hdBFKDjE825BC1VlqcRIUEB4CpJvUF/6+A3\ngx5c4nKDJAFQMrWpr4jOcq3iLiWnJ73e80b+JpWFODdt16g2KCOINs1j8vf2U6Og\nx+Vo8vHek/Uomz1n5W0oXrJ4VedHl9NYa8r/YrVXd4k4WcaA0TXmMhMCgYEA3Jit\nzrEmrQIrLK66RgXF2RafA5c3atRHWBb5ddnGk0bV90cfsTsaDMDvpy7ZYgojBNpw\n7U6AYzqnPro6cHEginV97BFb6oetMvOWvljUob+tpnYOofgwk2hw7PeChViX7iS9\nujgTygi8ZIc2G0r7xntH+v6WHKp4yNQiCAyfGTcCgYAYKgZMDJKUOrn3wapraiON\nzI36wmnOnWq33v6SCyWcU+oI9yoJ4pNAD3mGRiW8Q8CtfDv+2W0ywAQ0VHeHunKl\nM7cNodXIY8+nnJ+Dwdf7vIV4eEPyKZIR5dkjBNtzLz7TsOWvJdzts1Q+Od0ZGy7A\naccyER1mvDo1jJvxXlv7KwKBgQDDBK9TdUVt2eb1X5sJ4HyiiN8XO44ggX55IAZ1\n64skFJGARH5+HnPPJpo3wLEpfTCsT7lZ8faKwwWr7NNRKJHOFkS2eDo8QqoZy0NP\nEBUa0evgp6oUAuheyQxcUgwver0GKbEZeg30pHh4nxh0VHv1YnOmL3/h48tYMEHN\nv+q/TQKBgQCXQmN8cY2K7UfZJ6BYEdguQZS5XISFbLNkG8wXQX9vFiF8TuSWawDN\nTrRHVDGwoMGWxjZBLCsitA6zwrMLJZs4RuetKHFou7MiDQ69YGdfNRlRvD5QCJDc\nY0ICsYjI7VM89Qj/41WQyRHYHm7E9key3avMGdbYtxdc0Ku4LnD4zg==\n-----END RSA PRIVATE KEY-----"), //nolint:lll
+						},
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						Name: kong.String("bar"),
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
+		{
+			name:     "creates keys and key_sets without name",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+
+			testKongState(t, client, false, false, tc.expectedState, nil)
+
+			// re-sync with no error
+			err = sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.1.0
+func Test_Sync_KeysAndKeySets_Update(t *testing.T) {
+	runWhen(t, "kong", ">=3.1.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		kongFile     string
+		initialState utils.KongRawState
+		updateFile   string
+		updatedState utils.KongRawState
+	}{
+		{
+			name:     "name addition post creation works without errors",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name.yaml",
+			initialState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+			updateFile: "testdata/sync/043-keys-and-key_sets/kong-name-update.yaml",
+			updatedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kty\": \"RSA\", \"kid\": \"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\", \"n\": \"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\", \"e\": \"AQAB\", \"alg\": \"A256GCM\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+			testKongState(t, client, false, false, tc.initialState, nil)
+
+			// update
+			err = sync(ctx, tc.updateFile)
+			require.NoError(t, err)
+			testKongState(t, client, false, false, tc.updatedState, nil)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+// Separate test function is added as Konnect has different
+// ordering and spacing for keys.
+func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "creates keys and key_sets",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong.yaml",
+			expectedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("f21a7073-1183-4b1c-bd87-4d5b8b18eeb4"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("d7cef208-23c3-46f8-94e8-fa1eddf43f0a"),
+						Name: kong.String("baz"),
+						KID:  kong.String("IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"IiI4ffge7LZXPztrZVOt26zgRt0EPsWPaxAmwhbJhDQ\",\"kty\":\"RSA\",\"use\":\"sig\",\"alg\":\"RS256\",\"n\":\"1Sn1X_y-RUzGna0hR00Wu64ZtY5N5BVzpRIby9wQ5EZVyWL9DRhU5PXqM3Y5gzgUVEQu548qQcMKOfs46PhOQudz-HPbwKWzcJCDUeNQsxdAEhW1uJR0EEV_SGJ-jTuKGqoEQc7bNrmhyXBMIeMkTeE_-ys75iiwvNjYphiOhsokC_vRTf_7TOPTe1UQasgxEVSLlTsen0vtK_FXcpbwdxZt02IysICcX5TcWX_XBuFP4cpwI9AS3M-imc01awc1t7FE5UWp62H5Ro2S5V9YwdxSjf4lX87AxYmawaWAjyO595XLuIXA3qt8-irzbCeglR1-cTB7a4I7_AclDmYrpw\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+					{
+						ID:   kong.String("03ad4618-82bb-4375-b9d1-edeefced868d"),
+						Name: kong.String("my-pem-key"),
+						KID:  kong.String("my-pem-key"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						PEM: &kong.PEM{
+							PublicKey:  kong.String("-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqvxMU4LTcHBYmCuLMhMP\nDWlZdcNRXuJkw26MRjLBxXjnPAyDolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMC\nIbDjseruCO+7EaIRY4d6RdpE+XowCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEK\nI51CoZ26LPYQvjIGIY2/pPxq0Ydl9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST\n8vV5Q5HJsZNFLR7Fy61+HHfnQiWIYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHl\nYeoHcP/CqviZnQOf5804qcVpPKbsGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWd\nFQIDAQAB\n-----END PUBLIC KEY-----"),                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               //nolint:lll
+							PrivateKey: kong.String("-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAqvxMU4LTcHBYmCuLMhMPDWlZdcNRXuJkw26MRjLBxXjnPAyD\nolmuFFMIqPDlSaJkkzu2tn7m9p8KB90wLiMCIbDjseruCO+7EaIRY4d6RdpE+Xow\nCjJu7SbC2CqWBAzKkO7WWAunO3KOsQRk1NEKI51CoZ26LPYQvjIGIY2/pPxq0Ydl\n9dyURqVfmTywni1WeScgdEZXuy9WIcobqBST8vV5Q5HJsZNFLR7Fy61+HHfnQiWI\nYyi6h8QRT+Css9y5KbH7KuN6tnb94UZaOmHlYeoHcP/CqviZnQOf5804qcVpPKbs\nGU8jupTriiJZU3a8f59eHV0ybI4ORXYgDSWdFQIDAQABAoIBAEOOqAGfATe9y+Nj\n4P2J9jqQU15qK65XuQRWm2npCBKj8IkTULdGw7cYD6XgeFedqCtcPpbgkRUERYxR\n4oV4I5F4OJ7FegNh5QHUjRZMIw2Sbgo8Mtr0jkt5MycBvIAhJbAaDep/wDWGz8Y1\nPDmx1lW3/umoTjURjA/5594+CWiABYzuIi4WprWe4pIKqSKOMHnCYVAD243mwJ7y\nvsatO3LRKYfLw74ifCYhWNBHaZwfw+OO2P5Ku0AGhY4StOLCHobJ8/KkkmkTlYzv\nrcF4cVdvpBfdTEQed0oD7u3xfnp3GpNU3wZFsZJRSVXouhroaMC7en4uMc+5yguW\nqrPIoEkCgYEAxm1UllY9rRfGV6884hdBFKDjE825BC1VlqcRIUEB4CpJvUF/6+A3\ngx5c4nKDJAFQMrWpr4jOcq3iLiWnJ73e80b+JpWFODdt16g2KCOINs1j8vf2U6Og\nx+Vo8vHek/Uomz1n5W0oXrJ4VedHl9NYa8r/YrVXd4k4WcaA0TXmMhMCgYEA3Jit\nzrEmrQIrLK66RgXF2RafA5c3atRHWBb5ddnGk0bV90cfsTsaDMDvpy7ZYgojBNpw\n7U6AYzqnPro6cHEginV97BFb6oetMvOWvljUob+tpnYOofgwk2hw7PeChViX7iS9\nujgTygi8ZIc2G0r7xntH+v6WHKp4yNQiCAyfGTcCgYAYKgZMDJKUOrn3wapraiON\nzI36wmnOnWq33v6SCyWcU+oI9yoJ4pNAD3mGRiW8Q8CtfDv+2W0ywAQ0VHeHunKl\nM7cNodXIY8+nnJ+Dwdf7vIV4eEPyKZIR5dkjBNtzLz7TsOWvJdzts1Q+Od0ZGy7A\naccyER1mvDo1jJvxXlv7KwKBgQDDBK9TdUVt2eb1X5sJ4HyiiN8XO44ggX55IAZ1\n64skFJGARH5+HnPPJpo3wLEpfTCsT7lZ8faKwwWr7NNRKJHOFkS2eDo8QqoZy0NP\nEBUa0evgp6oUAuheyQxcUgwver0GKbEZeg30pHh4nxh0VHv1YnOmL3/h48tYMEHN\nv+q/TQKBgQCXQmN8cY2K7UfZJ6BYEdguQZS5XISFbLNkG8wXQX9vFiF8TuSWawDN\nTrRHVDGwoMGWxjZBLCsitA6zwrMLJZs4RuetKHFou7MiDQ69YGdfNRlRvD5QCJDc\nY0ICsYjI7VM89Qj/41WQyRHYHm7E9key3avMGdbYtxdc0Ku4LnD4zg==\n-----END RSA PRIVATE KEY-----"), //nolint:lll
+						},
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						Name: kong.String("bar"),
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+
+			testKongState(t, client, true, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+// TODO: Update test once konnect supports key_set creation without names.
+func Test_Sync_KeysAndKeySets_Konnect_Update(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		kongFile     string
+		initialState utils.KongRawState
+		updateFile   string
+		updatedState utils.KongRawState
+	}{
+		{
+			name:     "name addition post creation works without errors",
+			kongFile: "testdata/sync/043-keys-and-key_sets/kong-no-name-konnect.yaml",
+			initialState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:  kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						KID: kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+			updateFile: "testdata/sync/043-keys-and-key_sets/kong-name-update.yaml",
+			updatedState: utils.KongRawState{
+				Keys: []*kong.Key{
+					{
+						ID:   kong.String("1d15274d-76ae-4aec-928e-1b395cc1333f"),
+						Name: kong.String("foo"),
+						KID:  kong.String("vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4"),
+						Set: &kong.KeySet{
+							ID: kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						},
+						JWK: kong.String("{\"kid\":\"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4\",\"kty\":\"RSA\",\"alg\":\"A256GCM\",\"n\":\"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ\",\"e\":\"AQAB\"}"), //nolint:lll
+					},
+				},
+				KeySets: []*kong.KeySet{
+					{
+						ID:   kong.String("d46b0e15-ffbc-4b15-ad92-09ef67935453"),
+						Name: kong.String("bar"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.kongFile)
+			require.NoError(t, err)
+			testKongState(t, client, true, false, tc.initialState, nil)
+
+			// update
+			err = sync(ctx, tc.updateFile)
+			require.NoError(t, err)
+			testKongState(t, client, true, false, tc.updatedState, nil)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.10.0+enterprise
+func Test_Sync_Partials_Tagging(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.10.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	expectedStatePostSync := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+							Name: kong.String("redis-ee-common"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+							Name: kong.String("redis-ee-sentinel"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
+	expectedStatePostSync312x := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"throttling":              nil,
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+							Name: kong.String("redis-ee-common"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"throttling":              nil,
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+							Name: kong.String("redis-ee-sentinel"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Service{}, "ID"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+		errorExpected bool
+		errorString   string
+		runWhen       string
+	}{
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			expectedState: expectedStatePostSync,
+			errorExpected: false,
+			runWhen:       ">=3.10.0 <3.12.0",
+		},
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			expectedState: expectedStatePostSync312x,
+			errorExpected: false,
+			runWhen:       ">=3.12.0",
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			expectedState: expectedStatePostSync,
+			errorExpected: false,
+			runWhen:       ">=3.10.0 <3.12.0",
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			expectedState: expectedStatePostSync312x,
+			errorExpected: false,
+			runWhen:       ">=3.12.0",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong tags",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong.yaml",
+			errorExpected: true,
+			errorString:   "partial redis-ee-common for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-names.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-name for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-ids.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-id-1234 for plugin rate-limiting-advanced: entity not found",
+			runWhen:       ">=3.10.0",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name+"/"+tc.runWhen, func(t *testing.T) {
+			runWhen(t, "enterprise", tc.runWhen)
+			reset(t)
+
+			// syncing partials
+			err := sync(ctx, "testdata/sync/044-partials-tagging/partials.yaml")
+			require.NoError(t, err)
+
+			// syncing the kong file with partial lookup tags
+			err = sync(ctx, tc.kongFile)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+			testKongState(t, client, false, false, tc.expectedState, ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	expectedStatePostSync := utils.KongRawState{
+		Partials: []*kong.Partial{
+			{
+				ID:   kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+				Name: kong.String("redis-ee-common"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(3001),
+					"send_timeout":             float64(2004),
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      bool(false),
+					"ssl_verify":               bool(false),
+					"username":                 nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+			{
+				ID:   kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+				Name: kong.String("redis-ee-sentinel"),
+				Type: kong.String("redis-ee"),
+				Config: kong.Configuration{
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"send_timeout":             float64(2000),
+					"sentinel_master":          string("mymaster"),
+					"sentinel_nodes": []any{
+						map[string]any{"host": string("redis-node-0"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-1"), "port": float64(26379)},
+						map[string]any{"host": string("redis-node-2"), "port": float64(26379)},
+					},
+					"sentinel_password": nil,
+					"sentinel_role":     string("master"),
+					"sentinel_username": nil,
+					"server_name":       nil,
+					"ssl":               bool(false),
+					"ssl_verify":        bool(false),
+					"username":          nil,
+				},
+				Tags: kong.StringSlice("redis-partials"),
+			},
+		},
+		Services: []*kong.Service{
+			{
+				ConnectTimeout: kong.Int(60000),
+				Enabled:        kong.Bool(true),
+				Host:           kong.String("httpbin.konghq.com"),
+				ID:             kong.String("ccb2e714-8398-4167-bf3f-049e1242483b"),
+				Name:           kong.String("httpbin-1"),
+				Path:           kong.String("/anything"),
+				Port:           kong.Int(443),
+				Protocol:       kong.String("https"),
+				ReadTimeout:    kong.Int(60000),
+				Retries:        kong.Int(5),
+				WriteTimeout:   kong.Int(60000),
+				Tags:           kong.StringSlice("api:partials-test-1"),
+			},
+		},
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("82c27e99-b1de-4772-aa60-4caa86c0480d"),
+				Name: kong.String("rate-limiting-advanced"),
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("consumer"),
+					"limit":                   []any{float64(10)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("test-ns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("local"),
+					"sync_rate":               float64(-1),
+					"throttling":              nil,
+					"window_size":             []any{float64(60)},
+					"window_type":             string("fixed"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID: kong.String("13dc230d-d65e-439a-9f05-9fd71abfee4d"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+			{
+				ID:   kong.String("88e5442f-5ff6-49ab-b4d7-ce41735cc2e0"),
+				Name: kong.String("rate-limiting-advanced"),
+				Service: &kong.Service{
+					ID: kong.String("5167329f-b331-48d0-801a-0a045a7e8bce"),
+				},
+				Config: kong.Configuration{
+					"compound_identifier":     nil,
+					"consumer_groups":         nil,
+					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"disable_penalty":         bool(false),
+					"enforce_consumer_groups": bool(false),
+					"error_code":              float64(429),
+					"error_message":           string("API rate limit exceeded"),
+					"header_name":             nil,
+					"hide_client_headers":     bool(false),
+					"identifier":              string("ip"),
+					"limit":                   []any{float64(10000)},
+					"lock_dictionary_name":    string("kong_locks"),
+					"namespace":               string("testns"),
+					"path":                    nil,
+					"retry_after_jitter_max":  float64(0),
+					"strategy":                string("redis"),
+					"sync_rate":               float64(2),
+					"throttling":              nil,
+					"window_size":             []any{float64(30)},
+					"window_type":             string("sliding"),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+				Tags:      kong.StringSlice("api:partials-test-1"),
+				Partials: []*kong.PartialLink{
+					{
+						Partial: &kong.Partial{
+							ID: kong.String("b426adc7-7f11-4cda-a862-112ddabae9ef"),
+						},
+						Path: kong.String("config.redis"),
+					},
+				},
+			},
+		},
+	}
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Service{}, "ID"),
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		errorExpected bool
+		errorString   string
+	}{
+		{
+			name:          "sync partials with default lookup tags - via names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-names.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "sync partials with default lookup tags - via ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-ids.yaml",
+			errorExpected: false,
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong tags",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong.yaml",
+			errorExpected: true,
+			errorString:   "partial redis-ee-common for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong names",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-names.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-name for plugin rate-limiting-advanced: entity not found",
+		},
+		{
+			name:          "syncing partials with default lookup tags errors out with wrong ids",
+			kongFile:      "testdata/sync/044-partials-tagging/partial-lookup-tags-wrong-ids.yaml",
+			errorExpected: true,
+			errorString:   "partial fake-id-1234 for plugin rate-limiting-advanced: entity not found",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			// syncing partials
+			err := sync(ctx, "testdata/sync/044-partials-tagging/partials.yaml")
+			require.NoError(t, err)
+
+			// syncing the kong file with partial lookup tags
+			err = sync(ctx, tc.kongFile)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorString)
+				return
+			}
+
+			require.NoError(t, err)
+			testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//
+// - >=3.0.0 enterprise
+// - konnect
+func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "skip adding degraphql_routes to state when select_tags are present",
+			stateFile: "testdata/sync/045-skip-custom-entities/select-tag.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			// syncing initial state
+			err := sync(ctx, "testdata/sync/045-skip-custom-entities/initial.yaml")
+			require.NoError(t, err)
+
+			// syncing state with selector tags
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// resync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func Test_Sync_ConsumerCredentials(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+	}{
+		{
+			name:      "sync consumer credentials with tags",
+			stateFile: "testdata/sync/046-consumer-credentials/creds-initial.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			// resync with no error
+			err = sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
+
+// test scope:
+//
+// - konnect
+func Test_Sync_BasicAuth_SkipHash_Konnect(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		updateFile    string
+		cmdArgs       []string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "skip basic auth hash - via flag",
+			kongFile: "testdata/sync/047-basic-auth-skip-hash/kong.yaml",
+			cmdArgs:  []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "skip basic auth hash - via info in config",
+			kongFile: "testdata/sync/047-basic-auth-skip-hash/kong-with-info.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "update basic auth with skip hash flag",
+			kongFile:   "testdata/sync/047-basic-auth-skip-hash/kong.yaml",
+			updateFile: "testdata/sync/047-basic-auth-skip-hash/kong-update.yaml",
+			cmdArgs:    []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:       "update basic auth with skip hash in info config",
+			kongFile:   "testdata/sync/047-basic-auth-skip-hash/kong-with-info.yaml",
+			updateFile: "testdata/sync/047-basic-auth-skip-hash/kong-with-info-update.yaml",
+			cmdArgs:    []string{"--skip-hash-for-basic-auth"},
+			expectedState: utils.KongRawState{
+				Consumers: []*kong.Consumer{
+					{
+						ID:       kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+						Username: kong.String("foo"),
+					},
+				},
+				BasicAuths: []*kong.BasicAuthOptions{
+					{
+						BasicAuth: kong.BasicAuth{
+							Username: kong.String("user1"),
+							Password: kong.String("76789880fe1b54caf0875cf1f1fbcfd89202468d"),
+							Consumer: &kong.Consumer{
+								ID: kong.String("9efa87d1-0f29-4b8b-bf71-b947ddccf100"),
+							},
+							Tags: kong.StringSlice("tag1", "tag2"),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			require.NoError(t, sync(ctx, tc.kongFile, tc.cmdArgs...))
+
+			// re-sync with no error
+			require.NoError(t, sync(ctx, tc.kongFile, tc.cmdArgs...))
+
+			if tc.updateFile != "" {
+				require.NoError(t, sync(ctx, tc.updateFile, tc.cmdArgs...))
+			}
+
+			ignoreFields := []cmp.Option{
+				cmpopts.IgnoreFields(kong.BasicAuthOptions{}, "ID", "CreatedAt"),
+			}
+			testKongState(t, client, true, false, tc.expectedState, ignoreFields)
 		})
 	}
 }

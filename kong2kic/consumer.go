@@ -32,7 +32,7 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 		}
 
 		// Add tags to annotations
-		addTagsToAnnotations(consumer.Tags, kongConsumer.ObjectMeta.Annotations)
+		addTagsToAnnotations(consumer.Tags, kongConsumer.Annotations)
 
 		// Populate credentials
 		populateKICKeyAuthSecrets(&consumer, &kongConsumer, file)
@@ -53,7 +53,7 @@ func populateKICConsumers(content *file.Content, file *KICContent) error {
 				continue
 			}
 			file.KongPlugins = append(file.KongPlugins, *kongPlugin)
-			addPluginToAnnotations(kongPlugin.ObjectMeta.Name, kongConsumer.ObjectMeta.Annotations)
+			addPluginToAnnotations(kongPlugin.Name, kongConsumer.Annotations)
 		}
 
 		file.KongConsumers = append(file.KongConsumers, kongConsumer)

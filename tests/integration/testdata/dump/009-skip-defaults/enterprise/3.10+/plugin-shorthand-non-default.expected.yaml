@@ -1,0 +1,9 @@
+_format_version: "3.0"
+plugins:
+- config:
+    minute: 10
+    redis:
+      port: 6000
+    redis_port: 6000
+  enabled: true
+  name: rate-limiting

@@ -1,0 +1,38 @@
+_format_version: "3.0"
+consumer_groups:
+- name: foo-group
+  tags:
+  - foo
+  - managed-by-deck
+consumers:
+- acls:
+  - group: acl-group-1
+    tags:
+    - managed-by-deck
+  basicauth_credentials:
+  - password: 1aa4ed9059d4d97bf4575aad4ea2058d6e5e8f35
+    tags:
+    - managed-by-deck
+    username: c1
+  groups:
+  - name: foo-group
+    tags:
+    - foo
+  hmacauth_credentials:
+  - secret: yeNZBeqCuk0D3H85VX77Umacf91MwqRo
+    tags:
+    - managed-by-deck
+    username: c1
+  jwt_secrets:
+  - algorithm: HS256
+    key: MKWeR0nu9OAUR9HrjpUG82Hbfz7ZXsIw
+    secret: 6gkrxTKAraykMSpmnLNEGiEE3Yz8XL6U
+    tags:
+    - managed-by-deck
+  keyauth_credentials:
+  - key: iwb6Djkk4HhUlOCmLilDIKh6nZrn90ts
+    tags:
+    - managed-by-deck
+  tags:
+  - bar
+  username: c1

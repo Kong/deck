@@ -1,0 +1,11 @@
+_format_version: "3.0"
+vaults:
+- config:
+    account: test-ac
+    api_key: test-key
+    endpoint_url: http://example-server.test
+    login: test-id
+  name: conjur
+  prefix: my-conjur-vault
+  tags:
+  - tag1

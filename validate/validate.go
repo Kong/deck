@@ -46,6 +46,7 @@ var EntityMap = map[string]string{
 	"JWTAuths":                "jwt_secrets",
 	"KeyAuths":                "keyauth_credentials",
 	"Oauth2Creds":             "oauth2_credentials",
+	"Partials":                "partials",
 	"Plugins":                 "plugins",
 	"RBACEndpointPermissions": "rbac-endpointpermission",
 	"RBACRoles":               "rbac-role",
@@ -206,7 +207,7 @@ func validate3xRoutes(routes *state.RoutesCollection) {
 	unsupportedRoutes := []string{}
 	for _, r := range results {
 		if reconcilerUtils.HasPathsWithRegex300AndAbove(r.Route) {
-			unsupportedRoutes = append(unsupportedRoutes, *r.Route.ID)
+			unsupportedRoutes = append(unsupportedRoutes, *r.ID)
 		}
 	}
 	if len(unsupportedRoutes) > 0 {

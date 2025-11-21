@@ -1,0 +1,25 @@
+partials:
+  - name: Demo
+    type: redis-ee
+    config:
+      connect_timeout: 2000
+      connection_is_proxied: false
+      database: 0
+      host: 127.0.0.1
+      keepalive_backlog: 0
+      keepalive_pool_size: 256
+      password: password_here
+      port: 6379
+      read_timeout: 2000
+      send_timeout: 2000
+      server_name: redis.example.com
+      ssl_verify: false
+      ssl: true
+      username: username_here
+      cluster_nodes: null
+      cluster_max_redirections: null
+      sentinel_master: null
+      sentinel_role: null
+      sentinel_nodes: null
+      sentinel_username: null
+      sentinel_password: null

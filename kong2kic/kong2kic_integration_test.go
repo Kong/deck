@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 // invoke with go test -tags=integration -run ^Test_deployManifests$ ./...
 package kong2kic
