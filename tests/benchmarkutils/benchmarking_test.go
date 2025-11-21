@@ -33,7 +33,7 @@ func BenchmarkSync(b *testing.B) {
 		setup(b)
 
 		b.StartTimer()
-		err := sync(b.Context(), "testdata/sync/kong.yaml")
+		err := sync(b.Context(), "testdata/sync/kong-huge.yaml")
 		if err != nil {
 			return err
 		}
