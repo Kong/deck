@@ -217,6 +217,39 @@ var (
 		},
 	}
 
+	plugin313 = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+				"realm":            string("service"),
+				"brute_force_protection": map[string]interface{}{
+					"redis": map[string]interface{}{
+						"cloud_authentication": nil,
+						"database":             float64(0),
+						"host":                 nil,
+						"password":             nil,
+						"port":                 float64(6379),
+						"server_name":          nil,
+						"ssl":                  false,
+						"ssl_verify":           false,
+						"timeout":              float64(2000),
+						"username":             nil,
+					},
+					"strategy": string("off"),
+				},
+			},
+		},
+	}
+
 	plugin_on_entities = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
@@ -3040,7 +3073,7 @@ func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: plugin36,
+				Plugins: plugin313,
 			},
 		},
 	}

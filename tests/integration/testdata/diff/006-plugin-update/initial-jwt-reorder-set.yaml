@@ -1,0 +1,7 @@
+_format_version: "3.0"
+plugins:
+  - name: jwt
+    config:
+      cookie_names:
+      - bwt
+      - awt

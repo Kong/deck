@@ -463,6 +463,68 @@ Summary:
 }
 
 `
+	expectedOutputRequestTransformerArrayReorder = `updating plugin request-transformer (global)  {
+   "config": {
+     "add": {
+       "body": [
+       ],
+       "headers": [
+       ],
+       "querystring": [
+       ]
+     },
+     "append": {
+       "body": [
+       ],
+       "headers": [
+       ],
+       "querystring": [
+       ]
+     },
+     "http_method": null,
+     "remove": {
+       "body": [
+       ],
+       "headers": [
+       ],
+       "querystring": [
+       ]
+     },
+     "rename": {
+       "body": [
+       ],
+       "headers": [
+         "Authorization:something-else",
+       ],
+       "querystring": [
+       ]
+     },
+     "replace": {
+       "body": [
+       ],
+       "headers": [
+       ],
+       "querystring": [
+       ],
+       "uri": null
+     }
+   },
+   "enabled": true,
+   "id": "bc364672-3032-45e3-aac2-7eb921da8515",
+   "name": "request-transformer",
+   "protocols": [
+     "grpc",
+     "grpcs",
+     "http",
+     "https"
+   ]
+ }
+
+Summary:
+  Created: 0
+  Updated: 1
+  Deleted: 0
+`
 )
 
 // test scope:
@@ -874,4 +936,47 @@ Summary:
 	out, err = diff("testdata/sync/015-consumer-groups/kong-consumer-2.yaml")
 	require.NoError(t, err)
 	assert.Equal(t, emptyOutput, out)
+}
+
+func Test_Diff_PluginConfigReorderArraySetValues(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name             string
+		initialStateFile string
+		stateFile        string
+		isDiffExpected   bool
+		expectedDiff     string
+	}{
+		{
+			name:             "Reordering plugin config values of type array should show diff",
+			initialStateFile: "testdata/diff/006-plugin-update/initial-request-transformer-reorder-array.yaml",
+			stateFile:        "testdata/diff/006-plugin-update/final-request-transformer-reorder-array.yaml",
+			isDiffExpected:   true,
+			expectedDiff:     expectedOutputRequestTransformerArrayReorder,
+		},
+		{
+			name:             "Reordering plugin config values of type set should not show diff",
+			initialStateFile: "testdata/diff/006-plugin-update/initial-jwt-reorder-set.yaml",
+			stateFile:        "testdata/diff/006-plugin-update/final-jwt-reorder-set.yaml",
+			isDiffExpected:   false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			// initialize state
+			require.NoError(t, sync(ctx, tc.initialStateFile))
+
+			out, err := diff(tc.stateFile)
+			require.NoError(t, err)
+			if tc.isDiffExpected {
+				assert.Equal(t, tc.expectedDiff, out)
+			} else {
+				assert.Equal(t, emptyOutput, out)
+			}
+		})
+	}
 }

@@ -21,6 +21,7 @@ consumer_groups:
       namespace: basic
       path: null
       redis:
+        cloud_authentication: null
         cluster_addresses: null
         cluster_max_redirections: 5
         cluster_nodes: null
