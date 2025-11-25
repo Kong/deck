@@ -8643,6 +8643,37 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, "partial non-existent-partial for plugin rate-limiting-advanced: entity not found")
 	})
+
+	t.Run("partial linking with a consumer-group scoped plugin works fine", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/cg-plugin-partial.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "my-redis-ee", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, *partials[0].ID, *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+		assert.Equal(t, "foo", *plugins[0].ConsumerGroup.Name)
+	})
 }
 
 func Test_Sync_Partials(t *testing.T) {
