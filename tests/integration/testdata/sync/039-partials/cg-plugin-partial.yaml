@@ -1,0 +1,57 @@
+_format_version: "3.0"
+consumer_groups:
+- name: foo
+  plugins:
+  - config:
+      compound_identifier: null
+      consumer_groups: null
+      dictionary_name: kong_rate_limiting_counters
+      disable_penalty: false
+      enforce_consumer_groups: false
+      error_code: 429
+      error_message: API rate limit exceeded
+      header_name: null
+      hide_client_headers: false
+      identifier: consumer
+      limit:
+      - 10
+      lock_dictionary_name: kong_locks
+      namespace: w8YrKXnDFXNJGynDdUhmeyrZWa7p5B2P
+      path: null
+      retry_after_jitter_max: 0
+      strategy: redis
+      sync_rate: -1
+      window_size:
+      - 60
+      window_type: sliding
+    name: rate-limiting-advanced
+    partials:
+    - id: c252219a-ace0-4f35-9dc7-156ef259981f
+      name: my-redis-ee
+      path: config.redis
+partials:
+- config:
+    cluster_max_redirections: null
+    cluster_nodes: null
+    connect_timeout: 2000
+    connection_is_proxied: false
+    database: 0
+    host: 127.0.0.1
+    keepalive_backlog: 0
+    keepalive_pool_size: 256
+    password: null
+    port: 6000
+    read_timeout: 2000
+    send_timeout: 2000
+    sentinel_master: null
+    sentinel_nodes: null
+    sentinel_password: null
+    sentinel_role: null
+    sentinel_username: null
+    server_name: null
+    ssl: false
+    ssl_verify: false
+    username: null
+  id: c252219a-ace0-4f35-9dc7-156ef259981f
+  name: my-redis-ee
+  type: redis-ee

@@ -1081,3 +1081,54 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_Services_TLS_Sans(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		runWhen      func(t *testing.T)
+	}{
+		{
+			name:         "dump services with TLS SANs",
+			stateFile:    "testdata/sync/048-service-tls-sans/kong.yaml",
+			expectedFile: "testdata/dump/010-services-tls-sans/kong.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+		},
+		{
+			name:         "dump services with https but no TLS SANs",
+			stateFile:    "testdata/sync/048-service-tls-sans/no-tls-https.yaml",
+			expectedFile: "testdata/dump/010-services-tls-sans/no-tls-https.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+		},
+		{
+			name:         "dump services with TLS SANs - konnect",
+			stateFile:    "testdata/sync/048-service-tls-sans/kong.yaml",
+			expectedFile: "testdata/dump/010-services-tls-sans/konnect.yaml",
+			runWhen:      func(t *testing.T) { runWhenKonnect(t) },
+		},
+		{
+			name:         "dump services with https but no TLS SANs - konnect",
+			stateFile:    "testdata/sync/048-service-tls-sans/no-tls-https.yaml",
+			expectedFile: "testdata/dump/010-services-tls-sans/konnect-no-tls-https.yaml",
+			runWhen:      func(t *testing.T) { runWhenKonnect(t) },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			reset(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}

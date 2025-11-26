@@ -8643,6 +8643,37 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 		require.Error(t, err)
 		assert.ErrorContains(t, err, "partial non-existent-partial for plugin rate-limiting-advanced: entity not found")
 	})
+
+	t.Run("partial linking with a consumer-group scoped plugin works fine", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/cg-plugin-partial.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "my-redis-ee", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, *partials[0].ID, *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+		assert.Equal(t, "foo", *plugins[0].ConsumerGroup.Name)
+	})
 }
 
 func Test_Sync_Partials(t *testing.T) {
@@ -10451,6 +10482,60 @@ func Test_Sync_BasicAuth_SkipHash_Konnect(t *testing.T) {
 				cmpopts.IgnoreFields(kong.BasicAuthOptions{}, "ID", "CreatedAt"),
 			}
 			testKongState(t, client, true, false, tc.expectedState, ignoreFields)
+		})
+	}
+}
+
+func Test_Sync_Services_TLS_Sans(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		initialFile string
+		updateFile  string
+	}{
+		{
+			name:        "create a service with TLS SANs",
+			initialFile: "testdata/sync/048-service-tls-sans/kong.yaml",
+		},
+		{
+			name:        "update an existing service with TLS SANs - protocol https",
+			initialFile: "testdata/sync/048-service-tls-sans/no-tls-https.yaml",
+			updateFile:  "testdata/sync/048-service-tls-sans/kong.yaml",
+		},
+		{
+			name:        "update an existing service with TLS SANs - protocol http",
+			initialFile: "testdata/sync/048-service-tls-sans/no-tls-http.yaml",
+			updateFile:  "testdata/sync/048-service-tls-sans/kong.yaml",
+		},
+		{
+			name:        "remove TLS SANs from existing service",
+			initialFile: "testdata/sync/048-service-tls-sans/kong.yaml",
+			updateFile:  "testdata/sync/048-service-tls-sans/no-tls-https.yaml",
+		},
+		{
+			name:        "remove TLS SANs from existing service and change protocol to http",
+			initialFile: "testdata/sync/048-service-tls-sans/kong.yaml",
+			updateFile:  "testdata/sync/048-service-tls-sans/no-tls-http.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.initialFile))
+			// resync with no error
+			require.NoError(t, sync(ctx, tc.initialFile))
+
+			if tc.updateFile == "" {
+				return
+			}
+			// update
+			require.NoError(t, sync(ctx, tc.updateFile))
+			// resync with no error
+			require.NoError(t, sync(ctx, tc.updateFile))
 		})
 	}
 }

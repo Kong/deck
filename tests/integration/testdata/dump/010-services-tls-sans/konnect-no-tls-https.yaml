@@ -1,0 +1,15 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: localhost
+  id: f2d89c6d-73ef-432b-b0ce-bfee9ad25f6b
+  name: tls-sans-uris
+  port: 12345
+  protocol: https
+  read_timeout: 60000
+  retries: 5
+  tls_verify: true
+  write_timeout: 60000
