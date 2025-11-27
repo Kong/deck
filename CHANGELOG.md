@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.54.0](#v1540)
 - [v1.53.2](#v1532)
 - [v1.53.1](#v1531)
 - [v1.53.0](#v1530)
@@ -126,6 +127,27 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.54.0]
+> Release date: 2025/11/27
+
+### Added
+- Added support for `tls_sans` parameter for services.
+[#1823](https://github.com/Kong/deck/pull/1823)
+[go-database-reconciler #359](https://github.com/Kong/go-database-reconciler/pull/359)
+[go-kong #585](https://github.com/Kong/go-kong/pull/585)
+- Added partials support for consumer-group plugins.
+[#1823](https://github.com/Kong/deck/pull/1823)
+[go-database-reconciler #360](https://github.com/Kong/go-database-reconciler/pull/360)
+[go-kong #586](https://github.com/Kong/go-kong/pull/586)
+
+### Fixed
+- Fixed ordering based diffs in request-transformer plugin.
+[#1819](https://github.com/Kong/deck/pull/1819)
+[go-database-reconciler #358](https://github.com/Kong/go-database-reconciler/pull/358)
+- Skipped template parsing for commented lines in config file.
+[#1823](https://github.com/Kong/deck/pull/1823)
+[go-database-reconciler #351](https://github.com/Kong/go-database-reconciler/pull/351)
 
 ## [v1.53.2]
 > Release date: 2025/11/14
@@ -2371,6 +2393,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.54.0]: https://github.com/Kong/deck/compare/v1.53.2...v1.54.0
 [v1.53.2]: https://github.com/Kong/deck/compare/v1.53.1...v1.53.2
 [v1.53.1]: https://github.com/Kong/deck/compare/v1.53.0...v1.53.1
 [v1.53.0]: https://github.com/Kong/deck/compare/v1.52.1...v1.53.0
