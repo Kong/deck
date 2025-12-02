@@ -9,5 +9,6 @@ plugins:
     client_secret:
     - abcd
     issuer: http://example.com
+    session_redis_host: null
   enabled: true
   name: openid-connect
