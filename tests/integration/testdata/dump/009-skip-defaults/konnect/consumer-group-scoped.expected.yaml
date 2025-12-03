@@ -9,9 +9,11 @@ consumer_groups:
       - 10
       namespace: tPHO9qtcb99zWWUWxSVDQiUpb7kj59ZQ
       redis:
+        cloud_authentication: null
         host: example.com
       strategy: redis
       sync_rate: -1
+      throttling: null
       window_size:
       - 100
     name: rate-limiting-advanced
