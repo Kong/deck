@@ -49,11 +49,7 @@ consumer_groups:
       retry_after_jitter_max: 0
       strategy: redis
       sync_rate: -1
-      throttling:
-        enabled: false
-        interval: 5
-        queue_limit: 5
-        retry_times: 3
+      throttling: null
       window_size:
       - 100
       window_type: sliding
