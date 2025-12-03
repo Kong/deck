@@ -1,0 +1,38 @@
+_format_version: "3.0"
+consumer_groups:
+- name: foo
+  plugins:
+  - config:
+      limit:
+      - 10
+      namespace: tPHO9qtcb99zWWUWxSVDQiUpb7kj59ZQ
+      redis:
+        host: example.com
+      strategy: redis
+      sync_rate: -1
+      throttling: null
+      window_size:
+      - 100
+    name: rate-limiting-advanced
+consumers:
+- acls:
+  - group: my-group
+  groups:
+  - name: foo
+  hmacauth_credentials:
+  - secret: abcd
+    username: c1
+  keyauth_credentials:
+  - key: abcd
+  username: c1
+- groups:
+  - name: foo
+  jwt_secrets:
+  - algorithm: HS256
+    key: abc
+    secret: abcd
+    tags:
+    - tag1
+  tags:
+  - tag1
+  username: c2

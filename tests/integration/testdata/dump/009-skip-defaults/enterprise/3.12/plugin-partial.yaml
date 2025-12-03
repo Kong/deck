@@ -47,7 +47,6 @@ plugins:
     retry_after_jitter_max: 0
     strategy: redis
     sync_rate: -1
-    throttling: null
     window_size:
     - 100
     window_type: sliding

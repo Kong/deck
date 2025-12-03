@@ -1002,16 +1002,28 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.5.0") },
 		},
 		{
-			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.10+",
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins >=3.10.0 <3.12.0",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.12.0") },
 		},
 		{
-			name:         "dump skip-defaults: plugins, partials (rla) 3.10+",
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins >=3.12.0",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.12/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.12/consumer-group-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (rla) >=3.10.0 <3.12.0",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.12.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (rla) >=3.12.0",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.12/plugin-partial.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.12/plugin-partial.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins (openid-connect) 3.4+",
