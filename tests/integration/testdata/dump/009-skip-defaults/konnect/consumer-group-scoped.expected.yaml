@@ -13,6 +13,7 @@ consumer_groups:
         host: example.com
       strategy: redis
       sync_rate: -1
+      throttling: null
       window_size:
       - 100
     name: rate-limiting-advanced
