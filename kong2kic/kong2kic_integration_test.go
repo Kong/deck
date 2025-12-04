@@ -71,14 +71,14 @@ func Test_deployManifests(t *testing.T) {
 			kindToResource, err := getKindToResourceMap(clientset)
 			require.NoError(t, err)
 
-		t.Log("creating a dynamic client for Kubernetes resources")
-		dynamicClient, err := dynamic.NewForConfig(config)
-		require.NoError(t, err)
+			t.Log("creating a dynamic client for Kubernetes resources")
+			dynamicClient, err := dynamic.NewForConfig(config)
+			require.NoError(t, err)
 
-		t.Log("creating Gateway resource for HTTPRoutes")
-		gatewayGVR, gatewayClassGVR, err := createGatewayResources(t, dynamicClient, kindToResource)
-		require.NoError(t, err)
-		defer func() {
+			t.Log("creating Gateway resource for HTTPRoutes")
+			gatewayGVR, gatewayClassGVR, err := createGatewayResources(t, dynamicClient, kindToResource)
+			require.NoError(t, err)
+			defer func() {
 			// Delete Gateway first
 			err := dynamicClient.Resource(gatewayGVR).
 				Namespace(apiv1.NamespaceDefault).
