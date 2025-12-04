@@ -213,7 +213,7 @@ func deployGatewayAPICRDs(t *testing.T, config *rest.Config) (*clientset.Clients
 	}
 
 	// Wait for CRDs to be available
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	return clientset, nil
 }
 
@@ -285,7 +285,7 @@ spec:
 	t.Logf("created Gateway: %s in Namespace: %s", gateway.GetName(), gateway.GetNamespace())
 
 	// Wait for the Gateway to be ready
-	time.Sleep(5 * time.Second)
+	time.Sleep(1 * time.Second)
 	return gatewayGVR, gatewayClassGVR, nil
 }
 
