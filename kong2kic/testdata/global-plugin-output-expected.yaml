@@ -10,6 +10,8 @@ metadata:
   annotations:
     konghq.com/tags: cloudops-managed,metrics
     kubernetes.io/ingress.class: kong
+  labels:
+    global: "true"
   name: prometheus
 plugin: prometheus
 ---
