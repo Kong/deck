@@ -79,28 +79,28 @@ func Test_deployManifests(t *testing.T) {
 			gatewayGVR, gatewayClassGVR, err := createGatewayResources(t, dynamicClient, kindToResource)
 			require.NoError(t, err)
 			defer func() {
-			// Delete Gateway first
-			err := dynamicClient.Resource(gatewayGVR).
-				Namespace(apiv1.NamespaceDefault).
-				Delete(context.TODO(), "kong", metav1.DeleteOptions{})
-			if err != nil {
-				t.Logf("failed to delete Gateway: %v", err)
-			} else {
-				t.Log("deleted Gateway: kong")
-			}
-			// Then delete GatewayClass
-			err = dynamicClient.Resource(gatewayClassGVR).
-				Delete(context.TODO(), "kong", metav1.DeleteOptions{})
-			if err != nil {
-				t.Logf("failed to delete GatewayClass: %v", err)
-			} else {
-				t.Log("deleted GatewayClass: kong")
-			}
-		}()
+				// Delete Gateway first
+				err := dynamicClient.Resource(gatewayGVR).
+					Namespace(apiv1.NamespaceDefault).
+					Delete(context.TODO(), "kong", metav1.DeleteOptions{})
+				if err != nil {
+					t.Logf("failed to delete Gateway: %v", err)
+				} else {
+					t.Log("deleted Gateway: kong")
+				}
+				// Then delete GatewayClass
+				err = dynamicClient.Resource(gatewayClassGVR).
+					Delete(context.TODO(), "kong", metav1.DeleteOptions{})
+				if err != nil {
+					t.Logf("failed to delete GatewayClass: %v", err)
+				} else {
+					t.Log("deleted GatewayClass: kong")
+				}
+			}()
 
-		t.Log("deploying manifests to the cluster")
-		err = deployManifestsToClusterForVersion(t, dynamicClient, kindToResource, version)
-		require.NoError(t, err)
+			t.Log("deploying manifests to the cluster")
+			err = deployManifestsToClusterForVersion(t, dynamicClient, kindToResource, version)
+			require.NoError(t, err)
 		})
 	}
 }

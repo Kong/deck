@@ -1,6 +1,6 @@
-package utils
+package utils //nolint:revive
 
 const (
-DefaultFormatVersion = "1.1"
-FormatVersion30      = "3.0"
+	DefaultFormatVersion = "1.1"
+	FormatVersion30      = "3.0"
 )

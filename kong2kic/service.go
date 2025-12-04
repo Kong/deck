@@ -71,6 +71,7 @@ func createK8sService(service *file.FService, upstreams []file.FUpstream) *k8sco
 		}
 		servicePort := k8scorev1.ServicePort{
 			Protocol: protocol,
+			//nolint: gosec
 			Port:       int32(*service.Port),
 			TargetPort: intstr.FromInt(*service.Port),
 		}

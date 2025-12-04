@@ -352,7 +352,7 @@ func addBackendRefs(httpRoute *k8sgwapiv1.HTTPRoute, service file.FService, rout
 		},
 	}
 	if service.Port != nil {
-		portNumber := k8sgwapiv1.PortNumber(*service.Port)
+		portNumber := k8sgwapiv1.PortNumber(*service.Port) //nolint:gosec
 		backendRef.Port = &portNumber
 	}
 
