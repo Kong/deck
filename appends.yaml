@@ -1,0 +1,94 @@
+_format_version: "3.0"
+partials:
+- config:
+    auth:
+      allow_override: false
+      aws_access_key_id: null
+      aws_secret_access_key: null
+      azure_client_id: null
+      azure_client_secret: null
+      azure_tenant_id: null
+      azure_use_managed_identity: false
+      gcp_service_account_json: null
+      gcp_use_service_account: false
+      header_name: Authorization
+      header_value: Bearer TEST
+      param_location: null
+      param_name: null
+      param_value: null
+    description: "i am partial"
+    logging:
+      log_payloads: true
+      log_statistics: true
+    metadata: null
+    model:
+      name: gpt-4
+      options: null
+      provider: openai
+    route_type: llm/v1/chat
+    weight: 100
+  id: f1680cdb-d201-4c57-8183-a10cddf0128a
+  name: my-model-config
+  type: model
+plugins:
+- config:
+    balancer:
+      algorithm: round-robin
+      connect_timeout: 60000
+      fail_timeout: 10000
+      failover_criteria:
+      - error
+      - timeout
+      hash_on_header: X-Kong-LLM-Request-ID
+      latency_strategy: tpot
+      max_fails: 0
+      read_timeout: 60000
+      retries: 5
+      slots: 10000
+      tokens_count_strategy: total-tokens
+      write_timeout: 60000
+    embeddings: null
+    genai_category: text/generation
+    llm_format: openai
+    max_request_body_size: 8192
+    model_name_header: true
+    response_streaming: allow
+    targets:
+    - auth:
+        aws_access_key_id: TEST
+        aws_secret_access_key: TEST
+      description: null
+      logging:
+        log_payloads: true
+        log_statistics: true
+      model:
+        name: cohere.command-r-plus-v1:0
+        options:
+          anthropic_version: null
+          azure_api_version: "2023-05-15"
+          azure_deployment_id: null
+          azure_instance: null
+          bedrock:
+            aws_region: us-east-1
+            performance_config_latency: null
+          max_tokens: 4096
+          output_cost: 15
+          temperature: 1
+        provider: bedrock
+      route_type: llm/v1/chat
+      weight: 100
+    vectordb: null
+  enabled: true
+  instance_name: ai-proxy-advanced-lb-bedrock-round-robin
+  name: ai-proxy-advanced
+  partials:
+  - id: f1680cdb-d201-4c57-8183-a10cddf0128a
+    name: my-model-config
+    path: config.targets[]
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  - ws
+  - wss
