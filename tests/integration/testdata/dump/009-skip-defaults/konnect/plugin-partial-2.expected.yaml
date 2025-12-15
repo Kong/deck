@@ -15,6 +15,10 @@ plugins:
     - abc-client
     client_secret:
     - abc-secret
+    cluster_cache_redis:
+      cloud_authentication: null
     issuer: http://example-issuer.com
+    redis:
+      cloud_authentication: null
   enabled: true
   name: openid-connect

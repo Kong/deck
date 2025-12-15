@@ -14,5 +14,10 @@ plugins:
     client_secret:
     - abc-secret
     issuer: http://example-issuer.com
+    redis:
+      host: null
+      port: null
+    session_redis_host: null
+    session_redis_port: null
   enabled: true
   name: openid-connect

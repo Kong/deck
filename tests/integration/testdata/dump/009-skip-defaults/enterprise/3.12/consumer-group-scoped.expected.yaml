@@ -1,6 +1,4 @@
 _format_version: "3.0"
-_konnect:
-  control_plane_name: default
 consumer_groups:
 - name: foo
   plugins:
@@ -9,7 +7,6 @@ consumer_groups:
       - 10
       namespace: tPHO9qtcb99zWWUWxSVDQiUpb7kj59ZQ
       redis:
-        cloud_authentication: null
         host: example.com
       strategy: redis
       sync_rate: -1
