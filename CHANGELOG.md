@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.55.0](#v1550)
 - [v1.54.0](#v1540)
 - [v1.53.2](#v1532)
 - [v1.53.1](#v1531)
@@ -127,6 +128,19 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.55.0]
+> Release date: 2025/12/16
+
+### Added
+- Added support for appending partials to plugin configuration.
+[#1836](https://github.com/Kong/deck/pull/1836)
+[go-database-reconciler #364](https://github.com/Kong/go-database-reconciler/pull/364)
+[go-kong #591](https://github.com/Kong/go-kong/pull/591)
+
+### Chores
+- Upgraded go version to `v1.25.5`
+[#1834](https://github.com/Kong/deck/pull/1834)
 
 ## [v1.54.0]
 > Release date: 2025/11/27
@@ -2393,6 +2407,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.55.0]: https://github.com/Kong/deck/compare/v1.54.0...v1.55.0
 [v1.54.0]: https://github.com/Kong/deck/compare/v1.53.2...v1.54.0
 [v1.53.2]: https://github.com/Kong/deck/compare/v1.53.1...v1.53.2
 [v1.53.1]: https://github.com/Kong/deck/compare/v1.53.0...v1.53.1
