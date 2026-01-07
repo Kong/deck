@@ -6,6 +6,8 @@ replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 
 replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
 
+replace github.com/kong/go-database-reconciler v1.31.0 => /Users/prashansa.kulshrestha@konghq.com/work/go-database-reconciler
+
 require (
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
@@ -14,7 +16,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.2.1
-	github.com/kong/go-database-reconciler v1.31.0
+	github.com/kong/go-database-reconciler v1.31.1-0.20251222062637-7b26eddcaf74
 	github.com/kong/go-kong v0.71.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
