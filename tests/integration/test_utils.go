@@ -242,7 +242,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	kongState, err := deckDump.Get(ctx, client, dumpConfig)
 	require.NoError(t, err)
 
-	opt := []cmp.Option{
+	opt := []cmp.Option{ //nolint:prealloc
 		cmpopts.IgnoreFields(kong.Service{}, "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Route{}, "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),

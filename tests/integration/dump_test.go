@@ -301,7 +301,7 @@ func Test_Dump_KonnectRename(t *testing.T) {
 				output string
 				err    error
 			)
-			flags := []string{"-o", "-", "--with-id"}
+			flags := []string{"-o", "-", "--with-id"} //nolint:prealloc
 			flags = append(flags, tc.flags...)
 			output, err = dump(flags...)
 
