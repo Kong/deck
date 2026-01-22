@@ -301,7 +301,7 @@ func Test_Dump_KonnectRename(t *testing.T) {
 				output string
 				err    error
 			)
-			flags := []string{"-o", "-", "--with-id"}
+			flags := []string{"-o", "-", "--with-id"} //nolint:prealloc
 			flags = append(flags, tc.flags...)
 			output, err = dump(flags...)
 
@@ -1131,4 +1131,19 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 			assert.Equal(t, expected, output)
 		})
 	}
+}
+
+func Test_UpstreamsAndTargetsKonnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	stateFile := "testdata/dump/011-upstreams-and-targets/kong.yaml"
+	require.NoError(t, sync(context.Background(), stateFile))
+
+	output, err := dump("-o", "-")
+	require.NoError(t, err)
+
+	expected, err := readFile(stateFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
 }

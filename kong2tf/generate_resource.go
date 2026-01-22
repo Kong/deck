@@ -141,7 +141,7 @@ func generateRelationship(
 	s := fmt.Sprintf(`resource "konnect_%s" "%s" {`, entityType, name)
 
 	// Extract keys to iterate in a deterministic order
-	keys := make([]string, 0)
+	keys := make([]string, 0, len(relations))
 	for k := range relations {
 		keys = append(keys, k)
 	}
