@@ -8550,6 +8550,7 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 	dumpConfig := deckDump.Config{}
 
 	partialConfig := kong.Configuration{
+		"cloud_authentication":     nil,
 		"cluster_max_redirections": float64(5),
 		"cluster_nodes":            nil,
 		"connect_timeout":          float64(2000),
@@ -10063,6 +10064,7 @@ func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
 				Name: kong.String("redis-ee-common"),
 				Type: kong.String("redis-ee"),
 				Config: kong.Configuration{
+					"cloud_authentication":     nil,
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),
