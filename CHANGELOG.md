@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.55.1](#v1551)
 - [v1.55.0](#v1550)
 - [v1.54.0](#v1540)
 - [v1.53.2](#v1532)
@@ -128,6 +129,14 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.55.1]
+> Release date: 2026/01/27
+
+### Fixed
+- Fixed openApi2Kong command to support request-validator plugin creation with path parameters schema.
+[#1846](https://github.com/Kong/deck/pull/1846)
+[go-apiops #281](https://github.com/Kong/go-apiops/pull/281)
 
 ## [v1.55.0]
 > Release date: 2025/12/16
@@ -2407,6 +2416,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.55.1]: https://github.com/Kong/deck/compare/v1.55.0...v1.55.1
 [v1.55.0]: https://github.com/Kong/deck/compare/v1.54.0...v1.55.0
 [v1.54.0]: https://github.com/Kong/deck/compare/v1.53.2...v1.54.0
 [v1.53.2]: https://github.com/Kong/deck/compare/v1.53.1...v1.53.2
