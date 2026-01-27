@@ -155,9 +155,8 @@ func Test_Validate_File(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			validateOpts := []string{
-				tc.stateFile,
-			}
+			validateOpts := make([]string, 0, 1+len(tc.additionalArgs))
+			validateOpts = append(validateOpts, tc.stateFile)
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(OFFLINE, validateOpts...)
@@ -205,9 +204,8 @@ func Test_Validate_Gateway(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			validateOpts := []string{
-				tc.stateFile,
-			}
+			validateOpts := make([]string, 0, 1+len(tc.additionalArgs))
+			validateOpts = append(validateOpts, tc.stateFile)
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
@@ -284,9 +282,8 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 				require.NoError(t, sync(ctx, tc.priorStateFile))
 			}
 
-			validateOpts := []string{
-				tc.stateFile,
-			}
+			validateOpts := make([]string, 0, 1+len(tc.additionalArgs))
+			validateOpts = append(validateOpts, tc.stateFile)
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(ONLINE, validateOpts...)
@@ -353,9 +350,8 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			require.NoError(t, sync(ctx, "testdata/validate/001-partials/partials.yaml"))
 
-			validateOpts := []string{
-				tc.stateFile,
-			}
+			validateOpts := make([]string, 0, 1+len(tc.additionalArgs))
+			validateOpts = append(validateOpts, tc.stateFile)
 			validateOpts = append(validateOpts, tc.additionalArgs...)
 
 			err := validate(tc.mode, validateOpts...)

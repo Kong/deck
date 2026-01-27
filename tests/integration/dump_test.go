@@ -301,7 +301,8 @@ func Test_Dump_KonnectRename(t *testing.T) {
 				output string
 				err    error
 			)
-			flags := []string{"-o", "-", "--with-id"}
+			flags := make([]string, 0, 3+len(tc.flags))
+			flags = append(flags, "-o", "-", "--with-id")
 			flags = append(flags, tc.flags...)
 			output, err = dump(flags...)
 

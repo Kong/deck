@@ -242,7 +242,8 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	kongState, err := deckDump.Get(ctx, client, dumpConfig)
 	require.NoError(t, err)
 
-	opt := []cmp.Option{
+	opt := make([]cmp.Option, 0, 22+len(ignoreFields))
+	opt = append(opt,
 		cmpopts.IgnoreFields(kong.Service{}, "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Route{}, "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Plugin{}, "ID", "CreatedAt"),
@@ -265,7 +266,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
-	}
+	)
 	opt = append(opt, ignoreFields...)
 
 	if diff := cmp.Diff(kongState, &expectedState, opt...); diff != "" {
