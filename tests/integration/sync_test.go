@@ -8540,7 +8540,7 @@ func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
 }
 
 func Test_Sync_Partials_Plugins(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+	runWhen(t, "enterprise", ">=3.10.0")
 
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -8550,6 +8550,146 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 	dumpConfig := deckDump.Config{}
 
 	partialConfig := kong.Configuration{
+		"cluster_max_redirections": float64(5),
+		"cluster_nodes":            nil,
+		"connect_timeout":          float64(2000),
+		"connection_is_proxied":    bool(false),
+		"database":                 float64(0),
+		"host":                     string("127.0.0.1"),
+		"keepalive_backlog":        nil,
+		"keepalive_pool_size":      float64(256),
+		"password":                 nil,
+		"port":                     float64(6379),
+		"read_timeout":             float64(3001),
+		"send_timeout":             float64(2004),
+		"sentinel_master":          nil,
+		"sentinel_nodes":           nil,
+		"sentinel_password":        nil,
+		"sentinel_role":            nil,
+		"sentinel_username":        nil,
+		"server_name":              nil,
+		"ssl":                      bool(false),
+		"ssl_verify":               bool(false),
+		"username":                 nil,
+	}
+
+	t.Run("create a partial and link to a plugin via name", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "my-ee-partial", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+		assert.IsType(t, kong.Configuration{}, partials[0].Config)
+		assert.Equal(t, partialConfig, partials[0].Config)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, *partials[0].ID, *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+	})
+
+	t.Run("partial id is preserved if passed and linking can be done via id", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong-ids.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "13dc230d-d65e-439a-9f05-9fd71abfee4d", *partials[0].ID)
+		assert.Equal(t, "my-ee-partial", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+		assert.IsType(t, kong.Configuration{}, partials[0].Config)
+		assert.Equal(t, partialConfig, partials[0].Config)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, "13dc230d-d65e-439a-9f05-9fd71abfee4d", *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+	})
+
+	t.Run("linking to a plugin fails in case of non-existent partial", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/039-partials/kong-wrong.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "partial non-existent-partial for plugin rate-limiting-advanced: entity not found")
+	})
+
+	t.Run("partial linking with a consumer-group scoped plugin works fine", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/039-partials/cg-plugin-partial.yaml"))
+		t.Cleanup(func() {
+			reset(t)
+		})
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		// check for partial
+		partials, err := newState.Partials.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, partials)
+
+		require.Len(t, partials, 1)
+		assert.Equal(t, "my-redis-ee", *partials[0].Name)
+		assert.Equal(t, "redis-ee", *partials[0].Type)
+
+		// check for plugin
+		plugins, err := newState.Plugins.GetAll()
+		require.NoError(t, err)
+		require.NotNil(t, plugins)
+		require.Len(t, plugins, 1)
+		assert.Equal(t, "rate-limiting-advanced", *plugins[0].Name)
+		assert.IsType(t, []*kong.PartialLink{}, plugins[0].Partials)
+		require.Len(t, plugins[0].Partials, 1)
+		assert.Equal(t, *partials[0].ID, *plugins[0].Partials[0].ID)
+		assert.Equal(t, "config.redis", *plugins[0].Partials[0].Path)
+		assert.Equal(t, "foo", *plugins[0].ConsumerGroup.Name)
+	})
+}
+
+func Test_Sync_Partials_Plugins_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	dumpConfig := deckDump.Config{}
+
+	partialConfig := kong.Configuration{
+		"cloud_authentication":     nil,
 		"cluster_max_redirections": float64(5),
 		"cluster_nodes":            nil,
 		"connect_timeout":          float64(2000),
@@ -10063,6 +10203,7 @@ func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
 				Name: kong.String("redis-ee-common"),
 				Type: kong.String("redis-ee"),
 				Config: kong.Configuration{
+					"cloud_authentication":     nil,
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),
@@ -10092,6 +10233,7 @@ func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
 				Name: kong.String("redis-ee-sentinel"),
 				Type: kong.String("redis-ee"),
 				Config: kong.Configuration{
+					"cloud_authentication":     nil,
 					"cluster_max_redirections": float64(5),
 					"cluster_nodes":            nil,
 					"connect_timeout":          float64(2000),

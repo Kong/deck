@@ -51,9 +51,8 @@ func Test_RenderPlain(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			renderOpts := []string{
-				tc.stateFile,
-			}
+			renderOpts := make([]string, 0, 1+len(tc.additionalArgs))
+			renderOpts = append(renderOpts, tc.stateFile)
 			renderOpts = append(renderOpts, tc.additionalArgs...)
 
 			for k, v := range tc.envVars {
