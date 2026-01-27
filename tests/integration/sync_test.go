@@ -8550,6 +8550,7 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 	dumpConfig := deckDump.Config{}
 
 	partialConfig := kong.Configuration{
+		"cloud_authentication":     nil,
 		"cluster_max_redirections": float64(5),
 		"cluster_nodes":            nil,
 		"connect_timeout":          float64(2000),
