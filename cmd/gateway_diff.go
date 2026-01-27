@@ -92,15 +92,15 @@ that will be created, updated, or deleted.
 		"only entities matching tags specified via this flag are diffed.\n"+
 			"When this setting has multiple tag values, entities must match each of them.")
 	diffCmd.Flags().BoolVar(&dumpConfig.RBACResourcesOnly, "rbac-resources-only",
-		false, "sync only the RBAC resources (Kong Enterprise only).")
+		false, "Sync only the RBAC resources (Kong Enterprise only).")
 	diffCmd.Flags().BoolVar(&diffCmdNonZeroExitCode, "non-zero-exit-code",
-		false, "return exit code 2 if there is a diff present,\n"+
+		false, "Return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
 	diffCmd.Flags().BoolVar(&dumpConfig.SkipCACerts, "skip-ca-certificates",
 		false, "do not diff CA certificates.")
 	diffCmd.Flags().BoolVar(&diffJSONOutput, "json-output",
-		false, "generate command execution report in a JSON format")
+		false, "Generate a JSON change report that includes a change summary and details for each entity.")
 	diffCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
 		false, "allow deck to diff consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
