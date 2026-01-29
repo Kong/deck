@@ -277,8 +277,3 @@ func convertScalarToList(pluginConfig kong.Configuration,
 
 	return pluginConfig
 }
-
-func convertIpToIpPort(pluginConfig kong.Configuration, fieldName, pluginName string) kong.Configuration {
-
-	return pluginConfig
-}
