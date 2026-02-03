@@ -2356,6 +2356,24 @@ var (
 		},
 	}
 
+	consumerGroupScopedPluginWithInstanceName = []*kong.Plugin{{
+		Name:         kong.String("request-transformer"),
+		InstanceName: kong.String("my-instance"),
+		Config: kong.Configuration{
+			"add":         map[string]any{"body": []any{}, "headers": []any{}, "querystring": []any{}},
+			"append":      map[string]any{"body": []any{}, "headers": []any{}, "querystring": []any{}},
+			"http_method": string("GET"),
+			"remove":      map[string]any{"body": []any{}, "headers": []any{string("test-header")}, "querystring": []any{}},
+			"rename":      map[string]any{"body": []any{}, "headers": []any{}, "querystring": []any{}},
+			"replace":     map[string]any{"body": []any{}, "headers": []any{}, "querystring": []any{}, "uri": nil},
+		},
+		ConsumerGroup: &kong.ConsumerGroup{
+			ID: kong.String("58076db2-28b6-423b-ba39-a79719301700"),
+		},
+		Enabled:   kong.Bool(true),
+		Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+	}}
+
 	consumerGroupScopedPlugins312x = []*kong.Plugin{
 		{
 			Name: kong.String("rate-limiting-advanced"),
@@ -4163,6 +4181,47 @@ func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
 			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
+}
+
+func Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
+	setup(t)
+	client, err := getTestClient()
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "create plugins on consumer-groups",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong-cg-plugin-instance-name.yaml",
+			expectedState: utils.KongRawState{
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("foo"),
+						},
+					},
+				},
+				Plugins: consumerGroupScopedPluginWithInstanceName,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "enterprise", ">=3.4.0")
+			setup(t)
+
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+
 }
 
 // test scope:

@@ -9,6 +9,7 @@ consumer_groups:
       - 2628000
       window_type: sliding
       namespace: basic
+    instance_name: basic-instance
     name: rate-limiting-advanced
 consumers:
   - username: foo

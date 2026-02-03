@@ -51,6 +51,7 @@ consumer_groups:
       window_size:
       - 2628000
       window_type: sliding
+    instance_name: basic-instance
     name: rate-limiting-advanced
 consumers:
 - groups:
