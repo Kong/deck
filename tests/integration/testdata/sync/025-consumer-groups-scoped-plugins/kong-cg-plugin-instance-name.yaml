@@ -1,0 +1,13 @@
+_format_version: "3.0"
+
+consumer_groups:
+  - id: 58076db2-28b6-423b-ba39-a79719301700
+    name: foo
+    plugins:
+      - name: request-transformer
+        instance_name: my-instance
+        config:
+          http_method: GET
+          remove:
+            headers:
+              - test-header

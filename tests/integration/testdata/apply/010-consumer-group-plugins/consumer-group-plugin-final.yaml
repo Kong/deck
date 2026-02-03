@@ -1,0 +1,12 @@
+_format_version: "3.0"
+consumer_groups:
+  - name: silver
+    plugins:
+      - config:
+          allow:
+            - 10.0.0.0
+          deny: null
+          message: null
+          status: null
+        instance_name: default-instance
+        name: ip-restriction
