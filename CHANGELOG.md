@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.55.2](#v1552)
 - [v1.55.1](#v1551)
 - [v1.55.0](#v1550)
 - [v1.54.0](#v1540)
@@ -129,6 +130,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.55.2]
+> Release date: 2026/02/03
+
+### Fixed
+- Added InstanceName to the ConsumerGroup Plugin schema.
+[#1860](https://github.com/Kong/deck/pull/1860)
+[go-database-reconciler #366](https://github.com/Kong/go-database-reconciler/pull/366/)
+[go-kong #600](https://github.com/Kong/go-kong/pull/600)
 
 ## [v1.55.1]
 > Release date: 2026/01/27
