@@ -4221,7 +4221,6 @@ func Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0(t *testing.T) {
 			testKongState(t, client, false, false, tc.expectedState, nil)
 		})
 	}
-
 }
 
 // test scope:
