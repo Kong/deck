@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "Kong/public-shared-renovate"
+  ],
+  "packageRules": [
+    {
+      "description": "Ignore pre-release versions until a stable tag exists",
+      "ignoreUnstable": true,
+      "matchPackageNames": [
+        "*"
+      ]
+    }
+  ]
+}
