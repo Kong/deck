@@ -156,10 +156,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 
-	if dumpConfig.SkipConsumers && targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil &&
-		(targetContent.Info.LookUpSelectorTags.Consumers != nil ||
-			targetContent.Info.LookUpSelectorTags.ConsumerGroups != nil) {
-		return errors.New("cannot use --skip-consumers with default lookup tags for consumers or consumer groups")
+	err = validateSkipConsumersWithLookupTags(targetContent)
+	if err != nil {
+		return err
 	}
 
 	if dumpConfig.SkipConsumers {
@@ -454,6 +453,15 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 
 		cprint.BluePrintLn(jsonOutputString + "\n")
+	}
+	return nil
+}
+
+func validateSkipConsumersWithLookupTags(targetContent *file.Content) error {
+	if dumpConfig.SkipConsumers && targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil &&
+		(targetContent.Info.LookUpSelectorTags.Consumers != nil ||
+			targetContent.Info.LookUpSelectorTags.ConsumerGroups != nil) {
+		return errors.New("cannot use --skip-consumers with default lookup tags for consumers or consumer groups")
 	}
 	return nil
 }
