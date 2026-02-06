@@ -132,13 +132,18 @@
 - [v0.1.0](#v010)
 
 ## [v1.55.2]
-> Release date: 2026/02/03
+> Release date: 2026/02/06
 
 ### Fixed
-- Added InstanceName to the ConsumerGroup Plugin schema.
-[#1860](https://github.com/Kong/deck/pull/1860)
-[go-database-reconciler #366](https://github.com/Kong/go-database-reconciler/pull/366/)
-[go-kong #600](https://github.com/Kong/go-kong/pull/600)
+- Added support for adding instance_name to ConsumerGroup plugins.
+  [#1860](https://github.com/Kong/deck/pull/1860)
+  [go-database-reconciler #366](https://github.com/Kong/go-database-reconciler/pull/366/)
+  [go-kong #600](https://github.com/Kong/go-kong/pull/600)
+
+- Added validation for --skip-consumers flag when used with default_lookup_tags for
+  consumers and consumer-groups to ensure consistent lookup behavior.
+  [#1875](https://github.com/Kong/deck/pull/1875)
+
 
 ## [v1.55.1]
 > Release date: 2026/01/27
@@ -2426,6 +2431,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2
 [v1.55.1]: https://github.com/Kong/deck/compare/v1.55.0...v1.55.1
 [v1.55.0]: https://github.com/Kong/deck/compare/v1.54.0...v1.55.0
 [v1.54.0]: https://github.com/Kong/deck/compare/v1.53.2...v1.54.0
