@@ -144,6 +144,13 @@
   consumers and consumer-groups to ensure consistent lookup behavior.
   [#1875](https://github.com/Kong/deck/pull/1875)
 
+- Redirected warnings and errors to stderr when using --json-output to prevent non-JSON 
+  text from corrupting the output and breaking automation scripts.
+  [go-database-reconciler #372](https://github.com/Kong/go-database-reconciler/pull/372)
+
+### Chores
+- Upgraded go version to `v1.25.6`
+[#1887](https://github.com/Kong/deck/pull/1887)
 
 ## [v1.55.1]
 > Release date: 2026/01/27
