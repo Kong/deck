@@ -65,7 +65,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Login to DockerHub
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
         with:
           username: ${{ secrets.DOCKER_USERNAME_JAN_2025 }}
           password: ${{ secrets.DOCKER_TOKEN_JAN_2025 }}
