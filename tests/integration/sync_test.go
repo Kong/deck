@@ -8597,6 +8597,25 @@ func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
 	})
 }
 
+func Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	t.Run("--skip-consumers-with-default-lookup-consumer flag set", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/049-skip-consumers-default-lookup-tags/consumers.yaml", "--skip-consumers")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "cannot use --skip-consumers with default lookup tags for consumers or consumer groups")
+	})
+
+	t.Run("--skip-consumers-with-default-lookup-consumer-group flag set", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/049-skip-consumers-default-lookup-tags/consumer-groups.yaml", "--skip-consumers")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "cannot use --skip-consumers with default lookup tags for consumers or consumer groups")
+	})
+}
+
 func Test_Sync_Partials_Plugins(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.10.0")
 

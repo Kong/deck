@@ -1,0 +1,29 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+    - my-service
+  default_lookup_tags:
+    consumers:
+      - MyConsumerTag
+services:
+  - name: my-service
+    host: example.com
+    port: 443
+    protocol: https
+    path: /api
+    tags:
+      - my-service
+plugins:
+  - name: rate-limiting-advanced
+    consumer: my-consumer-username
+    service: my-service
+    config:
+      limit:
+        - 30000
+      window_size:
+        - 60
+      strategy: local
+      window_type: fixed
+      namespace: my-namespace
+    tags:
+      - my-service

@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.55.2](#v1552)
 - [v1.55.1](#v1551)
 - [v1.55.0](#v1550)
 - [v1.54.0](#v1540)
@@ -129,6 +130,27 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.55.2]
+> Release date: 2026/02/06
+
+### Fixed
+- Added support for adding instance_name to ConsumerGroup plugins.
+  [#1860](https://github.com/Kong/deck/pull/1860)
+  [go-database-reconciler #366](https://github.com/Kong/go-database-reconciler/pull/366/)
+  [go-kong #600](https://github.com/Kong/go-kong/pull/600)
+
+- Added validation for --skip-consumers flag when used with default_lookup_tags for
+  consumers and consumer-groups to ensure consistent lookup behavior.
+  [#1875](https://github.com/Kong/deck/pull/1875)
+
+- Redirected warnings and errors to stderr when using --json-output to prevent non-JSON 
+  text from corrupting the output and breaking automation scripts.
+  [go-database-reconciler #372](https://github.com/Kong/go-database-reconciler/pull/372)
+
+### Chores
+- Upgraded go version to `v1.25.6`
+[#1887](https://github.com/Kong/deck/pull/1887)
 
 ## [v1.55.1]
 > Release date: 2026/01/27
@@ -2416,6 +2438,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2
 [v1.55.1]: https://github.com/Kong/deck/compare/v1.55.0...v1.55.1
 [v1.55.0]: https://github.com/Kong/deck/compare/v1.54.0...v1.55.0
 [v1.54.0]: https://github.com/Kong/deck/compare/v1.53.2...v1.54.0
