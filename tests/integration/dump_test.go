@@ -938,6 +938,11 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			stateFile:    "testdata/dump/009-skip-defaults/konnect/vaults.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/konnect/vaults.expected.yaml",
 		},
+		{
+			name:         "dump skip-defaults: credentials",
+			stateFile:    "testdata/dump/009-skip-defaults/konnect/credentials.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/konnect/credentials.expected.yaml",
+		},
 	}
 
 	for _, tc := range tests {
@@ -1055,6 +1060,12 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.11+/vaults.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.11+/vaults.expected.yaml",
 			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.11.0") },
+		},
+		{
+			name:         "credentials skip-defaults 3.4+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0") },
 		},
 	}
 
