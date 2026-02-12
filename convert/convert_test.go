@@ -334,6 +334,17 @@ func Test_Convert(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "converts from 3.10 to 3.14 format",
+			args: args{
+				inputFilenames:         []string{"testdata/11/input.yaml"},
+				outputFilename:         "testdata/11/output.yaml",
+				expectedOutputFilename: "testdata/11/output-expected.yaml",
+				fromFormat:             FormatKongGatewayVersion310x,
+				toFormat:               FormatKongGatewayVersion314x,
+			},
+			wantErr: false,
+		},
+		{
 			name: "errors from distributed to kong gateway with env variables not set",
 			args: args{
 				inputFilenames: []string{"testdata/9/input.yaml"},

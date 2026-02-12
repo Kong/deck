@@ -1,0 +1,75 @@
+rules:
+  # Route protocol default change
+  route-protocols-check:
+    description: >-
+      In Kong Gateway 3.14, the default route protocols changed from ["http", "https"]
+      to ["https"] only. Routes without explicit protocols set will now default to HTTPS only.
+    given:
+      - $.routes[*]
+      - $.services[*].routes[*]
+    message: >-
+      Kong Gateway 3.14 changed the default route protocols from ["http", "https"] to ["https"].
+      If your route does not specify protocols explicitly, it will default to HTTPS only.
+      Consider explicitly setting protocols to ["http", "https"] if you need HTTP access.
+    severity: warn
+    then:
+      - field: protocols
+        function: defined
+
+  # Service TLS verify default change
+  service-tls-verify-check:
+    description: >-
+      In Kong Gateway 3.14, the global tls_certificate_verify option changed from off to on.
+      Services using secure protocols (https, tls, grpcs, wss) without an explicit tls_verify
+      setting will now have TLS certificate verification enforced.
+    given:
+      - $.services[?(@.protocol == 'https' || @.protocol == 'tls' || @.protocol == 'grpcs' || @.protocol == 'wss')]
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. Services using secure
+      protocols without an explicit tls_verify setting will now verify upstream TLS certificates.
+      If your upstream does not have a valid TLS certificate, set tls_verify to false explicitly.
+    severity: warn
+    then:
+      - field: tls_verify
+        function: defined
+
+  # Plugin hide_credentials default change
+  hide-credentials-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, the hide_credentials default changed from false to true for
+      auth plugins. Credentials will be hidden from upstream by default.
+    given:
+      - $.plugins[?(@.name == 'key-auth' || @.name == 'key-auth-enc' || @.name == 'basic-auth' || @.name == 'hmac-auth' || @.name == 'ldap-auth' || @.name == 'oauth2' || @.name == 'oauth2-introspection' || @.name == 'vault-auth' || @.name == 'ldap-auth-advanced')].config
+      - $.services[*].plugins[?(@.name == 'key-auth' || @.name == 'key-auth-enc' || @.name == 'basic-auth' || @.name == 'hmac-auth' || @.name == 'ldap-auth' || @.name == 'oauth2' || @.name == 'oauth2-introspection' || @.name == 'vault-auth' || @.name == 'ldap-auth-advanced')].config
+      - $.routes[*].plugins[?(@.name == 'key-auth' || @.name == 'key-auth-enc' || @.name == 'basic-auth' || @.name == 'hmac-auth' || @.name == 'ldap-auth' || @.name == 'oauth2' || @.name == 'oauth2-introspection' || @.name == 'vault-auth' || @.name == 'ldap-auth-advanced')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'key-auth' || @.name == 'key-auth-enc' || @.name == 'basic-auth' || @.name == 'hmac-auth' || @.name == 'ldap-auth' || @.name == 'oauth2' || @.name == 'oauth2-introspection' || @.name == 'vault-auth' || @.name == 'ldap-auth-advanced')].config
+      - $.consumers[*].plugins[?(@.name == 'key-auth' || @.name == 'key-auth-enc' || @.name == 'basic-auth' || @.name == 'hmac-auth' || @.name == 'ldap-auth' || @.name == 'oauth2' || @.name == 'oauth2-introspection' || @.name == 'vault-auth' || @.name == 'ldap-auth-advanced')].config
+    message: >-
+      Kong Gateway 3.14 changed the default value of hide_credentials from false to true for
+      auth plugins. If your upstream service requires access to authentication credentials,
+      explicitly set hide_credentials to false.
+    severity: warn
+    then:
+      - field: hide_credentials
+        function: defined
+
+  # Plugin ssl_verify default change
+  ssl-verify-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, the global tls_certificate_verify changed from off to on,
+      which affects the ssl_verify behavior for many plugins.
+    given:
+      - $.plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+      - $.services[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+      - $.routes[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+      - $.services[*].routes[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+      - $.consumers[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. Plugins that connect
+      to external services over TLS without explicit ssl_verify settings will now verify
+      certificates. Set ssl_verify to false explicitly if your external services do not
+      have valid TLS certificates.
+    severity: warn
+    then:
+      - field: ssl_verify
+        function: defined
