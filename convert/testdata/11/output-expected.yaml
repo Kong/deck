@@ -1,0 +1,145 @@
+_format_version: "3.0"
+consumers:
+- plugins:
+  - config:
+      hide_credentials: false
+    name: key-auth
+  - config:
+      hide_credentials: false
+      ssl_verify: false
+    name: basic-auth
+  username: c1
+plugins:
+- config:
+    hide_credentials: false
+  name: key-auth
+- config:
+    hide_credentials: false
+  name: key-auth-enc
+- config:
+    hide_credentials: false
+    ssl_verify: false
+  name: basic-auth
+- config:
+    hide_credentials: false
+  name: hmac-auth
+- config:
+    hide_credentials: false
+    ldap_host: ldap.example.com
+    ssl_verify: false
+  name: ldap-auth
+- config:
+    hide_credentials: false
+  name: oauth2
+- config:
+    hide_credentials: false
+    introspection_url: https://auth.example.com/introspect
+  name: oauth2-introspection
+- config:
+    hide_credentials: false
+  name: vault-auth
+- config:
+    hide_credentials: false
+    ldap_host: ldap.example.com
+    ssl_verify: false
+  name: ldap-auth-advanced
+- config:
+    hide_credentials: true
+  name: key-auth
+- config:
+    function_name: my-function
+    ssl_verify: false
+  name: aws-lambda
+- config:
+    http_endpoint: https://log.example.com
+    ssl_verify: false
+  name: http-log
+- config:
+    issuer: https://auth.example.com
+    ssl_verify: false
+  name: openid-connect
+- config:
+    account_email: test@example.com
+    ssl_verify: false
+  name: acme
+- config:
+    http_endpoint: https://log.example.com
+    ssl_verify: true
+  name: http-log
+routes:
+- name: r3-no-protocols
+  paths:
+  - /top-level
+  plugins:
+  - config:
+      hide_credentials: false
+      ssl_verify: false
+    name: basic-auth
+  - config:
+      account_email: test@example.com
+      ssl_verify: false
+    name: acme
+  protocols:
+  - http
+  - https
+- name: r4-with-protocols
+  paths:
+  - /top-level-2
+  protocols:
+  - http
+  - https
+services:
+- host: example.com
+  name: s1
+  plugins:
+  - config:
+      hide_credentials: false
+    name: key-auth
+  - config:
+      http_endpoint: https://log.example.com
+      ssl_verify: false
+    name: http-log
+  protocol: https
+  routes:
+  - name: r1-no-protocols
+    paths:
+    - /test1
+    protocols:
+    - http
+    - https
+  - name: r1-with-protocols
+    paths:
+    - /test2
+    protocols:
+    - https
+  tls_verify: false
+- host: secure.example.com
+  name: s2-https-no-tls-verify
+  protocol: https
+  routes:
+  - name: r2
+    paths:
+    - /secure
+    protocols:
+    - http
+    - https
+  tls_verify: false
+- host: plain.example.com
+  name: s3-http
+  protocol: http
+- host: tls.example.com
+  name: s4-tls
+  protocol: tls
+  tls_verify: false
+- host: grpc.example.com
+  name: s5-grpcs
+  protocol: grpcs
+  tls_verify: false
+- host: ws.example.com
+  name: s6-wss
+  protocol: wss
+  tls_verify: false
+- host: verified.example.com
+  name: s7-https-tls-verify-set
+  protocol: https
+  tls_verify: true
