@@ -146,9 +146,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		jsonOutput.Errors = []string{}
 		jsonOutput.Warnings = []string{}
 		jsonOutput.Changes = diff.EntityChanges{
-			Creating: []diff.EntityState{},
-			Updating: []diff.EntityState{},
-			Deleting: []diff.EntityState{},
+			Creating:         []diff.EntityState{},
+			Updating:         []diff.EntityState{},
+			Deleting:         []diff.EntityState{},
+			DroppedCreations: []diff.EntityState{},
+			DroppedUpdates:   []diff.EntityState{},
+			DroppedDeletions: []diff.EntityState{},
 		}
 	}
 	targetContent, err := file.GetContentFromFiles(filenames, false)
@@ -706,20 +709,18 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	}
 
 	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
+	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
 	// print stats before error to report completed operations
 	if !enableJSONOutput {
 		printStats(stats)
-	}
-	if errs != nil {
-		return 0, reconcilerUtils.ErrArray{Errors: errs}
-	}
-	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()
-
-	if enableJSONOutput {
+	} else {
 		jsonOutput.Changes = diff.EntityChanges{
-			Creating: append(jsonOutput.Changes.Creating, changes.Creating...),
-			Updating: append(jsonOutput.Changes.Updating, changes.Updating...),
-			Deleting: append(jsonOutput.Changes.Deleting, changes.Deleting...),
+			Creating:         append(jsonOutput.Changes.Creating, changes.Creating...),
+			Updating:         append(jsonOutput.Changes.Updating, changes.Updating...),
+			Deleting:         append(jsonOutput.Changes.Deleting, changes.Deleting...),
+			DroppedCreations: append(jsonOutput.Changes.DroppedCreations, changes.DroppedCreations...),
+			DroppedUpdates:   append(jsonOutput.Changes.DroppedUpdates, changes.DroppedUpdates...),
+			DroppedDeletions: append(jsonOutput.Changes.DroppedDeletions, changes.DroppedDeletions...),
 		}
 		jsonOutput.Summary = diff.Summary{
 			Creating: stats.CreateOps.Count(),
@@ -728,6 +729,10 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 			Total:    totalOps,
 		}
 	}
+	if errs != nil {
+		return 0, reconcilerUtils.ErrArray{Errors: errs}
+	}
+
 	return int(totalOps), nil
 }
 
