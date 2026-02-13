@@ -1,11 +1,17 @@
 package cmd
 
 import (
+	"context"
 	"reflect"
 	"testing"
 
+	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/state"
+	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDetermineSelectorTag(t *testing.T) {
@@ -95,4 +101,65 @@ func TestDetermineSelectorTag(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPerformDiff_JSONOutput(t *testing.T) {
+	// Reset global jsonOutput to a known state
+	jsonOutput = diff.JSONOutputObject{}
+	// This is initialized in syncMain() in the actual application,
+	// but we need to set it up here for testing
+	jsonOutput.Changes = diff.EntityChanges{
+		Creating:         []diff.EntityState{},
+		Updating:         []diff.EntityState{},
+		Deleting:         []diff.EntityState{},
+		DroppedCreations: []diff.EntityState{},
+		DroppedUpdates:   []diff.EntityState{},
+		DroppedDeletions: []diff.EntityState{},
+	}
+
+	currentState, err := state.NewKongState()
+	require.NoError(t, err)
+
+	// mock target state
+	targetState, err := state.NewKongState()
+	require.NoError(t, err)
+	service := state.Service{
+		Service: kong.Service{
+			ID:   kong.String("service-1"),
+			Name: kong.String("Service 1"),
+		},
+	}
+	err = targetState.Services.Add(service)
+	require.NoError(t, err)
+
+	// Calling performDiff with dry=true to avoid actual API calls
+	totalOps, err := performDiff(
+		context.Background(),
+		currentState,
+		targetState,
+		true,  // dry mode
+		1,     // parallelism
+		0,     // delay
+		nil,   // client (not used in dry mode)
+		false, // isKonnect
+		true,  // enabled Json output
+		ApplyTypeFull,
+	)
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, totalOps)
+
+	// Verify jsonOutput is populated correctly
+	assert.Equal(t, int32(1), jsonOutput.Summary.Creating)
+	assert.Equal(t, int32(0), jsonOutput.Summary.Updating)
+	assert.Equal(t, int32(0), jsonOutput.Summary.Deleting)
+	assert.Equal(t, int32(1), jsonOutput.Summary.Total)
+
+	// Verify changes are populated
+	assert.Len(t, jsonOutput.Changes.Creating, 1)
+	assert.Len(t, jsonOutput.Changes.Updating, 0)
+	assert.Len(t, jsonOutput.Changes.Deleting, 0)
+	assert.Len(t, jsonOutput.Changes.DroppedCreations, 0)
+	assert.Len(t, jsonOutput.Changes.DroppedUpdates, 0)
+	assert.Len(t, jsonOutput.Changes.DroppedDeletions, 0)
 }
