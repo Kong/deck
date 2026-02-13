@@ -157,9 +157,9 @@ func TestPerformDiff_JSONOutput(t *testing.T) {
 
 	// Verify changes are populated
 	assert.Len(t, jsonOutput.Changes.Creating, 1)
-	assert.Len(t, jsonOutput.Changes.Updating, 0)
-	assert.Len(t, jsonOutput.Changes.Deleting, 0)
-	assert.Len(t, jsonOutput.Changes.DroppedCreations, 0)
-	assert.Len(t, jsonOutput.Changes.DroppedUpdates, 0)
-	assert.Len(t, jsonOutput.Changes.DroppedDeletions, 0)
+	assert.Empty(t, jsonOutput.Changes.Updating)
+	assert.Empty(t, jsonOutput.Changes.Deleting)
+	assert.Empty(t, jsonOutput.Changes.DroppedCreations)
+	assert.Empty(t, jsonOutput.Changes.DroppedUpdates)
+	assert.Empty(t, jsonOutput.Changes.DroppedDeletions)
 }
