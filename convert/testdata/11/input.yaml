@@ -1,0 +1,145 @@
+_format_version: "3.0"
+
+# Test route protocol defaults: routes without protocols should get ["http", "https"]
+services:
+  - name: s1
+    protocol: https
+    host: example.com
+    routes:
+      - name: r1-no-protocols
+        paths:
+          - /test1
+      - name: r1-with-protocols
+        paths:
+          - /test2
+        protocols:
+          - https
+    plugins:
+      - name: key-auth
+        config: {}
+      - name: http-log
+        config:
+          http_endpoint: https://log.example.com
+
+  # Service with secure protocol and no tls_verify
+  - name: s2-https-no-tls-verify
+    protocol: https
+    host: secure.example.com
+    routes:
+      - name: r2
+        paths:
+          - /secure
+
+  # Service with non-secure protocol (should NOT get tls_verify set)
+  - name: s3-http
+    protocol: http
+    host: plain.example.com
+
+  # Service with tls protocol and no tls_verify
+  - name: s4-tls
+    protocol: tls
+    host: tls.example.com
+
+  # Service with grpcs protocol and no tls_verify
+  - name: s5-grpcs
+    protocol: grpcs
+    host: grpc.example.com
+
+  # Service with wss protocol and no tls_verify
+  - name: s6-wss
+    protocol: wss
+    host: ws.example.com
+
+  # Service with https and tls_verify already set (should NOT be modified)
+  - name: s7-https-tls-verify-set
+    protocol: https
+    host: verified.example.com
+    tls_verify: true
+
+# Top-level routes without protocols
+routes:
+  - name: r3-no-protocols
+    paths:
+      - /top-level
+    plugins:
+      - name: basic-auth
+        config: {}
+      - name: acme
+        config:
+          account_email: test@example.com
+
+  - name: r4-with-protocols
+    paths:
+      - /top-level-2
+    protocols:
+      - http
+      - https
+
+# Auth plugins with no hide_credentials set (should get hide_credentials=false)
+# Also testing ssl_verify plugins without ssl_verify set
+plugins:
+  - name: key-auth
+    config: {}
+
+  - name: key-auth-enc
+    config: {}
+
+  - name: basic-auth
+    config: {}
+
+  - name: hmac-auth
+    config: {}
+
+  - name: ldap-auth
+    config:
+      ldap_host: ldap.example.com
+
+  - name: oauth2
+    config: {}
+
+  - name: oauth2-introspection
+    config:
+      introspection_url: https://auth.example.com/introspect
+
+  - name: vault-auth
+    config: {}
+
+  - name: ldap-auth-advanced
+    config:
+      ldap_host: ldap.example.com
+
+  # Auth plugin with hide_credentials already set (should NOT be modified)
+  - name: key-auth
+    config:
+      hide_credentials: true
+
+  # ssl_verify plugins
+  - name: aws-lambda
+    config:
+      function_name: my-function
+
+  - name: http-log
+    config:
+      http_endpoint: https://log.example.com
+
+  - name: openid-connect
+    config:
+      issuer: https://auth.example.com
+
+  - name: acme
+    config:
+      account_email: test@example.com
+
+  # Plugin with ssl_verify already set (should NOT be modified)
+  - name: http-log
+    config:
+      http_endpoint: https://log.example.com
+      ssl_verify: true
+
+consumers:
+  - username: c1
+    plugins:
+      - name: key-auth
+        config: {}
+      - name: basic-auth
+        config: {}
