@@ -43,7 +43,7 @@ func listWorkspaces(ctx context.Context, client *kong.Client) ([]string, error) 
 
 func getWorkspaceClient(ctx context.Context, workspace string) (*kong.Client, error) {
 	wsConfig := rootConfig.ForWorkspace(workspace)
-	exists, err := workspaceExists(ctx, rootConfig, workspace)
+	exists, err := workspaceExists(ctx, rootConfig, workspace, false)
 	if err != nil {
 		return nil, err
 	}

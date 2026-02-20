@@ -31,6 +31,8 @@ require (
 	sigs.k8s.io/yaml v1.6.0
 )
 
+require github.com/kong/go-kong v0.72.1
+
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Kong/sdk-konnect-go v0.2.28 // indirect
