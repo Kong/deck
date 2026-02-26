@@ -8766,28 +8766,17 @@ func Test_Sync_Partials_Plugins_Konnect(t *testing.T) {
 	dumpConfig := deckDump.Config{}
 
 	partialConfig := kong.Configuration{
-		"cloud_authentication":     nil,
 		"cluster_max_redirections": float64(5),
-		"cluster_nodes":            nil,
 		"connect_timeout":          float64(2000),
 		"connection_is_proxied":    bool(false),
 		"database":                 float64(0),
 		"host":                     string("127.0.0.1"),
-		"keepalive_backlog":        nil,
 		"keepalive_pool_size":      float64(256),
-		"password":                 nil,
 		"port":                     float64(6379),
 		"read_timeout":             float64(3001),
 		"send_timeout":             float64(2004),
-		"sentinel_master":          nil,
-		"sentinel_nodes":           nil,
-		"sentinel_password":        nil,
-		"sentinel_role":            nil,
-		"sentinel_username":        nil,
-		"server_name":              nil,
 		"ssl":                      bool(false),
 		"ssl_verify":               bool(false),
-		"username":                 nil,
 	}
 
 	t.Run("create a partial and link to a plugin via name", func(t *testing.T) {
