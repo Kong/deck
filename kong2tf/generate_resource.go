@@ -202,13 +202,13 @@ func (i importKeys) Marshal() (string, error) {
 		return "", err
 	}
 	for _, k := range keys {
-		_, err := sb.WriteString(fmt.Sprintf(`\"%s\": \"%s\", `, k, *i.keyValues[k]))
+		_, err := fmt.Fprintf(&sb, `\"%s\": \"%s\", `, k, *i.keyValues[k])
 		if err != nil {
 			return "", err
 		}
 	}
 
-	_, err := sb.WriteString(fmt.Sprintf(`\"control_plane_id\": \"%s\"`, *i.controlPlaneID))
+	_, err := fmt.Fprintf(&sb, `\"control_plane_id\": \"%s\"`, *i.controlPlaneID)
 	if err != nil {
 		return "", err
 	}
