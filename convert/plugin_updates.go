@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/kong/go-database-reconciler/pkg/cprint"
@@ -186,6 +187,25 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	value, ok := current[oldKey]
 	if !ok {
 		return pluginConfig
+	}
+
+	if newField == "redis.sentinel_nodes" {
+		rawList, _ := value.([]interface{})
+		var newIpPort []map[string]interface{}
+		for _, item := range rawList {
+			if entry, ok := item.(string); ok {
+				parts := strings.Split(entry, ":")
+				if len(parts) == 2 {
+					// 3. Convert the port string to an integer
+					portInt, _ := strconv.Atoi(parts[1])
+					newIpPort = append(newIpPort, map[string]interface{}{
+						"host": parts[0],
+						"port": portInt,
+					})
+				}
+			}
+		}
+		value = newIpPort
 	}
 
 	// Remove the old field
