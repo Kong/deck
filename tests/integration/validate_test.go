@@ -63,8 +63,14 @@ func Test_Validate_Konnect(t *testing.T) {
 			name:           "validate with workspace set",
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--workspace=default"},
-			errorExpected:  true,
-			errorString:    "[workspaces] not supported by Konnect - use control planes instead",
+			errorExpected:  false,
+			//errorString:    "[workspaces] not supported by Konnect - use control planes instead",
+		},
+		{
+			name:          "validate with non existent _workspace in state file",
+			stateFile:     "testdata/validate/konnect-non-existent-workspace.yaml",
+			errorExpected: true,
+			errorString:   "workspace doesn't exist: nonexistent",
 		},
 		{
 			name:           "validate with no konnect config in file, passed via cli flag konnect control plane",
