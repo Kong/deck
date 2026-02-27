@@ -45,3 +45,11 @@ test-integration:
 .PHONY: clean
 clean:
 	bash .ci/clean_kong.sh
+
+.PHONY: benchmark
+benchmark:
+	go test -tags benchmark -bench . -benchmem -count 5 -benchtime=20x ./tests/benchmarkutils/...
+
+.PHONY: benchmark-save
+benchmark-save:
+	go test -tags benchmark -bench . -benchmem -count 5 -benchtime=20x ./tests/benchmarkutils/... | tee benchmark_results.txt
