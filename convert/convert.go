@@ -25,6 +25,9 @@ var ruleset28to34 string
 //go:embed rulesets/340-to-310/entrypoint.yaml
 var ruleset34to310 string
 
+//go:embed rulesets/310-to-314/entrypoint.yaml
+var ruleset310to314 string
+
 const (
 	// FormatDistributed represents the Deck configuration format.
 	FormatDistributed Format = "distributed"
@@ -41,6 +44,7 @@ const (
 	FormatKongGatewayVersion28x  Format = "2.8"
 	FormatKongGatewayVersion34x  Format = "3.4"
 	FormatKongGatewayVersion310x Format = "3.10"
+	FormatKongGatewayVersion314x Format = "3.14"
 )
 
 // AllFormats contains all available formats.
@@ -65,6 +69,8 @@ func ParseFormat(key string) (Format, error) {
 		return FormatKongGatewayVersion34x, nil
 	case FormatKongGatewayVersion310x:
 		return FormatKongGatewayVersion310x, nil
+	case FormatKongGatewayVersion314x:
+		return FormatKongGatewayVersion314x, nil
 	default:
 		return "", fmt.Errorf("invalid format: '%v'", key)
 	}
@@ -148,6 +154,27 @@ func Convert(
 		}
 
 		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset34to310), "error", false)
+		if err != nil {
+			return err
+		}
+
+		_, err = lint.GetLintOutput(lintErrs, "plain", "-")
+		if err != nil {
+			return err
+		}
+
+	case from == FormatKongGatewayVersion310x && to == FormatKongGatewayVersion314x:
+		if len(inputFilenames) > 1 {
+			return fmt.Errorf("only one input file can be provided when converting from Kong 3.10 to Kong 3.14 format")
+		}
+		outputContent = convertKongGateway310xTo314x(inputContent)
+
+		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
+		if err != nil {
+			return fmt.Errorf("failed to read input file '%s'; %w", inputFilenames[0], err)
+		}
+
+		lintErrs, err := lint.WithContent(stateFileBytes, []byte(ruleset310to314), "error", false)
 		if err != nil {
 			return err
 		}
@@ -356,6 +383,30 @@ func convertKongGateway34xTo310x(input *file.Content) *file.Content {
 			"perform a manual audit of the config file.\n\n" +
 			"For related information, please visit:\n" +
 			"https://docs.konghq.com/deck/latest/3.10-upgrade\n\n")
+
+	return outputContent
+}
+
+// convertKongGateway310xTo314x is used to convert a Kong Gateway 3.10.x config
+// to a Kong Gateway 3.14.x config. It can be used as a migration utility
+// between the two LTS versions. It auto-fixes some configuration related to
+// the "Secure by Default" changes in 3.14:
+//   - Routes: default protocols changed from ["http","https"] to ["https"]
+//   - Services: tls_verify now defaults to true (global tls_certificate_verify changed from off to on)
+//   - Plugins: ssl_verify now defaults to true for impacted plugins
+//   - Plugins: hide_credentials now defaults to true for auth plugins
+func convertKongGateway310xTo314x(input *file.Content) *file.Content {
+	outputContent := input.DeepCopy()
+
+	updateRoutesFor314(outputContent)
+	updateServicesFor314(outputContent)
+	updatePluginsFor314(outputContent)
+
+	cprint.UpdatePrintf(
+		"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
+			"perform a manual audit of the config file.\n\n" +
+			"For related information, please visit:\n" +
+			"https://developer.konghq.com/gateway/upgrade\n\n")
 
 	return outputContent
 }

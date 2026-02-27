@@ -84,6 +84,26 @@ linters:
           - gosec
         path: file/codegen/main.go
         text: Expect WriteFile permissions to be 0600 or less
+      # Exclude gosec G101 (hardcoded credentials) for test files
+      - linters:
+          - gosec
+        path: _test\.go
+        text: G101
+      # Exclude gosec G101 for static entity maps (false positive on entity type names)
+      - linters:
+          - gosec
+        path: (sanitize/schemas|validate/validate)\.go
+        text: G101
+      # Exclude gosec G704 (SSRF) for test files where HTTP requests are expected
+      - linters:
+          - gosec
+        path: tests/integration/
+        text: G704
+      # Exclude gosec G115 (integer overflow) for safe port number conversion
+      - linters:
+          - gosec
+        path: kong2kic/route\.go
+        text: G115
       - linters:
           - unparam
           - unused
