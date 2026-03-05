@@ -136,10 +136,20 @@
 > Release date: 2026/03/02
 
 ### Added
+- Added support to migrate configurations
+between LTS versions `3.10` and `3.14` via
+`deck file convert` command.
+[#1890](https://github.com/Kong/deck/pull/1890)
 
 ### Fixed
-
-### Chores
+- Fixed json output rendering and added dropped
+operations support in json output.
+[#1841](https://github.com/Kong/deck/pull/1841)
+[#362](https://github.com/Kong/go-database-reconciler/pull/362)
+- Fixed `skip-defaults` functionality for dump config
+for basic-auth credentials.
+[#1889](https://github.com/Kong/deck/pull/1889)
+[#374](https://github.com/Kong/go-database-reconciler/pull/374)
 
 ## [v1.55.2]
 > Release date: 2026/02/06
