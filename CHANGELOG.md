@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.56.0](#v1560)
 - [v1.55.2](#v1552)
 - [v1.55.1](#v1551)
 - [v1.55.0](#v1550)
@@ -130,6 +131,28 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.56.0]
+> Release date: 2026/03/02
+
+### Added
+- Added support to migrate configurations
+between LTS versions `3.10` and `3.14` via
+`deck file convert` command.
+[#1890](https://github.com/Kong/deck/pull/1890)
+- Deterministic ordering of entities for 
+`deck file render`
+[#371](https://github.com/Kong/go-database-reconciler/pull/371)
+
+### Fixed
+- Fixed json output rendering and added dropped
+operations support in json output.
+[#1841](https://github.com/Kong/deck/pull/1841)
+[#362](https://github.com/Kong/go-database-reconciler/pull/362)
+- Fixed `skip-defaults` functionality for dump config
+for basic-auth credentials.
+[#1889](https://github.com/Kong/deck/pull/1889)
+[#374](https://github.com/Kong/go-database-reconciler/pull/374)
 
 ## [v1.55.2]
 > Release date: 2026/02/06
