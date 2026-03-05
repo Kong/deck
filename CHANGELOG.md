@@ -140,6 +140,9 @@
 between LTS versions `3.10` and `3.14` via
 `deck file convert` command.
 [#1890](https://github.com/Kong/deck/pull/1890)
+- Deterministic ordering of entities for 
+`deck file render`
+[#371](https://github.com/Kong/go-database-reconciler/pull/371)
 
 ### Fixed
 - Fixed json output rendering and added dropped
