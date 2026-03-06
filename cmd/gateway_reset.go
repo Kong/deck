@@ -73,7 +73,7 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 		}
 	}
 	if resetWorkspace != "" {
-		exists, err := workspaceExists(ctx, rootConfig, resetWorkspace)
+		exists, err := workspaceExists(ctx, rootConfig, resetWorkspace, false)
 		if err != nil {
 			return err
 		}

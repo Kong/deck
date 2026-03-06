@@ -335,40 +335,44 @@ func validateWithKong(
 func getKongClient(
 	ctx context.Context, targetContent *file.Content, mode mode,
 ) (*kong.Client, error) {
-	workspaceName := validateWorkspace
-	if validateWorkspace != "" {
-		if mode == modeKonnect {
-			return nil, fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
-		}
-		// check if workspace exists
-		workspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
-		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
-		if err != nil {
-			return nil, err
-		}
-		if !workspaceExists {
-			return nil, fmt.Errorf("workspace doesn't exist: %s", workspaceName)
-		}
-	}
-
 	var (
 		kongClient *kong.Client
 		err        error
 	)
 	if mode == modeKonnect {
+		dumpConfig.KonnectControlPlane = konnectControlPlane
+		if validateWorkspace != "" {
+			konnectWorkspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
+			if konnectWorkspaceName != "" {
+				konnectConfig.WorkspaceName = konnectWorkspaceName
+			}
+			exists, err := workspaceExists(ctx, rootConfig, konnectConfig.WorkspaceName, true)
+			if err != nil {
+				return nil, err
+			}
+			if !exists {
+				return nil, fmt.Errorf("workspace doesn't exist: %s", konnectConfig.WorkspaceName)
+			}
+		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return nil, err
 		}
-		dumpConfig.KonnectControlPlane = konnectControlPlane
-	} else {
-		wsConfig := rootConfig.ForWorkspace(workspaceName)
-		kongClient, err = reconcilerUtils.GetKongClient(wsConfig)
+		return kongClient, nil
+	}
+	workspaceName := ""
+	if validateWorkspace != "" {
+		workspaceName = getWorkspaceName(validateWorkspace, targetContent, false)
+		exists, err := workspaceExists(ctx, rootConfig, workspaceName, false)
 		if err != nil {
 			return nil, err
 		}
+		if !exists {
+			return nil, fmt.Errorf("workspace doesn't exist: %s", workspaceName)
+		}
 	}
-	return kongClient, nil
+	wsConfig := rootConfig.ForWorkspace(workspaceName)
+	return reconcilerUtils.GetKongClient(wsConfig)
 }
 
 // ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.
