@@ -57,7 +57,10 @@ func authenticate(
 func GetKongClientForKonnectMode(
 	ctx context.Context, konnectConfig *utils.KonnectConfig,
 ) (*kong.Client, error) {
-	httpClient, err := utils.HTTPClientWithTLSConfig(konnectConfig.TLSConfig)
+	httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
+		Timeout:   time.Duration(rootConfig.Timeout) * time.Second,
+		TLSConfig: konnectConfig.TLSConfig,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +177,12 @@ func dumpKonnectV2(ctx context.Context) error {
 func syncKonnect(ctx context.Context,
 	filenames []string, dry bool, parallelism int,
 ) error {
-	httpClient := utils.HTTPClient()
+	httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
+		Timeout: time.Duration(rootConfig.Timeout) * time.Second,
+	})
+	if err != nil {
+		return err
+	}
 
 	// read target file
 	targetContent, err := file.GetContentFromFiles(filenames, false)

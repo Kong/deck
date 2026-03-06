@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -28,7 +29,12 @@ func newKonnectDumpCmd() *cobra.Command {
 	configure Konnect.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			httpClient := utils.HTTPClient()
+			httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
+				Timeout: time.Duration(rootConfig.Timeout) * time.Second,
+			})
+			if err != nil {
+				return err
+			}
 			_ = sendAnalytics("konnect-dump", "", modeKonnect)
 
 			if yes, err := utils.ConfirmFileOverwrite(konnectDumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
