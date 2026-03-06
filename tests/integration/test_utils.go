@@ -498,3 +498,16 @@ func validate(online bool, opts ...string) error {
 
 	return deckCmd.ExecuteContext(context.Background())
 }
+
+// runDualTestWithSkipDefaults runs a test twice for Konnect and Enterprise tests:
+// once with default settings and once with DECK_SKIP_DEFAULTS_FILL=true
+func runDualTestWithSkipDefaults(t *testing.T, testName string, testFunc func(t *testing.T)) {
+	t.Run(testName+" (default fill)", func(t *testing.T) {
+		testFunc(t)
+	})
+
+	t.Run(testName+" (skip defaults fill)", func(t *testing.T) {
+		t.Setenv("DECK_SKIP_DEFAULTS_FILL", "true")
+		testFunc(t)
+	})
+}

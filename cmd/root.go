@@ -37,6 +37,8 @@ var (
 
 	konnectRuntimeGroup string
 	konnectControlPlane string
+
+	skipDefaultsFill bool
 )
 
 // NewRootCmd represents the base command when called without any subcommands
@@ -431,6 +433,8 @@ func initKonnectConfig() error {
 		token = string(fileContent)
 		token = strings.TrimRight(token, "\n")
 	}
+
+	skipDefaultsFill = viper.GetBool("skip-defaults-fill")
 
 	disableAnalytics = !viper.GetBool("analytics")
 	konnectConfig.Email = viper.GetString("konnect-email")

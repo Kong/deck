@@ -1801,7 +1801,7 @@ var (
 			Name: kong.String("key-auth"),
 			Config: kong.Configuration{
 				"anonymous":        nil,
-				"hide_credentials": false,
+				"hide_credentials": true,
 				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
 				"key_in_body":      false,
 				"key_in_header":    true,
@@ -2831,6 +2831,10 @@ func Test_Sync_ServicesRoutes_From_3x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ServicesRoutes_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ServicesRoutes_Konnect", testSyncServicesRoutesKonnectImpl)
+}
+
+func testSyncServicesRoutesKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -3077,6 +3081,10 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_BasicAuth_Plugin_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_BasicAuth_Plugin_Konnect", testSyncBasicAuthPluginKonnectImpl)
+}
+
+func testSyncBasicAuthPluginKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -3283,6 +3291,10 @@ func Test_Sync_Upstream_Target_From_3x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_Upstream_Target_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Upstream_Target_Konnect", testSyncUpstreamTargetKonnectImpl)
+}
+
+func testSyncUpstreamTargetKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -3443,6 +3455,11 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_Upstreams_Target_ZeroWeight_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Upstreams_Target_ZeroWeight_Konnect",
+		testSyncUpstreamsTargetZeroWeightKonnectImpl)
+}
+
+func testSyncUpstreamsTargetZeroWeightKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -3741,6 +3758,10 @@ func Test_Sync_SkipCACert_3x(t *testing.T) {
 // test scope:
 // - konnect
 func Test_Sync_SkipCACert_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_SkipCACert_Konnect", testSyncSkipCACertKonnectImpl)
+}
+
+func testSyncSkipCACertKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -4151,6 +4172,10 @@ func Test_Sync_PluginsOnEntitiesFrom_3_0_0(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_PluginsOnEntities_Konnect", testSyncPluginsOnEntitiesKonnectImpl)
+}
+
+func testSyncPluginsOnEntitiesKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -4184,6 +4209,23 @@ func Test_Sync_PluginsOnEntities_Konnect(t *testing.T) {
 }
 
 func Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0",
+			testSyncPluginsOnConsumerGroupsWithInstanceNameFrom3_4_0Impl)
+	} else {
+		// For Enterprise: run once
+		testSyncPluginsOnConsumerGroupsWithInstanceNameFrom3_4_0Impl(t)
+	}
+}
+
+func testSyncPluginsOnConsumerGroupsWithInstanceNameFrom3_4_0Impl(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
 	setup(t)
 	client, err := getTestClient()
@@ -4681,6 +4723,11 @@ func Test_Sync_UpdateUsernameInConsumerWithCustomID_3x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_UpdateUsernameInConsumerWithCustomID_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_UpdateUsernameInConsumerWithCustomID_Konnect",
+		testSyncUpdateUsernameInConsumerWithCustomIDKonnectImpl)
+}
+
+func testSyncUpdateUsernameInConsumerWithCustomIDKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -4765,6 +4812,11 @@ func Test_Sync_UpdateConsumerWithCustomID_3x(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_UpdateConsumerWithCustomID_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_UpdateConsumerWithCustomID_Konnect",
+		testSyncUpdateConsumerWithCustomIDKonnectImpl)
+}
+
+func testSyncUpdateConsumerWithCustomIDKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -5027,6 +5079,10 @@ func Test_Sync_ConsumerGroupsRLAFrom31(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ConsumerGroupsKonnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerGroupsKonnect", testSyncConsumerGroupsKonnectImpl)
+}
+
+func testSyncConsumerGroupsKonnectImpl(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 	tests := []struct {
@@ -5487,6 +5543,11 @@ func Test_Sync_SkipConsumers_34x(t *testing.T) {
 //   - konnect
 func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 	runWhenKonnect(t)
+	runDualTestWithSkipDefaults(t, "Test_Sync_SkipConsumers_Konnect",
+		testSyncSkipConsumersKonnectImpl)
+}
+
+func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -5538,10 +5599,11 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 				Plugins: []*kong.Plugin{
 					{
 						Name: kong.String("rate-limiting-advanced"),
-						ConsumerGroup: &kong.ConsumerGroup{
-							ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+						Consumer: &kong.Consumer{
+							ID: kong.String("416b038a-fd00-45fd-a5a2-a74bf70017fa"),
 						},
 						Config: kong.Configuration{
+							"compound_identifier":     nil,
 							"consumer_groups":         nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
@@ -5552,33 +5614,41 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 							"hide_client_headers":     bool(false),
 							"identifier":              string("consumer"),
 							"limit":                   []any{float64(10)},
-							"namespace":               string("gold"),
+							"lock_dictionary_name":    string("kong_locks"),
+							"namespace":               string("foo"),
 							"path":                    nil,
 							"redis": map[string]any{
-								"cluster_addresses":   nil,
-								"connect_timeout":     nil,
-								"database":            float64(0),
-								"host":                nil,
-								"keepalive_backlog":   nil,
-								"keepalive_pool_size": float64(30),
-								"password":            nil,
-								"port":                nil,
-								"read_timeout":        nil,
-								"send_timeout":        nil,
-								"sentinel_addresses":  nil,
-								"sentinel_master":     nil,
-								"sentinel_password":   nil,
-								"sentinel_role":       nil,
-								"sentinel_username":   nil,
-								"server_name":         nil,
-								"ssl":                 false,
-								"ssl_verify":          false,
-								"timeout":             float64(2000),
-								"username":            nil,
+								"cloud_authentication":     nil,
+								"cluster_addresses":        nil,
+								"cluster_max_redirections": float64(5),
+								"cluster_nodes":            nil,
+								"connect_timeout":          float64(2000),
+								"connection_is_proxied":    bool(false),
+								"database":                 float64(0),
+								"host":                     string("127.0.0.1"),
+								"keepalive_backlog":        nil,
+								"keepalive_pool_size":      float64(256),
+								"password":                 nil,
+								"port":                     float64(6379),
+								"read_timeout":             float64(2000),
+								"redis_proxy_type":         nil,
+								"send_timeout":             float64(2000),
+								"sentinel_addresses":       nil,
+								"sentinel_master":          nil,
+								"sentinel_nodes":           nil,
+								"sentinel_password":        nil,
+								"sentinel_role":            nil,
+								"sentinel_username":        nil,
+								"server_name":              nil,
+								"ssl":                      false,
+								"ssl_verify":               false,
+								"timeout":                  float64(2000),
+								"username":                 nil,
 							},
 							"retry_after_jitter_max": float64(1),
 							"strategy":               string("local"),
 							"sync_rate":              nil,
+							"throttling":             nil,
 							"window_size":            []any{float64(60)},
 							"window_type":            string("sliding"),
 						},
@@ -5591,6 +5661,7 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 							ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
 						},
 						Config: kong.Configuration{
+							"compound_identifier":     nil,
 							"consumer_groups":         nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
@@ -5601,33 +5672,99 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 							"hide_client_headers":     bool(false),
 							"identifier":              string("consumer"),
 							"limit":                   []any{float64(7)},
+							"lock_dictionary_name":    string("kong_locks"),
 							"namespace":               string("silver"),
 							"path":                    nil,
 							"redis": map[string]any{
-								"cluster_addresses":   nil,
-								"connect_timeout":     nil,
-								"database":            float64(0),
-								"host":                nil,
-								"keepalive_backlog":   nil,
-								"keepalive_pool_size": float64(30),
-								"password":            nil,
-								"port":                nil,
-								"read_timeout":        nil,
-								"send_timeout":        nil,
-								"sentinel_addresses":  nil,
-								"sentinel_master":     nil,
-								"sentinel_password":   nil,
-								"sentinel_role":       nil,
-								"sentinel_username":   nil,
-								"server_name":         nil,
-								"ssl":                 false,
-								"ssl_verify":          false,
-								"timeout":             float64(2000),
-								"username":            nil,
+								"cloud_authentication":     nil,
+								"cluster_addresses":        nil,
+								"cluster_max_redirections": float64(5),
+								"cluster_nodes":            nil,
+								"connect_timeout":          float64(2000),
+								"connection_is_proxied":    bool(false),
+								"database":                 float64(0),
+								"host":                     string("127.0.0.1"),
+								"keepalive_backlog":        nil,
+								"keepalive_pool_size":      float64(256),
+								"password":                 nil,
+								"port":                     float64(6379),
+								"read_timeout":             float64(2000),
+								"redis_proxy_type":         nil,
+								"send_timeout":             float64(2000),
+								"sentinel_addresses":       nil,
+								"sentinel_master":          nil,
+								"sentinel_nodes":           nil,
+								"sentinel_password":        nil,
+								"sentinel_role":            nil,
+								"sentinel_username":        nil,
+								"server_name":              nil,
+								"ssl":                      false,
+								"ssl_verify":               false,
+								"timeout":                  float64(2000),
+								"username":                 nil,
 							},
 							"retry_after_jitter_max": float64(1),
 							"strategy":               string("local"),
 							"sync_rate":              nil,
+							"throttling":             nil,
+							"window_size":            []any{float64(60)},
+							"window_type":            string("sliding"),
+						},
+						Enabled:   kong.Bool(true),
+						Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+					},
+					{
+						Name: kong.String("rate-limiting-advanced"),
+						ConsumerGroup: &kong.ConsumerGroup{
+							ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+						},
+						Config: kong.Configuration{
+							"compound_identifier":     nil,
+							"consumer_groups":         nil,
+							"dictionary_name":         string("kong_rate_limiting_counters"),
+							"disable_penalty":         bool(false),
+							"enforce_consumer_groups": bool(false),
+							"error_code":              float64(429),
+							"error_message":           string("API rate limit exceeded"),
+							"header_name":             nil,
+							"hide_client_headers":     bool(false),
+							"identifier":              string("consumer"),
+							"limit":                   []any{float64(10)},
+							"lock_dictionary_name":    string("kong_locks"),
+							"namespace":               string("gold"),
+							"path":                    nil,
+							"redis": map[string]any{
+								"cloud_authentication":     nil,
+								"cluster_addresses":        nil,
+								"cluster_max_redirections": float64(5),
+								"cluster_nodes":            nil,
+								"connect_timeout":          float64(2000),
+								"connection_is_proxied":    bool(false),
+								"database":                 float64(0),
+								"host":                     string("127.0.0.1"),
+								"keepalive_backlog":        nil,
+								"keepalive_pool_size":      float64(256),
+								"password":                 nil,
+								"port":                     float64(6379),
+								"read_timeout":             float64(2000),
+								"redis_proxy_type":         nil,
+								"send_timeout":             float64(2000),
+								"sentinel_addresses":       nil,
+								"sentinel_master":          nil,
+								"sentinel_nodes":           nil,
+								"sentinel_password":        nil,
+								"sentinel_role":            nil,
+								"sentinel_username":        nil,
+								"server_name":              nil,
+								"ssl":                      false,
+								"ssl_verify":               false,
+								"timeout":                  float64(2000),
+								"username":                 nil,
+							},
+							"retry_after_jitter_max": float64(1),
+							"strategy":               string("local"),
+							"sync_rate":              nil,
+							"throttling":             nil,
 							"window_size":            []any{float64(60)},
 							"window_type":            string("sliding"),
 						},
@@ -5641,7 +5778,6 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, "enterprise", ">=3.2.0")
 			setup(t)
 
 			if tc.skipConsumers {
@@ -5649,7 +5785,7 @@ func Test_Sync_SkipConsumers_Konnect(t *testing.T) {
 			} else {
 				require.NoError(t, sync(context.Background(), tc.kongFile))
 			}
-			testKongState(t, client, false, false, tc.expectedState, nil)
+			testKongState(t, client, true, false, tc.expectedState, nil)
 		})
 	}
 }
@@ -5791,6 +5927,11 @@ func Test_Sync_ChangingIDsWhileKeepingNames(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ChangingIDsWhileKeepingNames_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ChangingIDsWhileKeepingNames_Konnect",
+		testSyncChangingIDsWhileKeepingNamesKonnectImpl)
+}
+
+func testSyncChangingIDsWhileKeepingNamesKonnectImpl(t *testing.T) {
 	runWhen(t, "konnect", "")
 
 	client, err := getTestClient()
@@ -5939,6 +6080,10 @@ func Test_Sync_UpdateWithExplicitIDs(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDs_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_UpdateWithExplicitIDs_Konnect", testSyncUpdateWithExplicitIDsKonnectImpl)
+}
+
+func testSyncUpdateWithExplicitIDsKonnectImpl(t *testing.T) {
 	runWhen(t, "konnect", "")
 	setup(t)
 
@@ -6029,6 +6174,11 @@ func Test_Sync_UpdateWithExplicitIDsWithNoNames(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_UpdateWithExplicitIDsWithNoNames_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_UpdateWithExplicitIDsWithNoNames_Konnect",
+		testSyncUpdateWithExplicitIDsWithNoNamesKonnectImpl)
+}
+
+func testSyncUpdateWithExplicitIDsWithNoNamesKonnectImpl(t *testing.T) {
 	runWhen(t, "konnect", "")
 	setup(t)
 
@@ -6128,6 +6278,11 @@ func Test_Sync_CreateCertificateWithSNIs(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_CreateCertificateWithSNIs_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_CreateCertificateWithSNIs_Konnect",
+		testSyncCreateCertificateWithSNIsKonnectImpl)
+}
+
+func testSyncCreateCertificateWithSNIsKonnectImpl(t *testing.T) {
 	t.Skip("Skipping test for konnect due to flakiness")
 	runWhen(t, "konnect", "")
 	setup(t)
@@ -6239,6 +6394,11 @@ func Test_Sync_ConsumersWithCustomIDAndOrUsername(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ConsumersWithCustomIDAndOrUsername_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ConsumersWithCustomIDAndOrUsername_Konnect",
+		testSyncConsumersWithCustomIDAndOrUsernameKonnectImpl)
+}
+
+func testSyncConsumersWithCustomIDAndOrUsernameKonnectImpl(t *testing.T) {
 	runWhen(t, "konnect", "")
 	setup(t)
 
@@ -6877,6 +7037,11 @@ func Test_Sync_ConsumerGroupsScopedPlugins_Post340(t *testing.T) {
 }
 
 func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerGroupsScopedPluginsKonnect",
+		testSyncConsumerGroupsScopedPluginsKonnectImpl)
+}
+
+func testSyncConsumerGroupsScopedPluginsKonnectImpl(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 
@@ -6962,6 +7127,10 @@ func Test_Sync_ConsumerGroupsScopedPluginsKonnect(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_KonnectRename(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_KonnectRename", testSyncKonnectRenameImpl)
+}
+
+func testSyncKonnectRenameImpl(t *testing.T) {
 	// setup stage
 	tests := []struct {
 		name             string
@@ -7257,6 +7426,11 @@ func Test_Sync_ConsumerGroupConsumersWithCustomID(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerGroupConsumersWithCustomID_Konnect",
+		testSyncConsumerGroupConsumersWithCustomIDKonnectImpl)
+}
+
+func testSyncConsumerGroupConsumersWithCustomIDKonnectImpl(t *testing.T) {
 	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
 	runWhen(t, "konnect", "")
 	setup(t)
@@ -7523,6 +7697,11 @@ func Test_Sync_ConsumerGroupConsumerFromUpstream(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Sync_ConsumerGroupConsumerFromUpstream_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerGroupConsumerFromUpstream_Konnect",
+		testSyncConsumerGroupConsumerFromUpstreamKonnectImpl)
+}
+
+func testSyncConsumerGroupConsumerFromUpstreamKonnectImpl(t *testing.T) {
 	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
 	runWhen(t, "konnect", "")
 	setup(t)
@@ -7853,6 +8032,10 @@ func Test_Sync_DegraphqlRoutes(t *testing.T) {
 }
 
 func Test_Sync_DegraphqlRoutes_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_DegraphqlRoutes_Konnect", testSyncDegraphqlRoutesKonnectImpl)
+}
+
+func testSyncDegraphqlRoutesKonnectImpl(t *testing.T) {
 	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
 	runWhen(t, "konnect", "")
 	setup(t)
@@ -8585,6 +8768,11 @@ func Test_Sync_SkipConsumersWithConsumerGroups(t *testing.T) {
 }
 
 func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_SkipConsumersWithConsumerGroups_Konnect",
+		testSyncSkipConsumersWithConsumerGroupsKonnectImpl)
+}
+
+func testSyncSkipConsumersWithConsumerGroupsKonnectImpl(t *testing.T) {
 	runWhen(t, "konnect", "")
 	setup(t)
 
@@ -8599,6 +8787,21 @@ func Test_Sync_SkipConsumersWithConsumerGroups_Konnect(t *testing.T) {
 
 func Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag",
+			testSyncSkipConsumersWithDefaultLookUpConsumersAndConsumerGroupTagImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncSkipConsumersWithDefaultLookUpConsumersAndConsumerGroupTagImpl(t)
+	}
+}
+
+func testSyncSkipConsumersWithDefaultLookUpConsumersAndConsumerGroupTagImpl(t *testing.T) {
 	setup(t)
 
 	ctx := context.Background()
@@ -8754,6 +8957,10 @@ func Test_Sync_Partials_Plugins(t *testing.T) {
 }
 
 func Test_Sync_Partials_Plugins_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Partials_Plugins_Konnect", testSyncPartialsPluginsKonnectImpl)
+}
+
+func testSyncPartialsPluginsKonnectImpl(t *testing.T) {
 	runWhenKonnect(t)
 	setDefaultKonnectControlPlane(t)
 	setup(t)
@@ -8884,7 +9091,20 @@ func Test_Sync_Partials_Plugins_Konnect(t *testing.T) {
 
 func Test_Sync_Partials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
 
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_Partials", testSyncPartialsImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncPartialsImpl(t)
+	}
+}
+
+func testSyncPartialsImpl(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("create partials", func(t *testing.T) {
@@ -8923,6 +9143,21 @@ func Test_Sync_Partials(t *testing.T) {
 
 func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_Consumers_Default_Lookup_Tag", testSyncConsumersDefaultLookupTagImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncConsumersDefaultLookupTagImpl(t)
+	}
+}
+
+func testSyncConsumersDefaultLookupTagImpl(t *testing.T) {
 	client, err := getTestClient()
 	require.NoError(t, err)
 	ctx := context.Background()
@@ -9399,8 +9634,23 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_3x(t *testing.T) {
 // - >=3.0.0+enterprise
 // - konnect
 func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
-	// prior versions don't support a consumer_group foreign key with a value
 	runWhenEnterpriseOrKonnect(t, ">=3.6.0")
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x",
+			testSyncPluginsNestedForeignKeysEE3xImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncPluginsNestedForeignKeysEE3xImpl(t)
+	}
+}
+
+func testSyncPluginsNestedForeignKeysEE3xImpl(t *testing.T) {
+	// prior versions don't support a consumer_group foreign key with a value
 	setup(t)
 
 	ctx := context.Background()
@@ -9683,6 +9933,10 @@ func Test_Sync_KeysAndKeySets_Update(t *testing.T) {
 // Separate test function is added as Konnect has different
 // ordering and spacing for keys.
 func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_KeysAndKeySets_Konnect", testSyncKeysAndKeySetsKonnectImpl)
+}
+
+func testSyncKeysAndKeySetsKonnectImpl(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
 
@@ -9756,6 +10010,10 @@ func Test_Sync_KeysAndKeySets_Konnect(t *testing.T) {
 // - konnect
 // TODO: Update test once konnect supports key_set creation without names.
 func Test_Sync_KeysAndKeySets_Konnect_Update(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_KeysAndKeySets_Konnect_Update", testSyncKeysAndKeySetsKonnectUpdateImpl)
+}
+
+func testSyncKeysAndKeySetsKonnectUpdateImpl(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
 
@@ -10254,6 +10512,10 @@ func Test_Sync_Partials_Tagging(t *testing.T) {
 //
 // - konnect
 func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Partials_Tagging_Konnect", testSyncPartialsTaggingKonnectImpl)
+}
+
+func testSyncPartialsTaggingKonnectImpl(t *testing.T) {
 	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
 	setup(t)
@@ -10484,6 +10746,21 @@ func Test_Sync_Partials_Tagging_Konnect(t *testing.T) {
 func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_SkipCustomEntitiesWithSelectorTags",
+			testSyncSkipCustomEntitiesWithSelectorTagsImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncSkipCustomEntitiesWithSelectorTagsImpl(t)
+	}
+}
+
+func testSyncSkipCustomEntitiesWithSelectorTagsImpl(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
@@ -10516,7 +10793,20 @@ func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
 
 func Test_Sync_ConsumerCredentials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
 
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerCredentials", testSyncConsumerCredentialsImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncConsumerCredentialsImpl(t)
+	}
+}
+
+func testSyncConsumerCredentialsImpl(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
@@ -10546,6 +10836,10 @@ func Test_Sync_ConsumerCredentials(t *testing.T) {
 //
 // - konnect
 func Test_Sync_BasicAuth_SkipHash_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_BasicAuth_SkipHash_Konnect", testSyncBasicAuthSkipHashKonnectImpl)
+}
+
+func testSyncBasicAuthSkipHashKonnectImpl(t *testing.T) {
 	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
 	setup(t)
@@ -10685,6 +10979,21 @@ func Test_Sync_BasicAuth_SkipHash_Konnect(t *testing.T) {
 
 func Test_Sync_Services_TLS_Sans(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Sync_Services_TLS_Sans", testSyncServicesTLSSansImpl)
+	} else {
+		// For Enterprise: run once
+		testSyncServicesTLSSansImpl(t)
+	}
+}
+
+func testSyncServicesTLSSansImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 

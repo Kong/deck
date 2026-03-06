@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/spf13/cobra"
@@ -56,7 +57,10 @@ func pingKonnect(ctx context.Context) error {
 		return err
 	}
 	// get Konnect client
-	httpClient, err := utils.HTTPClientWithTLSConfig(rootConfig.TLSConfig)
+	httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
+		Timeout:   time.Duration(rootConfig.Timeout) * time.Second,
+		TLSConfig: rootConfig.TLSConfig,
+	})
 	if err != nil {
 		return err
 	}

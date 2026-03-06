@@ -14,19 +14,19 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.2.2
-	github.com/kong/go-database-reconciler v1.31.6
+	github.com/kong/go-database-reconciler v1.32.0
 	github.com/kong/go-kong v0.72.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/sync v0.18.0
+	golang.org/x/sync v0.19.0
 	k8s.io/api v0.35.1
 	k8s.io/apiextensions-apiserver v0.33.1
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
-	k8s.io/code-generator v0.33.3
+	k8s.io/code-generator v0.35.1
 	sigs.k8s.io/gateway-api v1.3.0
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -55,13 +55,13 @@ require (
 	github.com/go-errors/errors v1.4.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/hashicorp/go-memdb v1.3.5 // indirect
-	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
@@ -83,7 +83,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.50.0 // indirect
+	github.com/samber/lo v1.52.0 // indirect
 	github.com/sethvargo/go-password v0.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -108,7 +108,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/cli-runtime v0.31.0 // indirect
 	k8s.io/component-base v0.33.1 // indirect
-	k8s.io/gengo/v2 v2.0.0-20250604051438-85fd79dbfd9f // indirect
+	k8s.io/gengo/v2 v2.0.0-20250922181213-ec3ebc5fd46b // indirect
 	k8s.io/kubectl v0.31.0 // indirect
 	sigs.k8s.io/kind v0.24.0 // indirect
 	sigs.k8s.io/kustomize/api v0.17.3 // indirect
@@ -193,8 +193,8 @@ require (
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect

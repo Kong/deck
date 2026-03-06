@@ -4,6 +4,7 @@ package integration
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -133,11 +134,27 @@ func Test_Apply_3x(t *testing.T) {
 	})
 }
 
+func Test_Apply_Custom_Entities(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Apply_Custom_Entities",
+			testApplyCustomEntitiesImpl)
+	} else {
+		// For Enterprise: run once
+		testApplyCustomEntitiesImpl(t)
+	}
+}
+
 // test scope:
 //   - enterprise: >=3.0.0
 //   - konnect
-func Test_Apply_Custom_Entities(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+func testApplyCustomEntitiesImpl(t *testing.T) {
 	setup(t)
 
 	ctx := context.Background()
@@ -251,6 +268,10 @@ func Test_Apply_KeysAndKeySets(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Apply_KeysAndKeySets_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_KeysAndKeySets_Konnect", testApplyKeysAndKeySetsKonnectImpl)
+}
+
+func testApplyKeysAndKeySetsKonnectImpl(t *testing.T) {
 	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
 	setup(t)
@@ -333,6 +354,10 @@ func Test_Apply_KeysAndKeySets_Konnect(t *testing.T) {
 // test scope:
 //   - konnect
 func Test_Apply_NestedEntities_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_NestedEntities_Konnect", testApplyNestedEntitiesKonnectImpl)
+}
+
+func testApplyNestedEntitiesKonnectImpl(t *testing.T) {
 	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
 	setup(t)
@@ -384,6 +409,10 @@ func Test_Apply_NestedEntities_Konnect(t *testing.T) {
 //
 // - konnect
 func Test_Apply_BasicAuth_SkipHash_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_BasicAuth_SkipHash_Konnect", testApplyBasicAuthSkipHashKonnectImpl)
+}
+
+func testApplyBasicAuthSkipHashKonnectImpl(t *testing.T) {
 	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
 	setup(t)

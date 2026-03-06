@@ -15,6 +15,7 @@ plugins:
     - abc-client
     client_secret:
     - abc-secret
+    hide_credentials: false
     issuer: http://example-issuer.com
   enabled: true
   name: openid-connect
