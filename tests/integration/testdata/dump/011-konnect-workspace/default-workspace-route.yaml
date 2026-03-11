@@ -1,9 +1,0 @@
-_format_version: "3.0"
-_workspace: default
-_konnect:
-  control_plane_name: default
-routes:
-- name: route-default-ws
-  paths:
-  - /route-default-ws
-  https_redirect_status_code: 301

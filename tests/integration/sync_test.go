@@ -11077,7 +11077,7 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 		},
 		{
 			name:             "sync then reset to empty workspace",
-			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-routes.yaml",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-entities.yaml",
 			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
 		},
 	}

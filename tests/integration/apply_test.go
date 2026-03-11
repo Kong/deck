@@ -621,21 +621,21 @@ func Test_Apply_KonnectWorkspace(t *testing.T) {
 		expectedState string
 	}{
 		{
-			name:          "apply route into konnect workspace",
+			name:          "apply entity into konnect workspace",
 			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-initial.yaml",
-			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-route.yaml",
-			expectedState: "testdata/apply/011-konnect-workspace/expected-state-route.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity.yaml",
 		},
 		{
-			name:          "apply and update route in konnect workspace",
-			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-route.yaml",
-			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-route-updated.yaml",
-			expectedState: "testdata/apply/011-konnect-workspace/expected-state-route-updated.yaml",
+			name:          "apply and update entity in konnect workspace",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity-updated.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity-updated.yaml",
 		},
 		{
-			name:          "apply is additive - does not delete existing routes",
-			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-existing-route.yaml",
-			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-new-route.yaml",
+			name:          "apply is additive - does not delete existing entities",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-existing-entity.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-new-entity.yaml",
 			expectedState: "testdata/apply/011-konnect-workspace/expected-state-additive.yaml",
 		},
 		{

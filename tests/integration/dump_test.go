@@ -1165,9 +1165,9 @@ func Test_Dump_KonnectWorkspace(t *testing.T) {
 			dumpFlags:    []string{"-o", "-", "--workspace", "test-workspace"},
 		},
 		{
-			name:         "dump workspace with single route",
-			stateFile:    "testdata/dump/011-konnect-workspace/single-route.yaml",
-			expectedFile: "testdata/dump/011-konnect-workspace/expected-single-route.yaml",
+			name:         "dump workspace with single entity",
+			stateFile:    "testdata/dump/011-konnect-workspace/single-entity.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-single-entity.yaml",
 			dumpFlags:    []string{"-o", "-", "--workspace", "test-workspace"},
 		},
 		{
@@ -1184,7 +1184,7 @@ func Test_Dump_KonnectWorkspace(t *testing.T) {
 		},
 		{
 			name:        "workspace isolation - entities synced to workspace should not appear in CP-level dump",
-			stateFile:   "testdata/dump/011-konnect-workspace/single-route.yaml",
+			stateFile:   "testdata/dump/011-konnect-workspace/single-entity.yaml",
 			dumpFlags:   []string{"-o", "-"},
 			notContains: "route-dump-1",
 		},
@@ -1229,10 +1229,10 @@ func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 		_ = os.Chdir(originalDir)
 	}()
 
-	// Reset and sync routes to two different workspaces
+	// Reset and sync entities to two different workspaces
 	reset(t)
-	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace1-route.yaml"))
-	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace2-route.yaml"))
+	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace1-entity.yaml"))
+	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace2-entity.yaml"))
 
 	// Dump all workspaces
 	_, err = dump("--all-workspaces")
