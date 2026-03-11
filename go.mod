@@ -14,8 +14,8 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.2.2
-	github.com/kong/go-database-reconciler v1.32.0
-	github.com/kong/go-kong v0.72.1
+	github.com/kong/go-database-reconciler v1.31.2
+	github.com/kong/go-kong v0.72.1-0.20260311094800-7124c7e95cd8
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.10
@@ -30,8 +30,6 @@ require (
 	sigs.k8s.io/gateway-api v1.3.0
 	sigs.k8s.io/yaml v1.6.0
 )
-
-require github.com/kong/go-kong v0.72.1
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
