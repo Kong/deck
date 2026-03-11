@@ -13,7 +13,7 @@ require (
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.18.0
 	github.com/google/go-cmp v0.7.0
-	github.com/kong/go-apiops v0.2.2
+	github.com/kong/go-apiops v0.3.0
 	github.com/kong/go-database-reconciler v1.32.0
 	github.com/kong/go-kong v0.72.1
 	github.com/mitchellh/go-homedir v1.1.0
@@ -78,8 +78,10 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/pb33f/doctor v0.0.6 // indirect
-	github.com/pb33f/libopenapi v0.16.13 // indirect
+	github.com/pb33f/jsonpath v0.7.1 // indirect
+	github.com/pb33f/libopenapi v0.33.0 // indirect
 	github.com/pb33f/libopenapi-validator v0.0.49 // indirect
+	github.com/pb33f/ordered-map/v2 v2.3.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -87,9 +89,7 @@ require (
 	github.com/sethvargo/go-password v0.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/speakeasy-api/jsonpath v0.6.2 // indirect
 	github.com/ssgelm/cookiejarparser v1.0.1 // indirect
-	github.com/wk8/go-ordered-map/v2 v2.1.9-0.20240815153524-6ea36470d1bd // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
@@ -101,6 +101,7 @@ require (
 	go.starlark.net v0.0.0-20230525235612-a134d8f9ddca // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
