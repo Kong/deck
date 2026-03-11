@@ -355,6 +355,7 @@ func getKongClient(
 			}
 		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
+		kongClient.SetKonnectFlag(true)
 		if err != nil {
 			return nil, err
 		}

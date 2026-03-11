@@ -1,0 +1,17 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: konnect-workspace-test
+routes:
+- https_redirect_status_code: 301
+  name: route-no-workspace
+  path_handling: v0
+  paths:
+  - /route-no-workspace
+  preserve_host: false
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: true

@@ -1144,3 +1144,118 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_KonnectWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+		dumpFlags    []string
+		notContains  string // if set, assert output does NOT contain this string (for isolation tests)
+	}{
+		{
+			name:         "dump empty workspace",
+			stateFile:    "testdata/dump/011-konnect-workspace/empty-workspace.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-empty.yaml",
+			dumpFlags:    []string{"-o", "-", "--workspace", "test-workspace"},
+		},
+		{
+			name:         "dump workspace with single route",
+			stateFile:    "testdata/dump/011-konnect-workspace/single-route.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-single-route.yaml",
+			dumpFlags:    []string{"-o", "-", "--workspace", "test-workspace"},
+		},
+		{
+			name:         "dump without _workspace field in state file",
+			stateFile:    "testdata/dump/011-konnect-workspace/no-workspace.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-no-workspace.yaml",
+			dumpFlags:    []string{"-o", "-"},
+		},
+		{
+			name:         "dump with default workspace name",
+			stateFile:    "testdata/dump/011-konnect-workspace/default-workspace.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-default-workspace.yaml",
+			dumpFlags:    []string{"-o", "-"},
+		},
+		{
+			name:        "workspace isolation - entities synced to workspace should not appear in CP-level dump",
+			stateFile:   "testdata/dump/011-konnect-workspace/single-route.yaml",
+			dumpFlags:   []string{"-o", "-"},
+			notContains: "route-dump-1",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			output, err := dump(tc.dumpFlags...)
+			require.NoError(t, err)
+
+			if tc.notContains != "" {
+				assert.NotContains(t, output, tc.notContains,
+					"Workspace isolation failed: entity should NOT appear in dump")
+				return
+			}
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	// Create a temp directory for dump output
+	tmpDir, err := os.MkdirTemp("", "deck-dump-all-workspaces-*")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmpDir)
+
+	// Change to temp directory for dump output
+	originalDir, err := os.Getwd()
+	require.NoError(t, err)
+	require.NoError(t, os.Chdir(tmpDir))
+	defer func() {
+		_ = os.Chdir(originalDir)
+	}()
+
+	// Reset and sync routes to two different workspaces
+	reset(t)
+	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace1-route.yaml"))
+	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace2-route.yaml"))
+
+	// Dump all workspaces
+	_, err = dump("--all-workspaces")
+	require.NoError(t, err)
+
+	// Verify workspace1.yaml was created with correct content
+	workspace1Output, err := os.ReadFile("workspace1.yaml")
+	require.NoError(t, err)
+	workspace1Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace1.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, workspace1Expected, string(workspace1Output))
+
+	// Verify workspace2.yaml was created with correct content
+	workspace2Output, err := os.ReadFile("workspace2.yaml")
+	require.NoError(t, err)
+	workspace2Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace2.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, workspace2Expected, string(workspace2Output))
+
+	// Verify default.yaml was created (default workspace should also be dumped)
+	defaultOutput, err := os.ReadFile("default.yaml")
+	require.NoError(t, err)
+	// Default workspace dump should contain _workspace: default
+	assert.Contains(t, string(defaultOutput), "_workspace: default",
+		"default.yaml should contain _workspace: default")
+}

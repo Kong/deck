@@ -58,7 +58,8 @@ func getMode(targetContent *file.Content) mode {
 
 // workspaceExists checks if workspace exists in Kong or Konnect
 func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfig, workspaceName string,
-	isKonnectMode bool) (bool, error) {
+	isKonnectMode bool,
+) (bool, error) {
 	rootConfig := config.ForWorkspace("")
 	if workspaceName == "" {
 		// default workspace always exists
@@ -71,11 +72,17 @@ func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfi
 	}
 
 	if isKonnectMode {
+		if workspaceName == "default" {
+			// As commented on ticket(https://konghq.atlassian.net/browse/KOKO-3141) default workspace
+			// should be treated as normal flow. Because there is always an implicit default workspace.
+			return true, nil
+		}
 		konnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return false, fmt.Errorf("creating Konnect client: %w", err)
 		}
-		exists, err := konnectClient.KonnectWorkspaces.ExistsByName(ctx, &workspaceName)
+		konnectClient.SetKonnectFlag(true)
+		exists, err := konnectClient.Workspaces.ExistsByName(ctx, &workspaceName)
 		if err != nil {
 			return false, fmt.Errorf("checking Konnect workspace exists: %w", err)
 		}
@@ -221,7 +228,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			konnectControlPlane = konnectRuntimeGroup
 		}
 		konnectConfig.TLSConfig = rootConfig.TLSConfig
-		if workspaceName != "" {
+		if workspaceName != "" && workspaceName != "default" {
 			konnectConfig.WorkspaceName = workspaceName
 		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
@@ -414,7 +421,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		if !dry {
 			if mode == modeKonnect {
-				_, err := kongClient.KonnectWorkspaces.Create(ctx, &kong.Workspace{Name: &konnectConfig.WorkspaceName})
+				kongClient.SetKonnectFlag(true)
+				_, err := kongClient.Workspaces.Create(ctx, &kong.Workspace{Name: &konnectConfig.WorkspaceName})
 				if err != nil {
 					return err
 				}

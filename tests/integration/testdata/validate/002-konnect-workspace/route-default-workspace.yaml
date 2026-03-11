@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_workspace: default
+_konnect:
+  control_plane_name: konnect-workspace-test
+routes:
+- name: route-validate-default
+  paths:
+  - /route-validate-default
+  https_redirect_status_code: 301

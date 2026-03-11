@@ -1,0 +1,18 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: konnect-workspace-test
+routes:
+  - name: route-idempotent
+    paths:
+      - /idempotent
+    https_redirect_status_code: 426
+    path_handling: v0
+    preserve_host: false
+    protocols:
+      - http
+      - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true

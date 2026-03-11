@@ -123,6 +123,12 @@ func resetKonnectV2(ctx context.Context) error {
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
 	konnectConfig.TLSConfig = rootConfig.TLSConfig
+
+	konnectConfig.WorkspaceName = resetWorkspace
+	if strings.EqualFold(resetWorkspace, "default") {
+		konnectConfig.WorkspaceName = ""
+	}
+
 	baseKonnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 
 	var workspaces []string
@@ -151,6 +157,9 @@ func resetKonnectV2(ctx context.Context) error {
 		}
 
 		konnectConfig.WorkspaceName = ws
+		if ws == "default" {
+			konnectConfig.WorkspaceName = ""
+		}
 
 		client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
@@ -161,12 +170,10 @@ func resetKonnectV2(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("fetching state for workspace '%s': %w", ws, err)
 		}
-
 		targetState, err := state.NewKongState()
 		if err != nil {
 			return err
 		}
-
 		// Perform the diff/reset
 		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
 		if err != nil {
@@ -187,9 +194,20 @@ func dumpKonnectV2(ctx context.Context) error {
 	dumpConfig.KonnectControlPlane = konnectControlPlane
 	konnectConfig.TLSConfig = rootConfig.TLSConfig
 
+	// Reset workspace to the value from --workspace flag (or empty if not provided)
+	// This ensures we don't inherit workspace state from previous commands
+	konnectConfig.WorkspaceName = dumpWorkspace
+
+	// Treat "default" workspace as empty (CP-level dump)
+	if strings.EqualFold(dumpWorkspace, "default") {
+		dumpWorkspace = ""
+		konnectConfig.WorkspaceName = ""
+	}
+
 	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 	writeConfig := file.WriteConfig{
 		SelectTags:       dumpConfig.SelectorTags,
+		Workspace:        dumpWorkspace,
 		FileFormat:       format,
 		WithID:           dumpWithID,
 		ControlPlaneName: konnectControlPlane,
@@ -217,6 +235,9 @@ func dumpKonnectV2(ctx context.Context) error {
 
 	for _, workspace := range workspacesList {
 		konnectConfig.WorkspaceName = workspace
+		if workspace == "default" {
+			konnectConfig.WorkspaceName = ""
+		}
 		exists, err := workspaceExists(ctx, rootConfig, workspace, true)
 		if err != nil {
 			return err
@@ -233,6 +254,11 @@ func dumpKonnectV2(ctx context.Context) error {
 		if err := performKonnectDump(ctx, wsKonnectClient, workspace, writeConfig); err != nil {
 			return err
 		}
+	}
+
+	// If specific workspaces were dumped, we're done
+	if len(workspacesList) > 0 {
+		return nil
 	}
 
 	// No workspace (default)

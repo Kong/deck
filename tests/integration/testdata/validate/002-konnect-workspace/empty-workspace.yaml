@@ -1,0 +1,4 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: konnect-workspace-test

@@ -1,0 +1,18 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: konnect-workspace-test
+_workspace: workspace2
+routes:
+- https_redirect_status_code: 426
+  name: route-workspace2
+  path_handling: v0
+  paths:
+  - /route-workspace2
+  preserve_host: false
+  protocols:
+  - http
+  - https
+  regex_priority: 0
+  request_buffering: true
+  response_buffering: true
+  strip_path: true

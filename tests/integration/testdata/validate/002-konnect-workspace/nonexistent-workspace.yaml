@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_workspace: nonexistent-workspace
+_konnect:
+  control_plane_name: konnect-workspace-test
+routes:
+- name: route-validate-nonexistent
+  paths:
+  - /route-validate-nonexistent
+  https_redirect_status_code: 301
