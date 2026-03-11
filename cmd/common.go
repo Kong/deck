@@ -218,8 +218,8 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	if mode == modeKonnect {
 		isKonnect = true
-		
-    if skipDefaultsFill {
+
+		if skipDefaultsFill {
 			dumpConfig.SkipDefaults = true
 		}
 		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
