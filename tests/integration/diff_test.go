@@ -4,6 +4,7 @@ package integration
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -932,7 +933,23 @@ func Test_Diff_NoDiffCompressedTarget(t *testing.T) {
 }
 
 func Test_Diff_Consumers_Default_Lookup_Tag(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Diff_Consumers_Default_Lookup_Tag",
+			testDiffConsumersDefaultLookupTagImpl)
+	} else {
+		// For Enterprise: run once
+		testDiffConsumersDefaultLookupTagImpl(t)
+	}
+}
+
+func testDiffConsumersDefaultLookupTagImpl(t *testing.T) {
 	setup(t)
 
 	ctx := context.Background()

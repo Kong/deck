@@ -17,6 +17,7 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/schema"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
@@ -29,6 +30,8 @@ var (
 	assumeYes        bool
 	noMaskValues     bool
 	syncCmdAssumeYes bool
+
+	schemaRegistry *schema.Registry
 )
 
 type mode int
@@ -215,6 +218,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	if mode == modeKonnect {
 		isKonnect = true
+		
+    if skipDefaultsFill {
+			dumpConfig.SkipDefaults = true
+		}
 		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
 		if dumpConfig.SkipConsumersWithConsumerGroups {
 			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
@@ -294,6 +301,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			return err
 		}
 	}
+
+	schemaRegistry = schema.NewRegistry(kongClient, mode == modeKonnect)
+	dumpConfig.SchemaRegistry = schemaRegistry
 
 	dumpConfig.IsConsumerGroupPolicyOverrideSet = determinePolicyOverride(*targetContent, dumpConfig)
 
@@ -720,13 +730,15 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	shouldSkipDeletes := applyType == ApplyTypePartial
 
 	s, err := diff.NewSyncer(diff.SyncerOpts{
-		CurrentState:  currentState,
-		TargetState:   targetState,
-		KongClient:    client,
-		StageDelaySec: delay,
-		NoMaskValues:  noMaskValues,
-		IsKonnect:     isKonnect,
-		NoDeletes:     shouldSkipDeletes,
+		CurrentState:       currentState,
+		TargetState:        targetState,
+		KongClient:         client,
+		StageDelaySec:      delay,
+		NoMaskValues:       noMaskValues,
+		IsKonnect:          isKonnect,
+		NoDeletes:          shouldSkipDeletes,
+		SkipSchemaDefaults: isKonnect && skipDefaultsFill,
+		SchemaRegistry:     schemaRegistry,
 	})
 	if err != nil {
 		return 0, err
