@@ -13,9 +13,7 @@ import (
 )
 
 func registerSignalHandler() context.Context {
-	ctx, cancel := context.WithCancel(context.Background()) //nolint:gosec
-	// cancel is called in signal handler goroutine, so it is not deferred here.
-	// hence, the linter warning is ignored.
+	ctx, cancel := context.WithCancel(context.Background())
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
