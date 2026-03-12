@@ -133,12 +133,12 @@ func resetKonnectV2(ctx context.Context) error {
 	}
 
 	baseKonnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+	if err != nil {
+		return fmt.Errorf("getting initial konnect client: %w", err)
+	}
 
 	var workspaces []string
 	if resetAllWorkspaces {
-		if err != nil {
-			return fmt.Errorf("getting initial konnect client: %w", err)
-		}
 		workspaces, err = listWorkspaces(ctx, baseKonnectClient)
 		if err != nil {
 			return fmt.Errorf("listing Konnect workspaces: %w", err)
@@ -158,7 +158,6 @@ func resetKonnectV2(ctx context.Context) error {
 		if !exists {
 			return fmt.Errorf("workspace '%v' does not exist in Konnect", ws)
 		}
-
 		konnectConfig.WorkspaceName = ws
 		if ws == "default" {
 			konnectConfig.WorkspaceName = ""
