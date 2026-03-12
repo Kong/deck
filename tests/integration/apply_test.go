@@ -607,3 +607,61 @@ func Test_Apply_Consumer_Group_Plugin(t *testing.T) {
 		})
 	}
 }
+
+func Test_Apply_KonnectWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		firstFile     string
+		secondFile    string
+		expectedState string
+	}{
+		{
+			name:          "apply entity into konnect workspace",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-initial.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity.yaml",
+		},
+		{
+			name:          "apply and update entity in konnect workspace",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity-updated.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity-updated.yaml",
+		},
+		{
+			name:          "apply is additive - does not delete existing entities",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-existing-entity.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-new-entity.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-additive.yaml",
+		},
+		{
+			name:          "apply without _workspace field in state file",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-initial.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-no-workspace.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-no-workspace.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			err := sync(ctx, tc.firstFile)
+			require.NoError(t, err)
+
+			err = apply(ctx, tc.secondFile)
+			require.NoError(t, err)
+
+			out, _ := dump()
+
+			expected, err := readFile(tc.expectedState)
+			if err != nil {
+				t.Fatalf("failed to read expected state: %v", err)
+			}
+
+			assert.Equal(t, expected, out)
+		})
+	}
+}

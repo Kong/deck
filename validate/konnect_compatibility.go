@@ -43,10 +43,6 @@ func checkPlugin(name *string, config kong.Configuration) error {
 func KonnectCompatibility(targetContent *file.Content, dumpConfig dump.Config) []error {
 	var errs []error
 
-	if targetContent.Workspace != "" {
-		errs = append(errs, errors.New(errWorkspace))
-	}
-
 	if targetContent.Konnect == nil && dumpConfig.KonnectControlPlane == "" {
 		errs = append(errs, errors.New(errKonnect))
 	}

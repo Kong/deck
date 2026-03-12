@@ -59,8 +59,10 @@ func getMode(targetContent *file.Content) mode {
 	return modeKong
 }
 
-// workspaceExists checks if workspace exists in Kong.
-func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfig, workspaceName string) (bool, error) {
+// workspaceExists checks if workspace exists in Kong or Konnect
+func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfig, workspaceName string,
+	isKonnectMode bool,
+) (bool, error) {
 	rootConfig := config.ForWorkspace("")
 	if workspaceName == "" {
 		// default workspace always exists
@@ -72,6 +74,24 @@ func workspaceExists(ctx context.Context, config reconcilerUtils.KongClientConfi
 		return true, nil
 	}
 
+	if isKonnectMode {
+		if workspaceName == "default" {
+			// As commented on ticket(https://konghq.atlassian.net/browse/KOKO-3141) default workspace
+			// should be treated as normal flow. Because there is always an implicit default workspace.
+			return true, nil
+		}
+		konnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return false, fmt.Errorf("creating Konnect client: %w", err)
+		}
+		konnectClient.SetKonnectFlag(true)
+		exists, err := konnectClient.Workspaces.ExistsByName(ctx, &workspaceName)
+		if err != nil {
+			return false, fmt.Errorf("checking Konnect workspace exists: %w", err)
+		}
+		return exists, nil
+	}
+	// For Kong Gateway mode
 	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
 	if err != nil {
 		return false, err
@@ -193,24 +213,18 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	var kongClient *kong.Client
 	mode := getMode(targetContent)
+	isKonnect := false
+	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
+
 	if mode == modeKonnect {
+		isKonnect = true
+
 		if skipDefaultsFill {
 			dumpConfig.SkipDefaults = true
 		}
-
 		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
 		if dumpConfig.SkipConsumersWithConsumerGroups {
 			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
-		}
-
-		if targetContent.Workspace != "" {
-			return fmt.Errorf("_workspace set in config file.\n"+
-				"Workspaces are not supported in Konnect. "+
-				"Please remove '_workspace: %s' from your "+
-				"configuration and try again", targetContent.Workspace)
-		}
-		if workspace != "" {
-			return fmt.Errorf("--workspace flag is not supported when running against Konnect")
 		}
 		if targetContent.Konnect != nil {
 			if err := evaluateTargetRuntimeGroupOrControlPlaneName(targetContent); err != nil {
@@ -221,6 +235,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			konnectControlPlane = konnectRuntimeGroup
 		}
 		konnectConfig.TLSConfig = rootConfig.TLSConfig
+		if workspaceName != "" && workspaceName != "default" {
+			konnectConfig.WorkspaceName = workspaceName
+		}
 		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return err
@@ -239,8 +256,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 
 	// prepare to read the current state from Kong
 	var wsConfig reconcilerUtils.KongClientConfig
-	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
-	wsConfig = rootConfig.ForWorkspace(workspaceName)
 
 	// load Kong version after workspace
 	var kongVersion string
@@ -248,6 +263,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if mode == modeKonnect {
 		kongVersion = fetchKonnectKongVersion()
 	} else {
+		wsConfig = rootConfig.ForWorkspace(workspaceName)
 		kongVersion, err = fetchKongVersion(ctx, wsConfig)
 		if err != nil {
 			return fmt.Errorf("reading Kong version: %w", err)
@@ -274,7 +290,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// workspace name and kong client to be present on that level.
 	_ = sendAnalytics(cmd, kongVersion, mode)
 
-	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
+	workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName, isKonnect)
 	if err != nil {
 		return err
 	}
@@ -414,9 +430,17 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			cprint.CreatePrintln("Creating workspace", wsConfig.Workspace)
 		}
 		if !dry {
-			_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
-			if err != nil {
-				return err
+			if mode == modeKonnect {
+				kongClient.SetKonnectFlag(true)
+				_, err := kongClient.Workspaces.Create(ctx, &kong.Workspace{Name: &konnectConfig.WorkspaceName})
+				if err != nil {
+					return err
+				}
+			} else {
+				_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}

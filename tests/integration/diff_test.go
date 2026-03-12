@@ -526,6 +526,35 @@ Summary:
   Updated: 1
   Deleted: 0
 `
+	expectedKonnectWorkspaceMismatchDiff = `Creating workspace 
+creating route route-diff1
+Summary:
+  Created: 1
+  Updated: 0
+  Deleted: 0
+`
+
+	expectedKonnectWorkspaceEntityCreationDiff = `creating route route-diff1
+Summary:
+  Created: 1
+  Updated: 0
+  Deleted: 0
+`
+
+	expectedKonnectWorkspaceCreationDeletionDiff = `creating route route-diff2
+deleting route route-diff1
+Summary:
+  Created: 1
+  Updated: 0
+  Deleted: 1
+`
+
+	expectedKonnectWorkspaceEmptyStateDiff = `deleting route route-diff1
+Summary:
+  Created: 0
+  Updated: 0
+  Deleted: 1
+`
 )
 
 // test scope:
@@ -990,6 +1019,90 @@ func Test_Diff_PluginConfigReorderArraySetValues(t *testing.T) {
 			out, err := diff(tc.stateFile)
 			require.NoError(t, err)
 			if tc.isDiffExpected {
+				assert.Equal(t, tc.expectedDiff, out)
+			} else {
+				assert.Equal(t, emptyOutput, out)
+			}
+		})
+	}
+}
+
+func Test_Diff_Konnect_Workspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	tests := []struct {
+		name             string
+		initialStateFile string
+		stateFile        string
+		isDiffExpected   bool
+		expectedDiff     string
+		expectedContains []string
+	}{
+		{
+			name:             "create konnect workspace with entity creation",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation.yaml",
+			isDiffExpected:   true,
+			expectedDiff:     expectedKonnectWorkspaceEntityCreationDiff,
+		},
+		{
+			name:             "create konnect workspace with existing entity deletion and new entity creation",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation-deletion.yaml",
+			isDiffExpected:   true,
+			expectedDiff:     expectedKonnectWorkspaceCreationDeletionDiff,
+		},
+		{
+			name:             "update single entity in konnect workspace",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-update-entity.yaml",
+			isDiffExpected:   true,
+			expectedContains: []string{
+				"updating route route-diff1",
+				`-  "https_redirect_status_code": 301`,
+				`+  "https_redirect_status_code": 426`,
+				`-    "/route-diff1"`,
+				`+    "/route-diff1-updated"`,
+				"Updated: 1",
+			},
+		},
+		{
+			name:             "empty state file should show deletion of all entities",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace.yaml",
+			isDiffExpected:   true,
+			expectedDiff:     expectedKonnectWorkspaceEmptyStateDiff,
+		},
+		{
+			name:             "workspace mismatch - different workspace name should create new workspace",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-entity-creation.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-mismatch.yaml",
+			isDiffExpected:   true,
+			expectedDiff:     expectedKonnectWorkspaceMismatchDiff,
+		},
+		{
+			name:             "idempotency - no diff after sync",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-idempotent.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-idempotent.yaml",
+			isDiffExpected:   false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			if tc.initialStateFile != "" {
+				require.NoError(t, sync(ctx, tc.initialStateFile))
+			}
+			out, err := diff(tc.stateFile)
+			require.NoError(t, err)
+			if tc.expectedContains != nil {
+				// Use contains-based comparison for diffs with dynamic fields
+				for _, expected := range tc.expectedContains {
+					assert.Contains(t, out, expected, "expected output to contain: %s", expected)
+				}
+			} else if tc.isDiffExpected {
 				assert.Equal(t, tc.expectedDiff, out)
 			} else {
 				assert.Equal(t, emptyOutput, out)

@@ -1,0 +1,13 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: default
+routes:
+  - name: route-reset-1
+    paths:
+      - /route-reset-1
+    https_redirect_status_code: 301
+  - name: route-reset-2
+    paths:
+      - /route-reset-2
+    https_redirect_status_code: 301

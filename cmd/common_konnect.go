@@ -66,9 +66,18 @@ func GetKongClientForKonnectMode(
 	}
 
 	if konnectConfig.Token != "" {
-		konnectConfig.Headers = append(
-			konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token,
-		)
+		found := false
+		for _, h := range konnectConfig.Headers {
+			if strings.HasPrefix(h, "Authorization:") {
+				found = true
+				break
+			}
+		}
+		if !found {
+			konnectConfig.Headers = append(
+				konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token,
+			)
+		}
 	}
 
 	if konnectConfig.Address == "" {
@@ -104,6 +113,7 @@ func GetKongClientForKonnectMode(
 		Headers:    konnectConfig.Headers,
 		Retryable:  true,
 		TLSConfig:  konnectConfig.TLSConfig,
+		Workspace:  konnectConfig.WorkspaceName,
 	})
 }
 
@@ -116,22 +126,63 @@ func resetKonnectV2(ctx context.Context) error {
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
 	konnectConfig.TLSConfig = rootConfig.TLSConfig
-	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-	if err != nil {
-		return err
+
+	konnectConfig.WorkspaceName = resetWorkspace
+	if strings.EqualFold(resetWorkspace, "default") {
+		konnectConfig.WorkspaceName = ""
 	}
-	currentState, err := fetchCurrentState(ctx, client, dumpConfig)
+
+	baseKonnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("getting initial konnect client: %w", err)
 	}
-	targetState, err := state.NewKongState()
-	if err != nil {
-		return err
+
+	var workspaces []string
+	if resetAllWorkspaces {
+		workspaces, err = listWorkspaces(ctx, baseKonnectClient)
+		if err != nil {
+			return fmt.Errorf("listing Konnect workspaces: %w", err)
+		}
+	} else if resetWorkspace != "" {
+		workspaces = append(workspaces, resetWorkspace)
+	} else {
+		// No workspace provided: reset global entities only
+		workspaces = append(workspaces, "")
 	}
-	_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
-	if err != nil {
-		return err
+	for _, ws := range workspaces {
+		// Update the config for this specific workspace iteration
+		exists, err := workspaceExists(ctx, rootConfig, ws, true)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return fmt.Errorf("workspace '%v' does not exist in Konnect", ws)
+		}
+		konnectConfig.WorkspaceName = ws
+		if ws == "default" {
+			konnectConfig.WorkspaceName = ""
+		}
+
+		client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return fmt.Errorf("getting client for workspace '%s': %w", ws, err)
+		}
+
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig)
+		if err != nil {
+			return fmt.Errorf("fetching state for workspace '%s': %w", ws, err)
+		}
+		targetState, err := state.NewKongState()
+		if err != nil {
+			return err
+		}
+		// Perform the diff/reset
+		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
+		if err != nil {
+			return fmt.Errorf("resetting workspace '%s': %w", ws, err)
+		}
 	}
+
 	return nil
 }
 
@@ -144,34 +195,105 @@ func dumpKonnectV2(ctx context.Context) error {
 	}
 	dumpConfig.KonnectControlPlane = konnectControlPlane
 	konnectConfig.TLSConfig = rootConfig.TLSConfig
-	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-	if err != nil {
-		return err
-	}
-	rawState, err := dump.Get(ctx, client, dumpConfig)
-	if err != nil {
-		return fmt.Errorf("reading configuration from Kong: %w", err)
-	}
-	ks, err := state.Get(rawState)
-	if err != nil {
-		return fmt.Errorf("building state: %w", err)
+
+	// Reset workspace to the value from --workspace flag (or empty if not provided)
+	// This ensures we don't inherit workspace state from previous commands
+	konnectConfig.WorkspaceName = dumpWorkspace
+
+	// Treat "default" workspace as empty (CP-level dump)
+	if strings.EqualFold(dumpWorkspace, "default") {
+		dumpWorkspace = ""
+		konnectConfig.WorkspaceName = ""
 	}
 
+	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 	writeConfig := file.WriteConfig{
 		SelectTags:       dumpConfig.SelectorTags,
-		Filename:         dumpCmdKongStateFile,
-		FileFormat:       file.Format(strings.ToUpper(dumpCmdStateFormat)),
+		Workspace:        dumpWorkspace,
+		FileFormat:       format,
 		WithID:           dumpWithID,
 		ControlPlaneName: konnectControlPlane,
 		KongVersion:      fetchKonnectKongVersion(),
 		SanitizeContent:  dumpConfig.SanitizeContent,
 	}
 
-	if dumpConfig.SanitizeContent {
-		return sanitizeContent(ctx, client, ks, writeConfig, true)
+	var workspacesList []string
+
+	if dumpWorkspace != "" {
+		workspacesList = append(workspacesList, dumpWorkspace)
 	}
 
-	return file.KongStateToFile(ks, writeConfig)
+	if dumpAllWorkspaces {
+		baseClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return err
+		}
+		workspaces, err := listWorkspaces(ctx, baseClient)
+		if err != nil {
+			return err
+		}
+		workspacesList = append(workspacesList, workspaces...)
+	}
+
+	for _, workspace := range workspacesList {
+		konnectConfig.WorkspaceName = workspace
+		if workspace == "default" {
+			konnectConfig.WorkspaceName = ""
+		}
+		exists, err := workspaceExists(ctx, rootConfig, workspace, true)
+		if err != nil {
+			return err
+		}
+		if !exists {
+			return fmt.Errorf("workspace '%v' does not exist in Konnect", workspace)
+		}
+		wsKonnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return fmt.Errorf("getting client for workspace %s: %w", workspace, err)
+		}
+		writeConfig.Workspace = workspace
+		writeConfig.Filename = workspace
+		if err := performKonnectDump(ctx, wsKonnectClient, workspace, writeConfig); err != nil {
+			return err
+		}
+	}
+
+	// If specific workspaces were dumped, we're done
+	if len(workspacesList) > 0 {
+		return nil
+	}
+
+	// No workspace (default)
+	// If dumpWorkspace is empty, GetKongClientForKonnectMode builds the CP-level URL
+	client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+	if err != nil {
+		return err
+	}
+
+	return performKonnectDump(ctx, client, dumpWorkspace, writeConfig)
+}
+
+func performKonnectDump(ctx context.Context, client *kong.Client, wsName string, cfg file.WriteConfig) error {
+	rawState, err := dump.Get(ctx, client, dumpConfig)
+	if err != nil {
+		return fmt.Errorf("reading configuration: %w", err)
+	}
+	ks, err := state.Get(rawState)
+	if err != nil {
+		return fmt.Errorf("building state: %w", err)
+	}
+
+	cfg.Workspace = wsName
+	if dumpAllWorkspaces {
+		cfg.Filename = wsName
+	} else {
+		cfg.Filename = dumpCmdKongStateFile
+	}
+
+	if cfg.SanitizeContent {
+		return sanitizeContent(ctx, client, ks, cfg, true)
+	}
+	return file.KongStateToFile(ks, cfg)
 }
 
 func syncKonnect(ctx context.Context,
