@@ -1,0 +1,5 @@
+_format_version: "3.0"
+custom_entities:
+  - type: graphql_ratelimiting_cost_decorations
+    fields:
+      add_constant: 1.0
