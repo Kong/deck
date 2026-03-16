@@ -12,7 +12,7 @@ on: [pull_request]
 
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT || '10') }}
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
