@@ -1144,3 +1144,99 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+
+	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
+		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
+		os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Dump_GraphqlRateLimitingCostDecorations",
+			testDumpGraphqlRateLimitingCostDecorationsImpl)
+	} else {
+		testDumpGraphqlRateLimitingCostDecorationsImpl(t)
+	}
+}
+
+// test scope:
+//   - enterprise: >=3.0.0
+//   - konnect
+func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name                string
+		stateFile           string
+		expectedContains    []string
+		notExpectedContains []string
+	}{
+		{
+			name:      "dump single decoration with all fields",
+			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedContains: []string{
+				"graphql_ratelimiting_cost_decorations",
+				"Query.posts",
+				"add_constant",
+				"mul_constant",
+				"add_arguments",
+				"mul_arguments",
+				"limit",
+				"offset",
+				"first",
+				"last",
+			},
+		},
+		{
+			name:      "dump multiple decorations",
+			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedContains: []string{
+				"graphql_ratelimiting_cost_decorations",
+				"Query.users",
+				"Query.posts",
+			},
+		},
+		{
+			name:      "dump empty when none exist",
+			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			notExpectedContains: []string{
+				"graphql_ratelimiting_cost_decorations",
+				"custom_entities",
+			},
+		},
+		{
+			name:      "dump mixed with other custom entity types",
+			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedContains: []string{
+				"graphql_ratelimiting_cost_decorations",
+				"Query.users",
+				"degraphql_routes",
+				"/foo",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
+			require.NoError(t, err)
+
+			for _, expected := range tc.expectedContains {
+				assert.Contains(t, output, expected,
+					"dump output should contain %q", expected)
+			}
+			for _, notExpected := range tc.notExpectedContains {
+				assert.NotContains(t, output, notExpected,
+					"dump output should not contain %q", notExpected)
+			}
+		})
+	}
+}

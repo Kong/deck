@@ -8114,7 +8114,8 @@ func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
 	})
 
 	t.Run("create graphql ratelimiting cost decoration - all fields", func(t *testing.T) {
-		require.NoError(t, sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml"))
+		require.NoError(t,
+			sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml"))
 
 		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
 		require.NoError(t, err)
