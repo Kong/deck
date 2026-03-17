@@ -8108,9 +8108,8 @@ func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
 
 		require.Len(t, decorations, 1)
 
-		assert.Equal(t, 1, len(decorations))
 		assert.Equal(t, "Query.users", *decorations[0].TypePath)
-		assert.Equal(t, 1.0, *decorations[0].AddConstant)
+		assert.InEpsilon(t, 1.0, *decorations[0].AddConstant, 0.01)
 	})
 
 	t.Run("create graphql ratelimiting cost decoration - all fields", func(t *testing.T) {
@@ -8123,10 +8122,10 @@ func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
 		decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, len(decorations))
+		assert.Len(t, decorations, 1)
 		assert.Equal(t, "Query.posts", *decorations[0].TypePath)
-		assert.Equal(t, 2.0, *decorations[0].AddConstant)
-		assert.Equal(t, 1.5, *decorations[0].MulConstant)
+		assert.InEpsilon(t, 2.0, *decorations[0].AddConstant, 0.01)
+		assert.InEpsilon(t, 1.5, *decorations[0].MulConstant, 0.01)
 
 		expectedAddArgs := kong.StringSlice("limit", "offset")
 		assert.Equal(t, expectedAddArgs, decorations[0].AddArguments)
