@@ -8087,6 +8087,60 @@ func testSyncDegraphqlRoutesKonnectImpl(t *testing.T) {
 	})
 }
 
+func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"graphql_ratelimiting_cost_decorations"}}
+
+	t.Run("create graphql ratelimiting cost decoration", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+		require.NoError(t, err)
+
+		require.Len(t, decorations, 1)
+
+		assert.Equal(t, 1, len(decorations))
+		assert.Equal(t, "Query.users", *decorations[0].TypePath)
+		assert.Equal(t, 1.0, *decorations[0].AddConstant)
+	})
+
+	t.Run("create graphql ratelimiting cost decoration - all fields", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+		require.NoError(t, err)
+
+		assert.Equal(t, 1, len(decorations))
+		assert.Equal(t, "Query.posts", *decorations[0].TypePath)
+		assert.Equal(t, 2.0, *decorations[0].AddConstant)
+		assert.Equal(t, 1.5, *decorations[0].MulConstant)
+
+		expectedAddArgs := kong.StringSlice("limit", "offset")
+		assert.Equal(t, expectedAddArgs, decorations[0].AddArguments)
+
+		expectedMulArgs := kong.StringSlice("first", "last")
+		assert.Equal(t, expectedMulArgs, decorations[0].MulArguments)
+	})
+
+	t.Run("create graphql ratelimiting cost decoration - fails if type_path is missing", func(t *testing.T) {
+		err := sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong-missing-type-path.yaml")
+		require.Error(t, err)
+		assert.ErrorContains(t, err, "type_path is required")
+	})
+}
+
 func Test_Sync_CustomEntitiesFake(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	setup(t)

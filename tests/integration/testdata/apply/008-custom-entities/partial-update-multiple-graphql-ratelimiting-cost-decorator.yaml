@@ -1,0 +1,10 @@
+_format_version: "3.0"
+custom_entities:
+  - type: graphql_ratelimiting_cost_decorations
+    fields:
+      type_path: "Query.comments"
+      add_constant: 3.0
+      mul_constant: 2.0
+      add_arguments:
+        - "limit"
+        - "offset"

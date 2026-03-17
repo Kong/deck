@@ -165,8 +165,18 @@ func testApplyCustomEntitiesImpl(t *testing.T) {
 	}{
 		{
 			name:                   "degraphql routes",
-			initialStateFile:       "testdata/apply/008-custom-entities/initial-state.yaml",
-			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update.yaml",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-degraphql-routes.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-degraphql-routes.yaml",
+		},
+		{
+			name:                   "graphql ratelimiting cost decorations",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-graphql-ratelimiting-cost-decorator.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-graphql-ratelimiting-cost-decorator.yaml",
+		},
+		{
+			name:                   "multiple graphql ratelimiting cost decorations",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-multiple-graphql-ratelimiting-cost-decorator.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-multiple-graphql-ratelimiting-cost-decorator.yaml",
 		},
 	}
 
