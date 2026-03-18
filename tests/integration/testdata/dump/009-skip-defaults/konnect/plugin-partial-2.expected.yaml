@@ -15,7 +15,13 @@ plugins:
     - abc-client
     client_secret:
     - abc-secret
+    cluster_cache_redis:
+      ssl_verify: false
     hide_credentials: false
     issuer: http://example-issuer.com
+    redis:
+      ssl_verify: false
+    session_redis_ssl_verify: false
+    ssl_verify: false
   enabled: true
   name: openid-connect
