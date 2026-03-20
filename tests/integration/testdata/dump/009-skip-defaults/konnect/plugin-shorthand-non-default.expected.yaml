@@ -6,6 +6,8 @@ plugins:
     minute: 10
     redis:
       port: 6000
+      ssl_verify: false
     redis_port: 6000
+    redis_ssl_verify: false
   enabled: true
   name: rate-limiting
