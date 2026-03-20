@@ -33,4 +33,4 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Run integration tests
-        run: make test-integration
+        run: make test-integration TEST_TIMEOUT=${{ vars.DECK_WORKFLOW_KONNECT_TIMEOUT || '20m' }}

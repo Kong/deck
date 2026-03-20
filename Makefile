@@ -1,6 +1,7 @@
 .DEFAULT_GOAL := test-all
 
 CLI_DOCS_PATH=docs/cli-docs/
+TEST_TIMEOUT ?= 20m
 .PHONY: test-all
 test-all: lint test
 
@@ -39,6 +40,7 @@ setup-kong-ee:
 test-integration:
 	go test -v -count=1 -tags=integration \
 		-race \
+		-timeout $(TEST_TIMEOUT) \
 		$(GOTESTFLAGS) \
 		./tests/integration/...
 
