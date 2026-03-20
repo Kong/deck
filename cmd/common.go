@@ -242,6 +242,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if err != nil {
 			return err
 		}
+		kongClient.SetKonnectFlag(true)
 		dumpConfig.KonnectControlPlane = konnectControlPlane
 	}
 
