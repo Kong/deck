@@ -5,6 +5,7 @@ partials:
 - config:
     host: example.com
     keepalive_backlog: 0
+    ssl_verify: false
   id: 9e060517-7cae-4425-9ff1-1df11d0e9b5a
   name: my-partial-ee
   type: redis-ee
