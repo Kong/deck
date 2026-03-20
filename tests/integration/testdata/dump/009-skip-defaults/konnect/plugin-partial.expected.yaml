@@ -6,6 +6,7 @@ partials:
     host: example.com
     keepalive_backlog: 0
     password: redis-pass
+    ssl_verify: false
     username: redis-user
   id: 65a8785d-2e4a-4adb-8805-63e1141219cd
   name: my-partial-ee
