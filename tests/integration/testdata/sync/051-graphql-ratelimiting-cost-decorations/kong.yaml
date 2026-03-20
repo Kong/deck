@@ -21,5 +21,7 @@ services:
 custom_entities:
   - type: graphql_ratelimiting_cost_decorations
     fields:
+      service:
+        name: svc1
       type_path: "Query.users"
       add_constant: 1.0

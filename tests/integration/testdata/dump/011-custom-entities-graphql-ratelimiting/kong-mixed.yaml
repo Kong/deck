@@ -25,7 +25,9 @@ custom_entities:
       query: "query{ foo { bar } }"
       service:
         name: svc1
-  - type: graphql_ratelimiting_cost_decorations
+  - type: graphql_ratelimiting_cost_decoration
     fields:
+      service:
+        name: svc1
       type_path: "Query.users"
       add_constant: 1.0
