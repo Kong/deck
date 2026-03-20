@@ -17,6 +17,8 @@ custom_entities:
       add_constant: 1.0
   - type: graphql_ratelimiting_cost_decorations
     fields:
+      service:
+        name: svc1
       type_path: "Query.posts"
       add_constant: 2.0
       mul_constant: 1.5
