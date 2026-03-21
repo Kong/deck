@@ -90,7 +90,7 @@ func Test_Validate_Konnect(t *testing.T) {
 		{
 			name:           "validate with correct online list, passed via --online-entities-list cli flag",
 			stateFile:      "testdata/validate/kong3x.yaml",
-			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins", "--konnect-control-plane-name=default"},
 			errorExpected:  false,
 		},
 	}
