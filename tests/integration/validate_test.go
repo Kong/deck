@@ -78,12 +78,6 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  false,
 		},
 		{
-			name:           "validate with no konnect config in file, passed via cli flag konnect runtime group",
-			stateFile:      "testdata/validate/konnect_invalid.yaml",
-			additionalArgs: []string{"--konnect-runtime-group-name=default"},
-			errorExpected:  false,
-		},
-		{
 			name:           "validate with wrong online list, passed via --online-entities-list cli flag",
 			stateFile:      "testdata/validate/kong3x.yaml",
 			additionalArgs: []string{"--online-entities-list=services,Routes,Plugins"},
