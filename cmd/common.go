@@ -235,6 +235,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 			konnectControlPlane = konnectRuntimeGroup
 		}
 		konnectConfig.TLSConfig = rootConfig.TLSConfig
+		konnectConfig.WorkspaceName = ""
 		if workspaceName != "" && workspaceName != "default" {
 			konnectConfig.WorkspaceName = workspaceName
 		}

@@ -619,24 +619,28 @@ func Test_Apply_KonnectWorkspace(t *testing.T) {
 		firstFile     string
 		secondFile    string
 		expectedState string
+		dumpOpts      []string
 	}{
 		{
 			name:          "apply entity into konnect workspace",
 			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-initial.yaml",
 			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
 			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity.yaml",
+			dumpOpts:      []string{"--workspace", "test-workspace"},
 		},
 		{
 			name:          "apply and update entity in konnect workspace",
 			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-entity.yaml",
 			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-entity-updated.yaml",
 			expectedState: "testdata/apply/011-konnect-workspace/expected-state-entity-updated.yaml",
+			dumpOpts:      []string{"--workspace", "test-workspace"},
 		},
 		{
 			name:          "apply is additive - does not delete existing entities",
 			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-existing-entity.yaml",
 			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-new-entity.yaml",
 			expectedState: "testdata/apply/011-konnect-workspace/expected-state-additive.yaml",
+			dumpOpts:      []string{"--workspace", "test-workspace"},
 		},
 		{
 			name:          "apply without _workspace field in state file",
@@ -654,7 +658,7 @@ func Test_Apply_KonnectWorkspace(t *testing.T) {
 			err = apply(ctx, tc.secondFile)
 			require.NoError(t, err)
 
-			out, _ := dump()
+			out, _ := dump(tc.dumpOpts...)
 
 			expected, err := readFile(tc.expectedState)
 			if err != nil {
