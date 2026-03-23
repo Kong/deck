@@ -778,8 +778,11 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		if workspace == "" {
 			return "", err
 		}
+
+		cleanAddr := reconcilerUtils.CleanAddress(config.Address)
+
 		// Validate address scheme before constructing the fallback URL.
-		if err := validateAddress(reconcilerUtils.CleanAddress(config.Address)); err != nil {
+		if err := validateAddress(cleanAddr); err != nil {
 			return "", err
 		}
 
@@ -793,7 +796,7 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		}
 
 		// try with workspace path
-		target, err := url.JoinPath(reconcilerUtils.CleanAddress(config.Address), workspace, "kong")
+		target, err := url.JoinPath(cleanAddr, workspace, "kong")
 		if err != nil {
 			return "", err
 		}
