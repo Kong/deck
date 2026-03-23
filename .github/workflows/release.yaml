@@ -7,7 +7,7 @@ on:
 
 jobs:
   goreleaser:
-    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_RELEASE_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_RELEASE_TIMEOUT || '20') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
