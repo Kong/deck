@@ -12,7 +12,7 @@ on: [pull_request]
 
 jobs:
   integration:
-    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT) }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT || '10') }}
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       DECK_KONNECT_EMAIL : ${{ secrets.DECK_KONNECT_EMAIL }}
@@ -33,4 +33,5 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Run integration tests
-        run: make test-integration
+        # DECK_WORKFLOW_KONNECT_TIMEOUT is a plain number of minutes (used for timeout-minutes above), append 'm' for go test -timeout.
+        run: make test-integration TEST_TIMEOUT=${{ vars.DECK_WORKFLOW_KONNECT_TIMEOUT || '20' }}m

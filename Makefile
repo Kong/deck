@@ -1,6 +1,8 @@
 .DEFAULT_GOAL := test-all
 
 CLI_DOCS_PATH=docs/cli-docs/
+# TEST_TIMEOUT must be a Go duration string (e.g. 20m, 30m, 1h). Do not pass a bare number.
+TEST_TIMEOUT ?= 20m
 .PHONY: test-all
 test-all: lint test
 
@@ -39,6 +41,7 @@ setup-kong-ee:
 test-integration:
 	go test -v -count=1 -tags=integration \
 		-race \
+		-timeout $(TEST_TIMEOUT) \
 		$(GOTESTFLAGS) \
 		./tests/integration/...
 
