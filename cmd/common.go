@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
+	"regexp"
 	"sort"
 
 	"github.com/blang/semver/v4"
@@ -748,6 +750,18 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	return int(totalOps), nil
 }
 
+// validateAddress ensures that addr is a well-formed http/https URL
+func validateAddress(addr string) error {
+	u, err := url.ParseRequestURI(addr)
+	if err != nil {
+		return fmt.Errorf("invalid Kong address %q: %w", addr, err)
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return fmt.Errorf("invalid scheme %q in Kong address: must be http or https", u.Scheme)
+	}
+	return nil
+}
+
 func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
 	var version string
 
@@ -764,10 +778,29 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		if workspace == "" {
 			return "", err
 		}
+
+		cleanAddr := reconcilerUtils.CleanAddress(config.Address)
+
+		// Validate address scheme before constructing the fallback URL.
+		if err := validateAddress(cleanAddr); err != nil {
+			return "", err
+		}
+
+		// validWorkspaceName matches only safe workspace name characters, preventing path traversal.
+		// Accepted characters: alphanumerics and '.', '-', '_', '~'.
+		validWorkspaceName := regexp.MustCompile(`^[a-zA-Z0-9._\-~]+$`)
+		// Validate workspace name to prevent path traversal.
+		if !validWorkspaceName.MatchString(workspace) {
+			return "",
+				fmt.Errorf("invalid workspace name %q: only alphanumerics or '.', '-', '_', and '~' are accepted", workspace)
+		}
+
 		// try with workspace path
-		req, err := http.NewRequest("GET",
-			reconcilerUtils.CleanAddress(config.Address)+"/"+workspace+"/kong",
-			nil)
+		target, err := url.JoinPath(cleanAddr, workspace, "kong")
+		if err != nil {
+			return "", err
+		}
+		req, err := http.NewRequest("GET", target, nil)
 		if err != nil {
 			return "", err
 		}
