@@ -788,7 +788,8 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		validWorkspaceName := regexp.MustCompile(`^[a-zA-Z0-9._\-~]+$`)
 		// Validate workspace name to prevent path traversal.
 		if !validWorkspaceName.MatchString(workspace) {
-			return "", fmt.Errorf("invalid workspace name %q: only alphanumerics or '.', '-', '_', and '~' are accepted", workspace)
+			return "",
+				fmt.Errorf("invalid workspace name %q: only alphanumerics or '.', '-', '_', and '~' are accepted", workspace)
 		}
 
 		// try with workspace path
