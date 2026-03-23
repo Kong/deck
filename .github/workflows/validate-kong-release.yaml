@@ -26,9 +26,12 @@ jobs:
         with:
           egress-policy: audit
       - name: Execution Information
+        env:
+          KONG_IMAGE_INPUT: ${{ inputs.kong_image }}
+          BRANCH_INPUT: ${{ inputs.branch }}
         run: |
-          echo "Kong Gateway Image = ${{ inputs.kong_image }}"
-          echo "decK Branch = ${{ inputs.branch }}"
+          echo "Kong Gateway Image = $KONG_IMAGE_INPUT"
+          echo "decK Branch = $BRANCH_INPUT"
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
