@@ -4,5 +4,8 @@ _konnect:
 plugins:
 - config:
     minute: 10
+    redis:
+      ssl_verify: false
+    redis_ssl_verify: false
   enabled: true
   name: rate-limiting
