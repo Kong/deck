@@ -965,10 +965,9 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 			// dump again
 			output, err = dump(dumpArgs...)
 			require.NoError(t, err)
-			if tc.name == "dump skip-defaults: vaults" {
-				fmt.Printf("Expected: %s", expected)
-				fmt.Printf("output: %s", output)
-			}
+			fmt.Printf("output: %s\n", output)
+			fmt.Printf("expected: %s\n", expected)
+			assert.Equal(t, expected, output)
 			assert.Equal(t, expected, output)
 		})
 	}
