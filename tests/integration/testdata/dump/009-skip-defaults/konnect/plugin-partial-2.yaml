@@ -367,5 +367,3 @@ plugins:
   - grpcs
   - http
   - https
-  - ws
-  - wss

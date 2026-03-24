@@ -97,19 +97,13 @@ func (v *Validator) validateEntity(entityType string, entity interface{}) (bool,
 	nameOrID := getEntityNameOrID(entity)
 	errWrap := "validate entity '%s (%s)': %s"
 	endpoint := fmt.Sprintf("/schemas/%s/validate", entityType)
-
+	var req *http.Request
+	var err error
 	if v.client.IsKonnectMode() {
-		req, err := v.client.NewKonnectWorkspaceRequest(http.MethodPost, endpoint, nil, entity)
-		if err != nil {
-			return false, fmt.Errorf(errWrap, entityType, nameOrID, err)
-		}
-		resp, err := v.client.Do(v.ctx, req, nil)
-		if err != nil {
-			return false, fmt.Errorf(errWrap, entityType, nameOrID, err)
-		}
-		return resp.StatusCode == http.StatusOK, nil
+		req, err = v.client.NewKonnectWorkspaceRequest(http.MethodPost, endpoint, nil, entity)
+	} else {
+		req, err = v.client.NewRequest(http.MethodPost, endpoint, nil, entity)
 	}
-	req, err := v.client.NewRequest(http.MethodPost, endpoint, nil, entity)
 	if err != nil {
 		return false, fmt.Errorf(errWrap, entityType, nameOrID, err)
 	}

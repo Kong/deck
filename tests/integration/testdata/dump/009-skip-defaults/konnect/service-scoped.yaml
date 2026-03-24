@@ -21,8 +21,6 @@ services:
     - grpcs
     - http
     - https
-    - ws
-    - wss
   - config:
       allowed_content_types:
       - application/json
