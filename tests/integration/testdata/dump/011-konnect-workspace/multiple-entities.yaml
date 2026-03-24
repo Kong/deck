@@ -1,0 +1,46 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: default
+services:
+  - connect_timeout: 60000
+    enabled: true
+    host: httpbin.org
+    name: mock-multi-1
+    path: /anything
+    port: 80
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    write_timeout: 60000
+routes:
+  - name: route-multi-entity-1
+    paths:
+      - /route-multi-entity-1
+    https_redirect_status_code: 301
+  - name: route-multi-entity-2
+    paths:
+      - /route-multi-entity-2
+    https_redirect_status_code: 301
+upstreams:
+  - name: upstream1
+    algorithm: round-robin
+    sticky_sessions_cookie_path: /
+    targets:
+      - target: 198.51.100.11:80
+vaults:
+  - config:
+      base64_decode: false
+      prefix: MY_SECRET_
+    description: ENV vault for secrets
+    name: env
+    prefix: my-env-vault
+certificates:
+  - id: 13c562a1-191c-4464-9b18-e5222b46035b
+    cert: "{vault://my-env-vault/cert}"
+    key: "{vault://my-env-vault/key}"
+    snis:
+      - name: localhost
+consumers:
+  - custom_id: test_consumer_3x_custom_test
+    username: test_consumer_3x

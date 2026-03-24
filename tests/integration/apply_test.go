@@ -648,6 +648,13 @@ func Test_Apply_KonnectWorkspace(t *testing.T) {
 			secondFile:    "testdata/apply/011-konnect-workspace/konnect-no-workspace.yaml",
 			expectedState: "testdata/apply/011-konnect-workspace/expected-state-no-workspace.yaml",
 		},
+		{
+			name:          "apply multiple entities in a single file",
+			firstFile:     "testdata/apply/011-konnect-workspace/konnect-workspace-with-multiple-entities.yaml",
+			secondFile:    "testdata/apply/011-konnect-workspace/konnect-workspace-with-multiple-entities-updated.yaml",
+			expectedState: "testdata/apply/011-konnect-workspace/expected-state-multiple-entities.yaml",
+			dumpOpts:      []string{"--workspace", "test-workspace"},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

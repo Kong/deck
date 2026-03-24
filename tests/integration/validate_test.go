@@ -412,6 +412,12 @@ func Test_Validate_KonnectWorkspace(t *testing.T) {
 			errorExpected:  true,
 			errorString:    "workspace doesn't exist: nonexistent-workspace",
 		},
+		{
+			name:           "validate multiple entities in workspace",
+			stateFile:      "testdata/validate/002-konnect-workspace/multiple-entities.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
 	}
 
 	for _, tc := range tests {

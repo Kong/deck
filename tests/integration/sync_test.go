@@ -11080,6 +11080,11 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-entities.yaml",
 			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
 		},
+		{
+			name:             "sync multiple entities in a single file",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-multiple-entities.yaml",
+			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-multiple-entities-updated.yaml",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

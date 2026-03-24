@@ -1088,6 +1088,20 @@ func Test_Diff_Konnect_Workspace(t *testing.T) {
 			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-idempotent.yaml",
 			isDiffExpected:   false,
 		},
+		{
+			name:             "diff multiple entities in a single file",
+			initialStateFile: "testdata/diff/007-konnect-workspace/konnect-workspace-with-multiple-entities.yaml",
+			stateFile:        "testdata/diff/007-konnect-workspace/konnect-workspace-with-multiple-entities-updated.yaml",
+			isDiffExpected:   true,
+			expectedContains: []string{
+				"updating route route-multi-entity-1",
+				"creating route route-multi-entity-3",
+				"deleting route route-multi-entity-2",
+				"Created: 1",
+				"Updated: 1",
+				"Deleted: 1",
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

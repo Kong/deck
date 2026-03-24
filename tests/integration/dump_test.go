@@ -1188,6 +1188,12 @@ func Test_Dump_KonnectWorkspace(t *testing.T) {
 			dumpFlags:   []string{"-o", "-"},
 			notContains: "route-dump-1",
 		},
+		{
+			name:         "dump workspace with multiple entities",
+			stateFile:    "testdata/dump/011-konnect-workspace/multiple-entities.yaml",
+			expectedFile: "testdata/dump/011-konnect-workspace/expected-multiple-entities.yaml",
+			dumpFlags:    []string{"-o", "-", "--workspace", "test-workspace"},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
