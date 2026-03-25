@@ -141,6 +141,8 @@
 sync, diff and apply for Konnect resources. 
 [#1904](https://github.com/Kong/deck/pull/1904)
 [go-database-reconciler #391](https://github.com/Kong/go-database-reconciler/pull/391)
+- Upgraded vacuum to v0.25.1
+[#1748](https://github.com/Kong/deck/pull/1748)
 
 ### Fixed
 - Fixed data race issue due to mutating http.DefaultTransport
