@@ -34,11 +34,11 @@ vaults:
       prefix: MY_SECRET_
     description: ENV vault for secrets
     name: env
-    prefix: my-env-vault
+    prefix: my-workspace-vault
 certificates:
   - id: 13c562a1-191c-4464-9b18-e5222b46035b
-    cert: "{vault://my-env-vault/cert}"
-    key: "{vault://my-env-vault/key}"
+    cert: "{vault://my-workspace-vault/cert}"
+    key: "{vault://my-workspace-vault/key}"
     snis:
       - name: localhost
 consumers:

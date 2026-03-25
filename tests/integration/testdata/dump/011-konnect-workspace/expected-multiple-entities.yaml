@@ -3,9 +3,9 @@ _konnect:
   control_plane_name: default
 _workspace: test-workspace
 certificates:
-- cert: '{vault://my-env-vault/cert}'
+- cert: '{vault://my-workspace-vault/cert}'
   id: 13c562a1-191c-4464-9b18-e5222b46035b
-  key: '{vault://my-env-vault/key}'
+  key: '{vault://my-workspace-vault/key}'
   snis:
   - name: localhost
 consumers:
@@ -128,4 +128,4 @@ vaults:
     prefix: MY_SECRET_
   description: ENV vault for secrets
   name: env
-  prefix: my-env-vault
+  prefix: my-workspace-vault

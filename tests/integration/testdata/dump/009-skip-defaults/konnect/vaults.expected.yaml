@@ -35,7 +35,7 @@ vaults:
 - config:
     prefix: TEST_
   name: env
-  prefix: my-env-vault1
+  prefix: my-env-vault
   tags:
   - tag1
 - config:
