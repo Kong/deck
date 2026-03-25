@@ -160,7 +160,7 @@ func performReset(ctx context.Context, workspaces []string, isKonnect bool) erro
 			return err
 		}
 		// Perform the diff/reset
-		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
+		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, isKonnect, resetJSONOutput, ApplyTypeFull)
 		if err != nil {
 			return fmt.Errorf("resetting workspace '%s': %w", ws, err)
 		}
