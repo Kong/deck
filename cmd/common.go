@@ -435,16 +435,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		}
 		if !dry {
 			if mode == modeKonnect {
-				kongClient.SetKonnectFlag(true)
-				_, err := kongClient.Workspaces.Create(ctx, &kong.Workspace{Name: &konnectConfig.WorkspaceName})
-				if err != nil {
-					return err
-				}
+				_, err = kongClient.Workspaces.Create(ctx, &kong.Workspace{Name: &konnectConfig.WorkspaceName})
 			} else {
 				_, err = rootClient.Workspaces.Create(ctx, &kong.Workspace{Name: &wsConfig.Workspace})
-				if err != nil {
-					return err
-				}
+			}
+			if err != nil {
+				return err
 			}
 		}
 	}

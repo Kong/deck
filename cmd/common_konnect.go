@@ -65,6 +65,7 @@ func GetKongClientForKonnectMode(
 		return nil, err
 	}
 
+	// Ensure the Authorization header is set exactly once, even across repeated calls.
 	if konnectConfig.Token != "" {
 		found := false
 		for _, h := range konnectConfig.Headers {
@@ -131,56 +132,15 @@ func resetKonnectV2(ctx context.Context) error {
 	if strings.EqualFold(resetWorkspace, "default") {
 		konnectConfig.WorkspaceName = ""
 	}
-
-	baseKonnectClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-	if err != nil {
-		return fmt.Errorf("getting initial konnect client: %w", err)
-	}
-
 	var workspaces []string
-	if resetAllWorkspaces {
-		workspaces, err = listWorkspaces(ctx, baseKonnectClient)
-		if err != nil {
-			return fmt.Errorf("listing Konnect workspaces: %w", err)
-		}
-	} else if resetWorkspace != "" {
-		workspaces = append(workspaces, resetWorkspace)
-	} else {
-		// No workspace provided: reset global entities only
-		workspaces = append(workspaces, "")
+	var err error
+	workspaces, err = fetchWorkspaces(ctx, true)
+	if err != nil {
+		return err
 	}
-	for _, ws := range workspaces {
-		// Update the config for this specific workspace iteration
-		exists, err := workspaceExists(ctx, rootConfig, ws, true)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			return fmt.Errorf("workspace '%v' does not exist in Konnect", ws)
-		}
-		konnectConfig.WorkspaceName = ws
-		if ws == "default" {
-			konnectConfig.WorkspaceName = ""
-		}
-
-		client, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-		if err != nil {
-			return fmt.Errorf("getting client for workspace '%s': %w", ws, err)
-		}
-
-		currentState, err := fetchCurrentState(ctx, client, dumpConfig)
-		if err != nil {
-			return fmt.Errorf("fetching state for workspace '%s': %w", ws, err)
-		}
-		targetState, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
-		// Perform the diff/reset
-		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, true, resetJSONOutput, ApplyTypeFull)
-		if err != nil {
-			return fmt.Errorf("resetting workspace '%s': %w", ws, err)
-		}
+	err = performReset(ctx, workspaces, true)
+	if err != nil {
+		return err
 	}
 
 	return nil

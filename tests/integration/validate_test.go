@@ -66,15 +66,15 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  false,
 		},
 		{
-			name:          "validate with non existent _workspace in state file",
-			stateFile:     "testdata/validate/konnect-non-existent-workspace.yaml",
-			errorExpected: true,
-			errorString:   "workspace doesn't exist: nonexistent",
-		},
-		{
 			name:           "validate with no konnect config in file, passed via cli flag konnect control plane",
 			stateFile:      "testdata/validate/konnect_invalid.yaml",
 			additionalArgs: []string{"--konnect-control-plane-name=default"},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with no konnect config in file, passed via cli flag konnect runtime group",
+			stateFile:      "testdata/validate/konnect_invalid.yaml",
+			additionalArgs: []string{"--konnect-runtime-group-name=default"},
 			errorExpected:  false,
 		},
 		{
@@ -90,7 +90,7 @@ func Test_Validate_Konnect(t *testing.T) {
 		{
 			name:           "validate with correct online list, passed via --online-entities-list cli flag",
 			stateFile:      "testdata/validate/kong3x.yaml",
-			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins", "--konnect-control-plane-name=default"},
+			additionalArgs: []string{"--online-entities-list=Services,Routes,Plugins"},
 			errorExpected:  false,
 		},
 	}
@@ -247,6 +247,12 @@ func Test_Validate_Gateway_EE(t *testing.T) {
 			name:           "validate with --workspace",
 			stateFile:      "testdata/validate/kong-ee.yaml",
 			additionalArgs: []string{"--workspace=default"},
+		},
+		{
+			name:          "validate with non existent _workspace in state file",
+			stateFile:     "testdata/validate/kong-ee-non-existent-workspace.yaml",
+			errorExpected: true,
+			errorString:   "workspace doesn't exist: nonexistent",
 		},
 		{
 			name:           "validate with non-default _workspace and default_lookup_tags",

@@ -332,45 +332,50 @@ func validateWithKong(
 	return validator.Validate(parsedFormatVersion)
 }
 
+// resolveAndValidateWorkspace resolves the workspace name from the flag/state file
+// and validates its existence. It returns the resolved workspace name.
+func resolveAndValidateWorkspace(
+	ctx context.Context, workspaceFlag string, targetContent *file.Content, isKonnect bool,
+) (string, error) {
+	if workspaceFlag == "" {
+		return "", nil
+	}
+	workspaceName := getWorkspaceName(workspaceFlag, targetContent, false)
+	if workspaceName == "" {
+		return "", nil
+	}
+	exists, err := workspaceExists(ctx, rootConfig, workspaceName, isKonnect)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", fmt.Errorf("workspace doesn't exist: %s", workspaceName)
+	}
+	return workspaceName, nil
+}
+
 func getKongClient(
 	ctx context.Context, targetContent *file.Content, mode mode,
 ) (*kong.Client, error) {
-	var (
-		kongClient *kong.Client
-		err        error
-	)
 	if mode == modeKonnect {
 		dumpConfig.KonnectControlPlane = konnectControlPlane
-		if validateWorkspace != "" {
-			konnectWorkspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
-			if konnectWorkspaceName != "" {
-				konnectConfig.WorkspaceName = konnectWorkspaceName
-			}
-			exists, err := workspaceExists(ctx, rootConfig, konnectConfig.WorkspaceName, true)
-			if err != nil {
-				return nil, err
-			}
-			if !exists {
-				return nil, fmt.Errorf("workspace doesn't exist: %s", konnectConfig.WorkspaceName)
-			}
+		workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, true)
+		if err != nil {
+			return nil, err
 		}
-		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if workspaceName != "" {
+			konnectConfig.WorkspaceName = workspaceName
+		}
+		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return nil, err
 		}
 		kongClient.SetKonnectFlag(true)
 		return kongClient, nil
 	}
-	workspaceName := ""
-	if validateWorkspace != "" {
-		workspaceName = getWorkspaceName(validateWorkspace, targetContent, false)
-		exists, err := workspaceExists(ctx, rootConfig, workspaceName, false)
-		if err != nil {
-			return nil, err
-		}
-		if !exists {
-			return nil, fmt.Errorf("workspace doesn't exist: %s", workspaceName)
-		}
+	workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, false)
+	if err != nil {
+		return nil, err
 	}
 	wsConfig := rootConfig.ForWorkspace(workspaceName)
 	return reconcilerUtils.GetKongClient(wsConfig)
