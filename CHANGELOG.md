@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.57.0](#v1570)
 - [v1.56.0](#v1560)
 - [v1.55.2](#v1552)
 - [v1.55.1](#v1551)
@@ -131,6 +132,25 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.57.0]
+> Release date: 2026/03/25
+
+### Added
+- Added functionality to skip defaults injection during
+sync, diff and apply for Konnect resources. 
+[#1904](https://github.com/Kong/deck/pull/1904)
+[go-database-reconciler #391](https://github.com/Kong/go-database-reconciler/pull/391)
+
+### Fixed
+- Fixed data race issue due to mutating http.DefaultTransport
+[#1915](https://github.com/Kong/deck/pull/1915)
+[go-database-reconciler #392] (https://github.com/Kong/go-database-reconciler/pull/392)
+- Upgraded Alpine packages in docker images to address CVE-2025-15467
+[#1923](https://github.com/Kong/deck/pull/1923)
+- Added validations for passed address and workspace to avoid any
+malicious inputs.
+[#1946](https://github.com/Kong/deck/pull/1946)
 
 ## [v1.56.0]
 > Release date: 2026/03/02
@@ -2461,6 +2481,8 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.57.0]: https://github.com/Kong/deck/compare/v1.56.0...v1.57.0
+[v1.56.0]: https://github.com/Kong/deck/compare/v1.55.2...v1.56.0
 [v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2
 [v1.55.1]: https://github.com/Kong/deck/compare/v1.55.0...v1.55.1
 [v1.55.0]: https://github.com/Kong/deck/compare/v1.54.0...v1.55.0
