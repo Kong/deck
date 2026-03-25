@@ -834,6 +834,28 @@ var (
 		},
 	}
 
+	targetUpdatedWeight = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(100),
+			Failover: kong.Bool(false),
+		},
+	}
+
+	targetUpdatedWeightPost34 = []*kong.Target{
+		{
+			Target: kong.String("198.51.100.11:80"),
+			Upstream: &kong.Upstream{
+				ID: kong.String("a6f89ffc-1e53-4b01-9d3d-7a142bcd"),
+			},
+			Weight:   kong.Int(100),
+			Failover: kong.Bool(false),
+		},
+	}
+
 	rateLimitingPlugin = []*kong.Plugin{
 		{
 			Name: kong.String("rate-limiting"),
@@ -3439,6 +3461,15 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 			},
 			runWhen: ">=3.12.0",
 		},
+		{
+			name:     "updates weight of a target for an existing upstream >= 3.4",
+			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetUpdatedWeightPost34,
+			},
+			runWhen: ">=3.4.0",
+		},
 	}
 
 	for _, tc := range tests {
@@ -3486,6 +3517,45 @@ func testSyncUpstreamsTargetZeroWeightKonnectImpl(t *testing.T) {
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, true, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_Upstreams_Target_UpdateWeight_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Upstreams_Target_UpdateWeight_Konnect",
+		testSyncUpstreamsTargetUpdateWeightKonnectImpl)
+}
+
+func testSyncUpstreamsTargetUpdateWeightKonnectImpl(t *testing.T) {
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+	}{
+		{
+			name:     "updates weight in upstream target",
+			kongFile: "testdata/sync/050-update-upstream-target-weight/after.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetUpdatedWeight,
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "konnect", "")
+			setup(t)
+			require.NoError(t, sync(context.Background(),
+				"testdata/sync/050-update-upstream-target-weight/before.yaml"))
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, true, false,
+				tc.expectedState, nil)
 		})
 	}
 }
