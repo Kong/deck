@@ -160,7 +160,7 @@ func dumpKonnectV2(ctx context.Context) error {
 	// This ensures we don't inherit workspace state from previous commands
 	konnectConfig.WorkspaceName = dumpWorkspace
 
-	// Treat "default" workspace as empty (CP-level dump)
+	// Treat "default" workspace as empty
 	if strings.EqualFold(dumpWorkspace, "default") {
 		dumpWorkspace = ""
 		konnectConfig.WorkspaceName = ""
