@@ -3461,15 +3461,6 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 			},
 			runWhen: ">=3.12.0",
 		},
-		{
-			name:     "updates weight of a target for an existing upstream >= 3.4",
-			kongFile: "testdata/sync/005-create-upstream-and-target-weight/kong3x.yaml",
-			expectedState: utils.KongRawState{
-				Upstreams: upstream,
-				Targets:   targetUpdatedWeightPost34,
-			},
-			runWhen: ">=3.4.0",
-		},
 	}
 
 	for _, tc := range tests {
@@ -3479,6 +3470,41 @@ func Test_Sync_Upstreams_Target_ZeroWeight_3x(t *testing.T) {
 
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
+		})
+	}
+}
+
+// test scope:
+//   - 3.x
+func Test_Sync_Upstreams_Target_UpdateWeight(t *testing.T) {
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedState utils.KongRawState
+		runWhen       string
+	}{
+		{
+			name:     "updates weight of a target for an existing upstream >= 3.4",
+			kongFile: "testdata/sync/050-update-upstream-target-weight/after.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   targetUpdatedWeightPost34,
+			},
+			runWhen: ">=3.4.0",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, "kong", tc.runWhen)
+			setup(t)
+			require.NoError(t, sync(context.Background(),
+				"testdata/sync/050-update-upstream-target-weight/before.yaml"))
+			require.NoError(t, sync(context.Background(), tc.kongFile))
+			testKongState(t, client, false, false,
+				tc.expectedState, nil)
 		})
 	}
 }
