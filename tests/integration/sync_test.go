@@ -3487,13 +3487,31 @@ func Test_Sync_Upstreams_Target_UpdateWeight(t *testing.T) {
 		runWhen       string
 	}{
 		{
-			name:     "updates weight of a target for an existing upstream >= 3.4",
+			name:     "updates weight of a target for an existing upstream >=3.4.0 <3.11.0",
+			kongFile: "testdata/sync/050-update-upstream-target-weight/after.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstreamPre311,
+				Targets:   target,
+			},
+			runWhen: ">=3.4.0 <3.11.0",
+		},
+		{
+			name:     "updates weight of a target for an existing upstream >=3.11.0 <3.12.0",
+			kongFile: "testdata/sync/050-update-upstream-target-weight/after.yaml",
+			expectedState: utils.KongRawState{
+				Upstreams: upstream,
+				Targets:   target,
+			},
+			runWhen: ">=3.11.0 <3.12.0",
+		},
+		{
+			name:     "updates weight of a target for an existing upstream >=3.12.0",
 			kongFile: "testdata/sync/050-update-upstream-target-weight/after.yaml",
 			expectedState: utils.KongRawState{
 				Upstreams: upstream,
 				Targets:   targetUpdatedWeightPost34,
 			},
-			runWhen: ">=3.4.0",
+			runWhen: ">=3.12.0",
 		},
 	}
 	for _, tc := range tests {
