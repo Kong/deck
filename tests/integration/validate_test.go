@@ -63,8 +63,7 @@ func Test_Validate_Konnect(t *testing.T) {
 			name:           "validate with workspace set",
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--workspace=default"},
-			errorExpected:  true,
-			errorString:    "[workspaces] not supported by Konnect - use control planes instead",
+			errorExpected:  false,
 		},
 		{
 			name:           "validate with no konnect config in file, passed via cli flag konnect control plane",
@@ -363,4 +362,105 @@ func Test_Validate_PartialLookupTags(t *testing.T) {
 			require.NoError(t, err)
 		})
 	}
+}
+
+func Test_Validate_KonnectWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+		errorExpected  bool
+		errorString    string
+	}{
+		{
+			name:           "validate with _workspace in state file",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-in-workspace.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with --workspace flag",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-in-workspace.yaml",
+			additionalArgs: []string{"--workspace", "test-workspace"},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate without workspace (CP-level)",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-no-workspace.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with default workspace in state file",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-default-workspace.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with --workspace=default flag",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-no-workspace.yaml",
+			additionalArgs: []string{"--workspace", "default"},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate empty workspace",
+			stateFile:      "testdata/validate/002-konnect-workspace/empty-workspace.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+		{
+			name:           "validate with non-existent --workspace flag",
+			stateFile:      "testdata/validate/002-konnect-workspace/entity-no-workspace.yaml",
+			additionalArgs: []string{"--workspace", "nonexistent-workspace"},
+			errorExpected:  true,
+			errorString:    "workspace doesn't exist: nonexistent-workspace",
+		},
+		{
+			name:           "validate multiple entities in workspace",
+			stateFile:      "testdata/validate/002-konnect-workspace/multiple-entities.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			validateOpts := append([]string{tc.stateFile}, tc.additionalArgs...)
+			err := validate(ONLINE, validateOpts...)
+
+			if tc.errorExpected {
+				require.Error(t, err)
+				if tc.errorString != "" {
+					assert.Contains(t, err.Error(), tc.errorString)
+				}
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
+}
+
+func Test_Validate_KonnectWorkspace_Isolation(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	// Reset and sync an entity to test-workspace
+	reset(t)
+	require.NoError(t, sync(ctx, "testdata/validate/002-konnect-workspace/entity-in-workspace.yaml"))
+
+	// Validate the same file should succeed (entity exists in workspace)
+	err := validate(ONLINE, "testdata/validate/002-konnect-workspace/entity-in-workspace.yaml")
+	require.NoError(t, err, "Validation should succeed when entity exists in workspace")
+
+	// Validate CP-level file should also succeed (different scope)
+	err = validate(ONLINE, "testdata/validate/002-konnect-workspace/entity-no-workspace.yaml")
+	require.NoError(t, err, "Validation should succeed for CP-level file")
 }
