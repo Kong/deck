@@ -12,7 +12,6 @@ import (
 
 var (
 	errKonnect            = "[konnect] section not specified - ensure details are set via cli flags"
-	errWorkspace          = "[workspaces] not supported by Konnect - use control planes instead"
 	errNoVersion          = "[version] unable to determine decK file version"
 	errBadVersion         = fmt.Sprintf("[version] decK file version must be '%.1f' or greater", supportedVersion)
 	errPluginIncompatible = "[%s] plugin is not compatible with Konnect"
@@ -42,10 +41,6 @@ func checkPlugin(name *string, config kong.Configuration) error {
 
 func KonnectCompatibility(targetContent *file.Content, dumpConfig dump.Config) []error {
 	var errs []error
-
-	if targetContent.Workspace != "" {
-		errs = append(errs, errors.New(errWorkspace))
-	}
 
 	if targetContent.Konnect == nil && dumpConfig.KonnectControlPlane == "" {
 		errs = append(errs, errors.New(errKonnect))
