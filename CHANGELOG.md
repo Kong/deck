@@ -134,13 +134,16 @@
 - [v0.1.0](#v010)
 
 ## [v1.57.0]
-> Release date: 2026/03/25
+> Release date: 2026/03/26
 
 ### Added
 - Added functionality to skip defaults injection during
 sync, diff and apply for Konnect resources. 
 [#1904](https://github.com/Kong/deck/pull/1904)
 [go-database-reconciler #391](https://github.com/Kong/go-database-reconciler/pull/391)
+- Added new command `deck file openapi2mcp` which converts OpenAPI files to Kong's decK format with ai-mcp-proxy plugin configuration.
+[#1954](https://github.com/Kong/deck/pull/1954)
+[go-apiops #289](https://github.com/Kong/go-apiops/pull/289)
 - Upgraded vacuum to v0.25.1
 [#1748](https://github.com/Kong/deck/pull/1748)
 
@@ -153,6 +156,9 @@ sync, diff and apply for Konnect resources.
 - Added validations for passed address and workspace to avoid any
 malicious inputs.
 [#1946](https://github.com/Kong/deck/pull/1946)
+- Fixed duplicate plugin IDs and generation of routes for headers with enums to be appled on required headers.
+[#1954](https://github.com/Kong/deck/pull/1954)
+[go-apiops #289](https://github.com/Kong/go-apiops/pull/289)
 
 ## [v1.56.0]
 > Release date: 2026/03/02
