@@ -146,6 +146,10 @@ sync, diff and apply for Konnect resources.
 [go-apiops #289](https://github.com/Kong/go-apiops/pull/289)
 - Upgraded vacuum to v0.25.1
 [#1748](https://github.com/Kong/deck/pull/1748)
+- Added support for `Workspaces` in the `Konnect` flow.
+[#1892](https://github.com/Kong/deck/pull/1892)
+[go-kong #602](https://github.com/Kong/go-kong/pull/602)
+[go-database-reconciler #376](https://github.com/Kong/go-database-reconciler/pull/376)
 
 ### Fixed
 - Fixed data race issue due to mutating http.DefaultTransport
