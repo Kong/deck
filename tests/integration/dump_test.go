@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/acarl005/stripansi"
 	"github.com/kong/deck/sanitize"
@@ -949,12 +948,6 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
-			if tc.name == "dump skip-defaults: vaults" {
-				// Konnect API has eventual consistency, so we need to wait a bit
-				// after reset to ensure all vaults are fully deleted before
-				// creating new ones.
-				time.Sleep(1 * time.Second)
-			}
 			require.NoError(t, sync(ctx, tc.stateFile))
 
 			dumpArgs := []string{"-o", "-", "--skip-defaults"}
