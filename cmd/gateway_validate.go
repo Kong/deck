@@ -358,6 +358,10 @@ func getKongClient(
 	ctx context.Context, targetContent *file.Content, mode mode,
 ) (*kong.Client, error) {
 	if mode == modeKonnect {
+		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return nil, err
+		}
 		dumpConfig.KonnectControlPlane = konnectControlPlane
 		workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, true)
 		if err != nil {
@@ -365,10 +369,6 @@ func getKongClient(
 		}
 		if workspaceName != "" {
 			konnectConfig.WorkspaceName = workspaceName
-		}
-		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-		if err != nil {
-			return nil, err
 		}
 		kongClient.SetKonnectFlag(true)
 		return kongClient, nil
