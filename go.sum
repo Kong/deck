@@ -207,8 +207,8 @@ github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/kong/go-apiops v0.4.0 h1:rXxdcE6VkDTOkhGt/ZytYqp8elw3SfrBQ/+r42lX2J4=
 github.com/kong/go-apiops v0.4.0/go.mod h1:Xt99d90LallLVwYJAGaufiNbBdsK0KKboe7gR4Ryths=
-github.com/kong/go-database-reconciler v1.32.1-0.20260323092013-e00446d0bb49 h1:JtZ3xy2slHXbhdKWQX0nNbOQUm6SA5n4+Y6KKkh/EZs=
-github.com/kong/go-database-reconciler v1.32.1-0.20260323092013-e00446d0bb49/go.mod h1:cNUdHCfvvSIVhXLKVh4xcNuomVyhzm3ZiKdQN5ymVIk=
+github.com/kong/go-database-reconciler v1.33.1-0.20260327050309-ea544f130d0c h1:yBD+kuptsOJ0BWJkdc2ESLS1fDSGWm5r+m0Outl36lk=
+github.com/kong/go-database-reconciler v1.33.1-0.20260327050309-ea544f130d0c/go.mod h1:SXOso5JoFoZgnftBBeb3XP2ruTer/wKBi928P9bbBbE=
 github.com/kong/go-kong v0.73.1-0.20260327024531-66b6879eebec h1:YxNVDlTS/G45pO4TLDBaYOzsA7ghuL0vt9hWr+PGnmY=
 github.com/kong/go-kong v0.73.1-0.20260327024531-66b6879eebec/go.mod h1:Wx5aTcMjyUnIF94M5NYFWb/EnuEkqB5STrWvybFSYYQ=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
