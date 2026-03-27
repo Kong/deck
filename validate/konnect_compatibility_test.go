@@ -30,7 +30,6 @@ func Test_KonnectCompatibility(t *testing.T) {
 			},
 			dumpConfig: dump.Config{},
 			expected: []error{
-				errors.New(errWorkspace),
 				errors.New(errBadVersion),
 			},
 		},

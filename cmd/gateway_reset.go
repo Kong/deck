@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
+	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 )
 
@@ -40,11 +42,6 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 		return resetKonnectV2(ctx)
 	}
 
-	rootClient, err := utils.GetKongClient(rootConfig)
-	if err != nil {
-		return err
-	}
-
 	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(resetWorkspace))
 	if err != nil {
 		return fmt.Errorf("reading Kong version: %w", err)
@@ -60,47 +57,13 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 	}
 
 	var workspaces []string
-	// Kong OSS or default workspace
-	if !resetAllWorkspaces && resetWorkspace == "" {
-		workspaces = append(workspaces, "")
+	workspaces, err = fetchWorkspaces(ctx, false)
+	if err != nil {
+		return err
 	}
-
-	// Kong Enterprise
-	if resetAllWorkspaces {
-		workspaces, err = listWorkspaces(ctx, rootClient)
-		if err != nil {
-			return err
-		}
-	}
-	if resetWorkspace != "" {
-		exists, err := workspaceExists(ctx, rootConfig, resetWorkspace)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			return fmt.Errorf("workspace '%v' does not exist in Kong", resetWorkspace)
-		}
-
-		workspaces = append(workspaces, resetWorkspace)
-	}
-
-	for _, workspace := range workspaces {
-		wsClient, err := utils.GetKongClient(rootConfig.ForWorkspace(workspace))
-		if err != nil {
-			return err
-		}
-		currentState, err := fetchCurrentState(ctx, wsClient, dumpConfig)
-		if err != nil {
-			return err
-		}
-		targetState, err := state.NewKongState()
-		if err != nil {
-			return err
-		}
-		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, wsClient, false, resetJSONOutput, ApplyTypeFull)
-		if err != nil {
-			return err
-		}
+	err = performReset(ctx, workspaces, false)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -155,4 +118,80 @@ By default, this command will ask for confirmation.`,
 		false, "generate command execution report in a JSON format")
 
 	return resetCmd
+}
+
+func getClientForReset(
+	ctx context.Context,
+	rootConfig utils.KongClientConfig,
+	isKonnect bool,
+	konnectConfig *utils.KonnectConfig,
+) (*kong.Client, error) {
+	if isKonnect {
+		konnectClient, err := GetKongClientForKonnectMode(ctx, konnectConfig)
+		if err != nil {
+			return nil, err
+		}
+		return konnectClient, nil
+	}
+	kongClient, err := utils.GetKongClient(rootConfig)
+	if err != nil {
+		return nil, err
+	}
+	return kongClient, nil
+}
+
+func performReset(ctx context.Context, workspaces []string, isKonnect bool) error {
+	for _, ws := range workspaces {
+		konnectConfig.WorkspaceName = ws
+		if ws == "default" {
+			konnectConfig.WorkspaceName = ""
+		}
+		client, err := getClientForReset(ctx, rootConfig.ForWorkspace(ws), isKonnect, &konnectConfig)
+		if err != nil {
+			return fmt.Errorf("getting client for workspace '%s': %w", ws, err)
+		}
+
+		currentState, err := fetchCurrentState(ctx, client, dumpConfig)
+		if err != nil {
+			return fmt.Errorf("fetching state for workspace '%s': %w", ws, err)
+		}
+		targetState, err := state.NewKongState()
+		if err != nil {
+			return err
+		}
+		// Perform the diff/reset
+		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, isKonnect, resetJSONOutput, ApplyTypeFull)
+		if err != nil {
+			return fmt.Errorf("resetting workspace '%s': %w", ws, err)
+		}
+	}
+	return nil
+}
+
+func fetchWorkspaces(ctx context.Context, isKonnect bool) ([]string, error) {
+	baseClient, err := getClientForReset(ctx, rootConfig, isKonnect, &konnectConfig)
+	if err != nil {
+		return nil, fmt.Errorf("getting initial client: %w", err)
+	}
+
+	var workspaces []string
+	if resetAllWorkspaces {
+		workspaces, err = listWorkspaces(ctx, baseClient)
+		if err != nil {
+			return nil, fmt.Errorf("listing workspaces: %w", err)
+		}
+	} else if resetWorkspace != "" {
+		exists, err := workspaceExists(ctx, rootConfig, resetWorkspace, isKonnect)
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			return nil, fmt.Errorf("workspace '%v' does not exist", resetWorkspace)
+		}
+		workspaces = append(workspaces, resetWorkspace)
+	} else {
+		// No workspace provided: reset global entities only
+		workspaces = append(workspaces, "")
+	}
+	return workspaces, nil
 }

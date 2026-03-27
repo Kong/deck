@@ -44,9 +44,9 @@ func Test_LintPlain(t *testing.T) {
 }
 
 type lintErrors struct {
-	TotalCount int
-	FailCount  int
-	Results    []lint.Result
+	TotalCount int           `yaml:"total_count" json:"total_count"`
+	FailCount  int           `yaml:"fail_count" json:"fail_count"`
+	Results    []lint.Result `yaml:"results" json:"results"`
 }
 
 func Test_LintStructured(t *testing.T) {

@@ -11099,3 +11099,59 @@ func testSyncServicesTLSSansImpl(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - konnect
+func Test_Sync_KonnectWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+	tests := []struct {
+		name             string
+		initialStateFile string
+		updatedStateFile string
+	}{
+		{
+			name:             "sync entities into konnect workspace",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
+			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-updated.yaml",
+		},
+		{
+			name:             "sync empty workspace - no entities",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
+		},
+		{
+			name:             "sync without _workspace field in state file",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-no-workspace.yaml",
+		},
+		{
+			name:             "sync with different workspace name - workspace mismatch",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
+			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-mismatch.yaml",
+		},
+		{
+			name:             "sync then reset to empty workspace",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-entities.yaml",
+			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-initial.yaml",
+		},
+		{
+			name:             "sync multiple entities in a single file",
+			initialStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-multiple-entities.yaml",
+			updatedStateFile: "testdata/sync/050-konnect-workspace/konnect-workspace-with-multiple-entities-updated.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.initialStateFile))
+			// resync with no error
+			require.NoError(t, sync(ctx, tc.initialStateFile))
+			if tc.updatedStateFile == "" {
+				return
+			}
+			require.NoError(t, sync(ctx, tc.updatedStateFile))
+			// resync with no error
+			require.NoError(t, sync(ctx, tc.updatedStateFile))
+		})
+	}
+}

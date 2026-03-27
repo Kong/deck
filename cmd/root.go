@@ -258,6 +258,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newMergeCmd())
 		fileCmd.AddCommand(newPatchCmd())
 		fileCmd.AddCommand(newOpenapi2KongCmd())
+		fileCmd.AddCommand(newOpenapi2MCPCmd())
 		fileCmd.AddCommand(newFileRenderCmd())
 		fileCmd.AddCommand(newLintCmd())
 		fileCmd.AddCommand(newNamespaceCmd())
