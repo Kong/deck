@@ -332,43 +332,53 @@ func validateWithKong(
 	return validator.Validate(parsedFormatVersion)
 }
 
+// resolveAndValidateWorkspace resolves the workspace name from the flag/state file
+// and validates its existence. It returns the resolved workspace name.
+func resolveAndValidateWorkspace(
+	ctx context.Context, workspaceFlag string, targetContent *file.Content, isKonnect bool,
+) (string, error) {
+	if workspaceFlag == "" {
+		return "", nil
+	}
+	workspaceName := getWorkspaceName(workspaceFlag, targetContent, false)
+	if workspaceName == "" {
+		return "", nil
+	}
+	exists, err := workspaceExists(ctx, rootConfig, workspaceName, isKonnect)
+	if err != nil {
+		return "", err
+	}
+	if !exists {
+		return "", fmt.Errorf("workspace doesn't exist: %s", workspaceName)
+	}
+	return workspaceName, nil
+}
+
 func getKongClient(
 	ctx context.Context, targetContent *file.Content, mode mode,
 ) (*kong.Client, error) {
-	workspaceName := validateWorkspace
-	if validateWorkspace != "" {
-		if mode == modeKonnect {
-			return nil, fmt.Errorf("[workspaces] not supported by Konnect - use control planes instead")
-		}
-		// check if workspace exists
-		workspaceName := getWorkspaceName(validateWorkspace, targetContent, false)
-		workspaceExists, err := workspaceExists(ctx, rootConfig, workspaceName)
-		if err != nil {
-			return nil, err
-		}
-		if !workspaceExists {
-			return nil, fmt.Errorf("workspace doesn't exist: %s", workspaceName)
-		}
-	}
-
-	var (
-		kongClient *kong.Client
-		err        error
-	)
 	if mode == modeKonnect {
-		kongClient, err = GetKongClientForKonnectMode(ctx, &konnectConfig)
+		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
 		if err != nil {
 			return nil, err
 		}
 		dumpConfig.KonnectControlPlane = konnectControlPlane
-	} else {
-		wsConfig := rootConfig.ForWorkspace(workspaceName)
-		kongClient, err = reconcilerUtils.GetKongClient(wsConfig)
+		workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, true)
 		if err != nil {
 			return nil, err
 		}
+		if workspaceName != "" {
+			konnectConfig.WorkspaceName = workspaceName
+		}
+		kongClient.SetKonnectFlag(true)
+		return kongClient, nil
 	}
-	return kongClient, nil
+	workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, false)
+	if err != nil {
+		return nil, err
+	}
+	wsConfig := rootConfig.ForWorkspace(workspaceName)
+	return reconcilerUtils.GetKongClient(wsConfig)
 }
 
 // ensureGetAllMethod ensures at init time that `GetAll()` method exists on the relevant structs.

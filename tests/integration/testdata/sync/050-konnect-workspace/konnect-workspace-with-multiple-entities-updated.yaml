@@ -1,0 +1,110 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: default
+services:
+  - connect_timeout: 60000
+    enabled: true
+    host: httpbin.org
+    name: mock1
+    path: /anything
+    port: 80
+    protocol: http
+    read_timeout: 60000
+    retries: 5
+    write_timeout: 60000
+routes:
+  - name: route-multi-entity-1
+    paths:
+      - /route-multi-entity-1-updated
+    https_redirect_status_code: 302
+  - name: route-multi-entity-3
+    paths:
+      - /route-multi-entity-3
+    https_redirect_status_code: 301
+plugins:
+  - name: rate-limiting
+    route: route-multi-entity-1
+    config:
+      minute: 20
+      policy: local
+upstreams:
+  - algorithm: round-robin
+    hash_fallback: none
+    hash_on: none
+    hash_on_cookie_path: /
+    healthchecks:
+      active:
+        concurrency: 10
+        healthy:
+          http_statuses:
+            - 200
+            - 302
+          interval: 0
+          successes: 0
+        http_path: /
+        https_verify_certificate: true
+        timeout: 1
+        type: http
+        unhealthy:
+          http_failures: 0
+          http_statuses:
+            - 429
+            - 404
+            - 500
+            - 501
+            - 502
+            - 503
+            - 504
+            - 505
+          interval: 0
+          tcp_failures: 0
+          timeouts: 0
+      passive:
+        healthy:
+          http_statuses:
+            - 200
+            - 201
+            - 202
+            - 203
+            - 204
+            - 205
+            - 206
+            - 207
+            - 208
+            - 226
+            - 300
+            - 301
+            - 302
+            - 303
+            - 304
+            - 305
+            - 306
+            - 307
+            - 308
+          successes: 0
+        type: http
+        unhealthy:
+          http_failures: 0
+          http_statuses:
+            - 429
+            - 500
+            - 503
+          tcp_failures: 0
+          timeouts: 0
+      threshold: 0
+    name: upstream1
+    slots: 10000
+    sticky_sessions_cookie_path: /
+    targets:
+      - failover: false
+        target: 198.51.100.11:80
+        weight: 100
+    use_srv_name: false
+vaults:
+  - config:
+      base64_decode: false
+      prefix: MY_SECRET_
+    description: ENV vault for secrets
+    name: env
+    prefix: my-workspace-vault

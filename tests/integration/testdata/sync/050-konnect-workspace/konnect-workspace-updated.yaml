@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: default
+routes:
+  - name: r114
+    https_redirect_status_code: 301
+    paths:
+      - /r114

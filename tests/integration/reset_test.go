@@ -8,6 +8,7 @@ import (
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -127,4 +128,143 @@ func Test_Reset_ConsumerGroupConsumersWithCustomID_Konnect(t *testing.T) {
 	require.NoError(t, sync(context.Background(), "testdata/sync/028-consumer-group-consumers-custom_id/kong.yaml"))
 	reset(t)
 	testKongState(t, client, true, false, utils.KongRawState{}, nil)
+}
+
+func Test_Reset_KonnectWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		stateFile   string
+		resetFlags  []string
+		notContains string // if set, verify dump output does NOT contain this after reset
+	}{
+		{
+			name:        "reset workspace with single entity",
+			stateFile:   "testdata/reset/002-konnect-workspace/single-entity.yaml",
+			resetFlags:  []string{"--workspace", "test-workspace"},
+			notContains: "route-reset-1",
+		},
+		{
+			name:        "reset workspace with multiple entities",
+			stateFile:   "testdata/reset/002-konnect-workspace/multiple-entities.yaml",
+			resetFlags:  []string{"--workspace", "test-workspace"},
+			notContains: "route-reset",
+		},
+		{
+			name:        "reset without workspace flag (CP-level)",
+			stateFile:   "testdata/reset/002-konnect-workspace/no-workspace.yaml",
+			resetFlags:  []string{},
+			notContains: "route-no-workspace",
+		},
+		{
+			name:        "reset with default workspace name",
+			stateFile:   "testdata/reset/002-konnect-workspace/default-workspace.yaml",
+			resetFlags:  []string{"--workspace", "default"},
+			notContains: "route-default-ws",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			// Verify entity exists before reset
+			dumpFlags := []string{"-o", "-"}
+			if len(tc.resetFlags) > 0 {
+				dumpFlags = append(dumpFlags, tc.resetFlags...)
+			}
+			output, err := dump(dumpFlags...)
+			require.NoError(t, err)
+			assert.Contains(t, output, tc.notContains,
+				"Entity should exist before reset")
+
+			// Reset with the specified flags
+			reset(t, tc.resetFlags...)
+
+			// Verify entity is gone after reset
+			output, err = dump(dumpFlags...)
+			require.NoError(t, err)
+			assert.NotContains(t, output, tc.notContains,
+				"Entity should NOT exist after reset")
+		})
+	}
+}
+
+func Test_Reset_KonnectWorkspace_Isolation(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	// Reset everything first
+	reset(t)
+
+	// Sync entities to two different workspaces
+	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace1-entity.yaml"))
+	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace2-entity.yaml"))
+
+	// Verify both entities exist
+	output1, err := dump("-o", "-", "--workspace", "workspace1")
+	require.NoError(t, err)
+	assert.Contains(t, output1, "route-workspace1", "workspace1 entity should exist")
+
+	output2, err := dump("-o", "-", "--workspace", "workspace2")
+	require.NoError(t, err)
+	assert.Contains(t, output2, "route-workspace2", "workspace2 entity should exist")
+
+	// Reset only workspace1
+	reset(t, "--workspace", "workspace1")
+
+	// Verify workspace1 is empty
+	output1, err = dump("-o", "-", "--workspace", "workspace1")
+	require.NoError(t, err)
+	assert.NotContains(t, output1, "route-workspace1",
+		"workspace1 entity should be deleted after reset")
+
+	// Verify workspace2 still has its entity (isolation check)
+	output2, err = dump("-o", "-", "--workspace", "workspace2")
+	require.NoError(t, err)
+	assert.Contains(t, output2, "route-workspace2",
+		"workspace2 entity should NOT be affected by workspace1 reset")
+}
+
+func Test_Reset_KonnectWorkspace_AllWorkspaces(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	reset(t)
+
+	// Sync entities to two different workspaces
+	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace1-entity.yaml"))
+	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace2-entity.yaml"))
+
+	// Verify both entities exist
+	output1, err := dump("-o", "-", "--workspace", "workspace1")
+	require.NoError(t, err)
+	assert.Contains(t, output1, "route-workspace1", "workspace1 entity should exist")
+
+	output2, err := dump("-o", "-", "--workspace", "workspace2")
+	require.NoError(t, err)
+	assert.Contains(t, output2, "route-workspace2", "workspace2 entity should exist")
+
+	// Reset all workspaces
+	reset(t, "--all-workspaces")
+
+	// Verify workspace1 is empty
+	output1, err = dump("-o", "-", "--workspace", "workspace1")
+	require.NoError(t, err)
+	assert.NotContains(t, output1, "route-workspace1",
+		"workspace1 entity should be deleted after --all-workspaces reset")
+
+	// Verify workspace2 is also empty
+	output2, err = dump("-o", "-", "--workspace", "workspace2")
+	require.NoError(t, err)
+	assert.NotContains(t, output2, "route-workspace2",
+		"workspace2 entity should be deleted after --all-workspaces reset")
 }
