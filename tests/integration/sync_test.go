@@ -11101,3 +11101,136 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 		})
 	}
 }
+
+// Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities verifies that a
+// second sync does not crash with "entity already exists" when a plugin
+// references an external entity (consumer, route, service, or consumer-group)
+// that exists in Kong but is absent from the state file and dump.
+// FTI: https://konghq.atlassian.net/browse/FTI-7401
+func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		runWhen   func(t *testing.T)
+		setupFn   func(t *testing.T)
+		stateFile string
+	}{
+		{
+			name:    "plugins with consumer reference(consumer not in state file or in dump)-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Consumers.Create(ctx, &kong.Consumer{
+					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Username: kong.String("bob"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with route reference(route not in state file or in dump)-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				svc, err := client.Services.Create(ctx, &kong.Service{
+					Name: kong.String("external-service"), Host: kong.String("localhost"),
+					Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+				_, err = client.Routes.Create(ctx, &kong.Route{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
+					Paths: kong.StringSlice("/ext"), Service: &kong.Service{ID: svc.ID},
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with service reference(service not in state file or in dump)-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Services.Create(ctx, &kong.Service{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
+					Host: kong.String("localhost"), Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with consumer reference(consumer not in state file or in dump)",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Consumers.Create(ctx, &kong.Consumer{
+					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Username: kong.String("bob"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with route reference(route not in state file or in dump)",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				svc, err := client.Services.Create(ctx, &kong.Service{
+					Name: kong.String("external-service"), Host: kong.String("localhost"),
+					Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+				_, err = client.Routes.Create(ctx, &kong.Route{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
+					Paths: kong.StringSlice("~/ext"), Service: &kong.Service{ID: svc.ID},
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with service reference(service not in state file or in dump)",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Services.Create(ctx, &kong.Service{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
+					Host: kong.String("localhost"), Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with consumer-group reference(consumer-group not in state file or in dump)",
+			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.6.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.ConsumerGroups.Create(ctx, &kong.ConsumerGroup{
+					ID:   kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Name: kong.String("external-group"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-not-in-state-or-dump.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			reset(t)
+
+			// Pre-create the external entity via Admin API.
+			tc.setupFn(t)
+
+			// First sync — creates service, route, and plugins.
+			require.NoError(t, sync(ctx, tc.stateFile))
+
+			// Second diff — without the fix this crashes with "entity already exists".
+			_, err = diff(tc.stateFile)
+			require.NoError(t, err)
+		})
+	}
+}
