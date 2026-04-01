@@ -1,12 +1,19 @@
-_format_version: "3.0"
+_format_version: "1.1"
 _info:
   select_tags:
     - "managed-by-test"
 services:
-- name: example-service
+- name: example-service2
   port: 3200
   protocol: http
   host: localhost
+
+routes:
+- name: example-route-1
+  paths:
+  - /r1
+  service:
+    name: example-service2
   plugins:
     - config:
         minute: 100
@@ -18,7 +25,7 @@ services:
     - config:
         minute: 200
         policy: local
-      route: 8ca63651-4068-4baa-b2b9-08dc99c29666 # external-route's id
+      service: external-service # using name instead of UUID - should fail
       enabled: true
       name: rate-limiting
       protocols:

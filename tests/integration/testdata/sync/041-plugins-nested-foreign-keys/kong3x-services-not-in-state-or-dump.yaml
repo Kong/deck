@@ -1,4 +1,7 @@
 _format_version: "3.0"
+_info:
+  select_tags:
+    - "managed-by-test"
 services:
 - name: example-service
   port: 3200

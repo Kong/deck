@@ -19,6 +19,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
@@ -11120,6 +11121,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 		runWhen   func(t *testing.T)
 		setupFn   func(t *testing.T)
 		stateFile string
+		wantErr   bool
 	}{
 		{
 			name:    "plugins with consumer reference(consumer not in state file or in dump)-2.x",
@@ -11161,6 +11163,50 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 				require.NoError(t, err)
 			},
 			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-not-in-state-or-dump.yaml",
+		},
+		{
+			name:    "plugins with consumer name reference fails when consumer not in state-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Consumers.Create(ctx, &kong.Consumer{
+					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Username: kong.String("bob"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-consumers-name-not-in-state.yaml",
+			wantErr:   true,
+		},
+		{
+			name:    "plugins with route name reference fails when route not in state-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				svc, err := client.Services.Create(ctx, &kong.Service{
+					Name: kong.String("external-service"), Host: kong.String("localhost"),
+					Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+				_, err = client.Routes.Create(ctx, &kong.Route{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
+					Paths: kong.StringSlice("/ext"), Service: &kong.Service{ID: svc.ID},
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-routes-name-not-in-state.yaml",
+			wantErr:   true,
+		},
+		{
+			name:    "plugins with service name reference fails when service not in state-2.x",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=2.8.0 <3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Services.Create(ctx, &kong.Service{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
+					Host: kong.String("localhost"), Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/1_1/kong-services-name-not-in-state.yaml",
+			wantErr:   true,
 		},
 		{
 			name:    "plugins with consumer reference(consumer not in state file or in dump)",
@@ -11215,6 +11261,63 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 			},
 			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-not-in-state-or-dump.yaml",
 		},
+		{
+			name:    "plugins with consumer name reference fails when consumer not in state",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Consumers.Create(ctx, &kong.Consumer{
+					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Username: kong.String("bob"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-name-not-in-state.yaml",
+			wantErr:   true,
+		},
+		{
+			name:    "plugins with route name reference fails when route not in state",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				svc, err := client.Services.Create(ctx, &kong.Service{
+					Name: kong.String("external-service"), Host: kong.String("localhost"),
+					Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+				_, err = client.Routes.Create(ctx, &kong.Route{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
+					Paths: kong.StringSlice("~/ext"), Service: &kong.Service{ID: svc.ID},
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-name-not-in-state.yaml",
+			wantErr:   true,
+		},
+		{
+			name:    "plugins with service name reference fails when service not in state",
+			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.Services.Create(ctx, &kong.Service{
+					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
+					Host: kong.String("localhost"), Port: kong.Int(3200), Protocol: kong.String("http"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-name-not-in-state.yaml",
+			wantErr:   true,
+		},
+		{
+			name:    "plugins with consumer-group name reference fails when consumer-group not in state",
+			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.6.0") },
+			setupFn: func(t *testing.T) {
+				_, err := client.ConsumerGroups.Create(ctx, &kong.ConsumerGroup{
+					ID:   kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
+					Name: kong.String("external-group"),
+				})
+				require.NoError(t, err)
+			},
+			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumer-groups-name-not-in-state.yaml",
+			wantErr:   true,
+		},
 	}
 
 	for _, tc := range tests {
@@ -11225,8 +11328,15 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 			// Pre-create the external entity via Admin API.
 			tc.setupFn(t)
 
-			// First sync — creates service, route, and plugins.
-			require.NoError(t, sync(ctx, tc.stateFile))
+			// First, sync — creates service, route, and plugins.
+			err = sync(ctx, tc.stateFile)
+			if tc.wantErr {
+				require.Error(t, err)
+				require.True(t, errors.Is(err, state.ErrNotFound), "expected error to be %v, got: %v",
+					state.ErrNotFound, err)
+				return
+			}
+			require.NoError(t, err)
 
 			// Second diff — without the fix this crashes with "entity already exists".
 			_, err = diff(tc.stateFile)
