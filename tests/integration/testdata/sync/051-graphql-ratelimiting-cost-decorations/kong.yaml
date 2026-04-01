@@ -1,14 +1,4 @@
 _format_version: "3.0"
-plugins:
-  - config:
-      graphql_server_path: /graphql
-    enabled: true
-    name: degraphql
-    protocols:
-      - grpc
-      - grpcs
-      - http
-      - https
 services:
   - connect_timeout: 60000
     host: mockbin.org

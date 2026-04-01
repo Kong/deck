@@ -8141,6 +8141,58 @@ func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
 	})
 }
 
+func Test_Sync_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_GraphqlRateLimitingCostDecorations_Konnect",
+		testSyncGraphqlRateLimitingCostDecorationsKonnectImpl)
+}
+
+func testSyncGraphqlRateLimitingCostDecorationsKonnectImpl(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhen(t, "konnect", "")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"graphql_ratelimiting_cost_decorations"}}
+	ctx := context.Background()
+	t.Run("create graphql ratelimiting cost decoration", func(t *testing.T) {
+		require.NoError(t, sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong.yaml"))
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+		require.NoError(t, err)
+
+		require.Len(t, decorations, 1)
+
+		assert.Equal(t, "Query.users", *decorations[0].TypePath)
+		assert.InEpsilon(t, 1.0, *decorations[0].AddConstant, 0.01)
+	})
+
+	t.Run("create graphql ratelimiting cost decoration - all fields", func(t *testing.T) {
+		require.NoError(t,
+			sync(ctx, "testdata/sync/051-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml"))
+
+		newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+		require.NoError(t, err)
+
+		decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+		require.NoError(t, err)
+
+		assert.Len(t, decorations, 1)
+		assert.Equal(t, "Query.posts", *decorations[0].TypePath)
+		assert.InEpsilon(t, 2.0, *decorations[0].AddConstant, 0.01)
+		assert.InEpsilon(t, 1.5, *decorations[0].MulConstant, 0.01)
+
+		expectedAddArgs := kong.StringSlice("limit", "offset")
+		assert.Equal(t, expectedAddArgs, decorations[0].AddArguments)
+
+		expectedMulArgs := kong.StringSlice("first", "last")
+		assert.Equal(t, expectedMulArgs, decorations[0].MulArguments)
+	})
+}
+
 func Test_Sync_CustomEntitiesFake(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	setup(t)
