@@ -62,6 +62,8 @@ services:
     - /r2
     plugins:
     - config:
+        access:
+        - kong.log.err("bar")       kong.response.exit(418)
         # legacy field
         functions:
         - kong.log.err("foo")       kong.response.exit(418)
