@@ -219,11 +219,13 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 					oldField, newField, pluginName)
 
 				return pluginConfig
-			} else {
-				cprint.DeletePrintf("ERROR: Type mismatch when merging legacy field \"%s\" into new field \"%s\" in plugin %s: existing value is a list but legacy value is not\n", oldField, newField, pluginName)
-
-				return pluginConfig
 			}
+
+			cprint.DeletePrintf(
+				"ERROR: Type mismatch when merging legacy field \"%s\" into new field \"%s\" in plugin %s\n",
+				oldField, newField, pluginName,
+			)
+			return pluginConfig
 		}
 	}
 
