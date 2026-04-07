@@ -1,0 +1,11 @@
+_format_version: "3.0"
+
+services:
+- name: example-service
+  host: example.com
+  port: 80
+  protocol: http
+  routes:
+  - name: example-route
+    paths:
+    - /example
