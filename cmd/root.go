@@ -34,6 +34,7 @@ var (
 
 	disableAnalytics         bool
 	konnectConnectionDesired bool
+	suppressUpdateCheck      bool
 
 	konnectRuntimeGroup string
 	konnectControlPlane string
@@ -53,7 +54,8 @@ configuration file.
 
 It can be used to export, import, or sync entities to Kong.`,
 		SilenceUsage: true,
-		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+			maybePrintUpdateNotice(cmd)
 			if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
 				return fmt.Errorf("invalid URL: %w", err)
 			}
@@ -82,6 +84,13 @@ It can be used to export, import, or sync entities to Kong.`,
 			"Use `--analytics=false` to disable this.")
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
+
+	rootCmd.PersistentFlags().BoolVar(&suppressUpdateCheck, "suppress-update-check", false,
+		"Disable checking GitHub for newer decK releases.\n"+
+			"This value can also be set using DECK_SUPPRESS_UPDATE_CHECK "+
+			"environment variable.")
+	viper.BindPFlag("suppress-update-check",
+		rootCmd.PersistentFlags().Lookup("suppress-update-check"))
 
 	// TODO: everything below are online flags to be moved to the "gateway" subcommand
 	// moving them now would break to top-level commands (sync, diff, etc) we still
@@ -266,6 +275,11 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newKong2KicCmd())
 		fileCmd.AddCommand(newKong2TfCmd())
 	}
+	defaultHelpFunc := rootCmd.HelpFunc()
+	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		maybePrintUpdateNotice(cmd)
+		defaultHelpFunc(cmd, args)
+	})
 	return rootCmd
 }
 
