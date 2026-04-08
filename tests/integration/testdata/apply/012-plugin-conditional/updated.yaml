@@ -1,0 +1,8 @@
+_format_version: "3.0"
+plugins:
+- id: efead952-0a1d-43ec-9794-0ac6abdc7f55
+  name: key-auth
+  condition: service.name != "healthcheck-service"
+  config:
+    key_names: [apikey]
+  enabled: true

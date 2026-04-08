@@ -1265,3 +1265,37 @@ func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	assert.Contains(t, string(defaultOutput), "_workspace: default",
 		"default.yaml should contain _workspace: default")
 }
+
+func Test_Dump_Plugin_Conditional(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.14.0")
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/012-plugin-conditional/expected.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}
+
+func Test_Dump_Plugin_Conditional_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/012-plugin-conditional/expected-konnect.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}

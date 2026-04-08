@@ -11101,3 +11101,92 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 		})
 	}
 }
+
+// test scope:
+//   - enterprise >=3.14.0
+func Test_Sync_Plugin_Conditional(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.14.0")
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https"), kong.String("ws"), kong.String("wss")},
+				Condition: kong.String("route.name != \"health\""),
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostSync, nil)
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_Plugin_Conditional_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Plugin_Conditional_Konnect", testSyncPluginConditionalKonnectImpl)
+}
+
+func testSyncPluginConditionalKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled:   kong.Bool(true),
+				Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https"), kong.String("ws"), kong.String("wss")},
+				Condition: kong.String("route.name != \"health\""),
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostSync, nil)
+}
