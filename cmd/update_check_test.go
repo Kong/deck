@@ -23,7 +23,6 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 func resetUpdateCheckState() {
 	updateNoticeOnce = sync.Once{}
 	updateHTTPClient = &http.Client{Timeout: updateCheckTimeout}
-	rootConfig.Address = ""
 }
 
 func setVersionForTest(t *testing.T) {
@@ -44,10 +43,20 @@ func disableColorForTest(t *testing.T) {
 	})
 }
 
+func setRootAddressForTest(t *testing.T) {
+	t.Helper()
+	previousAddress := rootConfig.Address
+	rootConfig.Address = defaultKongURL
+	t.Cleanup(func() {
+		rootConfig.Address = previousAddress
+	})
+}
+
 func TestBuildUpdateNotice(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
@@ -139,6 +148,7 @@ func TestMaybePrintUpdateNoticePrintsOnceToStderr(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
@@ -194,6 +204,7 @@ func TestRootCommandSuppressesUpdateCheckWithEnvVar(t *testing.T) {
 	t.Setenv("DECK_SUPPRESS_UPDATE_CHECK", "true")
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
@@ -220,6 +231,7 @@ func TestRootCommandFlagFalseOverridesSuppressEnvVar(t *testing.T) {
 	t.Setenv("DECK_SUPPRESS_UPDATE_CHECK", "true")
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
@@ -245,6 +257,7 @@ func TestRootCommandSuppressesUpdateCheckWithJSONOutput(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
@@ -279,6 +292,7 @@ func TestRootHelpShowsUpdateNoticeOnStderr(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	setVersionForTest(t)
 	disableColorForTest(t)
+	setRootAddressForTest(t)
 
 	updateHTTPClient = &http.Client{
 		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {

@@ -75,7 +75,7 @@ func buildUpdateNotice(localVersion string) string {
 		return ""
 	}
 
-	latestVersion, err := fetchLatestReleaseVersion()
+	latestVersion, err := fetchLatestReleaseVersion(localVersion)
 	if err != nil {
 		return ""
 	}
@@ -91,13 +91,13 @@ func parseReleaseVersion(version string) (semver.Version, error) {
 	return semver.ParseTolerant(version)
 }
 
-func fetchLatestReleaseVersion() (semver.Version, error) {
+func fetchLatestReleaseVersion(localVersion string) (semver.Version, error) {
 	req, err := http.NewRequest(http.MethodGet, updateCheckURL, nil)
 	if err != nil {
 		return semver.Version{}, err
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", fmt.Sprintf("decK/%s", VERSION))
+	req.Header.Set("User-Agent", fmt.Sprintf("decK/%s", localVersion))
 
 	resp, err := updateHTTPClient.Do(req)
 	if err != nil {
