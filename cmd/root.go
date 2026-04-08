@@ -34,7 +34,6 @@ var (
 
 	disableAnalytics         bool
 	konnectConnectionDesired bool
-	suppressUpdateCheck      bool
 
 	konnectRuntimeGroup string
 	konnectControlPlane string
@@ -85,12 +84,10 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
-	rootCmd.PersistentFlags().BoolVar(&suppressUpdateCheck, "suppress-update-check", false,
+	rootCmd.PersistentFlags().Bool("suppress-update-check", false,
 		"Disable checking GitHub for newer decK releases.\n"+
 			"This value can also be set using DECK_SUPPRESS_UPDATE_CHECK "+
 			"environment variable.")
-	viper.BindPFlag("suppress-update-check",
-		rootCmd.PersistentFlags().Lookup("suppress-update-check"))
 
 	// TODO: everything below are online flags to be moved to the "gateway" subcommand
 	// moving them now would break to top-level commands (sync, diff, etc) we still

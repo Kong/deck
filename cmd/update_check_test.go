@@ -10,7 +10,6 @@ import (
 
 	"github.com/blang/semver/v4"
 	"github.com/fatih/color"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +23,6 @@ func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 func resetUpdateCheckState() {
 	updateNoticeOnce = sync.Once{}
 	updateHTTPClient = &http.Client{Timeout: updateCheckTimeout}
-	viper.Reset()
 	rootConfig.Address = ""
 }
 
@@ -65,8 +63,7 @@ func TestBuildUpdateNotice(t *testing.T) {
 		}),
 	}
 
-	notice, err := buildUpdateNotice("v1.2.3")
-	require.NoError(t, err)
+	notice := buildUpdateNotice("v1.2.3")
 	assert.Contains(t, notice, "== Update available v1.2.3 -> v1.2.4")
 	assert.Contains(t, notice, "Download & Release Notes: "+releaseNotesURL(mustParseVersion(t, "v1.2.4")))
 	assert.True(t, strings.HasSuffix(notice, "\n"))
@@ -132,8 +129,7 @@ func TestBuildUpdateNoticeSkipsInvalidOrNonNewerVersions(t *testing.T) {
 				}),
 			}
 
-			notice, err := buildUpdateNotice(tt.localVersion)
-			require.NoError(t, err)
+			notice := buildUpdateNotice(tt.localVersion)
 			assert.Equal(t, tt.wantNotice, notice)
 		})
 	}
@@ -157,7 +153,6 @@ func TestMaybePrintUpdateNoticePrintsOnceToStderr(t *testing.T) {
 	var stderr bytes.Buffer
 	cmd := NewRootCmd()
 	cmd.SetErr(&stderr)
-	viper.Set("suppress-update-check", false)
 
 	maybePrintUpdateNotice(cmd)
 	maybePrintUpdateNotice(cmd)

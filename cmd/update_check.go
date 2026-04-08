@@ -35,8 +35,8 @@ func maybePrintUpdateNotice(cmd *cobra.Command) {
 	}
 
 	updateNoticeOnce.Do(func() {
-		notice, err := buildUpdateNotice(VERSION)
-		if err != nil || notice == "" {
+		notice := buildUpdateNotice(VERSION)
+		if notice == "" {
 			return
 		}
 		fmt.Fprintln(cmd.ErrOrStderr(), notice)
@@ -69,22 +69,22 @@ func suppressUpdateCheckEnabled(cmd *cobra.Command) bool {
 	return false
 }
 
-func buildUpdateNotice(localVersion string) (string, error) {
+func buildUpdateNotice(localVersion string) string {
 	currentVersion, err := parseReleaseVersion(localVersion)
 	if err != nil {
-		return "", nil
+		return ""
 	}
 
 	latestVersion, err := fetchLatestReleaseVersion()
 	if err != nil {
-		return "", nil
+		return ""
 	}
 
 	if !latestVersion.GT(currentVersion) {
-		return "", nil
+		return ""
 	}
 
-	return formatUpdateNotice(currentVersion, latestVersion), nil
+	return formatUpdateNotice(currentVersion, latestVersion)
 }
 
 func parseReleaseVersion(version string) (semver.Version, error) {
