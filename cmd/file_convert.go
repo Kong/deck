@@ -20,6 +20,7 @@ var (
 	convertCmdOutputFileDeprecated string
 	convertCmdAssumeYes            bool
 	convertCmdStateFormat          string // yaml/json output
+	convertCmdNoExpandEnvVars      bool
 )
 
 func executeConvert(_ *cobra.Command, _ []string) error {
@@ -35,6 +36,11 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 	}
 
 	if convertCmdInputFile != "" {
+		envVarsMode := file.EnvVarsExpand
+		if convertCmdNoExpandEnvVars {
+			envVarsMode = file.EnvVarsSkip
+		}
+
 		if yes, err := utils.ConfirmFileOverwrite(
 			convertCmdOutputFile, "", convertCmdAssumeYes,
 		); err != nil {
@@ -49,11 +55,16 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			file.Format(strings.ToUpper(convertCmdStateFormat)),
 			sourceFormat,
 			destinationFormat,
-			false)
+			envVarsMode)
 		if err != nil {
 			return fmt.Errorf("converting file: %w", err)
 		}
 	} else if is2xTo3xConversion() {
+		envVarsMode := file.EnvVarsExpand
+		if convertCmdNoExpandEnvVars {
+			envVarsMode = file.EnvVarsSkip
+		}
+
 		path, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("getting current working directory: %w", err)
@@ -69,7 +80,7 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 				file.Format(strings.ToUpper(convertCmdStateFormat)),
 				sourceFormat,
 				destinationFormat,
-				false)
+				envVarsMode)
 			if err != nil {
 				return fmt.Errorf("converting '%s' file: %w", filename, err)
 			}
@@ -168,6 +179,8 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	convertCmd.Flags().StringVar(&convertCmdStateFormat, "format",
 		"yaml", "output file format: json or yaml.")
+	convertCmd.Flags().BoolVar(&convertCmdNoExpandEnvVars, "no-expand-env-vars",
+		false, `do not expand ${{ env "DECK_VAR_NAME" }} placeholders in the output.`)
 
 	return convertCmd
 }
