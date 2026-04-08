@@ -10,10 +10,13 @@ on:
   push:
     branches:
     - main
-  pull_request: {}
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   integration:
+    # Skip if the PR has the 'skip-ee' label
+    if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.labels.*.name, 'skip-ee') }}
     timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_GW_TIMEOUT || '10') }}
     strategy:
       matrix:
