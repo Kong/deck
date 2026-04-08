@@ -246,6 +246,31 @@ func TestRootCommandFlagFalseOverridesSuppressEnvVar(t *testing.T) {
 	assert.Contains(t, stderr.String(), "== Update available")
 }
 
+func TestRootCommandSuppressesUpdateCheckWithJSONOutput(t *testing.T) {
+	t.Cleanup(resetUpdateCheckState)
+	setVersionForTest(t, "v1.2.3")
+	disableColorForTest(t)
+
+	updateHTTPClient = &http.Client{
+		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
+				Header:     make(http.Header),
+			}, nil
+		}),
+	}
+
+	cmd := NewRootCmd()
+	var stderr bytes.Buffer
+	cmd.SetErr(&stderr)
+	cmd.SetArgs([]string{"gateway", "diff", "--json-output"})
+
+	err := cmd.Execute()
+	require.Error(t, err)
+	assert.NotContains(t, stderr.String(), "== Update available")
+}
+
 func TestSuppressUpdateCheckEnabledFromEnvWithoutViperInitialization(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	t.Setenv("DECK_SUPPRESS_UPDATE_CHECK", "true")

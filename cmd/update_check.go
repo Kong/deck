@@ -51,6 +51,13 @@ func suppressUpdateCheckEnabled(cmd *cobra.Command) bool {
 				return value
 			}
 		}
+
+		if flag := cmd.Flags().Lookup("json-output"); flag != nil {
+			value, err := cmd.Flags().GetBool("json-output")
+			if err == nil && value {
+				return true
+			}
+		}
 	}
 
 	if value, ok := os.LookupEnv("DECK_SUPPRESS_UPDATE_CHECK"); ok {
