@@ -82,11 +82,11 @@ func Convert(
 	outputFormat file.Format,
 	from Format,
 	to Format,
-	mockEnvVars bool,
+	envVarsMode file.RenderEnvVarsMode,
 ) error {
 	var outputContent *file.Content
 
-	inputContent, err := file.GetContentFromFiles(inputFilenames, mockEnvVars)
+	inputContent, err := file.GetContentFromFilesWithEnvVars(inputFilenames, envVarsMode)
 	if err != nil {
 		return err
 	}
