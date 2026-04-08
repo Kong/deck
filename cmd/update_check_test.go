@@ -26,10 +26,10 @@ func resetUpdateCheckState() {
 	rootConfig.Address = ""
 }
 
-func setVersionForTest(t *testing.T, version string) {
+func setVersionForTest(t *testing.T) {
 	t.Helper()
 	previousVersion := VERSION
-	VERSION = version
+	VERSION = "v1.2.3"
 	t.Cleanup(func() {
 		VERSION = previousVersion
 	})
@@ -46,7 +46,7 @@ func disableColorForTest(t *testing.T) {
 
 func TestBuildUpdateNotice(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
@@ -118,9 +118,9 @@ func TestBuildUpdateNoticeSkipsInvalidOrNonNewerVersions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Cleanup(resetUpdateCheckState)
-			setVersionForTest(t, "v1.2.3")
+			setVersionForTest(t)
 			updateHTTPClient = &http.Client{
-				Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+				Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 					return &http.Response{
 						StatusCode: tt.statusCode,
 						Body:       io.NopCloser(strings.NewReader(tt.responseBody)),
@@ -137,11 +137,11 @@ func TestBuildUpdateNoticeSkipsInvalidOrNonNewerVersions(t *testing.T) {
 
 func TestMaybePrintUpdateNoticePrintsOnceToStderr(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v1.2.4"}`)),
@@ -166,11 +166,11 @@ func TestMaybePrintUpdateNoticePrintsOnceToStderr(t *testing.T) {
 
 func TestRootCommandSuppressesUpdateCheckWithFlag(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
@@ -192,11 +192,11 @@ func TestRootCommandSuppressesUpdateCheckWithFlag(t *testing.T) {
 func TestRootCommandSuppressesUpdateCheckWithEnvVar(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	t.Setenv("DECK_SUPPRESS_UPDATE_CHECK", "true")
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
@@ -218,11 +218,11 @@ func TestRootCommandSuppressesUpdateCheckWithEnvVar(t *testing.T) {
 func TestRootCommandFlagFalseOverridesSuppressEnvVar(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
 	t.Setenv("DECK_SUPPRESS_UPDATE_CHECK", "true")
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
@@ -243,11 +243,11 @@ func TestRootCommandFlagFalseOverridesSuppressEnvVar(t *testing.T) {
 
 func TestRootCommandSuppressesUpdateCheckWithJSONOutput(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
@@ -277,11 +277,11 @@ func TestSuppressUpdateCheckEnabledFromEnvWithoutViperInitialization(t *testing.
 
 func TestRootHelpShowsUpdateNoticeOnStderr(t *testing.T) {
 	t.Cleanup(resetUpdateCheckState)
-	setVersionForTest(t, "v1.2.3")
+	setVersionForTest(t)
 	disableColorForTest(t)
 
 	updateHTTPClient = &http.Client{
-		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripFunc(func(_ *http.Request) (*http.Response, error) {
 			return &http.Response{
 				StatusCode: http.StatusOK,
 				Body:       io.NopCloser(strings.NewReader(`{"tag_name":"v999.0.0"}`)),
