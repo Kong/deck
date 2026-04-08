@@ -8,10 +8,14 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   integration:
+    # Skip if the PR has the 'skip-konnect' label
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip-konnect') }}
     timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_KONNECT_TIMEOUT || '10') }}
     env:
       KONG_ANONYMOUS_REPORTS: "off"
