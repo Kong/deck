@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [v1.57.1](#v1571)
+- [v1.57.2](#v1572)
 - [v1.57.0](#v1570)
 - [v1.56.0](#v1560)
 - [v1.55.2](#v1552)
@@ -134,7 +134,7 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [v1.57.1]
+## [v1.57.2]
 > Release date: 2026/04/08
 
 ### Fixed
@@ -2500,7 +2500,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK  
-[v1.57.1]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.1
+[v1.57.2]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.2
 [v1.57.0]: https://github.com/Kong/deck/compare/v1.56.0...v1.57.0
 [v1.56.0]: https://github.com/Kong/deck/compare/v1.55.2...v1.56.0
 [v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2
