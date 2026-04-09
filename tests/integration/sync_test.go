@@ -11259,6 +11259,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 				_, err = client.Routes.Create(ctx, &kong.Route{
 					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
 					Paths: kong.StringSlice("/ext"), Service: &kong.Service{ID: svc.ID},
+					Protocols: kong.StringSlice("http", "https"),
 				})
 				require.NoError(t, err)
 			},
@@ -11278,7 +11279,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 		},
 		{
 			name:    "plugins with consumer reference(consumer not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
 			setupFn: func(t *testing.T) {
 				_, err := client.Consumers.Create(ctx, &kong.Consumer{
 					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
@@ -11290,7 +11291,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 		},
 		{
 			name:    "plugins with route reference(route not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
 			setupFn: func(t *testing.T) {
 				svc, err := client.Services.Create(ctx, &kong.Service{
 					Name: kong.String("external-service"), Host: kong.String("localhost"),
@@ -11300,6 +11301,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 				_, err = client.Routes.Create(ctx, &kong.Route{
 					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
 					Paths: kong.StringSlice("~/ext"), Service: &kong.Service{ID: svc.ID},
+					Protocols: kong.StringSlice("http", "https"),
 				})
 				require.NoError(t, err)
 			},
@@ -11307,7 +11309,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 		},
 		{
 			name:    "plugins with service reference(service not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.0.0") },
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
 			setupFn: func(t *testing.T) {
 				_, err := client.Services.Create(ctx, &kong.Service{
 					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
@@ -11319,7 +11321,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 		},
 		{
 			name:    "plugins with consumer-group reference(consumer-group not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.6.0") },
+			runWhen: func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
 			setupFn: func(t *testing.T) {
 				_, err := client.ConsumerGroups.Create(ctx, &kong.ConsumerGroup{
 					ID:   kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
@@ -11351,22 +11353,13 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 }
 
 func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities_Konnect(t *testing.T) {
-	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
-
-	if isKonnect {
-		runDualTestWithSkipDefaults(t, "Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities_Konnect",
-			testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl)
-	} else {
-		// For Enterprise/OSS: run once
-		testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t)
-	}
+	runDualTestWithSkipDefaults(t, "Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities_Konnect",
+		testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl)
 }
 
 func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 	setup(t)
+	runWhenKonnect(t)
 
 	client, err := getTestClient()
 	require.NoError(t, err)
@@ -11375,13 +11368,11 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		runWhen   func(t *testing.T)
 		setupFn   func(t *testing.T)
 		stateFile string
 	}{
 		{
-			name:    "plugins with consumer reference(consumer not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.0.0") },
+			name: "plugins with consumer reference(consumer not in state file or in dump)",
 			setupFn: func(t *testing.T) {
 				_, err := client.Consumers.Create(ctx, &kong.Consumer{
 					ID:       kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
@@ -11392,8 +11383,7 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-consumers-not-in-state-or-dump.yaml",
 		},
 		{
-			name:    "plugins with route reference(route not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.0.0") },
+			name: "plugins with route reference(route not in state file or in dump)",
 			setupFn: func(t *testing.T) {
 				svc, err := client.Services.Create(ctx, &kong.Service{
 					Name: kong.String("external-service"), Host: kong.String("localhost"),
@@ -11403,14 +11393,14 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 				_, err = client.Routes.Create(ctx, &kong.Route{
 					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-route"),
 					Paths: kong.StringSlice("~/ext"), Service: &kong.Service{ID: svc.ID},
+					Protocols: kong.StringSlice("http", "https"),
 				})
 				require.NoError(t, err)
 			},
 			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-routes-not-in-state-or-dump.yaml",
 		},
 		{
-			name:    "plugins with service reference(service not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.0.0") },
+			name: "plugins with service reference(service not in state file or in dump)",
 			setupFn: func(t *testing.T) {
 				_, err := client.Services.Create(ctx, &kong.Service{
 					ID: kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"), Name: kong.String("external-service"),
@@ -11421,8 +11411,7 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 			stateFile: "testdata/sync/041-plugins-nested-foreign-keys/kong3x-services-not-in-state-or-dump.yaml",
 		},
 		{
-			name:    "plugins with consumer-group reference(consumer-group not in state file or in dump)",
-			runWhen: func(t *testing.T) { runWhenEnterpriseOrKonnect(t, ">=3.6.0") },
+			name: "plugins with consumer-group reference(consumer-group not in state file or in dump)",
 			setupFn: func(t *testing.T) {
 				_, err := client.ConsumerGroups.Create(ctx, &kong.ConsumerGroup{
 					ID:   kong.String("8ca63651-4068-4baa-b2b9-08dc99c29666"),
@@ -11436,7 +11425,6 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.runWhen(t)
 			reset(t)
 
 			// Pre-create the external entity via Admin API.
