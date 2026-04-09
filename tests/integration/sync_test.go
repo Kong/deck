@@ -3350,7 +3350,7 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 			expectedState: utils.KongRawState{
 				Plugins: plugin313,
 			},
-			runWhen: ">=3.13.0. <3.14.0",
+			runWhen: ">=3.13.0 <3.14.0",
 		},
 		{
 			name:     "create a plugin 3.14+",
