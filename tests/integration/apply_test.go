@@ -55,7 +55,7 @@ func Test_Apply_3x(t *testing.T) {
 			firstFile:     "testdata/apply/004-foreign-keys-consumer-groups/consumer-group-01.yaml",
 			secondFile:    "testdata/apply/004-foreign-keys-consumer-groups/consumer-01.yaml",
 			expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
-			runWhen:       "kong",
+			runWhen:       "enterprise",
 			version:       ">=3.0.0",
 		},
 		{

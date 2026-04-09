@@ -11602,11 +11602,9 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 	}
 }
 
-// Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities verifies that a
-// second sync does not crash with "entity already exists" when a plugin
-// references an external entity (consumer, route, service, or consumer-group)
-// that exists in Kong but is absent from the state file and dump.
-// FTI: https://konghq.atlassian.net/browse/FTI-7401
+// test scope:
+// - >=2.8.0 <3.0.0 kong+enterprise
+// - >=3.0.0 kong+enterprise
 func Test_Sync_Plugins_Nested_Foreign_Keys_External_Entities(t *testing.T) {
 	setup(t)
 
