@@ -1801,7 +1801,7 @@ var (
 			Name: kong.String("key-auth"),
 			Config: kong.Configuration{
 				"anonymous":        nil,
-				"hide_credentials": true,
+				"hide_credentials": false,
 				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
 				"key_in_body":      false,
 				"key_in_header":    true,
