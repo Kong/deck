@@ -184,7 +184,21 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-312.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0 <3.13.0") },
+		},
+		{
+			name:          ">=3.13.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-313.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0 <3.14.0") },
+		},
+		{
+			name:          ">=3.14.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-314.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -526,7 +540,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong312x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0 <3.13.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.13.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong313x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0") },
 		},
 	}
 
@@ -714,7 +735,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized services and routes",
 			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0 <3.14.0") },
+		},
+		{
+			name:         "dump sanitized services and routes >=3.14.0",
+			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected314.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.14.0") },
 		},
 		{
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
@@ -726,7 +753,19 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.6.0",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0 <3.13.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.13.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins313.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0 <3.14.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.14.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins314.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump sanitize with select-tags",
@@ -993,7 +1032,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/service-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/service-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: expression routes",
@@ -1011,13 +1056,25 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/consumer-group-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins, partials (rla) 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (rla) 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins (openid-connect) 3.4+",
@@ -1029,13 +1086,25 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugin rate-limiting 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugin rate-limiting 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "vaults skip-defaults 3.4",
@@ -1047,7 +1116,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: non-default shorthand fields",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-shorthand-non-default.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-shorthand-non-default.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: non-default shorthand fields 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-shorthand-non-default.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-shorthand-non-default.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "vaults skip-defaults 3.10+",
@@ -1065,7 +1140,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "credentials skip-defaults 3.4+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.14.0") },
+		},
+		{
+			name:         "credentials skip-defaults 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/credentials.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/credentials.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 	}
 
