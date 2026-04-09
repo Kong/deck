@@ -1,0 +1,9 @@
+_format_version: "1.1"
+services:
+- connect_timeout: 60000
+  host: ${{ env "DECK_SVC1_HOST" }}
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
