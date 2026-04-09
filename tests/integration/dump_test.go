@@ -1044,7 +1044,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: expression routes",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0") },
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: expression routes >=3.14.0",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/expression-routes.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/expression-routes.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.4",
