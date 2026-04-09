@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.57.2](#v1572)
 - [v1.57.0](#v1570)
 - [v1.56.0](#v1560)
 - [v1.55.2](#v1552)
@@ -132,6 +133,12 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.57.2]
+> Release date: 2026/04/08
+
+### Fixed
+- Environment variable expansion can be skipped in `deck file convert` using a new flag `--no-expand-env-vars`. [#1977](https://github.com/Kong/deck/pull/1977) [go-database-reconciler #444](https://github.com/Kong/go-database-reconciler/pull/444)
 
 ## [v1.57.0]
 > Release date: 2026/03/26
@@ -2492,7 +2499,8 @@ No breaking changes have been introduced in this release.
 
 ### Summary
 
-Debut release of decK
+Debut release of decK  
+[v1.57.2]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.2
 [v1.57.0]: https://github.com/Kong/deck/compare/v1.56.0...v1.57.0
 [v1.56.0]: https://github.com/Kong/deck/compare/v1.55.2...v1.56.0
 [v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2
