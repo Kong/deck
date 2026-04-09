@@ -10,6 +10,7 @@ const (
 	graphqlProxyCacheAdvancedPluginName   = "graphql-proxy-cache-advanced"
 	graphqlRateLimitingAdvancedPluginName = "graphql-rate-limiting-advanced"
 	proxyCacheAdvancedPluginName          = "proxy-cache-advanced"
+	redisPartialsPluginName               = "redis-partials"
 	aiProxyPluginName                     = "ai-proxy"
 	aiProxyAdvancedPluginName             = "ai-proxy-advanced"
 	aiRagInjectorPluginName               = "ai-rag-injector"
