@@ -3393,7 +3393,7 @@ func testSyncBasicAuthPluginKonnectImpl(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: plugin313,
+				Plugins: plugin314,
 			},
 		},
 	}
