@@ -6,7 +6,6 @@ consumers:
     name: key-auth
   - config:
       hide_credentials: false
-      ssl_verify: false
     name: basic-auth
   username: c1
 plugins:
@@ -18,7 +17,6 @@ plugins:
   name: key-auth-enc
 - config:
     hide_credentials: false
-    ssl_verify: false
   name: basic-auth
 - config:
     hide_credentials: false
@@ -26,7 +24,7 @@ plugins:
 - config:
     hide_credentials: false
     ldap_host: ldap.example.com
-    ssl_verify: false
+    verify_ldap_host: false
   name: ldap-auth
 - config:
     hide_credentials: false
@@ -41,7 +39,7 @@ plugins:
 - config:
     hide_credentials: false
     ldap_host: ldap.example.com
-    ssl_verify: false
+    verify_ldap_host: false
   name: ldap-auth-advanced
 - config:
     hide_credentials: true
@@ -56,11 +54,11 @@ plugins:
   name: http-log
 - config:
     issuer: https://auth.example.com
+    session_memcached_ssl_verify: false
     ssl_verify: false
   name: openid-connect
 - config:
     account_email: test@example.com
-    ssl_verify: false
   name: acme
 - config:
     http_endpoint: https://log.example.com
@@ -73,11 +71,9 @@ routes:
   plugins:
   - config:
       hide_credentials: false
-      ssl_verify: false
     name: basic-auth
   - config:
       account_email: test@example.com
-      ssl_verify: false
     name: acme
   protocols:
   - http
