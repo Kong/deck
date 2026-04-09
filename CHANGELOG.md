@@ -138,8 +138,8 @@
 ## [v1.57.3]
 > Release date: 2026/04/09
 
-### Added
-- Added support for nested `ssl_verify` field.
+### Fixed
+- Fixed nested `ssl_verify` field handling in `deck file convert` for `3.10` and `3.14`.
 [#1989](https://github.com/Kong/deck/pull/1989)
 
 ## [v1.57.2]
