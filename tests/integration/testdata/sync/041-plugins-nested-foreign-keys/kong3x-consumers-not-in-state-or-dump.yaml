@@ -1,0 +1,28 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+    - "managed-by-test"
+services:
+- name: example-service
+  port: 3200
+  protocol: http
+  host: localhost
+  plugins:
+    - config:
+        limit_by: consumer
+        minute: 6
+        policy: local
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+    - config:
+        limit_by: consumer
+        minute: 10
+        policy: local
+      consumer: 8ca63651-4068-4baa-b2b9-08dc99c29666 # bob's id
+      enabled: true
+      name: rate-limiting
+      protocols:
+        - http
+
