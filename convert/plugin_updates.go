@@ -210,7 +210,8 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	// If the new key is present along with old key, preserve value in new key
 	// The values in new key can be of a different type than the old key, so we won't attempt to merge
 	if _, exists := current[newKey]; exists {
-		cprint.DeletePrintf("Warning: legacy configuration field \"%s\" was ignored since new field \"%s\" was already present in plugin %s\n", oldField, newField, pluginName)
+		cprint.DeletePrintf("Warning: legacy configuration field \"%s\" was ignored"+
+			" since new field \"%s\" was already present in plugin %s\n", oldField, newField, pluginName)
 		return pluginConfig
 	}
 
