@@ -5,7 +5,6 @@ partials:
 - config:
     host: example.com
     keepalive_backlog: 0
-    ssl_verify: false
   id: 9e060517-7cae-4425-9ff1-1df11d0e9b5a
   name: my-partial-ee
   type: redis-ee
@@ -16,11 +15,6 @@ plugins:
     - abc-client
     client_secret:
     - abc-secret
-    cluster_cache_redis:
-      ssl_verify: false
     issuer: http://example-issuer.com
-    redis:
-      ssl_verify: false
-    session_redis_ssl_verify: false
   enabled: true
   name: openid-connect
