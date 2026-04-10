@@ -68,3 +68,20 @@ func expandToFiles(paths []string) ([]string, error) {
 	}
 	return result, nil
 }
+
+// batchFiles splits files into consecutive batches of at most size entries.
+// If size < 1, each file is its own batch (equivalent to size=1).
+func batchFiles(files []string, size int) [][]string {
+	if size < 1 {
+		size = 1
+	}
+	var batches [][]string
+	for i := 0; i < len(files); i += size {
+		end := i + size
+		if end > len(files) {
+			end = len(files)
+		}
+		batches = append(batches, files[i:end])
+	}
+	return batches
+}

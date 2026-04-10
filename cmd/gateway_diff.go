@@ -35,10 +35,10 @@ func executeDiff(cmd *cobra.Command, _ []string) error {
 		}
 
 		originalSelectorTags := dumpConfig.SelectorTags
-		for _, f := range expanded {
+		for _, batch := range batchFiles(expanded, syncBatchSize) {
 			dumpConfig.SelectorTags = originalSelectorTags
 
-			err := syncMain(cmd.Context(), []string{f}, true,
+			err := syncMain(cmd.Context(), batch, true,
 				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
 			if err != nil {
 				return err
@@ -147,6 +147,10 @@ that will be created, updated, or deleted.
 		false, "assume `yes` to prompts and run non-interactively.")
 	diffCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
 		false, "do not merge the state file with the existing configuration")
+	diffCmd.Flags().IntVar(&syncBatchSize, "batch-size",
+		1, "number of files to process per batch when --no-merge is set.\n"+
+			"Defaults to 1 (one file at a time). Use a higher value to process\n"+
+			"multiple files per batch for better performance.")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }
