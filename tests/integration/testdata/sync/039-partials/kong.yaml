@@ -3,6 +3,7 @@ partials:
 - config:
     read_timeout: 3001
     send_timeout: 2004
+    ssl_verify: false
   name: my-ee-partial
   type: redis-ee
   tags:
