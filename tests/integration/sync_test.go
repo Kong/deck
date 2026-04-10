@@ -302,6 +302,39 @@ var (
 		},
 	}
 
+	pluginKonnect = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+				"realm":            string("service"),
+				"brute_force_protection": map[string]interface{}{
+					"redis": map[string]interface{}{
+						"cloud_authentication": nil,
+						"database":             float64(0),
+						"host":                 nil,
+						"password":             nil,
+						"port":                 float64(6379),
+						"server_name":          nil,
+						"ssl":                  false,
+						"ssl_verify":           false,
+						"timeout":              float64(2000),
+						"username":             nil,
+					},
+					"strategy": string("off"),
+				},
+			},
+		},
+	}
+
 	plugin_on_entities = []*kong.Plugin{ //nolint:revive
 		{
 			Name: kong.String("prometheus"),
@@ -3393,7 +3426,7 @@ func testSyncBasicAuthPluginKonnectImpl(t *testing.T) {
 			name:     "create a plugin",
 			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
 			expectedState: utils.KongRawState{
-				Plugins: plugin314,
+				Plugins: pluginKonnect,
 			},
 		},
 	}
@@ -6088,7 +6121,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 								"sentinel_username":        nil,
 								"server_name":              nil,
 								"ssl":                      false,
-								"ssl_verify":               true,
+								"ssl_verify":               false,
 								"timeout":                  float64(2000),
 								"username":                 nil,
 							},
@@ -6146,7 +6179,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 								"sentinel_username":        nil,
 								"server_name":              nil,
 								"ssl":                      false,
-								"ssl_verify":               true,
+								"ssl_verify":               false,
 								"timeout":                  float64(2000),
 								"username":                 nil,
 							},
@@ -6204,7 +6237,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 								"sentinel_username":        nil,
 								"server_name":              nil,
 								"ssl":                      false,
-								"ssl_verify":               true,
+								"ssl_verify":               false,
 								"timeout":                  float64(2000),
 								"username":                 nil,
 							},
@@ -9483,7 +9516,7 @@ func testSyncPartialsPluginsKonnectImpl(t *testing.T) {
 		"read_timeout":             float64(3001),
 		"send_timeout":             float64(2004),
 		"ssl":                      bool(false),
-		"ssl_verify":               bool(true),
+		"ssl_verify":               bool(false),
 	}
 
 	t.Run("create a partial and link to a plugin via name", func(t *testing.T) {
