@@ -16,6 +16,29 @@ var (
 )
 
 func executeDiff(cmd *cobra.Command, _ []string) error {
+	if syncNoMerge && len(diffCmdKongStateFile) > 0 {
+		// Save original SelectorTags from CLI flags. syncMain mutates the global
+		// dumpConfig.SelectorTags via determineSelectorTag (picking up tags from
+		// each file's _info.select_tags), so we must restore them before each
+		// iteration to prevent the first file's tags from bleeding into the next.
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, file := range diffCmdKongStateFile {
+			if file == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+
+			dumpConfig.SelectorTags = originalSelectorTags
+
+			err := syncMain(cmd.Context(), []string{file}, true,
+				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	return syncMain(cmd.Context(), diffCmdKongStateFile, true,
 		diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
 }
@@ -113,6 +136,8 @@ that will be created, updated, or deleted.
 			"This flag is not valid with Konnect.")
 	diffCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	diffCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
+		false, "do not merge the state file with the existing configuration")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +16,29 @@ var (
 var applyCmdKongStateFile []string
 
 func executeApply(cmd *cobra.Command, _ []string) error {
+	if syncNoMerge && len(applyCmdKongStateFile) > 0 {
+		// Save original SelectorTags from CLI flags. syncMain mutates the global
+		// dumpConfig.SelectorTags via determineSelectorTag (picking up tags from
+		// each file's _info.select_tags), so we must restore them before each
+		// iteration to prevent the first file's tags from bleeding into the next.
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, file := range applyCmdKongStateFile {
+			if file == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+
+			dumpConfig.SelectorTags = originalSelectorTags
+
+			err := syncMain(cmd.Context(), []string{file}, false,
+				applyCmdParallelism, applyCmdDBUpdateDelay, applyWorkspace, applyJSONOutput, ApplyTypePartial)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	return syncMain(cmd.Context(), applyCmdKongStateFile, false,
 		applyCmdParallelism, applyCmdDBUpdateDelay, applyWorkspace, applyJSONOutput, ApplyTypePartial)
 }
@@ -53,6 +78,8 @@ func newApplyCmd() *cobra.Command {
 	applyCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
 	addSilenceEventsFlag(applyCmd.Flags())
+	applyCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
+		false, "do not merge the state file with the existing configuration")
 
 	return applyCmd
 }

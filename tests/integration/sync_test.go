@@ -11855,3 +11855,340 @@ func testSyncPluginsNestedForeignKeysExternalEntitiesKonnectImpl(t *testing.T) {
 		})
 	}
 }
+
+func Test_Sync_Entities_No_Merge(t *testing.T) {
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		runWhen     func(t *testing.T)
+		stateFiles  []string
+		assertFn    func(t *testing.T)
+		expectedErr string
+	}{
+		{
+			name:    "consumers from two tagged files are each synced independently",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/consumer1.yaml",
+				"testdata/sync/051-sync-no-merge/consumer2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				// tag1 scope must contain only consumer1
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"consumer-tag1"}}, t)
+				require.NoError(t, err)
+				consumers1, err := state1.Consumers.GetAll()
+				require.NoError(t, err)
+				require.Len(t, consumers1, 1)
+				assert.Equal(t, "consumer1", *consumers1[0].Username)
+
+				// tag2 scope must contain only consumer2
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"consumer-tag2"}}, t)
+				require.NoError(t, err)
+				consumers2, err := state2.Consumers.GetAll()
+				require.NoError(t, err)
+				require.Len(t, consumers2, 1)
+				assert.Equal(t, "consumer2", *consumers2[0].Username)
+			},
+		},
+		{
+			name:    "services from two tagged files are each synced independently",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/service1.yaml",
+				"testdata/sync/051-sync-no-merge/service2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				// svc-tag1 scope must contain only service1
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"svc-tag1"}}, t)
+				require.NoError(t, err)
+				services1, err := state1.Services.GetAll()
+				require.NoError(t, err)
+				require.Len(t, services1, 1)
+				assert.Equal(t, "service1", *services1[0].Name)
+
+				// svc-tag2 scope must contain only service2
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"svc-tag2"}}, t)
+				require.NoError(t, err)
+				services2, err := state2.Services.GetAll()
+				require.NoError(t, err)
+				require.Len(t, services2, 1)
+				assert.Equal(t, "service2", *services2[0].Name)
+			},
+		},
+		{
+			name:    "routes from two tagged files are each synced independently",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/route1.yaml",
+				"testdata/sync/051-sync-no-merge/route2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				// route-tag1 scope must contain only route1 (and its parent service)
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"route-tag1"}}, t)
+				require.NoError(t, err)
+				routes1, err := state1.Routes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, routes1, 1)
+				assert.Equal(t, "route1", *routes1[0].Name)
+
+				// route-tag2 scope must contain only route2 (and its parent service)
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"route-tag2"}}, t)
+				require.NoError(t, err)
+				routes2, err := state2.Routes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, routes2, 1)
+				assert.Equal(t, "route2", *routes2[0].Name)
+			},
+		},
+		{
+			name:    "consumer-groups from two tagged files are each synced independently",
+			runWhen: func(t *testing.T) { runWhen(t, "enterprise", ">=3.0.0") },
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/consumer-group1.yaml",
+				"testdata/sync/051-sync-no-merge/consumer-group2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				// cg-tag1 scope must contain only group1
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"cg-tag1"}}, t)
+				require.NoError(t, err)
+				groups1, err := state1.ConsumerGroups.GetAll()
+				require.NoError(t, err)
+				require.Len(t, groups1, 1)
+				assert.Equal(t, "group1", *groups1[0].Name)
+
+				// cg-tag2 scope must contain only group2
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"cg-tag2"}}, t)
+				require.NoError(t, err)
+				groups2, err := state2.ConsumerGroups.GetAll()
+				require.NoError(t, err)
+				require.Len(t, groups2, 1)
+				assert.Equal(t, "group2", *groups2[0].Name)
+			},
+		},
+		{
+			name:    "plugins from two tagged files are each synced independently",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/plugin1.yaml",
+				"testdata/sync/051-sync-no-merge/plugin2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				// plugin-tag1 scope must contain only rate-limiting
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"plugin-tag1"}}, t)
+				require.NoError(t, err)
+				plugins1, err := state1.Plugins.GetAll()
+				require.NoError(t, err)
+				require.Len(t, plugins1, 1)
+				assert.Equal(t, "rate-limiting", *plugins1[0].Name)
+
+				// plugin-tag2 scope must contain only request-size-limiting
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"plugin-tag2"}}, t)
+				require.NoError(t, err)
+				plugins2, err := state2.Plugins.GetAll()
+				require.NoError(t, err)
+				require.Len(t, plugins2, 1)
+				assert.Equal(t, "request-size-limiting", *plugins2[0].Name)
+			},
+		},
+		{
+			name:    "stdin input is rejected when --no-merge is set",
+			runWhen: func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			stateFiles: []string{
+				"-",
+				"testdata/sync/051-sync-no-merge/consumer1.yaml",
+			},
+			expectedErr: "cannot use --no-merge with stdin input",
+			assertFn:    func(t *testing.T) { t.Helper() },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			reset(t)
+
+			err := multiFileSync(ctx, tc.stateFiles, "--no-merge")
+
+			if tc.expectedErr != "" {
+				require.ErrorContains(t, err, tc.expectedErr)
+				return
+			}
+
+			require.NoError(t, err)
+			tc.assertFn(t)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_Entities_No_Merge_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Entities_No_Merge_Konnect", testSyncEntitiesNoMergeKonnectImpl)
+}
+
+func testSyncEntitiesNoMergeKonnectImpl(t *testing.T) {
+	runWhenKonnect(t)
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name        string
+		stateFiles  []string
+		assertFn    func(t *testing.T)
+		expectedErr string
+	}{
+		{
+			name: "consumers from two tagged files are each synced independently",
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/consumer1.yaml",
+				"testdata/sync/051-sync-no-merge/consumer2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"consumer-tag1"}}, t)
+				require.NoError(t, err)
+				consumers1, err := state1.Consumers.GetAll()
+				require.NoError(t, err)
+				require.Len(t, consumers1, 1)
+				assert.Equal(t, "consumer1", *consumers1[0].Username)
+
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"consumer-tag2"}}, t)
+				require.NoError(t, err)
+				consumers2, err := state2.Consumers.GetAll()
+				require.NoError(t, err)
+				require.Len(t, consumers2, 1)
+				assert.Equal(t, "consumer2", *consumers2[0].Username)
+			},
+		},
+		{
+			name: "services from two tagged files are each synced independently",
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/service1.yaml",
+				"testdata/sync/051-sync-no-merge/service2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"svc-tag1"}}, t)
+				require.NoError(t, err)
+				services1, err := state1.Services.GetAll()
+				require.NoError(t, err)
+				require.Len(t, services1, 1)
+				assert.Equal(t, "service1", *services1[0].Name)
+
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"svc-tag2"}}, t)
+				require.NoError(t, err)
+				services2, err := state2.Services.GetAll()
+				require.NoError(t, err)
+				require.Len(t, services2, 1)
+				assert.Equal(t, "service2", *services2[0].Name)
+			},
+		},
+		{
+			name: "routes from two tagged files are each synced independently",
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/route1.yaml",
+				"testdata/sync/051-sync-no-merge/route2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"route-tag1"}}, t)
+				require.NoError(t, err)
+				routes1, err := state1.Routes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, routes1, 1)
+				assert.Equal(t, "route1", *routes1[0].Name)
+
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"route-tag2"}}, t)
+				require.NoError(t, err)
+				routes2, err := state2.Routes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, routes2, 1)
+				assert.Equal(t, "route2", *routes2[0].Name)
+			},
+		},
+		{
+			name: "consumer-groups from two tagged files are each synced independently",
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/consumer-group1.yaml",
+				"testdata/sync/051-sync-no-merge/consumer-group2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"cg-tag1"}}, t)
+				require.NoError(t, err)
+				groups1, err := state1.ConsumerGroups.GetAll()
+				require.NoError(t, err)
+				require.Len(t, groups1, 1)
+				assert.Equal(t, "group1", *groups1[0].Name)
+
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"cg-tag2"}}, t)
+				require.NoError(t, err)
+				groups2, err := state2.ConsumerGroups.GetAll()
+				require.NoError(t, err)
+				require.Len(t, groups2, 1)
+				assert.Equal(t, "group2", *groups2[0].Name)
+			},
+		},
+		{
+			name: "plugins from two tagged files are each synced independently",
+			stateFiles: []string{
+				"testdata/sync/051-sync-no-merge/plugin1.yaml",
+				"testdata/sync/051-sync-no-merge/plugin2.yaml",
+			},
+			assertFn: func(t *testing.T) {
+				t.Helper()
+				state1, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"plugin-tag1"}}, t)
+				require.NoError(t, err)
+				plugins1, err := state1.Plugins.GetAll()
+				require.NoError(t, err)
+				require.Len(t, plugins1, 1)
+				assert.Equal(t, "rate-limiting", *plugins1[0].Name)
+
+				state2, err := fetchCurrentState(ctx, client, deckDump.Config{SelectorTags: []string{"plugin-tag2"}}, t)
+				require.NoError(t, err)
+				plugins2, err := state2.Plugins.GetAll()
+				require.NoError(t, err)
+				require.Len(t, plugins2, 1)
+				assert.Equal(t, "request-size-limiting", *plugins2[0].Name)
+			},
+		},
+		{
+			name: "stdin input is rejected when --no-merge is set",
+			stateFiles: []string{
+				"-",
+				"testdata/sync/051-sync-no-merge/consumer1.yaml",
+			},
+			expectedErr: "cannot use --no-merge with stdin input",
+			assertFn:    func(t *testing.T) { t.Helper() },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			setup(t)
+
+			err := multiFileSync(ctx, tc.stateFiles, "--no-merge")
+
+			if tc.expectedErr != "" {
+				require.ErrorContains(t, err, tc.expectedErr)
+				return
+			}
+
+			require.NoError(t, err)
+			tc.assertFn(t)
+		})
+	}
+}

@@ -1,0 +1,7 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - cg-tag1
+
+consumer_groups:
+- name: group1

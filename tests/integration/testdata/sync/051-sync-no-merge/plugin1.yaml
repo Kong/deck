@@ -1,0 +1,10 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - plugin-tag1
+
+plugins:
+- name: rate-limiting
+  config:
+    minute: 5
+    policy: local

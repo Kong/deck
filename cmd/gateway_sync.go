@@ -12,11 +12,35 @@ var (
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
 	syncJSONOutput       bool
+	syncNoMerge          bool
 )
 
 var syncCmdKongStateFile []string
 
 func executeSync(cmd *cobra.Command, _ []string) error {
+	if syncNoMerge && len(syncCmdKongStateFile) > 0 {
+		// Save original SelectorTags from CLI flags. syncMain mutates the global
+		// dumpConfig.SelectorTags via determineSelectorTag (picking up tags from
+		// each file's _info.select_tags), so we must restore them before each
+		// iteration to prevent the first file's tags from bleeding into the next.
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, file := range syncCmdKongStateFile {
+			if file == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+
+			dumpConfig.SelectorTags = originalSelectorTags
+
+			err := syncMain(cmd.Context(), []string{file}, false,
+				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	return syncMain(cmd.Context(), syncCmdKongStateFile, false,
 		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
 }
@@ -113,6 +137,8 @@ to get Kong's state in sync with the input state.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	syncCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
+		false, "do not merge the state file with the existing configuration")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }
