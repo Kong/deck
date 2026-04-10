@@ -207,26 +207,11 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	// Set the value to the new field
 	newKey := newKeys[len(newKeys)-1]
 
-	// If the new key is present in both, merge the contents.
-	if existingValue, exists := current[newKey]; exists {
-		switch existingValueTyped := existingValue.(type) {
-		case []interface{}:
-			if valueTyped, ok := value.([]interface{}); ok {
-				current[newKey] = append(existingValueTyped, valueTyped...)
-
-				cprint.UpdatePrintf("Automatically merged legacy configuration field \"%s\""+
-					" into the new field \"%s\" in plugin %s\n",
-					oldField, newField, pluginName)
-
-				return pluginConfig
-			}
-
-			cprint.DeletePrintf(
-				"ERROR: Type mismatch when merging legacy field \"%s\" into new field \"%s\" in plugin %s\n",
-				oldField, newField, pluginName,
-			)
-			return pluginConfig
-		}
+	// If the new key is present along with old key, preserve value in new key
+	// The values in new key can be of a different type than the old key, so we won't attempt to merge
+	if _, exists := current[newKey]; exists {
+		cprint.DeletePrintf("Warning: legacy configuration field \"%s\" was ignored since new field \"%s\" was already present in plugin %s\n", oldField, newField, pluginName)
+		return pluginConfig
 	}
 
 	current[newKey] = value
