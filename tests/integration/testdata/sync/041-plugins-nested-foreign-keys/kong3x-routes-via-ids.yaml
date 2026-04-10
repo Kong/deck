@@ -28,11 +28,17 @@ routes:
   id: 8ca63651-4068-4baa-b2b9-08dc99c296e0
   paths:
   - ~/r1
+  protocols:
+    - http
+    - https
   service:
     name: example-service
 - name: example-route-2
   id: 8ca63651-4068-4baa-b2b9-08dc99c29666
   paths:
   - ~/r2
+  protocols:
+    - http
+    - https
   service:
     name: example-service

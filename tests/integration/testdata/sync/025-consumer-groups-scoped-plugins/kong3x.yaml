@@ -14,6 +14,9 @@ services:
     https_redirect_status_code: 301
     paths:
     - /r1
+    protocols:
+    - http
+    - https
 
 consumer_groups:
 - id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
@@ -31,6 +34,8 @@ consumer_groups:
       - 60
       window_type: sliding
       sync_rate: -1
+      redis:
+        ssl_verify: false
 - id: 77e6691d-67c0-446a-9401-27be2b141aae
   name: gold
   consumers:
@@ -46,6 +51,8 @@ consumer_groups:
       - 60
       window_type: sliding
       sync_rate: -1
+      redis:
+        ssl_verify: false
 consumers:
 - username: foo
   keyauth_credentials:
@@ -62,6 +69,8 @@ consumers:
   - key: i-am-just-average
 plugins:
 - name: key-auth
+  config:
+    hide_credentials: false
   enabled: true
   protocols:
   - http
@@ -76,3 +85,5 @@ plugins:
     - 60
     window_type: sliding
     sync_rate: -1
+    redis:
+        ssl_verify: false
