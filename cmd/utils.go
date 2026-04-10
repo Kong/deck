@@ -3,11 +3,13 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
 	"slices"
 
 	"github.com/fatih/color"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/diff"
+	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/spf13/pflag"
 )
 
@@ -46,4 +48,23 @@ func validateInputFlag(flagName string, flagValue string, allowedValues []string
 
 	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",
 		flagValue, flagName, allowedValues)
+}
+
+// expandToFiles expands a list of file/directory paths into a flat list of
+// individual files. Directories are walked recursively.
+func expandToFiles(paths []string) ([]string, error) {
+	var result []string
+	for _, p := range paths {
+		fi, err := os.Stat(p)
+		if err != nil || !fi.IsDir() {
+			result = append(result, p)
+			continue
+		}
+		files, err := reconcilerUtils.ConfigFilesInDir(p)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, files...)
+	}
+	return result, nil
 }

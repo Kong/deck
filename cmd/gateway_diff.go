@@ -16,26 +16,29 @@ var (
 )
 
 func executeDiff(cmd *cobra.Command, _ []string) error {
-	if syncNoMerge && len(diffCmdKongStateFile) > 0 {
-		// Save original SelectorTags from CLI flags. syncMain mutates the global
-		// dumpConfig.SelectorTags via determineSelectorTag (picking up tags from
-		// each file's _info.select_tags), so we must restore them before each
-		// iteration to prevent the first file's tags from bleeding into the next.
-		originalSelectorTags := dumpConfig.SelectorTags
-		for _, file := range diffCmdKongStateFile {
-			if file == "-" {
+	if syncNoMerge {
+		for _, f := range diffCmdKongStateFile {
+			if f == "-" {
 				return fmt.Errorf("cannot use --no-merge with stdin input")
 			}
 		}
 
-		if err := checkCrossFileConflicts(diffCmdKongStateFile); err != nil {
+		// Expand any directory arguments into individual files so that each
+		// file gets its own syncMain call with only its own select_tags.
+		expanded, err := expandToFiles(diffCmdKongStateFile)
+		if err != nil {
 			return err
 		}
 
-		for _, file := range diffCmdKongStateFile {
+		if err := checkCrossFileConflicts(expanded); err != nil {
+			return err
+		}
+
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, f := range expanded {
 			dumpConfig.SelectorTags = originalSelectorTags
 
-			err := syncMain(cmd.Context(), []string{file}, true,
+			err := syncMain(cmd.Context(), []string{f}, true,
 				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
 			if err != nil {
 				return err

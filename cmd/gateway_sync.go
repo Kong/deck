@@ -18,20 +18,25 @@ var (
 var syncCmdKongStateFile []string
 
 func executeSync(cmd *cobra.Command, _ []string) error {
-	if syncNoMerge && len(syncCmdKongStateFile) > 0 {
-		// Save original SelectorTags from CLI flags. syncMain mutates the global
-		// dumpConfig.SelectorTags via determineSelectorTag (picking up tags from
-		// each file's _info.select_tags), so we must restore them before each
-		// iteration to prevent the first file's tags from bleeding into the next.
-		originalSelectorTags := dumpConfig.SelectorTags
-		for _, file := range syncCmdKongStateFile {
-			if file == "-" {
+	if syncNoMerge {
+		for _, f := range syncCmdKongStateFile {
+			if f == "-" {
 				return fmt.Errorf("cannot use --no-merge with stdin input")
 			}
+		}
 
+		// Expand any directory arguments into individual files so that each
+		// file gets its own syncMain call with only its own select_tags.
+		expanded, err := expandToFiles(syncCmdKongStateFile)
+		if err != nil {
+			return err
+		}
+
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, f := range expanded {
 			dumpConfig.SelectorTags = originalSelectorTags
 
-			err := syncMain(cmd.Context(), []string{file}, false,
+			err := syncMain(cmd.Context(), []string{f}, false,
 				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
 			if err != nil {
 				return err
