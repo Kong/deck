@@ -33,6 +33,12 @@ func Test_Validate_Konnect(t *testing.T) {
 			errorExpected:  false,
 		},
 		{
+			name:           "validate with konnect basic auth",
+			stateFile:      "testdata/validate/konnect-basic-auth.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
+		},
+		{
 			name:           "validate with --konnect-compatibility",
 			stateFile:      "testdata/validate/konnect.yaml",
 			additionalArgs: []string{"--konnect-compatibility"},
@@ -178,6 +184,12 @@ func Test_Validate_Gateway(t *testing.T) {
 			name:           "validate format version 1.1",
 			stateFile:      "testdata/validate/kong.yaml",
 			additionalArgs: []string{},
+		},
+		{
+			name:           "validate with kong basic auth",
+			stateFile:      "testdata/validate/kong-basic-auth.yaml",
+			additionalArgs: []string{},
+			errorExpected:  false,
 		},
 		{
 			name:           "validate format version 3.0",
