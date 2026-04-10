@@ -494,6 +494,151 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	return nil
 }
 
+// uniqueKeysByType maps each entity type name to the field names that must be
+// unique within that type. reflect.Value.FieldByName resolves promoted fields
+// from embedded structs automatically, so Kong entity types embedded inside
+// file.F* types work without extra logic.
+var uniqueKeysByType = map[string][]string{
+	"FService":             {"Name"},
+	"FRoute":               {"Name"},
+	"FConsumer":            {"Username", "CustomID"},
+	"FConsumerGroupObject": {"Name"},
+	"FUpstream":            {"Name"},
+	"FCertificate":         {"Cert"},
+	"FCACertificate":       {"Cert"},
+	"FVault":               {"Prefix"},
+	"FKey":                 {"Name"},
+	"FKeySet":              {"Name"},
+	"FPartial":             {"Name"},
+	"FRBACRole":            {"Name"},
+	"FFilterChain":         {"Name"},
+	"SNI":                  {"Name"},
+}
+
+// checkCrossFileConflicts merges all filenames into one file.Content (the same
+// way a regular multi-file sync would) and then scans the merged content for
+// duplicate entity IDs (globally unique across all types) and duplicate natural
+// keys (per entity type).
+func checkCrossFileConflicts(filenames []string) error {
+	merged, err := file.GetContentFromFiles(filenames, false)
+	if err != nil {
+		return err
+	}
+	return detectDuplicatesInContent(merged)
+}
+
+func detectDuplicatesInContent(content *file.Content) error {
+	globalIDs := map[string]bool{}              // id -> label of first claimant
+	perTypeKeys := map[string]map[string]bool{} // typeName -> "field=value" -> seen
+
+	cv := reflect.ValueOf(content).Elem()
+	for i := 0; i < cv.NumField(); i++ {
+		fv := cv.Field(i)
+		if !fv.IsValid() || fv.Kind() != reflect.Slice || fv.Len() == 0 {
+			continue
+		}
+		for j := 0; j < fv.Len(); j++ {
+			elem := derefValue(fv.Index(j))
+			if !elem.IsValid() || elem.Kind() != reflect.Struct {
+				continue
+			}
+			if err := checkEntityConflicts(elem, globalIDs, perTypeKeys); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func checkEntityConflicts(v reflect.Value, globalIDs map[string]bool, perTypeKeys map[string]map[string]bool) error {
+	typeName := v.Type().Name()
+
+	// IDs must be globally unique across all entity types.
+	if id := stringPtrField(v, "ID"); id != "" {
+		if _, ok := globalIDs[id]; ok {
+			return fmt.Errorf("duplicate ID %q on %s", id, typeName)
+		}
+		globalIDs[id] = true
+	}
+
+	// Natural keys must be unique within each entity type.
+	if fields, ok := uniqueKeysByType[typeName]; ok {
+		if perTypeKeys[typeName] == nil {
+			perTypeKeys[typeName] = map[string]bool{}
+		}
+		for _, fieldName := range fields {
+			val := stringPtrField(v, fieldName)
+			if val == "" {
+				continue
+			}
+			mapKey := fieldName + "=" + val
+			if perTypeKeys[typeName][mapKey] {
+				return fmt.Errorf("duplicate %s %q in %s", fieldName, val, typeName)
+			}
+			perTypeKeys[typeName][mapKey] = true
+		}
+	}
+
+	// Recurse into any slice-of-struct fields: routes/plugins/filter-chains under
+	// services, plugins under consumers, SNIs under certificates, targets under
+	// upstreams, etc. No explicit nesting registry is needed — we walk every field
+	// of the current struct and recurse whenever its element type is a struct.
+	t := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		fv := v.Field(i)
+		if fv.Kind() != reflect.Slice || fv.Len() == 0 {
+			continue
+		}
+		// Determine the element type after stripping pointer indirection.
+		elemType := t.Field(i).Type.Elem()
+		for elemType.Kind() == reflect.Ptr {
+			elemType = elemType.Elem()
+		}
+		if elemType.Kind() != reflect.Struct {
+			continue
+		}
+		for j := 0; j < fv.Len(); j++ {
+			elem := derefValue(fv.Index(j))
+			if !elem.IsValid() || elem.Kind() != reflect.Struct {
+				continue
+			}
+			if err := checkEntityConflicts(elem, globalIDs, perTypeKeys); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// derefValue follows pointer indirections until a non-pointer value is reached.
+// Returns a zero Value if a nil pointer is encountered.
+func derefValue(v reflect.Value) reflect.Value {
+	for v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return reflect.Value{}
+		}
+		v = v.Elem()
+	}
+	return v
+}
+
+// stringPtrField returns the string stored at a *string field named fieldName
+// within struct v, resolving promoted fields from embedded structs via
+// reflect.Value.FieldByName. Returns "" if the field does not exist, is not a
+// *string, or is nil.
+func stringPtrField(v reflect.Value, fieldName string) string {
+	fv := v.FieldByName(fieldName)
+	if !fv.IsValid() || fv.Kind() != reflect.Ptr || fv.IsNil() {
+		return ""
+	}
+	s, ok := fv.Interface().(*string)
+	if !ok || s == nil {
+		return ""
+	}
+	return *s
+}
+
 func validateSkipConsumersWithLookupTags(targetContent *file.Content) error {
 	if dumpConfig.SkipConsumers && targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil &&
 		(targetContent.Info.LookUpSelectorTags.Consumers != nil ||

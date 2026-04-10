@@ -26,7 +26,13 @@ func executeDiff(cmd *cobra.Command, _ []string) error {
 			if file == "-" {
 				return fmt.Errorf("cannot use --no-merge with stdin input")
 			}
+		}
 
+		if err := checkCrossFileConflicts(diffCmdKongStateFile); err != nil {
+			return err
+		}
+
+		for _, file := range diffCmdKongStateFile {
 			dumpConfig.SelectorTags = originalSelectorTags
 
 			err := syncMain(cmd.Context(), []string{file}, true,
