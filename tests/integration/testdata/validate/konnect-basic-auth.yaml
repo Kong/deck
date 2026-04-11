@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_konnect:
+  control_plane_name: default
+
+consumers:
+  - username: user
+    basicauth_credentials:
+      - username: user
+        password: pass

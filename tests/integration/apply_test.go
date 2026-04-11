@@ -24,6 +24,7 @@ func Test_Apply_3x(t *testing.T) {
 		secondFile    string
 		expectedState string
 		runWhen       string
+		version       string
 	}{
 		{
 			name:          "applies multiple of the same entity",
@@ -31,6 +32,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/001-same-type/service-02.yaml",
 			expectedState: "testdata/apply/001-same-type/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "applies different entity types",
@@ -38,6 +40,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/002-different-types/plugin-01.yaml",
 			expectedState: "testdata/apply/002-different-types/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer foreign keys",
@@ -45,6 +48,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/003-foreign-keys-consumers/plugin-01.yaml",
 			expectedState: "testdata/apply/003-foreign-keys-consumers/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer group foreign keys",
@@ -52,6 +56,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/004-foreign-keys-consumer-groups/consumer-01.yaml",
 			expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
 			runWhen:       "enterprise",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts service foreign keys",
@@ -59,20 +64,23 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/005-foreign-keys-services/plugin-01.yaml",
 			expectedState: "testdata/apply/005-foreign-keys-services/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
-			name:          "accepts route foreign keys",
+			name:          "accepts route foreign keys <3.14.0",
 			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
 			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
 			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0 <3.14.0",
 		},
 		{
-			name:          "accepts route foreign keys",
+			name:          "accepts route foreign keys >=3.14.0",
 			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
 			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
-			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
-			runWhen:       "kong",
+			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state-314.yaml",
+			runWhen:       "enterprise",
+			version:       ">=3.14.0",
 		},
 		{
 			name:          "accepts route updates",
@@ -80,6 +88,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/route-02.yaml",
 			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer group consumer updates",
@@ -87,11 +96,12 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
 			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
 			runWhen:       "enterprise",
+			version:       ">=3.0.0",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, tc.runWhen, ">=3.0.0")
+			runWhen(t, tc.runWhen, tc.version)
 			setup(t)
 			ctx := context.Background()
 			require.NoError(t, apply(ctx, tc.firstFile))
