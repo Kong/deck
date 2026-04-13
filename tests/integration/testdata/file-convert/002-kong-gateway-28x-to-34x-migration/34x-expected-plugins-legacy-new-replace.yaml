@@ -6,16 +6,6 @@ services:
   name: mockbin
   routes:
   - https_redirect_status_code: 301
-    name: r1
-    paths:
-    - /r1
-    plugins:
-    - config:
-        access:
-        - kong.log.err("bar")       kong.response.exit(418)
-      enabled: true
-      name: post-function
-  - https_redirect_status_code: 301
     name: r2
     paths:
     - /r2

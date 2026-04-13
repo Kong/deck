@@ -6,20 +6,6 @@ services:
   host: mockbin.org
   name: mockbin
   routes:
-  - name: r1
-    https_redirect_status_code: 301
-    paths:
-    - /r1
-    plugins:
-    - config:
-        # Both legacy and new fields are non empty
-        access:
-        - kong.log.err("bar")       kong.response.exit(418)
-        # legacy field
-        functions:
-        - kong.log.err("foo")       kong.response.exit(418)
-      enabled: true
-      name: post-function
   - name: r2
     https_redirect_status_code: 301
     paths:
