@@ -1,0 +1,27 @@
+_format_version: "3.0"
+plugins:
+- condition: route.name != "health"
+  config:
+    anonymous: null
+    hide_credentials: true
+    identity_realms:
+    - id: null
+      region: null
+      scope: cp
+    key_in_body: false
+    key_in_header: true
+    key_in_query: true
+    key_names:
+    - apikey
+    realm: null
+    run_on_preflight: true
+  enabled: true
+  id: efead952-0a1d-43ec-9794-0ac6abdc7f55
+  name: key-auth
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  - ws
+  - wss
