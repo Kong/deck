@@ -16,6 +16,38 @@ var (
 )
 
 func executeDiff(cmd *cobra.Command, _ []string) error {
+	if syncNoMerge {
+		for _, f := range diffCmdKongStateFile {
+			if f == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+		}
+
+		// Expand any directory arguments into individual files so that each
+		// file gets its own syncMain call with only its own select_tags.
+		expanded, err := expandToFiles(diffCmdKongStateFile)
+		if err != nil {
+			return err
+		}
+
+		if err := checkCrossFileConflicts(expanded); err != nil {
+			return err
+		}
+
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, batch := range batchFiles(expanded, syncBatchSize) {
+			dumpConfig.SelectorTags = originalSelectorTags
+
+			err := syncMain(cmd.Context(), batch, true,
+				diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	return syncMain(cmd.Context(), diffCmdKongStateFile, true,
 		diffCmdParallelism, 0, diffWorkspace, diffJSONOutput, ApplyTypeFull)
 }
@@ -113,6 +145,12 @@ that will be created, updated, or deleted.
 			"This flag is not valid with Konnect.")
 	diffCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	diffCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
+		false, "do not merge the state file with the existing configuration")
+	diffCmd.Flags().IntVar(&syncBatchSize, "batch-size",
+		1, "number of files to process per batch when --no-merge is set.\n"+
+			"Defaults to 1 (one file at a time). Use a higher value to process\n"+
+			"multiple files per batch for better performance.")
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }

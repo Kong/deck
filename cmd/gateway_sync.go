@@ -12,11 +12,41 @@ var (
 	syncCmdDBUpdateDelay int
 	syncWorkspace        string
 	syncJSONOutput       bool
+	syncNoMerge          bool
+	syncBatchSize        int
 )
 
 var syncCmdKongStateFile []string
 
 func executeSync(cmd *cobra.Command, _ []string) error {
+	if syncNoMerge {
+		for _, f := range syncCmdKongStateFile {
+			if f == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+		}
+
+		// Expand any directory arguments into individual files so that each
+		// file gets its own syncMain call with only its own select_tags.
+		expanded, err := expandToFiles(syncCmdKongStateFile)
+		if err != nil {
+			return err
+		}
+
+		originalSelectorTags := dumpConfig.SelectorTags
+		for _, batch := range batchFiles(expanded, syncBatchSize) {
+			dumpConfig.SelectorTags = originalSelectorTags
+
+			err := syncMain(cmd.Context(), batch, false,
+				syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
 	return syncMain(cmd.Context(), syncCmdKongStateFile, false,
 		syncCmdParallelism, syncCmdDBUpdateDelay, syncWorkspace, syncJSONOutput, ApplyTypeFull)
 }
@@ -113,6 +143,12 @@ to get Kong's state in sync with the input state.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	syncCmd.Flags().BoolVar(&syncNoMerge, "no-merge",
+		false, "do not merge the state file with the existing configuration")
+	syncCmd.Flags().IntVar(&syncBatchSize, "batch-size",
+		1, "number of files to process per batch when --no-merge is set.\n"+
+			"Defaults to 1 (one file at a time). Use a higher value to process\n"+
+			"multiple files per batch for better performance.")
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }

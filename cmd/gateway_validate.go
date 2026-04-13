@@ -25,18 +25,44 @@ var (
 	validateKonnectCompatibility    bool
 	validateWorkspace               string
 	validateParallelism             int
+	validateNoMerge                 bool
 )
 
 func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
 	return targetContent.Info != nil && targetContent.Info.LookUpSelectorTags != nil
 }
 
-func executeValidate(cmd *cobra.Command, _ []string) error {
+func validateMain(cmd *cobra.Command, _ []string) error {
+	if validateNoMerge && len(validateCmdKongStateFile) > 0 {
+		for _, file := range validateCmdKongStateFile {
+			if file == "-" {
+				return fmt.Errorf("cannot use --no-merge with stdin input")
+			}
+		}
+
+		if err := checkCrossFileConflicts(validateCmdKongStateFile); err != nil {
+			return err
+		}
+
+		for _, file := range validateCmdKongStateFile {
+			err := executeValidate(cmd.Context(), []string{file})
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	return executeValidate(cmd.Context(), validateCmdKongStateFile)
+}
+
+func executeValidate(ctx context.Context, validationStateFiles []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
 	// read target file
 	// this does json schema validation as well
-	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
+	targetContent, err := file.GetContentFromFiles(validationStateFiles, false)
 	if err != nil {
 		return err
 	}
@@ -50,7 +76,6 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
-	ctx := cmd.Context()
 	var kongClient *kong.Client
 	if validateOnline {
 		// if workspace is not set via flag, use the one in the state file
@@ -188,7 +213,7 @@ parsing issues. It also checks for foreign relationships
 and alerts if there are broken relationships, or missing links present.
 
 `
-	execute := executeValidate
+	execute := validateMain
 	argsValidator := cobra.MinimumNArgs(0)
 	var preRun func(cmd *cobra.Command, args []string) error
 
@@ -213,7 +238,7 @@ this command unless --online flag is used.
 				"         - the '--online' flag is removed, use either 'deck file' or 'deck gateway'\n"+
 				"         - the default changed from 'kong.yaml' to '-' (stdin/stdout)\n")
 
-			return executeValidate(cmd, args)
+			return executeValidate(cmd.Context(), args)
 		}
 		argsValidator = validateNoArgs
 		preRun = func(_ *cobra.Command, _ []string) error {
@@ -297,6 +322,8 @@ this command unless --online flag is used.
 		10, "Maximum number of concurrent requests to Kong.")
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
+	validateCmd.Flags().BoolVar(&validateNoMerge, "no-merge",
+		false, "indicate that the state file(s) should not be merged before validation.")
 
 	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "workspace")
 	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "rbac-resources-only")

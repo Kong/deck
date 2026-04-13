@@ -1,0 +1,9 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - plugin-tag2
+
+plugins:
+- name: request-size-limiting
+  config:
+    allowed_payload_size: 128

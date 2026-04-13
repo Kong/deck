@@ -1,0 +1,14 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - route-tag2
+
+services:
+- name: route-service2
+  host: route2.test
+  port: 80
+  protocol: http
+  routes:
+  - name: route2
+    paths:
+    - /route2

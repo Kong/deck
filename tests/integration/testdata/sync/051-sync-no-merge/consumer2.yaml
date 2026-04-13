@@ -1,0 +1,7 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - consumer-tag2
+
+consumers:
+- username: consumer2

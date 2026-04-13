@@ -1,0 +1,10 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - svc-tag1
+
+services:
+- name: service1
+  host: service1.test
+  port: 80
+  protocol: http
