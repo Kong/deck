@@ -153,9 +153,9 @@ func Test_FileConvert_28xTo34x(t *testing.T) {
 		},
 		{
 			name:               "handles conflicting new and legacy fields in plugins",
-			inputFile:          "/testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-plugins-legacy-new-replace.yaml",
+			inputFile:          "/testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-plugins-legacy-new-replace.yaml", //nolint:lll
 			errorExpected:      false,
-			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-plugins-legacy-new-replace.yaml",
+			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-plugins-legacy-new-replace.yaml", //nolint:lll
 		},
 	}
 
