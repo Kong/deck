@@ -11635,6 +11635,33 @@ func Test_Sync_KonnectWorkspace(t *testing.T) {
 	}
 }
 
+func Test_Sync_ConsumerGroupNotFoundForConsumer(t *testing.T) {
+	tests := []struct {
+		name          string
+		kongFile      string
+		expectedError string
+	}{
+		{
+			name:     "consumer references non-existent consumer group",
+			kongFile: "testdata/sync/051-consumer-group-not-found/kong.yaml",
+			expectedError: "building state: consumer-group 'non-existent-group' not " +
+				"found for consumer '58076db2-28b6-423b-ba39-a797193017f7'",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+			setup(t)
+
+			ctx := context.Background()
+
+			err := sync(ctx, tc.kongFile)
+			require.Error(t, err)
+			assert.EqualError(t, err, tc.expectedError)
+		})
+	}
+}
+
 // test scope:
 // - >=2.8.0 <3.0.0 kong+enterprise
 // - >=3.0.0 kong+enterprise
