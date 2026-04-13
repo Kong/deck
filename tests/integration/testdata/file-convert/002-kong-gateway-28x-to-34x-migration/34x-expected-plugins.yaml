@@ -76,6 +76,6 @@ services:
     plugins:
     - config:
         access:
-        - kong.log.err("bar")       kong.response.exit(418)
+        - kong.log.err("foo")       kong.response.exit(418)
       enabled: true
       name: post-function

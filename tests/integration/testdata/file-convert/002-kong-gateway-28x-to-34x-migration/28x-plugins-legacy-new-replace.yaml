@@ -1,0 +1,59 @@
+_format_version: "1.1"
+
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: mockbin
+  routes:
+  - name: r1
+    https_redirect_status_code: 301
+    paths:
+    - /r1
+    plugins:
+    - config:
+        # Both legacy and new fields are non empty
+        access:
+        - kong.log.err("bar")       kong.response.exit(418)
+        # legacy field
+        functions:
+        - kong.log.err("foo")       kong.response.exit(418)
+      enabled: true
+      name: post-function
+  - name: r2
+    https_redirect_status_code: 301
+    paths:
+    - /r2
+    plugins:
+    - config:
+        # Legacy field is empty, new field is non-empty
+        access:
+        - kong.log.err("bar")       kong.response.exit(418)
+        # legacy field
+        functions: []
+      enabled: true
+      name: post-function
+  - name: r3
+    https_redirect_status_code: 301
+    paths:
+    - /r3
+    plugins:
+    - config:
+        # Legacy field is nonempty, new field is empty
+        functions: #legacy field
+        - kong.log.err("bar")       kong.response.exit(418)
+        access: [] # new field
+      enabled: true
+      name: post-function
+  - name: r4
+    https_redirect_status_code: 301
+    paths:
+    - /r4
+    plugins:
+    - config:
+        # Legacy field is null, new field non-empty
+        access: #new field
+        - kong.log.err("bar")       kong.response.exit(418)
+        functions: null # legacy field
+      enabled: true
+      name: post-function

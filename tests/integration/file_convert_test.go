@@ -151,6 +151,12 @@ func Test_FileConvert_28xTo34x(t *testing.T) {
 			errorExpected:      false,
 			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-routes.yaml",
 		},
+		{
+			name:               "handles conflicting new and legacy fields in plugins",
+			inputFile:          "/testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-plugins-legacy-new-replace.yaml",
+			errorExpected:      false,
+			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-plugins-legacy-new-replace.yaml",
+		},
 	}
 
 	// This is required to create the full testfile names.
