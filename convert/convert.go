@@ -146,7 +146,10 @@ func Convert(
 		if len(inputFilenames) > 1 {
 			return fmt.Errorf("only one input file can be provided when converting from Kong 3.4 to Kong 3.10 format")
 		}
-		outputContent = convertKongGateway34xTo310x(inputContent)
+		outputContent, err = convertKongGateway34xTo310x(inputContent)
+		if err != nil {
+			return err
+		}
 
 		stateFileBytes, err := filebasics.ReadFile(inputFilenames[0])
 		if err != nil {
@@ -357,7 +360,10 @@ func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Con
 
 	outputContent := preprocessContent.DeepCopy()
 
-	updatePlugins(outputContent)
+	err = updatePlugins(outputContent)
+	if err != nil {
+		return nil, err
+	}
 
 	cprint.UpdatePrintf(
 		"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
@@ -373,10 +379,12 @@ func convertKongGateway28xTo34x(input *file.Content, filename string) (*file.Con
 // between the two LTS versions. It auto-fixes some configuration. The
 // configuration that can't be autofixed is left as is and the user is shown
 // warnings/errors about the same.
-func convertKongGateway34xTo310x(input *file.Content) *file.Content {
+func convertKongGateway34xTo310x(input *file.Content) (*file.Content, error) {
 	outputContent := input.DeepCopy()
 
-	updatePluginsFor310(outputContent)
+	if err := updatePluginsFor310(outputContent); err != nil {
+		return nil, err
+	}
 
 	cprint.UpdatePrintf(
 		"\nThese automatic changes may not be correct or exhaustive enough, please\n" +
@@ -384,7 +392,7 @@ func convertKongGateway34xTo310x(input *file.Content) *file.Content {
 			"For related information, please visit:\n" +
 			"https://docs.konghq.com/deck/latest/3.10-upgrade\n\n")
 
-	return outputContent
+	return outputContent, nil
 }
 
 // convertKongGateway310xTo314x is used to convert a Kong Gateway 3.10.x config
