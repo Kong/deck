@@ -142,7 +142,6 @@
 ### Added
 - Added support for generating `konnect_gateway_custom_plugin` in `deck file kong2tf`
 [#1979](https://github.com/Kong/deck/pull/1979)
-- Added a startup check that prints a short stderr notice when an update is available. [#1988](https://github.com/Kong/deck/pull/1988)
 
 ### Fixed
 - New fields will not be overwritten while using `deck file convert` with plugin configs containing both legacy and new keys. 
