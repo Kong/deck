@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.58.0](#v1580)
 - [v1.57.3](#v1573)
 - [v1.57.2](#v1572)
 - [v1.57.0](#v1570)
@@ -134,6 +135,24 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.58.0]
+> Release date: 2026/04/15
+
+### Added
+- Added support for generating `konnect_gateway_custom_plugin` in `deck file kong2tf`
+[#1979](https://github.com/Kong/deck/pull/1979)
+- Added a startup check that prints a short stderr notice when an update is available. [#1988](https://github.com/Kong/deck/pull/1988)
+
+### Fixed
+- New fields will not be overwritten while using `deck file convert` with plugin configs containing both legacy and new keys. 
+[#1974](https://github.com/Kong/deck/pull/1974)
+- Fixed online validation of basic-auth credentials. [#1975](https://github.com/Kong/deck/pull/1975)
+- Fixed the error message while using `deck gateway sync` for consumers with consumer groups to clearly show which consumer group is missing from state. [#1983](https://github.com/Kong/deck/pull/1983) [go-database-reconciler #442](https://github.com/Kong/go-database-reconciler/pull/442)
+
+### Chores
+- Upgraded go version to `v1.25.9`
+[#1997](https://github.com/Kong/deck/pull/1997)
 
 ## [v1.57.3]
 > Release date: 2026/04/09
@@ -2524,6 +2543,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.58.0]: https://github.com/Kong/deck/compare/v1.57.3...v1.58.0
 [v1.57.3]: https://github.com/Kong/deck/compare/v1.57.2...v1.57.3
 [v1.57.2]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.2
 [v1.57.0]: https://github.com/Kong/deck/compare/v1.56.0...v1.57.0
