@@ -148,7 +148,7 @@
 - New fields will not be overwritten while using `deck file convert` with plugin configs containing both legacy and new keys. 
 [#1974](https://github.com/Kong/deck/pull/1974)
 - Fixed online validation of basic-auth credentials. [#1975](https://github.com/Kong/deck/pull/1975)
-- Fixed the error message while using `deck gateway sync` for consumers with consumer groups to clearly show which consumer group is missing from state. [#1983](https://github.com/Kong/deck/pull/1983) [go-database-reconciler #442](https://github.com/Kong/go-database-reconciler/pull/442)
+- Fixed the error message while using `sync`, `apply` and `diff` commands for consumers with consumer groups to clearly show which consumer group is missing from state. [#1983](https://github.com/Kong/deck/pull/1983) [go-database-reconciler #442](https://github.com/Kong/go-database-reconciler/pull/442)
 
 ### Chores
 - Upgraded go version to `v1.25.9`
