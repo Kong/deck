@@ -228,3 +228,66 @@ import {
 	}, []string{})
 	require.Equal(t, expected, result)
 }
+
+func TestCustomPlugin(t *testing.T) {
+	jsonInput := `{
+		"name": "my-header",
+		"config": {
+			"nested": "subkey"
+		}
+	}`
+
+	var entity map[string]any
+	err := json.Unmarshal([]byte(jsonInput), &entity)
+	require.NoError(t, err)
+
+	expected := `resource "konnect_gateway_custom_plugin" "my-header" {
+  name = "my-header"
+  config = jsonencode({
+    nested = "subkey"
+  })
+
+  control_plane_id = var.control_plane_id
+}
+
+`
+
+	cpID := new(string)
+	*cpID = "abc-123"
+
+	result := generateResource("gateway_plugin", "my-header", entity, map[string]string{}, importConfig{
+		controlPlaneID: cpID,
+	}, []string{})
+	require.Equal(t, expected, result)
+}
+
+func TestBuiltInPlugin(t *testing.T) {
+	jsonInput := `{
+		"name": "basic-auth",
+		"config": {
+			"hide_credentials": true
+		}
+	}`
+
+	var entity map[string]any
+	err := json.Unmarshal([]byte(jsonInput), &entity)
+	require.NoError(t, err)
+
+	expected := `resource "konnect_gateway_plugin_basic-auth" "basic-auth" {
+  config = {
+    hide_credentials = true
+  }
+
+  control_plane_id = var.control_plane_id
+}
+
+`
+
+	cpID := new(string)
+	*cpID = "abc-123"
+
+	result := generateResource("gateway_plugin", "basic-auth", entity, map[string]string{}, importConfig{
+		controlPlaneID: cpID,
+	}, []string{})
+	require.Equal(t, expected, result)
+}
