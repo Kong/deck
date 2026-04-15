@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
-	configurationv1 "github.com/kong/kubernetes-configuration/api/configuration/v1"
+	configurationv1 "github.com/kong/kubernetes-configuration/v2/api/configuration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
