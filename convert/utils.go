@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"reflect"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -31,4 +32,20 @@ func removeServiceName(service *file.FService) *file.FService {
 	serviceCopy.Name = nil
 	serviceCopy.ID = kong.String(utils.UUID())
 	return serviceCopy
+}
+
+// isEmpty checks if a value is considered empty (nil, empty slice/array).
+func isEmpty(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	rv := reflect.ValueOf(v)
+
+	switch rv.Kind() { //nolint:exhaustive
+	case reflect.Slice, reflect.Array, reflect.Map:
+		return rv.Len() == 0
+	}
+
+	return false
 }
