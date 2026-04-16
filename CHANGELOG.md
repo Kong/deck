@@ -137,7 +137,7 @@
 - [v0.1.0](#v010)
 
 ## [v1.58.0]
-> Release date: 2026/04/15
+> Release date: 2026/04/20
 
 ### Added
 - Added support for generating `konnect_gateway_custom_plugin` in `deck file kong2tf`
