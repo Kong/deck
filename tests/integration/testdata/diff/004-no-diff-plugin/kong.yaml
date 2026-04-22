@@ -6,6 +6,7 @@ plugins:
       - https://foo.com/baz
       - https://foo.com/bar
       issuer: https://test.com
+      cache_tokens_salt: 5CjRldqVE1mQtsunhqKGAAA4U3big9Xc
   - config:
       bootstrap_servers:
       - host: foo-2.bar.com

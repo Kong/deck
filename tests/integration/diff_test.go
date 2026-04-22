@@ -844,7 +844,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 }
 
 // test scope:
-//   - 3.5
+//   - >=3.5
 func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 	tests := []struct {
 		name      string
