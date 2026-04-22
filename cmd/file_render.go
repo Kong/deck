@@ -17,13 +17,18 @@ var (
 
 func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
 	_ = sendAnalytics("file-render", "", modeLocal)
+	envVarsMode := file.EnvVarsMock
+	if fileRenderCmdPopulateEnvVars {
+		envVarsMode = file.EnvVarsExpand
+	}
+
 	return convert.Convert(
 		fileRenderCmdKongStateFile,
 		fileRenderCmdKongFileOutput,
 		file.Format(strings.ToUpper(fileRenderCmdStateFormat)),
 		convert.FormatDistributed,
 		convert.FormatKongGateway3x,
-		!fileRenderCmdPopulateEnvVars)
+		envVarsMode)
 }
 
 func newFileRenderCmd() *cobra.Command {

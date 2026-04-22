@@ -57,19 +57,88 @@ rules:
   ssl-verify-plugin-check:
     description: >-
       In Kong Gateway 3.14, the global tls_certificate_verify changed from off to on,
-      which affects the ssl_verify behavior for many plugins.
+      which affects ssl_verify behavior for many plugins, including nested config fields.
     given:
-      - $.plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
-      - $.services[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
-      - $.routes[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
-      - $.services[*].routes[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
-      - $.consumers[*].plugins[?(@.name == 'acme' || @.name == 'aws-lambda' || @.name == 'azure-functions' || @.name == 'http-log' || @.name == 'openid-connect' || @.name == 'forward-proxy' || @.name == 'ldap-auth' || @.name == 'ldap-auth-advanced' || @.name == 'tcp-log' || @.name == 'upstream-oauth')].config
+      - $..plugins[?(@.name == 'ai-aws-guardrail' || @.name == 'ai-azure-content-safety' || @.name == 'aws-lambda' || @.name == 'header-cert-auth' || @.name == 'http-log' || @.name == 'mtls-auth' || @.name == 'tcp-log')].config
+      - $..plugins[?(@.name == 'ace')].config.rate_limiting.redis
+      - $..plugins[?(@.name == 'acme')].config.storage_config.redis
+      - $..plugins[?(@.name == 'ai-proxy-advanced' || @.name == 'ai-rag-injector' || @.name == 'ai-semantic-cache' || @.name == 'ai-semantic-prompt-guard' || @.name == 'ai-semantic-response-guard')].config.vectordb.pgvector
+      - $..plugins[?(@.name == 'ai-proxy-advanced' || @.name == 'ai-rag-injector' || @.name == 'ai-rate-limiting-advanced' || @.name == 'ai-semantic-cache' || @.name == 'ai-semantic-prompt-guard' || @.name == 'ai-semantic-response-guard' || @.name == 'graphql-proxy-cache-advanced' || @.name == 'graphql-rate-limiting-advanced' || @.name == 'openid-connect' || @.name == 'proxy-cache-advanced' || @.name == 'rate-limiting' || @.name == 'rate-limiting-advanced' || @.name == 'response-ratelimiting' || @.name == 'saml' || @.name == 'service-protection')].config.redis
+      - $..plugins[?(@.name == 'basic-auth')].config.brute_force_protection.redis
+      - $..plugins[?(@.name == 'confluent' || @.name == 'confluent-consume' || @.name == 'kafka-consume' || @.name == 'kafka-log' || @.name == 'kafka-upstream')].config.security
+      - $..plugins[?(@.name == 'confluent' || @.name == 'confluent-consume' || @.name == 'kafka-consume' || @.name == 'kafka-log' || @.name == 'kafka-upstream')].config.schema_registry.confluent.authentication.oauth2_client
+      - $..plugins[?(@.name == 'kafka-consume')].config.topics.schema_registry.confluent.authentication.oauth2_client
+      - $..plugins[?(@.name == 'datakit')].config.resources.cache.redis
+      - $..plugins[?(@.name == 'datakit')].config.nodes[?(@.type == 'call')]
+      - $..plugins[?(@.name == 'openid-connect')].config.cluster_cache_redis
+      - $..plugins[?(@.name == 'redis-partials')].config
+      - $..plugins[?(@.name == 'request-callout')].config.cache.redis
+      - $..plugins[?(@.name == 'request-callout')].config.callouts.request.http_opts
+      - $..plugins[?(@.name == 'upstream-oauth')].config.client
+      - $..plugins[?(@.name == 'upstream-oauth')].config.cache.redis
     message: >-
       Kong Gateway 3.14 enables TLS certificate verification by default. Plugins that connect
       to external services over TLS without explicit ssl_verify settings will now verify
-      certificates. Set ssl_verify to false explicitly if your external services do not
-      have valid TLS certificates.
+      certificates. Set the affected ssl_verify field to false explicitly if your external
+      service does not have a valid TLS certificate.
     severity: warn
     then:
       - field: ssl_verify
+        function: defined
+
+  https-verify-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, TLS verification is enabled by default for plugin HTTP clients
+      that use https_verify.
+    given:
+      - $..plugins[?(@.name == 'azure-functions' || @.name == 'forward-proxy')].config
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. Plugins that use
+      https_verify will now verify certificates unless you set https_verify to false explicitly.
+    severity: warn
+    then:
+      - field: https_verify
+        function: defined
+
+  verify-ldap-host-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, LDAP plugins verify upstream TLS certificates by default through
+      verify_ldap_host.
+    given:
+      - $..plugins[?(@.name == 'ldap-auth' || @.name == 'ldap-auth-advanced')].config
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. LDAP plugins will now
+      verify certificates unless you set verify_ldap_host to false explicitly.
+    severity: warn
+    then:
+      - field: verify_ldap_host
+        function: defined
+
+  jwt-signer-ssl-verify-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, JWT Signer endpoint TLS verification defaults changed to enabled.
+    given:
+      - $..plugins[?(@.name == 'jwt-signer')].config
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. JWT Signer endpoint
+      clients will now verify certificates unless you set the affected ssl_verify fields to false.
+    severity: warn
+    then:
+      - field: access_token_endpoints_ssl_verify
+        function: defined
+      - field: channel_token_endpoints_ssl_verify
+        function: defined
+
+  openid-connect-session-memcached-ssl-verify-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, OpenID Connect session Memcached TLS verification defaults changed
+      to enabled.
+    given:
+      - $..plugins[?(@.name == 'openid-connect')].config
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. OpenID Connect will now
+      verify Memcached certificates unless you set session_memcached_ssl_verify to false explicitly.
+    severity: warn
+    then:
+      - field: session_memcached_ssl_verify
         function: defined

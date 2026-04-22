@@ -114,6 +114,27 @@ func (v *Validator) validateEntity(entityType string, entity interface{}) (bool,
 	return resp.StatusCode == http.StatusOK, nil
 }
 
+func getEmbeddedTypeFromWrappedType(wrappedType interface{}, entityType string) interface{} {
+	switch entityType {
+	case "basicauth_credentials":
+		if wrappedType == nil {
+			return wrappedType
+		}
+		// Prefer the pointer case (most common)
+		if baPtr, ok := wrappedType.(*state.BasicAuth); ok && baPtr != nil {
+			return &baPtr.BasicAuth
+		}
+		// Also handle a value (non-pointer) just in case
+		if baVal, ok := wrappedType.(state.BasicAuth); ok {
+			return &baVal.BasicAuth
+		}
+		// Fallback: unknown shape, return as-is to avoid panics
+		return wrappedType
+	}
+
+	return wrappedType
+}
+
 func (v *Validator) entities(obj interface{}, entityType string) []error {
 	entities, err := reconcilerUtils.CallGetAll(obj)
 	if err != nil {
@@ -138,7 +159,9 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 			defer wg.Done()
 			// release a slot when completed
 			defer func() { <-chanBuff }()
-			_, err := v.validateEntity(entityType, entities.Index(i).Interface())
+			entity := entities.Index(i).Interface()
+			embeddedEntity := getEmbeddedTypeFromWrappedType(entity, entityType)
+			_, err := v.validateEntity(entityType, embeddedEntity)
 			if err != nil {
 				mu.Lock()
 				errors = append(errors, err)

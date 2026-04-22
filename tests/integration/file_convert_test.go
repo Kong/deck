@@ -74,6 +74,55 @@ func Test_FileConvert(t *testing.T) {
 	}
 }
 
+func Test_FileConvert_NoExpandEnvVars(t *testing.T) {
+	tests := []struct {
+		name               string
+		additionalArgs     []string
+		envVars            map[string]string
+		expectedOutputFile string
+	}{
+		{
+			name:               "env vars are expanded by default",
+			additionalArgs:     []string{},
+			envVars:            map[string]string{"DECK_SVC1_HOST": "mockbin.org"},
+			expectedOutputFile: "testdata/file-convert/003-no-expand-env-vars/expected-expanded.yaml",
+		},
+		{
+			name:               "env vars are not expanded with --no-expand-env-vars",
+			additionalArgs:     []string{"--no-expand-env-vars"},
+			envVars:            map[string]string{"DECK_SVC1_HOST": "mockbin.org"},
+			expectedOutputFile: "testdata/file-convert/003-no-expand-env-vars/expected-no-expand.yaml",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for k, v := range tc.envVars {
+				t.Setenv(k, v)
+			}
+
+			args := append([]string{
+				"--from", "kong-gateway-2.x",
+				"--to", "kong-gateway-3.x",
+				"--input-file", "testdata/file-convert/003-no-expand-env-vars/input.yaml",
+			}, tc.additionalArgs...)
+			output, err := fileConvert(args...)
+
+			require.NoError(t, err)
+
+			var expectedOutput interface{}
+			var currentOutput interface{}
+			content, err := os.ReadFile(tc.expectedOutputFile)
+			require.NoError(t, err)
+
+			err = yaml.Unmarshal(content, &expectedOutput)
+			require.NoError(t, err)
+			err = yaml.Unmarshal([]byte(output), &currentOutput)
+			require.NoError(t, err)
+			assert.Equal(t, expectedOutput, currentOutput)
+		})
+	}
+}
+
 func Test_FileConvert_28xTo34x(t *testing.T) {
 	originalCwd, err := os.Getwd()
 	require.NoError(t, err)
@@ -101,6 +150,18 @@ func Test_FileConvert_28xTo34x(t *testing.T) {
 			inputFile:          "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-routes.yaml",
 			errorExpected:      false,
 			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-routes.yaml",
+		},
+		{
+			name:               "handles empty fields - either new or legacy fields in plugins",
+			inputFile:          "/testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-plugins-legacy-new-replace.yaml", //nolint:lll
+			errorExpected:      false,
+			expectedOutputFile: "testdata/file-convert/002-kong-gateway-28x-to-34x-migration/34x-expected-plugins-legacy-new-replace.yaml", //nolint:lll
+		},
+		{
+			name:          "errors out when both new and legacy fields are present in plugins",
+			inputFile:     "/testdata/file-convert/002-kong-gateway-28x-to-34x-migration/28x-legacy-new-conflict.yaml", //nolint:lll
+			errorExpected: true,
+			errorString:   "converting file: conflicting fields: both legacy field \"functions\" and new field \"access\" have values in plugin post-function", //nolint:lll
 		},
 	}
 

@@ -44,7 +44,7 @@ consumer_groups:
         sentinel_username: null
         server_name: null
         ssl: false
-        ssl_verify: true
+        ssl_verify: false
         timeout: 2000
         username: null
       retry_after_jitter_max: 0

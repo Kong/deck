@@ -1,0 +1,7 @@
+_format_version: "3.0"
+
+consumers:
+  - username: user
+    basicauth_credentials:
+      - username: user
+        password: pass

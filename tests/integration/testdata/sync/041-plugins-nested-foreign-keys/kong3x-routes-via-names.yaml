@@ -29,8 +29,14 @@ routes:
   - ~/r1
   service:
     name: example-service
+  protocols:
+    - http
+    - https
 - name: example-route-2
   paths:
   - ~/r2
   service:
     name: example-service
+  protocols:
+    - http
+    - https

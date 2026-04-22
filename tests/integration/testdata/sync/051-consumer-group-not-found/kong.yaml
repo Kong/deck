@@ -1,0 +1,7 @@
+_format_version: "3.0"
+consumers:
+- username: test-consumer
+  id: "58076db2-28b6-423b-ba39-a797193017f7"
+  groups:
+    - name: non-existent-group
+
