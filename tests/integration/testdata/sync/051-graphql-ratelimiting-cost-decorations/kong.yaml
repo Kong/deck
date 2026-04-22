@@ -1,6 +1,7 @@
 _format_version: "3.0"
 services:
-  - connect_timeout: 60000
+  - id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
+    connect_timeout: 60000
     host: mockbin.org
     name: svc1
     port: 80
@@ -10,8 +11,9 @@ services:
     write_timeout: 60000
 custom_entities:
   - type: graphql_ratelimiting_cost_decorations
+    id: a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
     fields:
       service:
-        name: svc1
+        id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
       type_path: "Query.users"
       add_constant: 1.0

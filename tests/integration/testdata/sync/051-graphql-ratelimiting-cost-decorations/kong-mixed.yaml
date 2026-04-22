@@ -1,9 +1,9 @@
 _format_version: "3.0"
 plugins:
-- config:
+- id: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
+  config:
     graphql_server_path: /graphql
   enabled: true
-  id: d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a
   name: degraphql
   protocols:
   - grpc
@@ -11,9 +11,9 @@ plugins:
   - http
   - https
 services:
-- connect_timeout: 60000
+- id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
+  connect_timeout: 60000
   host: mockbin.org
-  id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
   name: svc1
   port: 80
   protocol: http
@@ -22,10 +22,10 @@ services:
   write_timeout: 60000
 custom_entities:
   - type: degraphql_routes
-    id: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+    id: e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b
     fields:
-      uri: "/foo"
-      query: "query{ foo { bar } }"
+      uri: "/users"
+      query: "query{ users { id name } }"
       service:
         id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
   - type: graphql_ratelimiting_cost_decorations
@@ -35,8 +35,4 @@ custom_entities:
         id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
       type_path: "Query.users"
       add_constant: 1.0
-      add_arguments:
-        - "limit"
-      mul_arguments:
-        - "first"
 

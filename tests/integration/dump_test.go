@@ -1232,77 +1232,38 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 	}
 }
 
-func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 "+
-		"|| >=3.14.0.2")
-
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
-
-	if isKonnect {
-		runDualTestWithSkipDefaults(t, "Test_Dump_GraphqlRateLimitingCostDecorations",
-			testDumpGraphqlRateLimitingCostDecorationsImpl)
-	} else {
-		testDumpGraphqlRateLimitingCostDecorationsImpl(t)
-	}
-}
-
 // test scope:
 //   - enterprise
-//   - konnect
-func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
+func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 "+
+		"|| >=3.14.0.2")
 	setup(t)
 
 	ctx := context.Background()
 	tests := []struct {
-		name                string
-		stateFile           string
-		expectedContains    []string
-		notExpectedContains []string
+		name         string
+		stateFile    string
+		expectedFile string
 	}{
 		{
-			name:      "dump single decoration with all fields",
-			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
-			expectedContains: []string{
-				"graphql_ratelimiting_cost_decorations",
-				"Query.posts",
-				"add_constant",
-				"mul_constant",
-				"add_arguments",
-				"mul_arguments",
-				"limit",
-				"offset",
-				"first",
-				"last",
-			},
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-all-fields.yaml",
 		},
 		{
-			name:      "dump multiple decorations",
-			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
-			expectedContains: []string{
-				"graphql_ratelimiting_cost_decorations",
-				"Query.users",
-				"Query.posts",
-			},
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-multiple.yaml",
 		},
 		{
-			name:      "dump empty when none exist",
-			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
-			notExpectedContains: []string{
-				"graphql_ratelimiting_cost_decorations",
-				"custom_entities",
-			},
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-no-custom-entities.yaml",
 		},
 		{
-			name:      "dump mixed with other custom entity types",
-			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
-			expectedContains: []string{
-				"graphql_ratelimiting_cost_decorations",
-				"Query.users",
-				"degraphql_routes",
-				"/foo",
-			},
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-mixed.yaml",
 		},
 	}
 
@@ -1317,14 +1278,61 @@ func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 			output, err := dump("-o", "-")
 			require.NoError(t, err)
 
-			for _, expected := range tc.expectedContains {
-				assert.Contains(t, output, expected,
-					"dump output should contain %q", expected)
-			}
-			for _, notExpected := range tc.notExpectedContains {
-				assert.NotContains(t, output, notExpected,
-					"dump output should not contain %q", notExpected)
-			}
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-all-fields.yaml",
+		},
+		{
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-multiple.yaml",
+		},
+		{
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-no-custom-entities.yaml",
+		},
+		{
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-mixed.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
 		})
 	}
 }
