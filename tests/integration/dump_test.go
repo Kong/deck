@@ -1175,7 +1175,7 @@ func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 	}{
 		{
 			name:      "dump single decoration with all fields",
-			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
 			expectedContains: []string{
 				"graphql_ratelimiting_cost_decorations",
 				"Query.posts",
@@ -1191,7 +1191,7 @@ func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 		},
 		{
 			name:      "dump multiple decorations",
-			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong.yaml",
+			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
 			expectedContains: []string{
 				"graphql_ratelimiting_cost_decorations",
 				"Query.users",
@@ -1200,7 +1200,7 @@ func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 		},
 		{
 			name:      "dump empty when none exist",
-			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
 			notExpectedContains: []string{
 				"graphql_ratelimiting_cost_decorations",
 				"custom_entities",
@@ -1208,7 +1208,7 @@ func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 		},
 		{
 			name:      "dump mixed with other custom entity types",
-			stateFile: "testdata/dump/011-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			stateFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
 			expectedContains: []string{
 				"graphql_ratelimiting_cost_decorations",
 				"Query.users",
