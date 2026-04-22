@@ -11,7 +11,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.25.5
 	github.com/ettle/strcase v0.2.0
-	github.com/fatih/color v1.18.0
+	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.4.0
 	github.com/kong/go-database-reconciler v1.35.1
