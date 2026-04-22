@@ -145,8 +145,6 @@ func Test_Apply_3x(t *testing.T) {
 }
 
 func Test_Apply_Custom_Entities(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
-
 	// Check if running against Konnect for dual testing
 	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
@@ -162,39 +160,43 @@ func Test_Apply_Custom_Entities(t *testing.T) {
 }
 
 // test scope:
-//   - enterprise: >=3.0.0
+//   - enterprise: >=3.0.0 (degraphql routes)
+//   - enterprise: specific versions for graphql ratelimiting cost decorations
 //   - konnect
 func testApplyCustomEntitiesImpl(t *testing.T) {
-	setup(t)
+	const gqlRLCostDecoVersions = "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 || >=3.14.0.2"
 
-	ctx := context.Background()
 	tests := []struct {
 		name                   string
 		initialStateFile       string
 		targetPartialStateFile string
+		enterpriseVersions     string
 	}{
 		{
 			name:                   "degraphql routes",
 			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-degraphql-routes.yaml",
 			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-degraphql-routes.yaml",
+			enterpriseVersions:     ">=3.0.0",
 		},
 		{
 			name:                   "graphql ratelimiting cost decorations",
 			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-gql-rl-cost-deco.yaml",
 			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-gql-rl-cost-deco.yaml",
+			enterpriseVersions:     gqlRLCostDecoVersions,
 		},
 		{
 			name:                   "multiple graphql ratelimiting cost decorations",
 			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-multiple-gql-rl-cost-deco.yaml",
 			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-multiple-gql-rl-cost-deco.yaml",
+			enterpriseVersions:     gqlRLCostDecoVersions,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Cleanup(func() {
-				reset(t)
-			})
+			runWhenEnterpriseOrKonnect(t, tc.enterpriseVersions)
+			setup(t)
+			ctx := context.Background()
 			err := sync(ctx, tc.initialStateFile)
 			require.NoError(t, err)
 

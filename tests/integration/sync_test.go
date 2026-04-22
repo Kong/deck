@@ -8621,7 +8621,8 @@ func testSyncDegraphqlRoutesKonnectImpl(t *testing.T) {
 }
 
 func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.0.0")
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3"+
+		" || >=3.14.0.2")
 	setup(t)
 
 	client, err := getTestClient()

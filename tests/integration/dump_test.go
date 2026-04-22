@@ -1233,7 +1233,8 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 }
 
 func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
+	runWhenEnterpriseOrKonnect(t, "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 "+
+		"|| >=3.14.0.2")
 
 	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
@@ -1248,7 +1249,7 @@ func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
 }
 
 // test scope:
-//   - enterprise: >=3.0.0
+//   - enterprise
 //   - konnect
 func testDumpGraphqlRateLimitingCostDecorationsImpl(t *testing.T) {
 	setup(t)
