@@ -1,0 +1,11 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  host: mockbin.org
+  id: 66666666-6666-6666-6666-666666666666
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000

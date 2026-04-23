@@ -11,23 +11,23 @@ require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.25.5
 	github.com/ettle/strcase v0.2.0
-	github.com/fatih/color v1.18.0
+	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.4.0
-	github.com/kong/go-database-reconciler v1.35.1
-	github.com/kong/go-kong v0.74.0
+	github.com/kong/go-database-reconciler v1.36.1
+	github.com/kong/go-kong v0.75.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/sync v0.20.0
-	k8s.io/api v0.35.2
+	k8s.io/api v0.35.4
 	k8s.io/apiextensions-apiserver v0.33.1
-	k8s.io/apimachinery v0.35.2
-	k8s.io/client-go v0.35.2
-	k8s.io/code-generator v0.35.1
-	sigs.k8s.io/gateway-api v1.5.1
+	k8s.io/apimachinery v0.35.4
+	k8s.io/client-go v0.35.4
+	k8s.io/code-generator v0.35.3
+	sigs.k8s.io/gateway-api v1.3.0
 	sigs.k8s.io/yaml v1.6.0
 )
 
@@ -87,7 +87,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.52.0 // indirect
+	github.com/samber/lo v1.53.0 // indirect
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/sethvargo/go-password v0.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
