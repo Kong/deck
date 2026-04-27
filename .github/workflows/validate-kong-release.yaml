@@ -1,6 +1,6 @@
 name: Validate Kong Gateway Release
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ inputs.kong_image }}-${{ inputs.branch }}
 on:
   workflow_dispatch:
     inputs:
