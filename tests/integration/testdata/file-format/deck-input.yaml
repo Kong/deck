@@ -1,0 +1,23 @@
+_format_version: "3.0"
+_transform: false
+
+consumer_groups:
+- name: A-team
+  plugins:
+  - name: rate-limiting-advanced
+    config:
+      limit:
+      - 1000
+      window_size:
+      - 3600
+      window_type: sliding
+
+consumers:
+- username: tieske
+  custom_id: tieske-custom
+  groups:
+  - name: A-team
+- username: foo
+  custom_id: bar
+  groups:
+  - name: A-team
