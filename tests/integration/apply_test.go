@@ -24,6 +24,7 @@ func Test_Apply_3x(t *testing.T) {
 		secondFile    string
 		expectedState string
 		runWhen       string
+		version       string
 	}{
 		{
 			name:          "applies multiple of the same entity",
@@ -31,6 +32,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/001-same-type/service-02.yaml",
 			expectedState: "testdata/apply/001-same-type/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "applies different entity types",
@@ -38,6 +40,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/002-different-types/plugin-01.yaml",
 			expectedState: "testdata/apply/002-different-types/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer foreign keys",
@@ -45,6 +48,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/003-foreign-keys-consumers/plugin-01.yaml",
 			expectedState: "testdata/apply/003-foreign-keys-consumers/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer group foreign keys",
@@ -52,6 +56,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/004-foreign-keys-consumer-groups/consumer-01.yaml",
 			expectedState: "testdata/apply/004-foreign-keys-consumer-groups/expected-state.yaml",
 			runWhen:       "enterprise",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts service foreign keys",
@@ -59,20 +64,23 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/005-foreign-keys-services/plugin-01.yaml",
 			expectedState: "testdata/apply/005-foreign-keys-services/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
-			name:          "accepts route foreign keys",
+			name:          "accepts route foreign keys <3.14.0",
 			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
 			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
 			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0 <3.14.0",
 		},
 		{
-			name:          "accepts route foreign keys",
+			name:          "accepts route foreign keys >=3.14.0",
 			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
 			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
-			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state.yaml",
-			runWhen:       "kong",
+			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state-314.yaml",
+			runWhen:       "enterprise",
+			version:       ">=3.14.0",
 		},
 		{
 			name:          "accepts route updates",
@@ -80,6 +88,7 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/route-02.yaml",
 			expectedState: "testdata/apply/008-update-existing-nested-entity/route-expected-state.yaml",
 			runWhen:       "kong",
+			version:       ">=3.0.0",
 		},
 		{
 			name:          "accepts consumer group consumer updates",
@@ -87,11 +96,12 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/008-update-existing-nested-entity/consumer-group-02.yaml",
 			expectedState: "testdata/apply/008-update-existing-nested-entity/consumer-group-expected-state.yaml",
 			runWhen:       "enterprise",
+			version:       ">=3.0.0",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			runWhen(t, tc.runWhen, ">=3.0.0")
+			runWhen(t, tc.runWhen, tc.version)
 			setup(t)
 			ctx := context.Background()
 			require.NoError(t, apply(ctx, tc.firstFile))
@@ -135,8 +145,6 @@ func Test_Apply_3x(t *testing.T) {
 }
 
 func Test_Apply_Custom_Entities(t *testing.T) {
-	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
-
 	// Check if running against Konnect for dual testing
 	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
 		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
@@ -152,29 +160,43 @@ func Test_Apply_Custom_Entities(t *testing.T) {
 }
 
 // test scope:
-//   - enterprise: >=3.0.0
+//   - enterprise: >=3.0.0 (degraphql routes)
+//   - enterprise: specific versions for graphql ratelimiting cost decorations
 //   - konnect
 func testApplyCustomEntitiesImpl(t *testing.T) {
-	setup(t)
+	const gqlRLCostDecoVersions = "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 || >=3.14.0.2"
 
-	ctx := context.Background()
 	tests := []struct {
 		name                   string
 		initialStateFile       string
 		targetPartialStateFile string
+		enterpriseVersions     string
 	}{
 		{
 			name:                   "degraphql routes",
-			initialStateFile:       "testdata/apply/008-custom-entities/initial-state.yaml",
-			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update.yaml",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-degraphql-routes.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-degraphql-routes.yaml",
+			enterpriseVersions:     ">=3.0.0",
+		},
+		{
+			name:                   "graphql ratelimiting cost decorations",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-gql-rl-cost-deco.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-gql-rl-cost-deco.yaml",
+			enterpriseVersions:     gqlRLCostDecoVersions,
+		},
+		{
+			name:                   "multiple graphql ratelimiting cost decorations",
+			initialStateFile:       "testdata/apply/008-custom-entities/initial-state-multiple-gql-rl-cost-deco.yaml",
+			targetPartialStateFile: "testdata/apply/008-custom-entities/partial-update-multiple-gql-rl-cost-deco.yaml",
+			enterpriseVersions:     gqlRLCostDecoVersions,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Cleanup(func() {
-				reset(t)
-			})
+			runWhenEnterpriseOrKonnect(t, tc.enterpriseVersions)
+			setup(t)
+			ctx := context.Background()
 			err := sync(ctx, tc.initialStateFile)
 			require.NoError(t, err)
 
@@ -675,4 +697,179 @@ func Test_Apply_KonnectWorkspace(t *testing.T) {
 			assert.Equal(t, expected, out)
 		})
 	}
+}
+
+// test scope:
+//   - enterprise >=3.14.0
+func Test_Apply_Plugin_Conditional(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.14.0")
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled: kong.Bool(true),
+				Protocols: []*string{
+					kong.String("grpc"),
+					kong.String("grpcs"),
+					kong.String("http"),
+					kong.String("https"),
+					kong.String("ws"),
+					kong.String("wss"),
+				},
+				Condition: kong.String("route.name != \"health\""),
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostSync, nil)
+
+	// apply command to change condition
+	updatedFile := "testdata/apply/012-plugin-conditional/updated.yaml"
+	require.NoError(t, apply(ctx, updatedFile))
+
+	expectedStatePostApply := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled: kong.Bool(true),
+				Protocols: []*string{
+					kong.String("grpc"),
+					kong.String("grpcs"),
+					kong.String("http"),
+					kong.String("https"),
+					kong.String("ws"),
+					kong.String("wss"),
+				},
+				Condition: kong.String("service.name != \"healthcheck-service\""),
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostApply, nil)
+}
+
+// test scope:
+//   - konnect
+func Test_Apply_Plugin_Conditional_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_Plugin_Conditional_Konnect", testApplyPluginConditionalKonnectImpl)
+}
+
+func testApplyPluginConditionalKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled: kong.Bool(true),
+				Protocols: []*string{
+					kong.String("grpc"),
+					kong.String("grpcs"),
+					kong.String("http"),
+					kong.String("https"),
+					kong.String("ws"),
+					kong.String("wss"),
+				},
+				Condition: kong.String("route.name != \"health\""),
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostSync, nil)
+
+	// apply command to change condition
+	updatedFile := "testdata/apply/012-plugin-conditional/updated.yaml"
+	require.NoError(t, apply(ctx, updatedFile))
+
+	expectedStatePostApply := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name: kong.String("key-auth"),
+				Config: kong.Configuration{
+					"anonymous":        nil,
+					"hide_credentials": bool(true),
+					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+					"key_in_body":      bool(false),
+					"key_in_header":    bool(true),
+					"key_in_query":     bool(true),
+					"key_names":        []any{string("apikey")},
+					"realm":            nil,
+					"run_on_preflight": bool(true),
+				},
+				Enabled: kong.Bool(true),
+				Protocols: []*string{
+					kong.String("grpc"),
+					kong.String("grpcs"),
+					kong.String("http"),
+					kong.String("https"),
+					kong.String("ws"),
+					kong.String("wss"),
+				},
+				Condition: kong.String("service.name != \"healthcheck-service\""),
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostApply, nil)
 }

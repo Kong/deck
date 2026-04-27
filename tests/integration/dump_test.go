@@ -184,7 +184,21 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-312.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0 <3.13.0") },
+		},
+		{
+			name:          ">=3.13.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-313.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0 <3.14.0") },
+		},
+		{
+			name:          ">=3.14.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-314.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -526,7 +540,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong312x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.12.0 <3.13.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.13.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong313x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0") },
 		},
 	}
 
@@ -714,7 +735,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized services and routes",
 			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.0.0 <3.14.0") },
+		},
+		{
+			name:         "dump sanitized services and routes >=3.14.0",
+			stateFile:    "testdata/dump/008-sanitizer/services-routes.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/services-routes.expected314.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "kong", ">=3.14.0") },
 		},
 		{
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins",
@@ -726,7 +753,19 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.6.0",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins36.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.6.0 <3.13.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.13.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins313.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0 <3.14.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.14.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins314.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump sanitize with select-tags",
@@ -993,13 +1032,25 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/service-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: service, routes, service-scoped plugins 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/service-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/service-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: expression routes",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/expression-routes.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0") },
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.4.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: expression routes >=3.14.0",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/expression-routes.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/expression-routes.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhenExpressions(t, ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.4",
@@ -1011,13 +1062,25 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/consumer-group-scoped.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: consumers, consumer-groups, consumer-group scoped plugins 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/consumer-group-scoped.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/consumer-group-scoped.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins, partials (rla) 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (rla) 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugins (openid-connect) 3.4+",
@@ -1029,13 +1092,25 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-partial-2.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugin rate-limiting 3.10+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugin rate-limiting 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "vaults skip-defaults 3.4",
@@ -1047,7 +1122,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: non-default shorthand fields",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-shorthand-non-default.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.10+/plugin-shorthand-non-default.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.10.0 <3.14.0") },
+		},
+		{
+			name:         "dump skip-defaults: non-default shorthand fields 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-shorthand-non-default.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-shorthand-non-default.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 		{
 			name:         "vaults skip-defaults 3.10+",
@@ -1065,7 +1146,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "credentials skip-defaults 3.4+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.4/credentials.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.4.0 <3.14.0") },
+		},
+		{
+			name:         "credentials skip-defaults 3.14+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/credentials.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/credentials.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
 		},
 	}
 
@@ -1136,6 +1223,111 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 			require.NoError(t, sync(ctx, tc.stateFile))
 
 			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//   - enterprise
+func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 "+
+		"|| >=3.14.0.2")
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-all-fields.yaml",
+		},
+		{
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-multiple.yaml",
+		},
+		{
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-no-custom-entities.yaml",
+		},
+		{
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-mixed.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-all-fields.yaml",
+		},
+		{
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-multiple.yaml",
+		},
+		{
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-no-custom-entities.yaml",
+		},
+		{
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-mixed.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
 			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
@@ -1264,4 +1456,38 @@ func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	// Default workspace dump should contain _workspace: default
 	assert.Contains(t, string(defaultOutput), "_workspace: default",
 		"default.yaml should contain _workspace: default")
+}
+
+func Test_Dump_Plugin_Conditional(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.14.0")
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/012-plugin-conditional/expected.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}
+
+func Test_Dump_Plugin_Conditional_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/012-plugin-conditional/expected-konnect.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
 }

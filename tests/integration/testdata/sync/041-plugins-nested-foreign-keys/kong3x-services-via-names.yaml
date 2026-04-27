@@ -12,6 +12,9 @@ routes:
   - ~/r1
   service:
     name: example-service
+  protocols:
+    - http
+    - https
   plugins:
     - config:
         minute: 100

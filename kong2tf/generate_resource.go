@@ -94,9 +94,34 @@ func generateResourceWithCustomizations(
 		delete(entity, k)
 	}
 
+	isCustomPlugin := false
+	var s string
 	if entityType == "gateway_plugin" {
-		entityType = fmt.Sprintf("%s_%s", entityType, name)
-		delete(entity, "name")
+		// If `name` is not in availablePlugins, then it's a custom plugin and
+		// we should use the plugin name as the resource name
+		if !contains(availablePlugins, entity["name"].(string)) {
+			isCustomPlugin = true
+			if customizations == nil {
+				customizations = map[string]string{}
+			}
+			customizations["config"] = "jsonencode"
+
+			s = fmt.Sprintf(`
+resource "konnect_gateway_custom_plugin" "%s" {
+%s
+
+%s  control_plane_id = var.control_plane_id%s
+}
+`,
+				slugify(name),
+				strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
+				generateParents(parents),
+				generateLifecycle(lifecycle))
+
+		} else {
+			entityType = fmt.Sprintf("%s_%s", entityType, name)
+			delete(entity, "name")
+		}
 	}
 
 	// We don't need to prefix SNIs with the Cert name
@@ -107,17 +132,19 @@ func generateResourceWithCustomizations(
 		}
 	}
 
-	s := fmt.Sprintf(`
+	if !isCustomPlugin {
+		s = fmt.Sprintf(`
 resource "konnect_%s" "%s" {
 %s
 
 %s  control_plane_id = var.control_plane_id%s
 }
 `,
-		entityType, slugify(name),
-		strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
-		generateParents(parents),
-		generateLifecycle(lifecycle))
+			entityType, slugify(name),
+			strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
+			generateParents(parents),
+			generateLifecycle(lifecycle))
+	}
 
 	// Generate imports
 	if imports.controlPlaneID != nil && entityID != "" {

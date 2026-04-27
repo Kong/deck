@@ -1,5 +1,9 @@
 # Table of Contents
 
+- [v1.59.0](#v1590)
+- [v1.58.0](#v1580)
+- [v1.57.3](#v1573)
+- [v1.57.2](#v1572)
 - [v1.57.0](#v1570)
 - [v1.56.0](#v1560)
 - [v1.55.2](#v1552)
@@ -132,6 +136,73 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.59.0]
+> Release date: 2026/04/23
+
+### Added
+- Added support for `graphql_ratelimiting_cost_decorations` custom entity.
+[#1937](https://github.com/Kong/deck/pull/1937)
+[go-database-reconciler #428](https://github.com/Kong/go-database-reconciler/pull/428)
+[go-database-reconciler #459](https://github.com/Kong/go-database-reconciler/pull/459)
+[go-kong #608](https://github.com/Kong/go-kong/pull/608)
+
+### Fixed
+- Fixed OIDC plugin config by adding check for non-empty `cache_tokens_salt`.
+[#2021](https://github.com/Kong/deck/pull/2021)
+[go-database-reconciler #448](https://github.com/Kong/go-database-reconciler/pull/448)
+- Fixed `_plugin_config` to properly merge deeply nested objects and maps at all levels.
+[go-database-reconciler #453](https://github.com/Kong/go-database-reconciler/pull/453) 
+- Bumped `golang.org/x/net` from v0.50.0 to v0.51.0 to account for `CVE-2026-27141`
+[go-database-reconciler #450](https://github.com/Kong/go-database-reconciler/pull/450)
+- Bumped `github.com/moby/spdystream` from v0.5.0 to v0.5.1 to account for `CVE-2026-35469`
+[#2018](https://github.com/Kong/deck/pull/2018)
+
+## [v1.58.0]
+> Release date: 2026/04/20
+
+### Added
+- Added support for generating `konnect_gateway_custom_plugin` in `deck file kong2tf`
+[#1979](https://github.com/Kong/deck/pull/1979)
+
+### Fixed
+- New fields will not be overwritten while using `deck file convert` with plugin configs containing both legacy and new keys. 
+[#1974](https://github.com/Kong/deck/pull/1974)
+- Fixed online validation of basic-auth credentials. [#1975](https://github.com/Kong/deck/pull/1975)
+- Fixed the error message while using `sync`, `apply` and `diff` commands for consumers with consumer groups to clearly show which consumer group is missing from state. [#1983](https://github.com/Kong/deck/pull/1983) [go-database-reconciler #442](https://github.com/Kong/go-database-reconciler/pull/442)
+
+### Chores
+- Upgraded go version to `v1.25.9`
+[#1997](https://github.com/Kong/deck/pull/1997)
+
+## [v1.57.3]
+> Release date: 2026/04/09
+
+### Fixed
+- Fixed nested `ssl_verify` field handling in `deck file convert` for `3.10` and `3.14`.
+[#1989](https://github.com/Kong/deck/pull/1989)
+
+## [v1.57.2]
+> Release date: 2026/04/08
+
+### Added
+- Added support for plugin `condition` field.
+[#1981](https://github.com/Kong/deck/pull/1981)
+[go-database-reconciler #447](https://github.com/Kong/go-database-reconciler/pull/447)
+[go-kong #612](https://github.com/Kong/go-kong/pull/612)
+
+### Fixed
+- Environment variable expansion can be skipped in `deck file convert` using a new flag `--no-expand-env-vars`. 
+[#1977](https://github.com/Kong/deck/pull/1977) 
+[go-database-reconciler #444](https://github.com/Kong/go-database-reconciler/pull/444)
+- Fixed HTTP2 to HTTP1.1 downgrade by explicitly forcing the HTTP2 ALPN.
+[go-database-reconciler #446](https://github.com/Kong/go-database-reconciler/pull/446)
+- Fixed updating Upstream Target weights in Konnect by switching from PATCH to PUT.
+[#1956](https://github.com/Kong/deck/pull/1956)
+[go-kong #610](https://github.com/Kong/go-kong/pull/610)
+- Fixed sync failure when plugins reference entities not present in the state file.
+[#1971](https://github.com/Kong/deck/pull/1971)
+[go-database-reconciler #439](https://github.com/Kong/go-database-reconciler/pull/439)
 
 ## [v1.57.0]
 > Release date: 2026/03/26
@@ -2493,6 +2564,10 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.59.0]: https://github.com/Kong/deck/compare/v1.58.0...v1.59.0
+[v1.58.0]: https://github.com/Kong/deck/compare/v1.57.3...v1.58.0
+[v1.57.3]: https://github.com/Kong/deck/compare/v1.57.2...v1.57.3
+[v1.57.2]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.2
 [v1.57.0]: https://github.com/Kong/deck/compare/v1.56.0...v1.57.0
 [v1.56.0]: https://github.com/Kong/deck/compare/v1.55.2...v1.56.0
 [v1.55.2]: https://github.com/Kong/deck/compare/v1.55.1...v1.55.2

@@ -29,6 +29,10 @@ generate-cli-docs:
 	mkdir -p $(CLI_DOCS_PATH)
 	go run docs/*.go -output-path $(CLI_DOCS_PATH)
 
+.PHONY: generate-plugin-list
+generate-plugin-list:
+	@curl -Ss localhost:8001 | jq -r '.plugins.available_on_server | keys | "package kong2tf\n\nvar availablePlugins = []string{\n" + (map("    \"" + . + "\"") | join(",\n")) + ",\n}"' > kong2tf/available_plugins.go
+
 .PHONY: setup-kong
 setup-kong:
 	bash .ci/setup_kong.sh

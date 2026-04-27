@@ -96,50 +96,64 @@ func autoGenerateNamespaceForRLAPluginConsumerGroups(plugin *kong.ConsumerGroupP
 	return nil
 }
 
-func updatePlugins(content *file.Content) {
+func updatePlugins(content *file.Content) error {
 	for idx := range content.Plugins {
 		plugin := &content.Plugins[idx]
-		updateLegacyPluginConfig(plugin)
+		if err := updateLegacyPluginConfig(plugin); err != nil {
+			return err
+		}
 	}
 
 	for _, service := range content.Services {
 		for _, plugin := range service.Plugins {
-			updateLegacyPluginConfig(plugin)
+			if err := updateLegacyPluginConfig(plugin); err != nil {
+				return err
+			}
 		}
 
 		for _, route := range service.Routes {
 			for _, plugin := range route.Plugins {
-				updateLegacyPluginConfig(plugin)
+				if err := updateLegacyPluginConfig(plugin); err != nil {
+					return err
+				}
 			}
 		}
 	}
 
 	for _, route := range content.Routes {
 		for _, plugin := range route.Plugins {
-			updateLegacyPluginConfig(plugin)
+			if err := updateLegacyPluginConfig(plugin); err != nil {
+				return err
+			}
 		}
 	}
 
 	for _, consumer := range content.Consumers {
 		for _, plugin := range consumer.Plugins {
-			updateLegacyPluginConfig(plugin)
+			if err := updateLegacyPluginConfig(plugin); err != nil {
+				return err
+			}
 		}
 	}
 
 	for _, consumerGroup := range content.ConsumerGroups {
 		for _, plugin := range consumerGroup.Plugins {
-			updateLegacyPluginConfig(&file.FPlugin{
+			if err := updateLegacyPluginConfig(&file.FPlugin{
 				Plugin: kong.Plugin{
 					ID:     plugin.ID,
 					Name:   plugin.Name,
 					Config: plugin.Config,
 				},
-			})
+			}); err != nil {
+				return err
+			}
 		}
 	}
+
+	return nil
 }
 
-func updateLegacyPluginConfig(plugin *file.FPlugin) {
+func updateLegacyPluginConfig(plugin *file.FPlugin) error {
 	if plugin != nil && plugin.Config != nil {
 		config := plugin.Config.DeepCopy()
 
@@ -148,26 +162,37 @@ func updateLegacyPluginConfig(plugin *file.FPlugin) {
 			pluginName = *plugin.Name
 		}
 
-		config = updateLegacyFieldToNewField(config, "blacklist", "deny", pluginName)
+		config, err := updateLegacyFieldToNewField(config, "blacklist", "deny", pluginName)
+		if err != nil {
+			return err
+		}
 
-		config = updateLegacyFieldToNewField(config, "whitelist", "allow", pluginName)
+		config, err = updateLegacyFieldToNewField(config, "whitelist", "allow", pluginName)
+		if err != nil {
+			return err
+		}
 
 		if pluginName != "" {
 			if pluginName == awsLambdaPluginName {
 				config = removeDeprecatedFields3x(config, "proxy_scheme", pluginName)
 			}
 			if pluginName == prefunctionPluginName || pluginName == postfunctionPluginName {
-				config = updateLegacyFieldToNewField(config, "functions", "access", pluginName)
+				config, err = updateLegacyFieldToNewField(config, "functions", "access", pluginName)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
 		plugin.Config = config
 	}
+
+	return nil
 }
 
 func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	oldField, newField, pluginName string,
-) kong.Configuration {
+) (kong.Configuration, error) {
 	oldKeys := strings.Split(oldField, ".")
 	newKeys := strings.Split(newField, ".")
 
@@ -177,7 +202,7 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 		if nested, ok := current[key].(map[string]interface{}); ok {
 			current = nested
 		} else {
-			return pluginConfig
+			return pluginConfig, nil
 		}
 	}
 
@@ -185,7 +210,7 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 	oldKey := oldKeys[len(oldKeys)-1]
 	value, ok := current[oldKey]
 	if !ok {
-		return pluginConfig
+		return pluginConfig, nil
 	}
 
 	// Remove the old field
@@ -206,13 +231,34 @@ func updateLegacyFieldToNewField(pluginConfig kong.Configuration,
 
 	// Set the value to the new field
 	newKey := newKeys[len(newKeys)-1]
+
+	newValue, exists := current[newKey]
+	if exists {
+		switch {
+		case isEmpty(value):
+			// Both exist, old is empty: choose new, do nothing
+		case isEmpty(newValue):
+			// Both exist, new is empty: choose old
+			current[newKey] = value
+			cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
+				" to the new field \"%s\" in plugin %s\n",
+				oldField, newField, pluginName)
+		default:
+			// Both exist with values: error
+			return pluginConfig, fmt.Errorf(
+				"conflicting fields: both legacy field \"%s\" and new field \"%s\" have values in plugin %s",
+				oldField, newField, pluginName)
+		}
+		return pluginConfig, nil
+	}
+
 	current[newKey] = value
 
 	cprint.UpdatePrintf("Automatically converted legacy configuration field \"%s\""+
 		" to the new field \"%s\" in plugin %s\n",
 		oldField, newField, pluginName)
 
-	return pluginConfig
+	return pluginConfig, nil
 }
 
 func removeDeprecatedFields3x(pluginConfig kong.Configuration, fieldName, pluginName string) kong.Configuration {

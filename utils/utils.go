@@ -1,3 +1,4 @@
+//revive:disable:var-naming // package name is established across the codebase.
 package utils
 
 const (

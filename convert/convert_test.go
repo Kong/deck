@@ -365,8 +365,12 @@ func Test_Convert(t *testing.T) {
 			for k, v := range tt.args.envVars {
 				t.Setenv(k, v)
 			}
+			envVarsMode := file.EnvVarsMock
+			if tt.args.disableMocks {
+				envVarsMode = file.EnvVarsExpand
+			}
 			err := Convert(inputFiles, tt.args.outputFilename, file.YAML, tt.args.fromFormat,
-				tt.args.toFormat, !tt.args.disableMocks)
+				tt.args.toFormat, envVarsMode)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)
 			}
