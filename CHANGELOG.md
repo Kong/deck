@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.59.0](#v1590)
 - [v1.58.0](#v1580)
 - [v1.57.3](#v1573)
 - [v1.57.2](#v1572)
@@ -135,6 +136,27 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.59.0]
+> Release date: 2026/04/23
+
+### Added
+- Added support for `graphql_ratelimiting_cost_decorations` custom entity.
+[#1937](https://github.com/Kong/deck/pull/1937)
+[go-database-reconciler #428](https://github.com/Kong/go-database-reconciler/pull/428)
+[go-database-reconciler #459](https://github.com/Kong/go-database-reconciler/pull/459)
+[go-kong #608](https://github.com/Kong/go-kong/pull/608)
+
+### Fixed
+- Fixed OIDC plugin config by adding check for non-empty `cache_tokens_salt`.
+[#2021](https://github.com/Kong/deck/pull/2021)
+[go-database-reconciler #448](https://github.com/Kong/go-database-reconciler/pull/448)
+- Fixed `_plugin_config` to properly merge deeply nested objects and maps at all levels.
+[go-database-reconciler #453](https://github.com/Kong/go-database-reconciler/pull/453) 
+- Bumped `golang.org/x/net` from v0.50.0 to v0.51.0 to account for `CVE-2026-27141`
+[go-database-reconciler #450](https://github.com/Kong/go-database-reconciler/pull/450)
+- Bumped `github.com/moby/spdystream` from v0.5.0 to v0.5.1 to account for `CVE-2026-35469`
+[#2018](https://github.com/Kong/deck/pull/2018)
 
 ## [v1.58.0]
 > Release date: 2026/04/20
@@ -2542,6 +2564,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.59.0]: https://github.com/Kong/deck/compare/v1.58.0...v1.59.0
 [v1.58.0]: https://github.com/Kong/deck/compare/v1.57.3...v1.58.0
 [v1.57.3]: https://github.com/Kong/deck/compare/v1.57.2...v1.57.3
 [v1.57.2]: https://github.com/Kong/deck/compare/v1.57.0...v1.57.2

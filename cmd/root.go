@@ -24,6 +24,7 @@ const (
 
 var supportedCustomEntityTypes = []string{
 	"degraphql_routes",
+	"graphql_ratelimiting_cost_decorations",
 }
 
 var (

@@ -19,6 +19,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
@@ -8618,6 +8619,198 @@ func testSyncDegraphqlRoutesKonnectImpl(t *testing.T) {
 		expectedMethods := kong.StringSlice("POST", "GET")
 		assert.Equal(t, expectedMethods, d.Methods)
 	})
+}
+
+func Test_Sync_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3"+
+		" || >=3.14.0.2")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"graphql_ratelimiting_cost_decorations", "degraphql_routes"}}
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		errorExpected string
+		validateFunc  func(t *testing.T, newState *state.KongState)
+	}{
+		{
+			name:     "create graphql ratelimiting cost decoration",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				require.Len(t, decorations, 1)
+				assert.Equal(t, "Query.users", *decorations[0].TypePath)
+				assert.InDelta(t, 1.0, *decorations[0].AddConstant, 0)
+			},
+		},
+		{
+			name:     "create graphql ratelimiting cost decoration - all fields",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				assert.Len(t, decorations, 1)
+				assert.Equal(t, "Query.posts", *decorations[0].TypePath)
+				assert.InDelta(t, 2.0, *decorations[0].AddConstant, 0)
+				assert.InDelta(t, 1.5, *decorations[0].MulConstant, 0)
+
+				expectedAddArgs := kong.StringSlice("limit", "offset")
+				assert.Equal(t, expectedAddArgs, decorations[0].AddArguments)
+
+				expectedMulArgs := kong.StringSlice("first", "last")
+				assert.Equal(t, expectedMulArgs, decorations[0].MulArguments)
+			},
+		},
+		{
+			name:          "create graphql ratelimiting cost decoration - fails if type_path is missing",
+			kongFile:      "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-missing-type-path.yaml",
+			errorExpected: "type_path is required",
+		},
+		{
+			name:     "create mixed custom entities - degraphql routes and graphql ratelimiting cost decorations",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-mixed.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				require.Len(t, decorations, 1)
+				assert.Equal(t, "Query.users", *decorations[0].TypePath)
+				assert.InDelta(t, 1.0, *decorations[0].AddConstant, 0)
+
+				degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, degraphqlRoutes, 1)
+
+				d := degraphqlRoutes[0]
+				assert.Equal(t, "/users", *d.URI)
+				assert.Equal(t, "query{ users { id name } }", *d.Query)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := sync(ctx, tc.kongFile)
+
+			if tc.errorExpected != "" {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorExpected)
+				return
+			}
+
+			require.NoError(t, err)
+
+			if tc.validateFunc != nil {
+				newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+				require.NoError(t, err)
+
+				tc.validateFunc(t, newState)
+			}
+		})
+	}
+}
+
+func Test_Sync_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_GraphqlRateLimitingCostDecorations_Konnect",
+		testSyncGraphqlRateLimitingCostDecorationsKonnectImpl)
+}
+
+func testSyncGraphqlRateLimitingCostDecorationsKonnectImpl(t *testing.T) {
+	t.Setenv("DECK_KONNECT_CONTROL_PLANE_NAME", "default")
+	runWhen(t, "konnect", "")
+
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	dumpConfig := deckDump.Config{CustomEntityTypes: []string{"graphql_ratelimiting_cost_decorations", "degraphql_routes"}}
+	ctx := context.Background()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		errorExpected string
+		validateFunc  func(t *testing.T, newState *state.KongState)
+	}{
+		{
+			name:     "create graphql ratelimiting cost decoration",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				require.Len(t, decorations, 1)
+				assert.Equal(t, "Query.users", *decorations[0].TypePath)
+				assert.InDelta(t, 1.0, *decorations[0].AddConstant, 0)
+			},
+		},
+		{
+			name:     "create graphql ratelimiting cost decoration - all fields",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-all-fields.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				assert.Len(t, decorations, 1)
+				assert.Equal(t, "Query.posts", *decorations[0].TypePath)
+				assert.InDelta(t, 2.0, *decorations[0].AddConstant, 0)
+				assert.InDelta(t, 1.5, *decorations[0].MulConstant, 0)
+
+				expectedAddArgs := kong.StringSlice("limit", "offset")
+				assert.Equal(t, expectedAddArgs, decorations[0].AddArguments)
+
+				expectedMulArgs := kong.StringSlice("first", "last")
+				assert.Equal(t, expectedMulArgs, decorations[0].MulArguments)
+			},
+		},
+		{
+			name:          "create graphql ratelimiting cost decoration - fails if type_path is missing",
+			kongFile:      "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-missing-type-path.yaml",
+			errorExpected: "type_path is required",
+		},
+		{
+			name:     "create mixed custom entities - degraphql routes and graphql ratelimiting cost decorations",
+			kongFile: "testdata/sync/052-graphql-ratelimiting-cost-decorations/kong-mixed.yaml",
+			validateFunc: func(t *testing.T, newState *state.KongState) {
+				decorations, err := newState.GraphqlRateLimitingCostDecorations.GetAll()
+				require.NoError(t, err)
+				require.Len(t, decorations, 1)
+				assert.Equal(t, "Query.users", *decorations[0].TypePath)
+				assert.InDelta(t, 1.0, *decorations[0].AddConstant, 0)
+
+				degraphqlRoutes, err := newState.DegraphqlRoutes.GetAll()
+				require.NoError(t, err)
+				require.Len(t, degraphqlRoutes, 1)
+
+				d := degraphqlRoutes[0]
+				assert.Equal(t, "/users", *d.URI)
+				assert.Equal(t, "query{ users { id name } }", *d.Query)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := sync(ctx, tc.kongFile)
+
+			if tc.errorExpected != "" {
+				require.Error(t, err)
+				assert.ErrorContains(t, err, tc.errorExpected)
+				return
+			}
+
+			require.NoError(t, err)
+
+			newState, err := fetchCurrentState(ctx, client, dumpConfig, t)
+			require.NoError(t, err)
+
+			tc.validateFunc(t, newState)
+		})
+	}
 }
 
 func Test_Sync_CustomEntitiesFake(t *testing.T) {

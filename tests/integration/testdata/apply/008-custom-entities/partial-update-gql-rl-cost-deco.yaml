@@ -1,0 +1,12 @@
+_format_version: "3.0"
+custom_entities:
+  - type: graphql_ratelimiting_cost_decorations
+    fields:
+      service:
+        name: svc1
+      type_path: "Query.posts"
+      add_constant: 2.0
+      mul_constant: 1.5
+      add_arguments:
+        - "limit"
+        - "offset"
