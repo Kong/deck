@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.59.1](#v1591)
 - [v1.59.0](#v1590)
 - [v1.58.0](#v1580)
 - [v1.57.3](#v1573)
@@ -137,8 +138,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
-## [v1.59.0]
-> Release date: 2026/04/23
+## [v1.59.1]
+> Release date: 2026/04/28
+
+### Fixed
+- Fixed a bug in template rendering to handle multi-line yaml parsing smoothly.
+[#2019](https://github.com/Kong/deck/pull/2019)
+[go-database-reconciler #455](https://github.com/Kong/go-database-reconciler/pull/455)
 
 ### Added
 - Added support for `graphql_ratelimiting_cost_decorations` custom entity.
@@ -2564,6 +2570,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.59.0]: https://github.com/Kong/deck/compare/v1.59.0...v1.59.1
 [v1.59.0]: https://github.com/Kong/deck/compare/v1.58.0...v1.59.0
 [v1.58.0]: https://github.com/Kong/deck/compare/v1.57.3...v1.58.0
 [v1.57.3]: https://github.com/Kong/deck/compare/v1.57.2...v1.57.3
