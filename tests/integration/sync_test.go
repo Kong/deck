@@ -6086,6 +6086,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6144,6 +6145,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6202,6 +6204,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -9506,8 +9509,7 @@ func testSyncSkipConsumersWithConsumerGroupsKonnectImpl(t *testing.T) {
 
 	t.Run("--skip-consumers-with-consumer-groups flag set", func(t *testing.T) {
 		err := sync(ctx, "testdata/sync/038-skip-consumers-with-cgs/base.yaml", "--skip-consumers-with-consumer-groups")
-		require.Error(t, err)
-		assert.ErrorContains(t, err, "the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
+		require.NoError(t, err)
 	})
 }
 

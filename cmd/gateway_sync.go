@@ -104,8 +104,7 @@ to get Kong's state in sync with the input state.`,
 		false, "do not show the association between consumer and consumer-group.\n"+
 			"If set to true, deck skips listing consumers with consumer-groups,\n"+
 			"thus gaining some performance with large configs.\n"+
-			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.\n"+
-			"This flag is not valid with Konnect.")
+			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.")
 	syncCmd.Flags().BoolVar(&dumpConfig.SkipHashForBasicAuth, "skip-hash-for-basic-auth",
 		false, "do not sync hash for basic auth credentials.\n"+
 			"This flag is only valid with Konnect.")

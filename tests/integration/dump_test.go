@@ -455,10 +455,9 @@ func Test_SkipConsumersWithConsumerGroups(t *testing.T) {
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups set: Konnect ",
 			stateFile:                       "testdata/dump/004-skip-consumers-with-consumer-groups/kong3x.yaml",
+			expectedFile:                    "testdata/dump/004-skip-consumers-with-consumer-groups/expected-konnect-flag.yaml",
 			skipConsumersWithConsumerGroups: true,
 			runWhen:                         func(t *testing.T) { runWhenKonnect(t) },
-			errorExpected:                   true,
-			errorString:                     "the flag --skip-consumers-with-consumer-groups can not be used with Konnect",
 		},
 		{
 			name:                            "dump with flag --skip-consumers-with-consumer-groups not set: Konnect ",

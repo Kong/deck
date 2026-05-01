@@ -224,10 +224,6 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		if skipDefaultsFill {
 			dumpConfig.SkipDefaults = true
 		}
-		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
-		if dumpConfig.SkipConsumersWithConsumerGroups {
-			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
-		}
 		if targetContent.Konnect != nil {
 			if err := evaluateTargetRuntimeGroupOrControlPlaneName(targetContent); err != nil {
 				return err
