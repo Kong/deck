@@ -55,6 +55,9 @@ const (
 	responseRateLimitingPluginName    = "response-ratelimiting"
 	samlPluginName                    = "saml"
 	serviceProtectionPluginName       = "service-protection"
+	solaceConsumePluginName           = "solace-consume"
+	solaceLogPluginName               = "solace-log"
+	solaceUpstreamPluginName          = "solace-upstream"
 	tcpLogPluginName                  = "tcp-log"
 	upstreamOauthPluginName           = "upstream-oauth"
 )

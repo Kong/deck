@@ -91,7 +91,7 @@ rules:
       In Kong Gateway 3.14, TLS verification is enabled by default for plugin HTTP clients
       that use https_verify.
     given:
-      - $..plugins[?(@.name == 'azure-functions' || @.name == 'forward-proxy')].config
+      - $..plugins[?(@.name == 'ai-llm-as-judge' || @.name == 'azure-functions' || @.name == 'forward-proxy')].config
     message: >-
       Kong Gateway 3.14 enables TLS certificate verification by default. Plugins that use
       https_verify will now verify certificates unless you set https_verify to false explicitly.
@@ -141,4 +141,32 @@ rules:
     severity: warn
     then:
       - field: session_memcached_ssl_verify
+        function: defined
+
+  acme-vault-tls-verify-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, TLS verification is enabled by default for the Acme plugin's
+      vault storage backend.
+    given:
+      - $..plugins[?(@.name == 'acme')].config.storage_config.vault
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. The Acme plugin vault
+      storage backend will now verify TLS certificates unless you set tls_verify to false explicitly.
+    severity: warn
+    then:
+      - field: tls_verify
+        function: defined
+
+  solace-ssl-validate-certificate-plugin-check:
+    description: >-
+      In Kong Gateway 3.14, TLS certificate validation is enabled by default for Solace plugin
+      session connections.
+    given:
+      - $..plugins[?(@.name == 'solace-consume' || @.name == 'solace-log' || @.name == 'solace-upstream')].config.session
+    message: >-
+      Kong Gateway 3.14 enables TLS certificate verification by default. Solace plugins will now
+      validate session TLS certificates unless you set ssl_validate_certificate to false explicitly.
+    severity: warn
+    then:
+      - field: ssl_validate_certificate
         function: defined
