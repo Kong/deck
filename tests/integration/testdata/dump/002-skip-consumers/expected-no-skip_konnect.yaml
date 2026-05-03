@@ -7,6 +7,7 @@ consumer_groups:
   - config:
       compound_identifier: null
       consumer_groups: null
+      counter_key: null
       dictionary_name: kong_rate_limiting_counters
       disable_penalty: false
       enforce_consumer_groups: false

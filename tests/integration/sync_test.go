@@ -1761,6 +1761,7 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"counter_key":             nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -1813,6 +1814,7 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"counter_key":             nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -1862,6 +1864,7 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"counter_key":             nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -6086,6 +6089,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6144,6 +6148,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6202,6 +6207,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 						Config: kong.Configuration{
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
+							"counter_key":             nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -11321,6 +11327,7 @@ func testSyncPartialsTaggingKonnectImpl(t *testing.T) {
 				Config: kong.Configuration{
 					"compound_identifier":     nil,
 					"consumer_groups":         nil,
+					"counter_key":             nil,
 					"dictionary_name":         string("kong_rate_limiting_counters"),
 					"disable_penalty":         bool(false),
 					"enforce_consumer_groups": bool(false),
@@ -11365,6 +11372,7 @@ func testSyncPartialsTaggingKonnectImpl(t *testing.T) {
 					"compound_identifier":     nil,
 					"consumer_groups":         nil,
 					"dictionary_name":         string("kong_rate_limiting_counters"),
+					"counter_key":             nil,
 					"disable_penalty":         bool(false),
 					"enforce_consumer_groups": bool(false),
 					"error_code":              float64(429),
