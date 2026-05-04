@@ -23,6 +23,7 @@ var (
 	cmdO2Ksecurity            bool
 	cmdO2KignoreSecurityError bool
 	cmdO2KignoreCircularRefs  bool
+	cmdO2KskipRouteByHeader   bool
 )
 
 // Executes the CLI command "openapi2kong"
@@ -48,6 +49,7 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		OIDC:                 cmdO2Ksecurity,
 		IgnoreSecurityErrors: cmdO2KignoreSecurityError,
 		IgnoreCircularRefs:   cmdO2KignoreCircularRefs,
+		SkipRouteByHeader:    cmdO2KskipRouteByHeader,
 	}
 
 	trackInfo := deckformat.HistoryNewEntry("openapi2kong")
@@ -115,6 +117,9 @@ The output will be targeted at Kong version 3.x.
 		"ignore errors for unsupported security schemes")
 	openapi2kongCmd.Flags().BoolVar(&cmdO2KignoreCircularRefs, "ignore-circular-refs", false,
 		"ignore circular $ref errors in the OpenAPI spec (dangerous, use with caution)")
+	openapi2kongCmd.Flags().BoolVar(&cmdO2KskipRouteByHeader, "skip-route-by-header", false,
+		"skip generation of separate route for each required header parameter enum value.\n"+
+			"When set, generates a single route per operation.")
 
 	return openapi2kongCmd
 }
