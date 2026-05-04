@@ -14,7 +14,7 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.4.1
-	github.com/kong/go-database-reconciler v1.36.2
+	github.com/kong/go-database-reconciler v1.36.3-0.20260504123813-38d5874bfff8
 	github.com/kong/go-kong v0.75.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
@@ -26,7 +26,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.33.1
 	k8s.io/apimachinery v0.35.4
 	k8s.io/client-go v0.35.4
-	k8s.io/code-generator v0.35.3
+	k8s.io/code-generator v0.35.4
 	sigs.k8s.io/gateway-api v1.5.1
 	sigs.k8s.io/yaml v1.6.0
 )
