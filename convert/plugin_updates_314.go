@@ -33,12 +33,16 @@ var sslVerifyPluginConfigSetters = map[string][]pluginConfigDefaultSetter{
 	},
 	acmePluginName: {
 		newNestedBoolDefaultSetter("storage_config.redis.ssl_verify"),
+		newNestedBoolDefaultSetter("storage_config.vault.tls_verify"),
 	},
 	aiAwsGuardrailPluginName: {
 		newNestedBoolDefaultSetter("ssl_verify"),
 	},
 	aiAzureContentSafetyPluginName: {
 		newNestedBoolDefaultSetter("ssl_verify"),
+	},
+	aiLlmAsJudgePluginName: {
+		newNestedBoolDefaultSetter("https_verify"),
 	},
 	aiProxyAdvancedPluginName: aiVectorDBSSLVerifySetters(),
 	aiRagInjectorPluginName:   aiVectorDBSSLVerifySetters(),
@@ -140,6 +144,15 @@ var sslVerifyPluginConfigSetters = map[string][]pluginConfigDefaultSetter{
 	},
 	serviceProtectionPluginName: {
 		newNestedBoolDefaultSetter("redis.ssl_verify"),
+	},
+	solaceConsumePluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
+	},
+	solaceLogPluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
+	},
+	solaceUpstreamPluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
 	},
 	tcpLogPluginName: {
 		newNestedBoolDefaultSetter("ssl_verify"),
