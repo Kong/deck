@@ -28,7 +28,8 @@ func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
 		file.Format(strings.ToUpper(fileRenderCmdStateFormat)),
 		convert.FormatDistributed,
 		convert.FormatKongGateway3x,
-		envVarsMode)
+		envVarsMode,
+		diagnosticPolicy)
 }
 
 func newFileRenderCmd() *cobra.Command {
@@ -58,6 +59,9 @@ combined JSON file:
 			if len(fileRenderCmdKongStateFile) == 0 {
 				fileRenderCmdKongStateFile = []string{"-"} // default to stdin
 			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
 			return preRunSilenceEventsFlag()
 		},
 	}
@@ -70,6 +74,7 @@ combined JSON file:
 	renderCmd.Flags().BoolVar(&fileRenderCmdPopulateEnvVars, "populate-env-vars", false,
 		"Populate 'DECK_' environment variables in the output file. The default behavior\n"+
 			"is to mock environment variable values.")
+	addDiagnosticSeverityFlags(renderCmd.Flags())
 
 	return renderCmd
 }

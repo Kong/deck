@@ -146,8 +146,9 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
-		CurrentState: dummyEmptyState,
-	}, dump.Config{}, kongClient)
+		CurrentState:     dummyEmptyState,
+		DiagnosticPolicy: diagnosticPolicy,
+	}, dump.Config{DiagnosticPolicy: diagnosticPolicy}, kongClient)
 	if err != nil {
 		return err
 	}
@@ -221,6 +222,9 @@ this command unless --online flag is used.
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
 			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
 			return preRunSilenceEventsFlag()
 		}
 	} else {
@@ -249,6 +253,9 @@ this command unless --online flag is used.
 						value, listOfKeys,
 					)
 				}
+			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
 			}
 			return preRunSilenceEventsFlag()
 		}
@@ -297,6 +304,7 @@ this command unless --online flag is used.
 		10, "Maximum number of concurrent requests to Kong.")
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
+	addDiagnosticSeverityFlags(validateCmd.Flags())
 
 	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "workspace")
 	validateCmd.MarkFlagsMutuallyExclusive("konnect-compatibility", "rbac-resources-only")

@@ -320,7 +320,8 @@ func syncKonnect(ctx context.Context,
 	}
 
 	targetKongState, targetKonnectState, err := file.GetForKonnect(ctx, targetContent, file.RenderConfig{
-		CurrentState: currentState,
+		CurrentState:     currentState,
+		DiagnosticPolicy: diagnosticPolicy,
 	}, kongClient)
 	if err != nil {
 		return err
@@ -437,7 +438,8 @@ func getKonnectState(ctx context.Context,
 		var err error
 		// get export of Kong resources
 		kongState, err = dump.Get(ctx, kongClient, dump.Config{
-			SkipConsumers: skipConsumers,
+			SkipConsumers:    skipConsumers,
+			DiagnosticPolicy: diagnosticPolicy,
 		})
 		if err != nil {
 			return fmt.Errorf("reading configuration from Kong: %w", err)
