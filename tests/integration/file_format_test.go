@@ -23,6 +23,11 @@ func Test_FileFormat_DBlessToDeck(t *testing.T) {
 			expectedOutputFile: "testdata/file-format/deck-input.yaml",
 		},
 		{
+			name:               "converts DBless plugin partial links to decK format",
+			inputFile:          "testdata/file-format/dbless-partials-input.yaml",
+			expectedOutputFile: "testdata/file-format/deck-partials-input.yaml",
+		},
+		{
 			name:               "file with no consumer groups passes through unchanged",
 			inputFile:          "testdata/file-format/no-consumer-groups.yaml",
 			expectedOutputFile: "testdata/file-format/no-consumer-groups.yaml",
@@ -64,6 +69,11 @@ func Test_FileFormat_DeckToDBless(t *testing.T) {
 			name:               "converts decK consumer groups to DBless format",
 			inputFile:          "testdata/file-format/deck-input.yaml",
 			expectedOutputFile: "testdata/file-format/dbless-input.yaml",
+		},
+		{
+			name:               "converts decK plugin partial links to DBless format",
+			inputFile:          "testdata/file-format/deck-partials-input.yaml",
+			expectedOutputFile: "testdata/file-format/dbless-partials-input.yaml",
 		},
 		{
 			name:               "file with no consumer groups passes through unchanged",
