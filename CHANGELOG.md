@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.60.0](#v160)
 - [v1.59.1](#v1591)
 - [v1.59.0](#v1590)
 - [v1.58.0](#v1580)
@@ -138,6 +139,20 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.60.0]
+> Release date: 2026/05/08
+
+### Added
+- Added `--skip-route-by-header` flag to `deck file openapi2kong` command to generate a single route per operation.
+[#2039](https://github.com/Kong/deck/pull/2039)
+[go-apiops #292](https://github.com/Kong/go-apiops/pull/292)
+
+### Fixed
+- Fixed Konnect consumer-group support by migrating from legacy Konnect-specific endpoints to common Kong/Konnect endpoints.
+[#2046](https://github.com/Kong/deck/pull/2046)
+[go-database-reconciler #464](https://github.com/Kong/go-database-reconciler/pull/464)
+[go-kong #616](https://github.com/Kong/go-kong/pull/616)
+
 ## [v1.59.1]
 > Release date: 2026/04/28
 
@@ -145,6 +160,9 @@
 - Fixed a bug in template rendering to handle multi-line yaml parsing smoothly.
 [#2019](https://github.com/Kong/deck/pull/2019)
 [go-database-reconciler #455](https://github.com/Kong/go-database-reconciler/pull/455)
+
+## [v1.59.0]
+> Release date: 2026/04/23
 
 ### Added
 - Added support for `graphql_ratelimiting_cost_decorations` custom entity.
@@ -2570,7 +2588,8 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
-[v1.59.0]: https://github.com/Kong/deck/compare/v1.59.0...v1.59.1
+[v1.60.0]: https://github.com/Kong/deck/compare/v1.59.1...v1.60.0
+[v1.59.1]: https://github.com/Kong/deck/compare/v1.59.0...v1.59.1
 [v1.59.0]: https://github.com/Kong/deck/compare/v1.58.0...v1.59.0
 [v1.58.0]: https://github.com/Kong/deck/compare/v1.57.3...v1.58.0
 [v1.57.3]: https://github.com/Kong/deck/compare/v1.57.2...v1.57.3
