@@ -49,3 +49,7 @@ certificates:
 consumers:
   - custom_id: test_consumer_3x_custom_test
     username: test_consumer_3x
+
+consumer_groups:
+  - id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
+    name: silver
