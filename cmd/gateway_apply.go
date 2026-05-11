@@ -33,6 +33,9 @@ func newApplyCmd() *cobra.Command {
 			if len(applyCmdKongStateFile) == 0 {
 				applyCmdKongStateFile = []string{"-"}
 			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
 			return preRunSilenceEventsFlag()
 		},
 	}
@@ -52,6 +55,7 @@ func newApplyCmd() *cobra.Command {
 			"This flag is only valid with Konnect.")
 	applyCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	addDiagnosticSeverityFlags(applyCmd.Flags())
 	addSilenceEventsFlag(applyCmd.Flags())
 
 	return applyCmd

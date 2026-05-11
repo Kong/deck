@@ -31,6 +31,9 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 		if len(diffCmdKongStateFile) == 0 {
 			diffCmdKongStateFile = []string{"-"}
 		}
+		if err := preRunDiagnosticPolicyFlags(); err != nil {
+			return err
+		}
 		return preRunSilenceEventsFlag()
 	}
 
@@ -51,6 +54,9 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 			if len(diffCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
+			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
 			}
 			return preRunSilenceEventsFlag()
 		}
@@ -112,6 +118,7 @@ that will be created, updated, or deleted.
 			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.")
 	diffCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	addDiagnosticSeverityFlags(diffCmd.Flags())
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd
 }

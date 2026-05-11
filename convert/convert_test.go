@@ -370,7 +370,7 @@ func Test_Convert(t *testing.T) {
 				envVarsMode = file.EnvVarsExpand
 			}
 			err := Convert(inputFiles, tt.args.outputFilename, file.YAML, tt.args.fromFormat,
-				tt.args.toFormat, envVarsMode)
+				tt.args.toFormat, envVarsMode, utils.DiagnosticPolicy{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)
 			}

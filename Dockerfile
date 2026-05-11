@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.25.9@sha256:7a00384194cf2cb68924bbb918d675f1517357433c8541bac0ab2f929b9d5447
+ARG GO_VERSION=1.26.2@sha256:5f3787b7f902c07c7ec4f3aa91a301a3eda8133aa32661a3b3a3a86ab3a68a36
 FROM golang:${GO_VERSION} AS build
 WORKDIR /deck
 COPY go.mod ./
@@ -10,7 +10,7 @@ ARG TAG
 RUN CGO_ENABLED=0 GOOS=linux go build -o deck \
       -ldflags "-s -w -X github.com/kong/deck/cmd.VERSION=$TAG -X github.com/kong/deck/cmd.COMMIT=$COMMIT"
 
-FROM alpine:3.23.3@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
+FROM alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11
 RUN adduser --disabled-password --gecos "" deckuser
 RUN apk --no-cache upgrade && apk --no-cache add ca-certificates jq
 USER deckuser

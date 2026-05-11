@@ -1,0 +1,8 @@
+_format_version: "3.0"
+services:
+  - name: svc-route-regex
+    url: http://example.com
+    routes:
+      - name: route-regex
+        paths:
+          - /users/\d+

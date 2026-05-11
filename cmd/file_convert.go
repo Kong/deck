@@ -55,7 +55,8 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 			file.Format(strings.ToUpper(convertCmdStateFormat)),
 			sourceFormat,
 			destinationFormat,
-			envVarsMode)
+			envVarsMode,
+			diagnosticPolicy)
 		if err != nil {
 			return fmt.Errorf("converting file: %w", err)
 		}
@@ -80,7 +81,8 @@ func executeConvert(_ *cobra.Command, _ []string) error {
 				file.Format(strings.ToUpper(convertCmdStateFormat)),
 				sourceFormat,
 				destinationFormat,
-				envVarsMode)
+				envVarsMode,
+				diagnosticPolicy)
 			if err != nil {
 				return fmt.Errorf("converting '%s' file: %w", filename, err)
 			}
@@ -146,6 +148,10 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 				return err
 			}
 
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}
@@ -181,6 +187,7 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 		"yaml", "output file format: json or yaml.")
 	convertCmd.Flags().BoolVar(&convertCmdNoExpandEnvVars, "no-expand-env-vars",
 		false, `do not expand ${{ env "DECK_VAR_NAME" }} placeholders in the output.`)
+	addDiagnosticSeverityFlags(convertCmd.Flags())
 
 	return convertCmd
 }

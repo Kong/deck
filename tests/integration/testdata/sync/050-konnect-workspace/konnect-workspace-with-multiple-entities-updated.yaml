@@ -108,3 +108,6 @@ vaults:
     description: ENV vault for secrets
     name: env
     prefix: my-workspace-vault
+
+consumer_groups:
+  - name: silver

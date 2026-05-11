@@ -83,6 +83,7 @@ func Convert(
 	from Format,
 	to Format,
 	envVarsMode file.RenderEnvVarsMode,
+	diagnosticPolicy utils.DiagnosticPolicy,
 ) error {
 	var outputContent *file.Content
 
@@ -113,7 +114,7 @@ func Convert(
 	case from == FormatDistributed && to == FormatKongGateway,
 		from == FormatDistributed && to == FormatKongGateway2x,
 		from == FormatDistributed && to == FormatKongGateway3x:
-		outputContent, err = convertDistributedToKong(inputContent, outputFilename, outputFormat, to)
+		outputContent, err = convertDistributedToKong(inputContent, outputFilename, outputFormat, to, diagnosticPolicy)
 		if err != nil {
 			return err
 		}
@@ -315,6 +316,7 @@ func convertDistributedToKong(
 	outputFilename string,
 	format file.Format,
 	kongFormat Format,
+	diagnosticPolicy utils.DiagnosticPolicy,
 ) (*file.Content, error) {
 	var version semver.Version
 
@@ -328,9 +330,10 @@ func convertDistributedToKong(
 
 	s, _ := state.NewKongState()
 	rawState, err := file.Get(context.Background(), targetContent, file.RenderConfig{
-		CurrentState: s,
-		KongVersion:  version,
-	}, dump.Config{}, nil)
+		CurrentState:     s,
+		KongVersion:      version,
+		DiagnosticPolicy: diagnosticPolicy,
+	}, dump.Config{DiagnosticPolicy: diagnosticPolicy}, nil)
 	if err != nil {
 		return nil, err
 	}
