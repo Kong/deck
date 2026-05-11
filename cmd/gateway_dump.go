@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -106,11 +105,6 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	if inKonnectMode(nil) {
-		// Konnect ConsumerGroup APIs don't support the query-parameter list_consumers yet
-		if dumpConfig.SkipConsumersWithConsumerGroups {
-			return errors.New("the flag --skip-consumers-with-consumer-groups can not be used with Konnect")
-		}
-
 		_ = sendAnalytics("dump", "", modeKonnect)
 		return dumpKonnectV2(ctx)
 	}
@@ -249,7 +243,7 @@ configure Kong.`,
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipConsumersWithConsumerGroups, "skip-consumers-with-consumer-groups",
 		false, "do not show the association between consumer and consumer-group.\n"+
 			"If set to true, deck skips listing consumers with consumer-groups,\n"+
-			"thus gaining some performance with large configs. This flag is not valid with Konnect.")
+			"thus gaining some performance with large configs.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.IsConsumerGroupPolicyOverrideSet, "consumer-group-policy-overrides",
 		false, "allow deck to dump consumer-group policy overrides.\n"+
 			"This allows policy overrides to work with Kong GW versions >= 3.4\n"+
