@@ -32,6 +32,9 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 		if len(syncCmdKongStateFile) == 0 {
 			syncCmdKongStateFile = []string{"-"}
 		}
+		if err := preRunDiagnosticPolicyFlags(); err != nil {
+			return err
+		}
 		return preRunSilenceEventsFlag()
 	}
 
@@ -51,6 +54,9 @@ func newSyncCmd(deprecated bool) *cobra.Command {
 			if len(syncCmdKongStateFile) == 0 {
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
+			}
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
 			}
 			return preRunSilenceEventsFlag()
 		}
@@ -113,6 +119,7 @@ to get Kong's state in sync with the input state.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	addDiagnosticSeverityFlags(syncCmd.Flags())
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd
 }

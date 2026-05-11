@@ -1,0 +1,7 @@
+_format_version: "3.0"
+plugins:
+  - name: rate-limiting-advanced
+    config:
+      consumer_groups:
+        - foo-group
+      enforce_consumer_groups: true
