@@ -222,7 +222,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 	// Get entities from Kong
 	ctx := context.Background()
 	dumpConfig := deckDump.Config{
-		CustomEntityTypes:                []string{"degraphql_routes"},
+		CustomEntityTypes:                []string{"degraphql_routes", "graphql_ratelimiting_cost_decorations"},
 		IsConsumerGroupPolicyOverrideSet: isConsumerGroupPolicyOverrideSet,
 	}
 	if expectedState.RBACEndpointPermissions != nil {

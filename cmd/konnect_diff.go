@@ -27,6 +27,9 @@ func newKonnectDiffCmd() *cobra.Command {
 				konnectDiffCmdParallelism)
 		},
 		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
 			return preRunSilenceEventsFlag()
 		},
 	}
@@ -45,6 +48,7 @@ func newKonnectDiffCmd() *cobra.Command {
 		false, "return exit code 2 if there is a diff present,\n"+
 			"exit code 0 if no diff is found,\n"+
 			"and exit code 1 if an error occurs.")
+	addDiagnosticSeverityFlags(konnectDiffCmd.Flags())
 	addSilenceEventsFlag(konnectDiffCmd.Flags())
 	return konnectDiffCmd
 }

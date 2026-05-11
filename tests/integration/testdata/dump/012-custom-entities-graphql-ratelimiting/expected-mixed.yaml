@@ -1,0 +1,43 @@
+_format_version: "3.0"
+custom_entities:
+- fields:
+    add_arguments:
+    - limit
+    add_constant: 1
+    mul_arguments:
+    - first
+    mul_constant: 1
+    service:
+      id: 5c3a1e8f-9b2d-4f7a-a3c6-8e1d4b6f9a2c
+    type_path: Query.users
+  id: c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+  type: graphql_ratelimiting_cost_decorations
+- fields:
+    methods:
+    - GET
+    query: query{ foo { bar } }
+    service:
+      name: svc1
+    uri: /foo
+  id: f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c
+  type: degraphql_routes
+plugins:
+- config:
+    graphql_server_path: /graphql
+  enabled: true
+  name: degraphql
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000

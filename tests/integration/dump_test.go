@@ -1232,6 +1232,111 @@ func Test_Dump_Services_TLS_Sans(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - enterprise
+func Test_Dump_GraphqlRateLimitingCostDecorations(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3 "+
+		"|| >=3.14.0.2")
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-all-fields.yaml",
+		},
+		{
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-multiple.yaml",
+		},
+		{
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-no-custom-entities.yaml",
+		},
+		{
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/expected-mixed.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	tests := []struct {
+		name         string
+		stateFile    string
+		expectedFile string
+	}{
+		{
+			name:         "dump single decoration with all fields",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-all-fields.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-all-fields.yaml",
+		},
+		{
+			name:         "dump multiple decorations",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-multiple.yaml",
+		},
+		{
+			name:         "dump empty when none exist",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-no-custom-entities.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-no-custom-entities.yaml",
+		},
+		{
+			name:         "dump mixed with other custom entity types",
+			stateFile:    "testdata/dump/012-custom-entities-graphql-ratelimiting/kong-mixed.yaml",
+			expectedFile: "testdata/dump/012-custom-entities-graphql-ratelimiting/konnect-expected-mixed.yaml",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Cleanup(func() {
+				reset(t)
+			})
+			err := sync(ctx, tc.stateFile)
+			require.NoError(t, err)
+
+			output, err := dump("-o", "-")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}
+
 func Test_Dump_KonnectWorkspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)

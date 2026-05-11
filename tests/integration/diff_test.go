@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
+	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -844,7 +845,7 @@ func Test_Diff_Unmasked_NewerThan3x(t *testing.T) {
 }
 
 // test scope:
-//   - 3.5
+//   - >=3.5
 func Test_Diff_NoDiffUnorderedArray(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -1095,10 +1096,11 @@ func Test_Diff_Konnect_Workspace(t *testing.T) {
 			isDiffExpected:   true,
 			expectedContains: []string{
 				"updating route route-multi-entity-1",
+				"updating consumer-group silver",
 				"creating route route-multi-entity-3",
 				"deleting route route-multi-entity-2",
 				"Created: 1",
-				"Updated: 1",
+				"Updated: 2",
 				"Deleted: 1",
 			},
 		},
@@ -1123,4 +1125,69 @@ func Test_Diff_Konnect_Workspace(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Test_RequestTermination_Dump_Diff ensures that a create-via-API → dump → diff
+// round-trip produces zero changes. This is a regression test for a bug where
+// YAML-wrapped continuation lines starting with '#'
+// were incorrectly stripped by renderTemplate, causing spurious diffs.
+//
+// test scope:
+//   - kong >=3.0.0
+func Test_RequestTermination_Dump_Diff(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	body := `{"email":[{"subject":"Lion Rock","htmlemail":"<html><head><style>` +
+		`body { color: #4c4c4c; background-color: #ebeced; font-size: 14px; }` +
+		` .header { background-color: #006564; }` +
+		` .border { border-left: 8px solid #1B3668; border: 1px solid #BCBEC0; }` +
+		` .footer a { color: #116F9A; }` +
+		`</style></head><body>Lion Rock Business Class Lounge Pass cancellation.` +
+		`</body></html>","textemail":""}],"sms":"","errors":null}`
+
+	// Step 1: Create the plugin via the Kong Admin API, simulating a plugin
+	// created through Kong Manager UI (pristine body, no prior YAML round-trip).
+	createdPlugin, err := client.Plugins.Create(ctx, &kong.Plugin{
+		Name:    kong.String("request-termination"),
+		Enabled: kong.Bool(true),
+		Config: kong.Configuration{
+			"status_code":  float64(200),
+			"body":         body,
+			"content_type": "application/json",
+			"echo":         false,
+			"message":      nil,
+			"trigger":      nil,
+		},
+		Protocols: kong.StringSlice("grpc", "grpcs", "http", "https"),
+	})
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		if createdPlugin != nil && createdPlugin.ID != nil {
+			_ = client.Plugins.Delete(ctx, createdPlugin.ID)
+		}
+	})
+
+	tmpFile, err := os.CreateTemp("", "deck-rt-dump-*.yaml")
+	require.NoError(t, err)
+	tmpFile.Close()
+	require.NoError(t, os.Remove(tmpFile.Name()))
+	t.Cleanup(func() { os.Remove(tmpFile.Name()) }) // no-op if dump already wrote it
+
+	_, err = dump("-o", tmpFile.Name())
+	require.NoError(t, err)
+
+	diffOut, err := diff(tmpFile.Name())
+	require.NoError(t, err)
+	assert.Contains(t, diffOut, "Created: 0",
+		"expected no diff between Kong state and the dumped file, got:\n%s", diffOut)
+	assert.Contains(t, diffOut, "Updated: 0",
+		"expected no diff between Kong state and the dumped file, got:\n%s", diffOut)
+	assert.Contains(t, diffOut, "Deleted: 0",
+		"expected no diff between Kong state and the dumped file, got:\n%s", diffOut)
 }

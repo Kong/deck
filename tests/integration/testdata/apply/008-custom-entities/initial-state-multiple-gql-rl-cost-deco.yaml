@@ -1,0 +1,24 @@
+_format_version: "3.0"
+services:
+- connect_timeout: 60000
+  host: mockbin.org
+  name: svc1
+  port: 80
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  write_timeout: 60000
+custom_entities:
+  - type: graphql_ratelimiting_cost_decorations
+    fields:
+      service:
+        name: svc1
+      type_path: "Query.users"
+      add_constant: 1.0
+  - type: graphql_ratelimiting_cost_decorations
+    fields:
+      service:
+        name: svc1
+      type_path: "Query.posts"
+      add_constant: 2.0
+      mul_constant: 1.5
