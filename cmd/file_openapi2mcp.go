@@ -35,7 +35,7 @@ func executeOpenapi2MCP(cmd *cobra.Command, _ []string) error {
 		cmdO2MentityTags = nil
 	}
 
-	cmdO2MoutputFormat = strings.ToUpper(cmdO2MoutputFormat)
+	cmdO2MoutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdO2MoutputFormat))
 
 	options := openapi2mcp.O2MOptions{
 		Tags:                 cmdO2MentityTags,

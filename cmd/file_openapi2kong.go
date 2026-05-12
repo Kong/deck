@@ -36,7 +36,7 @@ func executeOpenapi2Kong(cmd *cobra.Command, _ []string) error {
 		cmdO2KentityTags = nil
 	}
 
-	cmdO2KoutputFormat = strings.ToUpper(cmdO2KoutputFormat)
+	cmdO2KoutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdO2KoutputFormat))
 
 	if cmdO2KinsoCompat {
 		cmdO2KskipID = true // this is implicit in inso compatibility mode
