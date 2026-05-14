@@ -42,8 +42,19 @@ certificates:
     snis:
       - name: localhost
 consumers:
-  - custom_id: test_consumer_3x_custom_test
+  - custom_id: test_consumer_3x_custom_updated
     username: test_consumer_3x
+    acls:
+      - group: silver
+    basicauth_credentials:
+      - username: basic_user_updated
+        password: basic_pass_updated
+    keyauth_credentials:
+      - key: test-api-key-updated
+    jwt_secrets:
+      - key: test-jwt-key-updated
+        secret: test-jwt-secret-updated
+        algorithm: HS256
 
 consumer_groups:
   - id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
@@ -51,3 +62,32 @@ consumer_groups:
     tags:
       - tag1
       - tag2
+
+key_sets:
+  - id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+    name: test-key-set-updated
+    tags:
+      - test-keyset-updated
+
+keys:
+  - id: b2c3d4e5-6789-01bc-def1-234567890abc
+    name: test-key-jwk-updated
+    kid: test-kid-456
+    jwk: '{"kty":"RSA","kid":"test-kid-456","use":"sig","alg":"RS256","n":"updated_key_value_n","e":"AQAB"}'
+    set:
+      id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+
+key_sets:
+  - id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+    name: test-key-set-updated
+    tags:
+      - test-keyset-updated
+
+keys:
+  - id: b2c3d4e5-6789-01bc-def1-234567890abc
+    name: test-key-jwk-updated
+    kid: test-kid-456
+    jwk: '{"kty":"RSA","kid":"test-kid-456","use":"sig","alg":"RS256","n":"updated_key_value_n","e":"AQAB"}'
+    set:
+      id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+
