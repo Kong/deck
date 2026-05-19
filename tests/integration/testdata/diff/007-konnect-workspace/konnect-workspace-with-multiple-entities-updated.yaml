@@ -77,17 +77,3 @@ keys:
     set:
       id: a1b2c3d4-5678-90ab-cdef-1234567890ab
 
-key_sets:
-  - id: a1b2c3d4-5678-90ab-cdef-1234567890ab
-    name: test-key-set-updated
-    tags:
-      - test-keyset-updated
-
-keys:
-  - id: b2c3d4e5-6789-01bc-def1-234567890abc
-    name: test-key-jwk-updated
-    kid: test-kid-456
-    jwk: '{"kty":"RSA","kid":"test-kid-456","use":"sig","alg":"RS256","n":"updated_key_value_n","e":"AQAB"}'
-    set:
-      id: a1b2c3d4-5678-90ab-cdef-1234567890ab
-
