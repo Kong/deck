@@ -1102,6 +1102,9 @@ func Test_Diff_Konnect_Workspace(t *testing.T) {
 				"updating key test-key-jwk",
 				"creating route route-multi-entity-3",
 				"deleting route route-multi-entity-2",
+				"Created: 4",
+				"Updated: 6",
+				"Deleted: 4",
 			},
 		},
 	}

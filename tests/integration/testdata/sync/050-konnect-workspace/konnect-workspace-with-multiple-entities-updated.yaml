@@ -127,12 +127,6 @@ consumers:
 consumer_groups:
   - name: silver
 
-certificates:
-  - id: 13c562a1-191c-4464-9b18-e5222b46035b
-    cert: "{vault://my-workspace-vault/cert}"
-    key: "{vault://my-workspace-vault/key}"
-    snis:
-      - name: localhost
 
 key_sets:
   - id: a1b2c3d4-5678-90ab-cdef-1234567890ab
