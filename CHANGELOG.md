@@ -1,6 +1,7 @@
 # Table of Contents
 
-- [v1.60.0](#v160)
+- [v1.61.0](#v1610)
+- [v1.60.0](#v1600)
 - [v1.59.1](#v1591)
 - [v1.59.0](#v1590)
 - [v1.58.0](#v1580)
@@ -138,6 +139,17 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.61.0]
+> Release date: 2026/05/21
+
+### Added
+- Added support for `--skip-consumers-with-consumer-groups` flag for Konnect. [#2042](https://github.com/Kong/deck/pull/2042)
+- Added `-W` and `-E` flags to allow users to control error severity. [#2049](https://github.com/Kong/deck/pull/2049) [go-database-reconciler #466](https://github.com/Kong/go-database-reconciler/pull/466)
+
+### Chores
+- Upgraded go version to `v1.26.3`
+[#1997](https://github.com/Kong/deck/pull/1997)
 
 ## [v1.60.0]
 > Release date: 2026/05/08
@@ -2588,6 +2600,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.61.0]: https://github.com/Kong/deck/compare/v1.60.0...v1.61.0  
 [v1.60.0]: https://github.com/Kong/deck/compare/v1.59.1...v1.60.0
 [v1.59.1]: https://github.com/Kong/deck/compare/v1.59.0...v1.59.1
 [v1.59.0]: https://github.com/Kong/deck/compare/v1.58.0...v1.59.0
