@@ -228,6 +228,9 @@ It can be used to export, import, or sync entities to Kong.`,
 	rootCmd.AddCommand(newDiffCmd(true))            // deprecated, to exist under the `gateway` subcommand only
 	rootCmd.AddCommand(newConvertCmd(true))         // deprecated, to exist under the `file` subcommand only
 	rootCmd.AddCommand(newKonnectCmd())             // deprecated, to be removed
+
+	rootCmd.AddCommand(newPluginCmd())
+
 	{
 		gatewayCmd := newGatewaySubCmd()
 		rootCmd.AddCommand(gatewayCmd)
@@ -259,6 +262,8 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newKong2TfCmd())
 		fileCmd.AddCommand(newFileFormatCmd())
 	}
+
+
 	return rootCmd
 }
 

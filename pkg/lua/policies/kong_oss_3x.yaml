@@ -1,0 +1,54 @@
+# Kong OSS Lua Sandbox Knowledge Base
+
+version: "1.0"
+edition: "OSS"
+
+profiles:
+  - name: lua
+    description: "Base Lua environment for OSS"
+    allowed_globals:
+      - _VERSION
+      - assert
+      - error
+      - ipairs
+      - next
+      - pairs
+      - pcall
+      - print
+      - select
+      - tonumber
+      - tostring
+      - type
+      - unpack
+      - xpcall
+    allowed_prefixes:
+      - math.
+      - string.
+      - table.
+
+  - name: standard
+    extends: lua
+    description: "Standard OSS Sandbox. Core PDK only."
+    allowed_globals:
+      - kong
+      - ngx
+    allowed_prefixes:
+      - kong.log.
+      - kong.request.
+      - kong.response.
+      - kong.service.
+      - kong.ip.
+      - kong.table.
+      - ngx.log
+      - ngx.sleep
+      - ngx.time
+      - ngx.re.
+      - ngx.exit
+      - ngx.HTTP_
+      - ngx.OK
+
+rules:
+  - id: LUA-EV-001
+    pattern: "(_G\\[|getfenv|setfenv)"
+    severity: CRITICAL
+    message: "Sandbox evasion: global environment access is strictly blocked."
