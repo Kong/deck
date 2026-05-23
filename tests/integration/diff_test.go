@@ -1097,11 +1097,14 @@ func Test_Diff_Konnect_Workspace(t *testing.T) {
 			expectedContains: []string{
 				"updating route route-multi-entity-1",
 				"updating consumer-group silver",
+				"updating consumer test_consumer_3x",
+				"updating key-set test-key-set",
+				"updating key test-key-jwk",
 				"creating route route-multi-entity-3",
 				"deleting route route-multi-entity-2",
-				"Created: 1",
-				"Updated: 2",
-				"Deleted: 1",
+				"Created: 4",
+				"Updated: 6",
+				"Deleted: 4",
 			},
 		},
 	}

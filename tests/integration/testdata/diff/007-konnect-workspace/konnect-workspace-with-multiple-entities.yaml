@@ -44,7 +44,43 @@ certificates:
 consumers:
   - custom_id: test_consumer_3x_custom_test
     username: test_consumer_3x
+    acls:
+      - group: silver
+        tags:
+          - test-acl
+    basicauth_credentials:
+      - username: basic_user
+        password: basic_pass
+        tags:
+          - test-basic
+    keyauth_credentials:
+      - key: test-api-key
+        tags:
+          - test-key
+    jwt_secrets:
+      - key: test-jwt-key
+        secret: test-jwt-secret
+        algorithm: HS256
+        tags:
+          - test-jwt
 
 consumer_groups:
   - id: 5bcbd3a7-030b-4310-bd1d-2721ff85d236
     name: silver
+
+key_sets:
+  - id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+    name: test-key-set
+    tags:
+      - test-keyset
+
+keys:
+  - id: b2c3d4e5-6789-01bc-def1-234567890abc
+    name: test-key-jwk
+    kid: test-kid-123
+    jwk: '{"kty":"RSA","kid":"test-kid-123","use":"sig","alg":"RS256","n":"xGOr-H7A-PWG8_gM6F_kE3vN1RVwfFjLJZQXYRqLXe7bAzRUH3n7HWpCCBU3_xHJpC1lSYHPLvLvQwGh_V5JjqXuQ_3FqLrRYmQYPZRCCQXKF9b2cHvY5LqJfVY3OhOYLvMnLJ_MQ7cKcW7N8HhKLYmQVY3_HqLrRYmQYPZRCQ","e":"AQAB"}'
+    tags:
+      - test-key
+    set:
+      id: a1b2c3d4-5678-90ab-cdef-1234567890ab
+
