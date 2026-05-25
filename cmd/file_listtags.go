@@ -26,7 +26,7 @@ func executeListTags(cmd *cobra.Command, _ []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-list-tags", "", modeLocal)
 
-	cmdListTagsOutputFormat = strings.ToUpper(cmdListTagsOutputFormat)
+	cmdListTagsOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdListTagsOutputFormat))
 
 	// do the work: read/list-tags/write
 	data, err := filebasics.DeserializeFile(cmdListTagsInputFilename)

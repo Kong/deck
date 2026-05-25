@@ -27,7 +27,7 @@ func executePatch(cmd *cobra.Command, args []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-patch", "", modeLocal)
 
-	cmdPatchOutputFormat = strings.ToUpper(cmdPatchOutputFormat)
+	cmdPatchOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdPatchOutputFormat))
 
 	var valuesPatch patch.DeckPatch
 	{

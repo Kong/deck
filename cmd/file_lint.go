@@ -33,7 +33,7 @@ func executeLint(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	silenceErrors, err := lint.GetLintOutput(lintErrs, cmdLintFormat, cmdLintOutputFilename)
+	silenceErrors, err := lint.GetLintOutput(lintErrs, getFormatFlagValue(cmd, cmdLintFormat), cmdLintOutputFilename)
 	if err != nil {
 		return err
 	}

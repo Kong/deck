@@ -29,6 +29,7 @@ func newKonnectDumpCmd() *cobra.Command {
 	configure Konnect.` + konnectAlphaState,
 		Args: validateNoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			konnectDumpCmdStateFormat = getFormatFlagValue(cmd, konnectDumpCmdStateFormat)
 			httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
 				Timeout: time.Duration(rootConfig.Timeout) * time.Second,
 			})

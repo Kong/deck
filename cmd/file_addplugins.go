@@ -28,7 +28,7 @@ func executeAddPlugins(cmd *cobra.Command, cfgFiles []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-add-plugins", "", modeLocal)
 
-	cmdAddPluginOutputFormat = strings.ToUpper(cmdAddPluginOutputFormat)
+	cmdAddPluginOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdAddPluginOutputFormat))
 
 	var pluginConfigs []map[string]interface{}
 	{

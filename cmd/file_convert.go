@@ -23,8 +23,9 @@ var (
 	convertCmdNoExpandEnvVars      bool
 )
 
-func executeConvert(_ *cobra.Command, _ []string) error {
+func executeConvert(cmd *cobra.Command, _ []string) error {
 	_ = sendAnalytics("file-convert", "", modeLocal)
+	convertCmdStateFormat = getFormatFlagValue(cmd, convertCmdStateFormat)
 
 	sourceFormat, err := convert.ParseFormat(convertCmdSourceFormat)
 	if err != nil {
