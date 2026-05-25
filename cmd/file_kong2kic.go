@@ -39,7 +39,7 @@ func executeKong2Kic(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed reading input file '%s'; %w", cmdKong2KicInputFilename, err)
 	}
 
-	outputFileFormat, yamlOrJSON, err = validateInput(cmdKong2KicOutputFormat)
+	outputFileFormat, yamlOrJSON, err = validateInput(getFormatFlagValue(cmd, cmdKong2KicOutputFormat))
 	if err != nil {
 		return err
 	}

@@ -97,6 +97,7 @@ func sanitizeContent(ctx context.Context, client *kong.Client,
 
 func executeDump(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
+	dumpCmdStateFormat = getFormatFlagValue(cmd, dumpCmdStateFormat)
 
 	if yes, err := utils.ConfirmFileOverwrite(dumpCmdKongStateFile, dumpCmdStateFormat, assumeYes); err != nil {
 		return err

@@ -27,7 +27,7 @@ func executeRemoveTags(cmd *cobra.Command, tagsToRemove []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-remove-tags", "", modeLocal)
 
-	cmdRemoveTagsOutputFormat = strings.ToUpper(cmdRemoveTagsOutputFormat)
+	cmdRemoveTagsOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdRemoveTagsOutputFormat))
 
 	if !cmdRemoveTagsKeepOnlyTags && len(tagsToRemove) == 0 {
 		return fmt.Errorf("no tags to remove")

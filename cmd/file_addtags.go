@@ -25,7 +25,7 @@ func executeAddTags(cmd *cobra.Command, tagsToAdd []string) error {
 	logbasics.Initialize(log.LstdFlags, verbosity)
 	_ = sendAnalytics("file-add-tags", "", modeLocal)
 
-	cmdAddTagsOutputFormat = strings.ToUpper(cmdAddTagsOutputFormat)
+	cmdAddTagsOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdAddTagsOutputFormat))
 
 	// do the work: read/add-tags/write
 	data, err := filebasics.DeserializeFile(cmdAddTagsInputFilename)

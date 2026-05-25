@@ -15,7 +15,7 @@ var (
 	fileRenderCmdPopulateEnvVars bool
 )
 
-func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
+func executeFileRenderCmd(cmd *cobra.Command, _ []string) error {
 	_ = sendAnalytics("file-render", "", modeLocal)
 	envVarsMode := file.EnvVarsMock
 	if fileRenderCmdPopulateEnvVars {
@@ -25,7 +25,7 @@ func executeFileRenderCmd(_ *cobra.Command, _ []string) error {
 	return convert.Convert(
 		fileRenderCmdKongStateFile,
 		fileRenderCmdKongFileOutput,
-		file.Format(strings.ToUpper(fileRenderCmdStateFormat)),
+		file.Format(strings.ToUpper(getFormatFlagValue(cmd, fileRenderCmdStateFormat))),
 		convert.FormatDistributed,
 		convert.FormatKongGateway3x,
 		envVarsMode,
