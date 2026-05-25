@@ -36,7 +36,7 @@ func executeMerge(cmd *cobra.Command, args []string) error {
 	return filebasics.WriteSerializedFile(
 		cmdMergeOutputFilename,
 		merged,
-		filebasics.OutputFormat(cmdMergeOutputFormat))
+		filebasics.OutputFormat(getFormatFlagValue(cmd, cmdMergeOutputFormat)))
 }
 
 //

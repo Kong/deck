@@ -28,6 +28,18 @@ import (
 
 const exitCodeDiffDetection = 2
 
+// getFormatFlagValue returns the effective format value for a command.
+// CLI flag takes priority, then DECK_FORMAT env var, then the flag default.
+func getFormatFlagValue(cmd *cobra.Command, flagValue string) string {
+	if cmd.Flags().Changed("format") {
+		return flagValue
+	}
+	if envVal := os.Getenv("DECK_FORMAT"); envVal != "" {
+		return envVal
+	}
+	return flagValue
+}
+
 var (
 	assumeYes        bool
 	noMaskValues     bool

@@ -38,7 +38,7 @@ func executeNamespace(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	cmdNamespaceOutputFormat = strings.ToUpper(cmdNamespaceOutputFormat)
+	cmdNamespaceOutputFormat = strings.ToUpper(getFormatFlagValue(cmd, cmdNamespaceOutputFormat))
 
 	trackInfo := deckformat.HistoryNewEntry("namespace")
 	trackInfo["input"] = cmdNamespaceInputFilename
