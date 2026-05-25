@@ -122,7 +122,7 @@ The output will be targeted at Kong version 3.x.
 	openapi2kongCmd.Flags().BoolVar(&cmdO2KskipRouteByHeader, "skip-route-by-header", false,
 		"skip generation of separate route for each required header parameter enum value.\n"+
 			"When set, generates a single route per operation.")
-	openapi2kongCmd.Flags().BoolVar(&cmdO2KreuseService, "reuse-service", false,
+	openapi2kongCmd.Flags().BoolVar(&cmdO2KreuseService, "reuse-services", false,
 		"reuse existing Kong services when multiple paths share the same backend URL.\n"+
 			"When set, deduplicates services by checking host, protocol, port, and path.")
 
