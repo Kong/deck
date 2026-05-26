@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.62.0](#v1620)
 - [v1.61.0](#v1610)
 - [v1.60.0](#v1600)
 - [v1.59.1](#v1591)
@@ -139,6 +140,20 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.62.0]
+> Release date: 2026/05/26
+
+### Added
+- Added `--reuse-services` flag to `deck file openapi2kong` command to reuse services where server urls are same.
+[#2075](https://github.com/Kong/deck/pull/2075)
+[go-apiops #294](https://github.com/Kong/go-apiops/pull/294)
+
+### Fixed
+- Fixed `DECK_FORMAT` environment variable to support JSON format.
+[#2057](https://github.com/Kong/deck/pull/2057)
+- Bumped `golang.org/x/sys` from v0.43.0 to v0.44.1 to account for `CVE-2026-39824`
+[#2071](https://github.com/Kong/deck/pull/2071)
 
 ## [v1.61.0]
 > Release date: 2026/05/21
@@ -2600,6 +2615,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.62.0]: https://github.com/Kong/deck/compare/v1.61.0...v1.62.0  
 [v1.61.0]: https://github.com/Kong/deck/compare/v1.60.0...v1.61.0  
 [v1.60.0]: https://github.com/Kong/deck/compare/v1.59.1...v1.60.0
 [v1.59.1]: https://github.com/Kong/deck/compare/v1.59.0...v1.59.1
