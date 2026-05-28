@@ -1,0 +1,16 @@
+_format_version: "3.0"
+services:
+  - name: test-service
+    id: b35b3ec2-fa1c-4f6c-825e-c38141562c76
+    host: old-example.com
+    port: 8080
+    protocol: http
+    read_timeout: 60000
+    write_timeout: 60000
+    retries: 3
+    routes:
+      - name: test-route
+        id: a1234567-89ab-cdef-0123-456789abcdef
+        paths:
+          - /api
+        regex_priority: 1

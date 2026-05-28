@@ -7,6 +7,8 @@ import (
 	"os"
 	"testing"
 
+	"strings"
+
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
@@ -1193,4 +1195,126 @@ func Test_RequestTermination_Dump_Diff(t *testing.T) {
 		"expected no diff between Kong state and the dumped file, got:\n%s", diffOut)
 	assert.Contains(t, diffOut, "Deleted: 0",
 		"expected no diff between Kong state and the dumped file, got:\n%s", diffOut)
+}
+
+// Environment variables with short values that could cause false positives
+var maskingFixEnvVars = map[string]string{
+	"DECK_REDIS_DB":       "0",
+	"DECK_SYNC_RATE":      "1",
+	"DECK_RETRIES":        "5",
+	"DECK_SERVICE_HOST":   "example.com",
+	"DECK_REGEX_PRIORITY": "0",
+	"DECK_RATE_LIMIT":     "100",
+}
+
+// Test_Diff_Masking_ShortValues_NoCorruption verifies that short env var values
+// like "0", "1", "5" don't corrupt UUIDs or other unrelated values.
+// test scope:
+//   - 3.x
+func Test_Diff_Masking_ShortValues_NoCorruption(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range maskingFixEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/009-mask-short-values/initial.yaml"))
+
+	out, err := diff("testdata/diff/009-mask-short-values/kong.yaml")
+	require.NoError(t, err)
+
+	assert.Contains(t, out, "b35b3ec2-fa1c-4f6c-825e-c38141562c76",
+		"UUID should not be corrupted by short env var values")
+	assert.Contains(t, out, "a1234567-89ab-cdef-0123-456789abcdef",
+		"UUID should not be corrupted by short env var values")
+
+	assert.NotContains(t, out, "[masked]3ec",
+		"The '0' in UUID should not cause substring masking")
+	assert.NotContains(t, out, "b35b3ec[masked]",
+		"The '2' in UUID should not cause substring masking")
+}
+
+// Test_Diff_Masking_JSONOutput_ValidJSON verifies that when integers are masked,
+// the JSON output remains valid (masked values are properly quoted).
+// test scope:
+//   - 3.x
+func Test_Diff_Masking_JSONOutput_ValidJSON(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range maskingFixEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/009-mask-short-values/initial.yaml"))
+
+	out, err := diff("testdata/diff/009-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	assert.NotEmpty(t, out, "JSON output should not be empty")
+
+	if strings.Contains(out, "[masked]") {
+		assert.Contains(t, out, `"[masked]"`,
+			"Masked values in JSON should be quoted strings")
+	}
+
+	assert.Contains(t, out, "b35b3ec2-fa1c-4f6c-825e-c38141562c76",
+		"UUID should not be corrupted in JSON output")
+}
+
+// Test_Diff_Masking_ExactValueMatch verifies that masking uses exact value matching,
+// not substring matching. A value like "100" should NOT be masked just because
+// DECK_REDIS_DB=0 (the "0" in "100" should not trigger masking).
+// test scope:
+//   - 3.x
+func Test_Diff_Masking_ExactValueMatch(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range maskingFixEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/009-mask-short-values/initial.yaml"))
+
+	out, err := diff("testdata/diff/009-mask-short-values/kong.yaml")
+	require.NoError(t, err)
+
+	assert.Contains(t, out, "60000",
+		"Timeout value should not be masked - '0' in '60000' is not an exact match")
+
+	assert.Contains(t, out, "8080",
+		"Port value should not be masked - '0' in '8080' is not an exact match")
+}
+
+// Test_Sync_Masking_ValidJSON verifies that sync command with --json-output
+// produces valid JSON when env var values include integers.
+// test scope:
+//   - 3.x
+func Test_Sync_Masking_ValidJSON(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range maskingFixEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/009-mask-short-values/initial.yaml"))
+
+	out, err := diff("testdata/diff/009-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	if strings.Contains(out, "masked") {
+		assert.NotRegexp(t, `:\s*\[masked\][^"]`, out,
+			"Masked integer values should be quoted in JSON output")
+	}
 }

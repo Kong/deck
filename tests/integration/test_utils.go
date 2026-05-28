@@ -349,6 +349,28 @@ func sync(ctx context.Context, kongFile string, opts ...string) error {
 	return deckCmd.ExecuteContext(ctx)
 }
 
+func syncWithOutput(ctx context.Context, kongFile string, opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "sync", kongFile}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// overwrite default standard output
+	r, w, _ := os.Pipe()
+	color.Output = w
+
+	// execute decK command
+	cmdErr := deckCmd.ExecuteContext(ctx)
+
+	// read command output
+	w.Close()
+	out, _ := io.ReadAll(r)
+
+	return stripansi.Strip(string(out)), cmdErr
+}
+
 func multiFileSync(ctx context.Context, kongFiles []string, opts ...string) error {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"gateway", "sync"}
