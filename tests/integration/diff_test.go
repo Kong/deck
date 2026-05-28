@@ -5,9 +5,8 @@ package integration
 import (
 	"context"
 	"os"
-	"testing"
-
 	"strings"
+	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"

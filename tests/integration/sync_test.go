@@ -12325,16 +12325,11 @@ func Test_Sync_Masking_ReSyncIdempotency(t *testing.T) {
 
 	ctx := context.Background()
 
-	// First sync
 	require.NoError(t, sync(ctx, "testdata/sync/053-mask-short-values/kong.yaml"))
 
-	// Second sync should show no changes
 	out, err := syncWithOutput(ctx, "testdata/sync/053-mask-short-values/kong.yaml", "--json-output")
 	require.NoError(t, err)
 
-	// Check that change arrays are empty (proving idempotency)
-	// Note: We can't check summary counts like "creating": 0 because DECK_REDIS_DB=0
-	// causes the "0" value to be masked as "[masked]"
 	assert.Contains(t, out, `"creating": []`,
 		"No entities should be created on re-sync")
 	assert.Contains(t, out, `"updating": []`,
