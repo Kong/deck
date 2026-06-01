@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.62.1](#v1621)
 - [v1.62.0](#v1620)
 - [v1.61.0](#v1610)
 - [v1.60.0](#v1600)
@@ -140,6 +141,15 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.62.1]
+> Release date: 2026/06/01
+
+### Fixed
+- Fixed DECK_ env var masking in `deck diff`/`deck sync` to prevent corruption of UUIDs and other strings, 
+while ensuring masked values produce valid JSON.
+[#2079](https://github.com/Kong/deck/pull/2079)
+[go-apiops #473](https://github.com/Kong/go-apiops/pull/473)
 
 ## [v1.62.0]
 > Release date: 2026/05/26
@@ -2615,6 +2625,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.62.1]: https://github.com/Kong/deck/compare/v1.6120...v1.62.1
 [v1.62.0]: https://github.com/Kong/deck/compare/v1.61.0...v1.62.0  
 [v1.61.0]: https://github.com/Kong/deck/compare/v1.60.0...v1.61.0  
 [v1.60.0]: https://github.com/Kong/deck/compare/v1.59.1...v1.60.0
