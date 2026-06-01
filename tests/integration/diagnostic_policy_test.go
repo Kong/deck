@@ -8,6 +8,7 @@ import (
 )
 
 func Test_RenderDiagnosticSeverityOverrides_RouteRegexWarningAsError(t *testing.T) {
+	skipWhenKonnect(t)
 	_, err := render(
 		"testdata/render/005-diagnostics/route-regex.yaml",
 		"-E", "route-regex-path-format",
@@ -17,6 +18,7 @@ func Test_RenderDiagnosticSeverityOverrides_RouteRegexWarningAsError(t *testing.
 }
 
 func Test_RenderDiagnosticSeverityOverrides_OIDCSeverityOverrides(t *testing.T) {
+	skipWhenKonnect(t)
 	t.Run("defaults to hard error", func(t *testing.T) {
 		_, err := render("testdata/render/005-diagnostics/oidc-missing-config.yaml")
 		require.Error(t, err)
@@ -44,12 +46,14 @@ func Test_RenderDiagnosticSeverityOverrides_OIDCSeverityOverrides(t *testing.T) 
 }
 
 func Test_RenderDiagnosticSeverityOverrides_DefaultWarningsRemainWarnings(t *testing.T) {
+	skipWhenKonnect(t)
 	output, err := render("testdata/render/005-diagnostics/route-regex.yaml")
 	require.NoError(t, err)
 	assert.Contains(t, output, "svc-route-regex")
 }
 
 func Test_RenderDiagnosticSeverityOverrides_InvalidCode(t *testing.T) {
+	skipWhenKonnect(t)
 	_, err := render(
 		"testdata/render/005-diagnostics/route-regex.yaml",
 		"-E", "not-a-real-code",

@@ -16,6 +16,7 @@ import (
 )
 
 func Test_LintPlain(t *testing.T) {
+	skipWhenKonnect(t)
 	tests := []struct {
 		name        string
 		stateFile   string
@@ -50,6 +51,7 @@ type lintErrors struct {
 }
 
 func Test_LintStructured(t *testing.T) {
+	skipWhenKonnect(t)
 	tests := []struct {
 		name                string
 		stateFile           string
