@@ -333,6 +333,10 @@ var (
 					},
 					"strategy": string("off"),
 				},
+				"principals": map[string]interface{}{
+					"directory": string("default"),
+					"enabled":   bool(false),
+				},
 			},
 		},
 	}
