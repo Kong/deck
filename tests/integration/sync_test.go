@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -12184,4 +12185,155 @@ func testSyncPluginConditionalKonnectImpl(t *testing.T) {
 	}
 
 	testKongState(t, client, true, false, expectedStatePostSync, nil)
+}
+
+// Environment variables with short values that could cause false positives
+var syncMaskingEnvVars = map[string]string{
+	"DECK_REDIS_DB":       "0",
+	"DECK_SYNC_RATE":      "1",
+	"DECK_RETRIES":        "5",
+	"DECK_SERVICE_HOST":   "example.com",
+	"DECK_REGEX_PRIORITY": "0",
+	"DECK_RATE_LIMIT":     "100",
+}
+
+// Test_Sync_Masking_JSONOutput_ValidJSON verifies that sync with --json-output
+// produces valid JSON when env var values include short integers like "0".
+// This tests the masking fix - short values shouldn't corrupt the JSON output.
+// test scope:
+//   - 3.x
+func Test_Sync_Masking_JSONOutput_ValidJSON(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range syncMaskingEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	out, err := syncWithOutput(ctx, "testdata/sync/053-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	assert.NotEmpty(t, out, "JSON output should not be empty")
+	assert.Contains(t, out, `"summary"`,
+		"JSON output should contain summary field")
+
+	assert.Contains(t, out, `"creating"`,
+		"JSON output should contain creating field")
+
+	if strings.Contains(out, "[masked]") {
+		assert.Contains(t, out, `"[masked]"`,
+			"Masked values in JSON should be quoted strings")
+		// Check for invalid unquoted [masked]
+		assert.NotRegexp(t, `:\s*\[masked\][^"]`, out,
+			"Masked integer values should be quoted in JSON output")
+	}
+
+	assert.NotContains(t, out, "b35b3ec[masked]",
+		"UUID should not be corrupted by short env var values in sync output")
+	assert.NotContains(t, out, "[masked]3ec2",
+		"UUID should not be corrupted by substring matching")
+}
+
+// Test_Sync_Masking_ShortValues_NoCorruption verifies that short env var values
+// don't corrupt UUIDs or other values in the sync JSON output.
+// test scope:
+//   - 3.x
+func Test_Sync_Masking_ShortValues_NoCorruption(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range syncMaskingEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	out, err := syncWithOutput(ctx, "testdata/sync/053-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	assert.NotRegexp(t, `:\s*\[masked\][,\s\n\}]`, out,
+		"Masked values should be quoted strings, not unquoted [masked]")
+
+	if strings.Contains(out, "[masked]") {
+		assert.Contains(t, out, `"[masked]"`,
+			"Masked values must be quoted for valid JSON")
+	}
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	services, err := client.Services.ListAll(ctx)
+	require.NoError(t, err)
+
+	var foundService *kong.Service
+	for _, svc := range services {
+		if svc.Name != nil && *svc.Name == "mask-test-service" {
+			foundService = svc
+			break
+		}
+	}
+	require.NotNil(t, foundService, "Service should be created via sync")
+
+	assert.Equal(t, "b35b3ec2-fa1c-4f6c-825e-c38141562c76", *foundService.ID,
+		"Service UUID should not be corrupted")
+
+	assert.Equal(t, "example.com", *foundService.Host)
+	assert.Equal(t, 5, *foundService.Retries)
+}
+
+// Test_Sync_Masking_ExactValueMatch verifies that masking uses exact value matching
+// in the sync command's JSON output.
+// test scope:
+//   - 3.x
+func Test_Sync_Masking_ExactValueMatch(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range syncMaskingEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	out, err := syncWithOutput(ctx, "testdata/sync/053-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	assert.NotContains(t, out, "6[masked]",
+		"The '0' in '60000' should not cause partial masking")
+	assert.NotContains(t, out, "[masked][masked][masked][masked]",
+		"Multiple '0's should not create corrupted output")
+
+	if strings.Contains(out, "[masked]") {
+		assert.Contains(t, out, `"[masked]"`,
+			"Masked values should be quoted strings in JSON")
+	}
+}
+
+// Test_Sync_Masking_ReSyncIdempotency verifies that re-syncing the same file
+// with env vars doesn't cause spurious changes (idempotency).
+// test scope:
+//   - 3.x
+func Test_Sync_Masking_ReSyncIdempotency(t *testing.T) {
+	runWhen(t, "kong", ">=3.0.0")
+	setup(t)
+
+	for k, v := range syncMaskingEnvVars {
+		t.Setenv(k, v)
+	}
+
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/sync/053-mask-short-values/kong.yaml"))
+
+	out, err := syncWithOutput(ctx, "testdata/sync/053-mask-short-values/kong.yaml", "--json-output")
+	require.NoError(t, err)
+
+	assert.Contains(t, out, `"creating": []`,
+		"No entities should be created on re-sync")
+	assert.Contains(t, out, `"updating": []`,
+		"No entities should be updated on re-sync")
+	assert.Contains(t, out, `"deleting": []`,
+		"No entities should be deleted on re-sync")
 }
