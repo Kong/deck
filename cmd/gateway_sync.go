@@ -118,6 +118,9 @@ to get Kong's state in sync with the input state.`,
 		false, "assume `yes` to prompts and run non-interactively.")
 	syncCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	syncCmd.Flags().BoolVar(&dumpConfig.IncludePluginDefinitions, "include-plugin-definitions",
+		false, "allow deck to sync plugin definitions.\n"+
+			"Plugin definitions work with Konnect and Gateway versions >= 3.15.")
 	addDiagnosticSeverityFlags(syncCmd.Flags())
 	addSilenceEventsFlag(syncCmd.Flags())
 	return syncCmd

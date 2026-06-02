@@ -118,6 +118,9 @@ that will be created, updated, or deleted.
 			"Usage of this flag without apt select-tags and default-lookup-tags can be problematic.")
 	diffCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	diffCmd.Flags().BoolVar(&dumpConfig.IncludePluginDefinitions, "include-plugin-definitions",
+		false, "allow deck to diff plugin definitions.\n"+
+			"Plugin definitions work with Konnect and Gateway versions >= 3.15.")
 	addDiagnosticSeverityFlags(diffCmd.Flags())
 	addSilenceEventsFlag(diffCmd.Flags())
 	return diffCmd

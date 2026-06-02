@@ -132,6 +132,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		KongVersion:                      kongVersion,
 		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
 		SanitizeContent:                  dumpConfig.SanitizeContent,
+		IncludePluginDefinitions:         dumpConfig.IncludePluginDefinitions,
 	}
 
 	// Kong Enterprise dump all workspace
@@ -251,6 +252,9 @@ configure Kong.`,
 			"Warning: do not mix with consumer-group scoped plugins")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SkipDefaults, "skip-defaults",
 		false, "skip exporting default values.")
+	dumpCmd.Flags().BoolVar(&dumpConfig.IncludePluginDefinitions, "include-plugin-definitions",
+		false, "allow deck to dump plugin definitions.\n"+
+			"Plugin definitions work with Konnect and Gateway versions >= 3.15.")
 	dumpCmd.Flags().BoolVar(&dumpConfig.SanitizeContent, "sanitize",
 		false, "dumps a sanitized version of the gateway configuration.\n"+
 			"This feature hashes passwords, keys and other sensitive details.")

@@ -319,6 +319,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	dumpConfig.SchemaRegistry = schemaRegistry
 
 	dumpConfig.IsConsumerGroupPolicyOverrideSet = determinePolicyOverride(*targetContent, dumpConfig)
+	dumpConfig.IncludePluginDefinitions = determineIncludePluginDefinitions(*targetContent, dumpConfig)
 
 	dumpConfig.SelectorTags, err = determineSelectorTag(*targetContent, dumpConfig)
 	if err != nil {
@@ -463,6 +464,9 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 		return err
 	}
 	if err := checkForRBACResources(*rawState, dumpConfig.RBACResourcesOnly); err != nil {
+		return err
+	}
+	if err := checkForPluginDefinitions(*rawState, dumpConfig.IncludePluginDefinitions); err != nil {
 		return err
 	}
 	targetState, err := state.Get(rawState)
@@ -887,6 +891,30 @@ func containsProxyConfiguration(content reconcilerUtils.KongRawState) bool {
 
 func containsRBACConfiguration(content reconcilerUtils.KongRawState) bool {
 	return len(content.RBACRoles) != 0
+}
+
+func determineIncludePluginDefinitions(targetContent file.Content, config dump.Config) bool {
+	if config.IncludePluginDefinitions {
+		return true
+	}
+
+	if targetContent.Info != nil && targetContent.Info.IncludePluginDefinitions {
+		return targetContent.Info.IncludePluginDefinitions
+	}
+
+	return false
+}
+
+func checkForPluginDefinitions(content reconcilerUtils.KongRawState, includePluginDefinitions bool) error {
+	if containsPluginDefinitions(content) && !includePluginDefinitions {
+		return fmt.Errorf("state file(s) contains plugin definitions. " +
+			"Please use --include-plugin-definitions flag to manage these resources.")
+	}
+	return nil
+}
+
+func containsPluginDefinitions(content reconcilerUtils.KongRawState) bool {
+	return len(content.ClonedPluginDefinitions) != 0
 }
 
 func sendAnalytics(cmd, kongVersion string, mode mode) error {
