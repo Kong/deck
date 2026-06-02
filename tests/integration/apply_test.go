@@ -897,8 +897,18 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-cpd.yaml",
 			expectedState: utils.KongRawState{
 				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
-					{Name: kong.String("new-acl"), Ref: kong.String("acl"), Priority: kong.Uint64(1000), Tags: kong.StringSlice("tag1", "tag2")},
-					{Name: kong.String("new-file-log"), Ref: kong.String("file-log"), Priority: kong.Uint64(200), Tags: kong.StringSlice("select-me", "tag1", "tag2", "updated-tag")},
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Uint64(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Uint64(200),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2", "updated-tag"),
+					},
 				},
 			},
 		},
@@ -908,8 +918,18 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
 			expectedState: utils.KongRawState{
 				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
-					{Name: kong.String("new-acl"), Ref: kong.String("acl"), Priority: kong.Uint64(1000), Tags: kong.StringSlice("tag1", "tag2")},
-					{Name: kong.String("new-file-log"), Ref: kong.String("file-log"), Priority: kong.Uint64(100), Tags: kong.StringSlice("select-me", "tag1", "tag2")},
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Uint64(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Uint64(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
 				},
 				Plugins: []*kong.Plugin{
 					{

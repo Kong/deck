@@ -908,7 +908,7 @@ func determineIncludePluginDefinitions(targetContent file.Content, config dump.C
 func checkForPluginDefinitions(content reconcilerUtils.KongRawState, includePluginDefinitions bool) error {
 	if containsPluginDefinitions(content) && !includePluginDefinitions {
 		return fmt.Errorf("state file(s) contains plugin definitions. " +
-			"Please use --include-plugin-definitions flag to manage these resources.")
+			"Please use --include-plugin-definitions flag to manage these resources")
 	}
 	return nil
 }
