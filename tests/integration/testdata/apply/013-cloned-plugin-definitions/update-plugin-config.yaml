@@ -1,0 +1,19 @@
+_format_version: "3.0"
+plugins:
+- name: new-file-log
+  config:
+    path: /tmp/file-updated.log
+    reopen: false
+  tags:
+  - plugin-tag1
+  - plugin-tag2
+  - select-me
+- name: new-acl
+  config:
+    allow:
+    - example.com
+    - example.org
+    hide_groups_header: true
+  enabled: true
+  tags:
+  - plugin-tag1
