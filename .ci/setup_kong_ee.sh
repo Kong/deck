@@ -63,6 +63,7 @@ readonly KONG_IMAGE=${KONG_IMAGE:-kong/kong-gateway}
 readonly GATEWAY_CONTAINER_NAME=kong
 
 KONG_ROUTER_FLAVOR=${KONG_ROUTER_FLAVOR:-'traditional_compatible'}
+KONG_CUSTOM_PLUGINS_ENABLED=${KONG_CUSTOM_PLUGINS_ENABLED:-'on'}
 
 initNetwork
 initDb
@@ -81,6 +82,7 @@ docker run \
     -e "MY_SECRET_CERT=$MY_SECRET_CERT" \
     -e "MY_SECRET_KEY=$MY_SECRET_KEY" \
     -e "KONG_ROUTER_FLAVOR=${KONG_ROUTER_FLAVOR}" \
+    -e "KONG_CUSTOM_PLUGINS_ENABLED=${KONG_CUSTOM_PLUGINS_ENABLED}" \
     -p 8000:8000 \
     -p 8443:8443 \
     -p 8001:8001 \
