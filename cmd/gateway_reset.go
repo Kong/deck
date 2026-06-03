@@ -12,10 +12,11 @@ import (
 )
 
 var (
-	resetCmdForce      bool
-	resetWorkspace     string
-	resetAllWorkspaces bool
-	resetJSONOutput    bool
+	resetCmdForce         bool
+	resetWorkspace        string
+	resetAllWorkspaces    bool
+	resetJSONOutput       bool
+	skipPluginDefinitions bool
 )
 
 func executeReset(cmd *cobra.Command, _ []string) error {
@@ -34,6 +35,8 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 		if !ok {
 			return nil
 		}
+	} else if resetCmdForce && !skipPluginDefinitions {
+		dumpConfig.IncludePluginDefinitions = true
 	}
 
 	mode := getMode(nil)
@@ -116,6 +119,8 @@ By default, this command will ask for confirmation.`,
 		false, "do not reset CA certificates.")
 	resetCmd.Flags().BoolVar(&resetJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	resetCmd.Flags().BoolVar(&skipPluginDefinitions, "skip-plugin-definitions",
+		false, "do not reset plugin definitions.")
 
 	return resetCmd
 }

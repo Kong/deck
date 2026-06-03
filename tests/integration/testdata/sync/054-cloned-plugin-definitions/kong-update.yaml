@@ -1,0 +1,36 @@
+_format_version: "3.0"
+cloned_plugins:
+- name: new-file-log
+  ref: file-log
+  priority: 200
+  tags:
+  - tag1
+  - tag2
+  - select-me
+  - updated-tag
+- name: new-acl
+  ref: acl
+  priority: 1000
+  tags:
+  - tag1
+  - tag2
+
+plugins:
+- name: new-file-log
+  config:
+    path: /tmp/file-updated.log
+    reopen: false
+  tags:
+  - plugin-tag1
+  - plugin-tag2
+  - select-me
+
+- name: new-acl
+  config:
+    allow:
+    - example.com
+    - example.org
+    hide_groups_header: true
+  enabled: true
+  tags:
+  - plugin-tag1

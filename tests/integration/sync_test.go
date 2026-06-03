@@ -12341,3 +12341,94 @@ func Test_Sync_Masking_ReSyncIdempotency(t *testing.T) {
 	assert.Contains(t, out, `"deleting": []`,
 		"No entities should be deleted on re-sync")
 }
+
+// test scope:
+// - enterprise >=3.15.0
+func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.15.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		wantErr       bool
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:     "creates cloned plugin definitions and plugins",
+			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Uint64(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Uint64(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"allow":                           []any{"example.com"},
+							"always_use_authenticated_groups": bool(false),
+							"deny":                            nil,
+							"hide_groups_header":              bool(true),
+							"include_consumer_groups":         bool(false),
+						},
+						Tags: kong.StringSlice("plugin-tag1"),
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"custom_fields_by_lua": nil,
+							"path":                 string("/tmp/file.log"),
+							"reopen":               bool(true),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+		{
+			name:     "fails with invalid plugin ref",
+			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong-fake.yaml",
+			wantErr:  true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
+
+			// // re-sync is idempotent
+			err = sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			require.NoError(t, err, "re-sync should not error")
+		})
+	}
+}

@@ -1,0 +1,5 @@
+_format_version: "3.0"
+cloned_plugins:
+- name: fake-clone
+  ref: fake-nonexistent-plugin
+  priority: 100

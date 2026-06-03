@@ -55,6 +55,9 @@ func newApplyCmd() *cobra.Command {
 			"This flag is only valid with Konnect.")
 	applyCmd.Flags().BoolVar(&syncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format")
+	applyCmd.Flags().BoolVar(&dumpConfig.IncludePluginDefinitions, "include-plugin-definitions",
+		false, "allow deck to apply plugin definitions.\n"+
+			"Plugin definitions work with Konnect and Gateway versions >= 3.15.")
 	addDiagnosticSeverityFlags(applyCmd.Flags())
 	addSilenceEventsFlag(applyCmd.Flags())
 

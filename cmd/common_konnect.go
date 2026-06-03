@@ -168,13 +168,14 @@ func dumpKonnectV2(ctx context.Context) error {
 
 	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 	writeConfig := file.WriteConfig{
-		SelectTags:       dumpConfig.SelectorTags,
-		Workspace:        dumpWorkspace,
-		FileFormat:       format,
-		WithID:           dumpWithID,
-		ControlPlaneName: konnectControlPlane,
-		KongVersion:      fetchKonnectKongVersion(),
-		SanitizeContent:  dumpConfig.SanitizeContent,
+		SelectTags:               dumpConfig.SelectorTags,
+		Workspace:                dumpWorkspace,
+		FileFormat:               format,
+		WithID:                   dumpWithID,
+		ControlPlaneName:         konnectControlPlane,
+		KongVersion:              fetchKonnectKongVersion(),
+		SanitizeContent:          dumpConfig.SanitizeContent,
+		IncludePluginDefinitions: dumpConfig.IncludePluginDefinitions,
 	}
 
 	var workspacesList []string
