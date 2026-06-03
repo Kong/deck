@@ -1573,11 +1573,11 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 		t.Run(tc.name+" "+tc.runWhen+" "+tc.runWhenVersion, func(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
-			output, err := dump(tc.dumpFlags...)
 			reset(t)
 			require.NoError(t, sync(ctx,
 				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
+			output, err := dump(tc.dumpFlags...)
 			require.NoError(t, err)
 
 			expected, err := readFile(tc.expectedFile)
