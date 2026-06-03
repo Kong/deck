@@ -12426,7 +12426,177 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 
 			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
 
-			// // re-sync is idempotent
+			// re-sync is idempotent
+			err = sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			require.NoError(t, err, "re-sync should not error")
+		})
+	}
+}
+
+func Test_Sync_CustomPluginDefinitions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.15.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	const cpdTestdata = "testdata/custom-plugin-definitions"
+	setHeaderHandler := mustReadFile(t, cpdTestdata+"/set-header.handler.lua")
+	setHeaderSchema := mustReadFile(t, cpdTestdata+"/set-header.schema.lua")
+	colDblessHandler := mustReadFile(t, cpdTestdata+"/col-dbless.handler.lua")
+	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		wantErr       bool
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:     "creates custom plugin definitions and plugins",
+			kongFile: "testdata/sync/055-custom-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("set-header"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"name":  string("X-Custom-Header"),
+							"value": string("hello-world"),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
+
+			// re-sync is idempotent
+			err = sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			require.NoError(t, err, "re-sync should not error")
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Sync_CustomPluginDefinitions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_CustomPluginDefinitions_Konnect",
+		testSyncCustomPluginDefinitionsKonnectImpl)
+}
+
+func testSyncCustomPluginDefinitionsKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	const cpdTestdata = "testdata/custom-plugin-definitions"
+	setHeaderHandler := mustReadFile(t, cpdTestdata+"/set-header.handler.lua")
+	setHeaderSchema := mustReadFile(t, cpdTestdata+"/set-header.schema.lua")
+	colDblessHandler := mustReadFile(t, cpdTestdata+"/col-dbless.handler.lua")
+	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		wantErr       bool
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:     "creates custom plugin definitions and plugins",
+			kongFile: "testdata/sync/055-custom-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("set-header"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"name":  string("X-Custom-Header"),
+							"value": string("hello-world"),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			// In skip-defaults mode, deck fetches plugin schemas from Konnect to
+			// remove defaults from the target state. Custom plugin schemas aren't
+			// available until after their definitions are synced, so we must sync
+			// the CPD-only file first to register the schemas, then sync the full
+			// config that includes plugin instances.
+			cpdOnlyFile := "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml"
+			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+
+			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			testKongState(t, client, true, false, tc.expectedState, tc.ignoreFields)
+
+			// re-sync is idempotent
 			err = sync(ctx, tc.kongFile, "--include-plugin-definitions")
 			require.NoError(t, err, "re-sync should not error")
 		})

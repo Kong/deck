@@ -971,3 +971,195 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 		})
 	}
 }
+
+func Test_Apply_CustomPluginDefinitions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.15.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	const cpdTestdata = "testdata/custom-plugin-definitions"
+	setHeaderHandler := mustReadFile(t, cpdTestdata+"/set-header.handler.lua")
+	setHeaderSchema := mustReadFile(t, cpdTestdata+"/set-header.schema.lua")
+	colDblessHandler := mustReadFile(t, cpdTestdata+"/col-dbless.handler.lua")
+	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
+
+	tests := []struct {
+		name          string
+		initialFile   string
+		updateFile    string
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:        "updates custom plugin definition tags",
+			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-cpd.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2", "updated-tag"),
+					},
+				},
+			},
+		},
+		{
+			name:        "updates plugin config linked with custom plugin definitions",
+			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-with-plugins.yaml",
+			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-plugin-config.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("set-header"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1", "plugin-tag2", "select-me"),
+						Config: kong.Configuration{
+							"name":  string("X-Custom-Header"),
+							"value": string("updated-world"),
+						},
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
+			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
+			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Apply_CustomPluginDefinitions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_CustomPluginDefinitions_Konnect",
+		testApplyCustomPluginDefinitionsKonnectImpl)
+}
+
+func testApplyCustomPluginDefinitionsKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	const cpdTestdata = "testdata/custom-plugin-definitions"
+	setHeaderHandler := mustReadFile(t, cpdTestdata+"/set-header.handler.lua")
+	setHeaderSchema := mustReadFile(t, cpdTestdata+"/set-header.schema.lua")
+	colDblessHandler := mustReadFile(t, cpdTestdata+"/col-dbless.handler.lua")
+	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
+
+	tests := []struct {
+		name          string
+		initialFile   string
+		updateFile    string
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:        "updates custom plugin definition tags",
+			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-cpd.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2", "updated-tag"),
+					},
+				},
+			},
+		},
+		{
+			name:        "updates plugin config linked with custom plugin definitions",
+			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-with-plugins.yaml",
+			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-plugin-config.yaml",
+			expectedState: utils.KongRawState{
+				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
+					{
+						Name:    kong.String("col-dbless"),
+						Handler: kong.String(colDblessHandler),
+						Schema:  kong.String(colDblessSchema),
+						Tags:    kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:    kong.String("set-header"),
+						Handler: kong.String(setHeaderHandler),
+						Schema:  kong.String(setHeaderSchema),
+						Tags:    kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("set-header"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1", "plugin-tag2", "select-me"),
+						Config: kong.Configuration{
+							"name":  string("X-Custom-Header"),
+							"value": string("updated-world"),
+						},
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			// In skip-defaults mode, deck fetches plugin schemas from Konnect to
+			// remove defaults. Custom plugin schemas are unavailable until their
+			// definitions are synced, so register CPDs first before any sync that
+			// includes plugin instances.
+			cpdOnlyFile := "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml"
+			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
+			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
+			testKongState(t, client, true, false, tc.expectedState, tc.ignoreFields)
+		})
+	}
+}

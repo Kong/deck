@@ -212,6 +212,10 @@ func sortSlices(x, y interface{}) bool {
 		yEntity := y.(*kong.ClonedPluginDefinition)
 		xName = *xEntity.Name
 		yName = *yEntity.Name
+	case *kong.CustomPluginDefinition:
+		yEntity := y.(*kong.CustomPluginDefinition)
+		xName = *xEntity.Name
+		yName = *yEntity.Name
 	}
 
 	return xName < yName
@@ -269,6 +273,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.IgnoreFields(kong.KeySet{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.Partial{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.ClonedPluginDefinition{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.CustomPluginDefinition{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
@@ -320,6 +325,15 @@ func readFile(filepath string) (string, error) {
 		return "", err
 	}
 	return string(content), nil
+}
+
+// mustReadFile reads a file and returns its content as a string, failing the
+// test immediately if the file cannot be read.
+func mustReadFile(t *testing.T, filepath string) string {
+	t.Helper()
+	content, err := os.ReadFile(filepath)
+	require.NoError(t, err)
+	return string(content)
 }
 
 // setup sets deck env variable to prevent analytics in tests and registers reset
