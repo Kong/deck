@@ -1572,7 +1572,8 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name+" "+tc.runWhen+" "+tc.runWhenVersion, func(t *testing.T) {
 			reset(t)
-			require.NoError(t, sync(ctx, "testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
+			require.NoError(t, sync(ctx,
+				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
