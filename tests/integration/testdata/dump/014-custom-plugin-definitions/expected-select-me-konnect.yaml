@@ -1,11 +1,11 @@
 _format_version: "3.0"
-_konnect:
-  control_plane_name: default
 _info:
   defaults: {}
   include_plugin_definitions: true
   select_tags:
   - select-me
+_konnect:
+  control_plane_name: default
 custom_plugins:
 - handler: |
     return {
