@@ -163,3 +163,35 @@ func Test_LintStructured(t *testing.T) {
 		})
 	}
 }
+
+func Test_LintEmptyOrCommentsOnly(t *testing.T) {
+	tests := []struct {
+		name        string
+		stateFile   string
+		rulesetFile string
+		expectError string
+	}{
+		{
+			name:        "comments only file",
+			stateFile:   "testdata/lint/001-simple-lint/comments-only.yaml",
+			rulesetFile: "testdata/lint/001-simple-lint/ruleset.yaml",
+			expectError: "state file is empty or contains only comments",
+		},
+		{
+			name:        "empty file",
+			stateFile:   "testdata/lint/001-simple-lint/empty.yaml",
+			rulesetFile: "testdata/lint/001-simple-lint/ruleset.yaml",
+			expectError: "state file is empty or contains only comments",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := fileLint(
+				"-s", tc.stateFile,
+				tc.rulesetFile,
+			)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tc.expectError)
+		})
+	}
+}

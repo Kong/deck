@@ -7,6 +7,7 @@ import (
 	"github.com/daveshanley/vacuum/motor"
 	"github.com/daveshanley/vacuum/rulesets"
 	"github.com/kong/go-apiops/filebasics"
+	"sigs.k8s.io/yaml"
 )
 
 const plainTextFormat = "plain"
@@ -80,6 +81,10 @@ func WithContent(
 	customRuleSet, err := getRuleSet(rulesetContent)
 	if err != nil {
 		return nil, err
+	}
+	var parsedContent interface{}
+	if err := yaml.Unmarshal(stateFileBytes, &parsedContent); err == nil && parsedContent == nil {
+		return nil, fmt.Errorf("state file is empty or contains only comments")
 	}
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
