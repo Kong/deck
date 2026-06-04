@@ -1529,3 +1529,60 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_CustomPluginDefinitions(t *testing.T) {
+	setup(t)
+	ctx := t.Context()
+
+	tests := []struct {
+		name           string
+		dumpFlags      []string
+		expectedFile   string
+		runWhen        string
+		runWhenVersion string
+	}{
+		{
+			name:           "dump includes all custom plugin definitions",
+			dumpFlags:      []string{"-o", "-", "--include-plugin-definitions"},
+			expectedFile:   "testdata/dump/014-custom-plugin-definitions/expected.yaml",
+			runWhen:        "enterprise",
+			runWhenVersion: ">=3.15.0",
+		},
+		{
+			name:           "select tags filter custom plugin definitions",
+			dumpFlags:      []string{"--select-tag", "select-me", "-o", "-", "--include-plugin-definitions"},
+			expectedFile:   "testdata/dump/014-custom-plugin-definitions/expected-select-me.yaml",
+			runWhen:        "enterprise",
+			runWhenVersion: ">=3.15.0",
+		},
+		{
+			name:         "dump includes all custom plugin definitions",
+			dumpFlags:    []string{"-o", "-", "--include-plugin-definitions"},
+			expectedFile: "testdata/dump/014-custom-plugin-definitions/expected-konnect.yaml",
+			runWhen:      "konnect",
+		},
+		{
+			name:         "select tags filter custom plugin definitions",
+			dumpFlags:    []string{"--select-tag", "select-me", "-o", "-", "--include-plugin-definitions"},
+			expectedFile: "testdata/dump/014-custom-plugin-definitions/expected-select-me-konnect.yaml",
+			runWhen:      "konnect",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name+" "+tc.runWhen+" "+tc.runWhenVersion, func(t *testing.T) {
+			runWhen(t, tc.runWhen, tc.runWhenVersion)
+
+			reset(t)
+			require.NoError(t, sync(ctx,
+				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
+
+			output, err := dump(tc.dumpFlags...)
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
+}

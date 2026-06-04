@@ -231,6 +231,12 @@ github.com/kong/go-database-reconciler v1.39.1-0.20260602074119-e4d7fe9da34e h1:
 github.com/kong/go-database-reconciler v1.39.1-0.20260602074119-e4d7fe9da34e/go.mod h1:LRJiDPjKQylRKXozJ/2svn6uJx5RcwGrBn448QHshTo=
 github.com/kong/go-database-reconciler v1.39.1-0.20260602075514-8f3b326cd953 h1:eZwpSwqAEH0tVVcOapZ1DSgYXLonnnuezCGZO1xq5Ow=
 github.com/kong/go-database-reconciler v1.39.1-0.20260602075514-8f3b326cd953/go.mod h1:LRJiDPjKQylRKXozJ/2svn6uJx5RcwGrBn448QHshTo=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603030830-5a423173a3ef h1:2RKd1EApG0zVHvP5jjfX9l9sUkPMGHTpnOj7Edi/7+Q=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603030830-5a423173a3ef/go.mod h1:LRJiDPjKQylRKXozJ/2svn6uJx5RcwGrBn448QHshTo=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603070506-f89ffcf707ac h1:U5rbgNRhGjNUFMZk+ALCwPSEC0aPPd+ahX7Bs2n1VYk=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603070506-f89ffcf707ac/go.mod h1:w4R1UNIsuGM/3rM/M8eqn03nSBKGoszz4WEW4rKhJOE=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603071722-e4632790d2a2 h1:D5NcBJB6FJ5DkP8XButrXBOpeA/rtmQEegoQF1suHvs=
+github.com/kong/go-database-reconciler v1.39.1-0.20260603071722-e4632790d2a2/go.mod h1:w4R1UNIsuGM/3rM/M8eqn03nSBKGoszz4WEW4rKhJOE=
 github.com/kong/go-kong v0.76.0 h1:hMvr51RZh7zYfLPbRqXt6F30/HSvTuAFNXqqqSS3zzw=
 github.com/kong/go-kong v0.76.0/go.mod h1:Wx5aTcMjyUnIF94M5NYFWb/EnuEkqB5STrWvybFSYYQ=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=

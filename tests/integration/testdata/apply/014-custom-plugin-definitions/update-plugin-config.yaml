@@ -1,0 +1,11 @@
+_format_version: "3.0"
+plugins:
+- name: set-header
+  config:
+    name: X-Custom-Header
+    value: updated-world
+  enabled: true
+  tags:
+  - plugin-tag1
+  - plugin-tag2
+  - select-me

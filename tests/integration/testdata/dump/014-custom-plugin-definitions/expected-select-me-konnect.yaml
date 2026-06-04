@@ -1,0 +1,52 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  include_plugin_definitions: true
+  select_tags:
+  - select-me
+_konnect:
+  control_plane_name: default
+custom_plugins:
+- handler: |
+    return {
+      VERSION = "1.0,0",
+      PRIORITY = 500,
+      access = function(self, config)
+        kong.service.request.set_header(config.name, config.value)
+      end
+    }
+  name: set-header
+  schema: |
+    return {
+      name = "set-header",
+      fields = {
+        { protocols = require("kong.db.schema.typedefs").protocols_http },
+        {
+          config = {
+            type = "record",
+            fields = {
+              { name = { description = "The name of the header to set.", type = "string", required = true, }, },
+              { value = { description = "The value for the header.", type = "string", required = true, }, },
+            },
+          },
+        },
+      },
+    }
+  tags:
+  - tag1
+  - tag2
+  - select-me
+plugins:
+- config:
+    name: X-Custom-Header
+    value: hello-world
+  enabled: true
+  name: set-header
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - plugin-tag1
+  - select-me

@@ -914,7 +914,7 @@ func checkForPluginDefinitions(content reconcilerUtils.KongRawState, includePlug
 }
 
 func containsPluginDefinitions(content reconcilerUtils.KongRawState) bool {
-	return len(content.ClonedPluginDefinitions) != 0
+	return len(content.ClonedPluginDefinitions) != 0 || len(content.CustomPluginDefinitions) != 0
 }
 
 func sendAnalytics(cmd, kongVersion string, mode mode) error {
