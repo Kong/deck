@@ -900,13 +900,13 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 					{
 						Name:     kong.String("new-acl"),
 						Ref:      kong.String("acl"),
-						Priority: kong.Uint64(1000),
+						Priority: kong.Int(1000),
 						Tags:     kong.StringSlice("tag1", "tag2"),
 					},
 					{
 						Name:     kong.String("new-file-log"),
 						Ref:      kong.String("file-log"),
-						Priority: kong.Uint64(200),
+						Priority: kong.Int(200),
 						Tags:     kong.StringSlice("select-me", "tag1", "tag2", "updated-tag"),
 					},
 				},
@@ -921,13 +921,13 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 					{
 						Name:     kong.String("new-acl"),
 						Ref:      kong.String("acl"),
-						Priority: kong.Uint64(1000),
+						Priority: kong.Int(1000),
 						Tags:     kong.StringSlice("tag1", "tag2"),
 					},
 					{
 						Name:     kong.String("new-file-log"),
 						Ref:      kong.String("file-log"),
-						Priority: kong.Uint64(100),
+						Priority: kong.Int(100),
 						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
 					},
 				},
