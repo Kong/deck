@@ -35,7 +35,9 @@ func executeReset(cmd *cobra.Command, _ []string) error {
 		if !ok {
 			return nil
 		}
-	} else if resetCmdForce && !skipPluginDefinitions {
+	}
+
+	if !skipPluginDefinitions {
 		dumpConfig.IncludePluginDefinitions = true
 	}
 
