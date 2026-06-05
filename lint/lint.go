@@ -2,11 +2,14 @@ package lint
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/daveshanley/vacuum/motor"
 	"github.com/daveshanley/vacuum/rulesets"
 	"github.com/kong/go-apiops/filebasics"
+	"github.com/kong/go-database-reconciler/pkg/cprint"
+	"sigs.k8s.io/yaml"
 )
 
 const plainTextFormat = "plain"
@@ -80,6 +83,17 @@ func WithContent(
 	customRuleSet, err := getRuleSet(rulesetContent)
 	if err != nil {
 		return nil, err
+	}
+	var parsedContent interface{}
+	if err := yaml.Unmarshal(stateFileBytes, &parsedContent); err == nil && parsedContent == nil {
+		// Return empty results with a warning instead of an error
+		// to maintain backward compatibility with older deck versions
+		cprint.UpdatePrintlnStdErr(os.Stderr, "Warning: state file is empty or contains only comments, skipping linting")
+		return map[string]interface{}{
+			"total_count": 0,
+			"fail_count":  0,
+			"results":     []Result{},
+		}, nil
 	}
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,

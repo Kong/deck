@@ -468,6 +468,36 @@ func fileLint(opts ...string) (string, error) {
 	return stripansi.Strip(string(out)), cmdErr
 }
 
+func fileLintWithStderr(opts ...string) (stdout string, stderr string, err error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"file", "lint"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture stdout
+	rescueStdout := os.Stdout
+	rOut, wOut, _ := os.Pipe()
+	os.Stdout = wOut
+
+	// capture stderr
+	rescueStderr := os.Stderr
+	rErr, wErr, _ := os.Pipe()
+	os.Stderr = wErr
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	wOut.Close()
+	wErr.Close()
+	outBytes, _ := io.ReadAll(rOut)
+	errBytes, _ := io.ReadAll(rErr)
+	os.Stdout = rescueStdout
+	os.Stderr = rescueStderr
+
+	return stripansi.Strip(string(outBytes)), stripansi.Strip(string(errBytes)), cmdErr
+}
+
 func fileConvert(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"file", "convert"}
