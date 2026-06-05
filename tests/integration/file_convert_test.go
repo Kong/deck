@@ -11,6 +11,7 @@ import (
 )
 
 func Test_FileConvert(t *testing.T) {
+	skipWhenKonnect(t)
 	tests := []struct {
 		name                        string
 		convertCmdSourceFormat      string
@@ -75,6 +76,7 @@ func Test_FileConvert(t *testing.T) {
 }
 
 func Test_FileConvert_NoExpandEnvVars(t *testing.T) {
+	skipWhenKonnect(t)
 	tests := []struct {
 		name               string
 		additionalArgs     []string
@@ -124,6 +126,7 @@ func Test_FileConvert_NoExpandEnvVars(t *testing.T) {
 }
 
 func Test_FileConvert_28xTo34x(t *testing.T) {
+	skipWhenKonnect(t)
 	originalCwd, err := os.Getwd()
 	require.NoError(t, err)
 	defer func() {
