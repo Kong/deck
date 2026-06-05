@@ -123,6 +123,7 @@ func Test_Validate_Konnect(t *testing.T) {
 }
 
 func Test_Validate_File(t *testing.T) {
+	skipWhenKonnect(t)
 	setup(t)
 
 	tests := []struct {

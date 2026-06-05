@@ -8,6 +8,7 @@ import (
 )
 
 func Test_RenderPlain(t *testing.T) {
+	skipWhenKonnect(t)
 	tests := []struct {
 		name           string
 		stateFile      string
