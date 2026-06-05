@@ -15,6 +15,10 @@ plugins:
     key_in_query: true
     key_names:
     - apikey
+    principals:
+      directory: default
+      enabled: false
+      error_on_miss: true
     realm: null
     run_on_preflight: true
   enabled: true
