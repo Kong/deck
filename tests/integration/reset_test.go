@@ -278,9 +278,9 @@ func Test_Reset_SkipPluginDefinitions(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name                string
-		resetFlags          []string
-		expectPluginsExist  bool
+		name               string
+		resetFlags         []string
+		expectPluginsExist bool
 	}{
 		{
 			name:               "reset without --skip-plugin-definitions deletes cloned and custom plugins",
