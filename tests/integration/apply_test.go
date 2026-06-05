@@ -818,6 +818,11 @@ func testApplyPluginConditionalKonnectImpl(t *testing.T) {
 					"key_in_header":    bool(true),
 					"key_in_query":     bool(true),
 					"key_names":        []any{string("apikey")},
+					"principals": map[string]any{
+						"directory":     string("default"),
+						"enabled":       bool(false),
+						"error_on_miss": bool(true),
+					},
 					"realm":            nil,
 					"run_on_preflight": bool(true),
 				},
@@ -854,6 +859,11 @@ func testApplyPluginConditionalKonnectImpl(t *testing.T) {
 					"key_in_header":    bool(true),
 					"key_in_query":     bool(true),
 					"key_names":        []any{string("apikey")},
+					"principals": map[string]any{
+						"directory":     string("default"),
+						"enabled":       bool(false),
+						"error_on_miss": bool(true),
+					},
 					"realm":            nil,
 					"run_on_preflight": bool(true),
 				},

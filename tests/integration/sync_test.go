@@ -1923,6 +1923,11 @@ var (
 				"key_in_header":    true,
 				"key_in_query":     true,
 				"key_names":        []interface{}{"apikey"},
+				"principals": map[string]any{
+					"directory":     string("default"),
+					"enabled":       bool(false),
+					"error_on_miss": bool(true),
+				},
 				"realm":            nil, // This is present on 3.7.x+
 				"run_on_preflight": true,
 			},
@@ -12171,6 +12176,11 @@ func testSyncPluginConditionalKonnectImpl(t *testing.T) {
 					"key_in_header":    bool(true),
 					"key_in_query":     bool(true),
 					"key_names":        []any{string("apikey")},
+					"principals": map[string]any{
+						"directory":     string("default"),
+						"enabled":       bool(false),
+						"error_on_miss": bool(true),
+					},
 					"realm":            nil,
 					"run_on_preflight": bool(true),
 				},
