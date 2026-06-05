@@ -169,29 +169,49 @@ func Test_LintEmptyOrCommentsOnly(t *testing.T) {
 		name        string
 		stateFile   string
 		rulesetFile string
-		expectError string
 	}{
 		{
 			name:        "comments only file",
 			stateFile:   "testdata/lint/001-simple-lint/comments-only.yaml",
 			rulesetFile: "testdata/lint/001-simple-lint/ruleset.yaml",
-			expectError: "state file is empty or contains only comments",
 		},
 		{
 			name:        "empty file",
 			stateFile:   "testdata/lint/001-simple-lint/empty.yaml",
 			rulesetFile: "testdata/lint/001-simple-lint/ruleset.yaml",
-			expectError: "state file is empty or contains only comments",
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := fileLint(
+			stdout, stderr, err := fileLintWithStderr(
 				"-s", tc.stateFile,
 				tc.rulesetFile,
 			)
-			require.Error(t, err)
-			assert.Contains(t, err.Error(), tc.expectError)
+			require.NoError(t, err)
+			assert.Contains(t, stderr, "Warning: state file is empty or contains only comments, skipping linting")
+			assert.Empty(t, stdout)
+		})
+
+		t.Run(tc.name+" json output", func(t *testing.T) {
+			stdout, stderr, err := fileLintWithStderr(
+				"-s", tc.stateFile,
+				"--format", "json",
+				tc.rulesetFile,
+			)
+			require.NoError(t, err)
+
+			// Verify warning message appears in stderr (not stdout)
+			assert.Contains(t, stderr, "Warning: state file is empty or contains only comments, skipping linting")
+
+			// Verify JSON output is valid and contains expected structure
+			var output lintErrors
+			err = json.Unmarshal([]byte(stdout), &output)
+			require.NoError(t, err, "JSON output should be valid")
+
+			// Verify empty results
+			assert.Equal(t, 0, output.TotalCount)
+			assert.Equal(t, 0, output.FailCount)
+			assert.Empty(t, output.Results)
 		})
 	}
 }

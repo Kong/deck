@@ -2,6 +2,7 @@ package lint
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/daveshanley/vacuum/motor"
@@ -84,7 +85,14 @@ func WithContent(
 	}
 	var parsedContent interface{}
 	if err := yaml.Unmarshal(stateFileBytes, &parsedContent); err == nil && parsedContent == nil {
-		return nil, fmt.Errorf("state file is empty or contains only comments")
+		// Return empty results with a warning instead of an error
+		// to maintain backward compatibility with older deck versions
+		_, _ = fmt.Fprintln(os.Stderr, "Warning: state file is empty or contains only comments, skipping linting")
+		return map[string]interface{}{
+			"total_count": 0,
+			"fail_count":  0,
+			"results":     []Result{},
+		}, nil
 	}
 	ruleSetResults := motor.ApplyRulesToRuleSet(&motor.RuleSetExecution{
 		RuleSet:           customRuleSet,
