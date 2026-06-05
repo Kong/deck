@@ -1,0 +1,9 @@
+_format_version: "3.0"
+cloned_plugins:
+- name: reset-test-file-log
+  ref: file-log
+  priority: 100
+custom_plugins:
+- name: reset-set-header
+  handler: 'return { VERSION = "1.0.0", PRIORITY = 500, access = function(self, config) kong.service.request.set_header(config.name, config.value) end }'
+  schema: 'return { name = "reset-set-header", fields = { { protocols = require("kong.db.schema.typedefs").protocols_http }, { config = { type = "record", fields = { { name = { type = "string", required = true } }, { value = { type = "string", required = true } } } } } } }'
