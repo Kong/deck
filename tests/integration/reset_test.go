@@ -268,3 +268,64 @@ func Test_Reset_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	assert.NotContains(t, output2, "route-workspace2",
 		"workspace2 entity should be deleted after --all-workspaces reset")
 }
+
+// test scope:
+// - enterprise >=3.15.0
+func Test_Reset_SkipPluginDefinitions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.15.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	tests := []struct {
+		name               string
+		resetFlags         []string
+		expectPluginsExist bool
+	}{
+		{
+			name:               "reset without --skip-plugin-definitions deletes cloned and custom plugins",
+			resetFlags:         []string{},
+			expectPluginsExist: false,
+		},
+		{
+			name:               "reset with --skip-plugin-definitions preserves cloned and custom plugins",
+			resetFlags:         []string{"--skip-plugin-definitions"},
+			expectPluginsExist: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			require.NoError(t, sync(ctx,
+				"testdata/reset/003-skip-plugin-definitions/kong.yaml",
+				"--include-plugin-definitions"))
+
+			// Verify both plugin definitions exist before reset
+			output, err := dump("-o", "-", "--include-plugin-definitions")
+			require.NoError(t, err)
+			assert.Contains(t, output, "reset-test-file-log",
+				"cloned plugin should exist before reset")
+			assert.Contains(t, output, "reset-set-header",
+				"custom plugin should exist before reset")
+
+			// Perform reset with the specified flags
+			reset(t, tc.resetFlags...)
+
+			// Verify plugin definition state after reset
+			output, err = dump("-o", "-", "--include-plugin-definitions")
+			require.NoError(t, err)
+			if tc.expectPluginsExist {
+				assert.Contains(t, output, "reset-test-file-log",
+					"cloned plugin should still exist after reset with --skip-plugin-definitions")
+				assert.Contains(t, output, "reset-set-header",
+					"custom plugin should still exist after reset with --skip-plugin-definitions")
+			} else {
+				assert.NotContains(t, output, "reset-test-file-log",
+					"cloned plugin should be deleted after reset without --skip-plugin-definitions")
+				assert.NotContains(t, output, "reset-set-header",
+					"custom plugin should be deleted after reset without --skip-plugin-definitions")
+			}
+		})
+	}
+}
