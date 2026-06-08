@@ -9,17 +9,16 @@ import (
 
 	"github.com/kong/deck/plugin/lua"
 	"github.com/spf13/cobra"
-
 )
 
 var (
-	pluginLintCode		string
-	pluginLintEdition	string
-	pluginLintSandbox	string
+	pluginLintCode    string
+	pluginLintEdition string
+	pluginLintSandbox string
 )
 
-// Executes plugin lint command. 
-func executePluginLint(cmd *cobra.Command, args []string) error{
+// Executes plugin lint command.
+func executePluginLint(_ *cobra.Command, _ []string) error {
 	var luaCode string
 	var err error
 
@@ -31,7 +30,6 @@ func executePluginLint(cmd *cobra.Command, args []string) error{
 			return fmt.Errorf("failed to read file %s: %w", pluginLintCode, readErr)
 		}
 		luaCode = string(content)
-
 	}
 
 	if err != nil {
@@ -41,7 +39,6 @@ func executePluginLint(cmd *cobra.Command, args []string) error{
 	if strings.TrimSpace(luaCode) == "" {
 		return errors.New("no Lua code provided. Use --code or pipe code to stdin")
 	}
-
 
 	v, err := lua.NewValidator(pluginLintEdition, "")
 	if err != nil {
@@ -67,34 +64,33 @@ func executePluginLint(cmd *cobra.Command, args []string) error{
 		fmt.Printf("  - [%s] %s: %s%s\n", vio.Severity, vio.ID, vio.Message, lineInfo)
 	}
 
-
 	return errors.New("lua validation failed")
-
-
-
 }
+
 func readFromStdin() (string, error) {
-   data, err := io.ReadAll(os.Stdin)
-	 if err != nil {
-		 return "", fmt.Errorf("error reading from stdin: %w", err)
-	 }
+	data, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return "", fmt.Errorf("error reading from stdin: %w", err)
+	}
 
-   return string(data), err
+	return string(data), err
 }
-
 
 func newPluginLintCmd() *cobra.Command {
 	pluginLintCmd := &cobra.Command{
-		Use: "lint [flags]",
+		Use:   "lint [flags]",
 		Short: "Check custom LUA code for security and sandbox compatibility",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return executePluginLint(cmd, args)
 		},
 	}
-	
-	pluginLintCmd.Flags().StringVarP(&pluginLintCode, "code", "c", "-", "custom LUA code to validate. Use - to read from stdin.")
-	pluginLintCmd.Flags().StringVarP(&pluginLintEdition, "edition", "e", "ee", "Kong Edition [choices: ee (enterprise), oss (open source).")
-	pluginLintCmd.Flags().StringVarP(&pluginLintSandbox, "sandbox", "s", "strict", "Kong Edition [choices: ee (enterprise), oss (open source).")
-	
+
+	pluginLintCmd.Flags().StringVarP(&pluginLintCode, "code", "c", "-",
+		"custom LUA code to validate. Use - to read from stdin.")
+	pluginLintCmd.Flags().StringVarP(&pluginLintEdition, "edition", "e", "ee",
+		"Kong Edition [choices: ee (enterprise), oss (open source).")
+	pluginLintCmd.Flags().StringVarP(&pluginLintSandbox, "sandbox", "s", "strict",
+		"Kong Edition [choices: ee (enterprise), oss (open source).")
+
 	return pluginLintCmd
 }
