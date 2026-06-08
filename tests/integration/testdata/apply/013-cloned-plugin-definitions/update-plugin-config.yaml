@@ -3,7 +3,7 @@ plugins:
 - name: new-file-log
   config:
     path: /tmp/file-updated.log
-    reopen: false
+    reopen: true
   tags:
   - plugin-tag1
   - plugin-tag2

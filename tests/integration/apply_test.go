@@ -961,7 +961,7 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 						Config: kong.Configuration{
 							"custom_fields_by_lua": nil,
 							"path":                 "/tmp/file-updated.log",
-							"reopen":               false,
+							"reopen":               true,
 						},
 					},
 				},
@@ -978,6 +978,113 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
 			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
 			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
+		})
+	}
+}
+
+// test scope:
+//   - konnect
+func Test_Apply_ClonedPluginDefinitions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_ClonedPluginDefinitions_Konnect",
+		testApplyClonedPluginDefinitionsKonnectImpl)
+}
+
+func testApplyClonedPluginDefinitionsKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	tests := []struct {
+		name          string
+		initialFile   string
+		updateFile    string
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:        "updates cloned plugin definition priority and tags",
+			initialFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-cpd.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(200),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2", "updated-tag"),
+					},
+				},
+			},
+		},
+		{
+			name:        "updates plugin config linked with cloned definitions",
+			initialFile: "testdata/apply/013-cloned-plugin-definitions/initial-with-plugins.yaml",
+			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1"),
+						Config: kong.Configuration{
+							"allow":              []any{"example.com", "example.org"},
+							"hide_groups_header": true,
+						},
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1", "plugin-tag2", "select-me"),
+						Config: kong.Configuration{
+							"path":   "/tmp/file-updated.log",
+							"reopen": true,
+						},
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+			// In skip-defaults mode, deck fetches plugin schemas from Konnect to
+			// remove defaults. Cloned plugin schemas are unavailable until their
+			// definitions are synced, so register CPDs first before any sync that
+			// includes plugin instances.
+			cpdOnlyFile := "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml"
+			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+
+			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
+			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
+			testKongState(t, client, true, false, tc.expectedState, tc.ignoreFields)
 		})
 	}
 }

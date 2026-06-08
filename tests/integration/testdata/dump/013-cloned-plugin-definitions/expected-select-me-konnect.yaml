@@ -1,0 +1,31 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  include_plugin_definitions: true
+  select_tags:
+  - select-me
+_konnect:
+  control_plane_name: default
+cloned_plugins:
+- name: new-file-log
+  priority: 100
+  ref: file-log
+  tags:
+  - tag1
+  - tag2
+  - select-me
+plugins:
+- config:
+    custom_fields_by_lua: null
+    path: /tmp/file.log
+    reopen: true
+  enabled: true
+  name: new-file-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - plugin-tag1
+  - select-me
