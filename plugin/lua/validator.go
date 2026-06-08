@@ -8,7 +8,7 @@ import (
 
 	"github.com/yuin/gopher-lua/ast"
 	"github.com/yuin/gopher-lua/parse"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 )
 
 //go:embed policies/*.yaml
@@ -216,7 +216,7 @@ func (v *Validator) walkExpr(expr ast.Expr, inspect func(ast.Expr)) {
 		for _, arg := range e.Args {
 			v.walkExpr(arg, inspect)
 		}
-		case *ast.AttrGetExpr: // Handle recursive index access: obj[1].prop
+	case *ast.AttrGetExpr: // Handle recursive index access: obj[1].prop
 		v.walkExpr(e.Object, inspect)
 		v.walkExpr(e.Key, inspect)
 	case *ast.LogicalOpExpr:

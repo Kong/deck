@@ -271,7 +271,6 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newKong2TfCmd())
 	}
 
-
 	return rootCmd
 }
 

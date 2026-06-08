@@ -31,7 +31,7 @@ func TestMultiEditionValidator(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to initialize EE validator: %v", err)
 		}
-		
+
 		// EE should detect evasion via _G
 		code := `local x = _G["require"]`
 		violations, _ := v.Validate(code, "strict")
@@ -47,7 +47,6 @@ func TestMultiEditionValidator(t *testing.T) {
 		}
 	})
 }
-
 
 func TestInsidiousCases(t *testing.T) {
 	v, err := lua.NewValidator("ee", "")
@@ -77,8 +76,8 @@ func TestInsidiousCases(t *testing.T) {
 			profile: "lax", // os.execute is forbidden even in lax
 		},
 		{
-			name: "Forbidden call as function argument",
-			code: `print(os.execute("ls"))`,
+			name:    "Forbidden call as function argument",
+			code:    `print(os.execute("ls"))`,
 			profile: "strict",
 		},
 	}
