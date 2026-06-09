@@ -22,10 +22,7 @@ plugins:
 - config:
     allow:
     - example.com
-    always_use_authenticated_groups: false
-    deny: null
     hide_groups_header: true
-    include_consumer_groups: false
   enabled: true
   name: new-acl
   protocols:
@@ -36,7 +33,6 @@ plugins:
   tags:
   - plugin-tag1
 - config:
-    custom_fields_by_lua: null
     path: /tmp/file.log
     reopen: true
   enabled: true

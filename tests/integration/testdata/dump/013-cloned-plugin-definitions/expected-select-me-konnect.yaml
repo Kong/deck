@@ -16,7 +16,6 @@ cloned_plugins:
   - select-me
 plugins:
 - config:
-    custom_fields_by_lua: null
     path: /tmp/file.log
     reopen: true
   enabled: true
