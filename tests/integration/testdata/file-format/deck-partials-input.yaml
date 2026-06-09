@@ -1,0 +1,27 @@
+_format_version: "3.0"
+_transform: false
+
+partials:
+- id: c4ff03ed-478a-4b86-bdcf-811c45c00737
+  name: my-redis-instance
+  type: redis-ee
+  config:
+    port: 6379
+    host: 127.0.0.1
+
+plugins:
+- id: 017320fe-ba14-4e14-8bac-3a7d1d3cd1e0
+  name: rate-limiting-advanced
+  config:
+    strategy: redis
+    sync_rate: -1
+    limit:
+    - 1000
+    retry_after_jitter_max: 0
+    window_size:
+    - 3600
+    window_type: sliding
+  partials:
+  - id: c4ff03ed-478a-4b86-bdcf-811c45c00737
+    name: my-redis-instance
+    path: config.redis
