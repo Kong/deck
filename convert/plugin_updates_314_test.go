@@ -143,6 +143,28 @@ func TestUpdateLegacyPluginConfigFor314_SSLVerifyFields(t *testing.T) {
 				"https_verify": false,
 			},
 		},
+		{
+			name: "sets solace-consume session ssl_validate_certificate when session config exists",
+			plugin: &file.FPlugin{Plugin: kong.Plugin{
+				Name: kong.String(solaceConsumePluginName),
+				Config: kong.Configuration{
+					"session": map[string]interface{}{},
+				},
+			}},
+			expected: kong.Configuration{
+				"session": map[string]interface{}{
+					"ssl_validate_certificate": false,
+				},
+			},
+		},
+		{
+			name: "does not invent missing solace session config",
+			plugin: &file.FPlugin{Plugin: kong.Plugin{
+				Name:   kong.String(solaceLogPluginName),
+				Config: kong.Configuration{},
+			}},
+			expected: kong.Configuration{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -169,7 +191,7 @@ func TestUpdateLegacyPluginConfigFor314_LDAPVerifyHost(t *testing.T) {
 
 func TestUpdateLegacyPluginConfigFor314_LeavesUnsupportedPluginUnchanged(t *testing.T) {
 	plugin := &file.FPlugin{Plugin: kong.Plugin{
-		Name:   kong.String(aiLlmAsJudgePluginName),
+		Name:   kong.String(opaPluginName),
 		Config: kong.Configuration{"foo": "bar"},
 	}}
 

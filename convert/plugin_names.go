@@ -35,7 +35,6 @@ const (
 	acmePluginName                    = "acme"
 	aiAwsGuardrailPluginName          = "ai-aws-guardrail"
 	aiAzureContentSafetyPluginName    = "ai-azure-content-safety"
-	aiLlmAsJudgePluginName            = "ai-llm-as-judge"
 	aiSemanticResponseGuardPluginName = "ai-semantic-response-guard"
 	azureFunctionsPluginName          = "azure-functions"
 	confluentPluginName               = "confluent"
@@ -55,6 +54,9 @@ const (
 	responseRateLimitingPluginName    = "response-ratelimiting"
 	samlPluginName                    = "saml"
 	serviceProtectionPluginName       = "service-protection"
+	solaceConsumePluginName           = "solace-consume"
+	solaceLogPluginName               = "solace-log"
+	solaceUpstreamPluginName          = "solace-upstream"
 	tcpLogPluginName                  = "tcp-log"
 	upstreamOauthPluginName           = "upstream-oauth"
 )

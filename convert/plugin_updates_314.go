@@ -141,6 +141,15 @@ var sslVerifyPluginConfigSetters = map[string][]pluginConfigDefaultSetter{
 	serviceProtectionPluginName: {
 		newNestedBoolDefaultSetter("redis.ssl_verify"),
 	},
+	solaceConsumePluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
+	},
+	solaceLogPluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
+	},
+	solaceUpstreamPluginName: {
+		newNestedBoolDefaultSetter("session.ssl_validate_certificate"),
+	},
 	tcpLogPluginName: {
 		newNestedBoolDefaultSetter("ssl_verify"),
 	},
