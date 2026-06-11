@@ -12443,6 +12443,107 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - konnect
+func Test_Sync_ClonedPluginDefinitions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_ClonedPluginDefinitions_Konnect",
+		testSyncClonedPluginDefinitionsKonnectImpl)
+}
+
+func testSyncClonedPluginDefinitionsKonnectImpl(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := t.Context()
+
+	tests := []struct {
+		name          string
+		kongFile      string
+		wantErr       bool
+		expectedState utils.KongRawState
+		ignoreFields  []cmp.Option
+	}{
+		{
+			name:     "creates cloned plugin definitions and plugins",
+			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"allow":              []any{"example.com"},
+							"hide_groups_header": bool(true),
+						},
+						Tags: kong.StringSlice("plugin-tag1"),
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"path":   string("/tmp/file.log"),
+							"reopen": bool(true),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+		{
+			name:     "fails with invalid plugin ref",
+			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong-fake.yaml",
+			wantErr:  true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			reset(t)
+
+			// In skip-defaults mode, deck fetches plugin schemas from Konnect to
+			// remove defaults from the target state. Cloned plugin schemas aren't
+			// available until after their definitions are synced, so we must sync
+			// the CPD-only file first to register the schemas, then sync the full
+			// config that includes plugin instances.
+			cpdOnlyFile := "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml"
+			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+
+			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			testKongState(t, client, true, false, tc.expectedState, tc.ignoreFields)
+
+			// re-sync is idempotent
+			err = sync(ctx, tc.kongFile, "--include-plugin-definitions")
+			require.NoError(t, err, "re-sync should not error")
+		})
+	}
+}
+
 func Test_Sync_CustomPluginDefinitions(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.15.0")
 	setup(t)
@@ -12528,8 +12629,8 @@ func Test_Sync_CustomPluginDefinitions_Konnect(t *testing.T) {
 }
 
 func testSyncCustomPluginDefinitionsKonnectImpl(t *testing.T) {
-	setDefaultKonnectControlPlane(t)
 	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
 	setup(t)
 
 	client, err := getTestClient()

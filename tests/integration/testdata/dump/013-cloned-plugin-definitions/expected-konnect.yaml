@@ -1,0 +1,47 @@
+_format_version: "3.0"
+_info:
+  defaults: {}
+  include_plugin_definitions: true
+_konnect:
+  control_plane_name: default
+cloned_plugins:
+- name: new-acl
+  priority: 1000
+  ref: acl
+  tags:
+  - tag1
+  - tag2
+- name: new-file-log
+  priority: 100
+  ref: file-log
+  tags:
+  - tag1
+  - tag2
+  - select-me
+plugins:
+- config:
+    allow:
+    - example.com
+    hide_groups_header: true
+  enabled: true
+  name: new-acl
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - plugin-tag1
+- config:
+    path: /tmp/file.log
+    reopen: true
+  enabled: true
+  name: new-file-log
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+  tags:
+  - plugin-tag1
+  - select-me
