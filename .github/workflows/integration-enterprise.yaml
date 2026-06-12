@@ -59,7 +59,7 @@ jobs:
         with:
           username: ${{secrets.DOCKER_ORG_NAME}}
           password: ${{secrets.DOCKER_ORG_TOKEN}}
-      - uses: Kong/kong-license@master
+      - uses: Kong/kong-license@ddccb487a0b319cef85f348b16a1ad2b6d9c1df7 # master
         id: license
         with:
           op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
