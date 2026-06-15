@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.63.0](#v1630)
 - [v1.62.1](#v1621)
 - [v1.62.0](#v1620)
 - [v1.61.0](#v1610)
@@ -141,6 +142,38 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.63.0]
+> Release date: 2026/06/15
+
+### Added
+- Added support for `cloned_plugins` entity.
+[#2088](https://github.com/Kong/deck/pull/2088)
+[go-database-reconciler #476](https://github.com/Kong/go-database-reconciler/pull/476)
+[go-kong #619](https://github.com/Kong/go-kong/pull/619)
+- Added support for `custom_plugins` entity.
+[#2092](https://github.com/Kong/deck/pull/2092)
+[go-database-reconciler #477](https://github.com/Kong/go-database-reconciler/pull/477)
+[go-kong #619](https://github.com/Kong/go-kong/pull/619)
+- Added a new command `deck file format` to support conversion between dbless and decK format files.
+[#1978](https://github.com/Kong/deck/pull/1978)
+[#2043](https://github.com/Kong/deck/pull/2043)
+
+### Fixed
+- Fixed `deck file lint` command to handle empty state files and files containing only comments.
+[#2099](https://github.com/Kong/deck/pull/2099)
+- Fixed `openapi2kong` behavior where `--ignore-security-errors` incorrectly skipped valid OIDC plugin generation.
+[#2108](https://github.com/Kong/deck/pull/2108)
+[go-apiops #297](https://github.com/Kong/go-apiops/pull/297)
+- Fixed `openapi2kong` command for header-based routing to correctly deduplicate case-variant enum values, merge 
+duplicate header definitions and skip empty string enum values
+[#2091](https://github.com/Kong/deck/pull/2091)
+[go-apiops #298](https://github.com/Kong/go-apiops/pull/298)
+- Fixed `openapi2kong` command to support path-param size from 32 char to 128 char starting kong version 3.8. It may not
+work if path param exceeds 32 chars on kong gateway < 3.8.
+[#2091](https://github.com/Kong/deck/pull/2091)
+[go-apiops #299](https://github.com/Kong/go-apiops/pull/299)
+
 
 ## [v1.62.1]
 > Release date: 2026/06/01
@@ -2625,7 +2658,8 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
-[v1.62.1]: https://github.com/Kong/deck/compare/v1.6120...v1.62.1
+[v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
+[v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1
 [v1.62.0]: https://github.com/Kong/deck/compare/v1.61.0...v1.62.0  
 [v1.61.0]: https://github.com/Kong/deck/compare/v1.60.0...v1.61.0  
 [v1.60.0]: https://github.com/Kong/deck/compare/v1.59.1...v1.60.0
