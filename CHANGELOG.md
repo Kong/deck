@@ -146,10 +146,6 @@
 ## [v1.63.0]
 > Release date: 2026/06/15
 
-### Breaking changes
-- `openapi2kong` now supports path parameter names up to 128 characters (up from 32), aligning with Kong Gateway 3.8+ 
-behavior. You must switch to the `https://hub.docker.com/r/kong/deck` to use 3.8.0 and future releases. 
-
 ### Added
 - Added support for `cloned_plugins` entity.
 [#2088](https://github.com/Kong/deck/pull/2088)
@@ -173,7 +169,8 @@ behavior. You must switch to the `https://hub.docker.com/r/kong/deck` to use 3.8
 duplicate header definitions and skip empty string enum values
 [#2091](https://github.com/Kong/deck/pull/2091)
 [go-apiops #298](https://github.com/Kong/go-apiops/pull/298)
-- Fixed `openapi2kong` command to support path-param size from 32 char to 128 char starting kong version 3.8.
+- Fixed `openapi2kong` command to support path-param size from 32 char to 128 char starting kong version 3.8. It may not
+work if path param exceeds 32 chars on kong gateway < 3.8.
 [#2091](https://github.com/Kong/deck/pull/2091)
 [go-apiops #299](https://github.com/Kong/go-apiops/pull/299)
 
