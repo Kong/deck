@@ -222,6 +222,9 @@ this command unless --online flag is used.
 				return fmt.Errorf("a state file with Kong's configuration " +
 					"must be specified using `-s`/`--state` flag")
 			}
+			if err := checkParallelism(validateParallelism); err != nil {
+				return err
+			}
 			if err := preRunDiagnosticPolicyFlags(); err != nil {
 				return err
 			}
@@ -253,6 +256,9 @@ this command unless --online flag is used.
 						value, listOfKeys,
 					)
 				}
+			}
+			if err := checkParallelism(validateParallelism); err != nil {
+				return err
 			}
 			if err := preRunDiagnosticPolicyFlags(); err != nil {
 				return err
