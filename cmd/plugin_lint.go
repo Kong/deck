@@ -68,6 +68,7 @@ func executePluginLint(_ *cobra.Command, _ []string) error {
 }
 
 func readFromStdin() (string, error) {
+	fmt.Fprintf(os.Stderr, "Reading input from stdin...\n")
 	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return "", fmt.Errorf("error reading from stdin: %w", err)
