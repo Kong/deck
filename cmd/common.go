@@ -952,6 +952,7 @@ func inKonnectMode(targetContent *file.Content) bool {
 	}
 	return false
 }
+
 func checkParallelism(parallelism int) error {
 	if parallelism < 1 {
 		return fmt.Errorf("--parallelism cannot be less than 1, got %d", parallelism)

@@ -222,11 +222,13 @@ func TestGetFormatFlagValue(t *testing.T) {
 		})
 	}
 }
+
 func TestCheckParallelism_Negative(t *testing.T) {
 	parallelism := -1
 	err := checkParallelism(parallelism)
 	require.EqualError(t, err, "--parallelism cannot be less than 1, got -1")
 }
+
 func TestCheckParallelism_Zero(t *testing.T) {
 	parallelism := 0
 	err := checkParallelism(parallelism)
