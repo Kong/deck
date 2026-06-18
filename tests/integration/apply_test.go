@@ -715,37 +715,26 @@ func Test_Apply_Plugin_Conditional(t *testing.T) {
 	// resync with no error
 	require.NoError(t, sync(ctx, kongFile))
 
+	// We are checking for condition here, so config keys and protocols do not matter.
+	// They keep changing with versions and are not relevant to what we want to test,
+	// so we are ignoring them.
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
 	expectedStatePostSync := utils.KongRawState{
 		Plugins: []*kong.Plugin{
 			{
-				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
-				Name: kong.String("key-auth"),
-				Config: kong.Configuration{
-					"anonymous":        nil,
-					"hide_credentials": bool(true),
-					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
-					"key_in_body":      bool(false),
-					"key_in_header":    bool(true),
-					"key_in_query":     bool(true),
-					"key_names":        []any{string("apikey")},
-					"realm":            nil,
-					"run_on_preflight": bool(true),
-				},
-				Enabled: kong.Bool(true),
-				Protocols: []*string{
-					kong.String("grpc"),
-					kong.String("grpcs"),
-					kong.String("http"),
-					kong.String("https"),
-					kong.String("ws"),
-					kong.String("wss"),
-				},
+				ID:        kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name:      kong.String("key-auth"),
+				Enabled:   kong.Bool(true),
 				Condition: kong.String("route.name != \"health\""),
 			},
 		},
 	}
 
-	testKongState(t, client, false, false, expectedStatePostSync, nil)
+	testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
 
 	// apply command to change condition
 	updatedFile := "testdata/apply/012-plugin-conditional/updated.yaml"
@@ -754,34 +743,15 @@ func Test_Apply_Plugin_Conditional(t *testing.T) {
 	expectedStatePostApply := utils.KongRawState{
 		Plugins: []*kong.Plugin{
 			{
-				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
-				Name: kong.String("key-auth"),
-				Config: kong.Configuration{
-					"anonymous":        nil,
-					"hide_credentials": bool(true),
-					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
-					"key_in_body":      bool(false),
-					"key_in_header":    bool(true),
-					"key_in_query":     bool(true),
-					"key_names":        []any{string("apikey")},
-					"realm":            nil,
-					"run_on_preflight": bool(true),
-				},
-				Enabled: kong.Bool(true),
-				Protocols: []*string{
-					kong.String("grpc"),
-					kong.String("grpcs"),
-					kong.String("http"),
-					kong.String("https"),
-					kong.String("ws"),
-					kong.String("wss"),
-				},
+				ID:        kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name:      kong.String("key-auth"),
+				Enabled:   kong.Bool(true),
 				Condition: kong.String("service.name != \"healthcheck-service\""),
 			},
 		},
 	}
 
-	testKongState(t, client, false, false, expectedStatePostApply, nil)
+	testKongState(t, client, false, false, expectedStatePostApply, ignoreFields)
 }
 
 // test scope:
@@ -805,42 +775,26 @@ func testApplyPluginConditionalKonnectImpl(t *testing.T) {
 	// resync with no error
 	require.NoError(t, sync(ctx, kongFile))
 
+	// We are checking for condition here, so config keys and protocols do not matter.
+	// They keep changing with versions and are not relevant to what we want to test,
+	// so we are ignoring them.
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
 	expectedStatePostSync := utils.KongRawState{
 		Plugins: []*kong.Plugin{
 			{
-				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
-				Name: kong.String("key-auth"),
-				Config: kong.Configuration{
-					"anonymous":        nil,
-					"hide_credentials": bool(true),
-					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
-					"key_in_body":      bool(false),
-					"key_in_header":    bool(true),
-					"key_in_query":     bool(true),
-					"key_names":        []any{string("apikey")},
-					"principals": map[string]any{
-						"directory":     string("default"),
-						"enabled":       bool(false),
-						"error_on_miss": bool(true),
-					},
-					"realm":            nil,
-					"run_on_preflight": bool(true),
-				},
-				Enabled: kong.Bool(true),
-				Protocols: []*string{
-					kong.String("grpc"),
-					kong.String("grpcs"),
-					kong.String("http"),
-					kong.String("https"),
-					kong.String("ws"),
-					kong.String("wss"),
-				},
+				ID:        kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name:      kong.String("key-auth"),
+				Enabled:   kong.Bool(true),
 				Condition: kong.String("route.name != \"health\""),
 			},
 		},
 	}
 
-	testKongState(t, client, true, false, expectedStatePostSync, nil)
+	testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
 
 	// apply command to change condition
 	updatedFile := "testdata/apply/012-plugin-conditional/updated.yaml"
@@ -849,39 +803,15 @@ func testApplyPluginConditionalKonnectImpl(t *testing.T) {
 	expectedStatePostApply := utils.KongRawState{
 		Plugins: []*kong.Plugin{
 			{
-				ID:   kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
-				Name: kong.String("key-auth"),
-				Config: kong.Configuration{
-					"anonymous":        nil,
-					"hide_credentials": bool(true),
-					"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
-					"key_in_body":      bool(false),
-					"key_in_header":    bool(true),
-					"key_in_query":     bool(true),
-					"key_names":        []any{string("apikey")},
-					"principals": map[string]any{
-						"directory":     string("default"),
-						"enabled":       bool(false),
-						"error_on_miss": bool(true),
-					},
-					"realm":            nil,
-					"run_on_preflight": bool(true),
-				},
-				Enabled: kong.Bool(true),
-				Protocols: []*string{
-					kong.String("grpc"),
-					kong.String("grpcs"),
-					kong.String("http"),
-					kong.String("https"),
-					kong.String("ws"),
-					kong.String("wss"),
-				},
+				ID:        kong.String("efead952-0a1d-43ec-9794-0ac6abdc7f55"),
+				Name:      kong.String("key-auth"),
+				Enabled:   kong.Bool(true),
 				Condition: kong.String("service.name != \"healthcheck-service\""),
 			},
 		},
 	}
 
-	testKongState(t, client, true, false, expectedStatePostApply, nil)
+	testKongState(t, client, true, false, expectedStatePostApply, ignoreFields)
 }
 
 // test scope:
