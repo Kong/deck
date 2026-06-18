@@ -304,6 +304,44 @@ var (
 		},
 	}
 
+	plugin315 = []*kong.Plugin{
+		{
+			Name: kong.String("basic-auth"),
+			Protocols: []*string{
+				kong.String("grpc"),
+				kong.String("grpcs"),
+				kong.String("http"),
+				kong.String("https"),
+			},
+			Enabled: kong.Bool(true),
+			Config: kong.Configuration{
+				"anonymous":        "58076db2-28b6-423b-ba39-a797193017f7",
+				"hide_credentials": false,
+				"principals": map[string]any{
+					"directory":     string("default"),
+					"enabled":       bool(false),
+					"error_on_miss": bool(true),
+				},
+				"realm": string("service"),
+				"brute_force_protection": map[string]interface{}{
+					"redis": map[string]interface{}{
+						"cloud_authentication": nil,
+						"database":             float64(0),
+						"host":                 nil,
+						"password":             nil,
+						"port":                 float64(6379),
+						"server_name":          nil,
+						"ssl":                  false,
+						"ssl_verify":           true,
+						"timeout":              float64(2000),
+						"username":             nil,
+					},
+					"strategy": string("off"),
+				},
+			},
+		},
+	}
+
 	pluginKonnect = []*kong.Plugin{
 		{
 			Name: kong.String("basic-auth"),
@@ -3603,7 +3641,15 @@ func Test_Sync_BasicAuth_Plugin_From_36(t *testing.T) {
 			expectedState: utils.KongRawState{
 				Plugins: plugin314,
 			},
-			runWhen: ">=3.14.0",
+			runWhen: ">=3.14.0 <3.15.0",
+		},
+		{
+			name:     "create a plugin 3.15+",
+			kongFile: "testdata/sync/003-create-a-plugin/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Plugins: plugin315,
+			},
+			runWhen: ">=3.15.0",
 		},
 	}
 	for _, tc := range tests {
