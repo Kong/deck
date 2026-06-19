@@ -7,8 +7,8 @@ import (
 func newPluginCmd() *cobra.Command {
 	pluginCmd := &cobra.Command{
 		Use:   "plugin",
-		Short: "Manage and validate Kong plugins",
-		Long:  `The plugin command set allows you to manage, validate, and lint Kong plugins locally.`,
+		Short: "Lint Kong plugins",
+		Long:  `The plugin command set allows you to lint custom Kong plugin Lua code locally.`,
 	}
 
 	pluginCmd.AddCommand(newPluginLintCmd())
