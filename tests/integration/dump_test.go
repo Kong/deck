@@ -198,7 +198,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-314.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0 <3.15.0") },
+		},
+		{
+			name:          ">=3.15.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-315.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -546,7 +553,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong313x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.13.0 <3.15.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.15.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong315x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
 		},
 	}
 
@@ -1458,20 +1472,43 @@ func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 }
 
 func Test_Dump_Plugin_Conditional(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.14.0")
 	setup(t)
 
 	ctx := context.Background()
-	kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
-	require.NoError(t, sync(ctx, kongFile))
 
-	output, err := dump("-o", "-", "--with-id")
-	require.NoError(t, err)
+	tests := []struct {
+		name         string
+		runWhen      string
+		expectedFile string
+	}{
+		{
+			name:         "dump plugin with conditional fields",
+			runWhen:      ">=3.14.0 <3.15.0",
+			expectedFile: "testdata/dump/012-plugin-conditional/expected.yaml",
+		},
+		{
+			name:         "dump plugin with conditional fields",
+			runWhen:      ">=3.15.0",
+			expectedFile: "testdata/dump/012-plugin-conditional/expected315.yaml",
+		},
+	}
 
-	expectedFile := "testdata/dump/012-plugin-conditional/expected.yaml"
-	expected, err := readFile(expectedFile)
-	require.NoError(t, err)
-	assert.Equal(t, expected, output)
+	for _, tc := range tests {
+		t.Run(tc.name+" "+tc.runWhen, func(t *testing.T) {
+			runWhen(t, "enterprise", tc.runWhen)
+			reset(t)
+
+			kongFile := "testdata/sync/003-create-a-plugin/kong-conditional.yaml"
+			require.NoError(t, sync(ctx, kongFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
 }
 
 func Test_Dump_Plugin_Conditional_Konnect(t *testing.T) {
