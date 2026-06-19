@@ -89,9 +89,9 @@ func newPluginLintCmd() *cobra.Command {
 	pluginLintCmd.Flags().StringVarP(&pluginLintCode, "code", "c", "-",
 		"custom LUA code to validate. Use - to read from stdin.")
 	pluginLintCmd.Flags().StringVarP(&pluginLintEdition, "edition", "e", "ee",
-		"Kong Edition [choices: ee (enterprise), oss (open source).")
+		"Kong Edition [choices: ee (enterprise), oss (open source)]")
 	pluginLintCmd.Flags().StringVarP(&pluginLintSandbox, "sandbox", "s", "strict",
-		"Kong Edition [choices: ee (enterprise), oss (open source).")
+		"Kong sandbox profile [choices: lua, standard, strict, lax]")
 
 	return pluginLintCmd
 }
