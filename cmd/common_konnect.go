@@ -85,7 +85,6 @@ func GetKongClientForKonnectMode(
 		konnectConfig.Address = defaultKonnectURL
 	}
 
-	// authenticate with konnect
 	var konnectClient *konnect.Client
 	var konnectAddress string
 	// get Konnect client
@@ -93,9 +92,15 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, err
 	}
-	_, err = authenticate(ctx, konnectClient, *konnectConfig)
-	if err != nil {
-		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+
+	// Only authenticate when using email/password (legacy auth).
+	// PATs are passed directly via Authorization header and all Konnect
+	// endpoints handle them directly
+	if konnectConfig.Token == "" {
+		_, err = authenticate(ctx, konnectClient, *konnectConfig)
+		if err != nil {
+			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
+		}
 	}
 	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
 	if err != nil {
