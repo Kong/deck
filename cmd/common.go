@@ -940,9 +940,7 @@ func inKonnectMode(targetContent *file.Content) bool {
 		return true
 	} else if rootConfig.Address != defaultKongURL {
 		return false
-	} else if konnectConfig.Email != "" ||
-		konnectConfig.Password != "" ||
-		konnectConfig.Token != "" {
+	} else if konnectConfig.Token != "" {
 		return true
 	} else if konnectConnectionDesired {
 		return true

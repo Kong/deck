@@ -22,7 +22,7 @@ credentials.` + konnectAlphaState,
 			if err != nil {
 				return err
 			}
-			res, err := authenticate(cmd.Context(), client, konnectConfig)
+			res, err := authenticate(cmd.Context(), client, konnectConfig.Token)
 			if err != nil {
 				return fmt.Errorf("authenticating with Konnect: %w", err)
 			}

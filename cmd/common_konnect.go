@@ -24,13 +24,14 @@ const (
 )
 
 func authenticate(
-	_ context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
+	ctx context.Context, client *konnect.Client, konnectToken string,
 ) (konnect.AuthResponse, error) {
 	attempts := 0
 	backoff := 200 * time.Millisecond
 
 	for {
-		authResponse, err := client.Auth.LoginV2(konnectConfig.Token)
+		// Pass empty email/password since we only support token-based auth now
+		authResponse, err := client.Auth.LoginV2(ctx, "", "", konnectToken)
 		if err == nil {
 			return authResponse, nil
 		}
@@ -275,6 +276,13 @@ func syncKonnect(ctx context.Context,
 	}
 
 	targetContent.StripLocalDocumentPath()
+
+	// Add authorization header if token is provided
+	if konnectConfig.Token != "" {
+		konnectConfig.Headers = append(
+			konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token,
+		)
+	}
 
 	// get Konnect client
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)

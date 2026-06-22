@@ -4898,9 +4898,7 @@ func Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0",
@@ -9824,9 +9822,7 @@ func testSyncSkipConsumersWithConsumerGroupsKonnectImpl(t *testing.T) {
 func Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag",
@@ -10128,9 +10124,7 @@ func testSyncPartialsPluginsKonnectImpl(t *testing.T) {
 func Test_Sync_Partials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Partials", testSyncPartialsImpl)
@@ -10181,9 +10175,7 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Consumers_Default_Lookup_Tag", testSyncConsumersDefaultLookupTagImpl)
@@ -10672,9 +10664,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_3x(t *testing.T) {
 func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.6.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x",
@@ -11785,9 +11775,7 @@ func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_SkipCustomEntitiesWithSelectorTags",
@@ -11832,9 +11820,7 @@ func testSyncSkipCustomEntitiesWithSelectorTagsImpl(t *testing.T) {
 func Test_Sync_ConsumerCredentials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerCredentials", testSyncConsumerCredentialsImpl)
@@ -12019,9 +12005,7 @@ func Test_Sync_Services_TLS_Sans(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Services_TLS_Sans", testSyncServicesTLSSansImpl)
