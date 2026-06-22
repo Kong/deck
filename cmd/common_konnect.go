@@ -24,13 +24,13 @@ const (
 )
 
 func authenticate(
-	ctx context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
+	_ context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
 ) (konnect.AuthResponse, error) {
 	attempts := 0
 	backoff := 200 * time.Millisecond
 
 	for {
-		authResponse, err := client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
+		authResponse, err := client.Auth.LoginV2(konnectConfig.Token)
 		if err == nil {
 			return authResponse, nil
 		}
@@ -93,15 +93,6 @@ func GetKongClientForKonnectMode(
 		return nil, err
 	}
 
-	// Only authenticate when using email/password (legacy auth).
-	// PATs are passed directly via Authorization header and all Konnect
-	// endpoints handle them directly
-	if konnectConfig.Token == "" {
-		_, err = authenticate(ctx, konnectClient, *konnectConfig)
-		if err != nil {
-			return nil, fmt.Errorf("authenticating with Konnect: %w", err)
-		}
-	}
 	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
 	if err != nil {
 		return nil, err
@@ -289,14 +280,6 @@ func syncKonnect(ctx context.Context,
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 	if err != nil {
 		return err
-	}
-
-	// authenticate with konnect
-	_, err = konnectClient.Auth.Login(ctx,
-		konnectConfig.Email,
-		konnectConfig.Password)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 
 	// get kong control plane ID
