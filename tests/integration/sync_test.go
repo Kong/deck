@@ -370,8 +370,9 @@ var (
 					"strategy": string("off"),
 				},
 				"principals": map[string]interface{}{
-					"directory": string("default"),
-					"enabled":   bool(false),
+					"directory":     string("default"),
+					"enabled":       bool(false),
+					"error_on_miss": bool(true),
 				},
 			},
 		},
