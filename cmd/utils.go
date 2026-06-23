@@ -98,3 +98,10 @@ func validateInputFlag(flagName string, flagValue string, allowedValues []string
 	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",
 		flagValue, flagName, allowedValues)
 }
+
+func checkParallelism(parallelism int) error {
+	if parallelism < 1 {
+		return fmt.Errorf("--parallelism cannot be less than 1, got %d", parallelism)
+	}
+	return nil
+}
