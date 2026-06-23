@@ -36,6 +36,9 @@ func newApplyCmd() *cobra.Command {
 			if err := preRunDiagnosticPolicyFlags(); err != nil {
 				return err
 			}
+			if err := checkParallelism(applyCmdParallelism); err != nil {
+				return err
+			}
 			return preRunSilenceEventsFlag()
 		},
 	}
