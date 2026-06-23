@@ -780,7 +780,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		}
 	}
 	if errs != nil {
-		return 0, reconcilerUtils.ErrArray{Errors: errs}
+		return int(totalOps), reconcilerUtils.ErrArray{Errors: errs}
 	}
 
 	return int(totalOps), nil
