@@ -227,6 +227,13 @@ It can be used to export, import, or sync entities to Kong.`,
 
 	rootCmd.MarkFlagsMutuallyExclusive("konnect-runtime-group-name", "konnect-control-plane-name")
 
+	rootCmd.PersistentFlags().String("kong-admin-token", "",
+		"Token to use for authentication with Kong's Admin API.\n"+
+			"This value can also be set using DECK_KONG_ADMIN_TOKEN "+
+			"environment variable.")
+	viper.BindPFlag("kong-admin-token",
+		rootCmd.PersistentFlags().Lookup("kong-admin-token"))
+
 	rootCmd.AddCommand(newVersionCmd())
 	rootCmd.AddCommand(newCompletionCmd())
 	rootCmd.AddCommand(newSyncCmd(true))            // deprecated, to exist under the `gateway` subcommand only
@@ -332,7 +339,11 @@ func initConfig() {
 	tlsSkipVerify := viper.GetBool("tls-skip-verify")
 	tlsCACert := caCertContent
 
-	rootConfig.Headers = extendHeaders(viper.GetStringSlice("headers"))
+	rootConfig.Headers = extendHeaders(
+		viper.GetStringSlice("headers"),
+		header{name: "Kong-Admin-Token", value: viper.GetString("kong-admin-token")},
+	)
+
 	rootConfig.SkipWorkspaceCrud = viper.GetBool("skip-workspace-crud")
 	rootConfig.Debug = (viper.GetInt("verbose") >= 1)
 	rootConfig.Timeout = (viper.GetInt("timeout"))
@@ -451,9 +462,19 @@ func initKonnectConfig() error {
 	return nil
 }
 
-func extendHeaders(headers []string) []string {
-	userAgentHeader := fmt.Sprintf("User-Agent:decK/%s", VERSION)
-	headers = append(headers, userAgentHeader)
+type header struct {
+	name  string
+	value string
+}
+
+func extendHeaders(headers []string, extra ...header) []string {
+	headers = append(headers, fmt.Sprintf("User-Agent:decK/%s", VERSION))
+
+	for _, h := range extra {
+		if h.value != "" {
+			headers = append(headers, fmt.Sprintf("%s:%s", h.name, h.value))
+		}
+	}
 	return headers
 }
 
