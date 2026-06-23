@@ -178,9 +178,6 @@ func RemoveConsumerPlugins(targetContentPlugins []file.FPlugin) []file.FPlugin {
 func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
 ) error {
-	if err := checkParallelism(parallelism); err != nil {
-		return err
-	}
 	// read target file
 	if enableJSONOutput {
 		jsonOutput.Errors = []string{}
@@ -951,11 +948,4 @@ func inKonnectMode(targetContent *file.Content) bool {
 		return true
 	}
 	return false
-}
-
-func checkParallelism(parallelism int) error {
-	if parallelism < 1 {
-		return fmt.Errorf("--parallelism cannot be less than 1, got %d", parallelism)
-	}
-	return nil
 }
