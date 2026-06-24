@@ -473,6 +473,7 @@ func extendHeaders(headers []string, extra ...header) []string {
 
 	for _, h := range headers {
 		name, _, _ := strings.Cut(h, ":")
+		// skip --headers entries already set by a dedicated flag to avoid header collisions
 		if !overriddenBy(name, extra) {
 			result = append(result, h)
 		}
@@ -486,7 +487,7 @@ func extendHeaders(headers []string, extra ...header) []string {
 	return result
 }
 
-// reports whether the given header name collides with an explicit
+// reports whether the given header name collides with an explicit header set by a dedicated flag
 func overriddenBy(name string, extra []header) bool {
 	name = strings.TrimSpace(name)
 	for _, h := range extra {
