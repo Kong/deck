@@ -61,4 +61,19 @@ func Test_RBAC_AdminToken(t *testing.T) {
 		require.NoError(t, err,
 			"online validate should succeed against an RBAC-enabled Kong with a valid admin token")
 	})
+
+	t.Run("kong-admin-token takes precedence over a colliding --headers value", func(t *testing.T) {
+		// scrub the env so the token can only come from the flags under test.
+		t.Setenv("DECK_KONG_ADMIN_TOKEN", "")
+
+		// Supply an invalid Kong-Admin-Token via --headers alongside the valid
+		// token via --kong-admin-token. The explicit flag must win, so the
+		// invalid header value is dropped and the request authenticates.
+		err := validate(ONLINE, stateFile,
+			"--headers", "Kong-Admin-Token:invalid-token",
+			"--kong-admin-token", adminToken)
+		require.NoError(t, err,
+			"online validate should succeed: --kong-admin-token must override the "+
+				"colliding Kong-Admin-Token supplied via --headers")
+	})
 }

@@ -468,14 +468,33 @@ type header struct {
 }
 
 func extendHeaders(headers []string, extra ...header) []string {
-	headers = append(headers, fmt.Sprintf("User-Agent:decK/%s", VERSION))
+	result := make([]string, 0, len(headers)+len(extra)+1)
+	result = append(result, fmt.Sprintf("User-Agent:decK/%s", VERSION))
+
+	for _, h := range headers {
+		name, _, _ := strings.Cut(h, ":")
+		if !overriddenBy(name, extra) {
+			result = append(result, h)
+		}
+	}
 
 	for _, h := range extra {
 		if h.value != "" {
-			headers = append(headers, fmt.Sprintf("%s:%s", h.name, h.value))
+			result = append(result, fmt.Sprintf("%s:%s", h.name, h.value))
 		}
 	}
-	return headers
+	return result
+}
+
+// reports whether the given header name collides with an explicit
+func overriddenBy(name string, extra []header) bool {
+	name = strings.TrimSpace(name)
+	for _, h := range extra {
+		if h.value != "" && strings.EqualFold(name, h.name) {
+			return true
+		}
+	}
+	return false
 }
 
 func init() {

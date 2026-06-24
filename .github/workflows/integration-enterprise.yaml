@@ -73,10 +73,6 @@ jobs:
         run: make test-integration
         continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}
 
-  # RBAC enforcement is orthogonal to router flavor, so this job runs only the
-  # --kong-admin-token test (not the whole suite) against the same Kong versions
-  # as the matrix above — version-only, deliberately NOT crossed with
-  # router_flavor to avoid a combinatorial blow-up.
   integration-rbac:
     # Skip if the PR has the 'skip-ee' label
     if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.labels.*.name, 'skip-ee') }}
@@ -100,10 +96,6 @@ jobs:
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
-      # Enforce RBAC and seed the kong_admin super-admin token. KONG_PASSWORD is
-      # consumed by the bootstrap migration, KONG_ADMIN_TOKEN by the go-kong
-      # test client. DECK_KONG_ADMIN_TOKEN is intentionally left unset so the
-      # test controls authentication explicitly via the --kong-admin-token flag.
       KONG_ENFORCE_RBAC: 'on'
       KONG_PASSWORD: 'kong_admin_token'
       KONG_ADMIN_TOKEN: 'kong_admin_token'
