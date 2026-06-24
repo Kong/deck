@@ -72,3 +72,69 @@ jobs:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
         run: make test-integration
         continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}
+
+  # RBAC enforcement is orthogonal to router flavor, so this job runs only the
+  # --kong-admin-token test (not the whole suite) against the same Kong versions
+  # as the matrix above — version-only, deliberately NOT crossed with
+  # router_flavor to avoid a combinatorial blow-up.
+  integration-rbac:
+    # Skip if the PR has the 'skip-ee' label
+    if: ${{ github.event_name == 'push' || !contains(github.event.pull_request.labels.*.name, 'skip-ee') }}
+    timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_GW_TIMEOUT || '10') }}
+    strategy:
+      matrix:
+        kong_image:
+        - 'kong/kong-gateway:2.8'
+        - 'kong/kong-gateway:3.4'
+        - 'kong/kong-gateway:3.5'
+        - 'kong/kong-gateway:3.6'
+        - 'kong/kong-gateway:3.7'
+        - 'kong/kong-gateway:3.8'
+        - 'kong/kong-gateway:3.9'
+        - 'kong/kong-gateway:3.10'
+        - 'kong/kong-gateway:3.11'
+        - 'kong/kong-gateway:3.12'
+        - 'kong/kong-gateway:3.13'
+        - 'kong/kong-gateway:3.14'
+        - 'kong/kong-gateway-dev:latest'
+    env:
+      KONG_ANONYMOUS_REPORTS: "off"
+      KONG_IMAGE: ${{ matrix.kong_image }}
+      # Enforce RBAC and seed the kong_admin super-admin token. KONG_PASSWORD is
+      # consumed by the bootstrap migration, KONG_ADMIN_TOKEN by the go-kong
+      # test client. DECK_KONG_ADMIN_TOKEN is intentionally left unset so the
+      # test controls authentication explicitly via the --kong-admin-token flag.
+      KONG_ENFORCE_RBAC: 'on'
+      KONG_PASSWORD: 'kong_admin_token'
+      KONG_ADMIN_TOKEN: 'kong_admin_token'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Setup go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+      - name: Login to Docker Hub
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        with:
+          username: ${{secrets.DOCKER_ORG_NAME}}
+          password: ${{secrets.DOCKER_ORG_TOKEN}}
+      - uses: Kong/kong-license@master
+        id: license
+        with:
+          op-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      - name: Setup Kong
+        env:
+          KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
+        run: make setup-kong-ee
+      - name: Run RBAC admin-token integration test
+        env:
+          KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
+        run: make test-integration GOTESTFLAGS='-run Test_RBAC_AdminToken'
+        continue-on-error: ${{ matrix.kong_image == 'kong/kong-gateway-dev:latest' }}
