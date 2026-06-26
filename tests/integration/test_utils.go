@@ -119,6 +119,12 @@ func runWhenExpressions(t *testing.T, semverRange string) {
 	kong.RunWhenKongRouterFlavor(t, "expressions")
 }
 
+func runWhenRBAC(t *testing.T, semverRange string) {
+	t.Helper()
+	skipWhenKonnect(t)
+	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{RBAC: true})
+}
+
 func sortSlices(x, y interface{}) bool {
 	var xName, yName string
 	switch xEntity := x.(type) {
