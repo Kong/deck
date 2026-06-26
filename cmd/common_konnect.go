@@ -24,13 +24,14 @@ const (
 )
 
 func authenticate(
-	ctx context.Context, client *konnect.Client, konnectConfig utils.KonnectConfig,
+	ctx context.Context, client *konnect.Client, konnectToken string,
 ) (konnect.AuthResponse, error) {
 	attempts := 0
 	backoff := 200 * time.Millisecond
 
 	for {
-		authResponse, err := client.Auth.LoginV2(ctx, konnectConfig.Email, konnectConfig.Password, konnectConfig.Token)
+		// Pass empty email/password since we only support token-based auth now
+		authResponse, err := client.Auth.LoginV2(ctx, "", "", konnectToken)
 		if err == nil {
 			return authResponse, nil
 		}
@@ -85,7 +86,6 @@ func GetKongClientForKonnectMode(
 		konnectConfig.Address = defaultKonnectURL
 	}
 
-	// authenticate with konnect
 	var konnectClient *konnect.Client
 	var konnectAddress string
 	// get Konnect client
@@ -93,10 +93,7 @@ func GetKongClientForKonnectMode(
 	if err != nil {
 		return nil, err
 	}
-	_, err = authenticate(ctx, konnectClient, *konnectConfig)
-	if err != nil {
-		return nil, fmt.Errorf("authenticating with Konnect: %w", err)
-	}
+
 	cpID, err := fetchKonnectControlPlaneID(ctx, konnectClient, konnectConfig.ControlPlaneName)
 	if err != nil {
 		return nil, err
@@ -280,18 +277,17 @@ func syncKonnect(ctx context.Context,
 
 	targetContent.StripLocalDocumentPath()
 
+	// Add authorization header if token is provided
+	if konnectConfig.Token != "" {
+		konnectConfig.Headers = append(
+			konnectConfig.Headers, "Authorization:Bearer "+konnectConfig.Token,
+		)
+	}
+
 	// get Konnect client
 	konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 	if err != nil {
 		return err
-	}
-
-	// authenticate with konnect
-	_, err = konnectClient.Auth.Login(ctx,
-		konnectConfig.Email,
-		konnectConfig.Password)
-	if err != nil {
-		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}
 
 	// get kong control plane ID

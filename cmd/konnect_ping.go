@@ -22,13 +22,11 @@ credentials.` + konnectAlphaState,
 			if err != nil {
 				return err
 			}
-			res, err := client.Auth.Login(cmd.Context(), konnectConfig.Email,
-				konnectConfig.Password)
+			res, err := authenticate(cmd.Context(), client, konnectConfig.Token)
 			if err != nil {
 				return fmt.Errorf("authenticating with Konnect: %w", err)
 			}
-			fmt.Printf("Successfully Konnected as %s %s (%s)!\n",
-				res.FirstName, res.LastName, res.Organization)
+			fmt.Printf("Successfully Konnected to the %s organization!\n", res.Name)
 			if konnectConfig.Debug {
 				fmt.Printf("Organization ID: %s\n", res.OrganizationID)
 			}

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -48,14 +47,6 @@ func newKonnectDumpCmd() *cobra.Command {
 			konnectClient, err := utils.GetKonnectClient(httpClient, konnectConfig)
 			if err != nil {
 				return err
-			}
-
-			// authenticate with konnect
-			_, err = konnectClient.Auth.Login(cmd.Context(),
-				konnectConfig.Email,
-				konnectConfig.Password)
-			if err != nil {
-				return fmt.Errorf("authenticating with Konnect: %w", err)
 			}
 
 			// get kong control plane ID

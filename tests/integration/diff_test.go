@@ -938,9 +938,7 @@ func Test_Diff_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Diff_Consumers_Default_Lookup_Tag",
