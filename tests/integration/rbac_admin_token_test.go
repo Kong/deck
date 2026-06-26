@@ -6,7 +6,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -45,10 +44,10 @@ func Test_RBAC_AdminToken(t *testing.T) {
 		err := validate(ONLINE, stateFile)
 		require.Error(t, err,
 			"online validate should fail against an RBAC-enabled Kong without an admin token")
-		// Assert it fails *specifically* because of authentication (HTTP 401)
+		// Require that it fails *specifically* because of authentication (HTTP 401)
 		// rather than some unrelated error (bad file, gateway down, etc.).
 		// go-kong formats API errors as `HTTP status 401 (message: ...)`.
-		assert.Contains(t, err.Error(), "401",
+		require.Contains(t, err.Error(), "401",
 			"expected an authentication failure (HTTP 401), got: %v", err)
 	})
 
