@@ -34,6 +34,9 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 		if err := preRunDiagnosticPolicyFlags(); err != nil {
 			return err
 		}
+		if err := checkParallelism(diffCmdParallelism); err != nil {
+			return err
+		}
 		return preRunSilenceEventsFlag()
 	}
 
@@ -56,6 +59,9 @@ func newDiffCmd(deprecated bool) *cobra.Command {
 					"must be specified using `-s`/`--state` flag")
 			}
 			if err := preRunDiagnosticPolicyFlags(); err != nil {
+				return err
+			}
+			if err := checkParallelism(diffCmdParallelism); err != nil {
 				return err
 			}
 			return preRunSilenceEventsFlag()

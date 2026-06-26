@@ -146,9 +146,7 @@ func Test_Apply_3x(t *testing.T) {
 
 func Test_Apply_Custom_Entities(t *testing.T) {
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Apply_Custom_Entities",

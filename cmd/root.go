@@ -178,22 +178,6 @@ It can be used to export, import, or sync entities to Kong.`,
 		rootCmd.PersistentFlags().Lookup("tls-client-key-file"))
 
 	// konnect-specific flags
-	rootCmd.PersistentFlags().String("konnect-email", "",
-		"Email address associated with your Konnect account.")
-	viper.BindPFlag("konnect-email",
-		rootCmd.PersistentFlags().Lookup("konnect-email"))
-
-	rootCmd.PersistentFlags().String("konnect-password", "",
-		"Password associated with your Konnect account, "+
-			"this takes precedence over `--konnect-password-file` flag.")
-	viper.BindPFlag("konnect-password",
-		rootCmd.PersistentFlags().Lookup("konnect-password"))
-
-	rootCmd.PersistentFlags().String("konnect-password-file", "",
-		"File containing the password to your Konnect account.")
-	viper.BindPFlag("konnect-password-file",
-		rootCmd.PersistentFlags().Lookup("konnect-password-file"))
-
 	rootCmd.PersistentFlags().String("konnect-token", "",
 		"Personal Access Token associated with your Konnect account, "+
 			"this takes precedence over `--konnect-token-file` flag.")
@@ -416,22 +400,6 @@ func initConfig() {
 }
 
 func initKonnectConfig() error {
-	password := viper.GetString("konnect-password")
-	passwordFile := viper.GetString("konnect-password-file")
-	// read from password file only if password is not supplied using an
-	// environment variable or flag
-	if password == "" && passwordFile != "" {
-		fileContent, err := os.ReadFile(passwordFile)
-		if err != nil {
-			return fmt.Errorf("read file %q: %w", passwordFile, err)
-		}
-		if len(fileContent) == 0 {
-			return fmt.Errorf("file %q: empty", passwordFile)
-		}
-		password = string(fileContent)
-		password = strings.TrimRight(password, "\n")
-	}
-
 	token := viper.GetString("konnect-token")
 	tokenFile := viper.GetString("konnect-token-file")
 	// read from token file only if token is not supplied using an
@@ -451,8 +419,6 @@ func initKonnectConfig() error {
 	skipDefaultsFill = viper.GetBool("skip-defaults-fill")
 
 	disableAnalytics = !viper.GetBool("analytics")
-	konnectConfig.Email = viper.GetString("konnect-email")
-	konnectConfig.Password = password
 	konnectConfig.Token = token
 	konnectConfig.Debug = (viper.GetInt("verbose") >= 1)
 	konnectConfig.Address = viper.GetString("konnect-addr")

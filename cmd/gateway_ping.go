@@ -69,7 +69,7 @@ func pingKonnect(ctx context.Context) error {
 		return err
 	}
 	// authenticate with konnect
-	res, err := authenticate(ctx, konnectClient, konnectConfig)
+	res, err := authenticate(ctx, konnectClient, konnectConfig.Token)
 	if err != nil {
 		return fmt.Errorf("authenticating with Konnect: %w", err)
 	}

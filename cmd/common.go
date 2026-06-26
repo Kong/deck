@@ -780,7 +780,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 		}
 	}
 	if errs != nil {
-		return 0, reconcilerUtils.ErrArray{Errors: errs}
+		return int(totalOps), reconcilerUtils.ErrArray{Errors: errs}
 	}
 
 	return int(totalOps), nil
@@ -940,9 +940,7 @@ func inKonnectMode(targetContent *file.Content) bool {
 		return true
 	} else if rootConfig.Address != defaultKongURL {
 		return false
-	} else if konnectConfig.Email != "" ||
-		konnectConfig.Password != "" ||
-		konnectConfig.Token != "" {
+	} else if konnectConfig.Token != "" {
 		return true
 	} else if konnectConnectionDesired {
 		return true

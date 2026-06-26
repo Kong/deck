@@ -4899,9 +4899,7 @@ func Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_PluginsOnConsumerGroupsWithInstanceNameFrom_3_4_0",
@@ -5093,7 +5091,7 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 // test scope:
 //   - 3.0.0+
 //
-// This test does two things:
+// This test is supposed to do two things:
 // 1. makes sure decK can correctly configure a Vault entity
 // 2. makes sure secrets management works as expected end-to-end
 //
@@ -5111,6 +5109,8 @@ func Test_Sync_Unsupported_Formats(t *testing.T) {
 // an HTTPS client is created using the `caCert` used to sign the
 // deployed certificate, and then a GET is performed to test the
 // proxy functionality, which should return a 200.
+// However, we will skip checking for end to end vault resolution
+// since we need a local server set up https://github.com/Kong/go-database-reconciler/issues/485
 func Test_Sync_Vault(t *testing.T) {
 	// setup stage
 	client, err := getTestClient()
@@ -5281,52 +5281,53 @@ func Test_Sync_Vault(t *testing.T) {
 			require.NoError(t, sync(context.Background(), tc.kongFile))
 			testKongState(t, client, false, false, tc.expectedState, nil)
 
-			// Kong proxy may need a bit to be ready.
-			// 	time.Sleep(time.Second * 5)
+			// TODO: Enable after this test is modified to use a local server
+			// // Kong proxy may need a bit to be ready.
+			// time.Sleep(time.Second * 5)
 
-			// 	// build simple http client
-			// 	client := &http.Client{}
+			// // build simple http client
+			// client := &http.Client{}
 
-			// 	// use simple http client with https should result
-			// 	// in a failure due missing certificate.
-			// 	_, err := client.Get("https://localhost:8443/r1")
-			// 	require.Error(t, err)
+			// // use simple http client with https should result
+			// // in a failure due missing certificate.
+			// _, err := client.Get("https://localhost:8443/r1")
+			// require.Error(t, err)
 
-			// 	// use transport with wrong CA cert this should result
-			// 	// in a failure due to unknown authority.
-			// 	badCACertPool := x509.NewCertPool()
-			// 	badCACertPool.AppendCertsFromPEM(badCACertPEM)
+			// // use transport with wrong CA cert this should result
+			// // in a failure due to unknown authority.
+			// badCACertPool := x509.NewCertPool()
+			// badCACertPool.AppendCertsFromPEM(badCACertPEM)
 
-			// 	client = &http.Client{
-			// 		Transport: &http.Transport{
-			// 			TLSClientConfig: &tls.Config{
-			// 				RootCAs:    badCACertPool,
-			// 				ClientAuth: tls.RequireAndVerifyClientCert,
-			// 			},
+			// client = &http.Client{
+			// 	Transport: &http.Transport{
+			// 		TLSClientConfig: &tls.Config{
+			// 			RootCAs:    badCACertPool,
+			// 			ClientAuth: tls.RequireAndVerifyClientCert,
 			// 		},
-			// 	}
+			// 	},
+			// }
 
-			// 	_, err = client.Get("https://localhost:8443/r1")
-			// 	require.Error(t, err)
+			// _, err = client.Get("https://localhost:8443/r1")
+			// require.Error(t, err)
 
-			// 	// use transport with good CA cert should pass
-			// 	// if referenced secrets are resolved correctly
-			// 	// using the ENV vault.
-			// 	goodCACertPool := x509.NewCertPool()
-			// 	goodCACertPool.AppendCertsFromPEM(goodCACertPEM)
+			// // use transport with good CA cert should pass
+			// // if referenced secrets are resolved correctly
+			// // using the ENV vault.
+			// goodCACertPool := x509.NewCertPool()
+			// goodCACertPool.AppendCertsFromPEM(goodCACertPEM)
 
-			// 	client = &http.Client{
-			// 		Transport: &http.Transport{
-			// 			TLSClientConfig: &tls.Config{
-			// 				RootCAs:    goodCACertPool,
-			// 				ClientAuth: tls.RequireAndVerifyClientCert,
-			// 			},
+			// client = &http.Client{
+			// 	Transport: &http.Transport{
+			// 		TLSClientConfig: &tls.Config{
+			// 			RootCAs:    goodCACertPool,
+			// 			ClientAuth: tls.RequireAndVerifyClientCert,
 			// 		},
-			// 	}
+			// 	},
+			// }
 
-			// 	res, err := client.Get("https://localhost:8443/r1")
-			// 	require.NoError(t, err)
-			// 	assert.Equal(t, http.StatusOK, res.StatusCode)
+			// res, err := client.Get("https://localhost:8443/r1")
+			// require.NoError(t, err)
+			// assert.Equal(t, http.StatusOK, res.StatusCode)
 		})
 	}
 }
@@ -9825,9 +9826,7 @@ func testSyncSkipConsumersWithConsumerGroupsKonnectImpl(t *testing.T) {
 func Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_SkipConsumersWithDefaultLookUp_ConsumersAndConsumerGroup_Tag",
@@ -10129,9 +10128,7 @@ func testSyncPartialsPluginsKonnectImpl(t *testing.T) {
 func Test_Sync_Partials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Partials", testSyncPartialsImpl)
@@ -10182,9 +10179,7 @@ func Test_Sync_Consumers_Default_Lookup_Tag(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=2.8.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Consumers_Default_Lookup_Tag", testSyncConsumersDefaultLookupTagImpl)
@@ -10673,9 +10668,7 @@ func Test_Sync_Plugins_Nested_Foreign_Keys_3x(t *testing.T) {
 func Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.6.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Plugins_Nested_Foreign_Keys_EE_3x",
@@ -11786,9 +11779,7 @@ func Test_Sync_SkipCustomEntitiesWithSelectorTags(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_SkipCustomEntitiesWithSelectorTags",
@@ -11833,9 +11824,7 @@ func testSyncSkipCustomEntitiesWithSelectorTagsImpl(t *testing.T) {
 func Test_Sync_ConsumerCredentials(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.0.0")
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_ConsumerCredentials", testSyncConsumerCredentialsImpl)
@@ -12020,9 +12009,7 @@ func Test_Sync_Services_TLS_Sans(t *testing.T) {
 	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
 
 	// Check if running against Konnect for dual testing
-	isKonnect := os.Getenv("DECK_KONNECT_EMAIL") != "" ||
-		os.Getenv("DECK_KONNECT_PASSWORD") != "" ||
-		os.Getenv("DECK_KONNECT_TOKEN") != ""
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
 	if isKonnect {
 		runDualTestWithSkipDefaults(t, "Test_Sync_Services_TLS_Sans", testSyncServicesTLSSansImpl)
