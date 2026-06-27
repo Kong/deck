@@ -12,7 +12,7 @@ import (
 )
 
 func randomString(n int) (string, error) {
-	const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzj"
+	const charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	charsetLength := big.NewInt(int64(len(charset)))
 
 	ret := make([]byte, n)
