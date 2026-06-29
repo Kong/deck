@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.64.0](#v1640)
 - [v1.63.0](#v1630)
 - [v1.62.1](#v1621)
 - [v1.62.0](#v1620)
@@ -142,6 +143,28 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+
+## [v1.64.0]
+> Release date: 2026/06/29
+
+### Added
+- Added a `--kong-admin-token` flag to authenticate with Kong's Admin API. This value
+can also be set using the `DECK_KONG_ADMIN_TOKEN` environment variable.
+[#2123](https://github.com/Kong/deck/pull/2123)
+
+### Fixed
+- `deck diff`/`deck sync` now report the actual count of operations performed when an
+error occurs mid-run, instead of showing `Created: 0, Updated: 0, Deleted: 0` on a
+partial failure.
+[#2122](https://github.com/Kong/deck/pull/2122)
+- Added validation for the `--parallelism` flag to reject negative or zero values with a
+clear usage error, instead of hanging or panicking.
+[#2114](https://github.com/Kong/deck/pull/2114)
+[go-database-reconciler #480](https://github.com/Kong/go-database-reconciler/pull/488)
+- Removed the redundant email/password authentication check when a token is passed in the
+Konnect flow.
+[#2119](https://github.com/Kong/deck/pull/2119)
 
 ## [v1.63.0]
 > Release date: 2026/06/15
@@ -2658,6 +2681,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
 [v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
 [v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1
 [v1.62.0]: https://github.com/Kong/deck/compare/v1.61.0...v1.62.0  
