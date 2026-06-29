@@ -161,6 +161,7 @@ partial failure.
 - Added validation for the `--parallelism` flag to reject negative or zero values with a
 clear usage error, instead of hanging or panicking.
 [#2114](https://github.com/Kong/deck/pull/2114)
+[go-database-reconciler #480](https://github.com/Kong/go-database-reconciler/pull/488)
 - Removed the redundant email/password authentication check when a token is passed in the
 Konnect flow.
 [#2119](https://github.com/Kong/deck/pull/2119)
@@ -2680,6 +2681,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
 [v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
 [v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1
 [v1.62.0]: https://github.com/Kong/deck/compare/v1.61.0...v1.62.0  
