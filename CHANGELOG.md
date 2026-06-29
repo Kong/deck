@@ -146,7 +146,7 @@
 
 
 ## [v1.64.0]
-> Release date: 
+> Release date: 2026/06/29
 
 ### Added
 - Added a `--kong-admin-token` flag to authenticate with Kong's Admin API. This value
