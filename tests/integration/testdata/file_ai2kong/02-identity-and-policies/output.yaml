@@ -1,0 +1,93 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+    - 'managed-by: deck-ai'
+services:
+  - name: ai-gateway
+    url: http://ai-gateway.upstream.local
+    routes:
+      - name: openai-chat
+        paths:
+          - /ai/chat/completions
+        methods:
+          - POST
+        strip_path: false
+consumers:
+  - username: gregs-dev
+    custom_id: dev-001
+    groups:
+      - premium-users
+    keyauth_credentials:
+      - key: secret-abc
+        ttl: 3600
+    plugins:
+      - name: http-log
+        config:
+          http_endpoint: https://logs.internal/ingest
+    tags:
+      - tier:gold
+consumer_groups:
+  - name: premium-users
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 1000
+      policy: local
+  - name: ai-model-selector
+    config:
+      body_path: model
+      max_request_body_size: 8388608
+      source: body
+    route: openai-chat
+  - name: ai-proxy-advanced
+    config:
+      balancer:
+        algorithm: round-robin
+      genai_category: text/generation
+      llm_format: openai
+      targets:
+        - auth:
+            header_name: Authorization
+            header_value: '{vault://env/openai-key}'
+          description: gpt-4o
+          model:
+            model_alias: '@openai/guarded-gpt'
+            name: gpt-4o
+            provider: openai
+          route_type: llm/v1/chat
+    route: openai-chat
+    model:
+      name: guarded-gpt
+  - name: ai-prompt-guard
+    config:
+      allow_patterns:
+        - ^safe
+    route: openai-chat
+    model:
+      name: guarded-gpt
+  - name: http-log
+    config:
+      http_endpoint: https://logs.internal/ingest
+    route: openai-chat
+    model:
+      name: guarded-gpt
+  - name: acl
+    config:
+      allow:
+        - premium-users
+      include_consumer_groups: true
+    route: openai-chat
+    model:
+      name: guarded-gpt
+vaults:
+  - prefix: env-vault
+    name: env
+    description: Environment secrets
+    config:
+      prefix: KONG_
+ai_models:
+  - name: guarded-gpt
+    alias: '@openai/guarded-gpt'
+    tags:
+      - env:prod
+      - team:ai-platform

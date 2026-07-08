@@ -20,8 +20,23 @@ func Test_FileAI2Kong(t *testing.T) {
 	}{
 		{
 			name:               "convert AI gateway config to Kong gateway config",
-			inputFile:          "testdata/file_ai2kong/model-input.yaml",
-			expectedOutputFile: "testdata/file_ai2kong/model-output.yaml",
+			inputFile:          "testdata/file_ai2kong/01-models/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/01-models/output.yaml",
+		},
+		{
+			name:               "convert AI gateway config to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/02-identity-and-policies/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/02-identity-and-policies/output.yaml",
+		},
+		{
+			name:               "convert AI gateway config to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/03-agents/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/03-agents/output.yaml",
+		},
+		{
+			name:               "convert AI gateway config to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/04-mcp/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/04-mcp/output.yaml",
 		},
 	}
 	for _, tc := range tests {

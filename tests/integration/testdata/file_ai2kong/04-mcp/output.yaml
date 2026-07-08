@@ -1,0 +1,50 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+    - 'managed-by: deck-ai'
+services:
+  - name: flights-mcp
+    host: localhost
+    routes:
+      - name: flights-mcp-route
+        paths:
+          - /mcp/flights
+        plugins:
+          - name: ai-mcp-proxy
+            config:
+              default_acl:
+                - allow:
+                    - premium
+              logging:
+                log_audits: true
+                log_statistics: true
+              max_request_body_size: 8388608
+              mode: conversion-listener
+              server:
+                forward_client_headers: true
+                timeout: 10000
+              tools:
+                - description: Search available flights
+                  host: flights.internal
+                  method: GET
+                  name: searchFlights
+                  path: /flights
+                  scheme: https
+                - acl:
+                    allow:
+                      - agents
+                  description: Book a flight
+                  method: POST
+                  name: bookFlight
+                  path: /flights/book
+  - name: vendor-mcp
+    url: https://vendor-mcp.example.com/mcp
+    routes:
+      - name: vendor-mcp-route
+        paths:
+          - /mcp/vendor
+        plugins:
+          - name: ai-mcp-proxy
+            config:
+              mode: passthrough-listener
+              tools: []
