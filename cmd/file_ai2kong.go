@@ -16,15 +16,15 @@ var (
 
 func newAi2KongCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ai2kong",
-		Short: "Generate Kong configuration from AI Gateway configuration",
-		Long:  `This command takes an AI Gateway 2.0 entity model and converts it to a standard decK state file`,
-		Args:  validateNoArgs,
+		Use:     "ai2kong",
+		Short:   "Generate Kong configuration from AI Gateway configuration",
+		Long:    `This command takes an AI Gateway 2.0 entity model and converts it to a standard decK state file`,
+		Args:    validateNoArgs,
 		PreRunE: validateAi2KongFlags,
-		RunE:  execute,
+		RunE:    execute,
 	}
 
-	cmd.Flags().StringVarP(&convertSourceFile, "source", "s", "", "Source AI Gateway YAML file (required)")
+	cmd.Flags().StringVarP(&convertSourceFile, "state", "s", "", "AI Gateway state file (required)")
 	cmd.Flags().StringVarP(&convertOutputFile, "output-file", "o", "", "Output Kong decK YAML file (optional, defaults to stdout)")
 
 	return cmd
@@ -32,7 +32,7 @@ func newAi2KongCmd() *cobra.Command {
 
 func validateAi2KongFlags(cmd *cobra.Command, args []string) error {
 	if convertSourceFile == "" {
-		return fmt.Errorf("--source/-s flag is required")
+		return fmt.Errorf("--state/-s flag is required")
 	}
 	return nil
 }
