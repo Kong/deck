@@ -45,7 +45,7 @@ func execute(cmd *cobra.Command, args []string) error {
 	}
 
 	// Convert AI Gateway to Kong decK
-	converted, warnings, err := convert.Convert(sourceContent, convert.Options{})
+	converted, warnings, err := convert.Convert(sourceContent, convert.Options{GlobalSelectTags: []string{"managed-by: deck-ai"}})
 	if err != nil {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
