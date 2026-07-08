@@ -1,0 +1,33 @@
+mcp_servers:
+  - type: conversion-listener
+    display_name: Flights MCP
+    name: flights-mcp
+    policies: []
+    acls: {allow: [], deny: []}
+    default_tool_acls: {allow: [premium], deny: []}
+    config:
+      route: {name: flights-mcp-route, paths: [/mcp/flights]}
+      max_request_body_size: 8388608
+      logging: {statistics: true, audits: true}
+      server: {timeout: 10000, forward_client_headers: true}
+    tools:
+      - name: searchFlights
+        description: Search available flights
+        method: GET
+        path: /flights
+        scheme: https
+        host: flights.internal
+      - name: bookFlight
+        description: Book a flight
+        method: POST
+        path: /flights/book
+        acls: {allow: [agents], deny: []}
+  - type: passthrough-listener
+    display_name: Vendor MCP
+    name: vendor-mcp
+    policies: []
+    acls: {allow: [], deny: []}
+    upstream_url: https://vendor-mcp.example.com/mcp
+    config:
+      route: {name: vendor-mcp-route, paths: [/mcp/vendor]}
+    tools: []

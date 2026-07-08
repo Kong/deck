@@ -1,0 +1,63 @@
+models:
+  - type: model
+    display_name: Guarded GPT
+    name: guarded-gpt
+    capabilities: [generate]
+    formats: [{type: openai}]
+    labels:
+      env: prod
+      team: ai-platform
+    targets:
+      - name: gpt-4o
+        provider: openai-main
+        config: {type: openai}
+    policies: [pii-sanitizer, audit-logging]
+    acls:
+      allow: [premium-users]
+    config:
+      route: {paths: [/ai]}
+      model: {alias: "@openai/guarded-gpt"}
+providers:
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers: [{name: Authorization, value: "{vault://env/openai-key}"}]
+policies:
+  - type: ai-prompt-guard
+    name: pii-sanitizer
+    config:
+      allow_patterns: ["^safe"]
+  - type: http-log
+    name: audit-logging
+    config:
+      http_endpoint: https://logs.internal/ingest
+  - type: rate-limiting
+    name: org-wide-limit
+    global: true
+    config:
+      minute: 1000
+      policy: local
+consumers:
+  - name: gregs-dev
+    type: api-key
+    custom_id: dev-001
+    consumer_groups: [premium-users]
+    policies: [audit-logging]
+    labels: {tier: gold}
+    credentials:
+      - name: gregs-key
+        type: api-key
+        api_key: secret-abc
+        ttl: 3600
+consumer_groups:
+  - name: premium-users
+    policies: [org-wide-limit]
+vaults:
+  - type: env
+    name: env-vault
+    description: Environment secrets
+    config:
+      prefix: KONG_
