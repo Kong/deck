@@ -7,6 +7,7 @@ import (
 
 	"github.com/Kong/ai-deck-converter/convert"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 var (
@@ -44,8 +45,8 @@ func execute(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read source file: %w", err)
 	}
 
-	// Convert AI Gateway to Kong decK
-	converted, warnings, err := convert.Convert(sourceContent, convert.Options{GlobalSelectTags: []string{"managed-by: deck-ai"}})
+	// Convert AI Gateway to Kong decK (without GlobalSelectTags option)
+	converted, warnings, err := convert.Convert(sourceContent, convert.Options{})
 	if err != nil {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
@@ -57,23 +58,54 @@ func execute(cmd *cobra.Command, args []string) error {
 		}
 	}
 
+	// Parse the converted YAML to add select_tags to _info
+	var doc interface{}
+	err = yaml.Unmarshal(converted, &doc)
+	if err != nil {
+		return fmt.Errorf("failed to parse converted YAML: %w", err)
+	}
+
+	// Ensure the document is a map and add select_tags to _info
+	if docMap, ok := doc.(map[string]interface{}); ok {
+		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
+			// _info exists, update select_tags
+			infoMap["select_tags"] = []string{"managed-by: deck-ai"}
+		} else {
+			// _info doesn't exist, create it with select_tags
+			docMap["_info"] = map[string]interface{}{
+				"select_tags": []string{"managed-by: deck-ai"},
+			}
+		}
+	}
+
+	// Marshal back to YAML
+	output, err := marshalToYAML(doc)
+	if err != nil {
+		return fmt.Errorf("failed to marshal modified document: %w", err)
+	}
+
 	// Write output
-	var output io.Writer
+	var outputWriter io.Writer
 	if convertOutputFile != "" {
 		outFile, err := os.Create(convertOutputFile)
 		if err != nil {
 			return fmt.Errorf("failed to create output file: %w", err)
 		}
 		defer outFile.Close()
-		output = outFile
+		outputWriter = outFile
 	} else {
-		output = os.Stdout
+		outputWriter = os.Stdout
 	}
 
-	_, err = output.Write(converted)
+	_, err = outputWriter.Write(output)
 	if err != nil {
 		return fmt.Errorf("failed to write output: %w", err)
 	}
 
 	return nil
+}
+
+// marshalToYAML encodes v as YAML using a two-space indent.
+func marshalToYAML(v interface{}) ([]byte, error) {
+	return yaml.Marshal(v)
 }
