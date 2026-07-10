@@ -231,6 +231,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	isKonnect := false
 	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
 
+	// AI Gateway entities (tagged managed-by: deck-ai) must be managed with
+	// kongctl on Konnect, not decK. Fail fast before any Konnect calls.
+	if mode == modeKonnect && contentHasAIManagedTag(targetContent) {
+		return errAIManagedEntitiesOnKonnect()
+	}
+
 	if mode == modeKonnect {
 		isKonnect = true
 

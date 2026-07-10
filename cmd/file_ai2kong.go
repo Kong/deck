@@ -69,11 +69,11 @@ func execute(cmd *cobra.Command, args []string) error {
 	if docMap, ok := doc.(map[string]interface{}); ok {
 		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
 			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{"managed-by: deck-ai"}
+			infoMap["select_tags"] = []string{aiManagedSelectorTag}
 		} else {
 			// _info doesn't exist, create it with select_tags
 			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{"managed-by: deck-ai"},
+				"select_tags": []string{aiManagedSelectorTag},
 			}
 		}
 	}

@@ -19,6 +19,7 @@ services:
                 log_audits: true
                 log_statistics: true
               max_request_body_size: 8388608
+              include_consumer_groups: true
               mode: conversion-listener
               server:
                 forward_client_headers: true
@@ -46,5 +47,6 @@ services:
         plugins:
           - name: ai-mcp-proxy
             config:
+              include_consumer_groups: true
               mode: passthrough-listener
               tools: []

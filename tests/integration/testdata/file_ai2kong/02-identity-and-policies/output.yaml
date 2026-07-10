@@ -50,21 +50,18 @@ plugins:
         name: gpt-4o
         provider: openai
       route_type: llm/v1/chat
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: ai-proxy-advanced
   route: openai-chat
 - config:
     allow_patterns:
     - ^safe
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: ai-prompt-guard
   route: openai-chat
 - config:
     http_endpoint: https://logs.internal/ingest
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: http-log
   route: openai-chat
 services:
