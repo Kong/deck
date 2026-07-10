@@ -260,6 +260,11 @@ It can be used to export, import, or sync entities to Kong.`,
 		fileCmd.AddCommand(newFileFormatCmd())
 		fileCmd.AddCommand(newAi2KongCmd())
 	}
+	{
+		aiCmd := newAiSubCmd()
+		rootCmd.AddCommand(aiCmd)
+		aiCmd.AddCommand(newAiDumpCmd())
+	}
 	return rootCmd
 }
 
