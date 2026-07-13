@@ -33,6 +33,7 @@ jobs:
         - 'kong/kong-gateway:3.12'
         - 'kong/kong-gateway:3.13'
         - 'kong/kong-gateway:3.14'
+        - 'kong/kong-gateway:3.15'
         - 'kong/kong-gateway-dev:latest'
         router_flavor:
           - 'traditional_compatible'
