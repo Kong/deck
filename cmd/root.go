@@ -264,6 +264,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		aiCmd := newAiSubCmd()
 		rootCmd.AddCommand(aiCmd)
 		aiCmd.AddCommand(newAiDumpCmd())
+		aiCmd.AddCommand(newAiSyncCmd())
 	}
 	return rootCmd
 }

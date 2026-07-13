@@ -180,23 +180,41 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 ) error {
 	// read target file
 	if enableJSONOutput {
-		jsonOutput.Errors = []string{}
-		jsonOutput.Warnings = []string{}
-		jsonOutput.Changes = diff.EntityChanges{
-			Creating:         []diff.EntityState{},
-			Updating:         []diff.EntityState{},
-			Deleting:         []diff.EntityState{},
-			DroppedCreations: []diff.EntityState{},
-			DroppedUpdates:   []diff.EntityState{},
-			DroppedDeletions: []diff.EntityState{},
-		}
+		initJSONOutput()
 	}
 	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}
+	return syncContent(ctx, targetContent, dry, parallelism, delay, workspace, enableJSONOutput, applyType)
+}
 
-	err = validateSkipConsumersWithLookupTags(targetContent)
+// initJSONOutput resets the shared JSON output report at the start of a command.
+// It is called by the command entrypoints (rather than syncContent) so that
+// warnings a command emits before diffing — e.g. AI Gateway conversion
+// warnings — are not clobbered.
+func initJSONOutput() {
+	jsonOutput.Errors = []string{}
+	jsonOutput.Warnings = []string{}
+	jsonOutput.Changes = diff.EntityChanges{
+		Creating:         []diff.EntityState{},
+		Updating:         []diff.EntityState{},
+		Deleting:         []diff.EntityState{},
+		DroppedCreations: []diff.EntityState{},
+		DroppedUpdates:   []diff.EntityState{},
+		DroppedDeletions: []diff.EntityState{},
+	}
+}
+
+// syncContent performs the sync/diff/apply operation against Kong for an
+// already-loaded target configuration. It is the shared back half of syncMain,
+// reused by commands (such as `ai sync`) that build their target content
+// in-memory rather than reading it from files. Callers are responsible for
+// calling initJSONOutput when JSON output is enabled.
+func syncContent(ctx context.Context, targetContent *file.Content, dry bool, parallelism,
+	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
+) error {
+	err := validateSkipConsumersWithLookupTags(targetContent)
 	if err != nil {
 		return err
 	}
