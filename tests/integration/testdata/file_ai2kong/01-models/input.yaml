@@ -59,7 +59,7 @@ models:
       balancer:
         algorithm: round-robin
         slots: 10000
-providers:
+model_providers:
   - type: openai
     display_name: OpenAI Main
     name: openai-main

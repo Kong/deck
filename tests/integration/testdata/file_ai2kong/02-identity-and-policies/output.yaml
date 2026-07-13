@@ -64,6 +64,13 @@ plugins:
   model: guarded-gpt
   name: http-log
   route: openai-chat
+- config:
+    allow:
+    - premium-users
+    include_consumer_groups: true
+  model: guarded-gpt
+  name: acl
+  route: openai-chat
 services:
 - name: ai-gateway
   routes:
