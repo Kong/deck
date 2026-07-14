@@ -125,6 +125,15 @@ func runWhenRBAC(t *testing.T, semverRange string) {
 	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{RBAC: true})
 }
 
+// runWhenAIGateway skips the test unless it is running against a self-hosted
+// AI Gateway instance within the given semver range. AI Gateway is detected via
+// the "ai-gateway" marker in the Admin API Server header.
+func runWhenAIGateway(t *testing.T, semverRange string) {
+	t.Helper()
+	skipWhenKonnect(t)
+	kong.RunWhenAIGateway(t, semverRange)
+}
+
 func sortSlices(x, y interface{}) bool {
 	var xName, yName string
 	switch xEntity := x.(type) {
@@ -270,6 +279,7 @@ func testKongState(t *testing.T, client *kong.Client, isKonnect bool,
 		cmpopts.IgnoreFields(kong.Partial{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.ClonedPluginDefinition{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.IgnoreFields(kong.CustomPluginDefinition{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.IgnoreFields(kong.AIModel{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(sortSlices),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		cmpopts.EquateEmpty(),
@@ -363,6 +373,43 @@ func sync(ctx context.Context, kongFile string, opts ...string) error {
 	}
 	deckCmd.SetArgs(args)
 	return deckCmd.ExecuteContext(ctx)
+}
+
+// aiSync converts an AI Gateway source file to Kong configuration and syncs it
+// directly to Kong (the equivalent of `deck ai sync <source-file>`). It runs
+// non-interactively so it can be used in tests.
+func aiSync(ctx context.Context, sourceFile string, opts ...string) error {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"ai", "sync", sourceFile, "--yes"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	return deckCmd.ExecuteContext(ctx)
+}
+
+// aiDump reads the AI-managed entities from Kong and writes them in AI Gateway
+// format (the equivalent of `deck ai dump`), returning the generated output.
+func aiDump(opts ...string) (string, error) {
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"ai", "dump"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+
+	// capture command output to be used during tests
+	rescueStdout := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	cmdErr := deckCmd.ExecuteContext(context.Background())
+
+	w.Close()
+	out, _ := io.ReadAll(r)
+	os.Stdout = rescueStdout
+
+	return stripansi.Strip(string(out)), cmdErr
 }
 
 func syncWithOutput(ctx context.Context, kongFile string, opts ...string) (string, error) {
