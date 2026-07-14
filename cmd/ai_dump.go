@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	aiDumpCmdStateFormat string = "yaml" // default to yaml
+	aiDumpCmdStateFormat = "yaml" // default to yaml
 	aiDumpCmdOutputFile  string
 	aiDumpWorkspace      string
 )
