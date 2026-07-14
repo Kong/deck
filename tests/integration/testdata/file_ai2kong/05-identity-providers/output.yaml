@@ -1,0 +1,55 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - 'managed-by:deck-ai'
+ai_models:
+- alias: '@openai/gpt-5.4'
+  name: openai-gpt-5-4
+consumers:
+- custom_id: anonymous
+  plugins:
+  - config:
+      message: Unauthorized
+      status_code: 401
+    name: request-termination
+  username: anonymous
+plugins:
+- config:
+    body_path: model
+    max_request_body_size: 8388608
+    source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/openai-token}'
+      description: gpt-5.4
+      model:
+        model_alias: '@openai/gpt-5.4'
+        name: gpt-5.4
+        provider: openai
+      route_type: llm/v1/chat
+  model: openai-gpt-5-4
+  name: ai-proxy-advanced
+  route: openai-chat
+- config:
+    anonymous: anonymous
+    issuer: https://dev-123456.okta.com/oauth2/default
+  name: openid-connect
+  route: openai-chat
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  url: http://ai-gateway.upstream.local

@@ -1,7 +1,7 @@
 _format_version: "3.0"
 _info:
   select_tags:
-    - 'managed-by: deck-ai'
+    - 'managed-by:deck-ai'
 services:
   - name: ai-gateway
     url: http://ai-gateway.upstream.local
@@ -55,8 +55,7 @@ plugins:
           route_type: llm/v1/chat
           weight: 30
     route: openai-chat
-    model:
-      name: gpt-4o
+    model: gpt-4o
   - name: ai-proxy-advanced
     config:
       balancer:
@@ -93,8 +92,7 @@ plugins:
           route_type: llm/v1/chat
           weight: 30
     route: openai-chat
-    model:
-      name: gpt-5.4
+    model: gpt-5.4
 ai_models:
   - name: gpt-4o
     alias: '@openai/gpt-4o'

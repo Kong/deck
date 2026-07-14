@@ -1,15 +1,18 @@
 mcp_servers:
   - type: conversion-listener
-    display_name: Flights MCP
-    name: flights-mcp
-    policies: []
-    acls: {allow: [], deny: []}
-    default_tool_acls: {allow: [premium], deny: []}
+    display_name: Secure Flights MCP
+    name: secure-flights-mcp
+    enabled: true
     config:
-      route: {name: flights-mcp-route, paths: [/mcp/flights]}
-      max_request_body_size: 8388608
-      logging: {statistics: true, audits: true}
-      server: {timeout: 10000, forward_client_headers: true}
+      route:
+        paths:
+          - /mcp/secure-flights
+      auth:
+        acl_attribute_type: oauth_access_token
+        access_token_claim_field: .user.email
+        default_tool_acls:
+          allow:
+            - premium
     tools:
       - name: searchFlights
         description: Search available flights
@@ -17,17 +20,34 @@ mcp_servers:
         path: /flights
         scheme: https
         host: flights.internal
-      - name: bookFlight
-        description: Book a flight
-        method: POST
-        path: /flights/book
-        acls: {allow: [agents], deny: []}
   - type: passthrough-listener
-    display_name: Vendor MCP
-    name: vendor-mcp
-    policies: []
-    acls: {allow: [], deny: []}
-    upstream_url: https://vendor-mcp.example.com/mcp
+    name: vendor-proxy-mcp
+    upstream_url: https://vendor.example.com/mcp
     config:
-      route: {name: vendor-mcp-route, paths: [/mcp/vendor]}
-    tools: []
+      route:
+        paths:
+          - /mcp/vendor-proxy
+      proxy:
+        https_proxy:
+          host: proxy.internal
+          port: 8080
+    tools:
+      - name: vendorTool
+        description: A vendor tool
+  - type: upstream-server
+    name: upstream-mcp
+    upstream_url: https://upstream.example.com/mcp
+    config:
+      route:
+        paths:
+          - /mcp/upstream
+      tools_cache_ttl_seconds: 300
+      server:
+        preserve_upstream_tool_names: true
+    tools:
+      - name: upstreamTool
+        description: An upstream tool
+        input_schema:
+          type: object
+        output_schema:
+          type: object

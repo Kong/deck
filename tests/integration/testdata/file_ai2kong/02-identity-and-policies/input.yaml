@@ -12,12 +12,13 @@ models:
         provider: openai-main
         config: {type: openai}
     policies: [pii-sanitizer, audit-logging]
-    acls:
-      allow: [premium-users]
+    access:
+      acls:
+        allow: [premium-users]
     config:
       route: {paths: [/ai]}
       model: {alias: "@openai/guarded-gpt"}
-providers:
+model_providers:
   - type: openai
     display_name: OpenAI Main
     name: openai-main
