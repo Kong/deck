@@ -1,8 +1,0 @@
-go 1.26.4
-
-use (
-	.
-	../ai-deck-converter
-	../go-database-reconciler
-	../go-kong-ssh/go-kong
-)
