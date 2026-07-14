@@ -25,7 +25,7 @@ func newAi2KongCmd() *cobra.Command {
 		RunE:    execute,
 	}
 
-	cmd.Flags().StringVarP(&convertSourceFile, "state", "s", "", "AI Gateway state file (required)")
+	cmd.Flags().StringVarP(&convertSourceFile, "source", "s", "", "AI Gateway source file (required)")
 	cmd.Flags().StringVarP(&convertOutputFile, "output-file", "o", "", "Output Kong decK YAML file (optional, defaults to stdout)")
 
 	return cmd
@@ -33,7 +33,7 @@ func newAi2KongCmd() *cobra.Command {
 
 func validateAi2KongFlags(cmd *cobra.Command, args []string) error {
 	if convertSourceFile == "" {
-		return fmt.Errorf("--state/-s flag is required")
+		return fmt.Errorf("--source/-s flag is required")
 	}
 	return nil
 }
@@ -45,8 +45,9 @@ func execute(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to read source file: %w", err)
 	}
 
-	// Convert AI Gateway to Kong decK (without GlobalSelectTags option)
-	converted, warnings, err := convert.Convert(sourceContent, convert.Options{})
+	converted, warnings, err := convert.Convert(sourceContent, convert.Options{
+		OutputMode: "deck",
+	})
 	if err != nil {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
@@ -69,11 +70,11 @@ func execute(cmd *cobra.Command, args []string) error {
 	if docMap, ok := doc.(map[string]interface{}); ok {
 		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
 			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{"managed-by: deck-ai"}
+			infoMap["select_tags"] = []string{"managed-by:deck-ai"}
 		} else {
 			// _info doesn't exist, create it with select_tags
 			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{"managed-by: deck-ai"},
+				"select_tags": []string{"managed-by:deck-ai"},
 			}
 		}
 	}

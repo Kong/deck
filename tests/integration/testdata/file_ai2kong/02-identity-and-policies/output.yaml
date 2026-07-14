@@ -1,7 +1,7 @@
 _format_version: "3.0"
 _info:
   select_tags:
-  - 'managed-by: deck-ai'
+  - 'managed-by:deck-ai'
 ai_models:
 - alias: '@openai/guarded-gpt'
   name: guarded-gpt
@@ -50,22 +50,26 @@ plugins:
         name: gpt-4o
         provider: openai
       route_type: llm/v1/chat
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: ai-proxy-advanced
   route: openai-chat
 - config:
     allow_patterns:
     - ^safe
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: ai-prompt-guard
   route: openai-chat
 - config:
     http_endpoint: https://logs.internal/ingest
-  model:
-    name: guarded-gpt
+  model: guarded-gpt
   name: http-log
+  route: openai-chat
+- config:
+    allow:
+    - premium-users
+    include_consumer_groups: true
+  model: guarded-gpt
+  name: acl
   route: openai-chat
 services:
 - name: ai-gateway

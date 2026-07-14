@@ -1,50 +1,65 @@
 _format_version: "3.0"
 _info:
   select_tags:
-    - 'managed-by: deck-ai'
+  - managed-by:deck-ai
 services:
-  - name: flights-mcp
-    host: localhost
-    routes:
-      - name: flights-mcp-route
-        paths:
-          - /mcp/flights
-        plugins:
-          - name: ai-mcp-proxy
-            config:
-              default_acl:
-                - allow:
-                    - premium
-              logging:
-                log_audits: true
-                log_statistics: true
-              max_request_body_size: 8388608
-              mode: conversion-listener
-              server:
-                forward_client_headers: true
-                timeout: 10000
-              tools:
-                - description: Search available flights
-                  host: flights.internal
-                  method: GET
-                  name: searchFlights
-                  path: /flights
-                  scheme: https
-                - acl:
-                    allow:
-                      - agents
-                  description: Book a flight
-                  method: POST
-                  name: bookFlight
-                  path: /flights/book
-  - name: vendor-mcp
-    url: https://vendor-mcp.example.com/mcp
-    routes:
-      - name: vendor-mcp-route
-        paths:
-          - /mcp/vendor
-        plugins:
-          - name: ai-mcp-proxy
-            config:
-              mode: passthrough-listener
-              tools: []
+- host: localhost
+  name: secure-flights-mcp
+  routes:
+  - name: secure-flights-mcp-route
+    paths:
+    - /mcp/secure-flights
+    plugins:
+    - config:
+        access_token_claim_field: .user.email
+        acl_attribute_type: oauth_access_token
+        default_acl:
+        - allow:
+          - premium
+        mode: conversion-listener
+        tools:
+        - description: Search available flights
+          host: flights.internal
+          method: GET
+          name: searchFlights
+          path: /flights
+          scheme: https
+      name: ai-mcp-proxy
+- name: vendor-proxy-mcp
+  routes:
+  - name: vendor-proxy-mcp-route
+    paths:
+    - /mcp/vendor-proxy
+    plugins:
+    - config:
+        include_consumer_groups: true
+        mode: passthrough-listener
+        proxy_config:
+          https_proxy_host: proxy.internal
+          https_proxy_port: 8080
+        tools:
+        - description: A vendor tool
+          name: vendorTool
+      name: ai-mcp-proxy
+  url: https://vendor.example.com/mcp
+- name: upstream-mcp
+  routes:
+  - name: upstream-mcp-route
+    paths:
+    - /mcp/upstream
+    plugins:
+    - config:
+        include_consumer_groups: true
+        mode: upstream-server
+        server:
+          preserve_upstream_tool_names: true
+        tools:
+        - description: An upstream tool
+          input_schema:
+            type: object
+          name: upstreamTool
+          output_schema:
+            type: object
+        tools_cache_ttl_seconds: 300
+      name: ai-mcp-proxy
+  url: https://upstream.example.com/mcp
