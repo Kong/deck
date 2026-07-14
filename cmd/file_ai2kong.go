@@ -26,19 +26,20 @@ func newAi2KongCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&convertSourceFile, "source", "s", "", "AI Gateway source file (required)")
-	cmd.Flags().StringVarP(&convertOutputFile, "output-file", "o", "", "Output Kong decK YAML file (optional, defaults to stdout)")
+	cmd.Flags().StringVarP(&convertOutputFile, "output-file", "o", "",
+		"Output Kong decK YAML file (optional, defaults to stdout)")
 
 	return cmd
 }
 
-func validateAi2KongFlags(cmd *cobra.Command, args []string) error {
+func validateAi2KongFlags(_ *cobra.Command, _ []string) error {
 	if convertSourceFile == "" {
 		return fmt.Errorf("--source/-s flag is required")
 	}
 	return nil
 }
 
-func execute(cmd *cobra.Command, args []string) error {
+func execute(_ *cobra.Command, _ []string) error {
 	// Read source file
 	sourceContent, err := os.ReadFile(convertSourceFile)
 	if err != nil {
