@@ -56,7 +56,7 @@ func contentHasAIManagedTag(content *file.Content) bool {
 // Non-Tags fields are traversed structurally but their string values are never
 // matched, so plugin config values or names cannot trigger a false positive.
 func valueHasTag(v reflect.Value) bool {
-	switch v.Kind() {
+	switch v.Kind() { //nolint:exhaustive // only container and struct kinds need traversal; scalars can never hold Tags
 	case reflect.Pointer, reflect.Interface:
 		if v.IsNil() {
 			return false
