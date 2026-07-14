@@ -9,6 +9,7 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
+	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 )
@@ -45,12 +46,18 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
+	isAIGateway, err := kong.IsKongAIGateway()
+	if err != nil {
+		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
+	}
+
 	writeConfig := file.WriteConfig{
 		SelectTags:                       dumpConfig.SelectorTags,
 		Workspace:                        aiDumpWorkspace,
 		Filename:                         "",
 		WithID:                           false,
 		KongVersion:                      kongVersion,
+		IsKongAIGateway:                  isAIGateway,
 		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
 		SanitizeContent:                  false,
 		IncludePluginDefinitions:         dumpConfig.IncludePluginDefinitions,
