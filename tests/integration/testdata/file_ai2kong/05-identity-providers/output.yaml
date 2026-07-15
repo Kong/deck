@@ -1,7 +1,7 @@
 _format_version: "3.0"
 _info:
   select_tags:
-  - 'managed_by:deck-ai'
+  - managed_by:deck-ai
 ai_models:
 - alias: '@openai/gpt-5.4'
   name: openai-gpt-5-4
@@ -11,6 +11,7 @@ consumers:
   - config:
       message: Unauthorized
       status_code: 401
+    enabled: true
     name: request-termination
   username: anonymous
 plugins:
@@ -30,6 +31,9 @@ plugins:
         header_name: Authorization
         header_value: '{vault://ai/openai-token}'
       description: gpt-5.4
+      logging:
+        log_payloads: false
+        log_statistics: true
       model:
         model_alias: '@openai/gpt-5.4'
         name: gpt-5.4
@@ -41,7 +45,14 @@ plugins:
 - config:
     anonymous: anonymous
     issuer: https://dev-123456.okta.com/oauth2/default
+    cache_tokens_salt: "LNzaN7n85dxFWfqmZKCaFcTehSDNfozB"
   name: openid-connect
+  route: openai-chat
+- config:
+    anonymous: anonymous
+    key_names:
+    - x-api-key
+  name: key-auth
   route: openai-chat
 services:
 - name: ai-gateway
