@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	convertSourceFile  string
-	convertOutputFile  string
-	managedByAIDeckTag = "managed_by:deck-ai"
+	convertSourceFile string
+	convertOutputFile string
 )
+
+const managedByAIDeckTag = "managed_by:deck-ai"
 
 func newAi2KongCmd() *cobra.Command {
 	cmd := &cobra.Command{

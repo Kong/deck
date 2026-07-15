@@ -102,32 +102,6 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		}
 	}
 
-	// Parse the AI Gateway YAML to add select_tags to _info
-	var doc interface{}
-	err = yaml.Unmarshal(aiGatewayYAML, &doc)
-	if err != nil {
-		return fmt.Errorf("failed to parse AI Gateway YAML: %w", err)
-	}
-
-	// Ensure the document is a map and add select_tags to _info
-	if docMap, ok := doc.(map[string]interface{}); ok {
-		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
-			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{managedByAIDeckTag}
-		} else {
-			// _info doesn't exist, create it with select_tags
-			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{managedByAIDeckTag},
-			}
-		}
-	}
-
-	// Marshal back to YAML
-	finalOutput, err := yaml.Marshal(doc)
-	if err != nil {
-		return fmt.Errorf("failed to marshal modified AI Gateway document: %w", err)
-	}
-
 	// Write output
 	var output io.Writer
 	if aiDumpCmdOutputFile != "" && aiDumpCmdOutputFile != "-" {
@@ -141,7 +115,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		output = os.Stdout
 	}
 
-	_, err = output.Write(finalOutput)
+	_, err = output.Write(aiGatewayYAML)
 	if err != nil {
 		return fmt.Errorf("failed to write output: %w", err)
 	}
