@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/Kong/ai-deck-converter/convert"
+	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 )
@@ -13,13 +13,15 @@ import (
 var (
 	convertSourceFile string
 	convertOutputFile string
+	managedByTag      = "managed_by:deck-ai"
 )
 
 func newAi2KongCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "ai2kong",
-		Short:   "Generate Kong configuration from AI Gateway configuration",
-		Long:    `This command takes an AI Gateway 2.0 entity model and converts it to a standard decK state file`,
+		Use:   "ai2kong",
+		Short: "Generate Kong configuration from AI Gateway configuration",
+		Long: `This command takes an AI Gateway 2.0 entity model and converts it to a standard decK state file.` +
+			` It also adds the 'managed_by:deck-ai' tag which is used internally to all entities by default.`,
 		Args:    validateNoArgs,
 		PreRunE: validateAi2KongFlags,
 		RunE:    execute,
@@ -46,7 +48,7 @@ func execute(_ *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to read source file: %w", err)
 	}
 
-	converted, warnings, err := convert.Convert(sourceContent, convert.Options{
+	converted, warnings, err := ai2kong.Convert(sourceContent, ai2kong.Options{
 		OutputMode: "deck",
 	})
 	if err != nil {
@@ -60,34 +62,16 @@ func execute(_ *cobra.Command, _ []string) error {
 		}
 	}
 
-	// Parse the converted YAML to add select_tags to _info
-	var doc interface{}
-	err = yaml.Unmarshal(converted, &doc)
+	// Add the default select_tags to the converted document's _info section
+	output, err := addDefaultSelectTags(converted)
 	if err != nil {
-		return fmt.Errorf("failed to parse converted YAML: %w", err)
-	}
-
-	// Ensure the document is a map and add select_tags to _info
-	if docMap, ok := doc.(map[string]interface{}); ok {
-		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
-			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{"managed-by:deck-ai"}
-		} else {
-			// _info doesn't exist, create it with select_tags
-			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{"managed-by:deck-ai"},
-			}
-		}
-	}
-
-	// Marshal back to YAML
-	output, err := marshalToYAML(doc)
-	if err != nil {
-		return fmt.Errorf("failed to marshal modified document: %w", err)
+		return err
 	}
 
 	// Write output
 	var outputWriter io.Writer
+	outputWriter = os.Stdout
+
 	if convertOutputFile != "" {
 		outFile, err := os.Create(convertOutputFile)
 		if err != nil {
@@ -95,8 +79,6 @@ func execute(_ *cobra.Command, _ []string) error {
 		}
 		defer outFile.Close()
 		outputWriter = outFile
-	} else {
-		outputWriter = os.Stdout
 	}
 
 	_, err = outputWriter.Write(output)
@@ -105,6 +87,35 @@ func execute(_ *cobra.Command, _ []string) error {
 	}
 
 	return nil
+}
+
+// addDefaultSelectTags parses the converted YAML and ensures the _info section
+// carries the default select_tags, creating _info if it is absent. It returns
+// the re-marshaled YAML.
+func addDefaultSelectTags(converted []byte) ([]byte, error) {
+	var doc interface{}
+	if err := yaml.Unmarshal(converted, &doc); err != nil {
+		return nil, fmt.Errorf("failed to parse converted YAML: %w", err)
+	}
+
+	// Ensure the document is a map and add select_tags to _info
+	if docMap, ok := doc.(map[string]interface{}); ok {
+		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
+			// _info exists, update select_tags
+			infoMap["select_tags"] = []string{managedByTag}
+		} else {
+			// _info doesn't exist, create it with select_tags
+			docMap["_info"] = map[string]interface{}{
+				"select_tags": []string{managedByTag},
+			}
+		}
+	}
+
+	output, err := marshalToYAML(doc)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal modified document: %w", err)
+	}
+	return output, nil
 }
 
 // marshalToYAML encodes v as YAML using a two-space indent.
