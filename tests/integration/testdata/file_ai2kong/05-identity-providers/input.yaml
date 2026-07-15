@@ -1,32 +1,43 @@
 models:
-  - type: model
+  - display_name: "OpenAI Prod - GPT-5.4"
     name: openai-gpt-5-4
-    capabilities:
-      - generate
+    type: model
+    enabled: true
+    capabilities: [generate]
     formats:
       - type: openai
+    config:
+      route:
+        paths: [/ai]
+      model:
+        alias: "@openai/gpt-5.4"
     targets:
       - name: gpt-5.4
-        provider: openai-ai
+        provider: openai-prod
         config:
           type: openai
+    policies: []
     access:
-      identity_providers:
-        - openid-connect-1
-    config:
-      model:
-        alias: '@openai/gpt-5.4'
+      identity_providers: [okta-oidc, key-auth-default]
 model_providers:
-  - type: openai
-    name: openai-ai
+  - name: openai-prod
+    type: openai
+    display_name: OpenAI Prod
     config:
       auth:
         type: basic
         headers:
           - name: Authorization
-            value: '{vault://ai/openai-token}'
+            value: "{vault://ai/openai-token}"
 identity_providers:
-  - type: openid-connect
-    name: openid-connect-1
+  - name: okta-oidc
+    type: openid-connect
+    display_name: Okta OIDC
     config:
       issuer: https://dev-123456.okta.com/oauth2/default
+      cache_tokens_salt: "LNzaN7n85dxFWfqmZKCaFcTehSDNfozB"
+  - name: key-auth-default
+    type: key-auth
+    display_name: Default Key Auth
+    config:
+      key_names: [x-api-key]

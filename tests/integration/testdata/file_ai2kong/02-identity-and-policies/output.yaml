@@ -1,7 +1,7 @@
 _format_version: "3.0"
 _info:
   select_tags:
-  - 'managed_by:deck-ai'
+  - managed_by:deck-ai
 ai_models:
 - alias: '@openai/guarded-gpt'
   name: guarded-gpt
@@ -45,6 +45,9 @@ plugins:
         header_name: Authorization
         header_value: '{vault://env/openai-key}'
       description: gpt-4o
+      logging:
+        log_payloads: false
+        log_statistics: true
       model:
         model_alias: '@openai/guarded-gpt'
         name: gpt-4o
