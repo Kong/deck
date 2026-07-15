@@ -4,16 +4,13 @@ package integration
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/require"
-	"sigs.k8s.io/yaml"
 )
 
 // test scope:
@@ -75,54 +72,6 @@ func Test_Sync_AIModels(t *testing.T) {
 	}
 }
 
-// managedByAIDeckTag is the selector tag `deck ai sync` stamps on every entity it
-// manages, mirroring the scope of `deck ai dump`.
-const managedByAIDeckTag = "managed_by:deck-ai"
-
-// parseAIState parses a `deck gateway dump` document into a file.Content so two
-// dumps can be compared structurally rather than as text.
-func parseAIState(t *testing.T, dumped string) *file.Content {
-	t.Helper()
-	var content file.Content
-	require.NoError(t, yaml.Unmarshal([]byte(dumped), &content))
-	return &content
-}
-
-// assertAIStateEqual asserts that two dumped AI-managed states are equivalent.
-//
-// Plugins are sorted by their content before comparing: `deck gateway dump`
-// orders plugins by name and foreign-key ID (see FPlugin.sortKey in
-// go-database-reconciler), so entities that share a name and route - such as
-// the two ai-proxy-advanced plugins bound to one route - are emitted in a
-// server-ID-dependent order that differs between independent syncs. A KeyAuth
-// credential's TTL is a server-side countdown, so it is ignored.
-func assertAIStateEqual(t *testing.T, expected, actual string) {
-	t.Helper()
-	opts := []cmp.Option{
-		cmpopts.SortSlices(func(a, b *file.FPlugin) bool {
-			return pluginSortKey(a) < pluginSortKey(b)
-		}),
-		// tags/paths/methods are sets; their order is not significant.
-		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
-		cmpopts.IgnoreFields(kong.KeyAuth{}, "TTL"),
-		cmpopts.EquateEmpty(),
-	}
-	if diff := cmp.Diff(parseAIState(t, expected), parseAIState(t, actual), opts...); diff != "" {
-		t.Errorf("unexpected AI-managed state diff:\n%s", diff)
-	}
-}
-
-// pluginSortKey returns a content-derived, ID-independent ordering key for a
-// plugin. json.Marshal emits map keys in sorted order, so structurally equal
-// plugins always produce the same key.
-func pluginSortKey(p *file.FPlugin) string {
-	b, err := json.Marshal(p)
-	if err != nil {
-		return ""
-	}
-	return string(b)
-}
-
 // Test_AISync exercises `deck ai sync`, which converts an AI Gateway state file
 // to Kong configuration and syncs it directly to Kong.
 //
@@ -134,7 +83,7 @@ func pluginSortKey(p *file.FPlugin) string {
 // direct sync as the expected state, assert that `ai sync` converges to it, and
 // then assert that re-running `ai sync` keeps the state consistent.
 //
-// State is compared via `deck gateway dump` (scoped to the managed-by:deck-ai
+// State is compared via `deck gateway dump` (scoped to the managed_by:deck-ai
 // tag, IDs stripped) so the comparison is independent of server-assigned IDs.
 func Test_AISync(t *testing.T) {
 	runWhenAIGateway(t, ">=2.0.0")

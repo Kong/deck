@@ -3,6 +3,7 @@ package integration
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"os"
 	"testing"
@@ -13,11 +14,17 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/deck/cmd"
 	deckDump "github.com/kong/go-database-reconciler/pkg/dump"
+	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
+	"github.com/stretchr/testify/assert/yaml"
 	"github.com/stretchr/testify/require"
 )
+
+// managedByAIDeckTag is the selector tag `deck ai sync` stamps on every entity it
+// manages, mirroring the scope of `deck ai dump`.
+const managedByAIDeckTag = "managed_by:deck-ai"
 
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
@@ -193,6 +200,9 @@ func sortSlices(x, y interface{}) bool {
 		if xEntity.ConsumerGroup != nil {
 			xName += *xEntity.ConsumerGroup.ID
 		}
+		if xEntity.Model != nil && xEntity.Model.ID != nil {
+			xName += *xEntity.Model.ID
+		}
 		if yEntity.Route != nil {
 			yName += *yEntity.Route.ID
 		}
@@ -204,6 +214,9 @@ func sortSlices(x, y interface{}) bool {
 		}
 		if yEntity.ConsumerGroup != nil {
 			yName += *yEntity.ConsumerGroup.ID
+		}
+		if yEntity.Model != nil && yEntity.Model.ID != nil {
+			yName += *yEntity.Model.ID
 		}
 	case *kong.Key:
 		yEntity := y.(*kong.Key)
@@ -669,4 +682,43 @@ func runDualTestWithSkipDefaults(t *testing.T, testName string, testFunc func(t 
 		t.Setenv("DECK_SKIP_DEFAULTS_FILL", "true")
 		testFunc(t)
 	})
+}
+
+// parseAIState unmarshals a dump into file.Content so states compare
+// structurally, not as text.
+func parseAIState(t *testing.T, dumped string) *file.Content {
+	t.Helper()
+	var content file.Content
+	require.NoError(t, yaml.Unmarshal([]byte(dumped), &content))
+	return &content
+}
+
+// assertAIStateEqual asserts two AI-managed dumps are equivalent, ignoring
+// ordering and server-side fields.
+func assertAIStateEqual(t *testing.T, expected, actual string) {
+	t.Helper()
+	opts := []cmp.Option{
+		// dump orders plugins by server ID, which differs across syncs.
+		cmpopts.SortSlices(func(a, b *file.FPlugin) bool {
+			return pluginSortKey(a) < pluginSortKey(b)
+		}),
+		// tags/paths/methods are sets; their order is not significant.
+		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
+		// KeyAuth TTL is a server-side countdown.
+		cmpopts.IgnoreFields(kong.KeyAuth{}, "TTL"),
+		cmpopts.EquateEmpty(),
+	}
+	if diff := cmp.Diff(parseAIState(t, expected), parseAIState(t, actual), opts...); diff != "" {
+		t.Errorf("unexpected AI-managed state diff:\n%s", diff)
+	}
+}
+
+// pluginSortKey keys a plugin by full content; json.Marshal sorts map keys, so
+// equal plugins yield equal keys regardless of ID.
+func pluginSortKey(p *file.FPlugin) string {
+	b, err := json.Marshal(p)
+	if err != nil {
+		return ""
+	}
+	return string(b)
 }

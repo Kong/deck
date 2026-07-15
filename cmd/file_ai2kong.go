@@ -43,6 +43,7 @@ func validateAi2KongFlags(_ *cobra.Command, _ []string) error {
 }
 
 func execute(_ *cobra.Command, _ []string) error {
+	_ = sendAnalytics("file-ai2kong", "", modeAIGateway)
 	// Read source file
 	sourceContent, err := os.ReadFile(convertSourceFile)
 	if err != nil {

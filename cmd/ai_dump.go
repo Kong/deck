@@ -65,9 +65,9 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		WithID:                           false,
 		KongVersion:                      kongVersion,
 		IsKongAIGateway:                  isAIGateway,
-		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
+		IsConsumerGroupPolicyOverrideSet: false,
 		SanitizeContent:                  false,
-		IncludePluginDefinitions:         dumpConfig.IncludePluginDefinitions,
+		IncludePluginDefinitions:         false,
 	}
 
 	if aiDumpWorkspace != "" {

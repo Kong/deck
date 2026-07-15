@@ -85,8 +85,8 @@ func newAiSyncCmd() *cobra.Command {
 	aiSyncCmd := &cobra.Command{
 		Use:   "sync [flags] [ai-gateway-state-file]",
 		Short: "Sync AI Gateway configuration to Kong",
-		Long: `The ai sync command reads an AI Gateway configuration file and syncs it to Kong AI Gateway, tagging every managed entity with
-'managed_by:deck-ai'.
+		Long: `The ai sync command reads an AI Gateway configuration file and syncs it to Kong AI Gateway,
+tagging every managed entity with 'managed_by:deck-ai'.
 
 The AI Gateway state file is provided as a positional argument. Use '-' to read
 from stdin (the default when no argument is given).

@@ -30,7 +30,7 @@ func Test_Dump_AIModels(t *testing.T) {
 	ctx := context.Background()
 
 	// ID and CreatedAt/UpdatedAt are server-assigned, so they are ignored.
-	ignoreFields := []cmp.Option{
+	cmpOpts := []cmp.Option{
 		cmpopts.IgnoreFields(kong.AIModel{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.SortSlices(func(a, b file.FAIModel) bool { return *a.Name < *b.Name }),
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
@@ -60,13 +60,13 @@ func Test_Dump_AIModels(t *testing.T) {
 	require.NoError(t, err)
 
 	content := parseAIState(t, output)
-	if diff := cmp.Diff(content.AIModels, expected, ignoreFields...); diff != "" {
+	if diff := cmp.Diff(content.AIModels, expected, cmpOpts...); diff != "" {
 		t.Errorf("unexpected ai_models dump diff:\n%s", diff)
 	}
 }
 
 // Test_AIDump exercises `deck ai dump`, which reads the AI-managed entities
-// (tagged 'managed-by:deck-ai') from Kong and reverts them back to AI Gateway
+// (tagged 'managed_by:deck-ai') from Kong and reverts them back to AI Gateway
 // format.
 //
 // `deck ai dump` does not reproduce the original source file byte-for-byte (it
@@ -77,7 +77,7 @@ func Test_Dump_AIModels(t *testing.T) {
 // reproduce exactly the same AI-managed Kong state. If `ai dump` dropped or
 // mangled any entity, the round-tripped state would diverge.
 //
-// State is compared via `deck gateway dump` (scoped to the managed-by:deck-ai
+// State is compared via `deck gateway dump` (scoped to the managed_by:deck-ai
 // tag, IDs stripped) using the same structural comparison as Test_AISync.
 func Test_AIDump(t *testing.T) {
 	runWhenAIGateway(t, ">=2.0.0")

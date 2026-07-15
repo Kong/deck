@@ -126,7 +126,12 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
 	}
-	_ = sendAnalytics("dump", kongVersion, modeKong)
+
+	if isAIGateway {
+		_ = sendAnalytics("dump", kongVersion, modeAIGateway)
+	} else {
+		_ = sendAnalytics("dump", kongVersion, modeKong)
+	}
 
 	writeConfig := file.WriteConfig{
 		SelectTags:                       dumpConfig.SelectorTags,

@@ -55,6 +55,7 @@ const (
 	modeKong
 	modeKongEnterprise
 	modeLocal
+	modeAIGateway
 )
 
 type ApplyType int
@@ -69,8 +70,22 @@ var jsonOutput diff.JSONOutputObject
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {
 		return modeKonnect
+	} else if inAIGatewayMode(targetContent) {
+		return modeAIGateway
 	}
 	return modeKong
+}
+
+func inAIGatewayMode(targetContent *file.Content) bool {
+	if targetContent != nil && targetContent.Info != nil && targetContent.Info.SelectorTags != nil {
+		for _, tag := range targetContent.Info.SelectorTags {
+			if tag == managedByAIDeckTag {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // workspaceExists checks if workspace exists in Kong or Konnect
@@ -249,13 +264,13 @@ func syncContent(ctx context.Context, targetContent *file.Content, dry bool, par
 	isKonnect := false
 	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
 
-	// AI Gateway entities (tagged managed_by:deck-ai) must be managed with
-	// kongctl on Konnect, not decK. Fail fast before any Konnect calls.
-	if mode == modeKonnect && contentHasmanagedByAIDeckTag(targetContent) {
-		return errAIManagedEntitiesOnKonnect()
-	}
-
 	if mode == modeKonnect {
+		// AI Gateway entities (tagged managed_by:deck-ai) must be managed with
+		// kongctl on Konnect, not decK. Fail fast before any Konnect calls.
+		if contentHasmanagedByAIDeckTag(targetContent) {
+			return errAIManagedEntitiesOnKonnect()
+		}
+
 		isKonnect = true
 
 		if skipDefaultsFill {
@@ -955,6 +970,8 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 		modeStr = "enterprise"
 	case modeLocal:
 		modeStr = "local"
+	case modeAIGateway:
+		modeStr = "ai-gateway"
 	}
 	return reconcilerUtils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
 }
