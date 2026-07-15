@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	convertSourceFile string
-	convertOutputFile string
-	managedByTag      = "managed_by:deck-ai"
+	convertSourceFile  string
+	convertOutputFile  string
+	managedByAIDeckTag = "managed_by:deck-ai"
 )
 
 func newAi2KongCmd() *cobra.Command {
@@ -102,11 +102,11 @@ func addDefaultSelectTags(converted []byte) ([]byte, error) {
 	if docMap, ok := doc.(map[string]interface{}); ok {
 		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
 			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{managedByTag}
+			infoMap["select_tags"] = []string{managedByAIDeckTag}
 		} else {
 			// _info doesn't exist, create it with select_tags
 			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{managedByTag},
+				"select_tags": []string{managedByAIDeckTag},
 			}
 		}
 	}

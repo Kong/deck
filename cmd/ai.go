@@ -9,11 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// aiManagedSelectorTag is the tag decK AI Gateway commands attach to every
-// entity they manage. Its presence marks a configuration as owned by the
-// AI Gateway (deck-ai) tooling.
-const aiManagedSelectorTag = "managed-by:deck-ai"
-
 // aiGatewayDocsURL documents the supported way to manage AI Gateway
 // configuration on Konnect.
 const aiGatewayDocsURL = "https://developer.konghq.com/ai-gateway/kongctl"
@@ -35,24 +30,24 @@ func errAIManagedEntitiesOnKonnect() error {
 	return fmt.Errorf(
 		"AI Gateway entities (tagged %q) cannot be managed on Konnect using decK.\n"+
 			"Use kongctl to manage AI Gateway configuration on Konnect instead: %s",
-		aiManagedSelectorTag, aiGatewayDocsURL)
+		managedByAIDeckTag, aiGatewayDocsURL)
 }
 
-// contentHasAIManagedTag reports whether the configuration is marked as managed
+// contentHasmanagedByAIDeckTag reports whether the configuration is marked as managed
 // by the AI Gateway tooling, either via a select tag in _info or via the tags
 // of any individual entity.
-func contentHasAIManagedTag(content *file.Content) bool {
+func contentHasmanagedByAIDeckTag(content *file.Content) bool {
 	if content == nil {
 		return false
 	}
-	if content.Info != nil && slices.Contains(content.Info.SelectorTags, aiManagedSelectorTag) {
+	if content.Info != nil && slices.Contains(content.Info.SelectorTags, managedByAIDeckTag) {
 		return true
 	}
 	return valueHasTag(reflect.ValueOf(content))
 }
 
 // valueHasTag recursively walks v looking for any exported field named "Tags"
-// (a []*string, as used by every Kong entity) that contains aiManagedSelectorTag.
+// (a []*string, as used by every Kong entity) that contains managedByAIDeckTag.
 // Non-Tags fields are traversed structurally but their string values are never
 // matched, so plugin config values or names cannot trigger a false positive.
 func valueHasTag(v reflect.Value) bool {
@@ -96,7 +91,7 @@ func valueHasTag(v reflect.Value) bool {
 	return false
 }
 
-// tagsContain reports whether a []*string Tags field contains aiManagedSelectorTag.
+// tagsContain reports whether a []*string Tags field contains managedByAIDeckTag.
 func tagsContain(tags reflect.Value) bool {
 	if tags.Kind() != reflect.Slice {
 		return false
@@ -109,7 +104,7 @@ func tagsContain(tags reflect.Value) bool {
 			}
 			tag = tag.Elem()
 		}
-		if tag.Kind() == reflect.String && tag.String() == aiManagedSelectorTag {
+		if tag.Kind() == reflect.String && tag.String() == managedByAIDeckTag {
 			return true
 		}
 	}

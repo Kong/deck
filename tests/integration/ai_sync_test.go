@@ -75,9 +75,9 @@ func Test_Sync_AIModels(t *testing.T) {
 	}
 }
 
-// aiManagedTag is the selector tag `deck ai sync` stamps on every entity it
+// managedByAIDeckTag is the selector tag `deck ai sync` stamps on every entity it
 // manages, mirroring the scope of `deck ai dump`.
-const aiManagedTag = "managed-by:deck-ai"
+const managedByAIDeckTag = "managed_by:deck-ai"
 
 // parseAIState parses a `deck gateway dump` document into a file.Content so two
 // dumps can be compared structurally rather than as text.
@@ -179,19 +179,19 @@ func Test_AISync(t *testing.T) {
 			// (ai2kong) configuration directly.
 			reset(t)
 			require.NoError(t, sync(ctx, tc.outputFile))
-			expected, err := dump("--select-tag", aiManagedTag, "-o", "-")
+			expected, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
 			require.NoError(t, err)
 
 			// `ai sync` of the AI Gateway source must reach the same state.
 			reset(t)
 			require.NoError(t, aiSync(ctx, tc.inputFile))
-			afterSync, err := dump("--select-tag", aiManagedTag, "-o", "-")
+			afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
 			require.NoError(t, err)
 			assertAIStateEqual(t, expected, afterSync)
 
 			// Re-syncing must succeed and keep the state consistent.
 			require.NoError(t, aiSync(ctx, tc.inputFile))
-			afterResync, err := dump("--select-tag", aiManagedTag, "-o", "-")
+			afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
 			require.NoError(t, err)
 			assertAIStateEqual(t, afterSync, afterResync)
 		})

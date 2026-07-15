@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestContentHasAIManagedTag(t *testing.T) {
+func TestContentHasmanagedByAIDeckTag(t *testing.T) {
 	otherTag := "team-a"
 	tests := []struct {
 		name    string
@@ -28,7 +28,7 @@ func TestContentHasAIManagedTag(t *testing.T) {
 		{
 			name: "tag in _info select tags",
 			content: &file.Content{
-				Info: &file.Info{SelectorTags: []string{otherTag, aiManagedSelectorTag}},
+				Info: &file.Info{SelectorTags: []string{otherTag, managedByAIDeckTag}},
 			},
 			want: true,
 		},
@@ -45,7 +45,7 @@ func TestContentHasAIManagedTag(t *testing.T) {
 				Services: []file.FService{
 					{Service: kong.Service{
 						Name: kong.String("s1"),
-						Tags: kong.StringSlice(otherTag, aiManagedSelectorTag),
+						Tags: kong.StringSlice(otherTag, managedByAIDeckTag),
 					}},
 				},
 			},
@@ -60,7 +60,7 @@ func TestContentHasAIManagedTag(t *testing.T) {
 						Routes: []*file.FRoute{
 							{Route: kong.Route{
 								Name: kong.String("r1"),
-								Tags: kong.StringSlice(aiManagedSelectorTag),
+								Tags: kong.StringSlice(managedByAIDeckTag),
 							}},
 						},
 					},
@@ -84,7 +84,7 @@ func TestContentHasAIManagedTag(t *testing.T) {
 			name: "matching string in a non-tag field is not a false positive",
 			content: &file.Content{
 				Services: []file.FService{
-					{Service: kong.Service{Name: kong.String(aiManagedSelectorTag)}},
+					{Service: kong.Service{Name: kong.String(managedByAIDeckTag)}},
 				},
 			},
 			want: false,
@@ -93,7 +93,7 @@ func TestContentHasAIManagedTag(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, contentHasAIManagedTag(tt.content))
+			assert.Equal(t, tt.want, contentHasmanagedByAIDeckTag(tt.content))
 		})
 	}
 }

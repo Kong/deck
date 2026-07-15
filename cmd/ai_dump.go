@@ -31,7 +31,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 
 	// Set the selector tags to only get AI-managed entities
 	originalTags := dumpConfig.SelectorTags
-	dumpConfig.SelectorTags = []string{aiManagedSelectorTag}
+	dumpConfig.SelectorTags = []string{managedByAIDeckTag}
 	defer func() {
 		dumpConfig.SelectorTags = originalTags
 	}()
@@ -106,11 +106,11 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 	if docMap, ok := doc.(map[string]interface{}); ok {
 		if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
 			// _info exists, update select_tags
-			infoMap["select_tags"] = []string{aiManagedSelectorTag}
+			infoMap["select_tags"] = []string{managedByAIDeckTag}
 		} else {
 			// _info doesn't exist, create it with select_tags
 			docMap["_info"] = map[string]interface{}{
-				"select_tags": []string{aiManagedSelectorTag},
+				"select_tags": []string{managedByAIDeckTag},
 			}
 		}
 	}

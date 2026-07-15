@@ -44,7 +44,7 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("parsing converted configuration: %w", err)
 	}
 
-	injectAiManagedSelectorTag(targetContent)
+	injectmanagedByAIDeckTag(targetContent)
 
 	return syncContent(ctx, targetContent, false, aiSyncParallelism, aiSyncDBUpdateDelay,
 		aiSyncWorkspace, aiSyncJSONOutput, ApplyTypeFull)
@@ -67,18 +67,18 @@ func readAiSyncSource(filename string) ([]byte, error) {
 	return content, nil
 }
 
-// injectAiManagedSelectorTag ensures the AI-managed select tag is present in
+// injectmanagedByAIDeckTag ensures the AI-managed select tag is present in
 // _info.select_tags, adding it without discarding any tags already declared.
 // This scopes the sync (including pruning) to AI Gateway entities only, the same
 // way `ai dump` scopes its read.
-func injectAiManagedSelectorTag(content *file.Content) {
+func injectmanagedByAIDeckTag(content *file.Content) {
 	if content.Info == nil {
 		content.Info = &file.Info{}
 	}
-	if slices.Contains(content.Info.SelectorTags, aiManagedSelectorTag) {
+	if slices.Contains(content.Info.SelectorTags, managedByAIDeckTag) {
 		return
 	}
-	content.Info.SelectorTags = append(content.Info.SelectorTags, aiManagedSelectorTag)
+	content.Info.SelectorTags = append(content.Info.SelectorTags, managedByAIDeckTag)
 }
 
 func newAiSyncCmd() *cobra.Command {

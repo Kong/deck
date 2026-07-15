@@ -63,7 +63,7 @@ func Test_AIDump(t *testing.T) {
 			// AI-managed state as the reference.
 			reset(t)
 			require.NoError(t, aiSync(ctx, tc.inputFile))
-			reference, err := dump("--select-tag", aiManagedTag, "-o", "-")
+			reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
 			require.NoError(t, err)
 
 			// `ai dump` reverts the state back to AI Gateway format.
@@ -83,7 +83,7 @@ func Test_AIDump(t *testing.T) {
 
 			reset(t)
 			require.NoError(t, aiSync(ctx, roundTripFile))
-			roundTripped, err := dump("--select-tag", aiManagedTag, "-o", "-")
+			roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
 			require.NoError(t, err)
 
 			assertAIStateEqual(t, reference, roundTripped)

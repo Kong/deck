@@ -251,7 +251,7 @@ func syncContent(ctx context.Context, targetContent *file.Content, dry bool, par
 
 	// AI Gateway entities (tagged managed-by: deck-ai) must be managed with
 	// kongctl on Konnect, not decK. Fail fast before any Konnect calls.
-	if mode == modeKonnect && contentHasAIManagedTag(targetContent) {
+	if mode == modeKonnect && contentHasmanagedByAIDeckTag(targetContent) {
 		return errAIManagedEntitiesOnKonnect()
 	}
 
