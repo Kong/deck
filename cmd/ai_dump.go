@@ -29,6 +29,13 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		return nil
 	}
 
+	// AI Gateway entities (tagged managed_by:deck-ai) must be managed with
+	// kongctl on Konnect, not decK. Since ai dump only ever reads AI-managed
+	// entities, fail fast before any Konnect calls.
+	if inKonnectMode(nil) {
+		return errAIManagedEntitiesOnKonnect()
+	}
+
 	// Set the selector tags to only get AI-managed entities
 	originalTags := dumpConfig.SelectorTags
 	dumpConfig.SelectorTags = []string{managedByAIDeckTag}
@@ -156,10 +163,10 @@ func newAiDumpCmd() *cobra.Command {
 	aiDumpCmd := &cobra.Command{
 		Use:   "dump",
 		Short: "Dump AI Gateway configuration from Kong (managed by deck-ai)",
-		Long: `The ai dump command reads AI Gateway entities (tagged with 'managed-by: deck-ai')
+		Long: `The ai dump command reads AI Gateway entities (tagged with 'managed_by:deck-ai')
 from Kong and writes them to a local file in AI Gateway format.
 
-The command exports only entities that have the 'managed-by: deck-ai' tag.`,
+The command exports only entities that have the 'managed_by:deck-ai' tag.`,
 		Args: validateNoArgs,
 		RunE: executeAiDump,
 	}

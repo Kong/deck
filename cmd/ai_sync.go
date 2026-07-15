@@ -87,7 +87,7 @@ func newAiSyncCmd() *cobra.Command {
 		Short: "Sync AI Gateway configuration to Kong",
 		Long: `The ai sync command converts an AI Gateway configuration file to Kong
 configuration and syncs it directly to Kong, tagging every managed entity with
-'managed-by: deck-ai'.
+'managed_by:deck-ai'.
 
 The AI Gateway state file is provided as a positional argument. Use '-' to read
 from stdin (the default when no argument is given).

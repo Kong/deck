@@ -8,9 +8,62 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// test scope:
+//
+//   - AI Gateway >=2.0.0
+//
+// Test_Dump_AIModels verifies `deck gateway dump` round-trips the ai_model
+// entity: after seeding Kong with ai_models, the dumped file must contain the
+// same entities. ai_model is only available on AI Gateway instances.
+func Test_Dump_AIModels(t *testing.T) {
+	runWhenAIGateway(t, ">=2.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	// ID and CreatedAt/UpdatedAt are server-assigned, so they are ignored.
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.AIModel{}, "ID", "CreatedAt", "UpdatedAt"),
+		cmpopts.SortSlices(func(a, b file.FAIModel) bool { return *a.Name < *b.Name }),
+		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
+		cmpopts.EquateEmpty(),
+	}
+
+	expected := []file.FAIModel{
+		{
+			AIModel: kong.AIModel{
+				Name:  kong.String("gpt-5"),
+				Alias: kong.String("@openai/gpt-5"),
+			},
+		},
+		{
+			AIModel: kong.AIModel{
+				Name:  kong.String("claude-opus"),
+				Alias: kong.String("@anthropic/claude-opus"),
+				Tags:  kong.StringSlice("ai", "anthropic"),
+			},
+		},
+	}
+
+	reset(t)
+	require.NoError(t, sync(ctx, "testdata/sync/056-ai-models/kong.yaml"))
+
+	output, err := dump("-o", "-")
+	require.NoError(t, err)
+
+	content := parseAIState(t, output)
+	if diff := cmp.Diff(content.AIModels, expected, ignoreFields...); diff != "" {
+		t.Errorf("unexpected ai_models dump diff:\n%s", diff)
+	}
+}
 
 // Test_AIDump exercises `deck ai dump`, which reads the AI-managed entities
 // (tagged 'managed-by:deck-ai') from Kong and reverts them back to AI Gateway

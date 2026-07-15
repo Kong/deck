@@ -24,7 +24,7 @@ func newAiSubCmd() *cobra.Command {
 }
 
 // errAIManagedEntitiesOnKonnect is returned when a user attempts to sync/apply
-// AI Gateway entities (tagged managed-by: deck-ai) to Konnect using decK. Those
+// AI Gateway entities (tagged managed_by:deck-ai) to Konnect using decK. Those
 // entities must be managed with kongctl instead.
 func errAIManagedEntitiesOnKonnect() error {
 	return fmt.Errorf(
