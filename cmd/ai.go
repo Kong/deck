@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"reflect"
+	"io"
+	"os"
 	"slices"
 
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -23,6 +24,20 @@ func newAiSubCmd() *cobra.Command {
 	return aiSubCmd
 }
 
+// printAIWarnings writes conversion warnings, one per line, to w. When w is nil
+// it defaults to os.Stderr. It is a no-op when there are no warnings.
+func printAIWarnings(w io.Writer, warnings []string) {
+	if len(warnings) == 0 {
+		return
+	}
+	if w == nil {
+		w = os.Stderr
+	}
+	for _, warning := range warnings {
+		fmt.Fprintf(w, "Warning: %v\n", warning)
+	}
+}
+
 // errAIManagedEntitiesOnKonnect is returned when a user attempts to sync/apply
 // AI Gateway entities (tagged managed_by:deck-ai) to Konnect using decK. Those
 // entities must be managed with kongctl instead.
@@ -36,6 +51,11 @@ func errAIManagedEntitiesOnKonnect() error {
 // contentHasmanagedByAIDeckTag reports whether the configuration is marked as managed
 // by the AI Gateway tooling, either via a select tag in _info or via the tags
 // of any individual entity.
+//
+// AI Gateway configuration only ever contains services, routes, plugins,
+// consumers, consumer groups, vaults and AI models (plus the plugins/routes
+// nested under them), so those collections are checked explicitly instead of
+// reflecting over the whole state file.
 func contentHasmanagedByAIDeckTag(content *file.Content) bool {
 	if content == nil {
 		return false
@@ -43,68 +63,85 @@ func contentHasmanagedByAIDeckTag(content *file.Content) bool {
 	if content.Info != nil && slices.Contains(content.Info.SelectorTags, managedByAIDeckTag) {
 		return true
 	}
-	return valueHasTag(reflect.ValueOf(content))
+
+	for i := range content.Services {
+		s := &content.Services[i]
+		if hasAIDeckTag(s.Tags) || fpluginsHaveTag(s.Plugins) {
+			return true
+		}
+		for _, r := range s.Routes {
+			if r != nil && (hasAIDeckTag(r.Tags) || fpluginsHaveTag(r.Plugins)) {
+				return true
+			}
+		}
+	}
+
+	for i := range content.Routes {
+		r := &content.Routes[i]
+		if hasAIDeckTag(r.Tags) || fpluginsHaveTag(r.Plugins) {
+			return true
+		}
+	}
+
+	for i := range content.Plugins {
+		if hasAIDeckTag(content.Plugins[i].Tags) {
+			return true
+		}
+	}
+
+	for i := range content.Consumers {
+		c := &content.Consumers[i]
+		if hasAIDeckTag(c.Tags) || fpluginsHaveTag(c.Plugins) {
+			return true
+		}
+	}
+
+	for i := range content.ConsumerGroups {
+		cg := &content.ConsumerGroups[i]
+		if hasAIDeckTag(cg.Tags) {
+			return true
+		}
+		for _, c := range cg.Consumers {
+			if c != nil && hasAIDeckTag(c.Tags) {
+				return true
+			}
+		}
+		for _, p := range cg.Plugins {
+			if p != nil && hasAIDeckTag(p.Tags) {
+				return true
+			}
+		}
+	}
+
+	for i := range content.Vaults {
+		if hasAIDeckTag(content.Vaults[i].Tags) {
+			return true
+		}
+	}
+
+	for i := range content.AIModels {
+		if hasAIDeckTag(content.AIModels[i].Tags) {
+			return true
+		}
+	}
+
+	return false
 }
 
-// valueHasTag recursively walks v looking for any exported field named "Tags"
-// (a []*string, as used by every Kong entity) that contains managedByAIDeckTag.
-// Non-Tags fields are traversed structurally but their string values are never
-// matched, so plugin config values or names cannot trigger a false positive.
-func valueHasTag(v reflect.Value) bool {
-	switch v.Kind() { //nolint:exhaustive // only container and struct kinds need traversal; scalars can never hold Tags
-	case reflect.Pointer, reflect.Interface:
-		if v.IsNil() {
-			return false
-		}
-		return valueHasTag(v.Elem())
-	case reflect.Slice, reflect.Array:
-		for i := 0; i < v.Len(); i++ {
-			if valueHasTag(v.Index(i)) {
-				return true
-			}
-		}
-	case reflect.Map:
-		for _, key := range v.MapKeys() {
-			if valueHasTag(v.MapIndex(key)) {
-				return true
-			}
-		}
-	case reflect.Struct:
-		t := v.Type()
-		for i := 0; i < v.NumField(); i++ {
-			field := t.Field(i)
-			if !field.IsExported() {
-				continue
-			}
-			fieldValue := v.Field(i)
-			if field.Name == "Tags" {
-				if tagsContain(fieldValue) {
-					return true
-				}
-				continue
-			}
-			if valueHasTag(fieldValue) {
-				return true
-			}
+// fpluginsHaveTag reports whether any plugin in plugins carries managedByAIDeckTag.
+func fpluginsHaveTag(plugins []*file.FPlugin) bool {
+	for _, p := range plugins {
+		if p != nil && hasAIDeckTag(p.Tags) {
+			return true
 		}
 	}
 	return false
 }
 
-// tagsContain reports whether a []*string Tags field contains managedByAIDeckTag.
-func tagsContain(tags reflect.Value) bool {
-	if tags.Kind() != reflect.Slice {
-		return false
-	}
-	for i := 0; i < tags.Len(); i++ {
-		tag := tags.Index(i)
-		if tag.Kind() == reflect.Pointer {
-			if tag.IsNil() {
-				continue
-			}
-			tag = tag.Elem()
-		}
-		if tag.Kind() == reflect.String && tag.String() == managedByAIDeckTag {
+// hasAIDeckTag reports whether a []*string Tags field contains managedByAIDeckTag.
+func hasAIDeckTag(tags []*string) bool {
+	for _, tag := range tags {
+		if tag != nil && *tag == managedByAIDeckTag {
 			return true
 		}
 	}

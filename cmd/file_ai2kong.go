@@ -57,12 +57,7 @@ func execute(_ *cobra.Command, _ []string) error {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
 
-	// Print warnings to stderr
-	if len(warnings) > 0 {
-		for _, warning := range warnings {
-			fmt.Fprintf(os.Stderr, "Warning: %v\n", warning)
-		}
-	}
+	printAIWarnings(os.Stderr, warnings)
 
 	// Add the default select_tags to the converted document's _info section
 	output, err := addDefaultSelectTags(converted)

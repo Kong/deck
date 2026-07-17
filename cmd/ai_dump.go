@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/Kong/ai-deck-converter/revert"
+	ai2kong "github.com/Kong/ai-deck-converter/revert"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -37,11 +37,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Set the selector tags to only get AI-managed entities
-	originalTags := dumpConfig.SelectorTags
 	dumpConfig.SelectorTags = []string{managedByAIDeckTag}
-	defer func() {
-		dumpConfig.SelectorTags = originalTags
-	}()
 
 	wsClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
@@ -90,20 +86,15 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 	}
 
 	// Revert Kong YAML back to AI Gateway format
-	aiGatewayYAML, warnings, err := revert.Revert(kongYAML, revert.Options{})
+	aiGatewayYAML, warnings, err := ai2kong.Revert(kongYAML, ai2kong.Options{})
 	if err != nil {
 		return fmt.Errorf("reverting Kong configuration to AI Gateway format: %w", err)
 	}
 
-	// Print warnings to stderr
-	if len(warnings) > 0 {
-		for _, warning := range warnings {
-			fmt.Fprintf(os.Stderr, "Warning: %v\n", warning)
-		}
-	}
+	printAIWarnings(os.Stderr, warnings)
 
 	// Write output
-	var output io.Writer
+	var output io.Writer = os.Stdout
 	if aiDumpCmdOutputFile != "" && aiDumpCmdOutputFile != "-" {
 		outFile, err := os.Create(aiDumpCmdOutputFile)
 		if err != nil {
@@ -111,8 +102,6 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		}
 		defer outFile.Close()
 		output = outFile
-	} else {
-		output = os.Stdout
 	}
 
 	_, err = output.Write(aiGatewayYAML)

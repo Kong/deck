@@ -7,7 +7,7 @@ import (
 	"os"
 	"slices"
 
-	"github.com/Kong/ai-deck-converter/convert"
+	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/spf13/cobra"
@@ -33,7 +33,7 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	convertedYAML, warnings, err := convert.Convert(sourceContent, convert.Options{})
+	convertedYAML, warnings, err := ai2kong.Convert(sourceContent, ai2kong.Options{})
 	if err != nil {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
