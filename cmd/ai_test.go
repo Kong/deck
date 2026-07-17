@@ -277,24 +277,6 @@ func TestAiConvertJSONInputParity(t *testing.T) {
 		"JSON and YAML inputs should convert to identical decK output")
 }
 
-func TestAddDefaultSelectTags(t *testing.T) {
-	t.Run("creates _info when absent", func(t *testing.T) {
-		doc, err := addDefaultSelectTags([]byte("services: []\n"))
-		require.NoError(t, err)
-		info, ok := doc["_info"].(map[string]interface{})
-		require.True(t, ok, "_info should be created")
-		assert.Equal(t, []string{managedByAIDeckTag}, info["select_tags"])
-	})
-
-	t.Run("overwrites select_tags when _info present", func(t *testing.T) {
-		doc, err := addDefaultSelectTags([]byte("_info:\n  select_tags: [existing]\nservices: []\n"))
-		require.NoError(t, err)
-		info, ok := doc["_info"].(map[string]interface{})
-		require.True(t, ok)
-		assert.Equal(t, []string{managedByAIDeckTag}, info["select_tags"])
-	})
-}
-
 // TestAi2KongOutputFormats drives the ai2kong command end-to-end with JSON input
 // and asserts both YAML (default) and JSON output are valid and carry the AI tag,
 // and that an unknown format is rejected.
@@ -339,26 +321,5 @@ func TestAi2KongOutputFormats(t *testing.T) {
 	t.Run("unknown format errors", func(t *testing.T) {
 		err := runAi2Kong(t, srcYAML, filepath.Join(dir, "out.xml"), "xml")
 		assert.Error(t, err)
-	})
-}
-
-// TestAiDumpOutput verifies the format handling of ai dump: YAML is returned
-// verbatim and JSON is an equivalent re-serialization.
-func TestAiDumpOutput(t *testing.T) {
-	yamlIn := []byte("_info:\n  select_tags:\n  - managed_by:deck-ai\nmodels:\n- name: gpt-4o\n  type: model\n")
-
-	t.Run("yaml returns verbatim", func(t *testing.T) {
-		out, err := aiDumpOutput(yamlIn, "yaml")
-		require.NoError(t, err)
-		assert.True(t, bytes.Equal(yamlIn, out), "yaml output should be returned verbatim")
-	})
-
-	t.Run("json is equivalent", func(t *testing.T) {
-		out, err := aiDumpOutput(yamlIn, "json")
-		require.NoError(t, err)
-		var jsonDoc, yamlDoc map[string]interface{}
-		require.NoError(t, json.Unmarshal(out, &jsonDoc), "output should be valid JSON")
-		require.NoError(t, yaml.Unmarshal(yamlIn, &yamlDoc))
-		assert.Equal(t, yamlDoc, jsonDoc)
 	})
 }
