@@ -14,11 +14,10 @@ import (
 )
 
 var (
-	aiSyncSourceFile    string
-	aiSyncWorkspace     string
-	aiSyncParallelism   int
-	aiSyncDBUpdateDelay int
-	aiSyncJSONOutput    bool
+	aiSyncSourceFile  string
+	aiSyncWorkspace   string
+	aiSyncParallelism int
+	aiSyncJSONOutput  bool
 )
 
 func executeAiSync(cmd *cobra.Command, _ []string) error {
@@ -46,7 +45,7 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 
 	injectmanagedByAIDeckTag(targetContent)
 
-	return syncContent(ctx, targetContent, false, aiSyncParallelism, aiSyncDBUpdateDelay,
+	return syncContent(ctx, targetContent, false, aiSyncParallelism, 0,
 		aiSyncWorkspace, aiSyncJSONOutput, ApplyTypeFull)
 }
 
@@ -110,10 +109,6 @@ This is the direct equivalent of running 'deck file ai2kong' followed by
 			"This takes precedence over _workspace fields in state files.")
 	aiSyncCmd.Flags().IntVar(&aiSyncParallelism, "parallelism",
 		10, "Maximum number of concurrent operations.")
-	aiSyncCmd.Flags().IntVar(&aiSyncDBUpdateDelay, "db-update-propagation-delay",
-		0, "artificial delay (in seconds) that is injected between insert operations \n"+
-			"for related entities (usually for Cassandra deployments).\n"+
-			"See `db_update_propagation` in kong.conf.")
 	aiSyncCmd.Flags().BoolVar(&syncCmdAssumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 	aiSyncCmd.Flags().BoolVar(&aiSyncJSONOutput, "json-output",

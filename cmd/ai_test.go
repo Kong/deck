@@ -69,6 +69,113 @@ func TestContentHasmanagedByAIDeckTag(t *testing.T) {
 			want: true,
 		},
 		{
+			name: "tag on a plugin nested under a route under a service",
+			content: &file.Content{
+				Services: []file.FService{
+					{
+						Service: kong.Service{Name: kong.String("s1")},
+						Routes: []*file.FRoute{
+							{
+								Route: kong.Route{Name: kong.String("r1")},
+								Plugins: []*file.FPlugin{
+									{Plugin: kong.Plugin{
+										Name: kong.String("p1"),
+										Tags: kong.StringSlice(managedByAIDeckTag),
+									}},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "tag on a plugin nested under a service",
+			content: &file.Content{
+				Services: []file.FService{
+					{
+						Service: kong.Service{Name: kong.String("s1")},
+						Plugins: []*file.FPlugin{
+							{Plugin: kong.Plugin{
+								Name: kong.String("p1"),
+								Tags: kong.StringSlice(managedByAIDeckTag),
+							}},
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "tag on a consumer nested under a consumer group",
+			content: &file.Content{
+				ConsumerGroups: []file.FConsumerGroupObject{
+					{
+						ConsumerGroup: kong.ConsumerGroup{Name: kong.String("cg1")},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("c1"),
+								Tags:     kong.StringSlice(managedByAIDeckTag),
+							},
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "tag on a plugin nested under a consumer group",
+			content: &file.Content{
+				ConsumerGroups: []file.FConsumerGroupObject{
+					{
+						ConsumerGroup: kong.ConsumerGroup{Name: kong.String("cg1")},
+						Plugins: []*kong.ConsumerGroupPlugin{
+							{
+								Name: kong.String("p1"),
+								Tags: kong.StringSlice(managedByAIDeckTag),
+							},
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "nested entity with multiple tags including the ai tag",
+			content: &file.Content{
+				Services: []file.FService{
+					{
+						Service: kong.Service{Name: kong.String("s1")},
+						Routes: []*file.FRoute{
+							{Route: kong.Route{
+								Name: kong.String("r1"),
+								Tags: kong.StringSlice(otherTag, managedByAIDeckTag, "team-b"),
+							}},
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "nested entity with multiple tags but none is the ai tag",
+			content: &file.Content{
+				Services: []file.FService{
+					{
+						Service: kong.Service{Name: kong.String("s1")},
+						Routes: []*file.FRoute{
+							{Route: kong.Route{
+								Name: kong.String("r1"),
+								Tags: kong.StringSlice(otherTag, "team-b"),
+							}},
+						},
+					},
+				},
+			},
+			want: false,
+		},
+		{
 			name: "entities without the tag",
 			content: &file.Content{
 				Services: []file.FService{
