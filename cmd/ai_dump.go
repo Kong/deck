@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	ai2kong "github.com/Kong/ai-deck-converter/revert"
+	"github.com/kong/go-apiops/filebasics"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -15,7 +17,7 @@ import (
 )
 
 var (
-	aiDumpCmdStateFormat = "yaml" // default to yaml
+	aiDumpCmdStateFormat string
 	aiDumpCmdOutputFile  string
 	aiDumpWorkspace      string
 )
@@ -23,7 +25,9 @@ var (
 func executeAiDump(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
 
-	if yes, err := utils.ConfirmFileOverwrite(aiDumpCmdOutputFile, aiDumpCmdStateFormat, assumeYes); err != nil {
+	format := strings.ToLower(getFormatFlagValue(cmd, aiDumpCmdStateFormat))
+
+	if yes, err := utils.ConfirmFileOverwrite(aiDumpCmdOutputFile, format, assumeYes); err != nil {
 		return err
 	} else if !yes {
 		return nil
@@ -93,6 +97,11 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 
 	printAIWarnings(os.Stderr, warnings)
 
+	outputBytes, err := aiDumpOutput(aiGatewayYAML, format)
+	if err != nil {
+		return err
+	}
+
 	// Write output
 	var output io.Writer = os.Stdout
 	if aiDumpCmdOutputFile != "" && aiDumpCmdOutputFile != "-" {
@@ -104,12 +113,30 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		output = outFile
 	}
 
-	_, err = output.Write(aiGatewayYAML)
+	_, err = output.Write(outputBytes)
 	if err != nil {
 		return fmt.Errorf("failed to write output: %w", err)
 	}
 
 	return nil
+}
+
+// aiDumpOutput returns the AI Gateway configuration serialized in the requested
+// format. revert.Revert always produces YAML, so YAML is returned verbatim (to
+// preserve the library's formatting) while JSON is produced by re-serializing.
+func aiDumpOutput(aiGatewayYAML []byte, format string) ([]byte, error) {
+	if strings.ToLower(format) != "json" {
+		return aiGatewayYAML, nil
+	}
+	m, err := filebasics.Deserialize(aiGatewayYAML)
+	if err != nil {
+		return nil, fmt.Errorf("parsing reverted configuration: %w", err)
+	}
+	out, err := filebasics.Serialize(m, filebasics.OutputFormatJSON)
+	if err != nil {
+		return nil, fmt.Errorf("serializing configuration to JSON: %w", err)
+	}
+	return out, nil
 }
 
 // kongsStateToYAML converts Kong state to YAML bytes
@@ -129,7 +156,9 @@ func newAiDumpCmd() *cobra.Command {
 		Long: `The ai dump command reads AI Gateway entities (tagged with 'managed_by:deck-ai')
 from Kong and writes them to a local file in AI Gateway format.
 
-The command exports only entities that have the 'managed_by:deck-ai' tag.`,
+The command exports only entities that have the 'managed_by:deck-ai' tag.
+
+The output can be written as either YAML or JSON, controlled by the --format flag.`,
 		Args: validateNoArgs,
 		RunE: executeAiDump,
 	}
@@ -138,6 +167,8 @@ The command exports only entities that have the 'managed_by:deck-ai' tag.`,
 		"", "dump configuration of a specific Workspace (Kong Enterprise only).")
 	aiDumpCmd.Flags().StringVarP(&aiDumpCmdOutputFile, "output-file", "o",
 		"-", "file to which to write AI Gateway configuration. Use `-` to write to stdout.")
+	aiDumpCmd.Flags().StringVar(&aiDumpCmdStateFormat, "format",
+		"yaml", "output file format: json or yaml.")
 	aiDumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 
