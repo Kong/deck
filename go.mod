@@ -13,7 +13,7 @@ require (
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
-	github.com/kong/go-apiops v0.4.4
+	github.com/kong/go-apiops v0.4.5
 	github.com/kong/go-database-reconciler v1.40.3
 	github.com/kong/go-kong v0.76.1
 	github.com/mitchellh/go-homedir v1.1.0
