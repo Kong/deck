@@ -10,7 +10,10 @@ ARG TAG
 RUN CGO_ENABLED=0 GOOS=linux go build -o deck \
       -ldflags "-s -w -X github.com/kong/deck/cmd.VERSION=$TAG -X github.com/kong/deck/cmd.COMMIT=$COMMIT"
 
-FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+FROM ghcr.io/jqlang/jq:1.8.2@sha256:b9c68867e5766576263a222e91db3de422d802069c7af70440e667a95344e486 AS jq
+
+FROM gcr.io/distroless/base:latest@sha256:f4a335ca209e1d2ee873102c17c389ad0142e3d5b21aee2817e9cc9c01d87d20
+
 ARG COMMIT
 ARG TAG
 LABEL org.opencontainers.image.title="deck" \
@@ -21,8 +24,7 @@ LABEL org.opencontainers.image.title="deck" \
       org.opencontainers.image.revision="$COMMIT" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.vendor="Kong Inc."
-RUN adduser --disabled-password --gecos "" deckuser
-RUN apk --no-cache upgrade && apk --no-cache add ca-certificates jq
-USER deckuser
-COPY --from=build /deck/deck /usr/local/bin
+USER nonroot
+COPY --from=build /deck/deck /usr/local/bin/
+COPY --from=jq /jq /usr/local/bin/jq
 ENTRYPOINT ["deck"]
