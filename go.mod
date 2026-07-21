@@ -7,6 +7,7 @@ replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
 
 require (
+	dario.cat/mergo v1.0.2
 	github.com/Kong/ai-deck-converter v0.3.0
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
@@ -155,7 +156,6 @@ require (
 )
 
 require (
-	dario.cat/mergo v1.0.2 // indirect
 	github.com/Kong/go-diff v1.2.2 // indirect
 	github.com/Kong/gojsondiff v1.3.2 // indirect
 	github.com/adrg/strutil v0.3.0 // indirect
