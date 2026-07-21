@@ -8,7 +8,7 @@ import (
 	"slices"
 
 	"dario.cat/mergo"
-	"github.com/Kong/ai-deck-converter/convert"
+	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -16,11 +16,10 @@ import (
 )
 
 var (
-	aiSyncSourceFiles   []string
-	aiSyncWorkspace     string
-	aiSyncParallelism   int
-	aiSyncDBUpdateDelay int
-	aiSyncJSONOutput    bool
+	aiSyncSourceFiles []string
+	aiSyncWorkspace   string
+	aiSyncParallelism int
+	aiSyncJSONOutput  bool
 )
 
 func executeAiSync(cmd *cobra.Command, _ []string) error {
@@ -53,7 +52,7 @@ func buildAiSyncTargetContent(filenames []string) (*file.Content, error) {
 
 	var merged file.Content
 	for _, src := range sources {
-		convertedYAML, warnings, err := convert.Convert(src.content, convert.Options{})
+		convertedYAML, warnings, err := ai2kong.Convert(src.content, ai2kong.Options{})
 		if err != nil {
 			return nil, fmt.Errorf("converting %s: %w", src.name, err)
 		}

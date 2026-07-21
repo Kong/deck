@@ -7,10 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Kong/ai-deck-converter/convert"
+	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 )
@@ -61,7 +60,7 @@ func assertHasAITag(t *testing.T, doc map[string]interface{}) {
 	require.True(t, ok, "_info section should be present")
 	tags, ok := info["select_tags"].([]interface{})
 	require.True(t, ok, "_info.select_tags should be present")
-	assert.Contains(t, tags, managedByAIDeckTag)
+	require.Contains(t, tags, managedByAIDeckTag)
 }
 
 func TestContentHasmanagedByAIDeckTag(t *testing.T) {
@@ -256,7 +255,7 @@ func TestContentHasmanagedByAIDeckTag(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, contentHasmanagedByAIDeckTag(tt.content))
+			require.Equal(t, tt.want, contentHasmanagedByAIDeckTag(tt.content))
 		})
 	}
 }
@@ -268,12 +267,12 @@ func TestAiConvertJSONInputParity(t *testing.T) {
 	jsonSource, err := yaml.YAMLToJSON([]byte(aiGatewaySourceYAML))
 	require.NoError(t, err)
 
-	fromYAML, _, err := convert.Convert([]byte(aiGatewaySourceYAML), convert.Options{OutputMode: "deck"})
+	fromYAML, _, err := ai2kong.Convert([]byte(aiGatewaySourceYAML), ai2kong.Options{OutputMode: "deck"})
 	require.NoError(t, err)
-	fromJSON, _, err := convert.Convert(jsonSource, convert.Options{OutputMode: "deck"})
+	fromJSON, _, err := ai2kong.Convert(jsonSource, ai2kong.Options{OutputMode: "deck"})
 	require.NoError(t, err)
 
-	assert.True(t, bytes.Equal(fromYAML, fromJSON),
+	require.True(t, bytes.Equal(fromYAML, fromJSON),
 		"JSON and YAML inputs should convert to identical decK output")
 }
 
@@ -320,6 +319,32 @@ func TestAi2KongOutputFormats(t *testing.T) {
 
 	t.Run("unknown format errors", func(t *testing.T) {
 		err := runAi2Kong(t, srcYAML, filepath.Join(dir, "out.xml"), "xml")
-		assert.Error(t, err)
+		require.Error(t, err)
+	})
+}
+
+// TestAiDumpOutput verifies that aiDumpOutput returns YAML verbatim, produces
+// valid JSON on request, and rejects any other format rather than silently
+// falling back to YAML.
+func TestAiDumpOutput(t *testing.T) {
+	reverted := []byte("_info:\n  select_tags:\n  - " + managedByAIDeckTag + "\n")
+
+	t.Run("yaml returns input verbatim", func(t *testing.T) {
+		out, err := aiDumpOutput(reverted, "yaml")
+		require.NoError(t, err)
+		require.Equal(t, reverted, out)
+	})
+
+	t.Run("json re-serializes to valid JSON", func(t *testing.T) {
+		out, err := aiDumpOutput(reverted, "json")
+		require.NoError(t, err)
+		var doc map[string]interface{}
+		require.NoError(t, json.Unmarshal(out, &doc), "output should be valid JSON")
+		assertHasAITag(t, doc)
+	})
+
+	t.Run("unknown format errors", func(t *testing.T) {
+		_, err := aiDumpOutput(reverted, "xml")
+		require.Error(t, err)
 	})
 }

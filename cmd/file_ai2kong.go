@@ -35,7 +35,8 @@ func newAi2KongCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&convertSourceFile, "source", "s", "", "AI Gateway source file (required)")
 	cmd.Flags().StringVarP(&convertOutputFile, "output-file", "o", "",
 		"Output Kong decK file (optional, defaults to stdout)")
-	cmd.Flags().StringVarP(&convertOutputFormat, "format", "", "yaml", "output format: yaml or json")
+	cmd.Flags().StringVar(&convertOutputFormat, "format",
+		string(filebasics.OutputFormatYaml), "output format: yaml or json")
 
 	return cmd
 }

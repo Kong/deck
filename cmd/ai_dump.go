@@ -122,21 +122,27 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 }
 
 // aiDumpOutput returns the AI Gateway configuration serialized in the requested
-// format. revert.Revert always produces YAML, so YAML is returned verbatim (to
-// preserve the library's formatting) while JSON is produced by re-serializing.
+// format, which is expected to be lower-cased by the caller. revert.Revert
+// always produces YAML, so YAML is returned verbatim (to preserve the library's
+// formatting) while JSON is produced by re-serializing.
 func aiDumpOutput(aiGatewayYAML []byte, format string) ([]byte, error) {
-	if strings.ToLower(format) != "json" {
+	switch filebasics.OutputFormat(format) {
+	case filebasics.OutputFormatYaml:
 		return aiGatewayYAML, nil
+	case filebasics.OutputFormatJSON:
+		m, err := filebasics.Deserialize(aiGatewayYAML)
+		if err != nil {
+			return nil, fmt.Errorf("parsing reverted configuration: %w", err)
+		}
+		out, err := filebasics.Serialize(m, filebasics.OutputFormatJSON)
+		if err != nil {
+			return nil, fmt.Errorf("serializing configuration to JSON: %w", err)
+		}
+		return out, nil
+	default:
+		return nil, fmt.Errorf("expected format to be either %q or %q, got: %q",
+			filebasics.OutputFormatYaml, filebasics.OutputFormatJSON, format)
 	}
-	m, err := filebasics.Deserialize(aiGatewayYAML)
-	if err != nil {
-		return nil, fmt.Errorf("parsing reverted configuration: %w", err)
-	}
-	out, err := filebasics.Serialize(m, filebasics.OutputFormatJSON)
-	if err != nil {
-		return nil, fmt.Errorf("serializing configuration to JSON: %w", err)
-	}
-	return out, nil
 }
 
 // kongsStateToYAML converts Kong state to YAML bytes
@@ -168,7 +174,7 @@ The output can be written as either YAML or JSON, controlled by the --format fla
 	aiDumpCmd.Flags().StringVarP(&aiDumpCmdOutputFile, "output-file", "o",
 		"-", "file to which to write AI Gateway configuration. Use `-` to write to stdout.")
 	aiDumpCmd.Flags().StringVar(&aiDumpCmdStateFormat, "format",
-		"yaml", "output file format: json or yaml.")
+		string(filebasics.OutputFormatYaml), "output file format: json or yaml.")
 	aiDumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
 
