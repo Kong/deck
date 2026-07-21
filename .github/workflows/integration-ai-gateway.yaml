@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         kong_image:
-        - kong/kong-ai-gateway-dev:2.0.1-rc.2
+        - kong/kong-ai-gateway-dev:2.0.1-rc.3
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
