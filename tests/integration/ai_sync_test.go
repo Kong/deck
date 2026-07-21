@@ -146,3 +146,43 @@ func Test_AISync(t *testing.T) {
 		})
 	}
 }
+
+// Test_AISync_MultipleFiles exercises `deck ai sync` with more than one source
+// file, including a mix of formats (one YAML and one JSON).
+func Test_AISync_MultipleFiles(t *testing.T) {
+	runWhenAIGateway(t, ">=2.0.0")
+	setup(t)
+
+	ctx := context.Background()
+
+	// One YAML source (an agent) and one JSON source (an MCP server); each
+	// converts to distinctly-named Kong entities so the merge is conflict-free.
+	inputFiles := []string{
+		"testdata/ai_sync/01-multiple-files/input1.yaml",
+		"testdata/ai_sync/01-multiple-files/input2.json",
+	}
+	outputFiles := []string{
+		"testdata/ai_sync/01-multiple-files/output1.yaml",
+		"testdata/ai_sync/01-multiple-files/output2.yaml",
+	}
+
+	// Establish the expected AI-managed state by syncing the converted
+	// (ai2kong) configurations directly.
+	reset(t)
+	require.NoError(t, sync(ctx, outputFiles[0], outputFiles[1:]...))
+	expected, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+
+	// `ai sync` of the two AI Gateway sources must reach the same state.
+	reset(t)
+	require.NoError(t, aiSync(ctx, inputFiles...))
+	afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+	assertAIStateEqual(t, expected, afterSync)
+
+	// Re-syncing must succeed and keep the state consistent.
+	require.NoError(t, aiSync(ctx, inputFiles...))
+	afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+	assertAIStateEqual(t, afterSync, afterResync)
+}

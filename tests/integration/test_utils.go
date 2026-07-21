@@ -388,15 +388,14 @@ func sync(ctx context.Context, kongFile string, opts ...string) error {
 	return deckCmd.ExecuteContext(ctx)
 }
 
-// aiSync converts an AI Gateway source file to Kong configuration and syncs it
-// directly to Kong (the equivalent of `deck ai sync <source-file>`). It runs
+// aiSync converts one or more AI Gateway source files to Kong configuration and
+// syncs them directly to Kong (the equivalent of `deck ai sync <f1> <f2> ...`).
+// Sources may be files, directories, or "-" for stdin. It runs
 // non-interactively so it can be used in tests.
-func aiSync(ctx context.Context, sourceFile string, opts ...string) error {
+func aiSync(ctx context.Context, sourceFiles ...string) error {
 	deckCmd := cmd.NewRootCmd()
-	args := []string{"ai", "sync", sourceFile, "--yes"}
-	if len(opts) > 0 {
-		args = append(args, opts...)
-	}
+	args := append([]string{"ai", "sync"}, sourceFiles...)
+	args = append(args, "--yes")
 	deckCmd.SetArgs(args)
 	return deckCmd.ExecuteContext(ctx)
 }
