@@ -1,0 +1,21 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+services:
+- name: booking-agent
+  routes:
+  - methods:
+    - POST
+    name: booking-route
+    paths:
+    - /agents/booking
+    plugins:
+    - config:
+        logging:
+          log_payloads: false
+          log_statistics: true
+          max_payload_size: 524288
+        max_request_body_size: 1048576
+      name: ai-a2a-proxy
+  url: https://booking-agent.internal:8443/a2a

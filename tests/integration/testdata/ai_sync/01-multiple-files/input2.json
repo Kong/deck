@@ -1,0 +1,30 @@
+{
+  "mcp_servers": [
+    {
+      "type": "upstream-server",
+      "name": "upstream-mcp",
+      "upstream_url": "https://upstream.example.com/mcp",
+      "config": {
+        "route": {
+          "paths": ["/mcp/upstream"]
+        },
+        "tools_cache_ttl_seconds": 300,
+        "server": {
+          "preserve_upstream_tool_names": true
+        }
+      },
+      "tools": [
+        {
+          "name": "upstreamTool",
+          "description": "An upstream tool",
+          "input_schema": {
+            "type": "object"
+          },
+          "output_schema": {
+            "type": "object"
+          }
+        }
+      ]
+    }
+  ]
+}
