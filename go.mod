@@ -7,13 +7,15 @@ replace github.com/yudai/gojsondiff v1.0.0 => github.com/Kong/gojsondiff v1.3.0
 replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
 
 require (
+	dario.cat/mergo v1.0.2
+	github.com/Kong/ai-deck-converter v0.4.1
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.29.4
+	github.com/daveshanley/vacuum v0.29.7
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
-	github.com/kong/go-apiops v0.4.4
+	github.com/kong/go-apiops v0.4.5
 	github.com/kong/go-database-reconciler v1.41.2-0.20260722091433-6c1f156fe732
 	github.com/kong/go-kong v0.77.0
 	github.com/mitchellh/go-homedir v1.1.0
@@ -104,8 +106,8 @@ require (
 	github.com/pb33f/doctor v0.0.78 // indirect
 	github.com/pb33f/jsonpath v0.8.2 // indirect
 	github.com/pb33f/libasyncapi v0.0.1 // indirect
-	github.com/pb33f/libopenapi v0.38.1 // indirect
-	github.com/pb33f/libopenapi-validator v0.13.8 // indirect
+	github.com/pb33f/libopenapi v0.38.4 // indirect
+	github.com/pb33f/libopenapi-validator v0.13.13 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -132,7 +134,7 @@ require (
 	go.starlark.net v0.0.0-20230525235612-a134d8f9ddca // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	go.yaml.in/yaml/v4 v4.0.0-rc.5 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
@@ -154,7 +156,6 @@ require (
 )
 
 require (
-	dario.cat/mergo v1.0.2 // indirect
 	github.com/Kong/go-diff v1.2.2 // indirect
 	github.com/Kong/gojsondiff v1.3.2 // indirect
 	github.com/adrg/strutil v0.3.0 // indirect

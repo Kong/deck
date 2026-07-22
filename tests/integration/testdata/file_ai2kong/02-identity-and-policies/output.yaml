@@ -1,0 +1,92 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- alias: '@openai/guarded-gpt'
+  name: guarded-gpt
+  tags:
+  - env:prod
+  - team:ai-platform
+consumer_groups:
+- name: premium-users
+consumers:
+- custom_id: dev-001
+  groups:
+  - name: premium-users
+  keyauth_credentials:
+  - key: secret-abc
+    ttl: 3600
+  plugins:
+  - config:
+      http_endpoint: https://logs.internal/ingest
+    name: http-log
+  tags:
+  - tier:gold
+  username: gregs-dev
+plugins:
+- config:
+    minute: 1000
+    policy: local
+  name: rate-limiting
+- config:
+    body_path: model
+    max_request_body_size: 8388608
+    source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-4o
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: '@openai/guarded-gpt'
+        name: gpt-4o
+        provider: openai
+      route_type: llm/v1/chat
+  model: guarded-gpt
+  name: ai-proxy-advanced
+  route: openai-chat
+- config:
+    allow_patterns:
+    - ^safe
+  model: guarded-gpt
+  name: ai-prompt-guard
+  route: openai-chat
+- config:
+    http_endpoint: https://logs.internal/ingest
+  model: guarded-gpt
+  name: http-log
+  route: openai-chat
+- config:
+    allow:
+    - premium-users
+    include_consumer_groups: true
+  model: guarded-gpt
+  name: acl
+  route: openai-chat
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  url: http://ai-gateway.upstream.local
+vaults:
+- config:
+    prefix: KONG_
+  description: Environment secrets
+  name: env
+  prefix: env-vault

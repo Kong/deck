@@ -1,0 +1,107 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+services:
+- host: localhost
+  name: secure-flights-mcp-oauth
+  routes:
+  - name: secure-flights-mcp-oauth-route
+    paths:
+    - /mcp/secure-flights
+    plugins:
+    - config:
+        access_token_claim_field: .user.email
+        acl_attribute_type: oauth_access_token
+        default_acl:
+        - allow:
+          - gold
+          - premium
+          deny:
+          - platinum
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: conversion-listener
+        tools:
+        - description: Search available flights
+          host: flights.internal
+          method: GET
+          name: searchFlights
+          path: /flights
+          scheme: https
+      name: ai-mcp-proxy
+- host: localhost
+  name: secure-flights-mcp-consumer
+  routes:
+  - name: secure-flights-mcp-consumer-route
+    paths:
+    - /mcp/secure-flights
+    plugins:
+    - config:
+        acl_attribute_type: consumer
+        default_acl:
+        - allow:
+          - agents
+          - premium
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: conversion-listener
+        tools:
+        - description: Search available flights
+          host: flights.internal
+          method: GET
+          name: searchFlights
+          path: /flights
+          scheme: https
+      name: ai-mcp-proxy
+- name: vendor-proxy-mcp
+  routes:
+  - name: vendor-proxy-mcp-route
+    paths:
+    - /mcp/vendor-proxy
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: passthrough-listener
+        proxy_config:
+          https_proxy_host: proxy.internal
+          https_proxy_port: 8080
+        tools:
+        - description: A vendor tool
+          name: vendorTool
+      name: ai-mcp-proxy
+  url: https://vendor.example.com/mcp
+- name: upstream-mcp
+  routes:
+  - name: upstream-mcp-route
+    paths:
+    - /mcp/upstream
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: upstream-server
+        server:
+          preserve_upstream_tool_names: true
+        tools:
+        - description: An upstream tool
+          input_schema:
+            type: object
+          name: upstreamTool
+          output_schema:
+            type: object
+        tools_cache_ttl_seconds: 300
+      name: ai-mcp-proxy
+  url: https://upstream.example.com/mcp
