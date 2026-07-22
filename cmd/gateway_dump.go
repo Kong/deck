@@ -121,7 +121,17 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
-	_ = sendAnalytics("dump", kongVersion, modeKong)
+
+	isAIGateway, err := kong.IsKongAIGateway()
+	if err != nil {
+		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
+	}
+
+	if isAIGateway {
+		_ = sendAnalytics("dump", kongVersion, modeAIGateway)
+	} else {
+		_ = sendAnalytics("dump", kongVersion, modeKong)
+	}
 
 	writeConfig := file.WriteConfig{
 		SelectTags:                       dumpConfig.SelectorTags,
@@ -133,6 +143,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		IsConsumerGroupPolicyOverrideSet: dumpConfig.IsConsumerGroupPolicyOverrideSet,
 		SanitizeContent:                  dumpConfig.SanitizeContent,
 		IncludePluginDefinitions:         dumpConfig.IncludePluginDefinitions,
+		IsKongAIGateway:                  isAIGateway,
 	}
 
 	// Kong Enterprise dump all workspace

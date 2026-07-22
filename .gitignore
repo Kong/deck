@@ -40,3 +40,7 @@ docs/cli-docs/
 kong2kic/testdata/**/*-actual.*
 kong2tf/testdata/**/*-actual.*
 kong2tf/terraform
+
+# go workspace file
+go.work
+go.work.sum

@@ -1,0 +1,23 @@
+agents:
+  - type: a2a
+    display_name: Booking Agent
+    name: booking-agent
+    policies: []
+    acls: {allow: [], deny: []}
+    config:
+      url: https://booking-agent.internal:8443/a2a
+      route: {name: booking-route, paths: [/agents/booking], methods: [POST]}
+      max_request_body_size: 1048576
+      logging: {statistics: true, payloads: false, max_payload_size: 524288}
+  - type: http
+    display_name: Weather Agent
+    name: weather-agent
+    policies: [require-key]
+    acls: {allow: [], deny: []}
+    config:
+      url: https://weather.internal/api
+      route: {name: weather-route, paths: [/agents/weather]}
+policies:
+  - type: key-auth
+    name: require-key
+    config: {key_names: [apikey]}

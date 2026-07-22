@@ -1,0 +1,11 @@
+agents:
+  - type: a2a
+    display_name: Booking Agent
+    name: booking-agent
+    policies: []
+    acls: {allow: [], deny: []}
+    config:
+      url: https://booking-agent.internal:8443/a2a
+      route: {name: booking-route, paths: [/agents/booking], methods: [POST]}
+      max_request_body_size: 1048576
+      logging: {statistics: true, payloads: false, max_payload_size: 524288}
