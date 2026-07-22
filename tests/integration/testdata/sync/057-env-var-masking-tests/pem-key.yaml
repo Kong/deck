@@ -1,0 +1,6 @@
+_format_version: "3.0"
+certificates:
+  - id: 4803cc0f-4155-4802-9b55-ad988c7b0db7
+    cert: ${{ env "DECK_CLIENT_CERT" }}
+    key: ${{ env "DECK_CLIENT_KEY" }}
+
