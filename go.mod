@@ -23,6 +23,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
+	github.com/yuin/gopher-lua v1.1.2
 	golang.org/x/sync v0.21.0
 	k8s.io/api v0.35.4
 	k8s.io/apiextensions-apiserver v0.33.1
