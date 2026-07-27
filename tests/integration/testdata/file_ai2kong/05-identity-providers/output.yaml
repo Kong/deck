@@ -35,17 +35,17 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/gpt-5.4'
         name: gpt-5.4
         provider: openai
+        model_alias: '@openai/gpt-5.4'
       route_type: llm/v1/chat
   model: openai-gpt-5-4
   name: ai-proxy-advanced
   route: openai-chat
 - config:
     anonymous: anonymous
+    cache_tokens_salt: LNzaN7n85dxFWfqmZKCaFcTehSDNfozB
     issuer: https://dev-123456.okta.com/oauth2/default
-    cache_tokens_salt: "LNzaN7n85dxFWfqmZKCaFcTehSDNfozB"
   name: openid-connect
   route: openai-chat
 - config:

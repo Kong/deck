@@ -16,8 +16,7 @@ models:
       acls:
         allow: [premium-users]
     config:
-      route: {paths: [/ai]}
-      model: {alias: "@openai/guarded-gpt"}
+      route: {paths: [/ai], model: {path_aliases: ["@openai/guarded-gpt"]}}
 model_providers:
   - type: openai
     display_name: OpenAI Main
