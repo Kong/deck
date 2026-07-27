@@ -49,9 +49,9 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/guarded-gpt'
         name: gpt-4o
         provider: openai
+        model_alias: '@openai/guarded-gpt'
       route_type: llm/v1/chat
   model: guarded-gpt
   name: ai-proxy-advanced
