@@ -781,6 +781,8 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 // This function uses client.Server to check for the Server header in the response.
 // If the server header contains "ai-gateway", it returns true.
+// Note that this takes client as input, and does not use the default client.
+// Therefore, the client configuration including headers, non-default addresses are respected.
 func isAIGatewayInstance(ctx context.Context, client *kong.Client) (bool, error) {
 	server, err := client.Server(ctx)
 	if err != nil {
