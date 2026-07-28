@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strings"
 
 	"github.com/blang/semver/v4"
 	"github.com/fatih/color"
@@ -57,6 +58,8 @@ const (
 	modeLocal
 	modeAIGateway
 )
+
+const aiGatewayServer = "ai-gateway"
 
 type ApplyType int
 
@@ -774,6 +777,16 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 		return nil, err
 	}
 	return currentState, nil
+}
+
+// This function uses client.Server to check for the Server header in the response.
+// If the server header contains "ai-gateway", it returns true.
+func isAIGatewayInstance(ctx context.Context, client *kong.Client) (bool, error) {
+	server, err := client.Server(ctx)
+	if err != nil {
+		return false, err
+	}
+	return strings.Contains(server, aiGatewayServer), nil
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,

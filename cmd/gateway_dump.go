@@ -122,7 +122,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
-	isAIGateway, err := kong.IsKongAIGateway()
+	isAIGateway, err := isAIGatewayInstance(ctx, wsClient)
 	if err != nil {
 		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
 	}
