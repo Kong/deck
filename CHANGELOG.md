@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.65.1](#v1651)
 - [v1.64.0](#v1640)
 - [v1.63.0](#v1630)
 - [v1.62.1](#v1621)
@@ -144,6 +145,19 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
+## [v1.65.1]
+> Release date: 2026/06/28
+
+### Added
+- Added support for configuring AI Gateway using commands `deck file ai2kong`, `deck ai sync` and `deck ai dump`. [#2137](https://github.com/Kong/deck/pull/2137) [go-database-reconciler #496](https://github.com/Kong/go-database-reconciler/pull/496) [go-kong #624](https://github.com/Kong/go-kong/pull/624)
+
+### Fixed
+- Fixed `deck file openapi2mcp` to skip emitting `conversion-listener` mode attributes in `conversion` mode. [#2161](https://github.com/Kong/deck/pull/2161) [go-apiops #300](https://github.com/Kong/go-apiops/pull/300)
+- Fixed drift when headers are set to empty object in routes. [#2163](https://github.com/Kong/deck/pull/2163) [go-database-reconciler #500](https://github.com/Kong/go-database-reconciler/pull/500)
+
+### Chores
+- Added OCI metadata to the docker image
 
 ## [v1.64.0]
 > Release date: 2026/06/29
@@ -2681,6 +2695,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.65.1]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.1
 [v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
 [v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
 [v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1

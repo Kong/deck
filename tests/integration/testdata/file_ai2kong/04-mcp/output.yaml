@@ -95,6 +95,7 @@ services:
         mode: upstream-server
         server:
           preserve_upstream_tool_names: true
+          tag: aigwmcp:tools
         tools:
         - description: An upstream tool
           input_schema:
