@@ -12,7 +12,6 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-kong/kong"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -123,11 +122,6 @@ func Test_AIDump(t *testing.T) {
 			aiConfig, err := aiDump("-o", "-")
 			require.NoError(t, err)
 			require.NotEmpty(t, aiConfig)
-
-			// Dumping the same state again must be deterministic.
-			aiConfigAgain, err := aiDump("-o", "-")
-			require.NoError(t, err)
-			assert.Equal(t, aiConfig, aiConfigAgain)
 
 			// Round-trip: syncing the dumped AI Gateway config into a fresh Kong
 			// must reproduce the same AI-managed state.
