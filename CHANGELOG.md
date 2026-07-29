@@ -1,6 +1,6 @@
 # Table of Contents
 
-- [v1.65.0](#v1650)
+- [v1.65.1](#v1651)
 - [v1.64.0](#v1640)
 - [v1.63.0](#v1630)
 - [v1.62.1](#v1621)
@@ -146,7 +146,7 @@
 - [v0.1.0](#v010)
 
 
-## [v1.65.0]
+## [v1.65.1]
 > Release date: 2026/06/28
 
 ### Added
@@ -2695,7 +2695,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
-[v1.65.0]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.0
+[v1.65.1]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.1
 [v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
 [v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
 [v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1

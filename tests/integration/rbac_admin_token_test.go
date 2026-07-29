@@ -75,4 +75,18 @@ func Test_RBAC_AdminToken(t *testing.T) {
 			"online validate should succeed: --kong-admin-token must override the "+
 				"colliding Kong-Admin-Token supplied via --headers")
 	})
+
+	t.Run("dump succeeds when kong-admin-token is passed", func(t *testing.T) {
+		// This test helps us verify that dump respects --kong-admin-token flag.
+		// scrub the env so the token can only come from the flag, proving the
+		// flag is what authenticates the request.
+		t.Setenv("DECK_KONG_ADMIN_TOKEN", "")
+		t.Setenv("KONG_ADMIN_TOKEN", "") // go-kong reads from this.
+
+		// dump reads from the Admin API, so a valid admin token must let the
+		// request through against an RBAC-enabled Kong.
+		_, err := dump("-o", "-", "--kong-admin-token", adminToken)
+		require.NoError(t, err,
+			"online dump should succeed against an RBAC-enabled Kong with a valid admin token")
+	})
 }

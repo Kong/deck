@@ -11,7 +11,6 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	"github.com/kong/go-database-reconciler/pkg/utils"
-	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 )
@@ -53,7 +52,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
-	isAIGateway, err := kong.IsKongAIGateway()
+	isAIGateway, err := isAIGatewayInstance(ctx, wsClient)
 	if err != nil {
 		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
 	}
