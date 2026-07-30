@@ -67,6 +67,7 @@ mcp_servers:
       tools_cache_ttl_seconds: 300
       server:
         preserve_upstream_tool_names: true
+        label: 'aigwmcp:tools'
     tools:
       - name: upstreamTool
         description: An upstream tool
