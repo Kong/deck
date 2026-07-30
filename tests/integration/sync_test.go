@@ -13042,4 +13042,58 @@ func Test_Sync_EnvVar_Masking(t *testing.T) {
 		// Verify that actual secret content is NOT exposed
 		require.NotContains(t, output, "\"kty\"", "actual jwk content should not be exposed")
 	})
+
+	t.Run("comprehensive test with pem, jwk, and normal secrets", func(t *testing.T) {
+		reset(t)
+
+		// Set all types of secrets as environment variables
+		t.Setenv("DECK_CLIENT_CERT", certAMask)
+		t.Setenv("DECK_CLIENT_KEY", keyAMask)
+		t.Setenv("DECK_JWK_KEY", jwkKeyMask)
+		t.Setenv("DECK_API_KEY", "apiKeySecret")
+		t.Setenv("DECK_DATABASE_PASSWORD", "databasePassword")
+		t.Setenv("DECK_BEARER_TOKEN", "bearerToken")
+		t.Setenv("DECK_WEBHOOK_SECRET", "webhookSecret")
+
+		// Initial sync with all secrets
+		output, err := syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/comprehensive.yaml")
+		require.NoError(t, err)
+		require.Contains(t, output, "creating certificate", "should create certificate")
+		require.Contains(t, output, "creating key", "should create key")
+
+		// Re-syncing with identical secrets produces zero diff (Created/Updated/Deleted
+		// all 0), so no per-entity diff body is printed at all - there would be nothing
+		// for the masking assertions below to find. Rotate every secret so the second
+		// sync actually updates the certificate, key, and plugin config and prints a
+		// diff for each.
+		t.Setenv("DECK_CLIENT_CERT", certBMask)
+		t.Setenv("DECK_CLIENT_KEY", keyBMask)
+		t.Setenv("DECK_JWK_KEY", jwkKeyMask2)
+		t.Setenv("DECK_API_KEY", "apiKeySecretV2")
+		t.Setenv("DECK_DATABASE_PASSWORD", "databasePasswordV2")
+		t.Setenv("DECK_BEARER_TOKEN", "bearerTokenV2")
+		t.Setenv("DECK_WEBHOOK_SECRET", "webhookSecretV2")
+
+		output, err = syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/comprehensive.yaml")
+		require.NoError(t, err)
+
+		require.Contains(t, output, `"cert": "[masked]"`, "PEM cert should be masked")
+		require.Contains(t, output, `"key": "[masked]"`, "PEM key should be masked")
+		require.NotContains(t, output, "-----BEGIN CERTIFICATE-----", "actual cert content should not be exposed")
+		require.NotContains(t, output, "-----BEGIN PRIVATE KEY-----", "actual key content should not be exposed")
+
+		require.Contains(t, output, `"jwk": "[masked]"`, "JWK should be masked")
+		require.NotContains(t, output, "\"kty\"", "actual jwk content should not be exposed")
+
+		require.Contains(t, output, `"X-API-Key:[masked]"`, "API key should be masked")
+		require.Contains(t, output, `"X-DB-Pass:[masked]"`, "database password should be masked")
+		require.Contains(t, output, `"Authorization:Bearer [masked]"`, "bearer token should be masked")
+		require.Contains(t, output, `"X-Webhook-Secret:[masked]"`, "webhook secret should be masked")
+
+		// Verify the current secret values are NOT exposed in the output
+		require.NotContains(t, output, "apiKeySecretV2", "actual API key should not be exposed")
+		require.NotContains(t, output, "databasePasswordV2", "actual database password should not be exposed")
+		require.NotContains(t, output, "bearerTokenV2", "actual bearer token should not be exposed")
+		require.NotContains(t, output, "webhookSecretV2", "actual webhook secret should not be exposed")
+	})
 }
