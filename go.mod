@@ -11,7 +11,7 @@ require (
 	github.com/Kong/ai-deck-converter v0.5.2
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.29.7
+	github.com/daveshanley/vacuum v0.30.0
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
@@ -34,16 +34,16 @@ require (
 )
 
 require (
-	charm.land/bubbles/v2 v2.1.0 // indirect
-	charm.land/bubbletea/v2 v2.0.7 // indirect
-	charm.land/lipgloss/v2 v2.0.4 // indirect
+	charm.land/bubbles/v2 v2.1.1 // indirect
+	charm.land/bubbletea/v2 v2.0.8 // indirect
+	charm.land/lipgloss/v2 v2.0.5 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Kong/sdk-konnect-go v0.3.1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/a-h/templ v0.3.1020 // indirect
-	github.com/alecthomas/chroma/v2 v2.26.1 // indirect
+	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/basgys/goxml2json v1.1.1-0.20231018121955-e66ee54ceaad // indirect
@@ -53,7 +53,7 @@ require (
 	github.com/chai2010/gettext-go v1.0.2 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/harmonica v0.2.0 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260525132238-948f4557a654 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260703014108-f5a850f9c2b7 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
@@ -90,7 +90,7 @@ require (
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.0 // indirect
 	github.com/lucasjones/reggen v0.0.0-20200904144131-37ba4fa293bb // indirect
-	github.com/mattn/go-runewidth v0.0.23 // indirect
+	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/spdystream v0.5.1 // indirect
@@ -103,10 +103,10 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
-	github.com/pb33f/doctor v0.0.78 // indirect
-	github.com/pb33f/jsonpath v0.8.2 // indirect
-	github.com/pb33f/libasyncapi v0.0.1 // indirect
-	github.com/pb33f/libopenapi v0.38.4 // indirect
+	github.com/pb33f/doctor v0.0.79 // indirect
+	github.com/pb33f/jsonpath v0.8.3 // indirect
+	github.com/pb33f/libasyncapi v0.0.2 // indirect
+	github.com/pb33f/libopenapi v0.38.7 // indirect
 	github.com/pb33f/libopenapi-validator v0.13.13 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
@@ -160,7 +160,7 @@ require (
 	github.com/Kong/gojsondiff v1.3.2 // indirect
 	github.com/adrg/strutil v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/dop251/goja v0.0.0-20260607120635-348e6bea910d // indirect
+	github.com/dop251/goja v0.0.0-20260701091749-b07b74453ea9 // indirect
 	github.com/dop251/goja_nodejs v0.0.0-20260212111938-1f56ff5bcf14 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
@@ -211,13 +211,13 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
-	golang.org/x/mod v0.37.0 // indirect
-	golang.org/x/net v0.56.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/term v0.44.0 // indirect
-	golang.org/x/text v0.39.0 // indirect
-	golang.org/x/tools v0.47.0 // indirect
+	golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597 // indirect
+	golang.org/x/mod v0.38.0 // indirect
+	golang.org/x/net v0.57.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/term v0.45.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/tools v0.48.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
