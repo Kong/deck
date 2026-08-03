@@ -12635,15 +12635,19 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name          string
-		kongFile      string
-		wantErr       bool
-		expectedState utils.KongRawState
-		ignoreFields  []cmp.Option
+		name           string
+		pluginDefsFile string
+		kongFile       string
+		wantErr        bool
+		expectedState  utils.KongRawState
+		ignoreFields   []cmp.Option
 	}{
 		{
-			name:     "creates cloned plugin definitions and plugins",
-			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			name: "creates cloned plugin definitions and plugins",
+			// Register the cloned plugin definitions on their own first so Kong
+			// has them ready before the plugins in kong.yaml reference them.
+			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			kongFile:       "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
 			expectedState: utils.KongRawState{
 				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
 					{
@@ -12698,6 +12702,11 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+
+			if tc.pluginDefsFile != "" {
+				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
+				time.Sleep(pluginDefinitionSyncDelay)
+			}
 
 			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
 			if tc.wantErr {
@@ -12799,6 +12808,7 @@ func testSyncClonedPluginDefinitionsKonnectImpl(t *testing.T) {
 			// config that includes plugin instances.
 			cpdOnlyFile := "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml"
 			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 
 			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
 			if tc.wantErr {
@@ -12831,15 +12841,19 @@ func Test_Sync_CustomPluginDefinitions(t *testing.T) {
 	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
 
 	tests := []struct {
-		name          string
-		kongFile      string
-		wantErr       bool
-		expectedState utils.KongRawState
-		ignoreFields  []cmp.Option
+		name           string
+		pluginDefsFile string
+		kongFile       string
+		wantErr        bool
+		expectedState  utils.KongRawState
+		ignoreFields   []cmp.Option
 	}{
 		{
-			name:     "creates custom plugin definitions and plugins",
-			kongFile: "testdata/sync/055-custom-plugin-definitions/kong.yaml",
+			name: "creates custom plugin definitions and plugins",
+			// Register the custom plugin definitions on their own first so Kong
+			// has them ready before the plugins in kong.yaml reference them.
+			pluginDefsFile: "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+			kongFile:       "testdata/sync/055-custom-plugin-definitions/kong.yaml",
 			expectedState: utils.KongRawState{
 				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
 					{
@@ -12876,6 +12890,11 @@ func Test_Sync_CustomPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+
+			if tc.pluginDefsFile != "" {
+				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
+				time.Sleep(pluginDefinitionSyncDelay)
+			}
 
 			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
 			if tc.wantErr {
@@ -12969,6 +12988,7 @@ func testSyncCustomPluginDefinitionsKonnectImpl(t *testing.T) {
 			// config that includes plugin instances.
 			cpdOnlyFile := "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml"
 			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 
 			err := sync(ctx, tc.kongFile, "--include-plugin-definitions")
 			if tc.wantErr {
