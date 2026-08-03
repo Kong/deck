@@ -1577,6 +1577,11 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the plugin definitions first, in a separate run, so Kong
+			// has them registered before any plugin references them.
+			require.NoError(t, sync(ctx,
+				"testdata/sync/054-cloned-plugin-definitions/plugin-definitions.yaml",
+				"--include-plugin-definitions"))
 			require.NoError(t, sync(ctx,
 				"testdata/sync/054-cloned-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
@@ -1634,6 +1639,14 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the plugin definitions first, in a separate run, so Kong
+			// has them registered before any plugin references them. Doing
+			// this in a single sync is racy: a plugin may be created before
+			// its (custom) definition is ready, yielding an intermittent
+			// 404 "No plugin named '<name>'".
+			require.NoError(t, sync(ctx,
+				"testdata/sync/055-custom-plugin-definitions/plugin-definitions.yaml",
+				"--include-plugin-definitions"))
 			require.NoError(t, sync(ctx,
 				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
