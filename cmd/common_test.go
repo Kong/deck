@@ -145,6 +145,7 @@ func TestPerformDiff_JSONOutput(t *testing.T) {
 		false, // isKonnect
 		true,  // enabled Json output
 		ApplyTypeFull,
+		nil, // secretMap (not needed for this test)
 	)
 
 	require.NoError(t, err)

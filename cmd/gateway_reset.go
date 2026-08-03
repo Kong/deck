@@ -167,7 +167,9 @@ func performReset(ctx context.Context, workspaces []string, isKonnect bool) erro
 			return err
 		}
 		// Perform the diff/reset
-		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, isKonnect, resetJSONOutput, ApplyTypeFull)
+		// gateway reset has no state file — target is an empty new state, so
+		// there is nothing to mock-parse; secretMap is nil.
+		_, err = performDiff(ctx, currentState, targetState, false, 10, 0, client, isKonnect, resetJSONOutput, ApplyTypeFull, nil)
 		if err != nil {
 			return fmt.Errorf("resetting workspace '%s': %w", ws, err)
 		}
