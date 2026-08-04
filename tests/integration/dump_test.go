@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/acarl005/stripansi"
 	"github.com/kong/deck/sanitize"
@@ -1577,6 +1578,12 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the plugin definitions first, in a separate run, so Kong
+			// has them registered before any plugin references them.
+			require.NoError(t, sync(ctx,
+				"testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+				"--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 			require.NoError(t, sync(ctx,
 				"testdata/sync/054-cloned-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
@@ -1634,6 +1641,12 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the custom plugin definitions on their own first and let
+			// Kong register them before syncing the plugins that reference
+			require.NoError(t, sync(ctx,
+				"testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+				"--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 			require.NoError(t, sync(ctx,
 				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 

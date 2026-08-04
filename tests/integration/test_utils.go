@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/acarl005/stripansi"
 	"github.com/fatih/color"
@@ -25,6 +26,10 @@ import (
 // managedByAIDeckTag is the selector tag `deck ai sync` stamps on every entity it
 // manages, mirroring the scope of `deck ai dump`.
 const managedByAIDeckTag = "managed_by:deck-ai"
+
+// pluginDefinitionSyncDelay gives Kong time to register a freshly synced
+// custom/cloned plugin definition before a plugin instance references it.
+const pluginDefinitionSyncDelay = 3 * time.Second
 
 func getKongAddress() string {
 	address := os.Getenv("DECK_KONG_ADDR")
