@@ -33,7 +33,7 @@ import (
 )
 
 func Test_deployManifests(t *testing.T) {
-	versions := []string{"2.12", "3.0", "3.1", "3.2", "3.3"}
+	versions := []string{"2.12", "3.0", "3.1", "3.2", "3.3", "3.4", "3.5"}
 	for _, version := range versions {
 		t.Run("KIC Version "+version, func(t *testing.T) {
 			t.Parallel()
@@ -74,6 +74,29 @@ func Test_deployManifests(t *testing.T) {
 			t.Log("creating a dynamic client for Kubernetes resources")
 			dynamicClient, err := dynamic.NewForConfig(config)
 			require.NoError(t, err)
+
+			t.Log("creating Gateway resource for HTTPRoutes")
+			gatewayGVR, gatewayClassGVR, err := createGatewayResources(t, dynamicClient, kindToResource)
+			require.NoError(t, err)
+			defer func() {
+				// Delete Gateway first
+				err := dynamicClient.Resource(gatewayGVR).
+					Namespace(apiv1.NamespaceDefault).
+					Delete(context.TODO(), "kong", metav1.DeleteOptions{})
+				if err != nil {
+					t.Logf("failed to delete Gateway: %v", err)
+				} else {
+					t.Log("deleted Gateway: kong")
+				}
+				// Then delete GatewayClass
+				err = dynamicClient.Resource(gatewayClassGVR).
+					Delete(context.TODO(), "kong", metav1.DeleteOptions{})
+				if err != nil {
+					t.Logf("failed to delete GatewayClass: %v", err)
+				} else {
+					t.Log("deleted GatewayClass: kong")
+				}
+			}()
 
 			t.Log("deploying manifests to the cluster")
 			err = deployManifestsToClusterForVersion(t, dynamicClient, kindToResource, version)
@@ -190,8 +213,80 @@ func deployGatewayAPICRDs(t *testing.T, config *rest.Config) (*clientset.Clients
 	}
 
 	// Wait for CRDs to be available
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 	return clientset, nil
+}
+
+// Helper function to create Gateway and GatewayClass resources
+func createGatewayResources(
+	t *testing.T,
+	dynamicClient dynamic.Interface,
+	kindToResource map[string]string,
+) (schema.GroupVersionResource, schema.GroupVersionResource, error) {
+	// Create GatewayClass first
+	gatewayClassManifest := `
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kong
+spec:
+  controllerName: konghq.com/kic-gateway-controller
+`
+	gatewayClass := &unstructured.Unstructured{}
+	err := yaml.Unmarshal([]byte(gatewayClassManifest), gatewayClass)
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+
+	gatewayClassGVR, err := getGroupVersionResource(gatewayClass, kindToResource)
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+
+	_, err = dynamicClient.Resource(gatewayClassGVR).
+		Create(context.TODO(), gatewayClass, metav1.CreateOptions{})
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+	t.Logf("created GatewayClass: %s", gatewayClass.GetName())
+
+	// Then create Gateway
+	gatewayManifest := `
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: kong
+spec:
+  gatewayClassName: kong
+  listeners:
+  - name: proxy
+    port: 80
+    protocol: HTTP
+`
+	gateway := &unstructured.Unstructured{}
+	err = yaml.Unmarshal([]byte(gatewayManifest), gateway)
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+
+	gatewayGVR, err := getGroupVersionResource(gateway, kindToResource)
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+
+	setNamespaceIfNeeded(gateway)
+
+	_, err = dynamicClient.Resource(gatewayGVR).
+		Namespace(gateway.GetNamespace()).
+		Create(context.TODO(), gateway, metav1.CreateOptions{})
+	if err != nil {
+		return schema.GroupVersionResource{}, schema.GroupVersionResource{}, err
+	}
+	t.Logf("created Gateway: %s in Namespace: %s", gateway.GetName(), gateway.GetNamespace())
+
+	// Wait for the Gateway to be ready
+	time.Sleep(1 * time.Second)
+	return gatewayGVR, gatewayClassGVR, nil
 }
 
 // Helper function to get Kind to Resource mapping
