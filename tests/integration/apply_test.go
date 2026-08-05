@@ -6,6 +6,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -823,11 +824,12 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 	ctx := t.Context()
 
 	tests := []struct {
-		name          string
-		initialFile   string
-		updateFile    string
-		expectedState utils.KongRawState
-		ignoreFields  []cmp.Option
+		name           string
+		pluginDefsFile string
+		initialFile    string
+		updateFile     string
+		expectedState  utils.KongRawState
+		ignoreFields   []cmp.Option
 	}{
 		{
 			name:        "updates cloned plugin definition priority and tags",
@@ -851,9 +853,10 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 			},
 		},
 		{
-			name:        "updates plugin config linked with cloned definitions",
-			initialFile: "testdata/apply/013-cloned-plugin-definitions/initial-with-plugins.yaml",
-			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
+			name:           "updates plugin config linked with cloned definitions",
+			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			initialFile:    "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			updateFile:     "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
 			expectedState: utils.KongRawState{
 				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
 					{
@@ -903,6 +906,10 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+			if tc.pluginDefsFile != "" {
+				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
+				time.Sleep(pluginDefinitionSyncDelay)
+			}
 			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
 			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
 			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
@@ -956,7 +963,7 @@ func testApplyClonedPluginDefinitionsKonnectImpl(t *testing.T) {
 		},
 		{
 			name:        "updates plugin config linked with cloned definitions",
-			initialFile: "testdata/apply/013-cloned-plugin-definitions/initial-with-plugins.yaml",
+			initialFile: "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
 			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
 			expectedState: utils.KongRawState{
 				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
@@ -1009,6 +1016,7 @@ func testApplyClonedPluginDefinitionsKonnectImpl(t *testing.T) {
 			// includes plugin instances.
 			cpdOnlyFile := "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml"
 			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 
 			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
 			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
@@ -1032,11 +1040,12 @@ func Test_Apply_CustomPluginDefinitions(t *testing.T) {
 	colDblessSchema := mustReadFile(t, cpdTestdata+"/col-dbless.schema.lua")
 
 	tests := []struct {
-		name          string
-		initialFile   string
-		updateFile    string
-		expectedState utils.KongRawState
-		ignoreFields  []cmp.Option
+		name           string
+		pluginDefsFile string
+		initialFile    string
+		updateFile     string
+		expectedState  utils.KongRawState
+		ignoreFields   []cmp.Option
 	}{
 		{
 			name:        "updates custom plugin definition tags",
@@ -1060,9 +1069,10 @@ func Test_Apply_CustomPluginDefinitions(t *testing.T) {
 			},
 		},
 		{
-			name:        "updates plugin config linked with custom plugin definitions",
-			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-with-plugins.yaml",
-			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-plugin-config.yaml",
+			name:           "updates plugin config linked with custom plugin definitions",
+			pluginDefsFile: "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+			initialFile:    "testdata/sync/055-custom-plugin-definitions/kong.yaml",
+			updateFile:     "testdata/apply/014-custom-plugin-definitions/update-plugin-config.yaml",
 			expectedState: utils.KongRawState{
 				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
 					{
@@ -1099,6 +1109,10 @@ func Test_Apply_CustomPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+			if tc.pluginDefsFile != "" {
+				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
+				time.Sleep(pluginDefinitionSyncDelay)
+			}
 			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
 			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
 			testKongState(t, client, false, false, tc.expectedState, tc.ignoreFields)
@@ -1158,7 +1172,7 @@ func testApplyCustomPluginDefinitionsKonnectImpl(t *testing.T) {
 		},
 		{
 			name:        "updates plugin config linked with custom plugin definitions",
-			initialFile: "testdata/apply/014-custom-plugin-definitions/initial-with-plugins.yaml",
+			initialFile: "testdata/sync/055-custom-plugin-definitions/kong.yaml",
 			updateFile:  "testdata/apply/014-custom-plugin-definitions/update-plugin-config.yaml",
 			expectedState: utils.KongRawState{
 				CustomPluginDefinitions: []*kong.CustomPluginDefinition{
@@ -1202,6 +1216,7 @@ func testApplyCustomPluginDefinitionsKonnectImpl(t *testing.T) {
 			// includes plugin instances.
 			cpdOnlyFile := "testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml"
 			require.NoError(t, sync(ctx, cpdOnlyFile, "--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 			require.NoError(t, sync(ctx, tc.initialFile, "--include-plugin-definitions"))
 			require.NoError(t, apply(ctx, tc.updateFile, "--include-plugin-definitions"))
 			testKongState(t, client, true, false, tc.expectedState, tc.ignoreFields)

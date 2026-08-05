@@ -1,0 +1,47 @@
+_format_version: "3.0"
+
+# This file tests comprehensive masking with PEM certificates, JWK keys, and normal secrets
+certificates:
+  - id: 7fca84d6-7d37-4a74-a7b0-93e576089a41
+    cert: ${{ env "DECK_CLIENT_CERT" }}
+    key: ${{ env "DECK_CLIENT_KEY" }}
+    tags:
+      - test-cert
+
+# Key set for JWK keys
+key_sets:
+  - id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+    name: comprehensive-keyset
+
+# Key with JWK
+keys:
+  - id: f21a7073-1183-4b1c-bd87-4d5b8b18eeb4
+    name: comprehensive-jwk-test
+    kid: vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4
+    jwk: ${{ env "DECK_JWK_KEY" }}
+    set:
+      id: d46b0e15-ffbc-4b15-ad92-09ef67935453
+    tags:
+      - test-jwk
+
+# Service with normal secrets in configuration
+services:
+  - id: b35b3ec2-fa1c-4f6c-825e-c38141562c76
+    name: comprehensive-test-service
+    host: example.com
+    port: 443
+    protocol: https
+    tags:
+      - test-service
+    plugins:
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "X-API-Key:${{ env "DECK_API_KEY" }}"
+              - "X-DB-Pass:${{ env "DECK_DATABASE_PASSWORD" }}"
+              - "Authorization:Bearer ${{ env "DECK_BEARER_TOKEN" }}"
+              - "X-Webhook-Secret:${{ env "DECK_WEBHOOK_SECRET" }}"
+        tags:
+          - test-plugin
+
