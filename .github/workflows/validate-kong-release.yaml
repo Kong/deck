@@ -47,6 +47,7 @@ jobs:
       - name: Setup Kong
         env:
           KONG_LICENSE_DATA: ${{ steps.license.outputs.license }}
+          KONG_INCREMENTAL_SYNC: "on"
         run: make setup-kong-ee
       - name: Run integration tests
         env:
