@@ -25,6 +25,8 @@ import (
 	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 	"github.com/spf13/cobra"
+
+	deckDiff "github.com/kong/go-database-reconciler/pkg/diff"
 )
 
 const exitCodeDiffDetection = 2
@@ -211,10 +213,10 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// actually templated, rather than scanning values. Skipped entirely when
 	// --no-mask-values is set, since masking won't run anyway.
 	var secretMap file.SecretMap
-	if !noMaskValues {
-		mockContent, err := file.GetContentFromFilesWithEnvVars(filenames, file.EnvVarsMock)
+	if !noMaskValues && deckDiff.GetMaskingStrategy() == deckDiff.StrategyFieldBased {
+		mockContent, err := file.GetContentFromFilesWithEnvVars(filenames, file.EnvVarsSkip)
 		if err != nil {
-			return err
+			_ = fmt.Errorf("error parsing state file in skipMode for masking: %w", err)
 		}
 		secretMap = file.BuildSecretMap(mockContent)
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/kong/go-apiops/deckformat"
+	deckDiff "github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/utils"
 	homedir "github.com/mitchellh/go-homedir"
@@ -55,6 +56,7 @@ configuration file.
 It can be used to export, import, or sync entities to Kong.`,
 		SilenceUsage: true,
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
+			deckDiff.InitMaskingStrategyFromEnv()
 			if _, err := url.ParseRequestURI(rootConfig.Address); err != nil {
 				return fmt.Errorf("invalid URL: %w", err)
 			}
