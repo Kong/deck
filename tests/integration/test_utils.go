@@ -338,6 +338,16 @@ func reset(t *testing.T, opts ...string) {
 	require.NoError(t, deckCmd.Execute(), "failed to reset Kong's state")
 }
 
+func resetBenchMark(b *testing.B, opts ...string) {
+
+	deckCmd := cmd.NewRootCmd()
+	args := []string{"gateway", "reset", "--force"}
+	if len(opts) > 0 {
+		args = append(args, opts...)
+	}
+	deckCmd.SetArgs(args)
+	require.NoError(b, deckCmd.Execute(), "failed to reset Kong's state")
+}
 func readFile(filepath string) (string, error) {
 	content, err := os.ReadFile(filepath)
 	if err != nil {
