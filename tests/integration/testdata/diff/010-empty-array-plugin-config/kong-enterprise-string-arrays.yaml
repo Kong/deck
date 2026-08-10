@@ -1,0 +1,17 @@
+_format_version: "3.0"
+plugins:
+  - name: rate-limiting-advanced
+    enabled: true
+    instance_name: rate-limiting-advanced-empty-array
+    protocols:
+      - http
+      - https
+    config:
+      compound_identifier: []
+      identifier: consumer
+      namespace: empty-array-test
+      limit:
+        - 10
+      strategy: local
+      window_size:
+        - 60
