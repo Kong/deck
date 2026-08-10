@@ -13,5 +13,7 @@ plugins:
       limit:
         - 10
       strategy: local
+      # must be explicit: 3.9 coerces it to -1 for strategy=local, 3.10+ leaves it null
+      sync_rate: -1
       window_size:
         - 60
