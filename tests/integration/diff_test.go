@@ -528,7 +528,7 @@ Summary:
   Updated: 1
   Deleted: 0
 `
-	expectedKonnectWorkspaceMismatchDiff = `Creating workspace
+	expectedKonnectWorkspaceMismatchDiff = `Creating workspace 
 creating route route-diff1
 Summary:
   Created: 1
