@@ -1072,17 +1072,17 @@ func Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff(t *testing.T) {
 
 			if isKonnect {
 				runDualTestWithSkipDefaults(t, tc.name, func(t *testing.T) {
-					testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t, ctx, tc.stateFile)
+					testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx, t, tc.stateFile)
 				})
 			} else {
 				// for enterprise run once
-				testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t, ctx, tc.stateFile)
+				testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx, t, tc.stateFile)
 			}
 		})
 	}
 }
 
-func testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t *testing.T, ctx context.Context, stateFile string) {
+func testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx context.Context, t *testing.T, stateFile string) {
 	setup(t)
 
 	// A perpetual diff only surfaces across convergence cycles, so sync then diff twice: the second
