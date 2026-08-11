@@ -528,7 +528,7 @@ Summary:
   Updated: 1
   Deleted: 0
 `
-	expectedKonnectWorkspaceMismatchDiff = `Creating workspace 
+	expectedKonnectWorkspaceMismatchDiff = `Creating workspace
 creating route route-diff1
 Summary:
   Created: 1
@@ -1066,18 +1066,33 @@ func Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.runWhen(t)
-			setup(t)
 
-			// A perpetual diff only surfaces across convergence cycles, so sync then diff twice: the second
-			// cycle proves the first sync wrote nothing that diffs dirty again. Diff alone writes nothing.
-			for i := range 2 {
-				require.NoError(t, sync(ctx, tc.stateFile))
+			// Check if running against Konnect for dual testing
+			isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
 
-				out, err := diff(tc.stateFile)
-				require.NoError(t, err)
-				require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
+			if isKonnect {
+				runDualTestWithSkipDefaults(t, tc.name, func(t *testing.T) {
+					testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t, ctx, tc.stateFile)
+				})
+			} else {
+				// for enterprise run once
+				testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t, ctx, tc.stateFile)
 			}
 		})
+	}
+}
+
+func testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(t *testing.T, ctx context.Context, stateFile string) {
+	setup(t)
+
+	// A perpetual diff only surfaces across convergence cycles, so sync then diff twice: the second
+	// cycle proves the first sync wrote nothing that diffs dirty again. Diff alone writes nothing.
+	for i := range 2 {
+		require.NoError(t, sync(ctx, stateFile))
+
+		out, err := diff(stateFile)
+		require.NoError(t, err)
+		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
 	}
 }
 
@@ -1086,6 +1101,20 @@ func Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff(t *testing.T) {
 func Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected(t *testing.T) {
 	// the fixtures set plugin instance_name, which Kong only supports from 3.2.0.
 	runWhenKongOrKonnect(t, ">=3.2.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected",
+			testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl)
+	} else {
+		// for enterprise run once
+		testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl(t)
+	}
+}
+
+func testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 
@@ -1096,15 +1125,15 @@ func Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected(t *testing.T) {
 	assert.NotEqual(t, emptyOutput, out)
 	assert.Contains(t, out, "updating plugin zipkin")
 
-	// once applied, the populated state diffs clean too.
+	// once applied, the populated state diffs clean
 	require.NoError(t, sync(ctx, "testdata/diff/010-empty-array-plugin-config/kong-populated.yaml"))
 
 	out, err = diff("testdata/diff/010-empty-array-plugin-config/kong-populated.yaml")
 	require.NoError(t, err)
 	assert.Equal(t, emptyOutput, out)
 
-	// the reverse direction (populated -> []) is the one normalization could plausibly swallow; it must still be
-	// reported and must diff clean once applied.
+	// the reverse direction (populated -> []) is the one normalization could swallow, it must be
+	// reported and must diff clean
 	out, err = diff("testdata/diff/010-empty-array-plugin-config/kong.yaml")
 	require.NoError(t, err)
 	assert.NotEqual(t, emptyOutput, out, "populated -> [] must still be reported")
@@ -1119,6 +1148,15 @@ func Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected(t *testing.T) {
 
 // Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray pins down that omitting an array field entirely
 // is indistinguishable from setting it to [], since decK fills both sides with nil before comparing.
+//
+// NOTE: Deliberately NOT wrapped in runDualTestWithSkipDefaults, unlike the two tests above. That helper runs the same
+// body twice to assert a behavior is invariant across DECK_SKIP_DEFAULTS_FILL; the behavior pinned here is
+// precisely the one that is *not* invariant. Schema-default filling is what turns an omitted array field into an
+// explicit nil, which is what then compares equal to the [] the gateway stores. Skip the filling and the omitted
+// field stays absent, the distinction survives, and diff correctly reports one update (verified against Konnect:
+// the update is real, it writes null over the stored [], and converges once applied). Asserting emptyOutput under
+// both modes therefore fails the skip-defaults run. Branching the assertion on the env var inside a single body
+// would defeat the point of the helper, so the skip-defaults semantics are pinned by their own test instead.
 func Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray(t *testing.T) {
 	// the fixtures set plugin instance_name, which Kong only supports from 3.2.0.
 	runWhenKongOrKonnect(t, ">=3.2.0")
