@@ -212,7 +212,7 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	// --no-mask-values is set, since masking won't run anyway.
 	var secretMap file.SecretMap
 	if !noMaskValues {
-		mockContent, err := file.GetContentFromFilesWithEnvVars(filenames, file.EnvVarsMock)
+		mockContent, err := file.GetMockContentFromFiles(filenames, file.EnvVarsSkip)
 		if err != nil {
 			return err
 		}
