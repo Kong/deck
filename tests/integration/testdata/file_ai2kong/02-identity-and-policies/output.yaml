@@ -3,8 +3,7 @@ _info:
   select_tags:
   - managed_by:deck-ai
 ai_models:
-- alias: '@openai/guarded-gpt'
-  name: guarded-gpt
+- name: guarded-gpt
   tags:
   - env:prod
   - team:ai-platform
@@ -30,9 +29,10 @@ plugins:
     policy: local
   name: rate-limiting
 - config:
-    body_path: model
     max_request_body_size: 8388608
-    source: body
+    sources:
+    - body_path: model
+      source: body
   name: ai-model-selector
   route: openai-chat
 - config:
@@ -49,9 +49,9 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
+        model_alias: guarded-gpt
         name: gpt-4o
         provider: openai
-        model_alias: '@openai/guarded-gpt'
       route_type: llm/v1/chat
   model: guarded-gpt
   name: ai-proxy-advanced

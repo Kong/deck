@@ -3,8 +3,7 @@ _info:
   select_tags:
   - managed_by:deck-ai
 ai_models:
-- alias: '@openai/gpt-5.4'
-  name: openai-gpt-5-4
+- name: openai-gpt-5-4
 consumers:
 - custom_id: anonymous
   plugins:
@@ -16,9 +15,10 @@ consumers:
   username: anonymous
 plugins:
 - config:
-    body_path: model
     max_request_body_size: 8388608
-    source: body
+    sources:
+    - body_path: model
+      source: body
   name: ai-model-selector
   route: openai-chat
 - config:
@@ -35,9 +35,9 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
+        model_alias: openai-gpt-5-4
         name: gpt-5.4
         provider: openai
-        model_alias: '@openai/gpt-5.4'
       route_type: llm/v1/chat
   model: openai-gpt-5-4
   name: ai-proxy-advanced

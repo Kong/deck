@@ -9,8 +9,6 @@ models:
     config:
       route:
         paths: [/ai]
-        model:
-          path_aliases: ["@openai/gpt-5.4"]
     targets:
       - name: gpt-5.4
         provider: openai-prod
