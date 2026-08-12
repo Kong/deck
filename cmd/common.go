@@ -204,7 +204,22 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if err != nil {
 		return err
 	}
-	return syncContent(ctx, targetContent, dry, parallelism, delay, workspace, enableJSONOutput, applyType)
+
+	// Build the per-entity secret field map from a mock-rendered parse of the
+	// same files (env var references left as their bare name instead of the
+	// real value). This lets diff masking target exactly the fields that were
+	// actually templated, rather than scanning values. Skipped entirely when
+	// --no-mask-values is set, since masking won't run anyway.
+	var secretMap file.SecretMap
+	if !noMaskValues {
+		mockContent, err := file.GetMockContentFromFiles(filenames, file.EnvVarsSkip)
+		if err != nil {
+			return err
+		}
+		secretMap = file.BuildSecretMap(mockContent)
+	}
+
+	return syncContent(ctx, targetContent, dry, parallelism, delay, workspace, enableJSONOutput, applyType, secretMap)
 }
 
 // initJSONOutput resets the shared JSON output report at the start of a command.
@@ -229,8 +244,13 @@ func initJSONOutput() {
 // reused by commands (such as `ai sync`) that build their target content
 // in-memory rather than reading it from files. Callers are responsible for
 // calling initJSONOutput when JSON output is enabled.
+//
+// secretMap is optional (nil is fine) — callers that don't have an
+// on-disk state file to mock-parse (e.g. `ai sync`, whose target content is
+// converted from a different source format) simply pass nil, and diff
+// masking falls back to value-based masking for every entity.
 func syncContent(ctx context.Context, targetContent *file.Content, dry bool, parallelism,
-	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
+	delay int, workspace string, enableJSONOutput bool, applyType ApplyType, secretMap file.SecretMap,
 ) error {
 	err := validateSkipConsumersWithLookupTags(targetContent)
 	if err != nil {
@@ -518,7 +538,7 @@ func syncContent(ctx context.Context, targetContent *file.Content, dry bool, par
 
 	totalOps, err := performDiff(
 		ctx, currentState, targetState, dry, parallelism, delay, kongClient, mode == modeKonnect,
-		enableJSONOutput, applyType,
+		enableJSONOutput, applyType, secretMap,
 	)
 	if err != nil {
 		if enableJSONOutput {
@@ -793,7 +813,7 @@ func isAIGatewayInstance(ctx context.Context, client *kong.Client) (bool, error)
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
-	enableJSONOutput bool, applyType ApplyType,
+	enableJSONOutput bool, applyType ApplyType, secretMap file.SecretMap,
 ) (int, error) {
 	shouldSkipDeletes := applyType == ApplyTypePartial
 
@@ -811,6 +831,7 @@ func performDiff(ctx context.Context, currentState, targetState *state.KongState
 	if err != nil {
 		return 0, err
 	}
+	s.SetSecretMap(secretMap)
 
 	stats, errs, changes := s.Solve(ctx, parallelism, dry, enableJSONOutput)
 	totalOps := stats.CreateOps.Count() + stats.UpdateOps.Count() + stats.DeleteOps.Count()

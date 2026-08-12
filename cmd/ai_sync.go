@@ -36,8 +36,11 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 
 	injectmanagedByAIDeckTag(targetContent)
 
+	// No on-disk decK state file to mock-parse here — targetContent is
+	// converted from AI Gateway source files via ai2kong, a different format
+	// entirely.
 	return syncContent(ctx, targetContent, false, aiSyncParallelism, 0,
-		aiSyncWorkspace, aiSyncJSONOutput, ApplyTypeFull)
+		aiSyncWorkspace, aiSyncJSONOutput, ApplyTypeFull, nil)
 }
 
 // buildAiSyncTargetContent reads every AI Gateway source referenced by
