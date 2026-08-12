@@ -1,0 +1,16 @@
+_format_version: "3.0"
+# injection-protection.config.custom_injections is an array-of-records field explicitly set to [], which used to
+# overwrite as nil during schema-default filling and never diff clean.
+plugins:
+  - name: injection-protection
+    enabled: true
+    instance_name: injection-protection-empty-array
+    protocols:
+      - http
+      - https
+    config:
+      custom_injections: []
+      injection_types:
+        - sql
+      locations:
+        - path_and_query
