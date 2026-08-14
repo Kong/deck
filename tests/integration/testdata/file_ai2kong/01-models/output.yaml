@@ -3,15 +3,14 @@ _info:
   select_tags:
   - managed_by:deck-ai
 ai_models:
-- alias: '@openai/gpt-4o'
-  name: gpt-4o
-- alias: '@openai/gpt-5.4'
-  name: gpt-5.4
+- name: gpt-4o
+- name: gpt-5.4
 plugins:
 - config:
-    body_path: model
     max_request_body_size: 8388608
-    source: body
+    sources:
+    - body_path: model
+      source: body
   name: ai-model-selector
   route: openai-chat
 - config:
@@ -29,7 +28,7 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/gpt-4o'
+        model_alias: gpt-4o
         name: gpt-4o
         options:
           temperature: 0.7
@@ -45,7 +44,7 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/gpt-4o'
+        model_alias: gpt-4o
         name: gpt-4o-azure
         options:
           azure_api_version: "2024-02-01"
@@ -72,7 +71,7 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/gpt-5.4'
+        model_alias: gpt-5.4
         name: gpt-5.4
         options:
           temperature: 0.7
@@ -88,7 +87,7 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: '@openai/gpt-5.4'
+        model_alias: gpt-5.4
         name: gpt-5.4-azure
         options:
           azure_api_version: "2024-02-01"

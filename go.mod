@@ -8,7 +8,7 @@ replace gopkg.in/yaml.v3 v3.0.1 => github.com/Kong/yaml v1.0.0
 
 require (
 	dario.cat/mergo v1.0.2
-	github.com/Kong/ai-deck-converter v0.5.2
+	github.com/Kong/ai-deck-converter v0.12.1
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
 	github.com/daveshanley/vacuum v0.30.0
@@ -16,7 +16,7 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.4.6
-	github.com/kong/go-database-reconciler v1.42.1
+	github.com/kong/go-database-reconciler v1.42.2
 	github.com/kong/go-kong v0.77.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
