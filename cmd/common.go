@@ -214,9 +214,14 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	if !noMaskValues {
 		mockContent, err := file.GetMockContentFromFiles(filenames, file.EnvVarsSkip)
 		if err != nil {
-			return err
+			_ = fmt.Errorf("error getting mock content for secret field detection: %w", err)
+			secretMap = nil
+		} else {
+			secretMap = file.BuildSecretMap(mockContent)
 		}
-		secretMap = file.BuildSecretMap(mockContent)
+
+		fmt.Println(secretMap)
+
 	}
 
 	return syncContent(ctx, targetContent, dry, parallelism, delay, workspace, enableJSONOutput, applyType, secretMap)

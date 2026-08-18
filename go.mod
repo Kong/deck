@@ -17,15 +17,15 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	github.com/kong/go-apiops v0.4.5
-	github.com/kong/go-database-reconciler v1.42.1-0.20260812104611-660a8487b779
+	github.com/kong/go-database-reconciler v1.42.1-0.20260818055204-eef511ff3df8
 	github.com/kong/go-kong v0.77.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	gopkg.in/yaml.v2 v2.4.0
 	golang.org/x/sync v0.22.0
+	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.35.4
 	k8s.io/apiextensions-apiserver v0.33.1
 	k8s.io/apimachinery v0.35.4
