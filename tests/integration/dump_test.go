@@ -1353,7 +1353,7 @@ func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
 
 // test scope:
 //   - enterprise, workspaces
-func Test_Dump_DegraphqlRoute_CrossWorkspaceService(t *testing.T) {
+func Test_Dump_CustomEntities_CrossWorkspaceService(t *testing.T) {
 	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3"+
 		" || >=3.14.0.2")
 	setup(t)
