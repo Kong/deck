@@ -168,6 +168,8 @@ accepted by the `ai-mcp-proxy` plugin (`conversion-only`, `listener`, and
 [#2164](https://github.com/Kong/deck/pull/2164)
 - Bumped `ai-deck-converter` to v0.12.1.
 [#2190](https://github.com/Kong/deck/pull/2190) [go-database-reconciler #508](https://github.com/Kong/go-database-reconciler/pull/508)
+- Bumped go version to `v1.26.6`
+[#2198](https://github.com/Kong/deck/pull/2198)
 
 ## [v1.65.1]
 > Release date: 2026/06/28
