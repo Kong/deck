@@ -148,7 +148,7 @@
 
 
 ## [v1.65.2]
-> Release date: 2026/08/19
+> Release date: 2026/08/20
 
 ### Fixed
 - Fixed `deck file dump` to emit a warning instead of an error when global custom entities - `degraphql_routes`
@@ -172,7 +172,7 @@ accepted by the `ai-mcp-proxy` plugin (`conversion-only`, `listener`, and
 [#2198](https://github.com/Kong/deck/pull/2198)
 
 ## [v1.65.1]
-> Release date: 2026/06/28
+> Release date: 2026/07/28
 
 ### Added
 - Added support for configuring AI Gateway using commands `deck file ai2kong`, `deck ai sync` and `deck ai dump`. [#2137](https://github.com/Kong/deck/pull/2137) [go-database-reconciler #496](https://github.com/Kong/go-database-reconciler/pull/496) [go-kong #624](https://github.com/Kong/go-kong/pull/624)
