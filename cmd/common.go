@@ -877,8 +877,10 @@ func validateAddress(addr string) error {
 	return nil
 }
 
-func fetchKongRootAndVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (
-	map[string]interface{}, string, error) {
+func fetchKongRootAndVersion(
+	ctx context.Context,
+	config reconcilerUtils.KongClientConfig,
+) (map[string]interface{}, string, error) {
 	var version string
 
 	workspace := config.Workspace
