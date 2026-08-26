@@ -68,6 +68,10 @@ const (
 	ApplyTypePartial
 )
 
+const KongRootPluginKey = "plugins"
+const KongRootAvailableKey = "available_on_server"
+const AIModelSelectorPluginKey = "ai-model-selector"
+
 var jsonOutput diff.JSONOutputObject
 
 func getMode(targetContent *file.Content) mode {
@@ -779,13 +783,18 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 	return currentState, nil
 }
 
+// ServerGetter is an interface for getting the server information from Kong.
+type ServerGetter interface {
+	Server(context.Context) (string, error)
+}
+
 // This function uses client.Server to check for the Server header in the response.
 // If the server header contains "ai-gateway", it returns true.
 // If client.Server fails, it falls back to checking if "ai-model-selector" plugin exists in kongRoot.
 // For it to be considered an AI Gateway, the major Kong version must be 2.
 // Note that this takes client as input, and does not use the default client.
 // Therefore, the client configuration including headers, non-default addresses are respected.
-func isAIGatewayInstance(ctx context.Context, client *kong.Client, kongRoot map[string]interface{}) bool {
+func isAIGatewayInstance(ctx context.Context, client ServerGetter, kongRoot map[string]interface{}) bool {
 	server, err := client.Server(ctx)
 	if err == nil && strings.Contains(server, aiGatewayServer) {
 		return true
@@ -802,17 +811,17 @@ func isAIGatewayInstance(ctx context.Context, client *kong.Client, kongRoot map[
 	}
 
 	// Fallback: check if ai-model-selector plugin exists in kongRoot
-	plugins, ok := kongRoot["plugins"].(map[string]interface{})
+	plugins, ok := kongRoot[KongRootPluginKey].(map[string]interface{})
 	if !ok {
 		return false
 	}
 
-	available, ok := plugins["available"].(map[string]interface{})
+	available, ok := plugins[KongRootAvailableKey].(map[string]interface{})
 	if !ok {
 		return false
 	}
 
-	_, hasAIModelSelector := available["ai-model-selector"]
+	_, hasAIModelSelector := available[AIModelSelectorPluginKey]
 	return hasAIModelSelector
 }
 
