@@ -222,3 +222,62 @@ func TestGetFormatFlagValue(t *testing.T) {
 		})
 	}
 }
+
+type mockServerGetter struct {
+	serverValue string
+	serverErr   error
+}
+
+func (m *mockServerGetter) Server(ctx context.Context) (string, error) {
+	return m.serverValue, m.serverErr
+}
+
+func TestIsAIGatewayInstance(t *testing.T) {
+	tests := []struct {
+		name     string
+		server   string
+		err      error
+		kongRoot map[string]interface{}
+		want     bool
+	}{
+		{
+			name:     "detects via server header",
+			server:   "ai-gateway/2.0.0",
+			kongRoot: map[string]interface{}{},
+			want:     true,
+		},
+		{
+			name:   "detects via plugin fallback",
+			err:    context.Canceled,
+			server: "",
+			kongRoot: map[string]interface{}{
+				"version": "2.0.0",
+				"plugins": map[string]interface{}{
+					"available_on_server": map[string]interface{}{
+						"ai-model-selector": true,
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name:   "returns false for non-AI Gateway",
+			server: "kong/3.0.0",
+			kongRoot: map[string]interface{}{
+				"version": "3.0.0",
+			},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			client := &mockServerGetter{
+				serverValue: tt.server,
+				serverErr:   tt.err,
+			}
+			got := isAIGatewayInstance(context.Background(), client, tt.kongRoot)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
