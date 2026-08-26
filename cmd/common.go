@@ -782,31 +782,38 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 // This function uses client.Server to check for the Server header in the response.
 // If the server header contains "ai-gateway", it returns true.
 // If client.Server fails, it falls back to checking if "ai-model-selector" plugin exists in kongRoot.
+// For it to be considered an AI Gateway, the major Kong version must be 2.
 // Note that this takes client as input, and does not use the default client.
 // Therefore, the client configuration including headers, non-default addresses are respected.
-func isAIGatewayInstance(ctx context.Context, client *kong.Client, kongRoot map[string]interface{}) (bool, error) {
+func isAIGatewayInstance(ctx context.Context, client *kong.Client, kongRoot map[string]interface{}) bool {
 	server, err := client.Server(ctx)
 	if err == nil && strings.Contains(server, aiGatewayServer) {
-		return true, nil
+		return true
+	}
+
+	// Check Kong version - must be major version 2 for AI Gateway
+	version, ok := kongRoot["version"].(string)
+	if !ok {
+		return false
+	}
+	parsedVersion, _ := reconcilerUtils.ParseKongVersion(version)
+	if parsedVersion.Major != 2 {
+		return false
 	}
 
 	// Fallback: check if ai-model-selector plugin exists in kongRoot
-	if kongRoot == nil {
-		return false, nil
-	}
-
 	plugins, ok := kongRoot["plugins"].(map[string]interface{})
 	if !ok {
-		return false, nil
+		return false
 	}
 
 	available, ok := plugins["available"].(map[string]interface{})
 	if !ok {
-		return false, nil
+		return false
 	}
 
 	_, hasAIModelSelector := available["ai-model-selector"]
-	return hasAIModelSelector, nil
+	return hasAIModelSelector
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
@@ -870,7 +877,8 @@ func validateAddress(addr string) error {
 	return nil
 }
 
-func fetchKongRootAndVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (map[string]interface{}, string, error) {
+func fetchKongRootAndVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (
+	map[string]interface{}, string, error) {
 	var version string
 
 	workspace := config.Workspace
