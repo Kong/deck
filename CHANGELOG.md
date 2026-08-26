@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.65.3](#v1653)
 - [v1.65.2](#v1652)
 - [v1.65.1](#v1651)
 - [v1.64.0](#v1640)
@@ -146,6 +147,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
+## [v1.65.3]
+> Release date: 2026/08/27
+
+### Fixed
+- Fixed AI Gateway detection when `Server` header is unavailable using a fallback.
+[#2205](https://github.com/Kong/deck/pull/2205)
 
 ## [v1.65.2]
 > Release date: 2026/08/20
@@ -2720,6 +2728,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3
 [v1.65.2]: https://github.com/Kong/deck/compare/v1.65.1...v1.65.2
 [v1.65.1]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.1
 [v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
