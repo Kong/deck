@@ -52,10 +52,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
-	isAIGateway, err := isAIGatewayInstance(ctx, wsClient, root)
-	if err != nil {
-		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
-	}
+	isAIGateway := isAIGatewayInstance(ctx, wsClient, root)
 
 	writeConfig := file.WriteConfig{
 		SelectTags:                       dumpConfig.SelectorTags,
