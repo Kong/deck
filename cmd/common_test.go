@@ -228,7 +228,7 @@ type mockServerGetter struct {
 	serverErr   error
 }
 
-func (m *mockServerGetter) Server(ctx context.Context) (string, error) {
+func (m *mockServerGetter) Server(_ context.Context) (string, error) {
 	return m.serverValue, m.serverErr
 }
 

@@ -68,9 +68,11 @@ const (
 	ApplyTypePartial
 )
 
-const KongRootPluginKey = "plugins"
-const KongRootAvailableKey = "available_on_server"
-const AIModelSelectorPluginKey = "ai-model-selector"
+const (
+	KongRootPluginKey        = "plugins"
+	KongRootAvailableKey     = "available_on_server"
+	AIModelSelectorPluginKey = "ai-model-selector"
+)
 
 var jsonOutput diff.JSONOutputObject
 
