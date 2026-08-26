@@ -781,14 +781,32 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 
 // This function uses client.Server to check for the Server header in the response.
 // If the server header contains "ai-gateway", it returns true.
+// If client.Server fails, it falls back to checking if "ai-model-selector" plugin exists in kongRoot.
 // Note that this takes client as input, and does not use the default client.
 // Therefore, the client configuration including headers, non-default addresses are respected.
-func isAIGatewayInstance(ctx context.Context, client *kong.Client) (bool, error) {
+func isAIGatewayInstance(ctx context.Context, client *kong.Client, kongRoot map[string]interface{}) (bool, error) {
 	server, err := client.Server(ctx)
-	if err != nil {
-		return false, err
+	if err == nil && strings.Contains(server, aiGatewayServer) {
+		return true, nil
 	}
-	return strings.Contains(server, aiGatewayServer), nil
+
+	// Fallback: check if ai-model-selector plugin exists in kongRoot
+	if kongRoot == nil {
+		return false, nil
+	}
+
+	plugins, ok := kongRoot["plugins"].(map[string]interface{})
+	if !ok {
+		return false, nil
+	}
+
+	available, ok := plugins["available"].(map[string]interface{})
+	if !ok {
+		return false, nil
+	}
+
+	_, hasAIModelSelector := available["ai-model-selector"]
+	return hasAIModelSelector, nil
 }
 
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
@@ -852,7 +870,7 @@ func validateAddress(addr string) error {
 	return nil
 }
 
-func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
+func fetchKongRootAndVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (map[string]interface{}, string, error) {
 	var version string
 
 	workspace := config.Workspace
@@ -861,19 +879,19 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 	config.Workspace = ""
 	client, err := reconcilerUtils.GetKongClient(config)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 	root, err := client.Root(ctx)
 	if err != nil {
 		if workspace == "" {
-			return "", err
+			return nil, "", err
 		}
 
 		cleanAddr := reconcilerUtils.CleanAddress(config.Address)
 
 		// Validate address scheme before constructing the fallback URL.
 		if err := validateAddress(cleanAddr); err != nil {
-			return "", err
+			return nil, "", err
 		}
 
 		// validWorkspaceName matches only safe workspace name characters, preventing path traversal.
@@ -881,29 +899,34 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		validWorkspaceName := regexp.MustCompile(`^[a-zA-Z0-9._\-~]+$`)
 		// Validate workspace name to prevent path traversal.
 		if !validWorkspaceName.MatchString(workspace) {
-			return "",
+			return nil, "",
 				fmt.Errorf("invalid workspace name %q: only alphanumerics or '.', '-', '_', and '~' are accepted", workspace)
 		}
 
 		// try with workspace path
 		target, err := url.JoinPath(cleanAddr, workspace, "kong")
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		req, err := http.NewRequest("GET", target, nil)
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		var resp map[string]interface{}
 		_, err = client.Do(ctx, req, &resp)
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		version = resp["version"].(string)
-	} else {
-		version = root["version"].(string)
+		return resp, version, nil
 	}
-	return version, nil
+	version = root["version"].(string)
+	return root, version, nil
+}
+
+func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
+	_, version, err := fetchKongRootAndVersion(ctx, config)
+	return version, err
 }
 
 func validateNoArgs(_ *cobra.Command, args []string) error {
