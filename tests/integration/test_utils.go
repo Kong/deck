@@ -216,10 +216,29 @@ func runWhenRBAC(t *testing.T, semverRange string) {
 	t.Helper()
 	skipWhenKonnect(t)
 
-	// Skip SkipWhenAIGateway check by verifying Enterprise features directly
-	client, err := getTestClient()
-	require.NoError(t, err)
+	// For RBAC tests, we need to get the admin token from environment
+	// and pass it as a header since Kong requires authentication
+	adminToken := os.Getenv("KONG_ADMIN_TOKEN")
+	if adminToken == "" {
+		adminToken = os.Getenv("DECK_KONG_ADMIN_TOKEN")
+	}
+
+	// Create a client with proper RBAC headers
 	ctx := context.Background()
+	address := getKongAddress()
+
+	var headers []string
+	if adminToken != "" {
+		headers = []string{"kong-admin-token:" + adminToken}
+	}
+
+	client, err := utils.GetKongClient(utils.KongClientConfig{
+		Address:   address,
+		Retryable: true,
+		Headers:   headers,
+	})
+	require.NoError(t, err)
+
 	root, err := client.Root(ctx)
 	require.NoError(t, err)
 	version := kong.VersionFromInfo(root)
