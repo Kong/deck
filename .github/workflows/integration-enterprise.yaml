@@ -42,6 +42,7 @@ jobs:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
       KONG_ROUTER_FLAVOR: ${{ matrix.router_flavor }}
+      KONG_HEADERS: 'off'
 
     runs-on: ubuntu-latest
     steps:
@@ -92,6 +93,7 @@ jobs:
       KONG_ENFORCE_RBAC: 'on'
       KONG_PASSWORD: 'kong_admin_token'
       KONG_ADMIN_TOKEN: 'kong_admin_token'
+      KONG_HEADERS: 'off'
 
     runs-on: ubuntu-latest
     steps:
