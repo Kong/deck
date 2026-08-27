@@ -152,7 +152,7 @@
 > Release date: 2026/08/27
 
 ### Fixed
-- Fixed AI Gateway detection when `Server` header is unavailable using a fallback.
+- Fixed AI Gateway detection when `Server` header is unavailable using a fallback. This will avoid failure in `deck gateway dump` when headers are disabled on the Gateway.
 [#2205](https://github.com/Kong/deck/pull/2205)
 
 ## [v1.65.2]
