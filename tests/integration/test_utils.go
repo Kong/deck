@@ -90,7 +90,21 @@ func runWhenKongOrKonnect(t *testing.T, kongSemverRange string) {
 		setDefaultKonnectControlPlane(t)
 		return
 	}
-	kong.RunWhenKong(t, kongSemverRange)
+	// Skip SkipWhenAIGateway check by verifying Kong version directly
+	// instead of using kong.RunWhenKong which calls SkipWhenAIGateway
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+	root, err := client.Root(ctx)
+	require.NoError(t, err)
+	version := kong.VersionFromInfo(root)
+	currentVersion, err := kong.ParseSemanticVersion(version)
+	require.NoError(t, err)
+	r, err := kong.NewRange(kongSemverRange)
+	require.NoError(t, err)
+	if !r(currentVersion) {
+		t.Skipf("kong version %s not in range %s", currentVersion, kongSemverRange)
+	}
 	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
@@ -101,7 +115,26 @@ func runWhenEnterpriseOrKonnect(t *testing.T, kongSemverRange string) {
 		setDefaultKonnectControlPlane(t)
 		return
 	}
-	kong.RunWhenEnterprise(t, kongSemverRange, kong.RequiredFeatures{})
+	// Skip SkipWhenAIGateway check by verifying Enterprise features directly
+	// instead of using kong.RunWhenEnterprise which calls SkipWhenAIGateway
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+	root, err := client.Root(ctx)
+	require.NoError(t, err)
+	version := kong.VersionFromInfo(root)
+	currentVersion, err := kong.ParseSemanticVersion(version)
+	require.NoError(t, err)
+
+	if !currentVersion.IsKongGatewayEnterprise() {
+		t.Skip("non-Enterprise test Kong instance, skipping")
+	}
+
+	r, err := kong.NewRange(kongSemverRange)
+	require.NoError(t, err)
+	if !r(currentVersion) {
+		t.Skipf("kong version %s not in range %s", version, kongSemverRange)
+	}
 	kong.SkipWhenKongRouterFlavor(t, "expressions")
 }
 
@@ -111,11 +144,42 @@ func runWhen(t *testing.T, mode string, semverRange string) {
 	switch mode {
 	case "kong":
 		skipWhenKonnect(t)
-		kong.RunWhenKong(t, semverRange)
+		// Skip SkipWhenAIGateway check by verifying Kong version directly
+		client, err := getTestClient()
+		require.NoError(t, err)
+		ctx := context.Background()
+		root, err := client.Root(ctx)
+		require.NoError(t, err)
+		version := kong.VersionFromInfo(root)
+		currentVersion, err := kong.ParseSemanticVersion(version)
+		require.NoError(t, err)
+		r, err := kong.NewRange(semverRange)
+		require.NoError(t, err)
+		if !r(currentVersion) {
+			t.Skipf("kong version %s not in range %s", currentVersion, semverRange)
+		}
 		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "enterprise":
 		skipWhenKonnect(t)
-		kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+		// Skip SkipWhenAIGateway check by verifying Enterprise features directly
+		client, err := getTestClient()
+		require.NoError(t, err)
+		ctx := context.Background()
+		root, err := client.Root(ctx)
+		require.NoError(t, err)
+		version := kong.VersionFromInfo(root)
+		currentVersion, err := kong.ParseSemanticVersion(version)
+		require.NoError(t, err)
+
+		if !currentVersion.IsKongGatewayEnterprise() {
+			t.Skip("non-Enterprise test Kong instance, skipping")
+		}
+
+		r, err := kong.NewRange(semverRange)
+		require.NoError(t, err)
+		if !r(currentVersion) {
+			t.Skipf("kong version %s not in range %s", version, semverRange)
+		}
 		kong.SkipWhenKongRouterFlavor(t, "expressions")
 	case "konnect":
 		runWhenKonnect(t)
@@ -126,15 +190,60 @@ func runWhenExpressions(t *testing.T, semverRange string) {
 	t.Helper()
 	skipWhenKonnect(t)
 
-	// limiting to enterprise for now
-	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{})
+	// Skip SkipWhenAIGateway check by verifying Enterprise features directly
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+	root, err := client.Root(ctx)
+	require.NoError(t, err)
+	version := kong.VersionFromInfo(root)
+	currentVersion, err := kong.ParseSemanticVersion(version)
+	require.NoError(t, err)
+
+	if !currentVersion.IsKongGatewayEnterprise() {
+		t.Skip("non-Enterprise test Kong instance, skipping")
+	}
+
+	r, err := kong.NewRange(semverRange)
+	require.NoError(t, err)
+	if !r(currentVersion) {
+		t.Skipf("kong version %s not in range %s", version, semverRange)
+	}
 	kong.RunWhenKongRouterFlavor(t, "expressions")
 }
 
 func runWhenRBAC(t *testing.T, semverRange string) {
 	t.Helper()
 	skipWhenKonnect(t)
-	kong.RunWhenEnterprise(t, semverRange, kong.RequiredFeatures{RBAC: true})
+
+	// Skip SkipWhenAIGateway check by verifying Enterprise features directly
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+	root, err := client.Root(ctx)
+	require.NoError(t, err)
+	version := kong.VersionFromInfo(root)
+	currentVersion, err := kong.ParseSemanticVersion(version)
+	require.NoError(t, err)
+
+	if !currentVersion.IsKongGatewayEnterprise() {
+		t.Skip("non-Enterprise test Kong instance, skipping")
+	}
+
+	configuration, ok := root["configuration"].(map[string]interface{})
+	if !ok {
+		t.Errorf("failed to cast 'configuration' to map[string]interface{}")
+	}
+
+	if configuration["rbac"].(string) != "on" {
+		t.Skip("RBAC not enabled on test Kong instance, skipping")
+	}
+
+	r, err := kong.NewRange(semverRange)
+	require.NoError(t, err)
+	if !r(currentVersion) {
+		t.Skipf("kong version %s not in range %s", version, semverRange)
+	}
 }
 
 // runWhenAIGateway skips the test unless it is running against a self-hosted
