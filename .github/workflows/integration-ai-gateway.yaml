@@ -25,6 +25,7 @@ jobs:
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}
+      KONG_HEADERS: "off"
 
     runs-on: ubuntu-latest
     steps:

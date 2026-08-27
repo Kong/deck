@@ -827,6 +827,23 @@ func isAIGatewayInstance(ctx context.Context, client ServerGetter, kongRoot map[
 	return hasAIModelSelector
 }
 
+// IsAIGateway checks if the Kong instance is an AI Gateway.
+// This is exported for use by integration tests to determine whether
+// to skip AI Gateway-specific tests.
+func IsAIGateway(ctx context.Context, client *kong.Client) (bool, error) {
+	server, err := client.Server(ctx)
+	if err == nil && strings.Contains(server, aiGatewayServer) {
+		return true, nil
+	}
+
+	root, err := client.Root(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	return isAIGatewayInstance(ctx, client, root), nil
+}
+
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
 	enableJSONOutput bool, applyType ApplyType,

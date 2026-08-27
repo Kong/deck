@@ -143,7 +143,15 @@ func runWhenRBAC(t *testing.T, semverRange string) {
 func runWhenAIGateway(t *testing.T, semverRange string) {
 	t.Helper()
 	skipWhenKonnect(t)
-	kong.RunWhenAIGateway(t, semverRange)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	isAI, err := cmd.IsAIGateway(context.Background(), client)
+	require.NoError(t, err)
+	if !isAI {
+		t.Skip("non-AI-Gateway test instance, skipping")
+	}
 }
 
 func sortSlices(x, y interface{}) bool {
