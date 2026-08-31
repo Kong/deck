@@ -85,8 +85,9 @@ func Test_AIDump(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name      string
-		inputFile string
+		name          string
+		inputFile     string
+		skipRoundTrip bool
 	}{
 		{
 			name:      "models",
@@ -106,7 +107,17 @@ func Test_AIDump(t *testing.T) {
 		},
 		{
 			name:      "identity providers",
-			inputFile: "testdata/file_ai2kong/05-identity-providers/input.yaml",
+			inputFile: "testdata/file_ai2kong/05-auth-strategies/input.yaml",
+		},
+		{
+			name:          "certificate and SNI",
+			inputFile:     "testdata/file_ai2kong/06-certificate-and-sni/input.yaml",
+			skipRoundTrip: true, // https://github.com/Kong/ai-deck-converter/issues/159
+		},
+		{
+			name:          "ca certificates",
+			inputFile:     "testdata/file_ai2kong/07-ca-certificates/input.yaml",
+			skipRoundTrip: true,
 		},
 	}
 	for _, tc := range tests {
@@ -125,15 +136,17 @@ func Test_AIDump(t *testing.T) {
 
 			// Round-trip: syncing the dumped AI Gateway config into a fresh Kong
 			// must reproduce the same AI-managed state.
-			roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
-			require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
+			if !tc.skipRoundTrip {
+				roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
+				require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
 
-			reset(t)
-			require.NoError(t, aiSync(ctx, roundTripFile))
-			roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-			require.NoError(t, err)
+				reset(t)
+				require.NoError(t, aiSync(ctx, roundTripFile))
+				roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+				require.NoError(t, err)
 
-			assertAIStateEqual(t, reference, roundTripped)
+				assertAIStateEqual(t, reference, roundTripped)
+			}
 		})
 	}
 }
