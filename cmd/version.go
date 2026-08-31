@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"github.com/spf13/cobra"
 )
@@ -13,6 +14,16 @@ var VERSION = "dev"
 // COMMIT is the short hash of the source tree.
 // This should be substituted by Git commit hash  during the build process.
 var COMMIT = "unknown"
+
+func init() {
+	if VERSION == "dev" {
+		if buildInfo, ok := debug.ReadBuildInfo(); ok {
+			if buildInfo.Main.Version != "" && buildInfo.Main.Version != "(devel)" {
+				VERSION = buildInfo.Main.Version
+			}
+		}
+	}
+}
 
 // newVersionCmd represents the version command
 func newVersionCmd() *cobra.Command {
