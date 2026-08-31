@@ -112,7 +112,7 @@ func Test_AIDump(t *testing.T) {
 		{
 			name:          "certificate and SNI",
 			inputFile:     "testdata/file_ai2kong/06-certificate-and-sni/input.yaml",
-			skipRoundTrip: true, // https://github.com/Kong/ai-deck-converter/issues/159
+			skipRoundTrip: false,
 		},
 		{
 			name:          "ca certificates",
