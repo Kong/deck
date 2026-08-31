@@ -117,15 +117,12 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 
 	format := file.Format(strings.ToUpper(dumpCmdStateFormat))
 
-	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
+	root, kongVersion, err := fetchKongRootAndVersion(ctx, rootConfig.ForWorkspace(dumpWorkspace))
 	if err != nil {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
-	isAIGateway, err := isAIGatewayInstance(ctx, wsClient)
-	if err != nil {
-		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
-	}
+	isAIGateway := isAIGatewayInstance(ctx, wsClient, root)
 
 	if isAIGateway {
 		_ = sendAnalytics("dump", kongVersion, modeAIGateway)
