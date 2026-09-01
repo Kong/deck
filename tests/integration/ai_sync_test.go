@@ -117,7 +117,7 @@ func Test_AISync(t *testing.T) {
 			outputFile: "testdata/file_ai2kong/04-mcp/output.yaml",
 		},
 		{
-			name:       "identity providers",
+			name:       "auth strategies",
 			inputFile:  "testdata/file_ai2kong/05-auth-strategies/input.yaml",
 			outputFile: "testdata/file_ai2kong/05-auth-strategies/output.yaml",
 		},

@@ -106,7 +106,7 @@ func Test_AIDump(t *testing.T) {
 			inputFile: "testdata/file_ai2kong/04-mcp/input.yaml",
 		},
 		{
-			name:      "identity providers",
+			name:      "auth strategies",
 			inputFile: "testdata/file_ai2kong/05-auth-strategies/input.yaml",
 		},
 		{
