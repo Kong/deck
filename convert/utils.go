@@ -42,7 +42,7 @@ func isEmpty(v interface{}) bool {
 
 	rv := reflect.ValueOf(v)
 
-	switch rv.Kind() { //nolint:exhaustive
+	switch rv.Kind() {
 	case reflect.Slice, reflect.Array, reflect.Map:
 		return rv.Len() == 0
 	}
