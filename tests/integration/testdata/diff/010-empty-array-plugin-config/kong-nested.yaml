@@ -1,0 +1,15 @@
+_format_version: "3.0"
+# Same scenario as kong.yaml, but the empty array (config.prompts.prepend) is nested inside a record field rather than at the top level.
+plugins:
+  - name: ai-prompt-decorator
+    enabled: true
+    instance_name: ai-prompt-decorator-empty-array
+    protocols:
+      - http
+      - https
+    config:
+      prompts:
+        prepend: []
+        append:
+          - role: system
+            content: Be concise.

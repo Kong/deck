@@ -1,5 +1,9 @@
 # Table of Contents
 
+- [v1.66.0](#v1660)
+- [v1.65.3](#v1653)
+- [v1.65.2](#v1652)
+- [v1.65.1](#v1651)
 - [v1.64.0](#v1640)
 - [v1.63.0](#v1630)
 - [v1.62.1](#v1621)
@@ -144,6 +148,57 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
+## [v1.66.0]
+> Release date: 2026/09/01
+
+### Features
+- Added support for new AI Gateway 2.0 entities such as `certificate`, `ca_certificate` and `sni`
+[#2217](https://github.com/Kong/deck/pull/2217)
+
+## [v1.65.3]
+> Release date: 2026/08/27
+
+### Fixed
+- Fixed AI Gateway detection when `Server` header is unavailable using a fallback. This will avoid failure in `deck gateway dump` when headers are disabled on the Gateway.
+[#2205](https://github.com/Kong/deck/pull/2205)
+
+## [v1.65.2]
+> Release date: 2026/08/20
+
+### Fixed
+- Fixed `deck file dump` to emit a warning instead of an error when global custom entities - `degraphql_routes`
+or `graphql_ratelimiting_cost_decorations`
+reference a service that belongs to a different workspace than the one being dumped.
+[#2194](https://github.com/Kong/deck/pull/2194) [go-database-reconciler #511](https://github.com/Kong/go-database-reconciler/pull/511)
+- Fixed `DECK_` env var masking to correctly mask PEM and JWK formatted secrets.
+[#2139](https://github.com/Kong/deck/pull/2139) [go-database-reconciler #494](https://github.com/Kong/go-database-reconciler/pull/494)
+- Fixed the `--mode` flag help text of `deck file openapi2mcp` to match the modes
+accepted by the `ai-mcp-proxy` plugin (`conversion-only`, `listener`, and
+`passthrough-listener`), instead of the non-existent `conversion` mode.
+[#2192](https://github.com/Kong/deck/pull/2192) [go-apiops #301](https://github.com/Kong/go-apiops/pull/301)
+- Fixed the way decK handles plugin configurations with explicitly empty arrays to prevent drift [#2184](https://github.com/Kong/deck/pull/2184) [go-database-reconciler #506](https://github.com/Kong/go-database-reconciler/pull/506)
+
+### Chores
+- Switched the Docker image to a distroless base, reducing image size.
+[#2164](https://github.com/Kong/deck/pull/2164)
+- Bumped `ai-deck-converter` to v0.12.1.
+[#2190](https://github.com/Kong/deck/pull/2190) [go-database-reconciler #508](https://github.com/Kong/go-database-reconciler/pull/508)
+- Bumped go version to `v1.26.6`
+[#2198](https://github.com/Kong/deck/pull/2198)
+
+## [v1.65.1]
+> Release date: 2026/07/28
+
+### Added
+- Added support for configuring AI Gateway using commands `deck file ai2kong`, `deck ai sync` and `deck ai dump`. [#2137](https://github.com/Kong/deck/pull/2137) [go-database-reconciler #496](https://github.com/Kong/go-database-reconciler/pull/496) [go-kong #624](https://github.com/Kong/go-kong/pull/624)
+
+### Fixed
+- Fixed `deck file openapi2mcp` to skip emitting `conversion-listener` mode attributes in `conversion` mode. [#2161](https://github.com/Kong/deck/pull/2161) [go-apiops #300](https://github.com/Kong/go-apiops/pull/300)
+- Fixed drift when headers are set to empty object in routes. [#2163](https://github.com/Kong/deck/pull/2163) [go-database-reconciler #500](https://github.com/Kong/go-database-reconciler/pull/500)
+
+### Chores
+- Added OCI metadata to the docker image
 
 ## [v1.64.0]
 > Release date: 2026/06/29
@@ -2681,6 +2736,10 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.66.0]: https://github.com/Kong/deck/compare/v1.65.3...v1.66.0
+[v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3
+[v1.65.2]: https://github.com/Kong/deck/compare/v1.65.1...v1.65.2
+[v1.65.1]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.1
 [v1.64.0]: https://github.com/Kong/deck/compare/v1.63.0...v1.64.0
 [v1.63.0]: https://github.com/Kong/deck/compare/v1.62.1...v1.63.0
 [v1.62.1]: https://github.com/Kong/deck/compare/v1.62.0...v1.62.1

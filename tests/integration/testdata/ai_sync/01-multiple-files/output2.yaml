@@ -1,0 +1,30 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+services:
+- name: upstream-mcp
+  routes:
+  - name: upstream-mcp-route
+    paths:
+    - /mcp/upstream
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: upstream-server
+        server:
+          preserve_upstream_tool_names: true
+        tools:
+        - description: An upstream tool
+          input_schema:
+            type: object
+          name: upstreamTool
+          output_schema:
+            type: object
+        tools_cache_ttl_seconds: 300
+      name: ai-mcp-proxy
+  url: https://upstream.example.com/mcp

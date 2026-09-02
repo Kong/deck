@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/acarl005/stripansi"
 	"github.com/kong/deck/sanitize"
@@ -1350,6 +1351,43 @@ func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - enterprise, workspaces
+func Test_Dump_CustomEntities_CrossWorkspaceService(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3"+
+		" || >=3.14.0.2")
+	setup(t)
+	t.Cleanup(func() {
+		reset(t, "--all-workspaces")
+	})
+
+	ctx := context.Background()
+
+	// workspace test-b: create an unrelated service. This runs before test-a is
+	// populated below: since degraphql_routes/cost decorations are global
+	// entities (see below), a `sync` against test-b done *after* they exist
+	// would fetch them as part of its "current state" and, not finding them in
+	// this file, delete them as part of its normal reconciliation.
+	require.NoError(t, sync(ctx,
+		"testdata/dump/015-degraphql-cross-workspace-service/workspace-b-service.yaml"))
+
+	// workspace test-a: create a service, plus a degraphql route and a graphql
+	// ratelimiting cost decoration that reference it.
+	require.NoError(t, sync(ctx,
+		"testdata/dump/015-degraphql-cross-workspace-service/workspace-a-initial.yaml"))
+
+	// degraphql_routes and graphql_ratelimiting_cost_decorations are global
+	// entities in Kong: they aren't scoped to the workspace they were created
+	// in, so dumping test-b also picks up test-a's route and decoration. Their
+	// "service" can't be resolved against test-b's own state, since that
+	// service lives in test-a. That must produce a warning, not an error.
+	output, err := dump("-o", "-", "--workspace", "test-b")
+	require.NoError(t, err)
+
+	assert.Contains(t, output, "1a111111-1111-4111-8111-111111111111",
+		"the cross-workspace service id should still be present in the dump")
+}
+
 func Test_Dump_KonnectWorkspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
@@ -1577,6 +1615,12 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the plugin definitions first, in a separate run, so Kong
+			// has them registered before any plugin references them.
+			require.NoError(t, sync(ctx,
+				"testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+				"--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 			require.NoError(t, sync(ctx,
 				"testdata/sync/054-cloned-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 
@@ -1634,6 +1678,12 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 			runWhen(t, tc.runWhen, tc.runWhenVersion)
 
 			reset(t)
+			// Sync the custom plugin definitions on their own first and let
+			// Kong register them before syncing the plugins that reference
+			require.NoError(t, sync(ctx,
+				"testdata/apply/014-custom-plugin-definitions/initial-cpd-only.yaml",
+				"--include-plugin-definitions"))
+			time.Sleep(pluginDefinitionSyncDelay)
 			require.NoError(t, sync(ctx,
 				"testdata/sync/055-custom-plugin-definitions/kong.yaml", "--include-plugin-definitions"))
 

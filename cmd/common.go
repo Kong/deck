@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strings"
 
 	"github.com/blang/semver/v4"
 	"github.com/fatih/color"
@@ -55,7 +56,10 @@ const (
 	modeKong
 	modeKongEnterprise
 	modeLocal
+	modeAIGateway
 )
+
+const aiGatewayServer = "ai-gateway"
 
 type ApplyType int
 
@@ -64,13 +68,33 @@ const (
 	ApplyTypePartial
 )
 
+const (
+	KongRootPluginKey        = "plugins"
+	KongRootAvailableKey     = "available_on_server"
+	AIModelSelectorPluginKey = "ai-model-selector"
+)
+
 var jsonOutput diff.JSONOutputObject
 
 func getMode(targetContent *file.Content) mode {
 	if inKonnectMode(targetContent) {
 		return modeKonnect
+	} else if inAIGatewayMode(targetContent) {
+		return modeAIGateway
 	}
 	return modeKong
+}
+
+func inAIGatewayMode(targetContent *file.Content) bool {
+	if targetContent != nil && targetContent.Info != nil && targetContent.Info.SelectorTags != nil {
+		for _, tag := range targetContent.Info.SelectorTags {
+			if tag == managedByAIDeckTag {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // workspaceExists checks if workspace exists in Kong or Konnect
@@ -180,23 +204,41 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 ) error {
 	// read target file
 	if enableJSONOutput {
-		jsonOutput.Errors = []string{}
-		jsonOutput.Warnings = []string{}
-		jsonOutput.Changes = diff.EntityChanges{
-			Creating:         []diff.EntityState{},
-			Updating:         []diff.EntityState{},
-			Deleting:         []diff.EntityState{},
-			DroppedCreations: []diff.EntityState{},
-			DroppedUpdates:   []diff.EntityState{},
-			DroppedDeletions: []diff.EntityState{},
-		}
+		initJSONOutput()
 	}
 	targetContent, err := file.GetContentFromFiles(filenames, false)
 	if err != nil {
 		return err
 	}
+	return syncContent(ctx, targetContent, dry, parallelism, delay, workspace, enableJSONOutput, applyType)
+}
 
-	err = validateSkipConsumersWithLookupTags(targetContent)
+// initJSONOutput resets the shared JSON output report at the start of a command.
+// It is called by the command entrypoints (rather than syncContent) so that
+// warnings a command emits before diffing — e.g. AI Gateway conversion
+// warnings — are not clobbered.
+func initJSONOutput() {
+	jsonOutput.Errors = []string{}
+	jsonOutput.Warnings = []string{}
+	jsonOutput.Changes = diff.EntityChanges{
+		Creating:         []diff.EntityState{},
+		Updating:         []diff.EntityState{},
+		Deleting:         []diff.EntityState{},
+		DroppedCreations: []diff.EntityState{},
+		DroppedUpdates:   []diff.EntityState{},
+		DroppedDeletions: []diff.EntityState{},
+	}
+}
+
+// syncContent performs the sync/diff/apply operation against Kong for an
+// already-loaded target configuration. It is the shared back half of syncMain,
+// reused by commands (such as `ai sync`) that build their target content
+// in-memory rather than reading it from files. Callers are responsible for
+// calling initJSONOutput when JSON output is enabled.
+func syncContent(ctx context.Context, targetContent *file.Content, dry bool, parallelism,
+	delay int, workspace string, enableJSONOutput bool, applyType ApplyType,
+) error {
+	err := validateSkipConsumersWithLookupTags(targetContent)
 	if err != nil {
 		return err
 	}
@@ -232,6 +274,12 @@ func syncMain(ctx context.Context, filenames []string, dry bool, parallelism,
 	workspaceName := getWorkspaceName(workspace, targetContent, enableJSONOutput)
 
 	if mode == modeKonnect {
+		// AI Gateway entities (tagged managed_by:deck-ai) must be managed with
+		// kongctl on Konnect, not decK. Fail fast before any Konnect calls.
+		if contentHasmanagedByAIDeckTag(targetContent) {
+			return errAIManagedEntitiesOnKonnect()
+		}
+
 		isKonnect = true
 
 		if skipDefaultsFill {
@@ -737,6 +785,48 @@ func fetchCurrentState(ctx context.Context, client *kong.Client, dumpConfig dump
 	return currentState, nil
 }
 
+// ServerGetter is an interface for getting the server information from Kong.
+type ServerGetter interface {
+	Server(context.Context) (string, error)
+}
+
+// This function uses client.Server to check for the Server header in the response.
+// If the server header contains "ai-gateway", it returns true.
+// If client.Server fails, it falls back to checking if "ai-model-selector" plugin exists in kongRoot.
+// For it to be considered an AI Gateway, the major Kong version must be 2.
+// Note that this takes client as input, and does not use the default client.
+// Therefore, the client configuration including headers, non-default addresses are respected.
+func isAIGatewayInstance(ctx context.Context, client ServerGetter, kongRoot map[string]interface{}) bool {
+	server, err := client.Server(ctx)
+	if err == nil && strings.Contains(server, aiGatewayServer) {
+		return true
+	}
+
+	// Check Kong version - must be major version 2 for AI Gateway
+	version, ok := kongRoot["version"].(string)
+	if !ok {
+		return false
+	}
+	parsedVersion, _ := reconcilerUtils.ParseKongVersion(version)
+	if parsedVersion.Major != 2 {
+		return false
+	}
+
+	// Fallback: check if ai-model-selector plugin exists in kongRoot
+	plugins, ok := kongRoot[KongRootPluginKey].(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	available, ok := plugins[KongRootAvailableKey].(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	_, hasAIModelSelector := available[AIModelSelectorPluginKey]
+	return hasAIModelSelector
+}
+
 func performDiff(ctx context.Context, currentState, targetState *state.KongState,
 	dry bool, parallelism int, delay int, client *kong.Client, isKonnect bool,
 	enableJSONOutput bool, applyType ApplyType,
@@ -798,7 +888,10 @@ func validateAddress(addr string) error {
 	return nil
 }
 
-func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
+func fetchKongRootAndVersion(
+	ctx context.Context,
+	config reconcilerUtils.KongClientConfig,
+) (map[string]interface{}, string, error) {
 	var version string
 
 	workspace := config.Workspace
@@ -807,19 +900,19 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 	config.Workspace = ""
 	client, err := reconcilerUtils.GetKongClient(config)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 	root, err := client.Root(ctx)
 	if err != nil {
 		if workspace == "" {
-			return "", err
+			return nil, "", err
 		}
 
 		cleanAddr := reconcilerUtils.CleanAddress(config.Address)
 
 		// Validate address scheme before constructing the fallback URL.
 		if err := validateAddress(cleanAddr); err != nil {
-			return "", err
+			return nil, "", err
 		}
 
 		// validWorkspaceName matches only safe workspace name characters, preventing path traversal.
@@ -827,29 +920,34 @@ func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConf
 		validWorkspaceName := regexp.MustCompile(`^[a-zA-Z0-9._\-~]+$`)
 		// Validate workspace name to prevent path traversal.
 		if !validWorkspaceName.MatchString(workspace) {
-			return "",
+			return nil, "",
 				fmt.Errorf("invalid workspace name %q: only alphanumerics or '.', '-', '_', and '~' are accepted", workspace)
 		}
 
 		// try with workspace path
 		target, err := url.JoinPath(cleanAddr, workspace, "kong")
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		req, err := http.NewRequest("GET", target, nil)
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		var resp map[string]interface{}
 		_, err = client.Do(ctx, req, &resp)
 		if err != nil {
-			return "", err
+			return nil, "", err
 		}
 		version = resp["version"].(string)
-	} else {
-		version = root["version"].(string)
+		return resp, version, nil
 	}
-	return version, nil
+	version = root["version"].(string)
+	return root, version, nil
+}
+
+func fetchKongVersion(ctx context.Context, config reconcilerUtils.KongClientConfig) (string, error) {
+	_, version, err := fetchKongRootAndVersion(ctx, config)
+	return version, err
 }
 
 func validateNoArgs(_ *cobra.Command, args []string) error {
@@ -931,6 +1029,8 @@ func sendAnalytics(cmd, kongVersion string, mode mode) error {
 		modeStr = "enterprise"
 	case modeLocal:
 		modeStr = "local"
+	case modeAIGateway:
+		modeStr = "ai-gateway"
 	}
 	return reconcilerUtils.SendAnalytics(cmd, VERSION, kongVersion, modeStr)
 }
