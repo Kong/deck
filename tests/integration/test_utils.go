@@ -710,6 +710,8 @@ func assertAIStateEqual(t *testing.T, expected, actual string) {
 		cmpopts.SortSlices(func(a, b *string) bool { return *a < *b }),
 		// KeyAuth TTL is a server-side countdown.
 		cmpopts.IgnoreFields(kong.KeyAuth{}, "TTL"),
+		cmpopts.IgnoreFields(kong.Certificate{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.CACertificate{}, "ID", "CreatedAt"),
 		cmpopts.EquateEmpty(),
 	}
 	if diff := cmp.Diff(parseAIState(t, expected), parseAIState(t, actual), opts...); diff != "" {

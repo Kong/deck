@@ -16,7 +16,7 @@ models:
           type: openai
     policies: []
     access:
-      identity_providers: [okta-oidc, key-auth-default]
+      auth_strategies: [okta-oidc, key-auth-default]
 model_providers:
   - name: openai-prod
     type: openai
@@ -27,7 +27,7 @@ model_providers:
         headers:
           - name: Authorization
             value: "{vault://ai/openai-token}"
-identity_providers:
+auth_strategies:
   - name: okta-oidc
     type: openid-connect
     display_name: Okta OIDC

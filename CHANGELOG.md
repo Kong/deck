@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.66.0](#v1660)
 - [v1.65.3](#v1653)
 - [v1.65.2](#v1652)
 - [v1.65.1](#v1651)
@@ -147,6 +148,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
+## [v1.66.0]
+> Release date: 2026/09/01
+
+### Features
+- Added support for new AI Gateway 2.0 entities such as `certificate`, `ca_certificate` and `sni`
+[#2217](https://github.com/Kong/deck/pull/2217)
 
 ## [v1.65.3]
 > Release date: 2026/08/27
@@ -2728,6 +2736,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.66.0]: https://github.com/Kong/deck/compare/v1.65.3...v1.66.0
 [v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3
 [v1.65.2]: https://github.com/Kong/deck/compare/v1.65.1...v1.65.2
 [v1.65.1]: https://github.com/Kong/deck/compare/v1.64.0...v1.65.1
