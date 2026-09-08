@@ -154,12 +154,12 @@
 > Release date: 2026/09/08
 
 ### Fixed
-- Fixed env var masking for `PEM` during `deck gateway diff` to correctly detect certificates/keys that contain indentation.
+- Fixed env var masking for `PEM` during `deck gateway diff`, `deck gateway apply` and `deck gateway sync` by correctly detecting certificates/keys that contain indentation.
 [#2218](https://github.com/Kong/deck/pull/2218)
 [go-database-reconciler #516](https://github.com/Kong/go-database-reconciler/pull/516)
 
 ### Chores
-- Release binarie for MacOS are now signed and notarized.
+- Release binaries for MacOS are now signed and notarized.
 [#2227](https://github.com/Kong/deck/pull/2227)
 
 ## [v1.66.0]
