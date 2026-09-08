@@ -2923,6 +2923,7 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
@@ -2983,6 +2984,7 @@ var (
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -3038,6 +3040,7 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
@@ -12637,7 +12640,6 @@ func Test_Sync_Masking_ReSyncIdempotency(t *testing.T) {
 // test scope:
 // - enterprise >=3.15.0
 func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.15.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -12651,11 +12653,15 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 		wantErr        bool
 		expectedState  utils.KongRawState
 		ignoreFields   []cmp.Option
+		runWhen        string
+		version        string
 	}{
 		{
 			name: "creates cloned plugin definitions and plugins",
 			// Register the cloned plugin definitions on their own first so Kong
 			// has them ready before the plugins in kong.yaml reference them.
+			runWhen:        "enterprise",
+			version:        ">=3.15.0 <3.16.0",
 			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
 			kongFile:       "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
 			expectedState: utils.KongRawState{
@@ -12703,6 +12709,58 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 			},
 		},
 		{
+			name:           "creates cloned plugin definitions and plugins",
+			runWhen:        "enterprise",
+			version:        ">=3.16.0",
+			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			kongFile:       "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"allow":                           []any{"example.com"},
+							"allow_when":                      nil,
+							"always_use_authenticated_groups": bool(false),
+							"deny":                            nil,
+							"deny_when":                       nil,
+							"hide_groups_header":              bool(true),
+							"include_consumer_groups":         bool(false),
+						},
+						Tags: kong.StringSlice("plugin-tag1"),
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"custom_fields_by_lua": nil,
+							"path":                 string("/tmp/file.log"),
+							"reopen":               bool(true),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+		{
 			name:     "fails with invalid plugin ref",
 			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong-fake.yaml",
 			wantErr:  true,
@@ -12712,6 +12770,7 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+			runWhen(t, tc.runWhen, tc.version)
 
 			if tc.pluginDefsFile != "" {
 				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))

@@ -206,7 +206,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-315.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0 <3.16.0") },
+		},
+		{
+			name:          ">=3.16.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-316.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -561,7 +568,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong315x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0 <3.16.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.16.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong316x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 	}
 
@@ -779,7 +793,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.14.0",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins314.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0 <3.16.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.16.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins316.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 		{
 			name:         "dump sanitize with select-tags",
@@ -1585,7 +1605,14 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 			dumpFlags:      []string{"-o", "-", "--include-plugin-definitions"},
 			expectedFile:   "testdata/dump/013-cloned-plugin-definitions/expected.yaml",
 			runWhen:        "enterprise",
-			runWhenVersion: ">=3.15.0",
+			runWhenVersion: ">=3.15.0 <3.16.0",
+		},
+		{
+			name:           "dump includes all cloned plugin definitions",
+			dumpFlags:      []string{"-o", "-", "--include-plugin-definitions"},
+			expectedFile:   "testdata/dump/013-cloned-plugin-definitions/expected_316.yaml",
+			runWhen:        "enterprise",
+			runWhenVersion: ">=3.16.0",
 		},
 		{
 			name:           "dump includes all cloned plugin definitions",
