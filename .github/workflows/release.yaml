@@ -21,12 +21,12 @@ jobs:
             exit 1
           fi
 
-  goreleaser-build:
+  goreleaser:
     needs: check-branch
     timeout-minutes: ${{ fromJSON(vars.DECK_WORKFLOW_RELEASE_TIMEOUT || '20') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
@@ -40,14 +40,15 @@ jobs:
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-      - name: Run GoReleaser (build + sign + notarize, no publish)
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro'
           distribution: goreleaser
           version: v1.26.2
-          args: release --clean --skip=publish
+          args: release --clean
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APPLE_SIGNING_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_SIGNING_CERTIFICATE_P12_BASE64 }}
           APPLE_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_SIGNING_CERTIFICATE_PASSWORD }}
           APPLE_NOTARY_API_PRIVATE_KEY_BASE64: ${{ secrets.APPLE_NOTARY_API_PRIVATE_KEY_BASE64 }}
@@ -58,53 +59,6 @@ jobs:
         with:
           name: dist
           path: dist/*
-          retention-days: 1
-
-  verify-macos-signature:
-    needs: goreleaser-build
-    runs-on: macos-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Download built artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: dist
-          path: dist
-      - name: Inspect codesign / Gatekeeper status
-        run: |
-          set -x
-          chmod +x dist/deck_darwin_all/deck
-          codesign -dv --verbose=4 dist/deck_darwin_all/deck
-          spctl -a -vvv -t install dist/deck_darwin_all/deck
-
-  goreleaser-publish:
-    needs: verify-macos-signature
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
-        with:
-          egress-policy: audit
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - name: Download built artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: dist
-          path: dist
-      - name: Run GoReleaser (publish already-built, signed artifacts)
-        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
-        with:
-          distribution: goreleaser
-          version: v1.26.2
-          args: publish --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-push-images:
     needs: check-branch
