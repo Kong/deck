@@ -1,7 +1,8 @@
 universal_binaries:
 - replace: true
 builds:
-- env:
+- id: deck
+  env:
   - CGO_ENABLED=0
   goos:
   - linux
@@ -20,6 +21,20 @@ builds:
   - -trimpath
   ldflags:
   - -s -w -X github.com/kong/deck/cmd.VERSION={{ .Tag }} -X github.com/kong/deck/cmd.COMMIT={{ .ShortCommit }}
+notarize:
+  macos:
+    - enabled: '{{ isEnvSet "APPLE_SIGNING_CERTIFICATE_P12_BASE64" }}'
+      ids:
+        - deck
+      sign:
+        certificate: "{{.Env.APPLE_SIGNING_CERTIFICATE_P12_BASE64}}"
+        password: "{{.Env.APPLE_SIGNING_CERTIFICATE_PASSWORD}}"
+      notarize:
+        issuer_id: "{{.Env.APPLE_NOTARY_API_ISSUER_ID}}"
+        key_id: "{{.Env.APPLE_NOTARY_API_KEY_ID}}"
+        key: "{{.Env.APPLE_NOTARY_API_PRIVATE_KEY_BASE64}}"
+        wait: true
+        timeout: 20m
 checksum:
   name_template: 'checksums.txt'
 snapshot:
