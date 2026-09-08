@@ -159,7 +159,7 @@
 [go-database-reconciler #516](https://github.com/Kong/go-database-reconciler/pull/516)
 
 ### Chores
-- Release binaries are now signed and notarized.
+- Release binarie for MacOS are now signed and notarized.
 [#2227](https://github.com/Kong/deck/pull/2227)
 
 ## [v1.66.0]
