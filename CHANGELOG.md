@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.66.1](#v1661)
 - [v1.66.0](#v1660)
 - [v1.65.3](#v1653)
 - [v1.65.2](#v1652)
@@ -148,6 +149,18 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+
+## [v1.66.1]
+> Release date: 2026/09/08
+
+### Fixed
+- Fixed env var masking for `PEM` during `deck gateway diff` to correctly detect certificates/keys that contain indentation.
+[#2218](https://github.com/Kong/deck/pull/2218)
+[go-database-reconciler #516](https://github.com/Kong/go-database-reconciler/pull/516)
+
+### Chores
+- Release binaries are now signed and notarized.
+[#2227](https://github.com/Kong/deck/pull/2227)
 
 ## [v1.66.0]
 > Release date: 2026/09/01
@@ -2736,6 +2749,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.66.1]: https://github.com/Kong/deck/compare/v1.66.0...v1.66.1
 [v1.66.0]: https://github.com/Kong/deck/compare/v1.65.3...v1.66.0
 [v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3
 [v1.65.2]: https://github.com/Kong/deck/compare/v1.65.1...v1.65.2
