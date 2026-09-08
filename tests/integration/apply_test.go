@@ -81,7 +81,15 @@ func Test_Apply_3x(t *testing.T) {
 			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
 			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state-314.yaml",
 			runWhen:       "enterprise",
-			version:       ">=3.14.0",
+			version:       ">=3.14.0 <3.16.0",
+		},
+		{
+			name:          "accepts route foreign keys >=3.16.0",
+			firstFile:     "testdata/apply/006-foreign-keys-routes/route-01.yaml",
+			secondFile:    "testdata/apply/006-foreign-keys-routes/plugin-01.yaml",
+			expectedState: "testdata/apply/006-foreign-keys-routes/expected-state-316.yaml",
+			runWhen:       "enterprise",
+			version:       ">=3.16.0",
 		},
 		{
 			name:          "accepts route updates",
@@ -816,7 +824,6 @@ func testApplyPluginConditionalKonnectImpl(t *testing.T) {
 // test scope:
 // - enterprise >=3.15.0
 func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.15.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -830,9 +837,13 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 		updateFile     string
 		expectedState  utils.KongRawState
 		ignoreFields   []cmp.Option
+		runWhen        string
+		version        string
 	}{
 		{
 			name:        "updates cloned plugin definition priority and tags",
+			runWhen:     "enterprise",
+			version:     ">=3.15.0",
 			initialFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
 			updateFile:  "testdata/apply/013-cloned-plugin-definitions/update-cpd.yaml",
 			expectedState: utils.KongRawState{
@@ -854,6 +865,8 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 		},
 		{
 			name:           "updates plugin config linked with cloned definitions",
+			runWhen:        "enterprise",
+			version:        ">=3.15.0 <3.16.0",
 			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
 			initialFile:    "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
 			updateFile:     "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
@@ -901,10 +914,64 @@ func Test_Apply_ClonedPluginDefinitions(t *testing.T) {
 				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
 			},
 		},
+		{
+			name:           "updates plugin config linked with cloned definitions",
+			runWhen:        "enterprise",
+			version:        ">=3.16.0",
+			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			initialFile:    "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			updateFile:     "testdata/apply/013-cloned-plugin-definitions/update-plugin-config.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1"),
+						Config: kong.Configuration{
+							"allow":                           []any{"example.com", "example.org"},
+							"allow_when":                      nil,
+							"always_use_authenticated_groups": false,
+							"deny":                            nil,
+							"deny_when":                       nil,
+							"hide_groups_header":              true,
+							"include_consumer_groups":         false,
+						},
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Tags:    kong.StringSlice("plugin-tag1", "plugin-tag2", "select-me"),
+						Config: kong.Configuration{
+							"custom_fields_by_lua": nil,
+							"path":                 "/tmp/file-updated.log",
+							"reopen":               true,
+						},
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			runWhen(t, tc.runWhen, tc.version)
 			reset(t)
 			if tc.pluginDefsFile != "" {
 				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
