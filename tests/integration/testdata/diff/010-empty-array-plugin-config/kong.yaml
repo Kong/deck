@@ -1,0 +1,12 @@
+_format_version: "3.0"
+# config.static_tags is a top-level array-of-records field explicitly set to [], which used to overwrite as nil during schema-default filling and never diff clean.
+plugins:
+  - name: zipkin
+    enabled: true
+    instance_name: zipkin-empty-array
+    protocols:
+      - http
+      - https
+    config:
+      http_endpoint: http://localhost:9411/api/v2/spans
+      static_tags: []

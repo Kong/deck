@@ -206,7 +206,14 @@ func Test_Dump_SkipConsumers(t *testing.T) {
 			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
 			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-315.yaml",
 			skipConsumers: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0 <3.16.0") },
+		},
+		{
+			name:          ">=3.16.0 dump with no skip-consumers",
+			stateFile:     "testdata/dump/002-skip-consumers/kong34.yaml",
+			expectedFile:  "testdata/dump/002-skip-consumers/expected-no-skip-316.yaml",
+			skipConsumers: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 	}
 	for _, tc := range tests {
@@ -561,7 +568,14 @@ func Test_Dump_ConsumerGroupPlugin_PolicyOverrides(t *testing.T) {
 			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
 			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong315x.yaml",
 			errorExpected: false,
-			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0") },
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.15.0 <3.16.0") },
+		},
+		{
+			name:          "dump with flag --consumer-group-policy-overrides set: >=3.16.0",
+			stateFile:     "testdata/sync/037-consumer-group-policy-overrides/kong39x-no-info.yaml",
+			expectedFile:  "testdata/sync/037-consumer-group-policy-overrides/kong316x.yaml",
+			errorExpected: false,
+			runWhen:       func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 	}
 
@@ -779,7 +793,13 @@ func Test_Dump_Sanitize(t *testing.T) {
 			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.14.0",
 			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
 			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins314.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0 <3.16.0") },
+		},
+		{
+			name:         "dump sanitized consumers, consumer-groups and consumer-group-plugins >=3.16.0",
+			stateFile:    "testdata/dump/008-sanitizer/consumergroup-plugins36.yaml",
+			expectedFile: "testdata/dump/008-sanitizer/consumergroup-plugins316.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0") },
 		},
 		{
 			name:         "dump sanitize with select-tags",
@@ -1351,6 +1371,43 @@ func Test_Dump_GraphqlRateLimitingCostDecorations_Konnect(t *testing.T) {
 	}
 }
 
+// test scope:
+//   - enterprise, workspaces
+func Test_Dump_CustomEntities_CrossWorkspaceService(t *testing.T) {
+	runWhen(t, "enterprise", "=3.4.3.25 || =3.10.0.10 || =3.11.0.9 || =3.12.0.5 || =3.13.0.3"+
+		" || >=3.14.0.2")
+	setup(t)
+	t.Cleanup(func() {
+		reset(t, "--all-workspaces")
+	})
+
+	ctx := context.Background()
+
+	// workspace test-b: create an unrelated service. This runs before test-a is
+	// populated below: since degraphql_routes/cost decorations are global
+	// entities (see below), a `sync` against test-b done *after* they exist
+	// would fetch them as part of its "current state" and, not finding them in
+	// this file, delete them as part of its normal reconciliation.
+	require.NoError(t, sync(ctx,
+		"testdata/dump/015-degraphql-cross-workspace-service/workspace-b-service.yaml"))
+
+	// workspace test-a: create a service, plus a degraphql route and a graphql
+	// ratelimiting cost decoration that reference it.
+	require.NoError(t, sync(ctx,
+		"testdata/dump/015-degraphql-cross-workspace-service/workspace-a-initial.yaml"))
+
+	// degraphql_routes and graphql_ratelimiting_cost_decorations are global
+	// entities in Kong: they aren't scoped to the workspace they were created
+	// in, so dumping test-b also picks up test-a's route and decoration. Their
+	// "service" can't be resolved against test-b's own state, since that
+	// service lives in test-a. That must produce a warning, not an error.
+	output, err := dump("-o", "-", "--workspace", "test-b")
+	require.NoError(t, err)
+
+	assert.Contains(t, output, "1a111111-1111-4111-8111-111111111111",
+		"the cross-workspace service id should still be present in the dump")
+}
+
 func Test_Dump_KonnectWorkspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
@@ -1548,7 +1605,14 @@ func Test_Dump_ClonedPluginDefinitions(t *testing.T) {
 			dumpFlags:      []string{"-o", "-", "--include-plugin-definitions"},
 			expectedFile:   "testdata/dump/013-cloned-plugin-definitions/expected.yaml",
 			runWhen:        "enterprise",
-			runWhenVersion: ">=3.15.0",
+			runWhenVersion: ">=3.15.0 <3.16.0",
+		},
+		{
+			name:           "dump includes all cloned plugin definitions",
+			dumpFlags:      []string{"-o", "-", "--include-plugin-definitions"},
+			expectedFile:   "testdata/dump/013-cloned-plugin-definitions/expected_316.yaml",
+			runWhen:        "enterprise",
+			runWhenVersion: ">=3.16.0",
 		},
 		{
 			name:           "dump includes all cloned plugin definitions",

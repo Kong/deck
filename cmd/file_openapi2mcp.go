@@ -129,7 +129,7 @@ Security extensions:
 	openapi2mcpCmd.Flags().BoolVar(&cmdO2MskipID, "no-id", false,
 		"Do not generate UUIDs for entities.")
 	openapi2mcpCmd.Flags().StringVarP(&cmdO2Mmode, "mode", "m", openapi2mcp.ModeConversionListener,
-		"ai-mcp-proxy mode: 'conversion' (client mode) or 'conversion-listener' (server mode).")
+		"ai-mcp-proxy mode: 'passthrough-listener', 'conversion-listener', 'conversion-only', or 'listener'.")
 	openapi2mcpCmd.Flags().StringVarP(&cmdO2MpathPrefix, "path-prefix", "p", "",
 		"Custom path prefix for the MCP route (default: /{service-name}-mcp).")
 	openapi2mcpCmd.Flags().BoolVar(&cmdO2MincludeDirectRoute, "include-direct-route", false,

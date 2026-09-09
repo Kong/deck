@@ -47,15 +47,12 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	kongVersion, err := fetchKongVersion(ctx, rootConfig.ForWorkspace(aiDumpWorkspace))
+	root, kongVersion, err := fetchKongRootAndVersion(ctx, rootConfig.ForWorkspace(aiDumpWorkspace))
 	if err != nil {
 		return fmt.Errorf("reading Kong version: %w", err)
 	}
 
-	isAIGateway, err := isAIGatewayInstance(ctx, wsClient)
-	if err != nil {
-		return fmt.Errorf("checking if Kong is an AI Gateway: %w", err)
-	}
+	isAIGateway := isAIGatewayInstance(ctx, wsClient, root)
 
 	writeConfig := file.WriteConfig{
 		SelectTags:                       dumpConfig.SelectorTags,

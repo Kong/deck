@@ -1027,6 +1027,149 @@ func Test_Diff_PluginConfigReorderArraySetValues(t *testing.T) {
 	}
 }
 
+// Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff asserts that a plugin config field explicitly set to an empty
+// array does not produce a diff that never goes away, at any depth of the config tree.
+func Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name      string
+		stateFile string
+		runWhen   func(t *testing.T)
+	}{
+		{
+			// the fixtures set plugin instance_name, which Kong only supports from 3.2.0.
+			name:      "top-level empty array field",
+			stateFile: "testdata/diff/010-empty-array-plugin-config/kong.yaml",
+			runWhen:   func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.2.0") },
+		},
+		{
+			name:      "empty array field nested inside a record field",
+			stateFile: "testdata/diff/010-empty-array-plugin-config/kong-nested.yaml",
+			runWhen:   func(t *testing.T) { runWhenKongOrKonnect(t, ">=3.6.0") },
+		},
+		{
+			// injection-protection was introduced in 3.9.0.
+			name:      "empty array field on an enterprise plugin",
+			stateFile: "testdata/diff/010-empty-array-plugin-config/kong-enterprise.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+		{
+			// Control: string arrays take a different schema-default-filling path than arrays of records; kept
+			// in its own file so failures aren't misattributed. compound_identifier was introduced in 3.9.0.
+			name:      "empty string-array field on an enterprise plugin",
+			stateFile: "testdata/diff/010-empty-array-plugin-config/kong-enterprise-string-arrays.yaml",
+			runWhen:   func(t *testing.T) { runWhen(t, "enterprise", ">=3.9.0") },
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+
+			// Check if running against Konnect for dual testing
+			isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+			if isKonnect {
+				runDualTestWithSkipDefaults(t, tc.name, func(t *testing.T) {
+					testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx, t, tc.stateFile)
+				})
+			} else {
+				// for enterprise run once
+				testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx, t, tc.stateFile)
+			}
+		})
+	}
+}
+
+func testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx context.Context, t *testing.T, stateFile string) {
+	setup(t)
+
+	// A perpetual diff only surfaces across convergence cycles, so sync then diff twice: the second
+	// cycle proves the first sync wrote nothing that diffs dirty again. Diff alone writes nothing.
+	for i := range 2 {
+		require.NoError(t, sync(ctx, stateFile))
+
+		out, err := diff(stateFile)
+		require.NoError(t, err)
+		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
+	}
+}
+
+// Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected guards the other direction: normalizing empty arrays
+// must not swallow a genuine change from an empty array to a populated one.
+func Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected(t *testing.T) {
+	// the fixtures set plugin instance_name, which Kong only supports from 3.2.0.
+	runWhenKongOrKonnect(t, ">=3.2.0")
+
+	// Check if running against Konnect for dual testing
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected",
+			testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl)
+	} else {
+		// for enterprise run once
+		testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl(t)
+	}
+}
+
+func testDiffEmptyArrayPluginConfigRealChangeStillDetectedImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/010-empty-array-plugin-config/kong.yaml"))
+
+	out, err := diff("testdata/diff/010-empty-array-plugin-config/kong-populated.yaml")
+	require.NoError(t, err)
+	assert.NotEqual(t, emptyOutput, out)
+	assert.Contains(t, out, "updating plugin zipkin")
+
+	// once applied, the populated state diffs clean
+	require.NoError(t, sync(ctx, "testdata/diff/010-empty-array-plugin-config/kong-populated.yaml"))
+
+	out, err = diff("testdata/diff/010-empty-array-plugin-config/kong-populated.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+
+	// the reverse direction (populated -> []) is the one normalization could swallow, it must be
+	// reported and must diff clean
+	out, err = diff("testdata/diff/010-empty-array-plugin-config/kong.yaml")
+	require.NoError(t, err)
+	assert.NotEqual(t, emptyOutput, out, "populated -> [] must still be reported")
+	assert.Contains(t, out, "updating plugin zipkin")
+
+	require.NoError(t, sync(ctx, "testdata/diff/010-empty-array-plugin-config/kong.yaml"))
+
+	out, err = diff("testdata/diff/010-empty-array-plugin-config/kong.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
+// Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray pins down that omitting an array field entirely
+// is indistinguishable from setting it to [], since decK fills both sides with nil before comparing.
+//
+// NOTE: Deliberately NOT wrapped in runDualTestWithSkipDefaults, unlike the two tests above. That helper runs the same
+// body twice to assert a behavior is invariant across DECK_SKIP_DEFAULTS_FILL; the behavior pinned here is
+// precisely the one that is *not* invariant. Schema-default filling is what turns an omitted array field into an
+// explicit nil, which is what then compares equal to the [] the gateway stores. Skip the filling and the omitted
+// field stays absent, the distinction survives, and diff correctly reports one update (verified against Konnect:
+// the update is real, it writes null over the stored [], and converges once applied). Asserting emptyOutput under
+// both modes therefore fails the skip-defaults run. Branching the assertion on the env var inside a single body
+// would defeat the point of the helper, so the skip-defaults semantics are pinned by their own test instead.
+func Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray(t *testing.T) {
+	// the fixtures set plugin instance_name, which Kong only supports from 3.2.0.
+	runWhenKongOrKonnect(t, ">=3.2.0")
+	setup(t)
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/010-empty-array-plugin-config/kong.yaml"))
+
+	out, err := diff("testdata/diff/010-empty-array-plugin-config/kong-omitted.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
 func Test_Diff_Konnect_Workspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)

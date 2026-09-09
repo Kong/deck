@@ -117,9 +117,19 @@ func Test_AISync(t *testing.T) {
 			outputFile: "testdata/file_ai2kong/04-mcp/output.yaml",
 		},
 		{
-			name:       "identity providers",
-			inputFile:  "testdata/file_ai2kong/05-identity-providers/input.yaml",
-			outputFile: "testdata/file_ai2kong/05-identity-providers/output.yaml",
+			name:       "auth strategies",
+			inputFile:  "testdata/file_ai2kong/05-auth-strategies/input.yaml",
+			outputFile: "testdata/file_ai2kong/05-auth-strategies/output.yaml",
+		},
+		{
+			name:       "certificate and SNI",
+			inputFile:  "testdata/file_ai2kong/06-certificate-and-sni/input.yaml",
+			outputFile: "testdata/file_ai2kong/06-certificate-and-sni/output.yaml",
+		},
+		{
+			name:       "ca certificates",
+			inputFile:  "testdata/file_ai2kong/07-ca-certificates/input.yaml",
+			outputFile: "testdata/file_ai2kong/07-ca-certificates/output.yaml",
 		},
 	}
 	for _, tc := range tests {

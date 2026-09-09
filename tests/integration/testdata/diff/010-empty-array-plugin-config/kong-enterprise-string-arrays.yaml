@@ -1,0 +1,19 @@
+_format_version: "3.0"
+plugins:
+  - name: rate-limiting-advanced
+    enabled: true
+    instance_name: rate-limiting-advanced-empty-array
+    protocols:
+      - http
+      - https
+    config:
+      compound_identifier: []
+      identifier: consumer
+      namespace: empty-array-test
+      limit:
+        - 10
+      strategy: local
+      # must be explicit: 3.9 coerces it to -1 for strategy=local, 3.10+ leaves it null
+      sync_rate: -1
+      window_size:
+        - 60

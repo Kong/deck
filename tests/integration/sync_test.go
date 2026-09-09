@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -1804,6 +1805,7 @@ var (
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -1857,6 +1859,7 @@ var (
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -1907,6 +1910,7 @@ var (
 				"consumer_groups":         nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"counter_key":             nil,
+				"custom_key":              nil,
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
 				"error_code":              float64(429),
@@ -3034,6 +3038,209 @@ var (
 				"compound_identifier":     nil,
 				"consumer_groups":         nil,
 				"counter_key":             nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(5)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cloud_authentication":     nil,
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("key-auth"),
+			Config: kong.Configuration{
+				"anonymous":        nil,
+				"hide_credentials": false,
+				"identity_realms":  []any{map[string]any{"id": nil, "region": nil, "scope": string("cp")}},
+				"key_in_body":      false,
+				"key_in_header":    true,
+				"key_in_query":     true,
+				"key_names":        []interface{}{"apikey"},
+				"principals": map[string]any{
+					"directory":     string("default"),
+					"enabled":       bool(false),
+					"error_on_miss": bool(true),
+				},
+				"realm":            nil, // This is present on 3.7.x+
+				"run_on_preflight": true,
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("http"), kong.String("https")},
+		},
+	}
+
+	// consumerGroupScopedPlugins316x adds "custom_key" to the rate-limiting-advanced
+	// config, which is only present on Kong Gateway >=3.16.0.
+	consumerGroupScopedPlugins316x = []*kong.Plugin{
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("77e6691d-67c0-446a-9401-27be2b141aae"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"counter_key":             nil,
+				"custom_key":              nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(10)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("gold"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cloud_authentication":     nil,
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			ConsumerGroup: &kong.ConsumerGroup{
+				ID: kong.String("5bcbd3a7-030b-4310-bd1d-2721ff85d236"),
+			},
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"dictionary_name":         string("kong_rate_limiting_counters"),
+				"counter_key":             nil,
+				"custom_key":              nil,
+				"disable_penalty":         bool(false),
+				"enforce_consumer_groups": bool(false),
+				"error_code":              float64(429),
+				"error_message":           string("API rate limit exceeded"),
+				"header_name":             nil,
+				"hide_client_headers":     bool(false),
+				"identifier":              string("consumer"),
+				"limit":                   []any{float64(7)},
+				"lock_dictionary_name":    string("kong_locks"),
+				"namespace":               string("silver"),
+				"path":                    nil,
+				"redis": map[string]any{
+					"cloud_authentication":     nil,
+					"cluster_addresses":        nil,
+					"cluster_max_redirections": float64(5),
+					"cluster_nodes":            nil,
+					"connect_timeout":          float64(2000),
+					"connection_is_proxied":    bool(false),
+					"database":                 float64(0),
+					"host":                     string("127.0.0.1"),
+					"keepalive_backlog":        nil,
+					"keepalive_pool_size":      float64(256),
+					"password":                 nil,
+					"port":                     float64(6379),
+					"read_timeout":             float64(2000),
+					"redis_proxy_type":         nil,
+					"send_timeout":             float64(2000),
+					"sentinel_addresses":       nil,
+					"sentinel_master":          nil,
+					"sentinel_nodes":           nil,
+					"sentinel_password":        nil,
+					"sentinel_role":            nil,
+					"sentinel_username":        nil,
+					"server_name":              nil,
+					"ssl":                      false,
+					"ssl_verify":               false,
+					"timeout":                  float64(2000),
+					"username":                 nil,
+				},
+				"retry_after_jitter_max": float64(1),
+				"strategy":               string("local"),
+				"sync_rate":              float64(-1),
+				"throttling":             nil,
+				"window_size":            []any{float64(60)},
+				"window_type":            string("sliding"),
+			},
+			Enabled:   kong.Bool(true),
+			Protocols: []*string{kong.String("grpc"), kong.String("grpcs"), kong.String("http"), kong.String("https")},
+		},
+		{
+			Name: kong.String("rate-limiting-advanced"),
+			Config: kong.Configuration{
+				"compound_identifier":     nil,
+				"consumer_groups":         nil,
+				"counter_key":             nil,
+				"custom_key":              nil,
 				"dictionary_name":         string("kong_rate_limiting_counters"),
 				"disable_penalty":         bool(false),
 				"enforce_consumer_groups": bool(false),
@@ -6345,6 +6552,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
 							"counter_key":             nil,
+							"custom_key":              nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6404,6 +6612,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
 							"counter_key":             nil,
+							"custom_key":              nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -6463,6 +6672,7 @@ func testSyncSkipConsumersKonnectImpl(t *testing.T) {
 							"compound_identifier":     nil,
 							"consumer_groups":         nil,
 							"counter_key":             nil,
+							"custom_key":              nil,
 							"dictionary_name":         string("kong_rate_limiting_counters"),
 							"disable_penalty":         bool(false),
 							"enforce_consumer_groups": bool(false),
@@ -7733,7 +7943,7 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 		},
 		{
 			name:     "creates consumer groups scoped plugins",
-			runWhen:  ">=3.15.0",
+			runWhen:  ">=3.15.0 <3.16.0",
 			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
 			expectedState: utils.KongRawState{
 				Consumers: consumerGroupsConsumers,
@@ -7760,6 +7970,59 @@ func Test_Sync_ConsumerGroupsScopedPlugins_After360(t *testing.T) {
 					},
 				},
 				Plugins:  consumerGroupScopedPlugins315x,
+				Services: svc1_207,
+				Routes:   route1_20x,
+				KeyAuths: []*kong.KeyAuth{
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("87095815-5395-454e-8c18-a11c9bc0ef04"),
+						},
+						Key: kong.String("i-am-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("5a5b9369-baeb-4faa-a902-c40ccdc2928e"),
+						},
+						Key: kong.String("i-am-not-so-special"),
+					},
+					{
+						Consumer: &kong.Consumer{
+							ID: kong.String("e894ea9e-ad08-4acf-a960-5a23aa7701c7"),
+						},
+						Key: kong.String("i-am-just-average"),
+					},
+				},
+			},
+		},
+		{
+			name:     "creates consumer groups scoped plugins",
+			runWhen:  ">=3.16.0",
+			kongFile: "testdata/sync/025-consumer-groups-scoped-plugins/kong3x.yaml",
+			expectedState: utils.KongRawState{
+				Consumers: consumerGroupsConsumers,
+				ConsumerGroups: []*kong.ConsumerGroupObject{
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("silver"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("bar"),
+							},
+						},
+					},
+					{
+						ConsumerGroup: &kong.ConsumerGroup{
+							Name: kong.String("gold"),
+						},
+						Consumers: []*kong.Consumer{
+							{
+								Username: kong.String("foo"),
+							},
+						},
+					},
+				},
+				Plugins:  consumerGroupScopedPlugins316x,
 				Services: svc1_207,
 				Routes:   route1_20x,
 				KeyAuths: []*kong.KeyAuth{
@@ -11627,6 +11890,7 @@ func testSyncPartialsTaggingKonnectImpl(t *testing.T) {
 					"compound_identifier":     nil,
 					"consumer_groups":         nil,
 					"counter_key":             nil,
+					"custom_key":              nil,
 					"dictionary_name":         string("kong_rate_limiting_counters"),
 					"disable_penalty":         bool(false),
 					"enforce_consumer_groups": bool(false),
@@ -11672,6 +11936,7 @@ func testSyncPartialsTaggingKonnectImpl(t *testing.T) {
 					"consumer_groups":         nil,
 					"dictionary_name":         string("kong_rate_limiting_counters"),
 					"counter_key":             nil,
+					"custom_key":              nil,
 					"disable_penalty":         bool(false),
 					"enforce_consumer_groups": bool(false),
 					"error_code":              float64(429),
@@ -12628,7 +12893,6 @@ func Test_Sync_Masking_ReSyncIdempotency(t *testing.T) {
 // test scope:
 // - enterprise >=3.15.0
 func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.15.0")
 	setup(t)
 
 	client, err := getTestClient()
@@ -12642,11 +12906,15 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 		wantErr        bool
 		expectedState  utils.KongRawState
 		ignoreFields   []cmp.Option
+		runWhen        string
+		version        string
 	}{
 		{
 			name: "creates cloned plugin definitions and plugins",
 			// Register the cloned plugin definitions on their own first so Kong
 			// has them ready before the plugins in kong.yaml reference them.
+			runWhen:        "enterprise",
+			version:        ">=3.15.0 <3.16.0",
 			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
 			kongFile:       "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
 			expectedState: utils.KongRawState{
@@ -12694,6 +12962,58 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 			},
 		},
 		{
+			name:           "creates cloned plugin definitions and plugins",
+			runWhen:        "enterprise",
+			version:        ">=3.16.0",
+			pluginDefsFile: "testdata/apply/013-cloned-plugin-definitions/initial-cpd-only.yaml",
+			kongFile:       "testdata/sync/054-cloned-plugin-definitions/kong.yaml",
+			expectedState: utils.KongRawState{
+				ClonedPluginDefinitions: []*kong.ClonedPluginDefinition{
+					{
+						Name:     kong.String("new-acl"),
+						Ref:      kong.String("acl"),
+						Priority: kong.Int(1000),
+						Tags:     kong.StringSlice("tag1", "tag2"),
+					},
+					{
+						Name:     kong.String("new-file-log"),
+						Ref:      kong.String("file-log"),
+						Priority: kong.Int(100),
+						Tags:     kong.StringSlice("select-me", "tag1", "tag2"),
+					},
+				},
+				Plugins: []*kong.Plugin{
+					{
+						Name:    kong.String("new-acl"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"allow":                           []any{"example.com"},
+							"allow_when":                      nil,
+							"always_use_authenticated_groups": bool(false),
+							"deny":                            nil,
+							"deny_when":                       nil,
+							"hide_groups_header":              bool(true),
+							"include_consumer_groups":         bool(false),
+						},
+						Tags: kong.StringSlice("plugin-tag1"),
+					},
+					{
+						Name:    kong.String("new-file-log"),
+						Enabled: kong.Bool(true),
+						Config: kong.Configuration{
+							"custom_fields_by_lua": nil,
+							"path":                 string("/tmp/file.log"),
+							"reopen":               bool(true),
+						},
+						Tags: kong.StringSlice("plugin-tag1", "select-me"),
+					},
+				},
+			},
+			ignoreFields: []cmp.Option{
+				cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+			},
+		},
+		{
 			name:     "fails with invalid plugin ref",
 			kongFile: "testdata/sync/054-cloned-plugin-definitions/kong-fake.yaml",
 			wantErr:  true,
@@ -12703,6 +13023,7 @@ func Test_Sync_ClonedPluginDefinitions(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			reset(t)
+			runWhen(t, tc.runWhen, tc.version)
 
 			if tc.pluginDefsFile != "" {
 				require.NoError(t, sync(ctx, tc.pluginDefsFile, "--include-plugin-definitions"))
@@ -13014,6 +13335,124 @@ const (
 	keyBMask    = `"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCB8x03nBd6UVtf\n02X6N3p7Ls8S26i+bZuzYWm9N1Gh3Q1sCUb6myvgqenwVaYDqbdmWQzaLmzqTPwq\nJhuLWMCuFLDfnkuZw7Lx2lb88tOw6qLlwNFiAMfkGZtGo838f/mBJJ4eldY++3XA\nvyL6fM4DunWC6WJxCgye0opRWzqVqwnlVuoSRFhZER2y9+PCyGsyYQQsuErqchGL\nXFjTRIAwhqpSxwfkfk1A7SgfYHgh6RQjfKSAvIzWWLkiUOa93Fl4DJYprA+iXnny\n7OVIps00jwbhpDyCqGUrFb5B4TbvLo3/xyd1Aowny1NrXue8iYMwYQO1OUyLrs5M\nt72php7PAgMBAAECggEAMLfuijyw6KC7uw9MOiS2fJwt8gn8F3iMWRH6TIAC0MZJ\nE+nefHHUX2QUWpAhr1nfcjWMhffFyYmXOE4VIYbipeEH9q4n9bvSyK1s02ROTROK\ngsxpM27Lgg6/khozTajE58/Mn/bY3b/0g5ClEnfb3LX4/F13FJ4J4TlZteqX6igu\nyKRCGtB1Z0Af3UU9RSe1Z+XhQLZjj7khU4hZ5sMBQmEtQvtaO9BNbAV/RLNvOrQh\nNewolh+W5U7KZtjWuIMhN1FI/I0ax8Uezxd47q0y8JdE2CYzRnsn1Fl9x2DfshG3\nCBxWrYFYRYkY0occ61ATW7DE+K4XmB1dm2gjZcg1EQKBgQC2zX+5zKGOJ743kIwd\nr5d5RuZEPNAOmIR8AvBAcjwmUkm19L7VXxgz2cuyuN+WAofm/fFulMb/57YlBpQd\nRjIuMRAantq/K/QfMJ3EZ0dcD7GwbMIPgLDnMInJ5BL6S/QorSKUTsfd0a6vnYXK\nLs0TWeR6wk1bfvtTrM5AGnJGNQKBgQC1+9KoqkzplA+poECx8OGGIHVMhx1O6B/L\nNK0N8r8KkEGVnQUpwb3GQRH2U13QHeLKz0IqqoD9mJ4J7rv/53bjdqN1KtsS2uY7\nn8w4onXTkOjeBD2u7ZpnVR4X0wkoH25loyCeIf+wk+eE3Oo6w8J+bVr1FdCenFSQ\nGdx1RBthcwKBgQCj2ijtan04xWjbt0XQag601xcY/QVkv9KosZ2Vto8xrjqBzQGs\nkZNJDqRl6w4GEPit1NsuSk7hHFmIcJAceUoLW1Da+56JEqW7u0D+xbAR1cNopuN/\nL9PhNgGbpEJadfBA8Yd4NfEyY3tX0DMW2cJZ4Q5J9pWOOJCgHNm2Xb4mLQKBgDuU\n/E6um0nqaQpfZm8b76qrW9w3bJgWFbrBP1uOu4+o1WA3raYTQZ/0U/4zI0btUgCW\nxRIVCvB8lFmqKTFKxjkI8dF9u4Y71x90XTe5sRwYmLV/6/Ym4uOsEZM5TAkv6UQr\nmZVMilt0wVtVvPaKe1ZLVXlisBAOHP2lCfH234QTAoGAU+ketoVbPSTtjPNmot4T\nghFDjsc4kzc5LGahRFRw0Pc178QD7GJkTPFFea1rFUrS5SWToMvHjlgSH60PXNu2\nGWXu9hx1FA3mkywL578hNdrZVYK9yQunzoz7E3pbyAdAATfdvNPZl2ag9cpICD/Z\nbx8IrEy3OPzoCjbWVWAswx0=\n-----END PRIVATE KEY-----"`                                                                                                                                                     //nolint
 	jwkKeyMask  = `'{"kid":"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4","kty":"RSA","alg":"A256GCM","n":"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ","e":"AQAB"}'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              //nolint
 	jwkKeyMask2 = `'{"kid":"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4","kty":"RSA","alg":"A256GCM","n":"v2KAzzfruqcrVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ","e":"AQAB"}'`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              //nolint
+
+	// certAIndented/keyAIndented/certBIndented/keyBIndented hold the exact same
+	// cert/key pairs as certAMask/keyAMask/certBMask/keyBMask above, but as raw,
+	// real multi-line PEM text with leading whitespace on every line (including
+	// the BEGIN/END marker lines)
+	certAIndented = `      -----BEGIN CERTIFICATE-----
+      MIIErDCCApSgAwIBAgIUaZRSadvXi4QaZssfTWp+gNNzU0kwDQYJKoZIhvcNAQEL
+      BQAwSTEUMBIGA1UEAwwLZXhhbXBsZS5jb20xCzAJBgNVBAYTAkdCMRAwDgYDVQQI
+      DAdFbmdsYW5kMRIwEAYDVQQKDAlBbGljZSBMdGQwHhcNMjYwMjA1MDgxMzAxWhcN
+      MjgwNTEwMDgxMzAxWjBUMQswCQYDVQQGEwJNWTETMBEGA1UECAwKU29tZS1TdGF0
+      ZTESMBAGA1UECgwJbXljb21wYW55MRwwGgYDVQQDDBNrb25nLWNwLmV4YW1wbGUu
+      Y29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzFtAvLv3CgVY8bYk
+      U3XdwT+XHn55LCpQAWdoLyKwfnxCU0EXQ6aWjcVTeHQAxRwbGjD3pDnkaKYk2sFg
+      IOqJxJTgk+lcEjVoaMt1ZlEvWv8uLkmV9qkR3GkgkjEsdZpS0O0j9wktjFICfHT8
+      xhR2aNRGs0l8msRX6AWpwfCIFv4NODU+q8gTY2bN7jAb4GMlCid7Eryz+wpeT8OT
+      vuBTfMZDYXXYR+YnOsBhhJ0R8vEpjO7nhih600ABFJE1OsftNoffYQuSvX32Qpz0
+      1SxbuFdATOi1gJKqrr8wzPE9xZ0wwZPeWSq0bHlcNwRJxfS3jPhA87NrlpBsVqar
+      ek6uZQIDAQABo4GAMH4wHwYDVR0jBBgwFoAUTYO0qty6yVVauLKCgBsnJH8IH/ow
+      CQYDVR0TBAIwADALBgNVHQ8EBAMCBPAwJAYDVR0RBB0wG4ITa29uZy1jcC5leGFt
+      cGxlLmNvbYcEwKgBCjAdBgNVHQ4EFgQUkd88zLNJe1VTHVYhDpc+pzeLjvowDQYJ
+      KoZIhvcNAQELBQADggIBAEfLgqkuXU2MXFiiIsFAedRf/mV3s3Mw7pdivfJ6kAyL
+      O5FWgUTYlfOj96QI2Sy03Ucc8wyXIqfPThB8Of0W8S2IX17sO9NIJthfeA6mqLsF
+      lHadOqn5hmHkM98sYFg6x3c1Ca+lgmqV4bGwTq5/L5IEV80GsFZgz24ptz990vWy
+      DrwbRNZkRQjVNAl1Mi+DEqGGEam3GBJWwmrUZAR9pGvdYmW2T8LLLyPd/TneMaF0
+      K0EnPp6vpVDFx5fLRFifzWRTXsFrTkzdKIMrjo4yULzjZMeIvQC7ve6tkAqY/Yzi
+      dTKSfXdzB+mA+LX91irgVBJwJjm7pvzOLbipwnXPN/6S+ZgCjtGbInbphbTK9peX
+      aqr4LVFy91JvjfCUWTa53QvBed02z32wQTuUp6k3TG6Azulq2vDvlZ2dHAAAN1LX
+      riXH3R4G51SLiuhm0mMcHl2XB5RRm/VejwYwyVGtCUzXtu8n1iKlfTvbvf/AE9JI
+      8Z5tf5mTWmZWkUTAVHUhjaHl+2/u878neMSl5jMkkydc3scgV4V9jj4DwdlG7aQd
+      G5eX5Ais37lQOxOrRheqb+lBaOiQUZ1wAmmg2lhdmOAEA+4v7BxI2LE0ltrlpwUs
+      pFFME++aEsHprFc/sCqX/Qz3J5dw8C9jS2ys2NdtYvZbik+pD3fwao78hkEoXVHF
+      -----END CERTIFICATE-----`
+	keyAIndented = `      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMW0C8u/cKBVjx
+      tiRTdd3BP5cefnksKlABZ2gvIrB+fEJTQRdDppaNxVN4dADFHBsaMPekOeRopiTa
+      wWAg6onElOCT6VwSNWhoy3VmUS9a/y4uSZX2qRHcaSCSMSx1mlLQ7SP3CS2MUgJ8
+      dPzGFHZo1EazSXyaxFfoBanB8IgW/g04NT6ryBNjZs3uMBvgYyUKJ3sSvLP7Cl5P
+      w5O+4FN8xkNhddhH5ic6wGGEnRHy8SmM7ueGKHrTQAEUkTU6x+02h99hC5K9ffZC
+      nPTVLFu4V0BM6LWAkqquvzDM8T3FnTDBk95ZKrRseVw3BEnF9LeM+EDzs2uWkGxW
+      pqt6Tq5lAgMBAAECggEAF5IC4oHvmXlKa/6tK+8xV6PFA2BlC4IJ3k+WBbHDl6Mv
+      ZzjfvQ7O2KVE3mTK3fFC8v9o4MlIngVjxNN/CezjXQgq6wSEeRkt5MBq1xVQF/fM
+      1Mvp/xw7EigR+KqxTRMysCRZ/JlTZpbi8IXxzcr4aVjqmq1EMPmqhfl5PgRHPhd0
+      e1D+ovOSNBsEkCUW0wrVeThHPrTuVr6enjWmw/BsVXhTK3lXinRkYbPRo2L2VFKM
+      5XO/t5lmEm6OpRoA/cis32LlQMGEUROIP8xBDcSy3zDBWcNfcc+xohszoMgKpBvr
+      OrWahhIwSItH2EfE3GzTrANnWLOfPju88NLpPT7u9QKBgQD1m7fsUR8R5rEPx17w
+      COlRFR6g4+DYXgA2XM9J+ZBg7XMHkiiove5aFaJ5U0B2L2MGxTpzAHkOURIwaE1r
+      5UvUrsg6Y449sswjx8D+kP0R7PG0/zHwRqkFBVW4+0z1x0ud3XSpZix05xCAhIkl
+      TFJLtwmX+1iii3rafqIY1ln41wKBgQDVALgvGbrzNM2P/ErBKA6N0STg2vbqffOF
+      SsMUlGbvEz+Rs/zI/y8CjMbS2YZGPYOYiQd9uONaXJC831BqaYLqKhSg+Mo1JyXf
+      geudD2UDbD5GKeRh0hJxEr5hovv7cviguK0imrY8LWd9hzZR86riehUnj6OiiqCw
+      aBe9Rgl/IwKBgQChp2dL7Cy1/I+nogKTnFnsmyj4nmP8JQqgvT9WIiNsGH0wi3ul
+      bLU3p6uzjR8Naq0T5LZOwQ3sZWHCaLQkgtwBVTTGcYZKh6cjGbOmGcnnhXulNJ4q
+      1mcivdspEIYb8puLgRnq8SvrmbXb0N/vo6c63HM9DBrPiVxH+Tc5f8PiKwKBgE8K
+      9U6FPdsCvUWxWgxT0RLPid/nYbmjA7tzAvGgIJKXkf9/y07LY6aOlzmnfyyRp0Pz
+      ldQRyEzADPYJ6M2UWgCLnRwfNuqCnItUqxqdm96pTHK9GQMz8aQEUKHq2Zd2Es2R
+      uq4cu4OZVc4/XukKg1+H7lG/+/lVeEv+VNDoLJ4BAoGAfCIBneN9wNBKrDPtVKZB
+      kDYmWTkLzd1UDzXTD9LTc/3PXR6JRZURq7Z5vvjdBOh0uUxxG7RYeN7wIjWiPfww
+      mOUReWlh+n1kyxOyysfZkKJA+jcVs5AhMLzvOCGQL7Yy5uAteZHxQ1Lzr1LlZPOs
+      SGsNpIfCXpdZTJE3NAEShjE=
+      -----END PRIVATE KEY-----`
+	certBIndented = `      -----BEGIN CERTIFICATE-----
+      MIIFKDCCAxCgAwIBAgICEAMwDQYJKoZIhvcNAQELBQAwSTELMAkGA1UEBhMCR0Ix
+      EDAOBgNVBAgMB0VuZ2xhbmQxEjAQBgNVBAoMCUFsaWNlIEx0ZDEUMBIGA1UEAwwL
+      ZXhhbXBsZS5jb20wHhcNMjUwNzMxMDQ1MDE3WhcNMjYwNzMxMDQ1MDE3WjAMMQow
+      CAYDVQQDDAEvMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgfMdN5wX
+      elFbX9Nl+jd6ey7PEtuovm2bs2FpvTdRod0NbAlG+psr4Knp8FWmA6m3ZlkM2i5s
+      6kz8KiYbi1jArhSw355LmcOy8dpW/PLTsOqi5cDRYgDH5BmbRqPN/H/5gSSeHpXW
+      Pvt1wL8i+nzOA7p1gulicQoMntKKUVs6lasJ5VbqEkRYWREdsvfjwshrMmEELLhK
+      6nIRi1xY00SAMIaqUscH5H5NQO0oH2B4IekUI3ykgLyM1li5IlDmvdxZeAyWKawP
+      ol558uzlSKbNNI8G4aQ8gqhlKxW+QeE27y6N/8cndQKMJ8tTa17nvImDMGEDtTlM
+      i67OTLe9qYaezwIDAQABo4IBVTCCAVEwCQYDVR0TBAIwADARBglghkgBhvhCAQEE
+      BAMCBaAwMwYJYIZIAYb4QgENBCYWJE9wZW5TU0wgR2VuZXJhdGVkIENsaWVudCBD
+      ZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUAWacUI67lU62QGE4/E9tNINMvrAwHwYDVR0j
+      BBgwFoAUi4zJs4OH+vQWVIzA0f2gqH8GFtgwDgYDVR0PAQH/BAQDAgXgMB0GA1Ud
+      JQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDCBjAYDVR0RAQH/BIGBMH+BFmpvaG4u
+      ZG9lQG15Y29tcGFueS5jb22kZTBjMQswCQYDVQQGEwJESzEgMB4GA1UECgwXTXkg
+      RXhhbXBsZSBPcmdhbml6YXRpb24xGDAWBgNVBAsMD015IEV4YW1wbGUgVW5pdDEY
+      MBYGA1UEAwwPTXkgRXhhbXBsZSBOYW1lMA0GCSqGSIb3DQEBCwUAA4ICAQBybIhg
+      LbhL4VG4/J+IyksjJ71KgZZlgOHdg7d8fROjawtyZKh2ENZGYQOuZo79ppM7xhjf
+      p8RJE9meKH2VxNWyzvQ0CW4xqEAAq5Fyu9eejUe6dPVpbwmG3TLEiw+3L1af3zEl
+      palnTWVtUbCao06BbjuQ8MEnzH4sn1N3zUHnBDAh7zCHa79GhLlAeoLWQlgfMdTz
+      BNymnsSoqjtvmDwc1FsrVdcSlmbPbvmzorAgLKKIqu+xRFa9nWvaJlgvuqtodcQJ
+      3UGBCSAYrs23sCEfXXs/IK/IoiFTrKHPsaBr7NJfhKII6Fm3hJtgPXKIkxCQYkoP
+      Nz4fCRE72fCRbLJPaObc5X7i9ayoZoOqg5YgOLuSXiBp+LBu5wghGZABle/hjaJU
+      6LhKl5olsH0HHQrhzj1xPZ5dplZCIJ6t+e11zdNBRTTjCkmhZGqOzylMm0NDufzP
+      AHd9zGvotoM0gwDQNd9JuQ/A+G8+Wzb8Eb7EkdImxYi7qZsi01SG4GGoFHXIfoLp
+      cB2quk7bkBSqx/wtJNQnLdi04E78Cy9Yzre6HmZMjXXrspkLM3qlDA0g5JMEy5/n
+      ywUqL9srpjW7qrP8NGxzzQ9z40bktDYPqVy57NK3tQtU9C2IAosU6XHO+u/H+067
+      UrmTdgxd0MfsO5iH6OcBXGAkakvKx1vYGfHWjg==
+      -----END CERTIFICATE-----`
+	keyBIndented = `      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCB8x03nBd6UVtf
+      02X6N3p7Ls8S26i+bZuzYWm9N1Gh3Q1sCUb6myvgqenwVaYDqbdmWQzaLmzqTPwq
+      JhuLWMCuFLDfnkuZw7Lx2lb88tOw6qLlwNFiAMfkGZtGo838f/mBJJ4eldY++3XA
+      vyL6fM4DunWC6WJxCgye0opRWzqVqwnlVuoSRFhZER2y9+PCyGsyYQQsuErqchGL
+      XFjTRIAwhqpSxwfkfk1A7SgfYHgh6RQjfKSAvIzWWLkiUOa93Fl4DJYprA+iXnny
+      7OVIps00jwbhpDyCqGUrFb5B4TbvLo3/xyd1Aowny1NrXue8iYMwYQO1OUyLrs5M
+      t72php7PAgMBAAECggEAMLfuijyw6KC7uw9MOiS2fJwt8gn8F3iMWRH6TIAC0MZJ
+      E+nefHHUX2QUWpAhr1nfcjWMhffFyYmXOE4VIYbipeEH9q4n9bvSyK1s02ROTROK
+      gsxpM27Lgg6/khozTajE58/Mn/bY3b/0g5ClEnfb3LX4/F13FJ4J4TlZteqX6igu
+      yKRCGtB1Z0Af3UU9RSe1Z+XhQLZjj7khU4hZ5sMBQmEtQvtaO9BNbAV/RLNvOrQh
+      Newolh+W5U7KZtjWuIMhN1FI/I0ax8Uezxd47q0y8JdE2CYzRnsn1Fl9x2DfshG3
+      CBxWrYFYRYkY0occ61ATW7DE+K4XmB1dm2gjZcg1EQKBgQC2zX+5zKGOJ743kIwd
+      r5d5RuZEPNAOmIR8AvBAcjwmUkm19L7VXxgz2cuyuN+WAofm/fFulMb/57YlBpQd
+      RjIuMRAantq/K/QfMJ3EZ0dcD7GwbMIPgLDnMInJ5BL6S/QorSKUTsfd0a6vnYXK
+      Ls0TWeR6wk1bfvtTrM5AGnJGNQKBgQC1+9KoqkzplA+poECx8OGGIHVMhx1O6B/L
+      NK0N8r8KkEGVnQUpwb3GQRH2U13QHeLKz0IqqoD9mJ4J7rv/53bjdqN1KtsS2uY7
+      n8w4onXTkOjeBD2u7ZpnVR4X0wkoH25loyCeIf+wk+eE3Oo6w8J+bVr1FdCenFSQ
+      Gdx1RBthcwKBgQCj2ijtan04xWjbt0XQag601xcY/QVkv9KosZ2Vto8xrjqBzQGs
+      kZNJDqRl6w4GEPit1NsuSk7hHFmIcJAceUoLW1Da+56JEqW7u0D+xbAR1cNopuN/
+      L9PhNgGbpEJadfBA8Yd4NfEyY3tX0DMW2cJZ4Q5J9pWOOJCgHNm2Xb4mLQKBgDuU
+      /E6um0nqaQpfZm8b76qrW9w3bJgWFbrBP1uOu4+o1WA3raYTQZ/0U/4zI0btUgCW
+      xRIVCvB8lFmqKTFKxjkI8dF9u4Y71x90XTe5sRwYmLV/6/Ym4uOsEZM5TAkv6UQr
+      mZVMilt0wVtVvPaKe1ZLVXlisBAOHP2lCfH234QTAoGAU+ketoVbPSTtjPNmot4T
+      ghFDjsc4kzc5LGahRFRw0Pc178QD7GJkTPFFea1rFUrS5SWToMvHjlgSH60PXNu2
+      GWXu9hx1FA3mkywL578hNdrZVYK9yQunzoz7E3pbyAdAATfdvNPZl2ag9cpICD/Z
+      bx8IrEy3OPzoCjbWVWAswx0=
+      -----END PRIVATE KEY-----`
 )
 
 func Test_Sync_EnvVar_Masking(t *testing.T) {
@@ -13042,6 +13481,65 @@ func Test_Sync_EnvVar_Masking(t *testing.T) {
 
 		// Verify that actual secret content is NOT exposed
 		require.NotContains(t, output, "-----BEGIN", "actual cert/key content should not be exposed")
+	})
+
+	t.Run("indented PEM certificate/key (leading whitespace on every line) is masked", func(t *testing.T) {
+		reset(t)
+
+		t.Setenv("DECK_CLIENT_CERT", certAIndented)
+		t.Setenv("DECK_CLIENT_KEY", keyAIndented)
+
+		_, err := syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/pem-key-indented.yaml")
+		require.NoError(t, err)
+
+		// Rotate to a different indented cert/key pair so the diff actually
+		// prints a change for the masking assertions below to find.
+		t.Setenv("DECK_CLIENT_CERT", certBIndented)
+		t.Setenv("DECK_CLIENT_KEY", keyBIndented)
+
+		output, err := syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/pem-key-indented.yaml")
+		require.NoError(t, err)
+
+		// Verify that secrets are masked in the output
+		require.Contains(t, output, `"cert": "[masked]"`, "indented cert should be masked in sync output")
+		require.Contains(t, output, `"key": "[masked]"`, "indented key should be masked in sync output")
+
+		// Verify that actual secret content is NOT exposed
+		require.NotContains(t, output, "-----BEGIN", "actual indented cert/key content should not be exposed")
+	})
+
+	t.Run("cert/key env vars loaded from a file on disk (indented) are masked", func(t *testing.T) {
+		reset(t)
+
+		setEnvFromFile := func(t *testing.T, envVar, fileName, content string) {
+			t.Helper()
+			path := filepath.Join(t.TempDir(), fileName)
+			require.NoError(t, os.WriteFile(path, []byte(content+"\n"), 0o600))
+			data, err := os.ReadFile(path)
+			require.NoError(t, err)
+			t.Setenv(envVar, strings.TrimRight(string(data), "\n"))
+		}
+
+		setEnvFromFile(t, "DECK_CLIENT_CERT", "client_crt.crt_indent", certAIndented)
+		setEnvFromFile(t, "DECK_CLIENT_KEY", "client_key.key_indent", keyAIndented)
+
+		_, err := syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/pem-key-indented.yaml")
+		require.NoError(t, err)
+
+		// Rotate to a different file-sourced cert/key pair so the diff
+		// actually prints a change for the masking assertions below to find.
+		setEnvFromFile(t, "DECK_CLIENT_CERT", "client_crt.crt_indent", certBIndented)
+		setEnvFromFile(t, "DECK_CLIENT_KEY", "client_key.key_indent", keyBIndented)
+
+		output, err := syncWithOutput(context.Background(), "testdata/sync/057-env-var-masking-tests/pem-key-indented.yaml")
+		require.NoError(t, err)
+
+		// Verify that secrets are masked in the output
+		require.Contains(t, output, `"cert": "[masked]"`, "file-sourced indented cert should be masked in sync output")
+		require.Contains(t, output, `"key": "[masked]"`, "file-sourced indented key should be masked in sync output")
+
+		// Verify that actual secret content is NOT exposed
+		require.NotContains(t, output, "-----BEGIN", "actual file-sourced cert/key content should not be exposed")
 	})
 
 	t.Run("jwk key with masked output", func(t *testing.T) {
