@@ -25,5 +25,5 @@ func Test_IncrementalSync_Smoke(t *testing.T) {
 
 	configuration, ok := info["configuration"].(map[string]interface{})
 	require.True(t, ok, "expected 'configuration' in Admin API root response")
-	require.Equal(t, "on", configuration["incremental_sync"], "KONG_INCREMENTAL_SYNC did not reach the Gateway container")
+	require.Equal(t, true, configuration["incremental_sync"], "KONG_INCREMENTAL_SYNC did not reach the Gateway container")
 }
