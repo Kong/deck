@@ -11,7 +11,7 @@ require (
 	github.com/Kong/ai-deck-converter v0.17.1
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.30.0
+	github.com/daveshanley/vacuum v0.30.1
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
