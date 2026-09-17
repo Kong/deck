@@ -96,8 +96,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/daveshanley/vacuum v0.30.0 h1:1lTr9iBFgfiSfDYWixXk/a/L0WGi6hDUxBem/0zyCDI=
-github.com/daveshanley/vacuum v0.30.0/go.mod h1:pozgC8NLwLPRw23D7crFzk00mE/2NZdLJHt5LWHwyeA=
+github.com/daveshanley/vacuum v0.30.3 h1:bFf5C2cROrc4bOx9HkDqUL5w4LFi4GO6A8yFIVQLjP8=
+github.com/daveshanley/vacuum v0.30.3/go.mod h1:F+Hymr2ZlzB8Hq/olwSlRVFVaAIN/Dc14lO694EVwkk=
 github.com/distribution/reference v0.6.0 h1:0IXCQ5g4/QMHHkarYzh5l+u8T3t73zM5QvfrDyIgxBk=
 github.com/distribution/reference v0.6.0/go.mod h1:BbU0aIcezP1/5jX/8MP0YiH4SdvB5Y4f/wlDRiLyi3E=
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
@@ -340,8 +340,8 @@ github.com/opencontainers/go-digest v1.0.0 h1:apOUWs51W5PlhuyGyz9FCeeBIOUDA/6nW8
 github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3IKzErnv2BNG4W4MAM=
 github.com/opencontainers/image-spec v1.1.0 h1:8SG7/vwALn54lVB/0yZ/MMwhFrPYtpEHQb2IpWsCzug=
 github.com/opencontainers/image-spec v1.1.0/go.mod h1:W4s4sFTMaBeK1BQLXbG4AdM2szdn85PY75RI83NrTrM=
-github.com/pb33f/doctor v0.0.79 h1:g0Tn6MK3C/rPAIFTfBMBPlhUPv6rsm2gavbDpcEb0GM=
-github.com/pb33f/doctor v0.0.79/go.mod h1:1Det/ZyGtfwUK0P28IjcTmVqsM8xjA6tonRvsbDNVYs=
+github.com/pb33f/doctor v0.0.80 h1:A5QEGWRJ11rS1wp1ypEioXAWQBaMqzmWtQCR61dLXmY=
+github.com/pb33f/doctor v0.0.80/go.mod h1:1Det/ZyGtfwUK0P28IjcTmVqsM8xjA6tonRvsbDNVYs=
 github.com/pb33f/jsonpath v0.8.3 h1:gdOUYn31vic8iRSSR4I2SEv7UQf2WxLeDcUnDPpGZNE=
 github.com/pb33f/jsonpath v0.8.3/go.mod h1:zBV5LJW4OQOPatmQE2QdKpGQJvhDTlE5IEj6ASaRNTo=
 github.com/pb33f/libasyncapi v0.0.2 h1:mQn5br4VmDQwnYk8c2s7pVehBVQit1dNxjqoQoy4ZXk=

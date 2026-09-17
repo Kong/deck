@@ -11,7 +11,7 @@ require (
 	github.com/Kong/ai-deck-converter v0.17.1
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/blang/semver/v4 v4.0.0
-	github.com/daveshanley/vacuum v0.30.0
+	github.com/daveshanley/vacuum v0.30.3
 	github.com/ettle/strcase v0.2.0
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
@@ -102,7 +102,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
-	github.com/pb33f/doctor v0.0.79 // indirect
+	github.com/pb33f/doctor v0.0.80 // indirect
 	github.com/pb33f/jsonpath v0.8.3 // indirect
 	github.com/pb33f/libasyncapi v0.0.2 // indirect
 	github.com/pb33f/libopenapi v0.38.7 // indirect
