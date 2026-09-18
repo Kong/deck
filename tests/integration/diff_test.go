@@ -1170,6 +1170,63 @@ func Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray(t *testing.T
 	assert.Equal(t, emptyOutput, out)
 }
 
+func Test_Diff_Partials_NoPerpetualDiff(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Diff_Partials_NoPerpetualDiff", testDiffPartialsNoPerpetualDiffImpl)
+	} else {
+		testDiffPartialsNoPerpetualDiffImpl(t)
+	}
+}
+
+func testDiffPartialsNoPerpetualDiffImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	stateFile := "testdata/sync/039-partials/kong.yaml"
+
+	for i := range 2 {
+		require.NoError(t, sync(ctx, stateFile))
+
+		out, err := diff(stateFile)
+		require.NoError(t, err)
+		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
+	}
+}
+
+func Test_Diff_Partials_RealChangeStillDetected(t *testing.T) {
+	runWhenEnterpriseOrKonnect(t, ">=3.10.0")
+
+	isKonnect := os.Getenv("DECK_KONNECT_TOKEN") != ""
+
+	if isKonnect {
+		runDualTestWithSkipDefaults(t, "Test_Diff_Partials_RealChangeStillDetected", testDiffPartialsRealChangeStillDetectedImpl)
+	} else {
+		testDiffPartialsRealChangeStillDetectedImpl(t)
+	}
+}
+
+func testDiffPartialsRealChangeStillDetectedImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong.yaml"))
+
+	out, err := diff("testdata/sync/039-partials/kong-update.yaml")
+	require.NoError(t, err)
+	assert.NotEqual(t, emptyOutput, out)
+	assert.Contains(t, out, "updating partial my-ee-partial")
+
+	require.NoError(t, sync(ctx, "testdata/sync/039-partials/kong-update.yaml"))
+
+	out, err = diff("testdata/sync/039-partials/kong-update.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
 func Test_Diff_Konnect_Workspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
