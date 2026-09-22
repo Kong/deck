@@ -1,0 +1,39 @@
+models:
+  - type: model
+    display_name: Okta Protected GPT-5.4
+    name: okta-gpt-5-4
+    capabilities: [generate]
+    formats:
+      - type: openai
+    targets:
+      - name: gpt-5.4
+        provider: openai-main
+        config:
+          type: openai
+    policies: []
+    access:
+      auth_strategies: [okta-oidc]
+    config:
+      route:
+        paths: [/ai]
+model_providers:
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "{vault://env/openai-key}"
+auth_strategies:
+  # AI Gateway 2.1 (#21179 KAG-8713 AG-1470): openid-connect gains
+  # bearer_token_header_name, letting the bearer token be read from a custom
+  # header instead of the default 'Authorization: Bearer <token>'.
+  - name: okta-oidc
+    type: openid-connect
+    display_name: Okta OIDC
+    config:
+      issuer: https://dev-123456.okta.com/oauth2/default
+      cache_tokens_salt: LNzaN7n85dxFWfqmZKCaFcTehSDNfozB
+      bearer_token_header_name: x-my-token
