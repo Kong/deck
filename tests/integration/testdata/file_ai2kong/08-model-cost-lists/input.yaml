@@ -12,9 +12,8 @@ models:
         config:
           type: openai
           temperature: 0.7
-          # AI Gateway 2.1 (#21046 AG-1415): per-modality usage cost, an
-          # alternative to the pricing catalog. Each list entry pairs a modality
-          # (text/audio/image/video) with its cost per 1M tokens, while
+          # Per-modality usage cost as alternative to pricing catalog.
+          # Pairs modality (text/audio/image/video) with cost per 1M tokens.
           # cache_write_cost_list is per-cache-TTL (5m vs 1h).
           input_cost_list:
             - modal: text

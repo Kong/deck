@@ -22,11 +22,9 @@ model_providers:
         type: basic
         headers: [{name: Authorization, value: "{vault://env/openai-key}"}]
 policies:
-  # AI Gateway 2.1 (#21179 KAG-8713): a policy may carry a condition, a Kong
-  # expression that gates whether the plugin runs. It is lowered verbatim onto
-  # the plugin's `condition`, so it uses the expression language's field names
-  # (http.path, http.headers.*) rather than CEL's http.request.*. Model-scoped
-  # policies get the condition on the plugin scoped to the model's route.
+  # Policies may carry a Kong expression condition that gates plugin execution.
+  # Uses expression language field names (http.path, http.headers.*), not CEL's
+  # http.request.*. Model-scoped policies apply the condition to the model's route.
   - type: ai-prompt-guard
     name: pii-sanitizer
     condition: 'http.headers.x_tier == "premium"'

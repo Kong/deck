@@ -1,7 +1,6 @@
 mcp_servers:
-  # AI Gateway 2.1 (#21586 AG-1392 AI-141 AG-1458 AG-1618): the ai-mcp-proxy
-  # server block gains allowed_versions (listener mode), cache hints, and
-  # upstream_protocol_version (upstream-server mode).
+  # The ai-mcp-proxy server block supports allowed_versions (listener mode),
+  # cache hints, and upstream_protocol_version (upstream-server mode).
   - type: listener
     display_name: Secure Flights MCP 2.1
     name: secure-flights-mcp-2-1
