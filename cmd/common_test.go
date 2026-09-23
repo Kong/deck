@@ -2,9 +2,12 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"reflect"
+	"strings"
 	"testing"
 
+	"github.com/kong/go-database-reconciler/pkg/crud"
 	"github.com/kong/go-database-reconciler/pkg/diff"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
@@ -280,4 +283,31 @@ func TestIsAIGatewayInstance(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+}
+
+// TestSyncErrorMessage_UnnamedRoute reproduces the reported bug: a sync
+// failure on a route that has no `name` in the source YAML used to be
+// reported only by its Kong-assigned ID, which doesn't appear anywhere in
+// the source file and so can't be correlated back to it without a separate
+// `deck dump --with-id`. It should now be identified by paths/methods/hosts
+// and its parent service instead.
+func TestSyncErrorMessage_UnnamedRoute(t *testing.T) {
+	var route state.Route
+	route.ID = kong.String("018e1c1e-71cd-7c53-8000-000000000001")
+	route.Paths = kong.StringSlice("/foo", "/bar")
+	route.Methods = kong.StringSlice("GET")
+	route.Service = &kong.Service{Name: kong.String("my-service")}
+
+	actionErr := &crud.ActionError{
+		OperationType: crud.Update,
+		Kind:          "route",
+		Name:          route.Console(),
+		Err:           errors.New("db error"),
+	}
+
+	msg := actionErr.Error()
+	assert.NotContains(t, msg, "018e1c1e-71cd-7c53-8000-000000000001",
+		"error message should not require a --with-id dump to correlate back to source YAML")
+	assert.True(t, strings.Contains(msg, "/foo") && strings.Contains(msg, "/bar") && strings.Contains(msg, "my-service"),
+		"error message should identify the route by its paths and service: %q", msg)
 }
