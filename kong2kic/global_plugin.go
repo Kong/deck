@@ -29,6 +29,7 @@ func populateKICKongClusterPlugins(content *file.Content, file *KICContent) erro
 		kongClusterPlugin.APIVersion = ConfigurationKongHQv1
 		kongClusterPlugin.Kind = KongClusterPluginKind
 		kongClusterPlugin.Annotations = map[string]string{IngressClass: ClassName}
+		kongClusterPlugin.Labels = map[string]string{GlobalLabel: GlobalLabelValue}
 		if plugin.Name != nil {
 			kongClusterPlugin.PluginName = *plugin.Name
 			kongClusterPlugin.Name = calculateSlug(*plugin.Name)
