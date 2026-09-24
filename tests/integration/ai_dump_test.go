@@ -64,7 +64,16 @@ func Test_Dump_AIModels(t *testing.T) {
 	}
 }
 
-// Test_AIDump exercises `deck ai dump`, which reads the AI-managed entities
+// aiDumpTestCase describes one AI Gateway feature exercised by Test_AIDump: the
+// AI-native source to seed Kong with, and whether its ai dump round-trip is
+// expected to converge.
+type aiDumpTestCase struct {
+	name          string
+	inputFile     string
+	skipRoundTrip bool
+}
+
+// runAIDumpCases exercises `deck ai dump`, which reads the AI-managed entities
 // (tagged 'managed_by:deck-ai') from Kong and reverts them back to AI Gateway
 // format.
 //
@@ -78,17 +87,46 @@ func Test_Dump_AIModels(t *testing.T) {
 //
 // State is compared via `deck gateway dump` (scoped to the managed_by:deck-ai
 // tag, IDs stripped) using the same structural comparison as Test_AISync.
+func runAIDumpCases(t *testing.T, tests []aiDumpTestCase) {
+	t.Helper()
+	ctx := context.Background()
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Seed Kong from the AI Gateway source and capture the resulting
+			// AI-managed state as the reference.
+			reset(t)
+			require.NoError(t, aiSync(ctx, tc.inputFile))
+			reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+			require.NoError(t, err)
+
+			// `ai dump` reverts the state back to AI Gateway format.
+			aiConfig, err := aiDump("-o", "-")
+			require.NoError(t, err)
+			require.NotEmpty(t, aiConfig)
+
+			// Round-trip: syncing the dumped AI Gateway config into a fresh Kong
+			// must reproduce the same AI-managed state.
+			if !tc.skipRoundTrip {
+				roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
+				require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
+
+				reset(t)
+				require.NoError(t, aiSync(ctx, roundTripFile))
+				roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+				require.NoError(t, err)
+
+				assertAIStateEqual(t, reference, roundTripped)
+			}
+		})
+	}
+}
+
 func Test_AIDump(t *testing.T) {
 	runWhenAIGateway(t, ">=2.0.0")
 	setup(t)
 
-	ctx := context.Background()
-
-	tests := []struct {
-		name          string
-		inputFile     string
-		skipRoundTrip bool
-	}{
+	runAIDumpCases(t, []aiDumpTestCase{
 		{
 			name:      "models",
 			inputFile: "testdata/file_ai2kong/01-models/input.yaml",
@@ -119,34 +157,32 @@ func Test_AIDump(t *testing.T) {
 			inputFile:     "testdata/file_ai2kong/07-ca-certificates/input.yaml",
 			skipRoundTrip: true,
 		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			// Seed Kong from the AI Gateway source and capture the resulting
-			// AI-managed state as the reference.
-			reset(t)
-			require.NoError(t, aiSync(ctx, tc.inputFile))
-			reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-			require.NoError(t, err)
+	})
+}
 
-			// `ai dump` reverts the state back to AI Gateway format.
-			aiConfig, err := aiDump("-o", "-")
-			require.NoError(t, err)
-			require.NotEmpty(t, aiConfig)
+// Test_AIDump_AIGateway21 covers the AI Gateway 2.1 fields that have an AI
+// Gateway entity-model representation. It is split out from Test_AIDump so the
+// 2.0.x image, whose plugin schemas reject those fields, skips it.
+func Test_AIDump_AIGateway21(t *testing.T) {
+	runWhenAIGateway(t, ">=2.1.0")
+	setup(t)
 
-			// Round-trip: syncing the dumped AI Gateway config into a fresh Kong
-			// must reproduce the same AI-managed state.
-			if !tc.skipRoundTrip {
-				roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
-				require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
-
-				reset(t)
-				require.NoError(t, aiSync(ctx, roundTripFile))
-				roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-				require.NoError(t, err)
-
-				assertAIStateEqual(t, reference, roundTripped)
-			}
-		})
-	}
+	runAIDumpCases(t, []aiDumpTestCase{
+		{
+			name:      "model cost lists",
+			inputFile: "testdata/file_ai2kong/08-model-cost-lists/input.yaml",
+		},
+		{
+			name:      "mcp protocol 2.1 fields",
+			inputFile: "testdata/file_ai2kong/09-mcp-protocol-2-1-fields/input.yaml",
+		},
+		{
+			name:      "auth strategy bearer header",
+			inputFile: "testdata/file_ai2kong/10-auth-strategy-bearer-header/input.yaml",
+		},
+		{
+			name:      "policy condition",
+			inputFile: "testdata/file_ai2kong/11-policy-condition/input.yaml",
+		},
+	})
 }

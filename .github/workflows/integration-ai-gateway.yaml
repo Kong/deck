@@ -9,7 +9,7 @@ concurrency:
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
@@ -21,7 +21,8 @@ jobs:
     strategy:
       matrix:
         kong_image:
-        - kong/kong-ai-gateway:2.0.3
+          - kong/kong-ai-gateway:2.0.3
+          - kong/kong-ai-gateway:2.1.0
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}

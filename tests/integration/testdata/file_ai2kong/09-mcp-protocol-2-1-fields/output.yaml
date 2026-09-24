@@ -1,0 +1,57 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+services:
+- host: localhost
+  name: secure-flights-mcp-2-1
+  routes:
+  - name: secure-flights-mcp-2-1-route
+    paths:
+    - /mcp/secure-flights-2-1
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: listener
+        server:
+          allowed_versions:
+          - "2025-06-18"
+          - "2026-07-28"
+          cache:
+            discover:
+              cache_scope: private
+              ttl_ms: 30000
+            tools_list:
+              cache_scope: public
+              ttl_ms: 60000
+        tools: []
+      name: ai-mcp-proxy
+- name: vendor-mcp-upstream
+  routes:
+  - name: vendor-mcp-upstream-route
+    paths:
+    - /mcp/vendor-upstream
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: upstream-server
+        server:
+          upstream_protocol_version: "2026-07-28"
+        tools:
+        - description: A vendor tool
+          input_schema:
+            type: object
+          name: vendorTool
+          output_schema:
+            type: object
+        tools_cache_ttl_seconds: 300
+      name: ai-mcp-proxy
+  url: https://upstream.example.com/mcp

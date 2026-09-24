@@ -1,0 +1,81 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: gpt-5-4
+plugins:
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: round-robin
+      slots: 10000
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5.4
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: gpt-5-4
+        name: gpt-5.4
+        options:
+          cache_read_cost_list:
+          - cost: 0.5
+            modal: text
+          - cost: 15
+            modal: audio
+          - cost: 7.5
+            modal: image
+          - cost: 25
+            modal: video
+          cache_write_cost_list:
+          - cost: 2.5
+            ttl: 5m
+          - cost: 5
+            ttl: 1h
+          input_cost_list:
+          - cost: 2
+            modal: text
+          - cost: 60
+            modal: audio
+          - cost: 30
+            modal: image
+          - cost: 100
+            modal: video
+          output_cost_list:
+          - cost: 8
+            modal: text
+          - cost: 240
+            modal: audio
+          - cost: 120
+            modal: image
+          - cost: 400
+            modal: video
+          temperature: 0.7
+        provider: openai
+      route_type: llm/v1/chat
+      weight: 100
+  model: gpt-5-4
+  name: ai-proxy-advanced
+  route: openai-chat
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  url: http://ai-gateway.upstream.local

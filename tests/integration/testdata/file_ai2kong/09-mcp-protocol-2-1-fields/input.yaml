@@ -1,0 +1,45 @@
+mcp_servers:
+  # The ai-mcp-proxy server block supports allowed_versions (listener mode),
+  # cache hints, and upstream_protocol_version (upstream-server mode).
+  - type: listener
+    display_name: Secure Flights MCP 2.1
+    name: secure-flights-mcp-2-1
+    enabled: true
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route:
+        paths: [/mcp/secure-flights-2-1]
+      server:
+        # Narrows which MCP protocol revisions this server accepts from clients.
+        allowed_versions:
+          - "2025-06-18"
+          - "2026-07-28"
+        # TTL/scope hints Kong emits on the cacheable 'tools/list' and
+        # 'server/discover' operations.
+        cache:
+          tools_list:
+            ttl_ms: 60000
+            cache_scope: public
+          discover:
+            ttl_ms: 30000
+            cache_scope: private
+  - type: upstream-server
+    display_name: Vendor MCP Upstream
+    name: vendor-mcp-upstream
+    enabled: true
+    upstream_url: https://upstream.example.com/mcp
+    config:
+      route:
+        paths: [/mcp/vendor-upstream]
+      tools_cache_ttl_seconds: 300
+      server:
+        # The MCP protocol revision Kong speaks to the upstream server.
+        upstream_protocol_version: "2026-07-28"
+    tools:
+      - name: vendorTool
+        description: A vendor tool
+        input_schema:
+          type: object
+        output_schema:
+          type: object
