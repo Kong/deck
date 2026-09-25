@@ -139,12 +139,12 @@ can be converted into a 'kong-gateway-3.x' configuration file.`,
 				string(convert.FormatKongGatewayVersion314x),
 			}
 
-			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats, "")
+			err := validateInputFlag("from", convertCmdSourceFormat, validSourceFormats)
 			if err != nil {
 				return err
 			}
 
-			err = validateInputFlag("to", convertCmdDestinationFormat, validDestinationFormats, "")
+			err = validateInputFlag("to", convertCmdDestinationFormat, validDestinationFormats)
 			if err != nil {
 				return err
 			}

@@ -14,6 +14,7 @@ import (
 var (
 	cmdKong2TfInputFilename                    string
 	cmdKong2TfOutputFilename                   string
+	cmdKong2TfProvider                         string
 	cmdKong2TfGenerateImportsForControlPlaneID string
 	cmdKong2TfIgnoreCredentialChanges          bool
 )
@@ -44,7 +45,8 @@ func executeKong2Tf(cmd *cobra.Command, _ []string) error {
 	if cmdKong2TfGenerateImportsForControlPlaneID != "" {
 		generateImportsForControlPlaneID = &cmdKong2TfGenerateImportsForControlPlaneID
 	}
-	result, err = kong2tf.Convert(inputContent, generateImportsForControlPlaneID, cmdKong2TfIgnoreCredentialChanges)
+	result, err = kong2tf.ConvertWithProvider(inputContent, generateImportsForControlPlaneID,
+		cmdKong2TfIgnoreCredentialChanges, kong2tf.Provider(cmdKong2TfProvider))
 	if err != nil {
 		log.Printf("Error converting Kong configuration to Terraform; %v", err)
 		return fmt.Errorf("failed converting Kong configuration to Terraform; %w", err)
@@ -79,12 +81,26 @@ The kong2tf subcommand transforms Kong Gateway entities in deck format,
 into Terraform resources.`,
 		RunE: executeKong2Tf,
 		Args: cobra.NoArgs,
+		PreRunE: func(_ *cobra.Command, _ []string) error {
+			if err := validateInputFlag("provider", cmdKong2TfProvider,
+				[]string{string(kong2tf.ProviderKonnect), string(kong2tf.ProviderKongGateway)}); err != nil {
+				return err
+			}
+			if cmdKong2TfProvider == string(kong2tf.ProviderKongGateway) &&
+				cmdKong2TfGenerateImportsForControlPlaneID != "" {
+				return fmt.Errorf("--generate-imports-for-control-plane-id can only be used with --provider %s",
+					kong2tf.ProviderKonnect)
+			}
+			return nil
+		},
 	}
 
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfInputFilename, "state", "s", "-",
 		"decK file to process. Use - to read from stdin.")
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfOutputFilename, "output-file", "o", "-",
 		"Output file to write. Use - to write to stdout.")
+	kong2TfCmd.Flags().StringVar(&cmdKong2TfProvider, "provider", string(kong2tf.ProviderKonnect),
+		"Terraform provider to target. Allowed values: konnect, kong-gateway.")
 	kong2TfCmd.Flags().StringVarP(&cmdKong2TfGenerateImportsForControlPlaneID,
 		"generate-imports-for-control-plane-id", "g", "",
 		"Generate terraform import statements for the control plane ID."+
