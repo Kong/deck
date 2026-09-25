@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.67.0](#v1670)
 - [v1.66.1](#v1661)
 - [v1.66.0](#v1660)
 - [v1.65.3](#v1653)
@@ -149,6 +150,13 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.67.0]
+> Release date: 2026/09/24
+
+### Features
+- Added support for AI Gateway 2.1 features, including per-modality model cost lists,
+MCP protocol 2.1 fields, OpenID Connect bearer token header configuration and policy conditions.
+[#2243](https://github.com/Kong/deck/pull/2243)
 
 ## [v1.66.1]
 > Release date: 2026/09/08
@@ -2749,6 +2757,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.67.0]: https://github.com/Kong/deck/compare/v1.66.1...v1.67.0
 [v1.66.1]: https://github.com/Kong/deck/compare/v1.66.0...v1.66.1
 [v1.66.0]: https://github.com/Kong/deck/compare/v1.65.3...v1.66.0
 [v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3
