@@ -187,6 +187,9 @@ func fetchWorkspaces(ctx context.Context, isKonnect bool) ([]string, error) {
 		if err != nil {
 			return nil, fmt.Errorf("listing workspaces: %w", err)
 		}
+		if isKonnect {
+			workspaces = ensureDefaultWorkspace(workspaces)
+		}
 	} else if resetWorkspace != "" {
 		exists, err := workspaceExists(ctx, rootConfig, resetWorkspace, isKonnect)
 		if err != nil {
