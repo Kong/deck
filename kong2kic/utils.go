@@ -47,6 +47,8 @@ const (
 	ConfigurationKongHQv1beta1 = "configuration.konghq.com/v1beta1"
 	GatewayAPIVersionV1        = "gateway.networking.k8s.io/v1"
 	GatewayAPIVersionV1Beta1   = "gateway.networking.k8s.io/v1beta1"
+	GlobalLabel								 = "global"
+	GlobalLabelValue           = "true"
 	HTTPRouteKind              = "HTTPRoute"
 	IngressAPIVersion          = "networking.k8s.io/v1"
 	IngressClass               = "kubernetes.io/ingress.class"
