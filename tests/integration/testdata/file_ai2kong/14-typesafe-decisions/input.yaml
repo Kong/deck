@@ -1,0 +1,23 @@
+models:
+  - type: model
+    display_name: TypeSafe Jev LATEST
+    name: jev-latest
+    capabilities: [decisions]
+    formats: [{type: typesafe}]
+    targets:
+      - name: jev-latest
+        provider: jev-typesafe
+        config: {type: typesafe}
+    policies: []
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route: {paths: [/ai]}
+model_providers:
+  - type: typesafe
+    display_name: Jev on TypeSafe
+    name: jev-typesafe
+    config:
+      auth:
+        type: basic
+        headers: [{name: Authorization, value: "{vault://ai/typesafe-token}"}]

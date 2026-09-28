@@ -186,3 +186,23 @@ func Test_AIDump_AIGateway21(t *testing.T) {
 		},
 	})
 }
+
+func Test_AIDump_AIGateway22(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	runAIDumpCases(t, []aiDumpTestCase{
+		{
+			name:      "skills api",
+			inputFile: "testdata/file_ai2kong/12-skills-api/input.yaml",
+		},
+		{
+			name:      "passthrough format",
+			inputFile: "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+		},
+		{
+			name:      "typesafe provider decisions",
+			inputFile: "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+		},
+	})
+}

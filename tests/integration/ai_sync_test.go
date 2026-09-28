@@ -196,6 +196,29 @@ func Test_AISync_AIGateway21(t *testing.T) {
 	})
 }
 
+func Test_AISync_AIGateway22(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	runAISyncCases(t, []aiSyncTestCase{
+		{
+			name:       "skills api",
+			inputFile:  "testdata/file_ai2kong/12-skills-api/input.yaml",
+			outputFile: "testdata/file_ai2kong/12-skills-api/output.yaml",
+		},
+		{
+			name:       "passthrough format",
+			inputFile:  "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+			outputFile: "testdata/file_ai2kong/13-passthrough-format/output.yaml",
+		},
+		{
+			name:       "typesafe provider decisions",
+			inputFile:  "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+			outputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
+		},
+	})
+}
+
 // Test_AISync_MultipleFiles exercises `deck ai sync` with more than one source
 // file, including a mix of formats (one YAML and one JSON).
 func Test_AISync_MultipleFiles(t *testing.T) {
