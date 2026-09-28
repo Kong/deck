@@ -317,7 +317,7 @@ Use 'dbless' as the type to convert a decK file into DBless format.`,
 				return err
 			}
 			validTypes := []string{fileFormatTypeDeck, fileFormatTypeDBless}
-			return validateInputFlag("type", args[0], validTypes, "")
+			return validateInputFlag("type", args[0], validTypes)
 		},
 		RunE: executeFileFormat,
 	}
