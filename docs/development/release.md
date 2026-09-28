@@ -19,7 +19,7 @@
 
 - After the changelog is merged, `git checkout main; git pull`.
 - Tag the `HEAD` with your version, e.g. `git tag v0.5.0`
-- Push the tag to remote (Github), e.g. `git push --tags`
+- Push the tag to remote (Github), e.g. `git push origin v0.5.0`
 - Run Goreleaser: `goreleaser release --rm-dist`. This will create
   a release in Github and upload all the artifacts.
 - Edit the release to remove all the commit messages as the content and

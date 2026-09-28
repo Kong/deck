@@ -1,0 +1,57 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: guarded-gpt
+plugins:
+- condition: http.path == "/ai"
+  config:
+    minute: 1000
+    policy: local
+  name: rate-limiting
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-4o
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: guarded-gpt
+        name: gpt-4o
+        provider: openai
+      route_type: llm/v1/chat
+  model: guarded-gpt
+  name: ai-proxy-advanced
+  route: openai-chat
+- condition: http.headers.x_tier == "premium"
+  config:
+    allow_patterns:
+    - ^safe
+  model: guarded-gpt
+  name: ai-prompt-guard
+  route: openai-chat
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  url: http://ai-gateway.upstream.local

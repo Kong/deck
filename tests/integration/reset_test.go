@@ -240,11 +240,13 @@ func Test_Reset_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	ctx := context.Background()
 	reset(t)
 
-	// Sync entities to two different workspaces
+	// Sync entities to two named workspaces and to the default workspace, which
+	// the workspace listing endpoint does not report.
 	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace1-entity.yaml"))
 	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/workspace2-entity.yaml"))
+	require.NoError(t, sync(ctx, "testdata/reset/002-konnect-workspace/default-workspace.yaml"))
 
-	// Verify both entities exist
+	// Verify all three entities exist
 	output1, err := dump("-o", "-", "--workspace", "workspace1")
 	require.NoError(t, err)
 	assert.Contains(t, output1, "route-workspace1", "workspace1 entity should exist")
@@ -252,6 +254,10 @@ func Test_Reset_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	output2, err := dump("-o", "-", "--workspace", "workspace2")
 	require.NoError(t, err)
 	assert.Contains(t, output2, "route-workspace2", "workspace2 entity should exist")
+
+	defaultOutput, err := dump("-o", "-", "--workspace", "default")
+	require.NoError(t, err)
+	assert.Contains(t, defaultOutput, "route-default-ws", "default workspace entity should exist")
 
 	// Reset all workspaces
 	reset(t, "--all-workspaces")
@@ -267,6 +273,12 @@ func Test_Reset_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 	require.NoError(t, err)
 	assert.NotContains(t, output2, "route-workspace2",
 		"workspace2 entity should be deleted after --all-workspaces reset")
+
+	// Verify the default workspace is also empty
+	defaultOutput, err = dump("-o", "-", "--workspace", "default")
+	require.NoError(t, err)
+	assert.NotContains(t, defaultOutput, "route-default-ws",
+		"default workspace entity should be deleted after --all-workspaces reset")
 }
 
 // test scope:

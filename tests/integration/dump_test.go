@@ -1485,48 +1485,64 @@ func Test_Dump_KonnectWorkspace_AllWorkspaces(t *testing.T) {
 
 	ctx := context.Background()
 
-	// Create a temp directory for dump output
-	tmpDir, err := os.MkdirTemp("", "deck-dump-all-workspaces-*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
-
-	// Change to temp directory for dump output
 	originalDir, err := os.Getwd()
 	require.NoError(t, err)
-	require.NoError(t, os.Chdir(tmpDir))
-	defer func() {
-		_ = os.Chdir(originalDir)
-	}()
 
-	// Reset and sync entities to two different workspaces
-	reset(t)
-	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace1-entity.yaml"))
-	require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace2-entity.yaml"))
+	// dumpAllWorkspaces runs the dump from a fresh temp directory, so that a file
+	// written by an earlier dump can never satisfy a later subtest's assertions.
+	dumpAllWorkspaces := func(t *testing.T) {
+		t.Helper()
+		require.NoError(t, os.Chdir(t.TempDir()))
+		t.Cleanup(func() {
+			_ = os.Chdir(originalDir)
+		})
+		_, err := dump("--all-workspaces")
+		require.NoError(t, err)
+	}
 
-	// Dump all workspaces
-	_, err = dump("--all-workspaces")
-	require.NoError(t, err)
+	// The default workspace is not returned by the workspace listing endpoint, so
+	// it has to be added to the dump list explicitly. Cover it both when it is the
+	// only workspace and when other workspaces exist alongside it.
+	t.Run("empty default workspace is dumped", func(t *testing.T) {
+		// --all-workspaces empties every workspace, default included, so the
+		// default workspace holds no entities at all here.
+		reset(t, "--all-workspaces")
 
-	// Verify workspace1.yaml was created with correct content
-	workspace1Output, err := os.ReadFile("workspace1.yaml")
-	require.NoError(t, err)
-	workspace1Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace1.yaml")
-	require.NoError(t, err)
-	assert.Equal(t, workspace1Expected, string(workspace1Output))
+		dumpAllWorkspaces(t)
 
-	// Verify workspace2.yaml was created with correct content
-	workspace2Output, err := os.ReadFile("workspace2.yaml")
-	require.NoError(t, err)
-	workspace2Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace2.yaml")
-	require.NoError(t, err)
-	assert.Equal(t, workspace2Expected, string(workspace2Output))
+		defaultOutput, err := os.ReadFile("default.yaml")
+		require.NoError(t, err)
+		assert.Contains(t, string(defaultOutput), "_workspace: default",
+			"default.yaml should be written even when the default workspace is empty")
+	})
 
-	// Verify default.yaml was created (default workspace should also be dumped)
-	defaultOutput, err := os.ReadFile("default.yaml")
-	require.NoError(t, err)
-	// Default workspace dump should contain _workspace: default
-	assert.Contains(t, string(defaultOutput), "_workspace: default",
-		"default.yaml should contain _workspace: default")
+	t.Run("default workspace is dumped alongside other workspaces", func(t *testing.T) {
+		reset(t, "--all-workspaces")
+		require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace1-entity.yaml"))
+		require.NoError(t, sync(ctx, originalDir+"/testdata/dump/011-konnect-workspace/workspace2-entity.yaml"))
+
+		dumpAllWorkspaces(t)
+
+		// Verify workspace1.yaml was created with correct content
+		workspace1Output, err := os.ReadFile("workspace1.yaml")
+		require.NoError(t, err)
+		workspace1Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace1.yaml")
+		require.NoError(t, err)
+		assert.Equal(t, workspace1Expected, string(workspace1Output))
+
+		// Verify workspace2.yaml was created with correct content
+		workspace2Output, err := os.ReadFile("workspace2.yaml")
+		require.NoError(t, err)
+		workspace2Expected, err := readFile(originalDir + "/testdata/dump/011-konnect-workspace/expected-workspace2.yaml")
+		require.NoError(t, err)
+		assert.Equal(t, workspace2Expected, string(workspace2Output))
+
+		// Verify default.yaml was created (default workspace should also be dumped)
+		defaultOutput, err := os.ReadFile("default.yaml")
+		require.NoError(t, err)
+		assert.Contains(t, string(defaultOutput), "_workspace: default",
+			"default.yaml should contain _workspace: default")
+	})
 }
 
 func Test_Dump_Plugin_Conditional(t *testing.T) {
