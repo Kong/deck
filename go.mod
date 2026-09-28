@@ -16,8 +16,8 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/google/go-cmp v0.7.0
 	github.com/kong/go-apiops v0.4.6
-	github.com/kong/go-database-reconciler v1.42.4
-	github.com/kong/go-kong v0.78.0
+	github.com/kong/go-database-reconciler v1.42.5-0.20260928061024-3c3c9bcc979a
+	github.com/kong/go-kong v0.78.1-0.20260928060327-7ec2040b73d4
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
@@ -214,8 +214,8 @@ require (
 	golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/term v0.45.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect

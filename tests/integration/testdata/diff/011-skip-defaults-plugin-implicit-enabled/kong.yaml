@@ -1,0 +1,27 @@
+_format_version: "3.0"
+# A route-scoped plugin that deliberately omits the top-level `enabled` field. Kong defaults it to
+# true through a hardcoded default in go-kong rather than through the plugin schema, so under
+# DECK_SKIP_DEFAULTS_FILL=true it used to produce a perpetual `updating plugin post-function for
+# route ...` line whose diff body was empty.
+services:
+  - name: svc-skip-defaults-implicit-enabled
+    url: http://httpbin.org
+    routes:
+      - name: route-skip-defaults-implicit-enabled
+        paths:
+          - /skip-defaults-implicit-enabled
+        protocols:
+          - http
+          - https
+        plugins:
+          - name: post-function
+            instance_name: skip-defaults-implicit-enabled
+            protocols:
+              - http
+              - https
+            config:
+              access:
+                - |
+                  kong.log.set_serialize_value('request.headers.api-key', 'REDACTED')
+            tags:
+              - deck-skip-defaults-implicit-enabled
