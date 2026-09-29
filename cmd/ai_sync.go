@@ -36,6 +36,9 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 
 	injectmanagedByAIDeckTag(targetContent)
 
+	// AI Gateway custom policies sync as a Kong plugin definition entity.
+	dumpConfig.IncludePluginDefinitions = true
+
 	return syncContent(ctx, targetContent, false, aiSyncParallelism, 0,
 		aiSyncWorkspace, aiSyncJSONOutput, ApplyTypeFull)
 }

@@ -88,7 +88,11 @@ func execute(cmd *cobra.Command, _ []string) error {
 }
 
 // addDefaultSelectTags parses the converted YAML and ensures the _info section
-// carries the default select_tags, creating _info if it is absent. It returns
+// carries the default select_tags, creating _info if it is absent. Custom
+// policies convert to a custom_plugins entity, which `gateway sync`/`gateway
+// dump` otherwise ignore unless the file opts in via
+// _info.include_plugin_definitions, so that flag is set whenever custom_plugins
+// is present -- keeping the output usable standalone, as documented. It returns
 // the mutated document as a map ready for serialization.
 func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 	var docMap map[string]interface{}
@@ -96,14 +100,15 @@ func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 		return nil, fmt.Errorf("failed to parse converted config: %w", err)
 	}
 
-	if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
-		// _info exists, update select_tags
-		infoMap["select_tags"] = []string{managedByAIDeckTag}
-	} else {
-		// _info doesn't exist, create it with select_tags
-		docMap["_info"] = map[string]interface{}{
-			"select_tags": []string{managedByAIDeckTag},
-		}
+	infoMap, ok := docMap["_info"].(map[string]interface{})
+	if !ok {
+		infoMap = map[string]interface{}{}
+		docMap["_info"] = infoMap
+	}
+	infoMap["select_tags"] = []string{managedByAIDeckTag}
+
+	if _, hasCustomPlugins := docMap["custom_plugins"]; hasCustomPlugins {
+		infoMap["include_plugin_definitions"] = true
 	}
 
 	return docMap, nil

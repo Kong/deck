@@ -41,6 +41,8 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 
 	// Set the selector tags to only get AI-managed entities
 	dumpConfig.SelectorTags = []string{managedByAIDeckTag}
+	// AI Gateway custom policies dump as a Kong plugin definition entity.
+	dumpConfig.IncludePluginDefinitions = true
 
 	wsClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
@@ -63,7 +65,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		IsKongAIGateway:                  isAIGateway,
 		IsConsumerGroupPolicyOverrideSet: false,
 		SanitizeContent:                  false,
-		IncludePluginDefinitions:         false,
+		IncludePluginDefinitions:         true,
 	}
 
 	if aiDumpWorkspace != "" {
