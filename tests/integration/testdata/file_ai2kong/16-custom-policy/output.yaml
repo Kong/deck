@@ -9,8 +9,8 @@ custom_plugins:
       VERSION = "1.0.0",
       PRIORITY = 500
     }
-  id: 00000000-0000-0000-0000-000000000001
   name: streaming
+  id: e0c18dec-8f05-52a1-bdfc-cd4741f9ab55
   schema: |
     return {
       name = "streaming",

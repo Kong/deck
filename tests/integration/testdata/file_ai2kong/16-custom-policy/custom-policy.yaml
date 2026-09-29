@@ -14,9 +14,3 @@ custom_policies:
         VERSION = "1.0.0",
         PRIORITY = 500
       }
-policies:
-  - name: streaming-policy-instance
-    type: streaming
-    global: true
-    config:
-      message: custom policy is active

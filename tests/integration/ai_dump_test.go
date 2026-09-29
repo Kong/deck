@@ -214,24 +214,24 @@ func Test_AIDump_AIGateway22(t *testing.T) {
 
 // Test_AIDump_CustomPolicy covers reverting a custom plugin definition (and the
 // plugin instance referencing it) back to an AI Gateway custom_policies entry.
-// As in Test_AISync_CustomPolicy, the definition is synced and given
-// pluginDefinitionSyncDelay to register with Kong before the referencing plugin
-// instance is synced.
+// As in Test_AISync_CustomPolicy, the definition (custom-policy.yaml) is synced
+// and given pluginDefinitionSyncDelay to register with Kong before the
+// referencing plugin instance (policy.yaml) is synced.
 func Test_AIDump_CustomPolicy(t *testing.T) {
 	runWhenAIGateway(t, ">=2.2.0")
 	setup(t)
 
 	ctx := context.Background()
 	const (
-		definitionFile = "testdata/file_ai2kong/16-custom-policy/definition.yaml"
-		inputFile      = "testdata/file_ai2kong/16-custom-policy/input.yaml"
+		customPolicyFile = "testdata/file_ai2kong/16-custom-policy/custom-policy.yaml"
+		policyFile       = "testdata/file_ai2kong/16-custom-policy/policy.yaml"
 	)
 
 	reset(t)
-	require.NoError(t, sync(ctx, definitionFile))
+	require.NoError(t, aiSync(ctx, customPolicyFile))
 	time.Sleep(pluginDefinitionSyncDelay)
-	require.NoError(t, aiSync(ctx, inputFile))
-	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, aiSync(ctx, policyFile))
+	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 
 	aiConfig, err := aiDump("-o", "-")
@@ -242,10 +242,8 @@ func Test_AIDump_CustomPolicy(t *testing.T) {
 	require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
 
 	reset(t)
-	require.NoError(t, sync(ctx, definitionFile))
-	time.Sleep(pluginDefinitionSyncDelay)
 	require.NoError(t, aiSync(ctx, roundTripFile))
-	roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 
 	assertAIStateEqual(t, reference, roundTripped)
