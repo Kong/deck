@@ -20,6 +20,22 @@ jobs:
             echo "::error::Tag must be on the main branch"
             exit 1
           fi
+      - name: Verify tag is newer than the latest release
+        run: |
+          current="${GITHUB_REF_NAME}"
+          highest=$(git ls-remote --tags --refs origin 'v*.*' \
+            | awk -F/ '{print $NF}' \
+            | sort -V \
+            | tail -n1)
+          if [ -z "${highest}" ]; then
+            echo "No existing release tags found; proceeding with ${current}"
+            exit 0
+          fi
+          if [ "${current}" != "${highest}" ]; then
+            echo "::error::Tag ${current} is not greater than the highest existing release tag ${highest}"
+            exit 1
+          fi
+          echo "Tag ${current} is greater than or equal to the highest existing release tag ${highest}"
 
   goreleaser:
     needs: check-branch
