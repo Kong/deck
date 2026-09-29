@@ -88,6 +88,11 @@ func Test_FileAI2Kong(t *testing.T) {
 			inputFile:          "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
 			expectedOutputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
 		},
+		{
+			name:               "convert AI gateway 2.2 config with a typesafe provider decisions model with multiple aliases to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

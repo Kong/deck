@@ -204,5 +204,9 @@ func Test_AIDump_AIGateway22(t *testing.T) {
 			name:      "typesafe provider decisions",
 			inputFile: "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
 		},
+		{
+			name:      "typesafe provider decisions with multiple aliases",
+			inputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+		},
 	})
 }

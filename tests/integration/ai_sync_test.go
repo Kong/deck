@@ -216,6 +216,11 @@ func Test_AISync_AIGateway22(t *testing.T) {
 			inputFile:  "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
 			outputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
 		},
+		{
+			name:       "typesafe provider decisions with multiple aliases",
+			inputFile:  "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+			outputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
+		},
 	})
 }
 
