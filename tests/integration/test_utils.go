@@ -712,6 +712,7 @@ func assertAIStateEqual(t *testing.T, expected, actual string) {
 		cmpopts.IgnoreFields(kong.KeyAuth{}, "TTL"),
 		cmpopts.IgnoreFields(kong.Certificate{}, "ID", "CreatedAt"),
 		cmpopts.IgnoreFields(kong.CACertificate{}, "ID", "CreatedAt"),
+		cmpopts.IgnoreFields(kong.CustomPluginDefinition{}, "ID", "CreatedAt", "UpdatedAt"),
 		cmpopts.EquateEmpty(),
 	}
 	if diff := cmp.Diff(parseAIState(t, expected), parseAIState(t, actual), opts...); diff != "" {

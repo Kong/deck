@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -222,6 +223,43 @@ func Test_AISync_AIGateway22(t *testing.T) {
 			outputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
 		},
 	})
+}
+
+// Test_AISync_CustomPolicy covers AI Gateway 2.2 custom_policies, which sync as
+// a Kong custom plugin definition (config.custom_plugins) plus the plugin
+// instance that references it. The definition is synced on its own first and
+// given pluginDefinitionSyncDelay to register with Kong -- syncing both in the
+// same request races the plugin instance against the definition it depends on.
+func Test_AISync_CustomPolicy(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	ctx := context.Background()
+	const (
+		definitionFile = "testdata/file_ai2kong/16-custom-policy/definition.yaml"
+		inputFile      = "testdata/file_ai2kong/16-custom-policy/input.yaml"
+		outputFile     = "testdata/file_ai2kong/16-custom-policy/output.yaml"
+	)
+
+	reset(t)
+	require.NoError(t, sync(ctx, definitionFile))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, sync(ctx, outputFile))
+	expected, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+
+	reset(t)
+	require.NoError(t, sync(ctx, definitionFile))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, inputFile))
+	afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+	assertAIStateEqual(t, expected, afterSync)
+
+	require.NoError(t, aiSync(ctx, inputFile))
+	afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+	assertAIStateEqual(t, afterSync, afterResync)
 }
 
 // Test_AISync_MultipleFiles exercises `deck ai sync` with more than one source

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -209,4 +210,43 @@ func Test_AIDump_AIGateway22(t *testing.T) {
 			inputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
 		},
 	})
+}
+
+// Test_AIDump_CustomPolicy covers reverting a custom plugin definition (and the
+// plugin instance referencing it) back to an AI Gateway custom_policies entry.
+// As in Test_AISync_CustomPolicy, the definition is synced and given
+// pluginDefinitionSyncDelay to register with Kong before the referencing plugin
+// instance is synced.
+func Test_AIDump_CustomPolicy(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	ctx := context.Background()
+	const (
+		definitionFile = "testdata/file_ai2kong/16-custom-policy/definition.yaml"
+		inputFile      = "testdata/file_ai2kong/16-custom-policy/input.yaml"
+	)
+
+	reset(t)
+	require.NoError(t, sync(ctx, definitionFile))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, inputFile))
+	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+
+	aiConfig, err := aiDump("-o", "-")
+	require.NoError(t, err)
+	require.NotEmpty(t, aiConfig)
+
+	roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
+	require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
+
+	reset(t)
+	require.NoError(t, sync(ctx, definitionFile))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, roundTripFile))
+	roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+	require.NoError(t, err)
+
+	assertAIStateEqual(t, reference, roundTripped)
 }
