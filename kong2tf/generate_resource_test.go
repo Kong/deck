@@ -291,3 +291,64 @@ func TestBuiltInPlugin(t *testing.T) {
 	}, []string{})
 	require.Equal(t, expected, result)
 }
+
+func TestKongGatewayResourceTypes(t *testing.T) {
+	providerImports := func() importConfig {
+		return importConfig{provider: ProviderKongGateway}
+	}
+
+	t.Run("normal resource", func(t *testing.T) {
+		result := generateResource("gateway_service", "service", map[string]any{
+			"host": "example.com",
+		}, map[string]string{}, providerImports(), nil)
+
+		require.Contains(t, result, `resource "kong-gateway_service" "service"`)
+		require.NotContains(t, result, "control_plane_id")
+		require.NotContains(t, result, "\n\n}\n")
+	})
+
+	t.Run("parent and scalar id references", func(t *testing.T) {
+		result := generateResource("gateway_route", "route", map[string]any{
+			"service": "service",
+		}, map[string]string{
+			"service":     "service",
+			"consumer_id": "consumer",
+		}, providerImports(), nil)
+
+		require.Contains(t, result, "kong-gateway_service.service.id")
+		require.Contains(t, result, "kong-gateway_consumer.consumer.id")
+		require.NotContains(t, result, "konnect_")
+		require.NotContains(t, result, "kong-gateway_gateway_")
+		require.NotContains(t, result, "control_plane_id")
+	})
+
+	t.Run("relationship", func(t *testing.T) {
+		result := generateRelationship("gateway_consumer_group_member", "group_consumer", map[string]string{
+			"consumer":       "consumer",
+			"consumer_group": "group",
+		}, nil, providerImports())
+
+		require.Contains(t, result, `resource "kong-gateway_consumer_group_member"`)
+		require.Contains(t, result, "kong-gateway_consumer.consumer.id")
+		require.Contains(t, result, "kong-gateway_consumer_group.group.id")
+		require.NotContains(t, result, "control_plane_id")
+	})
+
+	t.Run("built-in plugin", func(t *testing.T) {
+		result := generateResource("gateway_plugin", "basic-auth", map[string]any{
+			"name": "basic-auth",
+		}, map[string]string{}, providerImports(), nil)
+
+		require.Contains(t, result, `resource "kong-gateway_plugin_basic-auth"`)
+		require.NotContains(t, result, "control_plane_id")
+	})
+
+	t.Run("custom plugin", func(t *testing.T) {
+		result := generateResource("gateway_plugin", "my-header", map[string]any{
+			"name": "my-header",
+		}, map[string]string{}, providerImports(), nil)
+
+		require.Contains(t, result, `resource "kong-gateway_custom_plugin"`)
+		require.NotContains(t, result, "control_plane_id")
+	})
+}
