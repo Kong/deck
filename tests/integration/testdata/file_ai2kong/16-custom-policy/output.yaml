@@ -1,0 +1,24 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+custom_plugins:
+- handler: |
+    return {
+      VERSION = "1.0.0",
+      PRIORITY = 500
+    }
+  name: streaming
+  id: e0c18dec-8f05-52a1-bdfc-cd4741f9ab55
+  schema: |
+    return {
+      name = "streaming",
+      fields = {
+        { protocols = require("kong.db.schema.typedefs").protocols_http },
+        { config = { type = "record", fields = { { message = { type = "string", required = true } }}}}
+      },
+    }
+plugins:
+- config:
+    message: custom policy is active
+  name: streaming

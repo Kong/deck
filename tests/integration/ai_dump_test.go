@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -185,4 +186,67 @@ func Test_AIDump_AIGateway21(t *testing.T) {
 			inputFile: "testdata/file_ai2kong/11-policy-condition/input.yaml",
 		},
 	})
+}
+
+func Test_AIDump_AIGateway22(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	runAIDumpCases(t, []aiDumpTestCase{
+		{
+			name:      "skills api",
+			inputFile: "testdata/file_ai2kong/12-skills-api/input.yaml",
+		},
+		{
+			name:      "passthrough format",
+			inputFile: "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+		},
+		{
+			name:      "typesafe provider decisions",
+			inputFile: "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+		},
+		{
+			name:      "typesafe provider decisions with multiple aliases",
+			inputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+		},
+	})
+}
+
+// Test_AIDump_CustomPolicy covers reverting a custom plugin definition (and the
+// plugin instance referencing it) back to an AI Gateway custom_policies entry.
+// As in Test_AISync_CustomPolicy, the definition (custom-policy.yaml) is synced
+// and given pluginDefinitionSyncDelay to register with Kong before the
+// referencing plugin instance (policy.yaml) is synced.
+func Test_AIDump_CustomPolicy(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	ctx := context.Background()
+	const (
+		customPolicyFile = "testdata/file_ai2kong/16-custom-policy/custom-policy.yaml"
+		policyFile       = "testdata/file_ai2kong/16-custom-policy/policy.yaml"
+	)
+
+	reset(t)
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-policy-definitions"))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, policyFile, "--include-policy-definitions"))
+	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+
+	aiConfig, err := aiDump("-o", "-", "--include-policy-definitions")
+	require.NoError(t, err)
+	require.NotEmpty(t, aiConfig)
+
+	roundTripFile := filepath.Join(t.TempDir(), "ai-dump.yaml")
+	require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
+
+	reset(t)
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-policy-definitions"))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, roundTripFile, "--include-policy-definitions"))
+	roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+
+	assertAIStateEqual(t, reference, roundTripped)
 }

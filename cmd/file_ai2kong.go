@@ -90,21 +90,25 @@ func execute(cmd *cobra.Command, _ []string) error {
 // addDefaultSelectTags parses the converted YAML and ensures the _info section
 // carries the default select_tags, creating _info if it is absent. It returns
 // the mutated document as a map ready for serialization.
+//
+// Custom policies convert to a custom_plugins entity, which `gateway
+// sync`/`gateway dump` (and `ai sync`/`ai dump`) only manage when explicitly
+// asked via --include-plugin-definitions/--include-policy-definitions.
+// This command does not set _info.include_plugin_definitions on the caller's behalf: doing so
+// would silently pre-authorize that operation for whoever syncs
+// the generated file, regardless of whether they hold the required role.
 func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 	var docMap map[string]interface{}
 	if err := yaml.Unmarshal(converted, &docMap); err != nil {
 		return nil, fmt.Errorf("failed to parse converted config: %w", err)
 	}
 
-	if infoMap, ok := docMap["_info"].(map[string]interface{}); ok {
-		// _info exists, update select_tags
-		infoMap["select_tags"] = []string{managedByAIDeckTag}
-	} else {
-		// _info doesn't exist, create it with select_tags
-		docMap["_info"] = map[string]interface{}{
-			"select_tags": []string{managedByAIDeckTag},
-		}
+	infoMap, ok := docMap["_info"].(map[string]interface{})
+	if !ok {
+		infoMap = map[string]interface{}{}
+		docMap["_info"] = infoMap
 	}
+	infoMap["select_tags"] = []string{managedByAIDeckTag}
 
 	return docMap, nil
 }

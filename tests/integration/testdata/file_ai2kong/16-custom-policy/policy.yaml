@@ -1,0 +1,22 @@
+custom_policies:
+  - name: streaming
+    type: streaming
+    schema: |
+      return {
+        name = "streaming",
+        fields = {
+          { protocols = require("kong.db.schema.typedefs").protocols_http },
+          { config = { type = "record", fields = { { message = { type = "string", required = true } }}}}
+        },
+      }
+    handler: |
+      return {
+        VERSION = "1.0.0",
+        PRIORITY = 500
+      }
+policies:
+  - name: streaming-policy-instance
+    type: streaming
+    global: true
+    config:
+      message: custom policy is active

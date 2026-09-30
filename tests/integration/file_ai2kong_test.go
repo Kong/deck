@@ -73,6 +73,31 @@ func Test_FileAI2Kong(t *testing.T) {
 			inputFile:          "testdata/file_ai2kong/11-policy-condition/input.yaml",
 			expectedOutputFile: "testdata/file_ai2kong/11-policy-condition/output.yaml",
 		},
+		{
+			name:               "convert AI gateway 2.2 config with a skills API model to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/12-skills-api/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/12-skills-api/output.yaml",
+		},
+		{
+			name:               "convert AI gateway 2.2 config with the passthrough format to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/13-passthrough-format/output.yaml",
+		},
+		{
+			name:               "convert AI gateway 2.2 config with a typesafe provider decisions model to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
+		},
+		{
+			name:               "convert AI gateway 2.2 config with a typesafe provider decisions model with multiple aliases",
+			inputFile:          "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
+		},
+		{
+			name:               "convert AI gateway 2.2 config with a custom policy to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/16-custom-policy/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/16-custom-policy/output.yaml",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

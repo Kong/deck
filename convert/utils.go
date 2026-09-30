@@ -42,8 +42,8 @@ func isEmpty(v interface{}) bool {
 
 	rv := reflect.ValueOf(v)
 
-	switch rv.Kind() { //nolint:exhaustive
-	case reflect.Slice, reflect.Array, reflect.Map:
+	kind := rv.Kind()
+	if kind == reflect.Slice || kind == reflect.Array || kind == reflect.Map {
 		return rv.Len() == 0
 	}
 

@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -194,6 +195,65 @@ func Test_AISync_AIGateway21(t *testing.T) {
 			outputFile: "testdata/file_ai2kong/11-policy-condition/output.yaml",
 		},
 	})
+}
+
+func Test_AISync_AIGateway22(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	runAISyncCases(t, []aiSyncTestCase{
+		{
+			name:       "skills api",
+			inputFile:  "testdata/file_ai2kong/12-skills-api/input.yaml",
+			outputFile: "testdata/file_ai2kong/12-skills-api/output.yaml",
+		},
+		{
+			name:       "passthrough format",
+			inputFile:  "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+			outputFile: "testdata/file_ai2kong/13-passthrough-format/output.yaml",
+		},
+		{
+			name:       "typesafe provider decisions",
+			inputFile:  "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+			outputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
+		},
+		{
+			name:       "typesafe provider decisions with multiple aliases",
+			inputFile:  "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+			outputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
+		},
+	})
+}
+
+// Test_AISync_CustomPolicy covers AI Gateway 2.2 custom_policies, which sync as
+// a Kong custom plugin definition (config.custom_plugins) plus the plugin
+// instance that references it. The definition (custom-policy.yaml) is synced
+// on its own first and given pluginDefinitionSyncDelay to register with Kong
+// -- syncing both in the same request races the plugin instance against the
+// definition it depends on -- before the instance (policy.yaml) is synced.
+func Test_AISync_CustomPolicy(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	ctx := context.Background()
+	const (
+		customPolicyFile = "testdata/file_ai2kong/16-custom-policy/custom-policy.yaml"
+		policyFile       = "testdata/file_ai2kong/16-custom-policy/policy.yaml"
+	)
+
+	reset(t)
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-policy-definitions"))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, policyFile, "--include-policy-definitions"))
+	afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+
+	// Regular round trip validation: re-syncing the policy instance must
+	// succeed and keep the state consistent.
+	require.NoError(t, aiSync(ctx, policyFile, "--include-policy-definitions"))
+	afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+	assertAIStateEqual(t, afterSync, afterResync)
 }
 
 // Test_AISync_MultipleFiles exercises `deck ai sync` with more than one source

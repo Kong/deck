@@ -1,0 +1,23 @@
+models:
+  - type: api
+    display_name: OpenAI Skills
+    name: openai-skills
+    capabilities: [skills]
+    formats: [{type: openai}]
+    targets:
+      - name: gpt-5.6
+        provider: openai-main
+        config: {type: openai}
+    policies: []
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route: {paths: [/ai]}
+model_providers:
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers: [{name: Authorization, value: "{vault://env/openai-key}"}]
