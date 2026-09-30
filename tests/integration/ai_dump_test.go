@@ -228,13 +228,13 @@ func Test_AIDump_CustomPolicy(t *testing.T) {
 	)
 
 	reset(t)
-	require.NoError(t, aiSync(ctx, customPolicyFile))
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-custom-policy-definitions"))
 	time.Sleep(pluginDefinitionSyncDelay)
-	require.NoError(t, aiSync(ctx, policyFile))
+	require.NoError(t, aiSync(ctx, policyFile, "--include-custom-policy-definitions"))
 	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 
-	aiConfig, err := aiDump("-o", "-")
+	aiConfig, err := aiDump("-o", "-", "--include-custom-policy-definitions")
 	require.NoError(t, err)
 	require.NotEmpty(t, aiConfig)
 
@@ -242,7 +242,9 @@ func Test_AIDump_CustomPolicy(t *testing.T) {
 	require.NoError(t, os.WriteFile(roundTripFile, []byte(aiConfig), 0o600))
 
 	reset(t)
-	require.NoError(t, aiSync(ctx, roundTripFile))
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-custom-policy-definitions"))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, roundTripFile, "--include-custom-policy-definitions"))
 	roundTripped, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 

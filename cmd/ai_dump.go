@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	aiDumpCmdStateFormat string
-	aiDumpCmdOutputFile  string
-	aiDumpWorkspace      string
+	aiDumpCmdStateFormat                 string
+	aiDumpCmdOutputFile                  string
+	aiDumpWorkspace                      string
+	aiDumpIncludeCustomPolicyDefinitions bool
 )
 
 func executeAiDump(cmd *cobra.Command, _ []string) error {
@@ -41,8 +42,9 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 
 	// Set the selector tags to only get AI-managed entities
 	dumpConfig.SelectorTags = []string{managedByAIDeckTag}
-	// AI Gateway custom policies dump as a Kong plugin definition entity.
-	dumpConfig.IncludePluginDefinitions = true
+	// Translate the AI-specific flag name into the field gateway sync/dump
+	// already use, so the shared dump path doesn't need to know it exists.
+	dumpConfig.IncludePluginDefinitions = aiDumpIncludeCustomPolicyDefinitions
 
 	wsClient, err := utils.GetKongClient(rootConfig)
 	if err != nil {
@@ -65,7 +67,7 @@ func executeAiDump(cmd *cobra.Command, _ []string) error {
 		IsKongAIGateway:                  isAIGateway,
 		IsConsumerGroupPolicyOverrideSet: false,
 		SanitizeContent:                  false,
-		IncludePluginDefinitions:         true,
+		IncludePluginDefinitions:         dumpConfig.IncludePluginDefinitions,
 	}
 
 	if aiDumpWorkspace != "" {
@@ -175,6 +177,10 @@ The output can be written as either YAML or JSON, controlled by the --format fla
 		string(filebasics.OutputFormatYaml), "output file format: json or yaml.")
 	aiDumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
+	aiDumpCmd.Flags().BoolVar(&aiDumpIncludeCustomPolicyDefinitions, "include-custom-policy-definitions",
+		false, "allow deck to dump AI Gateway custom policy definitions.\n"+
+			"Custom policies dump as a Kong plugin definition entity, which is\n"+
+			"typically restricted to specific Kong roles.")
 
 	return aiDumpCmd
 }

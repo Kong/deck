@@ -1,6 +1,5 @@
 _format_version: "3.0"
 _info:
-  include_plugin_definitions: true
   select_tags:
   - managed_by:deck-ai
 custom_plugins:

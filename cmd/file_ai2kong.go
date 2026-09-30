@@ -88,12 +88,16 @@ func execute(cmd *cobra.Command, _ []string) error {
 }
 
 // addDefaultSelectTags parses the converted YAML and ensures the _info section
-// carries the default select_tags, creating _info if it is absent. Custom
-// policies convert to a custom_plugins entity, which `gateway sync`/`gateway
-// dump` otherwise ignore unless the file opts in via
-// _info.include_plugin_definitions, so that flag is set whenever custom_plugins
-// is present -- keeping the output usable standalone, as documented. It returns
+// carries the default select_tags, creating _info if it is absent. It returns
 // the mutated document as a map ready for serialization.
+//
+// Custom policies convert to a custom_plugins entity, which `gateway
+// sync`/`gateway dump` (and `ai sync`/`ai dump`) only manage when explicitly
+// asked via --include-plugin-definitions/--include-custom-policy-definitions,
+// since Kong typically restricts that resource to specific roles. This command does
+// not set _info.include_plugin_definitions on the caller's behalf: doing so
+// would silently pre-authorize that privileged operation for whoever syncs
+// the generated file, regardless of whether they hold the required role.
 func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 	var docMap map[string]interface{}
 	if err := yaml.Unmarshal(converted, &docMap); err != nil {
@@ -106,10 +110,6 @@ func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 		docMap["_info"] = infoMap
 	}
 	infoMap["select_tags"] = []string{managedByAIDeckTag}
-
-	if _, hasCustomPlugins := docMap["custom_plugins"]; hasCustomPlugins {
-		infoMap["include_plugin_definitions"] = true
-	}
 
 	return docMap, nil
 }

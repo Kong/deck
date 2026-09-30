@@ -242,16 +242,15 @@ func Test_AISync_CustomPolicy(t *testing.T) {
 	)
 
 	reset(t)
-	require.NoError(t, aiSync(ctx, customPolicyFile))
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-custom-policy-definitions"))
 	time.Sleep(pluginDefinitionSyncDelay)
-	require.NoError(t, aiSync(ctx, policyFile))
+	require.NoError(t, aiSync(ctx, policyFile, "--include-custom-policy-definitions"))
 	afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 
-	// Regular round trip validation: the definition is already registered with
-	// Kong, so re-syncing both sources together in one call must succeed and
-	// keep the state consistent.
-	require.NoError(t, aiSync(ctx, policyFile))
+	// Regular round trip validation: re-syncing the policy instance must
+	// succeed and keep the state consistent.
+	require.NoError(t, aiSync(ctx, policyFile, "--include-custom-policy-definitions"))
 	afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
 	require.NoError(t, err)
 	assertAIStateEqual(t, afterSync, afterResync)
