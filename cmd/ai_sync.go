@@ -35,6 +35,15 @@ func executeAiSync(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
+	// Checked here, before any Kong calls, rather than relying on the check
+	// syncContent already does deep inside the shared sync path: that check
+	// reports the gateway-sync flag name (--include-plugin-definitions),
+	// which doesn't exist on this command.
+	if !aiSyncIncludeCustomPolicyDefinitions && contentHasPluginDefinitions(targetContent) {
+		return fmt.Errorf("AI Gateway source(s) contain custom policy definitions. "+
+			"Please use --%s flag to manage these resources", flagIncludeCustomPolicyDefinitions)
+	}
+
 	injectmanagedByAIDeckTag(targetContent)
 
 	// Translate the AI-specific flag name into the field gateway sync/dump
@@ -173,10 +182,9 @@ This is the direct equivalent of running 'deck file ai2kong' followed by
 		false, "assume `yes` to prompts and run non-interactively.")
 	aiSyncCmd.Flags().BoolVar(&aiSyncJSONOutput, "json-output",
 		false, "generate command execution report in a JSON format.")
-	aiSyncCmd.Flags().BoolVar(&aiSyncIncludeCustomPolicyDefinitions, "include-custom-policy-definitions",
-		false, "allow deck to sync AI Gateway custom policy definitions.\n"+
-			"Custom policies sync as a Kong plugin definition entity, which is\n"+
-			"typically restricted to specific Kong roles.")
+	aiSyncCmd.Flags().BoolVar(&aiSyncIncludeCustomPolicyDefinitions, flagIncludeCustomPolicyDefinitions,
+		false, "allow deck to sync AI Gateway policy definitions.\n"+
+			"Policy definitions work with AI Gateway versions >= 2.2")
 
 	return aiSyncCmd
 }

@@ -93,10 +93,9 @@ func execute(cmd *cobra.Command, _ []string) error {
 //
 // Custom policies convert to a custom_plugins entity, which `gateway
 // sync`/`gateway dump` (and `ai sync`/`ai dump`) only manage when explicitly
-// asked via --include-plugin-definitions/--include-custom-policy-definitions,
-// since Kong typically restricts that resource to specific roles. This command does
-// not set _info.include_plugin_definitions on the caller's behalf: doing so
-// would silently pre-authorize that privileged operation for whoever syncs
+// asked via --include-plugin-definitions/--include-policy-definitions.
+// This command does not set _info.include_plugin_definitions on the caller's behalf: doing so
+// would silently pre-authorize that operation for whoever syncs
 // the generated file, regardless of whether they hold the required role.
 func addDefaultSelectTags(converted []byte) (map[string]interface{}, error) {
 	var docMap map[string]interface{}

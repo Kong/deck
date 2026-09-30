@@ -177,10 +177,9 @@ The output can be written as either YAML or JSON, controlled by the --format fla
 		string(filebasics.OutputFormatYaml), "output file format: json or yaml.")
 	aiDumpCmd.Flags().BoolVar(&assumeYes, "yes",
 		false, "assume `yes` to prompts and run non-interactively.")
-	aiDumpCmd.Flags().BoolVar(&aiDumpIncludeCustomPolicyDefinitions, "include-custom-policy-definitions",
-		false, "allow deck to dump AI Gateway custom policy definitions.\n"+
-			"Custom policies dump as a Kong plugin definition entity, which is\n"+
-			"typically restricted to specific Kong roles.")
+	aiDumpCmd.Flags().BoolVar(&aiDumpIncludeCustomPolicyDefinitions, flagIncludeCustomPolicyDefinitions,
+		false, "allow deck to dump AI Gateway policy definitions.\n"+
+			"Policy definitions work with AI Gateway versions >= 2.2")
 
 	return aiDumpCmd
 }
