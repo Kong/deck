@@ -1170,6 +1170,112 @@ func Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray(t *testing.T
 	assert.Equal(t, emptyOutput, out)
 }
 
+func Test_Diff_SkipDefaults_PluginEnabled_NoFakeUpdate(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_NoFakeUpdate",
+		testDiffSkipDefaultsPluginEnabledNoFakeUpdateImpl)
+}
+
+func testDiffSkipDefaultsPluginEnabledNoFakeUpdateImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	stateFile := "testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong.yaml"
+
+	for i := range 2 {
+		require.NoError(t, sync(ctx, stateFile))
+
+		out, err := diff(stateFile)
+		require.NoError(t, err)
+		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
+		assert.NotContains(t, out, "updating plugin post-function",
+			"omitted enabled must not produce a fake plugin update")
+	}
+}
+
+func Test_Diff_SkipDefaults_PluginEnabled_RealChangeDetected(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_RealChangeDetected",
+		testDiffSkipDefaultsPluginEnabledRealChangeDetectedImpl)
+}
+
+func testDiffSkipDefaultsPluginEnabledRealChangeDetectedImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong.yaml"))
+
+	out, err := diff("testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong-updated.yaml")
+	require.NoError(t, err)
+	assert.NotEqual(t, emptyOutput, out)
+	assert.Contains(t, out, "updating plugin post-function")
+	assert.Contains(t, out, "MASKED")
+
+	// once applied, the updated state diffs clean
+	require.NoError(t, sync(ctx, "testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong-updated.yaml"))
+
+	out, err = diff("testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong-updated.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
+func Test_Diff_SkipDefaults_PluginDeprecatedField_NoFakeUpdate(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_NoFakeUpdate",
+		testDiffSkipDefaultsPluginDeprecatedFieldNoFakeUpdateImpl)
+}
+
+func testDiffSkipDefaultsPluginDeprecatedFieldNoFakeUpdateImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	stateFile := "testdata/diff/012-skip-defaults-plugin-deprecated-field/kong.yaml"
+
+	for i := range 2 {
+		require.NoError(t, sync(ctx, stateFile))
+
+		out, err := diff(stateFile)
+		require.NoError(t, err)
+		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
+		assert.NotContains(t, out, "updating plugin openid-connect",
+			"unmatched deprecated field must not produce a fake plugin update")
+	}
+}
+
+func Test_Diff_SkipDefaults_PluginDeprecatedField_RealChangeDetected(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_RealChangeDetected",
+		testDiffSkipDefaultsPluginDeprecatedFieldRealChangeDetectedImpl)
+}
+
+func testDiffSkipDefaultsPluginDeprecatedFieldRealChangeDetectedImpl(t *testing.T) {
+	setup(t)
+	ctx := context.Background()
+
+	require.NoError(t, sync(ctx, "testdata/diff/012-skip-defaults-plugin-deprecated-field/kong.yaml"))
+
+	out, err := diff("testdata/diff/012-skip-defaults-plugin-deprecated-field/kong-updated.yaml")
+	require.NoError(t, err)
+	assert.NotEqual(t, emptyOutput, out)
+	assert.Contains(t, out, "updating plugin openid-connect")
+	assert.Contains(t, out, "changed-issuer.example.com")
+
+	// once applied, the updated state diffs clean
+	require.NoError(t, sync(ctx, "testdata/diff/012-skip-defaults-plugin-deprecated-field/kong-updated.yaml"))
+
+	out, err = diff("testdata/diff/012-skip-defaults-plugin-deprecated-field/kong-updated.yaml")
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
 func Test_Diff_Konnect_Workspace(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)
