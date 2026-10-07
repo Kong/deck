@@ -459,6 +459,26 @@ func Test_Validate_KonnectWorkspace(t *testing.T) {
 	}
 }
 
+// Test_Validate_Gateway_PluginAutoFields checks that validate and sync agree
+// on a plugin config relying on an auto-generated field.
+func Test_Validate_Gateway_PluginAutoFields(t *testing.T) {
+	setup(t)
+	runWhenEnterpriseOrKonnect(t, ">=3.4.0")
+	ctx := context.Background()
+	reset(t)
+
+	stateFile := "testdata/validate/rate-limiting-advanced-auto-namespace.yaml"
+
+	syncErr := sync(ctx, stateFile)
+	validateErr := validate(ONLINE, stateFile)
+
+	if syncErr == nil {
+		assert.NoError(t, validateErr)
+	} else {
+		assert.Error(t, validateErr)
+	}
+}
+
 func Test_Validate_KonnectWorkspace_Isolation(t *testing.T) {
 	runWhenKonnect(t)
 	setup(t)

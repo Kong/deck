@@ -1,0 +1,10 @@
+_format_version: "3.0"
+plugins:
+  - name: rate-limiting-advanced
+    config:
+      limit:
+        - 200
+      window_size:
+        - 1800
+      window_type: fixed
+      # namespace omitted on purpose
