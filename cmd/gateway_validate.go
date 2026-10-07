@@ -152,6 +152,11 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return err
 	}
+	if validateOnline {
+		if err := fillPluginAutoFields(ctx, kongClient, rawState.Plugins); err != nil {
+			return err
+		}
+	}
 	if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
 		return err
 	}
@@ -319,6 +324,32 @@ this command unless --online flag is used.
 		panic(err.Error())
 	}
 	return validateCmd
+}
+
+// fillPluginAutoFields mirrors the auto-field handling go-database-reconciler's
+// diff.Syncer.Solve applies to every plugin before sending it to Kong (see
+// pkg/diff/diff.go), so that `gateway validate` validates the same plugin body
+// that `gateway sync`/`diff`/`apply` would actually send.
+func fillPluginAutoFields(ctx context.Context, kongClient *kong.Client, plugins []*kong.Plugin) error {
+	schemaCache := map[string]kong.Schema{}
+	for _, p := range plugins {
+		s, ok := schemaCache[*p.Name]
+		if !ok {
+			var err error
+			s, err = kongClient.Plugins.GetFullSchema(ctx, p.Name)
+			if err != nil {
+				return fmt.Errorf("retrieving schema for plugin %s: %w", *p.Name, err)
+			}
+			schemaCache[*p.Name] = s
+		}
+		if err := kong.FillPluginsDefaultsWithOpts(p, s, kong.FillRecordOptions{
+			FillDefaults: false,
+			FillAuto:     true,
+		}); err != nil {
+			return fmt.Errorf("processing auto fields for plugin %s: %w", *p.Name, err)
+		}
+	}
+	return nil
 }
 
 func validateWithKong(
