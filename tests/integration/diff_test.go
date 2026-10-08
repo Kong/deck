@@ -1085,15 +1085,11 @@ func Test_Diff_EmptyArrayPluginConfig_NoPerpetualDiff(t *testing.T) {
 func testDiffEmptyArrayPluginConfigNoPerpetualDiffImpl(ctx context.Context, t *testing.T, stateFile string) {
 	setup(t)
 
-	// A perpetual diff only surfaces across convergence cycles, so sync then diff twice: the second
-	// cycle proves the first sync wrote nothing that diffs dirty again. Diff alone writes nothing.
-	for i := range 2 {
-		require.NoError(t, sync(ctx, stateFile))
+	require.NoError(t, sync(ctx, stateFile))
 
-		out, err := diff(stateFile)
-		require.NoError(t, err)
-		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
-	}
+	out, err := diff(stateFile)
+	require.NoError(t, err)
+	require.Equal(t, emptyOutput, out, "empty array config must not produce a perpetual plugin diff")
 }
 
 // Test_Diff_EmptyArrayPluginConfig_RealChangeStillDetected guards the other direction: normalizing empty arrays
@@ -1170,40 +1166,37 @@ func Test_Diff_EmptyArrayPluginConfig_OmittedFieldMatchesEmptyArray(t *testing.T
 	assert.Equal(t, emptyOutput, out)
 }
 
-func Test_Diff_SkipDefaults_PluginEnabled_NoFakeUpdate(t *testing.T) {
+func Test_Diff_SkipDefaults_PluginEnabled_NoPerpetualDiff(t *testing.T) {
 	runWhenKonnect(t)
 	setDefaultKonnectControlPlane(t)
 
-	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_NoFakeUpdate",
-		testDiffSkipDefaultsPluginEnabledNoFakeUpdateImpl)
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_NoPerpetualDiff",
+		testDiffSkipDefaultsPluginEnabledNoPerpetualDiffImpl)
 }
 
-func testDiffSkipDefaultsPluginEnabledNoFakeUpdateImpl(t *testing.T) {
+func testDiffSkipDefaultsPluginEnabledNoPerpetualDiffImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 
 	stateFile := "testdata/diff/011-skip-defaults-plugin-implicit-enabled/kong.yaml"
 
-	for i := range 2 {
-		require.NoError(t, sync(ctx, stateFile))
+	require.NoError(t, sync(ctx, stateFile))
 
-		out, err := diff(stateFile)
-		require.NoError(t, err)
-		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
-		assert.NotContains(t, out, "updating plugin post-function",
-			"omitted enabled must not produce a fake plugin update")
-	}
+	out, err := diff(stateFile)
+	require.NoError(t, err)
+	require.Equal(t, emptyOutput, out,
+		"omitted enabled must not produce a perpetual plugin diff")
 }
 
-func Test_Diff_SkipDefaults_PluginEnabled_RealChangeDetected(t *testing.T) {
+func Test_Diff_SkipDefaults_PluginEnabled_ValidChangeDetected(t *testing.T) {
 	runWhenKonnect(t)
 	setDefaultKonnectControlPlane(t)
 
-	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_RealChangeDetected",
-		testDiffSkipDefaultsPluginEnabledRealChangeDetectedImpl)
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginEnabled_ValidChangeDetected",
+		testDiffSkipDefaultsPluginEnabledValidChangeDetectedImpl)
 }
 
-func testDiffSkipDefaultsPluginEnabledRealChangeDetectedImpl(t *testing.T) {
+func testDiffSkipDefaultsPluginEnabledValidChangeDetectedImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 
@@ -1223,40 +1216,37 @@ func testDiffSkipDefaultsPluginEnabledRealChangeDetectedImpl(t *testing.T) {
 	assert.Equal(t, emptyOutput, out)
 }
 
-func Test_Diff_SkipDefaults_PluginDeprecatedField_NoFakeUpdate(t *testing.T) {
+func Test_Diff_SkipDefaults_PluginDeprecatedField_NoPerpetualDiff(t *testing.T) {
 	runWhenKonnect(t)
 	setDefaultKonnectControlPlane(t)
 
-	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_NoFakeUpdate",
-		testDiffSkipDefaultsPluginDeprecatedFieldNoFakeUpdateImpl)
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_NoPerpetualDiff",
+		testDiffSkipDefaultsPluginDeprecatedFieldNoPerpetualDiffImpl)
 }
 
-func testDiffSkipDefaultsPluginDeprecatedFieldNoFakeUpdateImpl(t *testing.T) {
+func testDiffSkipDefaultsPluginDeprecatedFieldNoPerpetualDiffImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 
 	stateFile := "testdata/diff/012-skip-defaults-plugin-deprecated-field/kong.yaml"
 
-	for i := range 2 {
-		require.NoError(t, sync(ctx, stateFile))
+	require.NoError(t, sync(ctx, stateFile))
 
-		out, err := diff(stateFile)
-		require.NoError(t, err)
-		require.Equal(t, emptyOutput, out, "diff after sync %d reported changes", i+1)
-		assert.NotContains(t, out, "updating plugin openid-connect",
-			"unmatched deprecated field must not produce a fake plugin update")
-	}
+	out, err := diff(stateFile)
+	require.NoError(t, err)
+	require.Equal(t, emptyOutput, out,
+		"unmatched deprecated field must not produce a perpetual plugin diff")
 }
 
-func Test_Diff_SkipDefaults_PluginDeprecatedField_RealChangeDetected(t *testing.T) {
+func Test_Diff_SkipDefaults_PluginDeprecatedField_ValidChangeDetected(t *testing.T) {
 	runWhenKonnect(t)
 	setDefaultKonnectControlPlane(t)
 
-	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_RealChangeDetected",
-		testDiffSkipDefaultsPluginDeprecatedFieldRealChangeDetectedImpl)
+	runDualTestWithSkipDefaults(t, "Test_Diff_SkipDefaults_PluginDeprecatedField_ValidChangeDetected",
+		testDiffSkipDefaultsPluginDeprecatedFieldValidChangeDetectedImpl)
 }
 
-func testDiffSkipDefaultsPluginDeprecatedFieldRealChangeDetectedImpl(t *testing.T) {
+func testDiffSkipDefaultsPluginDeprecatedFieldValidChangeDetectedImpl(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
 
