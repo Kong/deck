@@ -1,0 +1,12 @@
+_format_version: "3.0"
+plugins:
+- id: 6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11
+  name: rate-limiting-advanced
+  config:
+    limit: [5]
+    window_size: [60]
+    strategy: local
+    namespace: expressions-test
+  expressions:
+    limit: ["5*10"]
+  enabled: true

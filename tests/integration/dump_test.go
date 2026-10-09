@@ -1739,3 +1739,35 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 		})
 	}
 }
+
+func Test_Dump_Plugin_Expressions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.16.0")
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/016-plugin-expressions/expected.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}
+
+func Test_Dump_Plugin_Expressions_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	assert.Contains(t, output, "expressions:")
+	assert.Contains(t, output, "- 5*10")
+}
