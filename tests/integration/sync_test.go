@@ -13615,3 +13615,80 @@ func Test_Sync_EnvVar_Masking(t *testing.T) {
 		require.NotContains(t, output, "webhookSecretV2", "actual webhook secret should not be exposed")
 	})
 }
+
+func Test_Sync_Plugin_Expressions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.16.0")
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"5*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
+}
+
+func Test_Sync_Plugin_Expressions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Sync_Plugin_Expressions_Konnect", testSyncPluginExpressionsKonnectImpl)
+}
+
+func testSyncPluginExpressionsKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	// resync with no error
+	require.NoError(t, sync(ctx, kongFile))
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"5*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
+}

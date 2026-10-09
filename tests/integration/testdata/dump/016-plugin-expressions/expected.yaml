@@ -1,0 +1,66 @@
+_format_version: "3.0"
+plugins:
+- config:
+    compound_identifier: null
+    consumer_groups: null
+    counter_key: null
+    custom_key: null
+    dictionary_name: kong_rate_limiting_counters
+    disable_penalty: false
+    enforce_consumer_groups: false
+    error_code: 429
+    error_message: API rate limit exceeded
+    header_name: null
+    hide_client_headers: false
+    identifier: consumer
+    limit:
+    - 5
+    lock_dictionary_name: kong_locks
+    namespace: expressions-test
+    path: null
+    redis:
+      cloud_authentication: null
+      cluster_addresses: null
+      cluster_max_redirections: 5
+      cluster_nodes: null
+      connect_timeout: 2000
+      connection_is_proxied: false
+      database: 0
+      host: 127.0.0.1
+      keepalive_backlog: null
+      keepalive_pool_size: 256
+      password: null
+      port: 6379
+      read_timeout: 2000
+      redis_proxy_type: null
+      send_timeout: 2000
+      sentinel_addresses: null
+      sentinel_master: null
+      sentinel_nodes: null
+      sentinel_password: null
+      sentinel_role: null
+      sentinel_username: null
+      server_name: null
+      ssl: false
+      ssl_verify: true
+      timeout: 2000
+      username: null
+    retry_after_jitter_max: 0
+    strategy: local
+    sync_rate: null
+    throttling: null
+    window_size:
+    - 60
+    window_type: sliding
+  enabled: true
+  expressions:
+    custom_key: null
+    limit:
+    - 5*10
+  id: 6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11
+  name: rate-limiting-advanced
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https

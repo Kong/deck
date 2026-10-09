@@ -34,6 +34,7 @@ jobs:
         - 'kong/kong-gateway:3.13'
         - 'kong/kong-gateway:3.14'
         - 'kong/kong-gateway:3.15'
+        - 'kong/kong-gateway:3.16'
         - 'kong/kong-gateway-dev:latest'
         router_flavor:
           - 'traditional_compatible'
@@ -85,6 +86,7 @@ jobs:
         - 'kong/kong-gateway:3.4'
         - 'kong/kong-gateway:3.10'
         - 'kong/kong-gateway:3.14'
+        - 'kong/kong-gateway:3.16'
         - 'kong/kong-gateway-dev:latest'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
