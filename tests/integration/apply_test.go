@@ -1290,3 +1290,116 @@ func testApplyCustomPluginDefinitionsKonnectImpl(t *testing.T) {
 		})
 	}
 }
+
+func Test_Apply_Plugin_Expressions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.16.0")
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	require.NoError(t, sync(ctx, kongFile))
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"5*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
+
+	updatedFile := "testdata/apply/015-plugin-expressions/updated.yaml"
+	require.NoError(t, apply(ctx, updatedFile))
+
+	expectedStatePostApply := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"7*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, false, false, expectedStatePostApply, ignoreFields)
+}
+
+func Test_Apply_Plugin_Expressions_Konnect(t *testing.T) {
+	runDualTestWithSkipDefaults(t, "Test_Apply_Plugin_Expressions_Konnect", testApplyPluginExpressionsKonnectImpl)
+}
+
+func testApplyPluginExpressionsKonnectImpl(t *testing.T) {
+	setDefaultKonnectControlPlane(t)
+	runWhenKonnect(t)
+	setup(t)
+	ctx := context.Background()
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	require.NoError(t, sync(ctx, kongFile))
+
+	ignoreFields := []cmp.Option{
+		cmpopts.IgnoreFields(kong.Plugin{}, "Config"),
+		cmpopts.IgnoreFields(kong.Plugin{}, "Protocols"),
+	}
+
+	expectedStatePostSync := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"5*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
+
+	updatedFile := "testdata/apply/015-plugin-expressions/updated.yaml"
+	require.NoError(t, apply(ctx, updatedFile))
+
+	expectedStatePostApply := utils.KongRawState{
+		Plugins: []*kong.Plugin{
+			{
+				ID:      kong.String("6f5c0bb0-8e5c-4d3e-9d5b-1c1f2f0a9a11"),
+				Name:    kong.String("rate-limiting-advanced"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"limit":      []any{"7*10"},
+				},
+			},
+		},
+	}
+
+	testKongState(t, client, true, false, expectedStatePostApply, ignoreFields)
+}
