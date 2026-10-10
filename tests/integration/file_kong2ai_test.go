@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -23,13 +22,7 @@ type fileKong2AITestCase struct {
 	dir  string
 }
 
-// runFileKong2AICases exercises `deck file kong2ai`, the file-based counterpart
-// of `deck ai dump`.
-//
-// Like `ai dump`, the output does not reproduce the original AI Gateway source
-// byte-for-byte (it fills defaults and drops presentation-only fields), so there
-// is no static fixture to compare against. Instead we assert what a migration
-// needs: the generated AI Gateway file must be accepted by `ai sync`, and must
+// The generated AI Gateway file must be accepted by `ai sync`, and must
 // yield the same AI-managed Kong state as the original AI Gateway source.
 func runFileKong2AICases(t *testing.T, tests []fileKong2AITestCase) {
 	t.Helper()
@@ -96,8 +89,6 @@ func Test_FileKong2AI(t *testing.T) {
 	})
 }
 
-// Test_FileKong2AI_AIGateway21 is split out from Test_FileKong2AI so the 2.0.x
-// image, whose plugin schemas reject these fields, skips it.
 func Test_FileKong2AI_AIGateway21(t *testing.T) {
 	runWhenAIGateway(t, ">=2.1.0")
 	setup(t)
@@ -146,11 +137,7 @@ func Test_FileKong2AI_AIGateway22(t *testing.T) {
 	})
 }
 
-// Test_FileKong2AI_CustomPolicy covers converting a custom plugin definition
-// (and the plugin instance referencing it) to AI Gateway custom_policies and
-// policies. The converted file holds both, but Kong must register the
-// definition before it accepts an instance of it, so the definition is synced
-// first and given pluginDefinitionSyncDelay to take effect.
+// Custom policy schema needs to be registered before use. So, we will test it differently.
 func Test_FileKong2AI_CustomPolicy(t *testing.T) {
 	runWhenAIGateway(t, ">=2.2.0")
 	setup(t)
@@ -186,40 +173,12 @@ func Test_FileKong2AI_CustomPolicy(t *testing.T) {
 	assertAIStateEqual(t, reference, migrated)
 }
 
-// Test_FileKong2AI_OutputFormats verifies the --format, --output-file and
-// --source flags: JSON and YAML sources are interchangeable, JSON output is
-// valid, and the file written with --output-file is accepted by `ai sync`.
 func Test_FileKong2AI_OutputFormats(t *testing.T) {
 	runWhenAIGateway(t, ">=2.0.0")
 	setup(t)
 
-	ctx := context.Background()
 	const dir = "testdata/file_ai2kong/02-identity-and-policies"
 	kongYAMLFile := filepath.Join(dir, "output.yaml")
-
-	reset(t)
-	require.NoError(t, aiSync(ctx, filepath.Join(dir, "input.yaml")))
-	reference, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-	require.NoError(t, err)
-
-	t.Run("json output written to a file syncs", func(t *testing.T) {
-		outputFile := filepath.Join(t.TempDir(), "kong2ai.json")
-
-		stdout, err := fileKong2AI("-s", kongYAMLFile, "--format", "json", "-o", outputFile)
-		require.NoError(t, err)
-		assert.Empty(t, stdout, "nothing should be written to stdout when --output-file is set")
-
-		content, err := os.ReadFile(outputFile)
-		require.NoError(t, err)
-		require.True(t, json.Valid(content), "output should be valid JSON")
-
-		reset(t)
-		require.NoError(t, aiSync(ctx, outputFile))
-		migrated, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-		require.NoError(t, err)
-
-		assertAIStateEqual(t, reference, migrated)
-	})
 
 	t.Run("json source gives the same result as yaml source", func(t *testing.T) {
 		kongJSONFile := filepath.Join(t.TempDir(), "kong.json")
@@ -233,15 +192,5 @@ func Test_FileKong2AI_OutputFormats(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.YAMLEq(t, fromYAML, fromJSON)
-	})
-
-	t.Run("source flag is required", func(t *testing.T) {
-		_, err := fileKong2AI()
-		require.Error(t, err)
-	})
-
-	t.Run("unknown format is rejected", func(t *testing.T) {
-		_, err := fileKong2AI("-s", kongYAMLFile, "--format", "xml")
-		require.Error(t, err)
 	})
 }

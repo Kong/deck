@@ -21,8 +21,7 @@ func newKong2AiCmd() *cobra.Command {
 		Use:   "kong2ai",
 		Short: "Generate AI Gateway configuration from Kong configuration",
 		Long: `This command takes a standard decK state file and converts it to an AI Gateway 2.0 entity model.` +
-			` It helps migrate an existing Kong Gateway configuration to AI Gateway,` +
-			` and is the inverse of 'deck file ai2kong'.` +
+			` It helps migrate an existing Kong Gateway configuration to AI Gateway.` +
 			"\n\nThe conversion is best-effort: AI plugins are recognized anywhere in the configuration," +
 			" while entities with no AI Gateway representation are reported as warnings." +
 			"\n\nThe state file may be provided in either YAML or JSON; the format is auto-detected." +
