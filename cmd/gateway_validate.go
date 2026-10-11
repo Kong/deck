@@ -327,9 +327,7 @@ this command unless --online flag is used.
 }
 
 // fillPluginAutoFields mirrors the auto-field handling go-database-reconciler's
-// diff.Syncer.Solve applies to every plugin before sending it to Kong (see
-// pkg/diff/diff.go), so that `gateway validate` validates the same plugin body
-// that `gateway sync`/`diff`/`apply` would actually send.
+// diff.Syncer.Solve applies to every plugin before sending it to Kong to maintain parity.
 func fillPluginAutoFields(ctx context.Context, kongClient *kong.Client, plugins []*kong.Plugin) error {
 	schemaCache := map[string]kong.Schema{}
 	for _, p := range plugins {
@@ -342,10 +340,7 @@ func fillPluginAutoFields(ctx context.Context, kongClient *kong.Client, plugins 
 			}
 			schemaCache[*p.Name] = s
 		}
-		if err := kong.FillPluginsDefaultsWithOpts(p, s, kong.FillRecordOptions{
-			FillDefaults: false,
-			FillAuto:     true,
-		}); err != nil {
+		if err := kong.FillPluginImplicitDefaults(p, s); err != nil {
 			return fmt.Errorf("processing auto fields for plugin %s: %w", *p.Name, err)
 		}
 	}
