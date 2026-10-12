@@ -20,6 +20,7 @@ consumer_groups:
       limit:
       - 30000
       lock_dictionary_name: kong_locks
+      missing_identifier_behavior: ip
       namespace: basic
       path: null
       redis:
