@@ -1,0 +1,23 @@
+_format_version: "3.0"
+# openid-connect's deprecated `consumer_claim` is returned by Kong as `consumer_claims`. Under
+# DECK_SKIP_DEFAULTS_FILL=true the decision pass used to skip ClearUnmatchingDeprecations while the
+# display pass still ran it, so an update was decided but the rendered diff body came out empty.
+services:
+  - name: example
+    host: example.com
+plugins:
+  - config:
+      session_memcached_ssl: false
+      consumer_by:
+        - custom_id
+      consumer_claim:
+        - clientId
+      issuer: https://my-issuer.com
+      cache_tokens_salt: xxxxxx
+      auth_methods:
+        - bearer
+    enabled: true
+    name: openid-connect
+    protocols:
+      - https
+    service: example

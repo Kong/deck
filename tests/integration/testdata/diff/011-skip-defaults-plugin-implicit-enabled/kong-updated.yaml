@@ -1,0 +1,25 @@
+_format_version: "3.0"
+# Same plugin as kong.yaml with a genuine config.access change, to assert normalizing the implicit
+# `enabled` default does not swallow real plugin updates.
+services:
+  - name: svc-skip-defaults-implicit-enabled
+    url: http://httpbin.org
+    routes:
+      - name: route-skip-defaults-implicit-enabled
+        paths:
+          - /skip-defaults-implicit-enabled
+        protocols:
+          - http
+          - https
+        plugins:
+          - name: post-function
+            instance_name: skip-defaults-implicit-enabled
+            protocols:
+              - http
+              - https
+            config:
+              access:
+                - |
+                  kong.log.set_serialize_value('request.headers.api-key', 'MASKED')
+            tags:
+              - deck-skip-defaults-implicit-enabled

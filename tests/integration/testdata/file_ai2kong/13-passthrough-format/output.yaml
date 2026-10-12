@@ -1,0 +1,58 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: gpt-passthrough
+- name: claude-passthrough
+plugins:
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5.2
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: gpt-5.2
+        provider: openai
+      route_type: passthrough
+  name: ai-proxy-advanced
+  route: openai-passthrough
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: anthropic
+    targets:
+    - auth:
+        header_name: x-api-key
+        header_value: '{vault://env/anthropic-key}'
+      description: claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: claude-sonnet-4-5
+        provider: anthropic
+      route_type: passthrough
+  name: ai-proxy-advanced
+  route: anthropic-passthrough
+services:
+- name: ai-gateway
+  routes:
+  - name: openai-passthrough
+    paths:
+    - /ai
+    strip_path: false
+  - name: anthropic-passthrough
+    paths:
+    - /claude
+    strip_path: false
+  url: http://ai-gateway.upstream.local

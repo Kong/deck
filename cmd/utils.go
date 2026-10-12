@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -86,13 +85,9 @@ func parseDiagnosticCodesFlag(flagName, value string) ([]reconcilerUtils.Diagnos
 	return codes, nil
 }
 
-func validateInputFlag(flagName string, flagValue string, allowedValues []string, errorMessage string) error {
+func validateInputFlag(flagName string, flagValue string, allowedValues []string) error {
 	if slices.Contains(allowedValues, flagValue) {
 		return nil
-	}
-
-	if errorMessage != "" {
-		return errors.New(errorMessage)
 	}
 
 	return fmt.Errorf("invalid value '%s' found for the '%s' flag. Allowed values: %v",

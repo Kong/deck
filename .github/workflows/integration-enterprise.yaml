@@ -34,6 +34,7 @@ jobs:
         - 'kong/kong-gateway:3.13'
         - 'kong/kong-gateway:3.14'
         - 'kong/kong-gateway:3.15'
+        - 'kong/kong-gateway:3.16'
         - 'kong/kong-gateway-dev:latest'
         router_flavor:
           - 'traditional_compatible'
@@ -46,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
       - name: Checkout repository
@@ -85,6 +86,7 @@ jobs:
         - 'kong/kong-gateway:3.4'
         - 'kong/kong-gateway:3.10'
         - 'kong/kong-gateway:3.14'
+        - 'kong/kong-gateway:3.16'
         - 'kong/kong-gateway-dev:latest'
     env:
       KONG_ANONYMOUS_REPORTS: "off"
@@ -96,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
       - name: Checkout repository

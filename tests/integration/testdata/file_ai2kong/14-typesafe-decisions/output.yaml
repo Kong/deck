@@ -1,0 +1,45 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: jev-latest
+plugins:
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: typesafe-decisions
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: typesafe
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/typesafe-token}'
+      description: jev-latest
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: jev-latest
+        name: jev-latest
+        provider: typesafe
+      route_type: llm/v1/chat
+  model: jev-latest
+  name: ai-proxy-advanced
+  route: typesafe-decisions
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    name: typesafe-decisions
+    paths:
+    - ~/ai/v1/systemone
+    strip_path: false
+  url: http://ai-gateway.upstream.local

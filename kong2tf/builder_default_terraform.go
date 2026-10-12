@@ -11,11 +11,55 @@ import (
 )
 
 type DefaultTerraformBuider struct {
-	content string
+	content  string
+	provider Provider
 }
 
-func newDefaultTerraformBuilder() *DefaultTerraformBuider {
-	return &DefaultTerraformBuider{}
+func newDefaultTerraformBuilder(provider ...Provider) *DefaultTerraformBuider {
+	selectedProvider := ProviderKonnect
+	if len(provider) > 0 {
+		selectedProvider = provider[0]
+	}
+	return &DefaultTerraformBuider{provider: selectedProvider}
+}
+
+func (b *DefaultTerraformBuider) generateResource(
+	entityType string,
+	name string,
+	entity map[string]any,
+	parents map[string]string,
+	imports importConfig,
+	lifecycle []string,
+) string {
+	imports.provider = b.provider
+	return generateResource(entityType, name, entity, parents, imports, lifecycle)
+}
+
+func (b *DefaultTerraformBuider) generateResourceWithCustomizations(
+	entityType string,
+	name string,
+	entity map[string]any,
+	parents map[string]string,
+	customizations map[string]string,
+	imports importConfig,
+	lifecycle []string,
+	oneOfFields map[string][]string,
+) string {
+	imports.provider = b.provider
+	return generateResourceWithCustomizations(
+		entityType, name, entity, parents, customizations, imports, lifecycle, oneOfFields,
+	)
+}
+
+func (b *DefaultTerraformBuider) generateRelationship(
+	entityType string,
+	name string,
+	relations map[string]string,
+	entity map[string]any,
+	imports importConfig,
+) string {
+	imports.provider = b.provider
+	return generateRelationship(entityType, name, relations, entity, imports)
 }
 
 // Generic function that takes type T and returns map[string]any using JSON marshalling
@@ -35,6 +79,9 @@ func toMapAny(resource any) map[string]any {
 }
 
 func (b *DefaultTerraformBuider) buildControlPlaneVar(controlPlaneID *string) {
+	if b.provider == ProviderKongGateway {
+		return
+	}
 	cpID := "YOUR_CONTROL_PLANE_ID"
 	if controlPlaneID != nil {
 		cpID = *controlPlaneID
@@ -48,7 +95,7 @@ func (b *DefaultTerraformBuider) buildControlPlaneVar(controlPlaneID *string) {
 func (b *DefaultTerraformBuider) buildServices(content *file.Content, controlPlaneID *string) {
 	for _, service := range content.Services {
 		parentResourceName := strings.ReplaceAll(*service.Name, "-", "_")
-		b.content += generateResource(
+		b.content += b.generateResource(
 			"gateway_service",
 			parentResourceName,
 			toMapAny(service),
@@ -64,7 +111,7 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content, controlPla
 
 		for _, route := range service.Routes {
 			resourceName := strings.ReplaceAll(*route.Name, "-", "_")
-			b.content += generateResource("gateway_route", resourceName, toMapAny(route), map[string]string{
+			b.content += b.generateResource("gateway_route", resourceName, toMapAny(route), map[string]string{
 				"service": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -75,7 +122,7 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content, controlPla
 
 			for _, plugin := range route.Plugins {
 				pluginName := strings.ReplaceAll(*plugin.Name, "-", "_")
-				b.content += generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
+				b.content += b.generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
 					"route": resourceName,
 				}, importConfig{
 					controlPlaneID: controlPlaneID,
@@ -88,7 +135,7 @@ func (b *DefaultTerraformBuider) buildServices(content *file.Content, controlPla
 
 		for _, plugin := range service.Plugins {
 			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
-			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+			b.content += b.generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
 				"service": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -107,7 +154,7 @@ func (b *DefaultTerraformBuider) buildRoutes(content *file.Content, controlPlane
 		if route.Service != nil {
 			parents["service"] = strings.ReplaceAll(*route.Service.Name, "-", "_")
 		}
-		b.content += generateResource("gateway_route", parentResourceName, toMapAny(route), parents, importConfig{
+		b.content += b.generateResource("gateway_route", parentResourceName, toMapAny(route), parents, importConfig{
 			controlPlaneID: controlPlaneID,
 			importValues: map[string]*string{
 				"id": route.ID,
@@ -116,7 +163,7 @@ func (b *DefaultTerraformBuider) buildRoutes(content *file.Content, controlPlane
 
 		for _, plugin := range route.Plugins {
 			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
-			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+			b.content += b.generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
 				"route": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -131,7 +178,7 @@ func (b *DefaultTerraformBuider) buildRoutes(content *file.Content, controlPlane
 func (b *DefaultTerraformBuider) buildGlobalPlugins(content *file.Content, controlPlaneID *string) {
 	for _, globalPlugin := range content.Plugins {
 		resourceName := strings.ReplaceAll(*globalPlugin.Name, "-", "_")
-		b.content += generateResource(
+		b.content += b.generateResource(
 			"gateway_plugin",
 			resourceName,
 			toMapAny(globalPlugin),
@@ -154,7 +201,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 ) {
 	for _, consumer := range content.Consumers {
 		parentResourceName := strings.ReplaceAll(*consumer.Username, "-", "_")
-		b.content += generateResource(
+		b.content += b.generateResource(
 			"gateway_consumer",
 			parentResourceName,
 			toMapAny(consumer),
@@ -171,7 +218,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 		for _, cg := range consumer.Groups {
 			resourceName := strings.ReplaceAll(*cg.Name, "-", "_")
 
-			b.content += generateRelationship(
+			b.content += b.generateRelationship(
 				"gateway_consumer_group_member",
 				resourceName+"_"+parentResourceName,
 				map[string]string{
@@ -191,7 +238,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 
 		for _, acl := range consumer.ACLGroups {
 			resourceName := "acl_" + strings.ReplaceAll(*acl.Group, "-", "_")
-			b.content += generateResource("gateway_acl", resourceName, toMapAny(acl), map[string]string{
+			b.content += b.generateResource("gateway_acl", resourceName, toMapAny(acl), map[string]string{
 				"consumer_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -212,7 +259,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 			}
 
 			resourceName := "basic_auth_" + strings.ReplaceAll(*basicauth.Username, "-", "_")
-			b.content += generateResource("gateway_basic_auth", resourceName, toMapAny(basicauth), map[string]string{
+			b.content += b.generateResource("gateway_basic_auth", resourceName, toMapAny(basicauth), map[string]string{
 				"consumer_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -225,7 +272,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 
 		for _, keyauth := range consumer.KeyAuths {
 			resourceName := "key_auth_" + strings.ReplaceAll(*keyauth.Key, "-", "_")
-			b.content += generateResource("gateway_key_auth", resourceName, toMapAny(keyauth), map[string]string{
+			b.content += b.generateResource("gateway_key_auth", resourceName, toMapAny(keyauth), map[string]string{
 				"consumer_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -245,7 +292,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 				}
 			}
 			resourceName := "jwt_" + strings.ReplaceAll(*jwt.Key, "-", "_")
-			b.content += generateResource("gateway_jwt", resourceName, toMapAny(jwt), map[string]string{
+			b.content += b.generateResource("gateway_jwt", resourceName, toMapAny(jwt), map[string]string{
 				"consumer_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -258,7 +305,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 
 		for _, hmacauth := range consumer.HMACAuths {
 			resourceName := "hmac_auth_" + strings.ReplaceAll(*hmacauth.Username, "-", "_")
-			b.content += generateResource("gateway_hmac_auth", resourceName, toMapAny(hmacauth), map[string]string{
+			b.content += b.generateResource("gateway_hmac_auth", resourceName, toMapAny(hmacauth), map[string]string{
 				"consumer_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -271,7 +318,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 
 		for _, plugin := range consumer.Plugins {
 			pluginName := strings.ReplaceAll(*plugin.Name, "-", "_")
-			b.content += generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
+			b.content += b.generateResource("gateway_plugin", pluginName, toMapAny(plugin), map[string]string{
 				"consumer": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -288,7 +335,7 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, cont
 	for _, cg := range content.ConsumerGroups {
 		parentResourceName := strings.ReplaceAll(*cg.Name, "-", "_")
 		parents := map[string]string{}
-		b.content += generateResource("gateway_consumer_group", parentResourceName, toMapAny(cg), parents, importConfig{
+		b.content += b.generateResource("gateway_consumer_group", parentResourceName, toMapAny(cg), parents, importConfig{
 			controlPlaneID: controlPlaneID,
 			importValues: map[string]*string{
 				"id": cg.ID,
@@ -299,7 +346,7 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, cont
 		for _, consumer := range cg.Consumers {
 			resourceName := strings.ReplaceAll(*consumer.Username, "-", "_")
 
-			b.content += generateRelationship(
+			b.content += b.generateRelationship(
 				"gateway_consumer_group_member",
 				parentResourceName+"_"+resourceName,
 				map[string]string{
@@ -319,7 +366,7 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, cont
 
 		for _, plugin := range cg.Plugins {
 			resourceName := strings.ReplaceAll(*plugin.Name, "-", "_")
-			b.content += generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
+			b.content += b.generateResource("gateway_plugin", resourceName, toMapAny(plugin), map[string]string{
 				"consumer_group": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -336,7 +383,7 @@ func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content, controlPl
 		parentResourceName := strings.ReplaceAll(*upstream.Name, "-", "_")
 		parentResourceName = "upstream_" + strings.ReplaceAll(parentResourceName, ".", "_")
 		parents := map[string]string{}
-		b.content += generateResource("gateway_upstream", parentResourceName, toMapAny(upstream), parents, importConfig{
+		b.content += b.generateResource("gateway_upstream", parentResourceName, toMapAny(upstream), parents, importConfig{
 			controlPlaneID: controlPlaneID,
 			importValues: map[string]*string{
 				"id": upstream.ID,
@@ -346,7 +393,7 @@ func (b *DefaultTerraformBuider) buildUpstreams(content *file.Content, controlPl
 		for _, target := range upstream.Targets {
 			resourceName := strings.ReplaceAll(*target.Target.Target, ".", "_")
 			resourceName = "target_" + strings.ReplaceAll(resourceName, ":", "_")
-			b.content += generateResource("gateway_target", resourceName, toMapAny(target), map[string]string{
+			b.content += b.generateResource("gateway_target", resourceName, toMapAny(target), map[string]string{
 				"upstream_id": parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -365,7 +412,7 @@ func (b *DefaultTerraformBuider) buildCACertificates(content *file.Content, cont
 		hashedCert := fmt.Sprintf("%x", md5.Sum([]byte(*caCertificate.Cert))) //nolint:gosec
 		resourceName := "ca_cert_" + hashedCert
 		idx++
-		b.content += generateResource(
+		b.content += b.generateResource(
 			"gateway_ca_certificate",
 			resourceName,
 			toMapAny(caCertificate),
@@ -385,7 +432,7 @@ func (b *DefaultTerraformBuider) buildCertificates(content *file.Content, contro
 	for _, certificate := range content.Certificates {
 		hashedCert := fmt.Sprintf("%x", md5.Sum([]byte(*certificate.Cert))) //nolint:gosec
 		resourceName := "cert_" + hashedCert
-		b.content += generateResource(
+		b.content += b.generateResource(
 			"gateway_certificate",
 			resourceName,
 			toMapAny(certificate),
@@ -401,7 +448,7 @@ func (b *DefaultTerraformBuider) buildCertificates(content *file.Content, contro
 
 		for _, sni := range certificate.SNIs {
 			resourceName := "sni_" + strings.ReplaceAll(*sni.Name, ".", "_")
-			b.content += generateResource("gateway_sni", resourceName, toMapAny(sni), map[string]string{
+			b.content += b.generateResource("gateway_sni", resourceName, toMapAny(sni), map[string]string{
 				"certificate": "cert_" + hashedCert,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
@@ -417,7 +464,7 @@ func (b *DefaultTerraformBuider) buildVaults(content *file.Content, controlPlane
 	for _, vault := range content.Vaults {
 		parentResourceName := strings.ReplaceAll(*vault.Name, "-", "_")
 		parents := map[string]string{}
-		b.content += generateResourceWithCustomizations(
+		b.content += b.generateResourceWithCustomizations(
 			"gateway_vault",
 			parentResourceName,
 			toMapAny(vault),
@@ -441,7 +488,7 @@ func (b *DefaultTerraformBuider) buildPartials(content *file.Content, controlPla
 	for _, partial := range content.Partials {
 		parentResourceName := strings.ReplaceAll(*partial.Name, "-", "_")
 		parents := map[string]string{}
-		b.content += generateResourceWithCustomizations(
+		b.content += b.generateResourceWithCustomizations(
 			"gateway_partial",
 			parentResourceName,
 			toMapAny(partial),

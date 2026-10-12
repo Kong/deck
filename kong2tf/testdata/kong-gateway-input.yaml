@@ -1,0 +1,11 @@
+_format_version: "3.0"
+
+services:
+  - name: parent-service
+    id: service-id
+    host: example.com
+    routes:
+      - name: child-route
+        id: route-id
+        paths:
+          - /child

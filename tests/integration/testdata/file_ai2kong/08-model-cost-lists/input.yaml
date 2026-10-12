@@ -1,0 +1,68 @@
+models:
+  - type: model
+    display_name: GPT-5.4
+    name: gpt-5-4
+    capabilities: [generate]
+    formats:
+      - type: openai
+    targets:
+      - name: gpt-5.4
+        weight: 100
+        provider: openai-main
+        config:
+          type: openai
+          temperature: 0.7
+          # Per-modality usage cost as alternative to pricing catalog.
+          # Pairs modality (text/audio/image/video) with cost per 1M tokens.
+          # cache_write_cost_list is per-cache-TTL (5m vs 1h).
+          input_cost_list:
+            - modal: text
+              cost: 2
+            - modal: audio
+              cost: 60
+            - modal: image
+              cost: 30
+            - modal: video
+              cost: 100
+          output_cost_list:
+            - modal: text
+              cost: 8
+            - modal: audio
+              cost: 240
+            - modal: image
+              cost: 120
+            - modal: video
+              cost: 400
+          cache_read_cost_list:
+            - modal: text
+              cost: 0.5
+            - modal: audio
+              cost: 15
+            - modal: image
+              cost: 7.5
+            - modal: video
+              cost: 25
+          cache_write_cost_list:
+            - ttl: 5m
+              cost: 2.5
+            - ttl: 1h
+              cost: 5
+    policies: []
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route:
+        paths: [/ai]
+      balancer:
+        algorithm: round-robin
+        slots: 10000
+model_providers:
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "{vault://env/openai-key}"

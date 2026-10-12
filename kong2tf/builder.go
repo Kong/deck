@@ -19,8 +19,12 @@ type ITerraformBuilder interface {
 	getContent() string
 }
 
-func getTerraformBuilder() ITerraformBuilder {
-	return newDefaultTerraformBuilder()
+func getTerraformBuilder(provider ...Provider) ITerraformBuilder {
+	selectedProvider := ProviderKonnect
+	if len(provider) > 0 {
+		selectedProvider = provider[0]
+	}
+	return newDefaultTerraformBuilder(selectedProvider)
 }
 
 type Director struct {

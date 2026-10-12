@@ -215,3 +215,19 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 		})
 	}
 }
+
+func TestConvertKongGatewayProvider(t *testing.T) {
+	inputContent, err := file.GetContentFromFiles([]string{baseLocation + "kong-gateway-input.yaml"}, false)
+	require.NoError(t, err)
+
+	output, err := ConvertWithProvider(inputContent, nil, false, ProviderKongGateway)
+	require.NoError(t, err)
+
+	require.Contains(t, output, `resource "kong-gateway_service" "parent_service"`)
+	require.Contains(t, output, `resource "kong-gateway_route" "child_route"`)
+	require.Contains(t, output, "service = {")
+	require.Contains(t, output, "id = kong-gateway_service.parent_service.id")
+	require.NotContains(t, output, "konnect_")
+	require.NotContains(t, output, "control_plane_id")
+	require.NotContains(t, output, "kong-gateway_gateway_")
+}

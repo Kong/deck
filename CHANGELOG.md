@@ -1,5 +1,7 @@
 # Table of Contents
 
+- [v1.68.0](#v1680)
+- [v1.67.0](#v1670)
 - [v1.66.1](#v1661)
 - [v1.66.0](#v1660)
 - [v1.65.3](#v1653)
@@ -149,6 +151,26 @@
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 
+## [v1.68.0]
+> Release date: 2026/09/30
+
+### Features
+- Added support for AI Gateway 2.2 - including typesafe model providers, custom policy definitions
+[#2268](https://github.com/Kong/deck/pull/2268)
+- Added support for converting a deck file into Kong Gateway Terraform provider configuration in addition to Konnect in `deck file kong2tf` using `--provider` flag
+[#2255](https://github.com/Kong/deck/pull/2255)
+
+### Fixed
+- Fixed `deck gateway dump --all-workspaces` and `deck gateway reset --all-workspaces` to explicitly include the `default` workspace in both operations for Konnect
+[#2251](https://github.com/Kong/deck/pull/2251)
+
+## [v1.67.0]
+> Release date: 2026/09/24
+
+### Features
+- Added support for AI Gateway 2.1 features, including per-modality model cost lists,
+MCP protocol 2.1 fields, OpenID Connect bearer token header configuration and policy conditions.
+[#2243](https://github.com/Kong/deck/pull/2243)
 
 ## [v1.66.1]
 > Release date: 2026/09/08
@@ -2749,6 +2771,8 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.68.0]: https://github.com/Kong/deck/compare/v1.67.0...v1.68.0
+[v1.67.0]: https://github.com/Kong/deck/compare/v1.66.1...v1.67.0
 [v1.66.1]: https://github.com/Kong/deck/compare/v1.66.0...v1.66.1
 [v1.66.0]: https://github.com/Kong/deck/compare/v1.65.3...v1.66.0
 [v1.65.3]: https://github.com/Kong/deck/compare/v1.65.2...v1.65.3

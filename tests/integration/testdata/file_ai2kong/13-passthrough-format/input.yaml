@@ -1,0 +1,44 @@
+models:
+  - type: model
+    display_name: GPT Passthrough
+    name: gpt-passthrough
+    capabilities: [generate]
+    formats: [{type: passthrough}]
+    targets:
+      - name: gpt-5.2
+        provider: openai-main
+        config: {type: openai}
+    policies: []
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route: {paths: [/ai]}
+  - type: model
+    display_name: Claude Passthrough
+    name: claude-passthrough
+    capabilities: []
+    formats: [{type: passthrough}]
+    targets:
+      - name: claude-sonnet-4-5
+        provider: anthropic-main
+        config: {type: anthropic}
+    policies: []
+    access:
+      acls: {allow: [], deny: []}
+    config:
+      route: {paths: [/claude]}
+model_providers:
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers: [{name: Authorization, value: "{vault://env/openai-key}"}]
+  - type: anthropic
+    display_name: Anthropic Main
+    name: anthropic-main
+    config:
+      auth:
+        type: basic
+        headers: [{name: x-api-key, value: "{vault://env/anthropic-key}"}]

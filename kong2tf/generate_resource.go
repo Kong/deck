@@ -10,6 +10,39 @@ import (
 type importConfig struct {
 	controlPlaneID *string
 	importValues   map[string]*string
+	provider       Provider
+}
+
+func terraformResourceType(provider Provider, entityType string) string {
+	if provider == ProviderKongGateway {
+		return "kong-gateway_" + strings.TrimPrefix(entityType, "gateway_")
+	}
+	return "konnect_" + entityType
+}
+
+func providerForImport(imports importConfig) Provider {
+	if imports.provider == "" {
+		return ProviderKonnect
+	}
+	return imports.provider
+}
+
+func controlPlaneProperty(provider Provider) string {
+	if provider == ProviderKongGateway {
+		return ""
+	}
+	return "  control_plane_id = var.control_plane_id"
+}
+
+func resourceSuffix(provider Provider, parents map[string]string, lifecycle []string) string {
+	suffix := generateParents(parents, provider) + controlPlaneProperty(provider) + generateLifecycle(lifecycle)
+	if provider == ProviderKongGateway && suffix == "" {
+		return "\n"
+	}
+	if provider == ProviderKongGateway {
+		return "\n\n" + strings.TrimRight(suffix, "\n") + "\n"
+	}
+	return "\n\n" + suffix + "\n"
 }
 
 func generateResource(
@@ -42,6 +75,7 @@ func generateResourceWithCustomizations(
 	lifecycle []string,
 	oneOfFields map[string][]string,
 ) string {
+	provider := providerForImport(imports)
 	// Cache ID in case we need to use it for imports
 	entityID := ""
 	if entity["id"] != nil {
@@ -107,16 +141,13 @@ func generateResourceWithCustomizations(
 			customizations["config"] = "jsonencode"
 
 			s = fmt.Sprintf(`
-resource "konnect_gateway_custom_plugin" "%s" {
-%s
-
-%s  control_plane_id = var.control_plane_id%s
-}
+resource "%s" "%s" {
+%s%s}
 `,
+				terraformResourceType(provider, "gateway_custom_plugin"),
 				slugify(name),
 				strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
-				generateParents(parents),
-				generateLifecycle(lifecycle))
+				resourceSuffix(provider, parents, lifecycle))
 
 		} else {
 			entityType = fmt.Sprintf("%s_%s", entityType, name)
@@ -134,22 +165,24 @@ resource "konnect_gateway_custom_plugin" "%s" {
 
 	if !isCustomPlugin {
 		s = fmt.Sprintf(`
-resource "konnect_%s" "%s" {
-%s
-
-%s  control_plane_id = var.control_plane_id%s
-}
+resource "%s" "%s" {
+%s%s}
 `,
-			entityType, slugify(name),
+			terraformResourceType(provider, entityType), slugify(name),
 			strings.TrimRight(output(entityType, entity, 1, true, "\n", customizations, oneOfFields), "\n"),
-			generateParents(parents),
-			generateLifecycle(lifecycle))
+			resourceSuffix(provider, parents, lifecycle))
 	}
 
 	// Generate imports
 	if imports.controlPlaneID != nil && entityID != "" {
 		entity["id"] = entityID
-		s += generateImports(entityType, name, imports.importValues, imports.controlPlaneID)
+		importResourceType := entityType
+		if isCustomPlugin {
+			importResourceType = "gateway_custom_plugin"
+		}
+		s += generateImports(
+			terraformResourceType(provider, importResourceType), name, imports.importValues, imports.controlPlaneID,
+		)
 	}
 
 	return strings.TrimSpace(s) + "\n\n"
@@ -160,12 +193,13 @@ func generateRelationship(
 	name string,
 	relations map[string]string,
 	_ map[string]any, // 'entity' when TODO is resolved
-	_ importConfig, // 'imports' when TODO is resolved
+	imports importConfig, // 'imports' when TODO is resolved
 ) string {
+	provider := providerForImport(imports)
 	// TODO: We don't support relationship importing in the provider yet
 	// entityID := entity["id"].(string)
 
-	s := fmt.Sprintf(`resource "konnect_%s" "%s" {`, entityType, name)
+	s := fmt.Sprintf(`resource "%s" "%s" {`, terraformResourceType(provider, entityType), name)
 
 	// Extract keys to iterate in a deterministic order
 	keys := make([]string, 0, len(relations))
@@ -177,9 +211,11 @@ func generateRelationship(
 
 	// Output each item in the relationship
 	for _, k := range keys {
-		s += fmt.Sprintf("\n"+`  %s_id = konnect_gateway_%s.%s.id`, k, k, relations[k])
+		s += fmt.Sprintf("\n"+`  %s_id = %s.%s.id`, k, terraformResourceType(provider, "gateway_"+k), relations[k])
 	}
-	s += "\n  control_plane_id = var.control_plane_id"
+	if controlPlane := controlPlaneProperty(provider); controlPlane != "" {
+		s += "\n" + controlPlane
+	}
 	s += "\n}\n\n"
 
 	// TODO: We don't support relationship importing in the provider yet
@@ -203,11 +239,11 @@ func generateImports(
 	cpID *string,
 ) string {
 	if len(keysFromEntity) == 0 {
-		return ""
+		return "\n"
 	}
 
 	return fmt.Sprintf("\n"+`import {
-  to = konnect_%s.%s
+  to = %s.%s
   id = "%s"
 }`, entityType, name, generateImportKeys(keysFromEntity, cpID))
 }
@@ -285,9 +321,13 @@ func generateLifecycle(lifecycle []string) string {
 	return s
 }
 
-func generateParents(parents map[string]string) string {
+func generateParents(parents map[string]string, provider ...Provider) string {
 	if len(parents) == 0 {
 		return ""
+	}
+	selectedProvider := ProviderKonnect
+	if len(provider) > 0 {
+		selectedProvider = provider[0]
 	}
 
 	result := make([]string, 0, len(parents))
@@ -295,12 +335,13 @@ func generateParents(parents map[string]string) string {
 		v = strings.ReplaceAll(v, "-", "_")
 		// if parent ends with _id, use it as-is
 		if strings.HasSuffix(k, "_id") {
-			result = append(result, fmt.Sprintf(`  %s = konnect_gateway_%s.%s.id`, k, strings.TrimSuffix(k, "_id"), v)+"\n")
+			result = append(result, fmt.Sprintf(`  %s = %s.%s.id`, k,
+				terraformResourceType(selectedProvider, "gateway_"+strings.TrimSuffix(k, "_id")), v)+"\n")
 			continue
 		}
 		result = append(result, fmt.Sprintf(`  %s = {
-    id = konnect_gateway_%s.%s.id
-  }`+"\n", k, k, v))
+    id = %s.%s.id
+  }`+"\n", k, terraformResourceType(selectedProvider, "gateway_"+k), v))
 	}
 
 	return strings.Join(result, "\n") + "\n"

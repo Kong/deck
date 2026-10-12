@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -72,8 +73,16 @@ func Test_Sync_AIModels(t *testing.T) {
 	}
 }
 
-// Test_AISync exercises `deck ai sync`, which converts an AI Gateway state file
-// to Kong configuration and syncs it directly to Kong.
+// aiSyncTestCase pairs an AI Gateway source (inputFile) with its pre-converted
+// Kong configuration (outputFile) for Test_AISync.
+type aiSyncTestCase struct {
+	name       string
+	inputFile  string
+	outputFile string
+}
+
+// runAISyncCases exercises `deck ai sync`, which converts an AI Gateway state
+// file to Kong configuration and syncs it directly to Kong.
 //
 // The testdata under testdata/file_ai2kong/<case> holds an AI Gateway source
 // (input.yaml) alongside its converted Kong configuration (output.yaml). Since
@@ -85,17 +94,40 @@ func Test_Sync_AIModels(t *testing.T) {
 //
 // State is compared via `deck gateway dump` (scoped to the managed_by:deck-ai
 // tag, IDs stripped) so the comparison is independent of server-assigned IDs.
+func runAISyncCases(t *testing.T, tests []aiSyncTestCase) {
+	t.Helper()
+	ctx := context.Background()
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Establish the expected AI-managed state by syncing the converted
+			// (ai2kong) configuration directly.
+			reset(t)
+			require.NoError(t, sync(ctx, tc.outputFile))
+			expected, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+			require.NoError(t, err)
+
+			// `ai sync` of the AI Gateway source must reach the same state.
+			reset(t)
+			require.NoError(t, aiSync(ctx, tc.inputFile))
+			afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+			require.NoError(t, err)
+			assertAIStateEqual(t, expected, afterSync)
+
+			// Re-syncing must succeed and keep the state consistent.
+			require.NoError(t, aiSync(ctx, tc.inputFile))
+			afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
+			require.NoError(t, err)
+			assertAIStateEqual(t, afterSync, afterResync)
+		})
+	}
+}
+
 func Test_AISync(t *testing.T) {
 	runWhenAIGateway(t, ">=2.0.0")
 	setup(t)
 
-	ctx := context.Background()
-
-	tests := []struct {
-		name       string
-		inputFile  string
-		outputFile string
-	}{
+	runAISyncCases(t, []aiSyncTestCase{
 		{
 			name:       "models",
 			inputFile:  "testdata/file_ai2kong/01-models/input.yaml",
@@ -131,30 +163,97 @@ func Test_AISync(t *testing.T) {
 			inputFile:  "testdata/file_ai2kong/07-ca-certificates/input.yaml",
 			outputFile: "testdata/file_ai2kong/07-ca-certificates/output.yaml",
 		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			// Establish the expected AI-managed state by syncing the converted
-			// (ai2kong) configuration directly.
-			reset(t)
-			require.NoError(t, sync(ctx, tc.outputFile))
-			expected, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-			require.NoError(t, err)
+	})
+}
 
-			// `ai sync` of the AI Gateway source must reach the same state.
-			reset(t)
-			require.NoError(t, aiSync(ctx, tc.inputFile))
-			afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-			require.NoError(t, err)
-			assertAIStateEqual(t, expected, afterSync)
+// Test_AISync_AIGateway21 covers the AI Gateway 2.1 fields that have an AI
+// Gateway entity-model representation. It is split out from Test_AISync so the
+// 2.0.x image, whose plugin schemas reject those fields, skips it.
+func Test_AISync_AIGateway21(t *testing.T) {
+	runWhenAIGateway(t, ">=2.1.0")
+	setup(t)
 
-			// Re-syncing must succeed and keep the state consistent.
-			require.NoError(t, aiSync(ctx, tc.inputFile))
-			afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-")
-			require.NoError(t, err)
-			assertAIStateEqual(t, afterSync, afterResync)
-		})
-	}
+	runAISyncCases(t, []aiSyncTestCase{
+		{
+			name:       "model cost lists",
+			inputFile:  "testdata/file_ai2kong/08-model-cost-lists/input.yaml",
+			outputFile: "testdata/file_ai2kong/08-model-cost-lists/output.yaml",
+		},
+		{
+			name:       "mcp protocol 2.1 fields",
+			inputFile:  "testdata/file_ai2kong/09-mcp-protocol-2-1-fields/input.yaml",
+			outputFile: "testdata/file_ai2kong/09-mcp-protocol-2-1-fields/output.yaml",
+		},
+		{
+			name:       "auth strategy bearer header",
+			inputFile:  "testdata/file_ai2kong/10-auth-strategy-bearer-header/input.yaml",
+			outputFile: "testdata/file_ai2kong/10-auth-strategy-bearer-header/output.yaml",
+		},
+		{
+			name:       "policy condition",
+			inputFile:  "testdata/file_ai2kong/11-policy-condition/input.yaml",
+			outputFile: "testdata/file_ai2kong/11-policy-condition/output.yaml",
+		},
+	})
+}
+
+func Test_AISync_AIGateway22(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	runAISyncCases(t, []aiSyncTestCase{
+		{
+			name:       "skills api",
+			inputFile:  "testdata/file_ai2kong/12-skills-api/input.yaml",
+			outputFile: "testdata/file_ai2kong/12-skills-api/output.yaml",
+		},
+		{
+			name:       "passthrough format",
+			inputFile:  "testdata/file_ai2kong/13-passthrough-format/input.yaml",
+			outputFile: "testdata/file_ai2kong/13-passthrough-format/output.yaml",
+		},
+		{
+			name:       "typesafe provider decisions",
+			inputFile:  "testdata/file_ai2kong/14-typesafe-decisions/input.yaml",
+			outputFile: "testdata/file_ai2kong/14-typesafe-decisions/output.yaml",
+		},
+		{
+			name:       "typesafe provider decisions with multiple aliases",
+			inputFile:  "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/input.yaml",
+			outputFile: "testdata/file_ai2kong/15-typesafe-decisions-multi-alias/output.yaml",
+		},
+	})
+}
+
+// Test_AISync_CustomPolicy covers AI Gateway 2.2 custom_policies, which sync as
+// a Kong custom plugin definition (config.custom_plugins) plus the plugin
+// instance that references it. The definition (custom-policy.yaml) is synced
+// on its own first and given pluginDefinitionSyncDelay to register with Kong
+// -- syncing both in the same request races the plugin instance against the
+// definition it depends on -- before the instance (policy.yaml) is synced.
+func Test_AISync_CustomPolicy(t *testing.T) {
+	runWhenAIGateway(t, ">=2.2.0")
+	setup(t)
+
+	ctx := context.Background()
+	const (
+		customPolicyFile = "testdata/file_ai2kong/16-custom-policy/custom-policy.yaml"
+		policyFile       = "testdata/file_ai2kong/16-custom-policy/policy.yaml"
+	)
+
+	reset(t)
+	require.NoError(t, aiSync(ctx, customPolicyFile, "--include-policy-definitions"))
+	time.Sleep(pluginDefinitionSyncDelay)
+	require.NoError(t, aiSync(ctx, policyFile, "--include-policy-definitions"))
+	afterSync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+
+	// Regular round trip validation: re-syncing the policy instance must
+	// succeed and keep the state consistent.
+	require.NoError(t, aiSync(ctx, policyFile, "--include-policy-definitions"))
+	afterResync, err := dump("--select-tag", managedByAIDeckTag, "-o", "-", "--include-plugin-definitions")
+	require.NoError(t, err)
+	assertAIStateEqual(t, afterSync, afterResync)
 }
 
 // Test_AISync_MultipleFiles exercises `deck ai sync` with more than one source

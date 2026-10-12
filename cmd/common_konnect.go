@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -143,6 +144,13 @@ func resetKonnectV2(ctx context.Context) error {
 	return nil
 }
 
+func ensureDefaultWorkspace(workspaces []string) []string {
+	if !slices.Contains(workspaces, "default") {
+		workspaces = append(workspaces, "default")
+	}
+	return workspaces
+}
+
 func dumpKonnectV2(ctx context.Context) error {
 	if konnectRuntimeGroup != "" {
 		konnectControlPlane = konnectRuntimeGroup
@@ -190,7 +198,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		workspacesList = append(workspacesList, workspaces...)
+		workspacesList = ensureDefaultWorkspace(append(workspacesList, workspaces...))
 	}
 
 	for _, workspace := range workspacesList {

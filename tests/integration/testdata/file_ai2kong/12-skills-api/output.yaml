@@ -1,0 +1,39 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: openai-skills
+plugins:
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    model_name_header: false
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5.6
+      logging:
+        log_payloads: false
+        log_statistics: false
+      model:
+        name: gpt-5.6
+        provider: openai
+      route_type: llm/v1/skills
+  name: ai-proxy-advanced
+  route: openai-skills
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - GET
+    - POST
+    - DELETE
+    name: openai-skills
+    paths:
+    - /ai/skills
+    strip_path: false
+  url: http://ai-gateway.upstream.local

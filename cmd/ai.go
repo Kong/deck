@@ -14,6 +14,17 @@ import (
 // configuration on Konnect.
 const aiGatewayDocsURL = "https://developer.konghq.com/ai-gateway/kongctl"
 
+// flagIncludeCustomPolicyDefinitions is the `ai sync`/`ai dump` flag that opts
+// in to managing/dumping the Kong plugin definition entity that AI Gateway
+// custom_policies convert to (and revert from)
+const flagIncludeCustomPolicyDefinitions = "include-policy-definitions"
+
+// contentHasPluginDefinitions reports whether content declares a custom
+// plugin definition, the Kong entity AI Gateway custom_policies convert to.
+func contentHasPluginDefinitions(content *file.Content) bool {
+	return content != nil && (len(content.CustomPluginDefinitions) != 0)
+}
+
 func newAiSubCmd() *cobra.Command {
 	aiSubCmd := &cobra.Command{
 		Use:   "ai [sub-command]...",
