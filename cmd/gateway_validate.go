@@ -394,19 +394,27 @@ func getKongClient(
 	ctx context.Context, targetContent *file.Content, mode mode,
 ) (*kong.Client, error) {
 	if mode == modeKonnect {
-		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
-		if err != nil {
-			return nil, err
+		if konnectRuntimeGroup != "" {
+			konnectControlPlane = konnectRuntimeGroup
 		}
-		dumpConfig.KonnectControlPlane = konnectControlPlane
+		konnectConfig.TLSConfig = rootConfig.TLSConfig
+		konnectConfig.WorkspaceName = ""
+		// Resolve (and validate) the workspace before building the client so that
+		// lookup-tag requests are scoped to the selected workspace, matching
+		// diff/sync behaviour.
 		workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, true)
 		if err != nil {
 			return nil, err
 		}
-		if workspaceName != "" {
+		if workspaceName != "" && workspaceName != "default" {
 			konnectConfig.WorkspaceName = workspaceName
 		}
+		kongClient, err := GetKongClientForKonnectMode(ctx, &konnectConfig)
+		if err != nil {
+			return nil, err
+		}
 		kongClient.SetKonnectFlag(true)
+		dumpConfig.KonnectControlPlane = konnectControlPlane
 		return kongClient, nil
 	}
 	workspaceName, err := resolveAndValidateWorkspace(ctx, validateWorkspace, targetContent, false)

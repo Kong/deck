@@ -497,3 +497,46 @@ func Test_Validate_KonnectWorkspace_Isolation(t *testing.T) {
 	err = validate(ONLINE, "testdata/validate/002-konnect-workspace/entity-no-workspace.yaml")
 	require.NoError(t, err, "Validation should succeed for CP-level file")
 }
+
+func Test_Validate_KonnectWorkspace_LookupTagsScopedToWorkspace(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+
+	reset(t)
+
+	// Sync the tagged service into the non-default workspace.
+	require.NoError(t, sync(ctx,
+		"testdata/validate/003-konnect-workspace-lookup-tags/prereq.yaml"))
+
+	tests := []struct {
+		name           string
+		stateFile      string
+		additionalArgs []string
+	}{
+		{
+			name:      "workspace from _workspace field in state file",
+			stateFile: "testdata/validate/003-konnect-workspace-lookup-tags/validate.yaml",
+		},
+		{
+			name:           "workspace from --workspace flag",
+			stateFile:      "testdata/validate/003-konnect-workspace-lookup-tags/validate-flag.yaml",
+			additionalArgs: []string{"--workspace", "test-workspace"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			// Clear the workspace left on the process-wide Konnect config by the
+			// sync (or by the previous validation); entities in test-workspace are
+			// not touched by a plain reset.
+			reset(t)
+
+			validateOpts := append([]string{tc.stateFile}, tc.additionalArgs...)
+			err := validate(ONLINE, validateOpts...)
+			require.NoError(t, err,
+				"lookup-tag requests must be scoped to the workspace selected for validation")
+		})
+	}
+}

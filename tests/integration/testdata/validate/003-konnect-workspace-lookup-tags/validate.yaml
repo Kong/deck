@@ -1,0 +1,14 @@
+_format_version: "3.0"
+_workspace: test-workspace
+_konnect:
+  control_plane_name: default
+_info:
+  default_lookup_tags:
+    services:
+    - service-lookup-scope-tag
+plugins:
+- name: rate-limiting
+  id: a1368a28-cb5c-4eee-86d8-03a6bdf94b5e
+  service: svc-lookup-scope
+  config:
+    minute: 123
