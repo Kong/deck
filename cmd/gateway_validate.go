@@ -11,6 +11,7 @@ import (
 	"github.com/kong/deck/validate"
 	"github.com/kong/go-database-reconciler/pkg/dump"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-database-reconciler/pkg/schema"
 	"github.com/kong/go-database-reconciler/pkg/state"
 	reconcilerUtils "github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
@@ -151,6 +152,12 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}, dump.Config{DiagnosticPolicy: diagnosticPolicy}, kongClient)
 	if err != nil {
 		return err
+	}
+	if validateOnline {
+		registry := schema.NewRegistry(kongClient, mode == modeKonnect)
+		if err := fillPluginAutoFields(ctx, registry, rawState.Plugins); err != nil {
+			return err
+		}
 	}
 	if err := checkForRBACResources(*rawState, validateCmdRBACResourcesOnly); err != nil {
 		return err
@@ -319,6 +326,21 @@ this command unless --online flag is used.
 		panic(err.Error())
 	}
 	return validateCmd
+}
+
+// fillPluginAutoFields mirrors the auto-field handling go-database-reconciler's
+// diff.Syncer.Solve applies to every plugin before sending it to Kong to maintain parity.
+func fillPluginAutoFields(ctx context.Context, registry *schema.Registry, plugins []*kong.Plugin) error {
+	for _, p := range plugins {
+		s, err := registry.GetPluginSchema(ctx, *p.Name)
+		if err != nil {
+			return fmt.Errorf("retrieving schema for plugin %s: %w", *p.Name, err)
+		}
+		if err := kong.FillPluginImplicitDefaults(p, s); err != nil {
+			return fmt.Errorf("processing auto fields for plugin %s: %w", *p.Name, err)
+		}
+	}
+	return nil
 }
 
 func validateWithKong(
