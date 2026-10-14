@@ -1,6 +1,59 @@
 _format_version: "3.0"
 plugins:
 - config:
+    custom_key: null
+    day: 1000
+    error_code: 429
+    error_message: API rate limit exceeded
+    fault_tolerant: true
+    header_name: null
+    hide_client_headers: false
+    hour: null
+    limit_by: consumer
+    minute: 10
+    month: null
+    path: null
+    policy: local
+    redis:
+      cloud_authentication: null
+      database: 0
+      host: null
+      password: null
+      port: 6379
+      server_name: null
+      ssl: false
+      ssl_verify: true
+      timeout: 2000
+      username: null
+    redis_database: 0
+    redis_host: null
+    redis_password: null
+    redis_port: 6379
+    redis_server_name: null
+    redis_ssl: false
+    redis_ssl_verify: true
+    redis_timeout: 2000
+    redis_username: null
+    second: null
+    sync_rate: -1
+    year: null
+  enabled: true
+  expressions:
+    custom_key: null
+    day: 'consumer.username == "vip" ? 10000 : 1000'
+    hour: null
+    minute: 'consumer.username == "vip" ? 1000 : 10'
+    month: null
+    second: null
+    year: null
+  id: 8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b
+  name: rate-limiting
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+- config:
     compound_identifier: null
     consumer_groups: null
     counter_key: null

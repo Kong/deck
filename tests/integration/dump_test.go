@@ -13,8 +13,10 @@ import (
 	"github.com/acarl005/stripansi"
 	"github.com/kong/deck/sanitize"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"sigs.k8s.io/yaml"
 )
 
 func Test_Dump_SelectTags_30(t *testing.T) {
@@ -1782,6 +1784,30 @@ func Test_Dump_Plugin_Expressions_Konnect(t *testing.T) {
 	output, err := dump("-o", "-", "--with-id")
 	require.NoError(t, err)
 
-	assert.Contains(t, output, "expressions:")
-	assert.Contains(t, output, "- 5*10")
+	// the dumped file round-trips the plugins and their expressions
+	var dumped struct {
+		Plugins []file.FPlugin `json:"plugins"`
+	}
+	require.NoError(t, yaml.Unmarshal([]byte(output), &dumped))
+	byName := make(map[string]file.FPlugin, len(dumped.Plugins))
+	for _, plugin := range dumped.Plugins {
+		byName[*plugin.Name] = plugin
+	}
+	require.Len(t, byName, 2)
+
+	assert.Equal(t, kong.PluginExpressions{
+		"custom_key": nil,
+		"limit":      []any{"5*10"},
+	}, byName["rate-limiting-advanced"].Expressions)
+
+	// unset scalar fields survive the round-trip as null
+	assert.Equal(t, kong.PluginExpressions{
+		"custom_key": nil,
+		"second":     nil,
+		"minute":     `consumer.username == "vip" ? 1000 : 10`,
+		"hour":       nil,
+		"day":        `consumer.username == "vip" ? 10000 : 1000`,
+		"month":      nil,
+		"year":       nil,
+	}, byName["rate-limiting"].Expressions)
 }

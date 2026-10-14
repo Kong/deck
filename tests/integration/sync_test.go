@@ -13913,10 +13913,34 @@ func Test_Sync_Plugin_Expressions(t *testing.T) {
 					"limit":      []any{"5*10"},
 				},
 			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 1000 : 10`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 10000 : 1000`,
+					"month":      nil,
+					"year":       nil,
+				},
+			},
 		},
 	}
 
 	testKongState(t, client, false, false, expectedStatePostSync, ignoreFields)
+
+	// static config values must survive alongside the expressions
+	plugins, err := client.Plugins.ListAll(ctx)
+	require.NoError(t, err)
+	byName := pluginsByName(plugins)
+	require.Contains(t, byName, "rate-limiting")
+	for field, want := range map[string]any{"minute": float64(10), "day": float64(1000)} {
+		assert.Equal(t, want, byName["rate-limiting"].Config[field],
+			"rate-limiting config %q", field)
+	}
 }
 
 func Test_Sync_Plugin_Expressions_Konnect(t *testing.T) {
@@ -13954,8 +13978,32 @@ func testSyncPluginExpressionsKonnectImpl(t *testing.T) {
 					"limit":      []any{"5*10"},
 				},
 			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 1000 : 10`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 10000 : 1000`,
+					"month":      nil,
+					"year":       nil,
+				},
+			},
 		},
 	}
 
 	testKongState(t, client, true, false, expectedStatePostSync, ignoreFields)
+
+	// static config values must survive alongside the expressions
+	plugins, err := client.Plugins.ListAll(ctx)
+	require.NoError(t, err)
+	byName := pluginsByName(plugins)
+	require.Contains(t, byName, "rate-limiting")
+	for field, want := range map[string]any{"minute": float64(10), "day": float64(1000)} {
+		assert.Equal(t, want, byName["rate-limiting"].Config[field],
+			"rate-limiting config %q", field)
+	}
 }

@@ -1320,6 +1320,20 @@ func Test_Apply_Plugin_Expressions(t *testing.T) {
 					"limit":      []any{"5*10"},
 				},
 			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 1000 : 10`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 10000 : 1000`,
+					"month":      nil,
+					"year":       nil,
+				},
+			},
 		},
 	}
 
@@ -1337,6 +1351,20 @@ func Test_Apply_Plugin_Expressions(t *testing.T) {
 				Expressions: kong.PluginExpressions{
 					"custom_key": nil,
 					"limit":      []any{"7*10"},
+				},
+			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 20 : 5`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 20000 : 5000`,
+					"month":      nil,
+					"year":       nil,
 				},
 			},
 		},
@@ -1379,6 +1407,20 @@ func testApplyPluginExpressionsKonnectImpl(t *testing.T) {
 					"limit":      []any{"5*10"},
 				},
 			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 1000 : 10`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 10000 : 1000`,
+					"month":      nil,
+					"year":       nil,
+				},
+			},
 		},
 	}
 
@@ -1396,6 +1438,20 @@ func testApplyPluginExpressionsKonnectImpl(t *testing.T) {
 				Expressions: kong.PluginExpressions{
 					"custom_key": nil,
 					"limit":      []any{"7*10"},
+				},
+			},
+			{
+				ID:      kong.String("8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b"),
+				Name:    kong.String("rate-limiting"),
+				Enabled: kong.Bool(true),
+				Expressions: kong.PluginExpressions{
+					"custom_key": nil,
+					"second":     nil,
+					"minute":     `consumer.username == "vip" ? 20 : 5`,
+					"hour":       nil,
+					"day":        `consumer.username == "vip" ? 20000 : 5000`,
+					"month":      nil,
+					"year":       nil,
 				},
 			},
 		},

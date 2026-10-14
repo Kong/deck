@@ -10,3 +10,13 @@ plugins:
   expressions:
     limit: ["5*10"]
   enabled: true
+- id: 8f2c4a6e-1b3d-4e5f-9a7b-0c1d2e3f4a5b
+  name: rate-limiting
+  config:
+    policy: local
+    minute: 10
+    day: 1000
+  expressions:
+    minute: 'consumer.username == "vip" ? 1000 : 10'
+    day: 'consumer.username == "vip" ? 10000 : 1000'
+  enabled: true
