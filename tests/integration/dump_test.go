@@ -13,8 +13,10 @@ import (
 	"github.com/acarl005/stripansi"
 	"github.com/kong/deck/sanitize"
 	"github.com/kong/go-database-reconciler/pkg/file"
+	"github.com/kong/go-kong/kong"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"sigs.k8s.io/yaml"
 )
 
 func Test_Dump_SelectTags_30(t *testing.T) {
@@ -1752,4 +1754,60 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 			assert.Equal(t, expected, output)
 		})
 	}
+}
+
+func Test_Dump_Plugin_Expressions(t *testing.T) {
+	runWhen(t, "enterprise", ">=3.16.0")
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	expectedFile := "testdata/dump/016-plugin-expressions/expected.yaml"
+	expected, err := readFile(expectedFile)
+	require.NoError(t, err)
+	assert.Equal(t, expected, output)
+}
+
+func Test_Dump_Plugin_Expressions_Konnect(t *testing.T) {
+	runWhenKonnect(t)
+	setup(t)
+
+	ctx := context.Background()
+	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
+	require.NoError(t, sync(ctx, kongFile))
+
+	output, err := dump("-o", "-", "--with-id")
+	require.NoError(t, err)
+
+	// the dumped file round-trips the plugins and their expressions
+	var dumped struct {
+		Plugins []file.FPlugin `json:"plugins"`
+	}
+	require.NoError(t, yaml.Unmarshal([]byte(output), &dumped))
+	byName := make(map[string]file.FPlugin, len(dumped.Plugins))
+	for _, plugin := range dumped.Plugins {
+		byName[*plugin.Name] = plugin
+	}
+	require.Len(t, byName, 2)
+
+	assert.Equal(t, kong.PluginExpressions{
+		"custom_key": nil,
+		"limit":      []any{"5*10"},
+	}, byName["rate-limiting-advanced"].Expressions)
+
+	// unset scalar fields survive the round-trip as null
+	assert.Equal(t, kong.PluginExpressions{
+		"custom_key": nil,
+		"second":     nil,
+		"minute":     `consumer.username == "vip" ? 1000 : 10`,
+		"hour":       nil,
+		"day":        `consumer.username == "vip" ? 10000 : 1000`,
+		"month":      nil,
+		"year":       nil,
+	}, byName["rate-limiting"].Expressions)
 }

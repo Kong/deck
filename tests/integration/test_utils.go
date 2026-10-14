@@ -729,3 +729,13 @@ func pluginSortKey(p *file.FPlugin) string {
 	}
 	return string(b)
 }
+
+// pluginsByName indexes plugins by name, so a test can assert on a specific
+// plugin without depending on list order.
+func pluginsByName(plugins []*kong.Plugin) map[string]*kong.Plugin {
+	byName := make(map[string]*kong.Plugin, len(plugins))
+	for _, plugin := range plugins {
+		byName[*plugin.Name] = plugin
+	}
+	return byName
+}
