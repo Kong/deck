@@ -32,6 +32,7 @@ services:
     - GET
     - POST
     - DELETE
+    - OPTIONS
     name: openai-skills
     paths:
     - /ai/skills
