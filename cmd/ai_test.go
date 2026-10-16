@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	ai2kong "github.com/Kong/ai-deck-converter/convert"
@@ -40,7 +41,7 @@ const aiGatewaySourceYAML = `models:
       balancer:
         algorithm: round-robin
         slots: 10000
-providers:
+model_providers:
   - type: openai
     display_name: OpenAI Main
     name: openai-main
@@ -267,13 +268,53 @@ func TestAiConvertJSONInputParity(t *testing.T) {
 	jsonSource, err := yaml.YAMLToJSON([]byte(aiGatewaySourceYAML))
 	require.NoError(t, err)
 
-	fromYAML, _, err := ai2kong.Convert([]byte(aiGatewaySourceYAML), ai2kong.Options{OutputMode: "deck"})
+	fromYAML, _, err := convertAIGatewaySource([]byte(aiGatewaySourceYAML))
 	require.NoError(t, err)
-	fromJSON, _, err := ai2kong.Convert(jsonSource, ai2kong.Options{OutputMode: "deck"})
+	fromJSON, _, err := convertAIGatewaySource(jsonSource)
 	require.NoError(t, err)
 
 	require.True(t, bytes.Equal(fromYAML, fromJSON),
 		"JSON and YAML inputs should convert to identical decK output")
+}
+
+// TestAIGatewayMinRuntimeVersionIsLatest fails when the converter learns a
+// newer AI Gateway release than aiGatewayMinRuntimeVersion, so decK does not
+// silently keep emitting an older output shape.
+func TestAIGatewayMinRuntimeVersionIsLatest(t *testing.T) {
+	result, err := ai2kong.Convert([]byte(aiGatewaySourceYAML), ai2kong.Options{MinRuntimeVersion: "99.0"})
+	require.NoError(t, err)
+	require.Equal(t, aiGatewayMinRuntimeVersion, result.Metadata.MinRuntimeVersion)
+}
+
+// TestConvertAIGatewaySourceIssues verifies that an ERROR issue fails the
+// conversion rather than yielding a document with the affected entity left out.
+func TestConvertAIGatewaySourceIssues(t *testing.T) {
+	t.Run("error issue fails the conversion", func(t *testing.T) {
+		src := "models:\n  - name: m1\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n"
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		require.Empty(t, warnings)
+	})
+
+	t.Run("warning issue is returned and does not fail", func(t *testing.T) {
+		src := strings.Replace(aiGatewaySourceYAML, "    targets:\n",
+			"    targets:\n      - name: orphan\n        provider: no-such-provider\n        config:\n          type: openai\n", 1)
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.NoError(t, err)
+		require.NotEmpty(t, out)
+		require.Len(t, warnings, 1)
+		require.Contains(t, warnings[0], "no-such-provider")
+	})
+
+	t.Run("warnings that explain an error are returned with it", func(t *testing.T) {
+		src := strings.Replace(aiGatewaySourceYAML, "provider: openai-main", "provider: no-such-provider", 1)
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		require.Len(t, warnings, 1)
+		require.Contains(t, warnings[0], "no-such-provider")
+	})
 }
 
 // TestAi2KongOutputFormats drives the ai2kong command end-to-end with JSON input
