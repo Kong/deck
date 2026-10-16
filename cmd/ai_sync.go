@@ -8,7 +8,6 @@ import (
 	"slices"
 
 	"dario.cat/mergo"
-	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-database-reconciler/pkg/cprint"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/kong/go-database-reconciler/pkg/utils"
@@ -66,11 +65,11 @@ func buildAiSyncTargetContent(filenames []string) (*file.Content, error) {
 
 	var merged file.Content
 	for _, src := range sources {
-		convertedYAML, warnings, err := ai2kong.Convert(src.content, ai2kong.Options{})
+		convertedYAML, warnings, err := convertAIGatewaySource(src.content)
+		reportAiConversionWarnings(warnings, aiSyncJSONOutput)
 		if err != nil {
 			return nil, fmt.Errorf("converting %s: %w", src.name, err)
 		}
-		reportAiConversionWarnings(warnings, aiSyncJSONOutput)
 
 		content, err := file.GetContentFromReader(bytes.NewReader(convertedYAML), file.EnvVarsSkip)
 		if err != nil {
