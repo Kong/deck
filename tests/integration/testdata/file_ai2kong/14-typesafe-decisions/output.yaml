@@ -38,6 +38,7 @@ services:
   routes:
   - methods:
     - POST
+    - OPTIONS
     name: typesafe-decisions
     paths:
     - ~/ai/v1/systemone
