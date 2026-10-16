@@ -104,6 +104,10 @@ linters:
           - gosec
         path: kong2kic/route\.go
         text: G115
+      # Repeated string literals are idiomatic in tests (table-driven cases, fixtures)
+      - linters:
+          - goconst
+        path: _test\.go
       - linters:
           - unparam
           - unused

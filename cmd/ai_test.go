@@ -298,8 +298,12 @@ func TestConvertAIGatewaySourceIssues(t *testing.T) {
 	})
 
 	t.Run("warning issue is returned and does not fail", func(t *testing.T) {
-		src := strings.Replace(aiGatewaySourceYAML, "    targets:\n",
-			"    targets:\n      - name: orphan\n        provider: no-such-provider\n        config:\n          type: openai\n", 1)
+		const orphanTarget = "    targets:\n" +
+			"      - name: orphan\n" +
+			"        provider: no-such-provider\n" +
+			"        config:\n" +
+			"          type: openai\n"
+		src := strings.Replace(aiGatewaySourceYAML, "    targets:\n", orphanTarget, 1)
 		out, warnings, err := convertAIGatewaySource([]byte(src))
 		require.NoError(t, err)
 		require.NotEmpty(t, out)
