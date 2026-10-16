@@ -74,6 +74,7 @@ services:
   routes:
   - methods:
     - POST
+    - OPTIONS
     name: openai-chat
     paths:
     - /ai/chat/completions
