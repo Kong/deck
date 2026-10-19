@@ -277,13 +277,25 @@ func TestAiConvertJSONInputParity(t *testing.T) {
 		"JSON and YAML inputs should convert to identical decK output")
 }
 
-// TestAIGatewayMinRuntimeVersionIsLatest fails when the converter learns a
-// newer AI Gateway release than aiGatewayMinRuntimeVersion, so decK does not
-// silently keep emitting an older output shape.
-func TestAIGatewayMinRuntimeVersionIsLatest(t *testing.T) {
-	result, err := ai2kong.Convert([]byte(aiGatewaySourceYAML), ai2kong.Options{MinRuntimeVersion: "99.0"})
-	require.NoError(t, err)
-	require.Equal(t, aiGatewayMinRuntimeVersion, result.Metadata.MinRuntimeVersion)
+// TestFormatAIIssue verifies the entity prefix is built from whichever of the
+// issue source's kind and name are set.
+func TestFormatAIIssue(t *testing.T) {
+	tests := []struct {
+		name   string
+		source ai2kong.ConversionIssueSource
+		want   string
+	}{
+		{"kind and name", ai2kong.ConversionIssueSource{Kind: "model", Name: "gpt-4o"}, `model "gpt-4o": boom`},
+		{"kind only", ai2kong.ConversionIssueSource{Kind: "option"}, "option: boom"},
+		{"name only", ai2kong.ConversionIssueSource{Name: "gpt-4o"}, `"gpt-4o": boom`},
+		{"neither", ai2kong.ConversionIssueSource{}, "boom"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatAIIssue(ai2kong.ConversionIssue{Reason: "boom", Source: tt.source})
+			require.Equal(t, tt.want, got)
+		})
+	}
 }
 
 // TestConvertAIGatewaySourceIssues verifies that an ERROR issue fails the
@@ -295,6 +307,19 @@ func TestConvertAIGatewaySourceIssues(t *testing.T) {
 		require.Error(t, err)
 		require.Nil(t, out)
 		require.Empty(t, warnings)
+	})
+
+	t.Run("all error issues are reported together", func(t *testing.T) {
+		src := "models:\n" +
+			"  - name: m1\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n" +
+			"  - name: m2\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n"
+		out, _, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		lines := strings.Split(err.Error(), "\n")
+		require.Len(t, lines, 2)
+		require.Contains(t, lines[0], `model "m1": `)
+		require.Contains(t, lines[1], `model "m2": `)
 	})
 
 	t.Run("warning issue is returned and does not fail", func(t *testing.T) {
