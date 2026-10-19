@@ -28,7 +28,7 @@ var (
 )
 
 func (s *Sanitizer) handleEntity(entityName string, fieldValue reflect.Value) error {
-	if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
+	if fieldValue.Kind() == reflect.Pointer && fieldValue.IsNil() {
 		return nil
 	}
 

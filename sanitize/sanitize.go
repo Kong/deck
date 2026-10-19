@@ -63,7 +63,7 @@ func NewSanitizer(opts *SanitizerOptions) *Sanitizer {
 
 func (s *Sanitizer) Sanitize() (*file.Content, error) {
 	content := reflect.ValueOf(s.content)
-	if content.Kind() == reflect.Ptr {
+	if content.Kind() == reflect.Pointer {
 		content = content.Elem()
 	}
 	contentType := content.Type()
@@ -92,7 +92,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 
 	//nolint:exhaustive
 	switch field.Kind() {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if field.IsNil() {
 			return
 		}
@@ -156,7 +156,7 @@ func (s *Sanitizer) sanitizeField(field reflect.Value) {
 				continue
 			}
 			mapValue := iter.Value()
-			if mapValue.Kind() == reflect.Ptr {
+			if mapValue.Kind() == reflect.Pointer {
 				mapValue = mapValue.Elem()
 			}
 			s.sanitizeField(mapValue)

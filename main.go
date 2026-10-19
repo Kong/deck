@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/kong/deck/cmd"
 )
@@ -29,8 +27,4 @@ func registerSignalHandler() context.Context {
 func main() {
 	ctx := registerSignalHandler()
 	cmd.Execute(ctx)
-}
-
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
 }

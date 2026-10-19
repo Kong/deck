@@ -5,7 +5,6 @@ import (
 	"os"
 	"strings"
 
-	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-apiops/filebasics"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
@@ -59,14 +58,11 @@ func execute(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to read source file: %w", err)
 	}
 
-	converted, warnings, err := ai2kong.Convert(sourceContent, ai2kong.Options{
-		OutputMode: "deck",
-	})
+	converted, warnings, err := convertAIGatewaySource(sourceContent)
+	printAIWarnings(os.Stderr, warnings)
 	if err != nil {
 		return fmt.Errorf("conversion failed: %w", err)
 	}
-
-	printAIWarnings(os.Stderr, warnings)
 
 	// Add the default select_tags to the converted document's _info section
 	doc, err := addDefaultSelectTags(converted)
