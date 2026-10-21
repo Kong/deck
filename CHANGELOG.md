@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.69.0](#v1690)
 - [v1.68.0](#v1680)
 - [v1.67.0](#v1670)
 - [v1.66.1](#v1661)
@@ -150,6 +151,25 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.69.0]
+> Release date: 2026/10/21
+
+### Features
+- Added support for plugin expressions, allowing plugins to be configured with `expressions` fields on supported Kong Gateway versions.
+[#2284](https://github.com/Kong/deck/pull/2284) [go-database-reconciler #539](https://github.com/Kong/go-database-reconciler/pull/539) [go-kong #639](https://github.com/Kong/go-kong/pull/639)
+
+### Fixed
+- Fixed `deck gateway validate` to fill in plugin implicit defaults before running online schema validation, avoiding spurious validation failures.
+[#2278](https://github.com/Kong/deck/pull/2278)
+- Fixed `deck gateway validate` in Konnect mode to resolve lookup tags only within the selected workspace.
+[#2287](https://github.com/Kong/deck/pull/2287)
+- Fixed `deck gateway dump --skip-defaults` in Konnect to fill in plugin implicit defaults and drop deprecated fields, preventing phantom diffs on subsequent `diff`/`sync`.
+[#2266](https://github.com/Kong/deck/pull/2266) [go-database-reconciler #533](https://github.com/Kong/go-database-reconciler/pull/533)
+
+### Chores
+- Upgraded go version to `v1.26.9`
+[#2288](https://github.com/Kong/deck/pull/2288)
 
 ## [v1.68.0]
 > Release date: 2026/09/30
@@ -2771,6 +2791,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.69.0]: https://github.com/Kong/deck/compare/v1.68.0...v1.69.0
 [v1.68.0]: https://github.com/Kong/deck/compare/v1.67.0...v1.68.0
 [v1.67.0]: https://github.com/Kong/deck/compare/v1.66.1...v1.67.0
 [v1.66.1]: https://github.com/Kong/deck/compare/v1.66.0...v1.66.1
