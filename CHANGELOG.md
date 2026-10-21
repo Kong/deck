@@ -168,8 +168,8 @@
 [#2266](https://github.com/Kong/deck/pull/2266) [go-database-reconciler #533](https://github.com/Kong/go-database-reconciler/pull/533)
 
 ### Chores
-- Upgraded go version to `v1.26.9`
-[#2288](https://github.com/Kong/deck/pull/2288)
+- Upgraded go version to `v1.26.10`
+[#2301](https://github.com/Kong/deck/pull/2301)
 
 ## [v1.68.0]
 > Release date: 2026/09/30
