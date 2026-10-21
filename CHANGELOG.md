@@ -156,7 +156,7 @@
 > Release date: 2026/10/21
 
 ### Features
-- Added support for plugin expressions, allowing plugins to be configured with `expressions` fields on supported Kong Gateway versions.
+- Added support for plugin expressions, allowing plugins to be configured with `expressions` fields on Kong Gateway 3.16 and later.
 [#2284](https://github.com/Kong/deck/pull/2284) [go-database-reconciler #539](https://github.com/Kong/go-database-reconciler/pull/539) [go-kong #639](https://github.com/Kong/go-kong/pull/639)
 
 ### Fixed
@@ -164,7 +164,7 @@
 [#2278](https://github.com/Kong/deck/pull/2278)
 - Fixed `deck gateway validate` in Konnect mode to resolve lookup tags only within the selected workspace.
 [#2287](https://github.com/Kong/deck/pull/2287)
-- Fixed `deck gateway dump --skip-defaults` in Konnect to fill in plugin implicit defaults and drop deprecated fields, preventing phantom diffs on subsequent `diff`/`sync`.
+- Fixed phantom plugin diffs on `diff`/`sync` in Konnect when `DECK_SKIP_DEFAULTS_FILL=true`, where implicit plugin defaults and deprecated fields were normalized inconsistently between the diff decision and display paths.
 [#2266](https://github.com/Kong/deck/pull/2266) [go-database-reconciler #533](https://github.com/Kong/go-database-reconciler/pull/533)
 
 ### Chores
