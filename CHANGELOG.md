@@ -155,6 +155,9 @@
 ## [v1.69.0]
 > Release date: 2026/10/21
 
+### Breaking changes
+- None.
+
 ### Features
 - Added support for plugin expressions, allowing plugins to be configured with `expressions` fields on Kong Gateway 3.16 and later.
 [#2284](https://github.com/Kong/deck/pull/2284) [go-database-reconciler #539](https://github.com/Kong/go-database-reconciler/pull/539) [go-kong #639](https://github.com/Kong/go-kong/pull/639)
@@ -366,6 +369,11 @@ while ensuring masked values produce valid JSON.
 
 ## [v1.59.0]
 > Release date: 2026/04/23
+
+### Breaking changes
+
+- The `openid-connect` plugin now requires a non-empty `config.cache_tokens_salt`. Declarative configurations that omit it, or set it to an empty value, fail with `openid-connect plugin requires explicit non-empty config values for cache_tokens_salt to avoid regenerating session credentials during sync`. Set `cache_tokens_salt` in your configuration to resolve this. To continue temporarily without changing the configuration, use `-W oidc-missing-required-config`. See [#1893](https://github.com/Kong/deck/issues/1893).
+[#2021](https://github.com/Kong/deck/pull/2021)
 
 ### Added
 - Added support for `graphql_ratelimiting_cost_decorations` custom entity.
