@@ -1,11 +1,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"slices"
 
+	ai2kong "github.com/Kong/ai-deck-converter/convert"
 	"github.com/kong/go-database-reconciler/pkg/file"
 	"github.com/spf13/cobra"
 )
@@ -13,6 +15,10 @@ import (
 // aiGatewayDocsURL documents the supported way to manage AI Gateway
 // configuration on Konnect.
 const aiGatewayDocsURL = "https://developer.konghq.com/ai-gateway/kongctl"
+
+// aiGatewayMinRuntimeVersion is the newest AI Gateway release the converter
+// knows, so conversion keeps emitting the newest output shape.
+const aiGatewayMinRuntimeVersion = "2.2"
 
 // flagIncludeCustomPolicyDefinitions is the `ai sync`/`ai dump` flag that opts
 // in to managing/dumping the Kong plugin definition entity that AI Gateway
@@ -33,6 +39,53 @@ func newAiSubCmd() *cobra.Command {
 	}
 
 	return aiSubCmd
+}
+
+// convertAIGatewaySource converts an AI Gateway source to decK YAML. All ERROR
+// issues are returned as a single joined error, because the converter leaves
+// the affected entities out of the output and syncing that would prune them.
+// Warnings are returned even on error, as they often explain it.
+func convertAIGatewaySource(src []byte) ([]byte, []string, error) {
+	result, err := ai2kong.Convert(src, ai2kong.Options{MinRuntimeVersion: aiGatewayMinRuntimeVersion})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var warnings []string
+	var errs []error
+	for _, issue := range result.Issues {
+		if issue.Severity != ai2kong.Error {
+			warnings = append(warnings, formatAIIssue(issue))
+		} else {
+			errs = append(errs, errors.New(formatAIIssue(issue)))
+		}
+	}
+	if len(errs) > 0 {
+		return nil, warnings, errors.Join(errs...)
+	}
+
+	converted, err := result.Output.ToYAML()
+	if err != nil {
+		return nil, warnings, err
+	}
+	return converted, warnings, nil
+}
+
+// formatAIIssue renders an issue's reason prefixed with the entity it came from
+// (e.g. `model "gpt-4o": ...`), as the reason alone does not say which entity
+// is affected. The prefix is omitted for whichever of kind and name is empty.
+func formatAIIssue(issue ai2kong.ConversionIssue) string {
+	src := issue.Source
+	switch {
+	case src.Kind != "" && src.Name != "":
+		return fmt.Sprintf("%s %q: %s", src.Kind, src.Name, issue.Reason)
+	case src.Kind != "":
+		return fmt.Sprintf("%s: %s", src.Kind, issue.Reason)
+	case src.Name != "":
+		return fmt.Sprintf("%q: %s", src.Name, issue.Reason)
+	default:
+		return issue.Reason
+	}
 }
 
 // printAIWarnings writes conversion warnings, one per line, to w. When w is nil

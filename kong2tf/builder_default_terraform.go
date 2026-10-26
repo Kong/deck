@@ -10,6 +10,8 @@ import (
 	"github.com/kong/go-database-reconciler/pkg/file"
 )
 
+const consumerIDKey = "consumer_id"
+
 type DefaultTerraformBuider struct {
 	content  string
 	provider Provider
@@ -229,7 +231,7 @@ func (b *DefaultTerraformBuider) buildConsumers(
 				importConfig{
 					controlPlaneID: controlPlaneID,
 					importValues: map[string]*string{
-						"consumer_id":       consumer.ID,
+						consumerIDKey:       consumer.ID,
 						"consumer_group_id": cg.ID,
 					},
 				},
@@ -239,12 +241,12 @@ func (b *DefaultTerraformBuider) buildConsumers(
 		for _, acl := range consumer.ACLGroups {
 			resourceName := "acl_" + strings.ReplaceAll(*acl.Group, "-", "_")
 			b.content += b.generateResource("gateway_acl", resourceName, toMapAny(acl), map[string]string{
-				"consumer_id": parentResourceName,
+				consumerIDKey: parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
 					"id":          acl.ID,
-					"consumer_id": consumer.ID,
+					consumerIDKey: consumer.ID,
 				},
 			}, []string{})
 		}
@@ -260,12 +262,12 @@ func (b *DefaultTerraformBuider) buildConsumers(
 
 			resourceName := "basic_auth_" + strings.ReplaceAll(*basicauth.Username, "-", "_")
 			b.content += b.generateResource("gateway_basic_auth", resourceName, toMapAny(basicauth), map[string]string{
-				"consumer_id": parentResourceName,
+				consumerIDKey: parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
 					"id":          basicauth.ID,
-					"consumer_id": consumer.ID,
+					consumerIDKey: consumer.ID,
 				},
 			}, lifecycle)
 		}
@@ -273,12 +275,12 @@ func (b *DefaultTerraformBuider) buildConsumers(
 		for _, keyauth := range consumer.KeyAuths {
 			resourceName := "key_auth_" + strings.ReplaceAll(*keyauth.Key, "-", "_")
 			b.content += b.generateResource("gateway_key_auth", resourceName, toMapAny(keyauth), map[string]string{
-				"consumer_id": parentResourceName,
+				consumerIDKey: parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
 					"id":          keyauth.ID,
-					"consumer_id": consumer.ID,
+					consumerIDKey: consumer.ID,
 				},
 			}, []string{})
 		}
@@ -293,12 +295,12 @@ func (b *DefaultTerraformBuider) buildConsumers(
 			}
 			resourceName := "jwt_" + strings.ReplaceAll(*jwt.Key, "-", "_")
 			b.content += b.generateResource("gateway_jwt", resourceName, toMapAny(jwt), map[string]string{
-				"consumer_id": parentResourceName,
+				consumerIDKey: parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
 					"id":          jwt.ID,
-					"consumer_id": consumer.ID,
+					consumerIDKey: consumer.ID,
 				},
 			}, lifecycle)
 		}
@@ -306,12 +308,12 @@ func (b *DefaultTerraformBuider) buildConsumers(
 		for _, hmacauth := range consumer.HMACAuths {
 			resourceName := "hmac_auth_" + strings.ReplaceAll(*hmacauth.Username, "-", "_")
 			b.content += b.generateResource("gateway_hmac_auth", resourceName, toMapAny(hmacauth), map[string]string{
-				"consumer_id": parentResourceName,
+				consumerIDKey: parentResourceName,
 			}, importConfig{
 				controlPlaneID: controlPlaneID,
 				importValues: map[string]*string{
 					"id":          hmacauth.ID,
-					"consumer_id": consumer.ID,
+					consumerIDKey: consumer.ID,
 				},
 			}, []string{})
 		}
@@ -357,7 +359,7 @@ func (b *DefaultTerraformBuider) buildConsumerGroups(content *file.Content, cont
 				importConfig{
 					controlPlaneID: controlPlaneID,
 					importValues: map[string]*string{
-						"consumer_id":       consumer.ID,
+						consumerIDKey:       consumer.ID,
 						"consumer_group_id": cg.ID,
 					},
 				},

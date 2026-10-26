@@ -206,7 +206,7 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 	for fieldName, entityName := range filteredEntityMap {
 		// Use reflection to get the value of the field from v.state
 		valueOfState := reflect.ValueOf(v.state)
-		if valueOfState.Kind() == reflect.Ptr {
+		if valueOfState.Kind() == reflect.Pointer {
 			valueOfState = valueOfState.Elem() // Dereference if it's a pointer
 		}
 

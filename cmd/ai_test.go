@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	ai2kong "github.com/Kong/ai-deck-converter/convert"
@@ -40,7 +41,7 @@ const aiGatewaySourceYAML = `models:
       balancer:
         algorithm: round-robin
         slots: 10000
-providers:
+model_providers:
   - type: openai
     display_name: OpenAI Main
     name: openai-main
@@ -267,13 +268,91 @@ func TestAiConvertJSONInputParity(t *testing.T) {
 	jsonSource, err := yaml.YAMLToJSON([]byte(aiGatewaySourceYAML))
 	require.NoError(t, err)
 
-	fromYAML, _, err := ai2kong.Convert([]byte(aiGatewaySourceYAML), ai2kong.Options{OutputMode: "deck"})
+	fromYAML, _, err := convertAIGatewaySource([]byte(aiGatewaySourceYAML))
 	require.NoError(t, err)
-	fromJSON, _, err := ai2kong.Convert(jsonSource, ai2kong.Options{OutputMode: "deck"})
+	fromJSON, _, err := convertAIGatewaySource(jsonSource)
 	require.NoError(t, err)
 
 	require.True(t, bytes.Equal(fromYAML, fromJSON),
 		"JSON and YAML inputs should convert to identical decK output")
+}
+
+// TestFormatAIIssue verifies the entity prefix is built from whichever of the
+// issue source's kind and name are set.
+func TestFormatAIIssue(t *testing.T) {
+	tests := []struct {
+		name   string
+		source ai2kong.ConversionIssueSource
+		want   string
+	}{
+		{"kind and name", ai2kong.ConversionIssueSource{Kind: "model", Name: "gpt-4o"}, `model "gpt-4o": boom`},
+		{"kind only", ai2kong.ConversionIssueSource{Kind: "option"}, "option: boom"},
+		{"name only", ai2kong.ConversionIssueSource{Name: "gpt-4o"}, `"gpt-4o": boom`},
+		{"neither", ai2kong.ConversionIssueSource{}, "boom"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatAIIssue(ai2kong.ConversionIssue{Reason: "boom", Source: tt.source})
+			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+// TestConvertAIGatewaySourceIssues verifies that an ERROR issue fails the
+// conversion rather than yielding a document with the affected entity left out.
+func TestConvertAIGatewaySourceIssues(t *testing.T) {
+	t.Run("error issue fails the conversion", func(t *testing.T) {
+		src := "models:\n  - name: m1\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n"
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		require.Empty(t, warnings)
+	})
+
+	t.Run("all error issues are reported together", func(t *testing.T) {
+		src := "models:\n" +
+			"  - name: m1\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n" +
+			"  - name: m2\n    access:\n      acls:\n        allow: [a]\n        deny: [b]\n"
+		out, _, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		lines := strings.Split(err.Error(), "\n")
+		require.Len(t, lines, 2)
+		require.Contains(t, lines[0], `model "m1": `)
+		require.Contains(t, lines[1], `model "m2": `)
+	})
+
+	t.Run("warning issue is returned and does not fail", func(t *testing.T) {
+		const orphanTarget = "    targets:\n" +
+			"      - name: orphan\n" +
+			"        provider: no-such-provider\n" +
+			"        config:\n" +
+			"          type: openai\n"
+		src := strings.Replace(aiGatewaySourceYAML, "    targets:\n", orphanTarget, 1)
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.NoError(t, err)
+		require.NotEmpty(t, out)
+		require.Len(t, warnings, 1)
+		require.Contains(t, warnings[0], "no-such-provider")
+	})
+
+	t.Run("warnings that explain an error are returned with it", func(t *testing.T) {
+		src := strings.Replace(aiGatewaySourceYAML, "provider: openai-main", "provider: no-such-provider", 1)
+		out, warnings, err := convertAIGatewaySource([]byte(src))
+		require.Error(t, err)
+		require.Nil(t, out)
+		require.Len(t, warnings, 1)
+		require.Contains(t, warnings[0], "no-such-provider")
+	})
+}
+
+// TestConvertAIGatewaySourceInvalidInput verifies that a source the converter
+// cannot parse is returned as an error, with no output and no warnings.
+func TestConvertAIGatewaySourceInvalidInput(t *testing.T) {
+	out, warnings, err := convertAIGatewaySource([]byte("models: ["))
+	require.Error(t, err)
+	require.Nil(t, out)
+	require.Nil(t, warnings)
 }
 
 // TestAi2KongOutputFormats drives the ai2kong command end-to-end with JSON input

@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.26.10@sha256:fb456410ab4c979617acaf28c46b2b9fe60b11bcc3dc8ceea0eaeb3e7cd0f8a8
+ARG GO_VERSION=1.27.3@sha256:sha256:f20d83a83e18dbd2a4714b8ffd4b30b287b6243962dd75608e86abcc63ba4efc
 FROM golang:${GO_VERSION} AS build
 WORKDIR /deck
 COPY go.mod ./
