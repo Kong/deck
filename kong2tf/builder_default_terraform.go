@@ -487,8 +487,8 @@ func (b *DefaultTerraformBuider) buildVaults(content *file.Content, controlPlane
 }
 
 func (b *DefaultTerraformBuider) buildPartials(content *file.Content, controlPlaneID *string) {
-	for _, partial := range content.Partials {
-		parentResourceName := strings.ReplaceAll(*partial.Name, "-", "_")
+	for idx, partial := range content.Partials {
+		parentResourceName := partialResourceName(partial, idx)
 		parents := map[string]string{}
 		b.content += b.generateResourceWithCustomizations(
 			"gateway_partial",
@@ -510,6 +510,23 @@ func (b *DefaultTerraformBuider) buildPartials(content *file.Content, controlPla
 			},
 		)
 	}
+}
+
+// partialResourceName returns the Terraform resource name for a partial.
+// The name field is optional on partials, so fall back to the ID, and then
+// to the partial type and its position in the file.
+func partialResourceName(partial file.FPartial, idx int) string {
+	if partial.Name != nil && *partial.Name != "" {
+		return strings.ReplaceAll(*partial.Name, "-", "_")
+	}
+	if partial.ID != nil && *partial.ID != "" {
+		return "partial_" + strings.ReplaceAll(*partial.ID, "-", "_")
+	}
+	partialType := ""
+	if partial.Type != nil {
+		partialType = strings.ReplaceAll(*partial.Type, "-", "_")
+	}
+	return fmt.Sprintf("partial_%s_%d", partialType, idx)
 }
 
 func (b *DefaultTerraformBuider) getContent() string {
