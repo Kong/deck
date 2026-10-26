@@ -346,6 +346,15 @@ func TestConvertAIGatewaySourceIssues(t *testing.T) {
 	})
 }
 
+// TestConvertAIGatewaySourceInvalidInput verifies that a source the converter
+// cannot parse is returned as an error, with no output and no warnings.
+func TestConvertAIGatewaySourceInvalidInput(t *testing.T) {
+	out, warnings, err := convertAIGatewaySource([]byte("models: ["))
+	require.Error(t, err)
+	require.Nil(t, out)
+	require.Nil(t, warnings)
+}
+
 // TestAi2KongOutputFormats drives the ai2kong command end-to-end with JSON input
 // and asserts both YAML (default) and JSON output are valid and carry the AI tag,
 // and that an unknown format is rejected.
