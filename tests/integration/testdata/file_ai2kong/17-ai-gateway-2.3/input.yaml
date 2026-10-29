@@ -1,0 +1,188 @@
+# AI Gateway 2.3 features in one document: MCP rate limiting, MCP ACL
+# expressions, Bedrock VPC endpoints, the Baseten provider, failover on HTTP
+# codes and the Gemini agentic capability. The converter tests each feature;
+# this fixture checks that the output syncs to and dumps from a 2.3 gateway.
+model_providers:
+  - name: bedrock-prod
+    type: bedrock
+    config:
+      auth:
+        type: aws
+        access_key_id: "{vault://ai/aws-access-key-id}"
+        secret_access_key: "{vault://ai/aws-secret-access-key}"
+  - type: baseten
+    display_name: Baseten Production
+    name: baseten-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "Bearer {vault://ai/baseten-token}"
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers: [{name: Authorization, value: "{vault://env/openai-key}"}]
+  - type: gemini
+    display_name: Gemini Production
+    name: gemini-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "{vault://ai/gemini-token}"
+# Models are sorted by name, the order `ai dump` returns them in. Three of them
+# use the openai format, and the converter numbers their routes in model order
+# (openai-chat, openai-chat-2, ...), so the dump round trip needs that order.
+models:
+  # http_5xx and http_413 are the failover criteria values new in 2.3.
+  - type: model
+    display_name: Balanced GPT
+    name: balanced-gpt
+    capabilities: [generate]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/ai]}
+      balancer:
+        algorithm: round-robin
+        failover_criteria: [error, timeout, http_429, http_5xx, http_413]
+    targets:
+      - name: gpt-4o
+        provider: openai-main
+        config: {type: openai}
+      - name: gpt-4o-mini
+        provider: openai-main
+        config: {type: openai}
+  # A Baseten target without upstream_url uses the Model APIs default. A
+  # dedicated deployment sets upstream_url.
+  - type: model
+    display_name: Baseten Chat
+    name: baseten-chat
+    capabilities: [generate]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/baseten]}
+    targets:
+      - name: deepseek-ai/DeepSeek-V4-Pro-0813
+        provider: baseten-prod
+        config: {type: baseten}
+      - name: my-served-model
+        provider: baseten-prod
+        config:
+          type: baseten
+          upstream_url: https://model-abc123.api.baseten.co/environments/production/sync/v1/chat/completions
+  # Bedrock targets with a PrivateLink VPC endpoint and an explicit endpoint
+  # type.
+  - name: claude-mantle
+    type: model
+    capabilities: [generate]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/mantle]}
+    targets:
+      - name: anthropic.claude-sonnet-4-5
+        provider: bedrock-prod
+        config:
+          type: bedrock
+          region: us-east-1
+          endpoint_type: mantle
+          mantle_openai_path_prefix: /openai/v1
+          vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+  - name: claude-runtime
+    type: model
+    capabilities: [generate]
+    formats: [{type: bedrock}]
+    config:
+      route: {paths: [/runtime]}
+    targets:
+      - name: anthropic.claude-sonnet-4-5
+        provider: bedrock-prod
+        config:
+          type: bedrock
+          region: us-east-1
+          endpoint_type: runtime
+          vpc_endpoint: vpce-0abc123-xyz.bedrock-runtime.us-east-1.vpce.amazonaws.com
+  # The Gemini Interactions API on the public Gemini endpoints. A target with
+  # no project_id and location_id gets only the public routes.
+  - type: model
+    display_name: Gemini Agentic
+    name: gemini-agentic
+    capabilities: [agentic]
+    formats: [{type: gemini}]
+    config:
+      route: {paths: [/gemini]}
+    targets:
+      - name: gemini-2.5-pro
+        provider: gemini-prod
+        config: {type: gemini}
+mcp_servers:
+  # A passthrough listener limiting one MCP method and one tool.
+  - type: passthrough-listener
+    display_name: Limited Vendor MCP
+    name: limited-vendor-mcp
+    upstream_url: https://mcp.internal.kongair.com
+    config:
+      route: {paths: [/mcp/vendor]}
+    rate_limiting:
+      limits:
+        - method: tools/call
+          limit: 100
+          window_size: 60
+        - tool: search_flights
+          limit: 10
+          window_size: 1
+  # A conversion listener limiting its own tool per day and per hour.
+  - type: conversion-listener
+    display_name: Limited Flights MCP
+    name: limited-flights-mcp
+    upstream_url: https://flights.internal.kongair.com
+    config:
+      route: {paths: [/mcp/flights]}
+    rate_limiting:
+      limits:
+        - tool: search_flights
+          limit: 1000
+          window_size: 86400
+        - tool: search_flights
+          limit: 100
+          window_size: 3600
+        - method: tools/list
+          limit: 50
+          window_size: 60
+    tools:
+      - name: search_flights
+        description: Search flights
+        method: GET
+        path: /flights
+  # The server-wide ACLs merge into one default_acl entry, and a per-tool ACL
+  # adds an allow_when expression on top.
+  - type: conversion-listener
+    display_name: Partner Flights MCP
+    name: partner-flights-mcp
+    upstream_url: https://flights.internal.kongair.com
+    config:
+      route: {paths: [/mcp/partner-flights]}
+    access:
+      acls:
+        deny_when:
+          - "has(principal.metadata.status) && principal.metadata.status == 'suspended'"
+      default_tool_acls:
+        allow_when:
+          - "has(principal.metadata.tier) && principal.metadata.tier == 'gold'"
+    tools:
+      - name: search_flights
+        description: Search flights
+        method: GET
+        path: /flights
+      - name: book_flight
+        description: Book a flight
+        method: POST
+        path: /bookings
+        access:
+          acls:
+            allow_when:
+              - "has(principal.metadata.role) && principal.metadata.role == 'buyer'"
