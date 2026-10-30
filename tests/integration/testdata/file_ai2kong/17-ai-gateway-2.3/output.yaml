@@ -135,6 +135,76 @@ plugins:
 - config:
     max_request_body_size: 8388608
     sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-mantle
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/responses
+  model: claude-mantle
+  name: ai-proxy-advanced
+  route: openai-responses
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: anthropic-messages
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: anthropic
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-mantle
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-mantle
+  name: ai-proxy-advanced
+  route: anthropic-messages
+- config:
+    max_request_body_size: 8388608
+    sources:
     - path_pattern: model/([^/]+)/
       source: path
   name: ai-model-selector
@@ -348,7 +418,23 @@ services:
     - OPTIONS
     name: openai-chat-3
     paths:
-    - /mantle/chat/completions
+    - /mantle/v1/chat/completions
+    - /mantle/openai/v1/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-responses
+    paths:
+    - /mantle/v1/responses
+    - /mantle/openai/v1/responses
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: anthropic-messages
+    paths:
+    - /mantle/v1/messages
     strip_path: false
   - methods:
     - GET

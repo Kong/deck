@@ -76,11 +76,13 @@ models:
           type: baseten
           upstream_url: https://model-abc123.api.baseten.co/environments/production/sync/v1/chat/completions
   # Bedrock targets with a PrivateLink VPC endpoint and an explicit endpoint
-  # type.
+  # type. Both lists are the "*" wildcard, so the converter expands them to
+  # every route the targets support: the mantle target serves the openai
+  # chat and responses routes and the anthropic messages route.
   - name: claude-mantle
     type: model
-    capabilities: [generate]
-    formats: [{type: openai}]
+    capabilities: ["*"]
+    formats: [{type: "*"}]
     config:
       route: {paths: [/mantle]}
     targets:
