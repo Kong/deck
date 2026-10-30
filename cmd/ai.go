@@ -18,7 +18,7 @@ const aiGatewayDocsURL = "https://developer.konghq.com/ai-gateway/kongctl"
 
 // aiGatewayMinRuntimeVersion is the newest AI Gateway release the converter
 // knows, so conversion keeps emitting the newest output shape.
-const aiGatewayMinRuntimeVersion = "2.2"
+const aiGatewayMinRuntimeVersion = "2.3"
 
 // flagIncludeCustomPolicyDefinitions is the `ai sync`/`ai dump` flag that opts
 // in to managing/dumping the Kong plugin definition entity that AI Gateway

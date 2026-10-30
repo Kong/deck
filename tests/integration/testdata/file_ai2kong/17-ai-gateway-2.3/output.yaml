@@ -1,0 +1,572 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: balanced-gpt
+- name: baseten-chat
+- name: claude-mantle
+- name: claude-runtime
+- name: gemini-agentic
+plugins:
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: round-robin
+      failover_criteria:
+      - error
+      - timeout
+      - http_429
+      - http_5xx
+      - http_413
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-4o
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: balanced-gpt
+        name: gpt-4o
+        provider: openai
+      route_type: llm/v1/chat
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-4o-mini
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: balanced-gpt
+        name: gpt-4o-mini
+        provider: openai
+      route_type: llm/v1/chat
+  model: balanced-gpt
+  name: ai-proxy-advanced
+  route: openai-chat
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-2
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/baseten-token}
+      description: deepseek-ai/DeepSeek-V4-Pro-0813
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: baseten-chat
+        name: deepseek-ai/DeepSeek-V4-Pro-0813
+        provider: baseten
+      route_type: llm/v1/chat
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/baseten-token}
+      description: my-served-model
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: baseten-chat
+        name: my-served-model
+        options:
+          upstream_url: https://model-abc123.api.baseten.co/environments/production/sync/v1/chat/completions
+        provider: baseten
+      route_type: llm/v1/chat
+  model: baseten-chat
+  name: ai-proxy-advanced
+  route: openai-chat-2
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-3
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-mantle
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-mantle
+  name: ai-proxy-advanced
+  route: openai-chat-3
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-mantle
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/responses
+  model: claude-mantle
+  name: ai-proxy-advanced
+  route: openai-responses
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: anthropic-messages
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: anthropic
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-mantle
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-mantle
+  name: ai-proxy-advanced
+  route: anthropic-messages
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - path_pattern: model/([^/]+)/
+      source: path
+  name: ai-model-selector
+  route: bedrock-converse
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: bedrock
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-runtime
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: runtime
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-runtime.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-runtime
+  name: ai-proxy-advanced
+  route: bedrock-converse
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - path_pattern: model/([^/]+)/
+      source: path
+  name: ai-model-selector
+  route: bedrock-invoke
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: bedrock
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-runtime
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: runtime
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-runtime.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-runtime
+  name: ai-proxy-advanced
+  route: bedrock-invoke
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: bedrock-chat
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: bedrock
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-runtime
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: runtime
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-runtime.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-runtime
+  name: ai-proxy-advanced
+  route: bedrock-chat
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: bedrock-messages
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: bedrock
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: claude-runtime
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: runtime
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-runtime.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/chat
+  model: claude-runtime
+  name: ai-proxy-advanced
+  route: bedrock-messages
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: gemini-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: gemini
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/gemini-token}'
+      description: gemini-2.5-pro
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: gemini-2.5-pro
+        options:
+          upstream_url: https://generativelanguage.googleapis.com/v1/interactions
+        provider: gemini
+      route_type: llm/v1/responses
+  model: gemini-agentic
+  name: ai-proxy-advanced
+  route: gemini-responses
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: gemini-beta-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: gemini
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/gemini-token}'
+      description: gemini-2.5-pro
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: gemini-2.5-pro
+        options:
+          upstream_url: https://generativelanguage.googleapis.com/v1beta/interactions
+        provider: gemini
+      route_type: llm/v1/responses
+  model: gemini-agentic
+  name: ai-proxy-advanced
+  route: gemini-beta-responses
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-2
+    paths:
+    - /baseten/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-3
+    paths:
+    - /mantle/v1/chat/completions
+    - /mantle/openai/v1/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-responses
+    paths:
+    - /mantle/v1/responses
+    - /mantle/openai/v1/responses
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: anthropic-messages
+    paths:
+    - /mantle/v1/messages
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: bedrock-converse
+    paths:
+    - ~/runtime/model/(?<model_name>[^/]+)/converse(?:-stream)?
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: bedrock-invoke
+    paths:
+    - ~/runtime/model/(?<model_name>[^/]+)/invoke(?:-with-response-stream)?
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: bedrock-chat
+    paths:
+    - /runtime/openai/v1/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: bedrock-messages
+    paths:
+    - /runtime/anthropic/v1/messages
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: gemini-responses
+    paths:
+    - /gemini/v1/interactions
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: gemini-beta-responses
+    paths:
+    - /gemini/v1beta/interactions
+    strip_path: false
+  url: http://ai-gateway.upstream.local
+- name: limited-vendor-mcp
+  routes:
+  - name: limited-vendor-mcp-route
+    paths:
+    - /mcp/vendor
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: passthrough-listener
+        rate_limiting:
+          limits:
+          - limit: 100
+            method: tools/call
+            window_size: 60
+          - limit: 10
+            tool: search_flights
+            window_size: 1
+        tools: []
+      name: ai-mcp-proxy
+  url: https://mcp.internal.kongair.com
+- name: limited-flights-mcp
+  routes:
+  - name: limited-flights-mcp-route
+    paths:
+    - /mcp/flights
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: conversion-listener
+        rate_limiting:
+          limits:
+          - limit: 1000
+            tool: search_flights
+            window_size: 86400
+          - limit: 100
+            tool: search_flights
+            window_size: 3600
+          - limit: 50
+            method: tools/list
+            window_size: 60
+        tools:
+        - description: Search flights
+          method: GET
+          name: search_flights
+          path: /flights
+      name: ai-mcp-proxy
+  url: https://flights.internal.kongair.com
+- name: partner-flights-mcp
+  routes:
+  - name: partner-flights-mcp-route
+    paths:
+    - /mcp/partner-flights
+    plugins:
+    - config:
+        default_acl:
+        - allow_when:
+          - has(principal.metadata.tier) && principal.metadata.tier == 'gold'
+          deny_when:
+          - has(principal.metadata.status) && principal.metadata.status == 'suspended'
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: conversion-listener
+        tools:
+        - description: Search flights
+          method: GET
+          name: search_flights
+          path: /flights
+        - acl:
+            allow_when:
+            - has(principal.metadata.role) && principal.metadata.role == 'buyer'
+          description: Book a flight
+          method: POST
+          name: book_flight
+          path: /bookings
+      name: ai-mcp-proxy
+  url: https://flights.internal.kongair.com
