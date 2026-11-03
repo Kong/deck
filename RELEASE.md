@@ -27,6 +27,16 @@ As of 1.9.0, the remaining steps are automated on tag pushes to Github. They are
 1. `cp <unpack directory>/deck.rb <homebrew-deck directory>/Formula/`. Make sure only version and checksum is changed and rest all is left as is.
 1. Commit and push to master.
 
+## winget release
+
+GoReleaser generates the [winget](https://learn.microsoft.com/windows/package-manager/) manifests for `Kong.deck` on every release.
+
+- If the `WINGET_GITHUB_TOKEN` secret is set, GoReleaser pushes the manifests to the `Kong/winget-pkgs` fork and opens a pull request against [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs). It opens none for a pre-release tag.
+- If the secret is not set, the manifests are only in `dist/winget/` in the `dist` artifact of the [release job](https://github.com/Kong/deck/actions/workflows/release.yaml). To submit them by hand, open a pull request against microsoft/winget-pkgs with that directory, for example with [`wingetcreate submit`](https://github.com/microsoft/winget-create).
+
+The token needs permission to push to `Kong/winget-pkgs` and to open pull requests against microsoft/winget-pkgs.
+A Microsoft moderator reviews each pull request before the version is available.
+
 ## Docker release
 
 As of 1.9.0, these steps are automated on tag pushes to Github. They are unnecessary unless the release job fails.
