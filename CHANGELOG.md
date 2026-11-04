@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.70.0](#v1700)
 - [v1.69.0](#v1690)
 - [v1.68.0](#v1680)
 - [v1.67.0](#v1670)
@@ -151,6 +152,26 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.70.0]
+> Release date: 2026/11/05
+
+### Breaking changes
+- None.
+
+### Features
+- `deck ai sync` and `deck file ai2kong` now convert AI Gateway 2.3 configurations, including MCP rate limiting, MCP ACL expressions and the Baseten provider.
+[#2313](https://github.com/Kong/deck/pull/2313)
+
+### Fixed
+- `deck ai sync` and `deck file ai2kong` now exit with an error when the conversion fails. The sync no longer deletes the entities that failed to convert. Source files that still use `identity_providers` fail too, with an error that says to rename the key to `auth_strategies`.
+[#2293](https://github.com/Kong/deck/pull/2293)
+- decK no longer creates the `anonymous` consumer when a model has one auth strategy. The next `deck ai sync` removes it from the gateway.
+[#2313](https://github.com/Kong/deck/pull/2313)
+
+### Chores
+- Upgraded go version to `v1.27.3`
+[#2293](https://github.com/Kong/deck/pull/2293)
 
 ## [v1.69.0]
 > Release date: 2026/10/21
@@ -2799,6 +2820,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.70.0]: https://github.com/Kong/deck/compare/v1.69.0...v1.70.0
 [v1.69.0]: https://github.com/Kong/deck/compare/v1.68.0...v1.69.0
 [v1.68.0]: https://github.com/Kong/deck/compare/v1.67.0...v1.68.0
 [v1.67.0]: https://github.com/Kong/deck/compare/v1.66.1...v1.67.0
