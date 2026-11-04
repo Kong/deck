@@ -19,15 +19,19 @@ type Validator struct {
 	ctx                  context.Context
 	state                *state.KongState
 	client               *kong.Client
+	configClient         *kong.Client
 	parallelism          int
 	rbacResourcesOnly    bool
 	onlineEntitiesFilter []string
 }
 
 type ValidatorOpts struct {
-	Ctx                  context.Context
-	State                *state.KongState
-	Client               *kong.Client
+	Ctx    context.Context
+	State  *state.KongState
+	Client *kong.Client
+	// ConfigClient sends the config validation requests. These can take longer than other requests.
+	// If it is nil, Client sends them.
+	ConfigClient         *kong.Client
 	Parallelism          int
 	RBACResourcesOnly    bool
 	OnlineEntitiesFilter []string
@@ -59,10 +63,15 @@ var EntityMap = map[string]string{
 }
 
 func NewValidator(opt ValidatorOpts) *Validator {
+	configClient := opt.ConfigClient
+	if configClient == nil {
+		configClient = opt.Client
+	}
 	return &Validator{
 		ctx:                  opt.Ctx,
 		state:                opt.State,
 		client:               opt.Client,
+		configClient:         configClient,
 		parallelism:          opt.Parallelism,
 		rbacResourcesOnly:    opt.RBACResourcesOnly,
 		onlineEntitiesFilter: opt.OnlineEntitiesFilter,
@@ -140,6 +149,15 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 	if err != nil {
 		return []error{err}
 	}
+	list := make([]interface{}, 0, entities.Len())
+	for i := 0; i < entities.Len(); i++ {
+		list = append(list, entities.Index(i).Interface())
+	}
+	return v.validateEntities(entityType, list)
+}
+
+// validateEntities sends one validation request for each entity.
+func (v *Validator) validateEntities(entityType string, entities []interface{}) []error {
 	errors := []error{}
 
 	// create a buffer of channels. Creation of new coroutines
@@ -147,20 +165,19 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 	chanBuff := make(chan struct{}, v.parallelism)
 
 	var wg sync.WaitGroup
-	wg.Add(entities.Len())
+	wg.Add(len(entities))
 	// each coroutine will append on a slice of errors.
 	// since slices are not thread-safe, let's add a mutex
 	// to handle access to the slice.
 	mu := &sync.Mutex{}
-	for i := 0; i < entities.Len(); i++ {
+	for i := range entities {
 		// reserve a slot
 		chanBuff <- struct{}{}
 		go func(i int) {
 			defer wg.Done()
 			// release a slot when completed
 			defer func() { <-chanBuff }()
-			entity := entities.Index(i).Interface()
-			embeddedEntity := getEmbeddedTypeFromWrappedType(entity, entityType)
+			embeddedEntity := getEmbeddedTypeFromWrappedType(entities[i], entityType)
 			_, err := v.validateEntity(entityType, embeddedEntity)
 			if err != nil {
 				mu.Lock()
@@ -171,6 +188,19 @@ func (v *Validator) entities(obj interface{}, entityType string) []error {
 	}
 	wg.Wait()
 	return errors
+}
+
+// validateStateField validates each entity of the KongState field fieldName.
+func (v *Validator) validateStateField(fieldName, entityType string) []error {
+	valueOfState := reflect.ValueOf(v.state)
+	if valueOfState.Kind() == reflect.Pointer {
+		valueOfState = valueOfState.Elem()
+	}
+	fieldValue := valueOfState.FieldByName(fieldName)
+	if !fieldValue.IsValid() || !fieldValue.CanInterface() {
+		return []error{fmt.Errorf("invalid field '%s' in state", fieldName)}
+	}
+	return v.entities(fieldValue.Interface(), entityType)
 }
 
 func (v *Validator) Validate(formatVersion semver.Version) []error {
@@ -202,21 +232,12 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 		filteredEntityMap = EntityMap
 	}
 
-	// Validate each entity using the filtered entityMap
-	for fieldName, entityName := range filteredEntityMap {
-		// Use reflection to get the value of the field from v.state
-		valueOfState := reflect.ValueOf(v.state)
-		if valueOfState.Kind() == reflect.Pointer {
-			valueOfState = valueOfState.Elem() // Dereference if it's a pointer
-		}
-
-		fieldValue := valueOfState.FieldByName(fieldName)
-		if fieldValue.IsValid() && fieldValue.CanInterface() {
-			if err := v.entities(fieldValue.Interface(), entityName); err != nil {
-				allErr = append(allErr, err...)
-			}
-		} else {
-			allErr = append(allErr, fmt.Errorf("invalid field '%s' in state", fieldName))
+	if errs, ok := v.validateWithConfigEndpoint(filteredEntityMap); ok {
+		allErr = append(allErr, errs...)
+	} else {
+		allErr = append(allErr, v.localConflictErrors(filteredEntityMap)...)
+		for fieldName, entityName := range filteredEntityMap {
+			allErr = append(allErr, v.validateStateField(fieldName, entityName)...)
 		}
 	}
 

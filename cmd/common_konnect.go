@@ -482,3 +482,35 @@ func fetchKonnectKongVersion() string {
 	// latest version here and avoid making an extra and unnecessary request.
 	return "3.5.0.0"
 }
+
+// konnectConfigValidationTimeout is the minimum timeout in seconds of a config validation request.
+const konnectConfigValidationTimeout = 30
+
+// konnectClientWithMinTimeout returns a client for the control plane of client.
+// Its request timeout is the --timeout value, but not less than minTimeout seconds.
+func konnectClientWithMinTimeout(
+	client *kong.Client, konnectConfig *utils.KonnectConfig, minTimeout int,
+) (*kong.Client, error) {
+	timeout := max(rootConfig.Timeout, minTimeout)
+	httpClient, err := utils.HTTPClientWithOpts(utils.HTTPClientOptions{
+		Timeout:   time.Duration(timeout) * time.Second,
+		TLSConfig: konnectConfig.TLSConfig,
+	})
+	if err != nil {
+		return nil, err
+	}
+	c, err := utils.GetKongClient(utils.KongClientConfig{
+		Address:    client.BaseRootURL(),
+		HTTPClient: httpClient,
+		Debug:      konnectConfig.Debug,
+		Headers:    konnectConfig.Headers,
+		TLSConfig:  konnectConfig.TLSConfig,
+		Workspace:  client.Workspace(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	c.SetKonnectFlag(true)
+	c.UserAgent = client.UserAgent
+	return c, nil
+}

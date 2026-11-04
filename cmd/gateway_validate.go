@@ -155,7 +155,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 	if validateOnline {
 		registry := schema.NewRegistry(kongClient, mode == modeKonnect)
-		if err := fillPluginAutoFields(ctx, registry, rawState.Plugins); err != nil {
+		if err := fillPluginAutoFields(ctx, registry, rawState.Plugins, rawState.ClonedPluginDefinitions); err != nil {
 			return err
 		}
 	}
@@ -179,7 +179,14 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 
 	if validateOnline {
-		if errs := validateWithKong(ctx, kongClient, ks, targetContent.FormatVersion); len(errs) != 0 {
+		configClient := kongClient
+		if mode == modeKonnect {
+			configClient, err = konnectClientWithMinTimeout(kongClient, &konnectConfig, konnectConfigValidationTimeout)
+			if err != nil {
+				return err
+			}
+		}
+		if errs := validateWithKong(ctx, kongClient, configClient, ks, targetContent.FormatVersion); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
 		}
 	}
@@ -330,9 +337,22 @@ this command unless --online flag is used.
 
 // fillPluginAutoFields mirrors the auto-field handling go-database-reconciler's
 // diff.Syncer.Solve applies to every plugin before sending it to Kong to maintain parity.
-func fillPluginAutoFields(ctx context.Context, registry *schema.Registry, plugins []*kong.Plugin) error {
+// A cloned plugin of the state does not exist in Kong yet. Its plugins get the schema of the plugin it clones.
+func fillPluginAutoFields(
+	ctx context.Context, registry *schema.Registry, plugins []*kong.Plugin, cloned []*kong.ClonedPluginDefinition,
+) error {
+	refs := map[string]string{}
+	for _, c := range cloned {
+		if c.Name != nil && c.Ref != nil {
+			refs[*c.Name] = *c.Ref
+		}
+	}
 	for _, p := range plugins {
-		s, err := registry.GetPluginSchema(ctx, *p.Name)
+		schemaName := *p.Name
+		if ref, ok := refs[schemaName]; ok {
+			schemaName = ref
+		}
+		s, err := registry.GetPluginSchema(ctx, schemaName)
 		if err != nil {
 			return fmt.Errorf("retrieving schema for plugin %s: %w", *p.Name, err)
 		}
@@ -346,6 +366,7 @@ func fillPluginAutoFields(ctx context.Context, registry *schema.Registry, plugin
 func validateWithKong(
 	ctx context.Context,
 	kongClient *kong.Client,
+	configClient *kong.Client,
 	ks *state.KongState,
 	formatVersion string,
 ) []error {
@@ -360,6 +381,7 @@ func validateWithKong(
 		Ctx:                  ctx,
 		State:                ks,
 		Client:               kongClient,
+		ConfigClient:         configClient,
 		Parallelism:          validateParallelism,
 		RBACResourcesOnly:    validateCmdRBACResourcesOnly,
 		OnlineEntitiesFilter: validateCmdOnlineEntitiesFilter,
