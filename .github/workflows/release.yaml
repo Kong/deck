@@ -75,6 +75,59 @@ jobs:
         with:
           name: dist
           path: dist/*
+      - name: Upload winget manifests
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: winget-manifests
+          path: dist/winget/**/*.yaml
+          if-no-files-found: error
+
+  # Submits the winget manifests that GoReleaser generated. This is a separate
+  # job, so a submission failure cannot fail the release, and the job can be
+  # re-run on its own. Pre-release tags are not submitted.
+  winget:
+    needs: goreleaser
+    if: ${{ !contains(github.ref_name, '-') }}
+    timeout-minutes: 15
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    env:
+      WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
+      WINGETCREATE_VERSION: v1.12.13.0
+      WINGETCREATE_SHA256: 24042bd37915805615e6cf969ac57c6439124c3fe85823327f5f3fb24bd9ffea
+      # wingetcreate targets .NET 9. Let it run on a newer runtime if the runner drops .NET 9.
+      DOTNET_ROLL_FORWARD: Major
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: audit
+      - name: Skip without a token
+        if: env.WINGET_CREATE_GITHUB_TOKEN == ''
+        run: echo "::notice::WINGET_GITHUB_TOKEN is not set. The winget manifests were not submitted."
+      - name: Download winget manifests
+        if: env.WINGET_CREATE_GITHUB_TOKEN != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: winget-manifests
+          path: winget-manifests
+      - name: Submit to microsoft/winget-pkgs
+        if: env.WINGET_CREATE_GITHUB_TOKEN != ''
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/microsoft/winget-create/releases/download/$env:WINGETCREATE_VERSION/wingetcreate.exe" -OutFile wingetcreate.exe
+          if ((Get-FileHash wingetcreate.exe -Algorithm SHA256).Hash -ne $env:WINGETCREATE_SHA256) {
+            throw "wingetcreate.exe does not match WINGETCREATE_SHA256"
+          }
+          # The artifact keeps GoReleaser's manifests/k/Kong/decK/<version>/ layout,
+          # and wingetcreate reads only the files directly in the given directory.
+          $manifests = @(Get-ChildItem winget-manifests -Recurse -Filter Kong.decK.yaml)
+          if ($manifests.Count -ne 1) {
+            throw "Expected one Kong.decK.yaml in the artifact, found $($manifests.Count)"
+          }
+          ./wingetcreate.exe submit --no-open $manifests[0].DirectoryName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   build-push-images:
     needs: check-branch
