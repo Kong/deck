@@ -74,9 +74,9 @@ brews:
   test: |
       system "#{bin}/deck", "version"
 winget:
-- name: deck
+- name: decK
   publisher: Kong
-  package_identifier: Kong.deck
+  package_identifier: Kong.decK
   publisher_url: https://konghq.com
   publisher_support_url: https://github.com/Kong/deck/issues
   homepage: https://github.com/kong/deck
@@ -94,17 +94,10 @@ winget:
   - cli
   ids:
   - winget
-  # Without the token, GoReleaser writes the manifests into dist/ and opens no
-  # pull request. With it, a pre-release tag still opens none.
-  skip_upload: '{{ if isEnvSet "WINGET_GITHUB_TOKEN" }}auto{{ else }}true{{ end }}'
+  # GoReleaser only writes the manifests into dist/winget/. The winget job in
+  # .github/workflows/release.yaml submits them, so that a submission failure
+  # cannot fail the release. GoReleaser needs a repository to write manifests.
+  skip_upload: true
   repository:
-    owner: Kong
+    owner: microsoft
     name: winget-pkgs
-    branch: Kong.deck-{{ .Version }}
-    token: '{{ envOrDefault "WINGET_GITHUB_TOKEN" "" }}'
-    pull_request:
-      enabled: true
-      base:
-        owner: microsoft
-        name: winget-pkgs
-        branch: master

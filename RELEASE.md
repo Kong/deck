@@ -29,13 +29,14 @@ As of 1.9.0, the remaining steps are automated on tag pushes to Github. They are
 
 ## winget release
 
-GoReleaser generates the [winget](https://learn.microsoft.com/windows/package-manager/) manifests for `Kong.deck` on every release.
+GoReleaser generates the [winget](https://learn.microsoft.com/windows/package-manager/) manifests for `Kong.decK`.
+The `winget` job of the release workflow submits them to [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) with [wingetcreate](https://github.com/microsoft/winget-create).
 
-- If the `WINGET_GITHUB_TOKEN` secret is set, GoReleaser pushes the manifests to the `Kong/winget-pkgs` fork and opens a pull request against [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs). It opens none for a pre-release tag.
-- If the secret is not set, the manifests are only in `dist/winget/` in the `dist` artifact of the [release job](https://github.com/Kong/deck/actions/workflows/release.yaml). To submit them by hand, open a pull request against microsoft/winget-pkgs with that directory, for example with [`wingetcreate submit`](https://github.com/microsoft/winget-create).
-
-The token needs permission to push to `Kong/winget-pkgs` and to open pull requests against microsoft/winget-pkgs.
-A Microsoft moderator reviews each pull request before the version is available.
+- The job needs the `WINGET_GITHUB_TOKEN` secret: a classic personal access token with the `public_repo` scope. If the secret is not set, the job submits nothing and passes.
+- wingetcreate forks microsoft/winget-pkgs into the account that owns the token, if that fork does not exist.
+- If the job fails, for example because the token expired, the release is not affected. Replace the token and re-run the `winget` job.
+- The job does not submit pre-release tags.
+- A Microsoft moderator reviews each pull request before the version is available in winget.
 
 ## Docker release
 
