@@ -120,7 +120,13 @@ jobs:
           if ((Get-FileHash wingetcreate.exe -Algorithm SHA256).Hash -ne $env:WINGETCREATE_SHA256) {
             throw "wingetcreate.exe does not match WINGETCREATE_SHA256"
           }
-          ./wingetcreate.exe submit --no-open winget-manifests
+          # The artifact keeps GoReleaser's manifests/k/Kong/decK/<version>/ layout,
+          # and wingetcreate reads only the files directly in the given directory.
+          $manifests = @(Get-ChildItem winget-manifests -Recurse -Filter Kong.decK.yaml)
+          if ($manifests.Count -ne 1) {
+            throw "Expected one Kong.decK.yaml in the artifact, found $($manifests.Count)"
+          }
+          ./wingetcreate.exe submit --no-open $manifests[0].DirectoryName
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   build-push-images:
