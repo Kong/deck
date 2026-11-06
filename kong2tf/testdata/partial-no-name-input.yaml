@@ -1,0 +1,10 @@
+partials:
+  - id: 1f8f3b1e-7a8b-4c2d-9e6f-0a1b2c3d4e5f
+    type: redis-ee
+    config:
+      host: 127.0.0.1
+      port: 6379
+  - type: redis-ce
+    config:
+      host: redis.example.com
+      port: 6380
