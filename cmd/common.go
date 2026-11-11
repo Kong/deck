@@ -311,7 +311,7 @@ func syncContent(ctx context.Context, targetContent *file.Content, dry bool, par
 	}
 
 	if dumpConfig.SkipReferenceValidation && mode != modeKonnect {
-		return errors.New("skip-reference-validation functionality can be used with Konnect only")
+		return errors.New("skip-plugin-reference-validation functionality can be used with Konnect only")
 	}
 
 	rootClient, err := reconcilerUtils.GetKongClient(rootConfig)
