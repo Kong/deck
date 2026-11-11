@@ -88,6 +88,7 @@ It can be used to export, import, or sync entities to Kong.`,
 		false, "do not fail when a plugin references (by ID) an entity that does not exist\n"+
 			"in the state file or control plane, and keep the reference as-is.\n"+
 			"This flag is only valid with Konnect.")
+	_ = rootCmd.PersistentFlags().MarkHidden("skip-reference-validation")
 
 	// TODO: everything below are online flags to be moved to the "gateway" subcommand
 	// moving them now would break to top-level commands (sync, diff, etc) we still
