@@ -150,8 +150,8 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 		CurrentState:     dummyEmptyState,
 		DiagnosticPolicy: diagnosticPolicy,
 	}, dump.Config{
-		DiagnosticPolicy:              diagnosticPolicy,
-		SkipPluginReferenceValidation: dumpConfig.SkipPluginReferenceValidation,
+		DiagnosticPolicy:        diagnosticPolicy,
+		SkipReferenceValidation: dumpConfig.SkipReferenceValidation,
 	}, kongClient)
 	if err != nil {
 		return err

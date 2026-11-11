@@ -310,7 +310,7 @@ func syncContent(ctx context.Context, targetContent *file.Content, dry bool, par
 		return errors.New("skip-hash-for-basic-auth functionality can be used with Konnect only")
 	}
 
-	if dumpConfig.SkipPluginReferenceValidation && mode != modeKonnect {
+	if dumpConfig.SkipReferenceValidation && mode != modeKonnect {
 		return errors.New("skip-plugin-reference-validation functionality can be used with Konnect only")
 	}
 
