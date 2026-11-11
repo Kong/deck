@@ -1,7 +1,6 @@
 package sanitize
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,14 +25,14 @@ func TestSanitizeExpression(t *testing.T) {
 		{
 			name:       "Preserve method and protocol in expression",
 			expression: `net.protocol == "http" && http.method == "GET"`,
-			expected:   `net.protocol == "http"  &&  http.method == "GET"`,
+			expected:   `net.protocol == "http" && http.method == "GET"`,
 		},
 		{
 			name:       "Sanitize complex expression",
 			expression: `(http.path == "/api/users" || http.path == "/api/products") && http.method == "POST"`,
-			expected: ` ( http.path == "ab1c696d4b37997a1c29a09610f47a7032949190db6c78d06a8d09b050ab91ea"  || ` +
-				` http.path == "af59ca84d7d64ca44795aa3c0217c5ebe63f2ee593a67b3d77fad31bf3b84372" )   && ` +
-				` http.method == "POST"`,
+			expected: `( http.path == "ab1c696d4b37997a1c29a09610f47a7032949190db6c78d06a8d09b050ab91ea" || ` +
+				`http.path == "af59ca84d7d64ca44795aa3c0217c5ebe63f2ee593a67b3d77fad31bf3b84372" ) && ` +
+				`http.method == "POST"`,
 		},
 		{
 			name:       "Sanitize expression with contain",
@@ -48,7 +47,7 @@ func TestSanitizeExpression(t *testing.T) {
 		{
 			name:       "Sanitize expression with ! operator",
 			expression: `!(http.path == "/api/users")`,
-			expected:   `! ( http.path == "ab1c696d4b37997a1c29a09610f47a7032949190db6c78d06a8d09b050ab91ea" ) `,
+			expected:   `! ( http.path == "ab1c696d4b37997a1c29a09610f47a7032949190db6c78d06a8d09b050ab91ea" )`,
 		},
 		{
 			name:       "Sanitize expression with regex",
@@ -64,8 +63,8 @@ func TestSanitizeExpression(t *testing.T) {
 			name: "Sanitize expression with multiple logical operators and regex",
 			expression: `(http.path ^= "/example/{query}" &&` +
 				`http.method == "PATCH") && http.headers.Accept ~ r#"^application\[vV](1.1.2.3)(.\d+)*?\+json$"#`,
-			expected: ` ( http.path ^= "a64a55a0d8d091518739d983c56c5ee3d2aa41a54c1906cc9bfade3a9462478d"  && ` +
-				`http.method == "PATCH" )   &&  ` +
+			expected: `( http.path ^= "a64a55a0d8d091518739d983c56c5ee3d2aa41a54c1906cc9bfade3a9462478d" && ` +
+				`http.method == "PATCH" ) && ` +
 				`http.headers.Accept ~ r#"98699493aea14c6936387ed103ad746e2155b28ff055b3e2c7c0be0fac622b21"#`,
 		},
 		{
@@ -118,14 +117,14 @@ func TestSanitizeExpression(t *testing.T) {
 			name:       "sanitize nested-function calls #3",
 			expression: `any(lower(upper(http.headers.x_foo))) ~ r#"bar\d"# && size(http.path) > 5)`,
 			expected: `any(lower(upper(http.headers.x_foo))) ~ ` +
-				`r#"54307518fddf09e0ab66e80cbf576c6a8ddfb0fd72bd0ad4dc6658e323b08b3b"#  &&  size(http.path) > 5 ) `,
+				`r#"54307518fddf09e0ab66e80cbf576c6a8ddfb0fd72bd0ad4dc6658e323b08b3b"# && size(http.path) > 5 )`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := s.sanitizeExpression(tt.expression)
-			assert.Equal(t, strings.Join(strings.Fields(tt.expected), " "), result)
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
