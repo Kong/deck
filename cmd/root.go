@@ -84,7 +84,7 @@ It can be used to export, import, or sync entities to Kong.`,
 	viper.BindPFlag("analytics",
 		rootCmd.PersistentFlags().Lookup("analytics"))
 
-	rootCmd.PersistentFlags().BoolVar(&dumpConfig.SkipReferenceValidation, "skip-plugin-reference-validation",
+	rootCmd.PersistentFlags().BoolVar(&dumpConfig.SkipPluginReferenceValidation, "skip-plugin-reference-validation",
 		false, "do not fail when a plugin references (by ID) an entity that does not exist\n"+
 			"in the state file or control plane, and keep the reference as-is.\n"+
 			"This flag is only valid with Konnect.")

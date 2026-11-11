@@ -106,7 +106,7 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return nil
 	}
 
-	if dumpConfig.SkipReferenceValidation && !inKonnectMode(nil) {
+	if dumpConfig.SkipPluginReferenceValidation && !inKonnectMode(nil) {
 		return errors.New("skip-plugin-reference-validation functionality can be used with Konnect only")
 	}
 
