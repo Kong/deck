@@ -63,8 +63,13 @@ func (s *Sanitizer) sanitizeExpression(expression string) string {
 	expression = parenRegex.ReplaceAllString(expression, " $1 ")
 	expression = logicalOpRegex.ReplaceAllString(expression, " $1 ")
 
-	// Third, breaking into predicate segments (separated by operators)
-	segments := strings.Split(expression, " ")
+	// Separate comparison operators after protecting literals so operators within
+	// string and regex values remain untouched. Match multi-character operators first.
+	comparisonOpRegex := regexp.MustCompile(`(==|!=|>=|<=|\^=|=\^|>|<|~|!)`)
+	expression = comparisonOpRegex.ReplaceAllString(expression, " $1 ")
+
+	// Third, break into tokens regardless of the amount or kind of whitespace.
+	segments := strings.Fields(expression)
 	for i := 0; i < len(segments); i++ {
 		segment := segments[i]
 
