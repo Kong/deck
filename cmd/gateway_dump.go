@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -103,6 +104,10 @@ func executeDump(cmd *cobra.Command, _ []string) error {
 		return err
 	} else if !yes {
 		return nil
+	}
+
+	if dumpConfig.SkipReferenceValidation && !inKonnectMode(nil) {
+		return errors.New("skip-plugin-reference-validation functionality can be used with Konnect only")
 	}
 
 	if inKonnectMode(nil) {
