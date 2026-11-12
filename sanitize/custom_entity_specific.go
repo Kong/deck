@@ -106,8 +106,12 @@ func (s *Sanitizer) handleKey(fieldValue reflect.Value) error {
 			PrivateKey: &privateKeyStr,
 		}
 
-		s.sanitizedMap[*key.PEM.PublicKey] = *sanitisedKey.PEM.PublicKey
-		s.sanitizedMap[*key.PEM.PrivateKey] = *sanitisedKey.PEM.PrivateKey
+		if key.PEM.PublicKey != nil {
+			s.sanitizedMap[*key.PEM.PublicKey] = *sanitisedKey.PEM.PublicKey
+		}
+		if key.PEM.PrivateKey != nil {
+			s.sanitizedMap[*key.PEM.PrivateKey] = *sanitisedKey.PEM.PrivateKey
+		}
 	}
 
 	if key.JWK != nil {
