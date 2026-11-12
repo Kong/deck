@@ -34,10 +34,14 @@ func Test_SanitizeKeyOptionalPEM(t *testing.T) {
 			if pem.PublicKey != nil {
 				require.NotEqual(t, *pem.PublicKey, *result.Keys[0].PEM.PublicKey)
 				require.Equal(t, *result.Keys[0].PEM.PublicKey, sanitizer.sanitizedMap[*pem.PublicKey])
+			} else {
+				require.Nil(t, result.Keys[0].PEM.PublicKey)
 			}
 			if pem.PrivateKey != nil {
 				require.NotEqual(t, *pem.PrivateKey, *result.Keys[0].PEM.PrivateKey)
 				require.Equal(t, *result.Keys[0].PEM.PrivateKey, sanitizer.sanitizedMap[*pem.PrivateKey])
+			} else {
+				require.Nil(t, result.Keys[0].PEM.PrivateKey)
 			}
 		})
 	}

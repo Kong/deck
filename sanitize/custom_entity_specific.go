@@ -101,15 +101,14 @@ func (s *Sanitizer) handleKey(fieldValue reflect.Value) error {
 
 		publicKey := generateRSAPublicKeyPEM(privateKey)
 
-		sanitisedKey.PEM = &kong.PEM{
-			PublicKey:  &publicKey,
-			PrivateKey: &privateKeyStr,
-		}
+		sanitisedKey.PEM = &kong.PEM{}
 
 		if key.PEM.PublicKey != nil {
+			sanitisedKey.PEM.PublicKey = &publicKey
 			s.sanitizedMap[*key.PEM.PublicKey] = *sanitisedKey.PEM.PublicKey
 		}
 		if key.PEM.PrivateKey != nil {
+			sanitisedKey.PEM.PrivateKey = &privateKeyStr
 			s.sanitizedMap[*key.PEM.PrivateKey] = *sanitisedKey.PEM.PrivateKey
 		}
 	}
