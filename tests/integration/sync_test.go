@@ -9125,6 +9125,63 @@ func testSyncConsumerGroupConsumerFromUpstreamKonnectImpl(t *testing.T) {
 }
 
 // test scope:
+//   - 3.0.0+
+//   - konnect
+func Test_Sync_PluginOnRouteFromUpstreamWithDefaultLookupTags(t *testing.T) {
+	runWhenKongOrKonnect(t, ">=3.0.0")
+	setup(t)
+
+	client, err := getTestClient()
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	const (
+		initialFile = "testdata/sync/058-route-lookup-tags/initial.yaml"
+		pluginFile  = "testdata/sync/058-route-lookup-tags/plugin.yaml"
+	)
+
+	require.NoError(t, sync(ctx, initialFile))
+
+	routeBefore, err := client.Routes.Get(ctx, kong.String("route-1"))
+	require.NoError(t, err)
+	require.ElementsMatch(t,
+		kong.StringSlice("project:the-project", "managed-by:the-background-process"),
+		routeBefore.Tags,
+	)
+
+	expectedDiff := `creating plugin key-auth for route route-1
+Summary:
+  Created: 1
+  Updated: 0
+  Deleted: 0
+`
+	out, err := diff(pluginFile)
+	require.NoError(t, err)
+	assert.Equal(t, expectedDiff, out)
+
+	require.NoError(t, sync(ctx, pluginFile))
+
+	routeAfter, err := client.Routes.Get(ctx, kong.String("route-1"))
+	require.NoError(t, err)
+	assert.Equal(t, routeBefore, routeAfter, "route must not be modified by the plugin sync")
+
+	plugins, err := client.Plugins.ListAll(ctx)
+	require.NoError(t, err)
+	require.Len(t, plugins, 1)
+	assert.Equal(t, "key-auth", *plugins[0].Name)
+	require.NotNil(t, plugins[0].Route)
+	assert.Equal(t, *routeBefore.ID, *plugins[0].Route.ID)
+	assert.ElementsMatch(t,
+		kong.StringSlice("project:the-project", "managed-by:deck"),
+		plugins[0].Tags,
+	)
+
+	out, err = diff(pluginFile)
+	require.NoError(t, err)
+	assert.Equal(t, emptyOutput, out)
+}
+
+// test scope:
 //   - 3.6.0+
 func Test_Sync_ConsumerGroupConsumerWithTags(t *testing.T) {
 	runWhen(t, "enterprise", ">=3.6.0")

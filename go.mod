@@ -17,7 +17,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gosimple/slug v1.15.0
 	github.com/kong/go-apiops v0.4.6
-	github.com/kong/go-database-reconciler v1.43.1
+	github.com/kong/go-database-reconciler v1.43.2-0.20261114132911-30a2cb79b6e6
 	github.com/kong/go-kong v0.80.0
 	github.com/kong/kubernetes-configuration v1.5.3
 	github.com/kong/kubernetes-testing-framework v0.47.2
