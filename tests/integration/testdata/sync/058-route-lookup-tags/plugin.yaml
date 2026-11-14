@@ -1,0 +1,12 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - project:the-project
+  - managed-by:deck
+  default_lookup_tags:
+    routes:
+    - managed-by:the-background-process
+    - project:the-project
+plugins:
+- name: key-auth
+  route: route-1

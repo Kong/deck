@@ -1,0 +1,8 @@
+_format_version: "3.0"
+routes:
+- name: route-1
+  paths:
+  - /route-1
+  tags:
+  - project:the-project
+  - managed-by:the-background-process
