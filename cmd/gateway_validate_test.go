@@ -56,3 +56,9 @@ func TestFillPluginAutoFields_ClonedPluginUsesTheSchemaOfItsRef(t *testing.T) {
 	err = fillPluginAutoFields(context.Background(), schema.NewRegistry(client, false), plugins, nil)
 	require.ErrorContains(t, err, "retrieving schema for plugin example-clone")
 }
+
+func TestValidateCmd_RequireBulkValidationIsOnlyOnGatewayValidate(t *testing.T) {
+	require.NotNil(t, newValidateCmd(false, true).Flags().Lookup("require-bulk-validation"))
+	require.Nil(t, newValidateCmd(false, false).Flags().Lookup("require-bulk-validation"))
+	require.Nil(t, newValidateCmd(true, false).Flags().Lookup("require-bulk-validation"))
+}

@@ -21,6 +21,7 @@ type Validator struct {
 	client               *kong.Client
 	configClient         *kong.Client
 	configChunkSize      int
+	requireBulk          bool
 	parallelism          int
 	rbacResourcesOnly    bool
 	onlineEntitiesFilter []string
@@ -35,10 +36,12 @@ type ValidatorOpts struct {
 	ConfigClient *kong.Client
 	// ConfigChunkSize is the maximum size in bytes of one config validation request.
 	// If it is 0, DefaultConfigChunkSize applies.
-	ConfigChunkSize      int
-	Parallelism          int
-	RBACResourcesOnly    bool
-	OnlineEntitiesFilter []string
+	ConfigChunkSize int
+	// RequireBulkValidation makes validation fail if the control plane does not have the config validation endpoint.
+	RequireBulkValidation bool
+	Parallelism           int
+	RBACResourcesOnly     bool
+	OnlineEntitiesFilter  []string
 }
 
 // Define a map of entity object field names and their corresponding string names
@@ -81,6 +84,7 @@ func NewValidator(opt ValidatorOpts) *Validator {
 		client:               opt.Client,
 		configClient:         configClient,
 		configChunkSize:      configChunkSize,
+		requireBulk:          opt.RequireBulkValidation,
 		parallelism:          opt.Parallelism,
 		rbacResourcesOnly:    opt.RBACResourcesOnly,
 		onlineEntitiesFilter: opt.OnlineEntitiesFilter,

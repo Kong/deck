@@ -284,6 +284,51 @@ func TestValidate_ConfigEndpointNotFoundUsesPerEntityValidation(t *testing.T) {
 	assert.Len(t, f.entityRequests["plugins"], 2)
 }
 
+func TestValidate_RequireBulkValidationFailsWithoutTheConfigEndpoint(t *testing.T) {
+	f := newFakeKonnect(t)
+	f.configEnabled = false
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := f.validator(t, ks)
+	v.requireBulk = true
+
+	errs := v.Validate(format30)
+
+	require.Len(t, errs, 1)
+	require.ErrorIs(t, errs[0], errConfigValidationUnavailable)
+	assert.Empty(t, f.configBodies)
+	assert.Empty(t, f.entityRequests)
+}
+
+func TestValidate_RequireBulkValidationFailsWithoutKonnect(t *testing.T) {
+	f := newFakeKonnect(t)
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := f.validator(t, ks)
+	v.client.SetKonnectFlag(false)
+	v.requireBulk = true
+
+	errs := v.Validate(format30)
+
+	require.Len(t, errs, 1)
+	require.ErrorIs(t, errs[0], errConfigValidationUnavailable)
+	assert.Empty(t, f.entityRequests)
+}
+
+func TestValidate_RequireBulkValidationUsesTheConfigEndpoint(t *testing.T) {
+	f := newFakeKonnect(t)
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := f.validator(t, ks)
+	v.requireBulk = true
+
+	errs := v.Validate(format30)
+
+	require.Empty(t, errs)
+	assert.Len(t, f.configBodies, 1)
+	assert.Empty(t, f.entityRequests)
+}
+
 func TestValidate_SmallConfigUsesOneRequest(t *testing.T) {
 	f := newFakeKonnect(t)
 	ks := newTestState(t)

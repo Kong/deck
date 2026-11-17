@@ -247,7 +247,7 @@ func (v *Validator) postConfig(rawURL string, body []byte) (*configValidationRes
 func (v *Validator) validateWithConfigEndpoint(fields map[string]string) ([]error, bool) {
 	endpoint := v.configValidateURL()
 	if endpoint == "" {
-		return nil, false
+		return v.configValidationUnavailable()
 	}
 
 	kinds := v.selectedConfigKinds(fields)
@@ -257,7 +257,7 @@ func (v *Validator) validateWithConfigEndpoint(fields map[string]string) ([]erro
 
 	_, status, err := v.postConfig(endpoint, []byte("{}"))
 	if errors.Is(err, errConfigValidationUnavailable) {
-		return nil, false
+		return v.configValidationUnavailable()
 	}
 	if err != nil {
 		return []error{err}, true
@@ -304,6 +304,14 @@ func (v *Validator) validateWithConfigEndpoint(fields map[string]string) ([]erro
 		errs.add(v.validateStateField(field, entityType)...)
 	}
 	return errs.errs, true
+}
+
+// configValidationUnavailable returns false if the per-entity validation can replace the config validation endpoint.
+func (v *Validator) configValidationUnavailable() ([]error, bool) {
+	if v.requireBulk {
+		return []error{errConfigValidationUnavailable}, true
+	}
+	return nil, false
 }
 
 func (r *configValidationResponse) issueErrors() []error {

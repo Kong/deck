@@ -27,6 +27,7 @@ var (
 	validateWorkspace               string
 	validateParallelism             int
 	validateConfigChunkSize         int
+	validateRequireBulkValidation   bool
 )
 
 func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
@@ -36,6 +37,9 @@ func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
+	if validateRequireBulkValidation && mode != modeKonnect {
+		return fmt.Errorf("--require-bulk-validation works only with Konnect")
+	}
 	// read target file
 	// this does json schema validation as well
 	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
@@ -333,6 +337,9 @@ this command unless --online flag is used.
 		validateCmd.Flags().IntVar(&validateConfigChunkSize, "config-chunk-size",
 			validate.DefaultConfigChunkSize>>20, "Konnect only. Maximum size in MB of one configuration validation request.\n"+
 				"Slower networks may benefit from a smaller size.")
+		validateCmd.Flags().BoolVar(&validateRequireBulkValidation, "require-bulk-validation",
+			false, "Konnect only. Fail if the control plane does not support the configuration validation\n"+
+				"endpoint, instead of validating each entity with a separate request.")
 	}
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
@@ -390,14 +397,15 @@ func validateWithKong(
 		return []error{fmt.Errorf("parsing Kong version: %w", err)}
 	}
 	opts := validate.ValidatorOpts{
-		Ctx:                  ctx,
-		State:                ks,
-		Client:               kongClient,
-		ConfigClient:         configClient,
-		ConfigChunkSize:      validateConfigChunkSize << 20,
-		Parallelism:          validateParallelism,
-		RBACResourcesOnly:    validateCmdRBACResourcesOnly,
-		OnlineEntitiesFilter: validateCmdOnlineEntitiesFilter,
+		Ctx:                   ctx,
+		State:                 ks,
+		Client:                kongClient,
+		ConfigClient:          configClient,
+		ConfigChunkSize:       validateConfigChunkSize << 20,
+		RequireBulkValidation: validateRequireBulkValidation,
+		Parallelism:           validateParallelism,
+		RBACResourcesOnly:     validateCmdRBACResourcesOnly,
+		OnlineEntitiesFilter:  validateCmdOnlineEntitiesFilter,
 	}
 	validator := validate.NewValidator(opts)
 	return validator.Validate(parsedFormatVersion)
