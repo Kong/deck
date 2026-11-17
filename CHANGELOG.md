@@ -1,5 +1,6 @@
 # Table of Contents
 
+- [v1.70.1](#v1701)
 - [v1.70.0](#v1700)
 - [v1.69.0](#v1690)
 - [v1.68.0](#v1680)
@@ -152,6 +153,13 @@
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
+
+## [v1.70.1]
+> Release date: 2026/11/12
+
+### Chores
+- Updated `go-database-reconciler` to the latest version.
+[#2323](https://github.com/Kong/deck/pull/2323) [go-database-reconciler #552](https://github.com/Kong/go-database-reconciler/pull/552)
 
 ## [v1.70.0]
 > Release date: 2026/11/05
@@ -2820,6 +2828,7 @@ No breaking changes have been introduced in this release.
 ### Summary
 
 Debut release of decK
+[v1.70.1]: https://github.com/Kong/deck/compare/v1.70.0...v1.70.1
 [v1.70.0]: https://github.com/Kong/deck/compare/v1.69.0...v1.70.0
 [v1.69.0]: https://github.com/Kong/deck/compare/v1.68.0...v1.69.0
 [v1.68.0]: https://github.com/Kong/deck/compare/v1.67.0...v1.68.0
