@@ -225,6 +225,21 @@ func Test_AISync_AIGateway22(t *testing.T) {
 	})
 }
 
+func Test_AISync_AIGateway23(t *testing.T) {
+	runWhenAIGateway(t, ">=2.3.0")
+	setup(t)
+
+	runAISyncCases(t, []aiSyncTestCase{
+		// Token Vault is left out: its datastore is Konnect-only, so a
+		// self-hosted gateway cannot serve it.
+		{
+			name:       "ai gateway 2.3 features",
+			inputFile:  "testdata/file_ai2kong/17-ai-gateway-2.3/input.yaml",
+			outputFile: "testdata/file_ai2kong/17-ai-gateway-2.3/output.yaml",
+		},
+	})
+}
+
 // Test_AISync_CustomPolicy covers AI Gateway 2.2 custom_policies, which sync as
 // a Kong custom plugin definition (config.custom_plugins) plus the plugin
 // instance that references it. The definition (custom-policy.yaml) is synced

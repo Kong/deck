@@ -149,7 +149,10 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	rawState, err := file.Get(ctx, targetContent, file.RenderConfig{
 		CurrentState:     dummyEmptyState,
 		DiagnosticPolicy: diagnosticPolicy,
-	}, dump.Config{DiagnosticPolicy: diagnosticPolicy}, kongClient)
+	}, dump.Config{
+		DiagnosticPolicy:        diagnosticPolicy,
+		SkipReferenceValidation: dumpConfig.SkipReferenceValidation,
+	}, kongClient)
 	if err != nil {
 		return err
 	}

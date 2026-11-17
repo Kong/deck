@@ -1061,7 +1061,7 @@ func Test_Dump_SkipDefaults_Konnect(t *testing.T) {
 // test scope:
 //
 // - gateway enterprise
-// - 3.4 and 3.10+
+// - 3.4, 3.10+, 3.14+ and 3.17+
 func Test_Dump_SkipDefaults(t *testing.T) {
 	setup(t)
 	ctx := context.Background()
@@ -1148,7 +1148,13 @@ func Test_Dump_SkipDefaults(t *testing.T) {
 			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.14+",
 			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.yaml",
 			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.14+/plugin-partial-2.expected.yaml",
-			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0") },
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.14.0 <3.17.0") },
+		},
+		{
+			name:         "dump skip-defaults: plugins, partials (openid-connect) 3.17+",
+			stateFile:    "testdata/dump/009-skip-defaults/enterprise/3.17+/plugin-partial-2.yaml",
+			expectedFile: "testdata/dump/009-skip-defaults/enterprise/3.17+/plugin-partial-2.expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.17.0") },
 		},
 		{
 			name:         "dump skip-defaults: plugin rate-limiting 3.10+",
@@ -1757,20 +1763,42 @@ func Test_Dump_CustomPluginDefinitions(t *testing.T) {
 }
 
 func Test_Dump_Plugin_Expressions(t *testing.T) {
-	runWhen(t, "enterprise", ">=3.16.0")
 	setup(t)
 
 	ctx := context.Background()
 	kongFile := "testdata/sync/003-create-a-plugin/kong-expressions.yaml"
-	require.NoError(t, sync(ctx, kongFile))
 
-	output, err := dump("-o", "-", "--with-id")
-	require.NoError(t, err)
+	tests := []struct {
+		name         string
+		expectedFile string
+		runWhen      func(t *testing.T)
+	}{
+		{
+			name:         "dump plugin with expression fields >=3.16.0 <3.17.0",
+			expectedFile: "testdata/dump/016-plugin-expressions/expected.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.16.0 <3.17.0") },
+		},
+		{
+			name:         "dump plugin with expression fields >=3.17.0",
+			expectedFile: "testdata/dump/016-plugin-expressions/expected-317.yaml",
+			runWhen:      func(t *testing.T) { runWhen(t, "enterprise", ">=3.17.0") },
+		},
+	}
 
-	expectedFile := "testdata/dump/016-plugin-expressions/expected.yaml"
-	expected, err := readFile(expectedFile)
-	require.NoError(t, err)
-	assert.Equal(t, expected, output)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.runWhen(t)
+			reset(t)
+			require.NoError(t, sync(ctx, kongFile))
+
+			output, err := dump("-o", "-", "--with-id")
+			require.NoError(t, err)
+
+			expected, err := readFile(tc.expectedFile)
+			require.NoError(t, err)
+			assert.Equal(t, expected, output)
+		})
+	}
 }
 
 func Test_Dump_Plugin_Expressions_Konnect(t *testing.T) {

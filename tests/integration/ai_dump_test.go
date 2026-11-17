@@ -212,6 +212,18 @@ func Test_AIDump_AIGateway22(t *testing.T) {
 	})
 }
 
+func Test_AIDump_AIGateway23(t *testing.T) {
+	runWhenAIGateway(t, ">=2.3.0")
+	setup(t)
+
+	runAIDumpCases(t, []aiDumpTestCase{
+		{
+			name:      "ai gateway 2.3 features",
+			inputFile: "testdata/file_ai2kong/17-ai-gateway-2.3/input.yaml",
+		},
+	})
+}
+
 // Test_AIDump_CustomPolicy covers reverting a custom plugin definition (and the
 // plugin instance referencing it) back to an AI Gateway custom_policies entry.
 // As in Test_AISync_CustomPolicy, the definition (custom-policy.yaml) is synced

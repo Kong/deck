@@ -181,6 +181,7 @@ func dumpKonnectV2(ctx context.Context) error {
 		KongVersion:              fetchKonnectKongVersion(),
 		SanitizeContent:          dumpConfig.SanitizeContent,
 		IncludePluginDefinitions: dumpConfig.IncludePluginDefinitions,
+		SkipReferenceValidation:  dumpConfig.SkipReferenceValidation,
 	}
 
 	var workspacesList []string

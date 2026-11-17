@@ -98,6 +98,11 @@ func Test_FileAI2Kong(t *testing.T) {
 			inputFile:          "testdata/file_ai2kong/16-custom-policy/input.yaml",
 			expectedOutputFile: "testdata/file_ai2kong/16-custom-policy/output.yaml",
 		},
+		{
+			name:               "convert AI gateway 2.3 config to Kong gateway config",
+			inputFile:          "testdata/file_ai2kong/17-ai-gateway-2.3/input.yaml",
+			expectedOutputFile: "testdata/file_ai2kong/17-ai-gateway-2.3/output.yaml",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
