@@ -192,6 +192,12 @@ func Test_convertKongGatewayToTerraform(t *testing.T) {
 			wantErr:        false,
 		},
 		{
+			name:           "partial-no-name",
+			inputFilename:  "partial-no-name-input.yaml",
+			outputFilename: "partial-no-name-output-expected.tf",
+			wantErr:        false,
+		},
+		{
 			name:           "handles-unsupported-chars",
 			inputFilename:  "handles-unsupported-chars-input.yaml",
 			outputFilename: "handles-unsupported-chars-expected.tf",
