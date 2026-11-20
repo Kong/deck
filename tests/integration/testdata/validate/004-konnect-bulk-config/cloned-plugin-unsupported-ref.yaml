@@ -1,0 +1,5 @@
+_format_version: "3.0"
+cloned_plugins:
+- name: bulk-clone-of-nothing
+  ref: bulk-plugin-that-does-not-exist
+  priority: 1000

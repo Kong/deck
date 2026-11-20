@@ -1,0 +1,110 @@
+_format_version: "3.0"
+services:
+- id: 0b5c1d3e-0001-4000-8000-000000000001
+  name: bulk-svc-1
+  host: example.com
+  port: 80
+  protocol: http
+  routes:
+  - id: 0b5c1d3e-0002-4000-8000-000000000001
+    name: bulk-route-1
+    paths:
+    - /bulk-1
+    headers:
+      x-bulk:
+      - one
+      - two
+    plugins:
+    - id: 0b5c1d3e-0003-4000-8000-000000000001
+      name: key-auth
+      config:
+        key_names:
+        - apikey
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000002
+    name: rate-limiting
+    config:
+      minute: 5
+      policy: local
+  - id: 0b5c1d3e-0003-4000-8000-000000000003
+    name: acl
+    instance_name: bulk-acl-1
+    config:
+      allow:
+      - bulk-group
+- id: 0b5c1d3e-0001-4000-8000-000000000002
+  name: bulk-svc-2
+  host: example.com
+  port: 80
+  protocol: http
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000004
+    name: acl
+    instance_name: bulk-acl-2
+    config:
+      allow:
+      - bulk-group
+upstreams:
+- id: 0b5c1d3e-0004-4000-8000-000000000001
+  name: bulk-upstream
+  healthchecks:
+    active:
+      headers:
+        x-health:
+        - "1"
+      http_path: /status
+  targets:
+  - id: 0b5c1d3e-0005-4000-8000-000000000001
+    target: 198.51.100.11:80
+vaults:
+- id: 0b5c1d3e-0006-4000-8000-000000000001
+  name: env
+  prefix: bulk-env-vault
+  config:
+    prefix: BULK_
+certificates:
+- id: 0b5c1d3e-0007-4000-8000-000000000001
+  cert: "{vault://bulk-env-vault/cert}"
+  key: "{vault://bulk-env-vault/key}"
+  snis:
+  - name: bulk.example.com
+key_sets:
+- id: 0b5c1d3e-0008-4000-8000-000000000001
+  name: bulk-key-set
+keys:
+- id: 0b5c1d3e-0009-4000-8000-000000000001
+  jwk: '{"kid":"vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4","kty":"RSA","alg":"A256GCM","n":"v2KAzzfruqctVHaE9WSCWIg1xAhMwxTIK-i56WNqPtpWBo9AqxcVea8NyVctEjUNq_mix5CklNy3ru7ARh7rBG_LU65fzs4fY_uYalul3QZSnr61Gj-cTUB3Gy4PhA63yXCbYRR3gDy6WR_wfis1MS61j0R_AjgXuVufmmC0F7R9qSWfR8ft0CbQgemEHY3ddKeW7T7fKv1jnRwYAkl5B_xtvxRFIYT-uR9NNftixNpUIW7q8qvOH7D9icXOg4_wIVxTRe5QiRYwEFoUbV1V9bFtu5FLal0vZnLaWwg5tA6enhzBpxJNdrS0v1RcPpyeNP-9r3cUDGmeftwz9v95UQ","e":"AQAB"}'
+  kid: vsR8NCNV_1_LB06LqudGa2r-T0y4Z6VQVYue9IQz6A4
+  name: bulk-key
+  set:
+    id: 0b5c1d3e-0008-4000-8000-000000000001
+consumer_groups:
+- id: 0b5c1d3e-000a-4000-8000-000000000001
+  name: bulk-consumer-group
+consumers:
+- id: 0b5c1d3e-000b-4000-8000-000000000001
+  username: bulk-consumer
+  custom_id: bulk-consumer-custom-id
+  groups:
+  - name: bulk-consumer-group
+  keyauth_credentials:
+  - id: 0b5c1d3e-000c-4000-8000-000000000001
+    key: bulk-consumer-key
+  basicauth_credentials:
+  - id: 0b5c1d3e-000c-4000-8000-000000000002
+    username: bulk-consumer-basic
+    password: bulk-consumer-password
+  acls:
+  - id: 0b5c1d3e-000c-4000-8000-000000000003
+    group: bulk-group
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000005
+    name: rate-limiting
+    config:
+      minute: 10
+      policy: local
+plugins:
+- id: 0b5c1d3e-0003-4000-8000-000000000006
+  name: correlation-id
+  config:
+    header_name: X-Bulk-Correlation-ID

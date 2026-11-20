@@ -1,0 +1,9 @@
+_format_version: "3.0"
+services:
+- id: 0b5c1d3e-0001-4000-8000-000000000b02
+  name: bulk-existing-svc
+  host: example.org
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000b02
+    name: correlation-id
+    instance_name: bulk-existing-instance-name

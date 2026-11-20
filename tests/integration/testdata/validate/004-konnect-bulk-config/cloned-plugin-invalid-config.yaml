@@ -1,0 +1,12 @@
+_format_version: "3.0"
+cloned_plugins:
+- name: bulk-acl-clone
+  ref: acl
+  priority: 1000
+plugins:
+- id: 0b5c1d3e-0003-4000-8000-000000000801
+  name: bulk-acl-clone
+  config:
+    allow:
+    - bulk-group
+    bulk_unknown_field: true

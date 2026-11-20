@@ -1,11 +1,46 @@
 package cmd
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/kong/go-database-reconciler/pkg/konnect"
+	"github.com/kong/go-database-reconciler/pkg/utils"
 	"github.com/kong/go-kong/kong"
 )
+
+func TestKonnectClientWithMinTimeoutDoesNotRetry(t *testing.T) {
+	requests := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests++
+		w.WriteHeader(http.StatusTooManyRequests)
+	}))
+	t.Cleanup(server.Close)
+
+	client, err := kong.NewClient(kong.String(server.URL+"/v2/control-planes/cp/core-entities"), server.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err = konnectClientWithMinTimeout(client, &utils.KonnectConfig{}, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req, err := http.NewRequest(http.MethodGet, server.URL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := client.DoRAW(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+
+	if requests != 1 {
+		t.Fatalf("request count = %d, want 1", requests)
+	}
+}
 
 func Test_singleOutKongCP(t *testing.T) {
 	type args struct {
