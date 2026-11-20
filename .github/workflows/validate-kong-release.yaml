@@ -1,4 +1,4 @@
-name: Validate Kong Gateway Release
+name: Validate Kong AI & API Gateway Release
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.kong_image }}-${{ inputs.branch }}
 on:
