@@ -106,10 +106,10 @@ waitContainer "${GATEWAY_CONTAINER_NAME}" kong health
 # `kong health` only reports that nginx is running. With RBAC enforced, the
 # Admin API can still answer 401 "Invalid RBAC credentials" to a valid token
 # for a short window after startup, which made the first test request flaky.
-# Wait (bounded) until the seeded admin token is actually accepted.
+# Wait (bounded, 10 tries 2s apart) until the seeded admin token is actually accepted.
 if [[ "${KONG_ENFORCE_RBAC}" == "on" ]]; then
     rbac_ready=false
-    for attempt in {1..60}; do
+    for attempt in {1..10}; do
         status=$(curl -s -o /dev/null -w '%{http_code}' \
             -H "Kong-Admin-Token: ${KONG_PASSWORD}" \
             http://127.0.0.1:8001/ || true)
@@ -117,11 +117,11 @@ if [[ "${KONG_ENFORCE_RBAC}" == "on" ]]; then
             rbac_ready=true
             break
         fi
-        echo "waiting for RBAC admin token to be accepted (attempt ${attempt}/60, last status: ${status:-none})"
-        sleep 0.5
+        echo "waiting for RBAC admin token to be accepted (attempt ${attempt}/10, last status: ${status:-none})"
+        sleep 2
     done
     if [[ "${rbac_ready}" != "true" ]]; then
-        echo "FATAL: Admin API did not accept the RBAC admin token within ~30s"
+        echo "FATAL: Admin API did not accept the RBAC admin token within ~20s"
         docker logs --tail 50 "${GATEWAY_CONTAINER_NAME}" || true
         exit 1
     fi
