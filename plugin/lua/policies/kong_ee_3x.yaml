@@ -1,0 +1,109 @@
+# Kong Enterprise Lua Sandbox Knowledge Base
+# Accurate mapping from kong/tools/sandbox/environment/
+
+version: "1.0"
+edition: "EE"
+
+profiles:
+  - name: lua
+    description: "Base Lua environment. Standard libraries only."
+    allowed_globals:
+      - _VERSION
+      - assert
+      - error
+      - ipairs
+      - next
+      - pairs
+      - pcall
+      - print
+      - select
+      - tonumber
+      - tostring
+      - type
+      - unpack
+      - xpcall
+    allowed_prefixes:
+      - bit.
+      - coroutine.
+      - io.type
+      - jit.
+      - math.
+      - os.clock
+      - os.date
+      - os.difftime
+      - os.time
+      - string.
+      - table.
+
+  - name: strict
+    extends: lua
+    description: "Standard Kong Sandbox. Safe PDK and Nginx utilities."
+    allowed_globals:
+      - kong
+      - ngx
+    allowed_prefixes:
+      - kong.client.
+      - kong.cluster.
+      - kong.default_workspace
+      - kong.ip.
+      - kong.jwe.
+      - kong.nginx.
+      - kong.node.
+      - kong.plugin.
+      - kong.request.
+      - kong.response.
+      - kong.service.request.
+      - kong.service.response.
+      - kong.table.
+      - kong.telemetry.
+      - kong.tracing.
+      - kong.version
+      - ngx.log
+      - ngx.sleep
+      - ngx.time
+      - ngx.re.
+      - ngx.req.
+      - ngx.resp.
+      - ngx.worker.
+      - ngx.config.
+      # Common constants
+      - ngx.HTTP_
+      - ngx.OK
+      - ngx.ERR
+      - ngx.INFO
+
+  - name: lax
+    extends: strict
+    description: "Permissive Sandbox. Advanced PDK capabilities."
+    allowed_prefixes:
+      - kong.cache.
+      - kong.db.consumers.select    # Permesso solo select su tabelle specifiche
+      - kong.db.services.select
+      - kong.db.routes.select
+      - kong.db.upstreams.select
+      - kong.db.targets.select
+      - kong.db.plugins.select
+      - kong.dns.
+      - kong.vault.
+      - ngx.socket.
+      - ngx.thread.
+
+
+rules:
+  - id: LUA-EV-001
+    name: "Global Environment Access"
+    pattern: "(_G\\[|getfenv|setfenv)"
+    severity: CRITICAL
+    message: "Potential sandbox evasion: global environment manipulation."
+
+  - id: LUA-SEC-001
+    name: "Forbidden Module Loading"
+    pattern: "require\\s*\\(['\"] (ffi|os|io) ['\"]\\)"
+    severity: CRITICAL
+    message: "Forbidden module loading."
+
+  - id: LUA-COMP-001
+    name: "Restricted OS/IO calls"
+    pattern: "(os\\.execute|os\\.getenv|io\\.open|io\\.popen)"
+    severity: ERROR
+    message: "Direct OS or IO system calls are strictly forbidden for security reasons."
