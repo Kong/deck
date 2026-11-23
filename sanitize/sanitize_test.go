@@ -517,3 +517,38 @@ func Test_patternBasedSanitization(t *testing.T) {
 		})
 	}
 }
+
+func TestSanitizePreservesCACertificateReferences(t *testing.T) {
+	const certificateID = "80552e11-f2ac-438f-b38d-65380d3f648a"
+	content := &file.Content{
+		Services: []file.FService{{Service: kong.Service{
+			Host:           kong.String("private.example.com"),
+			CACertificates: []*string{kong.String(certificateID)},
+		}}},
+		Plugins: []file.FPlugin{{Plugin: kong.Plugin{
+			Name: kong.String("mtls-auth"),
+			Config: kong.Configuration{
+				"ca_certificates": []interface{}{certificateID},
+				"private_value":   "sensitive",
+			},
+		}}},
+		CACertificates: []file.FCACertificate{{CACertificate: kong.CACertificate{
+			ID:         kong.String(certificateID),
+			Cert:       kong.String("original certificate"),
+			CertDigest: kong.String("original digest"),
+		}}},
+	}
+	sanitizer := NewSanitizer(&SanitizerOptions{
+		Ctx:     context.Background(),
+		Content: content.DeepCopy(),
+		Salt:    "test-salt",
+	})
+	result, err := sanitizer.Sanitize()
+	require.NoError(t, err)
+	assert.Equal(t, certificateID, *result.CACertificates[0].ID)
+	assert.Equal(t, certificateID, *result.Services[0].CACertificates[0])
+	assert.Equal(t, []interface{}{certificateID}, result.Plugins[0].Config["ca_certificates"])
+	assert.NotEqual(t, *content.Services[0].Host, *result.Services[0].Host)
+	assert.NotEqual(t, "sensitive", result.Plugins[0].Config["private_value"])
+	assert.NotEqual(t, *content.CACertificates[0].Cert, *result.CACertificates[0].Cert)
+}
