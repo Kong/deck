@@ -11,6 +11,20 @@
       "matchPackageNames": [
         "*"
       ]
+    },
+    {
+      "description": "pb33f/doctor generated code requires templ.JoinURLErrs",
+      "allowedVersions": "<=0.3.1070",
+      "matchPackageNames": [
+        "github.com/a-h/templ"
+      ]
+    },
+    {
+      "description": "Kubernetes 0.37 requires structured-merge-diff/v6 in kube-openapi",
+      "allowedVersions": "<=0.0.0-20260721132016-d427ff9ee9ad",
+      "matchPackageNames": [
+        "k8s.io/kube-openapi"
+      ]
     }
   ]
 }
