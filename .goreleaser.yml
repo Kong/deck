@@ -21,6 +21,19 @@ builds:
   - -trimpath
   ldflags:
   - -s -w -X github.com/kong/deck/cmd.VERSION={{ .Tag }} -X github.com/kong/deck/cmd.COMMIT={{ .ShortCommit }}
+archives:
+# The default archive: tar.gz for every platform, unchanged.
+- id: default
+# A zip of the Windows binary, for winget. winget reads zip archives only.
+- id: winget
+  format: zip
+  format_overrides:
+  - goos: linux
+    format: none
+  - goos: darwin
+    format: none
+  - goos: freebsd
+    format: none
 notarize:
   macos:
     - enabled: '{{ isEnvSet "APPLE_SIGNING_CERTIFICATE_P12_BASE64" }}'
@@ -60,3 +73,31 @@ brews:
   skip_upload: true
   test: |
       system "#{bin}/deck", "version"
+winget:
+- name: decK
+  publisher: Kong
+  package_identifier: Kong.decK
+  publisher_url: https://konghq.com
+  publisher_support_url: https://github.com/Kong/deck/issues
+  homepage: https://github.com/kong/deck
+  short_description: Declarative configuration for Kong
+  description: |-
+    decK manages the configuration of Kong Gateway and Kong Konnect declaratively.
+    It exports, validates, diffs and syncs configuration files.
+  license: Apache-2.0
+  license_url: https://github.com/Kong/deck/blob/main/LICENSE
+  release_notes_url: https://github.com/Kong/deck/releases/tag/{{ .Tag }}
+  tags:
+  - kong
+  - api-gateway
+  - declarative-configuration
+  - cli
+  ids:
+  - winget
+  # GoReleaser only writes the manifests into dist/winget/. The winget job in
+  # .github/workflows/release.yaml submits them, so that a submission failure
+  # cannot fail the release. GoReleaser needs a repository to write manifests.
+  skip_upload: true
+  repository:
+    owner: microsoft
+    name: winget-pkgs
