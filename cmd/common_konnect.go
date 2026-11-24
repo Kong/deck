@@ -380,31 +380,21 @@ func fetchKonnectControlPlaneID(
 	client *konnect.Client,
 	konnectControlPlaneName string,
 ) (string, error) {
-	var runtimeGroups []*konnect.RuntimeGroup
-	var listOpt *konnect.ListOpt
-	for {
-		currentRuntimeGroups, next, err := client.RuntimeGroups.List(ctx, listOpt)
-		if err != nil {
-			return "", fmt.Errorf("fetching control planes: %w", err)
-		}
-		runtimeGroups = append(runtimeGroups, currentRuntimeGroups...)
-		if next == nil {
-			break
-		}
-		listOpt = next
-	}
 	if konnectControlPlaneName != "" {
 		konnectControlPlane = konnectControlPlaneName
 	}
 	if konnectControlPlane == "" {
 		konnectControlPlane = defaultControlPlaneName
 	}
-	for _, rg := range runtimeGroups {
-		if *rg.Name == konnectControlPlane {
-			return *rg.ID, nil
-		}
+
+	rg, err := client.RuntimeGroups.GetByName(ctx, konnectControlPlane)
+	if err != nil {
+		return "", fmt.Errorf("fetching control planes: %w", err)
 	}
-	return "", fmt.Errorf("control plane not found: %s", konnectControlPlane)
+	if rg == nil {
+		return "", fmt.Errorf("control plane not found: %s", konnectControlPlane)
+	}
+	return *rg.ID, nil
 }
 
 func singleOutKongCP(controlPlanes []konnect.ControlPlane) (string, error) {
