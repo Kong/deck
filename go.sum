@@ -251,8 +251,8 @@ github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnr
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/kong/go-apiops v0.4.6 h1:sQkTievX92AT5PZNZcUFbm7inysBVeZIIagXN8MWnP8=
 github.com/kong/go-apiops v0.4.6/go.mod h1:Xt99d90LallLVwYJAGaufiNbBdsK0KKboe7gR4Ryths=
-github.com/kong/go-database-reconciler v1.43.2 h1:WPO9tF8mBwS7y2QSOqsDIwWoE9gPKEqdsWxBBmDvC6M=
-github.com/kong/go-database-reconciler v1.43.2/go.mod h1:DNC26DNo1cPePnGT9rSgWllHJsyKIUYQY10P/IpKq3U=
+github.com/kong/go-database-reconciler v1.43.3-0.20261124140456-384afce66509 h1:L39K1dSDrGrkpgysoVGiU/bDkrIt2xraDVo3d7SV3tM=
+github.com/kong/go-database-reconciler v1.43.3-0.20261124140456-384afce66509/go.mod h1:DNC26DNo1cPePnGT9rSgWllHJsyKIUYQY10P/IpKq3U=
 github.com/kong/go-kong v0.80.0 h1:2gnfi6xh9F4Bam99QFcsNGzR+i7xlHyeLZOq6bNO8Rs=
 github.com/kong/go-kong v0.80.0/go.mod h1:77mEn0XQ7maUS7HvF7qiqbNJEftcSAf0y7mKN1sA72U=
 github.com/kong/go-slugify v1.0.0 h1:vCFAyf2sdoSlBtLcrmDWUFn0ohlpKiKvQfXZkO5vSKY=
