@@ -26,6 +26,9 @@ var (
 	validateKonnectCompatibility    bool
 	validateWorkspace               string
 	validateParallelism             int
+	validateConfigChunkSize         int
+	validateUseBulkValidation       bool
+	validateRequireBulkValidation   bool
 )
 
 func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
@@ -35,6 +38,12 @@ func lookupSelectorTagsIsSet(targetContent *file.Content) bool {
 func executeValidate(cmd *cobra.Command, _ []string) error {
 	mode := getMode(nil)
 	_ = sendAnalytics("validate", "", mode)
+	if validateRequireBulkValidation && mode != modeKonnect {
+		return fmt.Errorf("--require-bulk-validation works only with Konnect")
+	}
+	if validateUseBulkValidation && mode != modeKonnect {
+		return fmt.Errorf("--use-bulk-validation works only with Konnect")
+	}
 	// read target file
 	// this does json schema validation as well
 	targetContent, err := file.GetContentFromFiles(validateCmdKongStateFile, false)
@@ -158,7 +167,7 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 	if validateOnline {
 		registry := schema.NewRegistry(kongClient, mode == modeKonnect)
-		if err := fillPluginAutoFields(ctx, registry, rawState.Plugins); err != nil {
+		if err := fillPluginAutoFields(ctx, registry, rawState.Plugins, rawState.ClonedPluginDefinitions); err != nil {
 			return err
 		}
 	}
@@ -182,7 +191,14 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	}
 
 	if validateOnline {
-		if errs := validateWithKong(ctx, kongClient, ks, targetContent.FormatVersion); len(errs) != 0 {
+		configClient := kongClient
+		if mode == modeKonnect {
+			configClient, err = konnectClientWithMinTimeout(kongClient, &konnectConfig, konnectConfigValidationTimeout)
+			if err != nil {
+				return err
+			}
+		}
+		if errs := validateWithKong(ctx, kongClient, configClient, ks, targetContent.FormatVersion); len(errs) != 0 {
 			return validate.ErrorsWrapper{Errors: errs}
 		}
 	}
@@ -270,6 +286,9 @@ this command unless --online flag is used.
 			if err := checkParallelism(validateParallelism); err != nil {
 				return err
 			}
+			if online && validateConfigChunkSize < 1 {
+				return fmt.Errorf("--config-chunk-size cannot be less than 1, got %d", validateConfigChunkSize)
+			}
 			if err := preRunDiagnosticPolicyFlags(); err != nil {
 				return err
 			}
@@ -318,6 +337,20 @@ this command unless --online flag is used.
 			"This takes precedence over _workspace fields in state files.")
 	validateCmd.Flags().IntVar(&validateParallelism, "parallelism",
 		10, "Maximum number of concurrent requests to Kong.")
+	if online {
+		validateCmd.Flags().IntVar(&validateConfigChunkSize, "config-chunk-size",
+			validate.DefaultConfigChunkSize>>20, "Konnect only. Maximum size in MB of one configuration validation request.\n"+
+				"Slower networks may benefit from a smaller size.")
+		validateCmd.Flags().BoolVar(&validateUseBulkValidation, "use-bulk-validation",
+			false, "Konnect only. Validate the configuration with the Konnect bulk configuration validation\n"+
+				"endpoint when the control plane supports it, instead of validating each entity with a\n"+
+				"separate request. Falls back to per-entity validation if the control plane does not\n"+
+				"support the endpoint.")
+		validateCmd.Flags().BoolVar(&validateRequireBulkValidation, "require-bulk-validation",
+			false, "Konnect only. Fail if the control plane does not support the configuration validation\n"+
+				"endpoint, instead of validating each entity with a separate request. Implies\n"+
+				"--use-bulk-validation.")
+	}
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
 	addDiagnosticSeverityFlags(validateCmd.Flags())
@@ -333,9 +366,22 @@ this command unless --online flag is used.
 
 // fillPluginAutoFields mirrors the auto-field handling go-database-reconciler's
 // diff.Syncer.Solve applies to every plugin before sending it to Kong to maintain parity.
-func fillPluginAutoFields(ctx context.Context, registry *schema.Registry, plugins []*kong.Plugin) error {
+// A cloned plugin of the state does not exist in Kong yet. Its plugins get the schema of the plugin it clones.
+func fillPluginAutoFields(
+	ctx context.Context, registry *schema.Registry, plugins []*kong.Plugin, cloned []*kong.ClonedPluginDefinition,
+) error {
+	refs := map[string]string{}
+	for _, c := range cloned {
+		if c.Name != nil && c.Ref != nil {
+			refs[*c.Name] = *c.Ref
+		}
+	}
 	for _, p := range plugins {
-		s, err := registry.GetPluginSchema(ctx, *p.Name)
+		schemaName := *p.Name
+		if ref, ok := refs[schemaName]; ok {
+			schemaName = ref
+		}
+		s, err := registry.GetPluginSchema(ctx, schemaName)
 		if err != nil {
 			return fmt.Errorf("retrieving schema for plugin %s: %w", *p.Name, err)
 		}
@@ -349,6 +395,7 @@ func fillPluginAutoFields(ctx context.Context, registry *schema.Registry, plugin
 func validateWithKong(
 	ctx context.Context,
 	kongClient *kong.Client,
+	configClient *kong.Client,
 	ks *state.KongState,
 	formatVersion string,
 ) []error {
@@ -360,12 +407,16 @@ func validateWithKong(
 		return []error{fmt.Errorf("parsing Kong version: %w", err)}
 	}
 	opts := validate.ValidatorOpts{
-		Ctx:                  ctx,
-		State:                ks,
-		Client:               kongClient,
-		Parallelism:          validateParallelism,
-		RBACResourcesOnly:    validateCmdRBACResourcesOnly,
-		OnlineEntitiesFilter: validateCmdOnlineEntitiesFilter,
+		Ctx:                   ctx,
+		State:                 ks,
+		Client:                kongClient,
+		ConfigClient:          configClient,
+		ConfigChunkSize:       validateConfigChunkSize << 20,
+		UseBulkValidation:     validateUseBulkValidation,
+		RequireBulkValidation: validateRequireBulkValidation,
+		Parallelism:           validateParallelism,
+		RBACResourcesOnly:     validateCmdRBACResourcesOnly,
+		OnlineEntitiesFilter:  validateCmdOnlineEntitiesFilter,
 	}
 	validator := validate.NewValidator(opts)
 	return validator.Validate(parsedFormatVersion)

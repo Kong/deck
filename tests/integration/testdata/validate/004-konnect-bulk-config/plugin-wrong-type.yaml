@@ -1,0 +1,6 @@
+_format_version: "3.0"
+plugins:
+- id: 0b5c1d3e-0003-4000-8000-000000000501
+  name: rate-limiting
+  config:
+    minute: five

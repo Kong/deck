@@ -1,0 +1,24 @@
+_format_version: "3.0"
+services:
+- id: 0b5c1d3e-0001-4000-8000-000000000101
+  name: bulk-dup-svc
+  host: example.com
+  routes:
+  - id: 0b5c1d3e-0002-4000-8000-000000000101
+    name: bulk-dup-route
+    paths:
+    - /bulk-dup
+    plugins:
+    - id: 0b5c1d3e-0003-4000-8000-000000000102
+      name: acl
+      instance_name: bulk-same-instance-name
+      config:
+        allow:
+        - bulk-group
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000101
+    name: acl
+    instance_name: bulk-same-instance-name
+    config:
+      allow:
+      - bulk-group

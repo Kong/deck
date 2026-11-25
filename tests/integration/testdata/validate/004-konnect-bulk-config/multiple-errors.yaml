@@ -1,0 +1,17 @@
+_format_version: "3.0"
+services:
+- id: 0b5c1d3e-0001-4000-8000-000000000701
+  name: bulk-bad-port
+  host: example.com
+  port: 70000
+- id: 0b5c1d3e-0001-4000-8000-000000000702
+  name: bulk-bad-retries
+  host: example.com
+  retries: -5
+consumers:
+- id: 0b5c1d3e-000b-4000-8000-000000000701
+  username: bulk-bad-credential-owner
+  keyauth_credentials:
+  - id: 0b5c1d3e-000c-4000-8000-000000000701
+    key: bulk-secret-key-value
+    ttl: -1

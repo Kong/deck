@@ -1,0 +1,32 @@
+_format_version: "3.0"
+_info:
+  default_lookup_tags:
+    partials:
+    - redis-partials
+services:
+- id: 0b5c1d3e-0001-4000-8000-000000000a01
+  name: bulk-partials-svc
+  host: httpbin.konghq.com
+  path: /anything
+  port: 443
+  protocol: https
+  plugins:
+  - id: 0b5c1d3e-0003-4000-8000-000000000a01
+    name: rate-limiting-advanced
+    instance_name: bulk-partial-plugin
+    config:
+      identifier: ip
+      limit:
+      - 10000
+      namespace: bulk-ns
+      strategy: redis
+      sync_rate: 2
+      window_size:
+      - 30
+      window_type: sliding
+    partials:
+    - id: b426adc7-7f11-4cda-a862-112ddabae9ef
+plugins:
+- id: 0b5c1d3e-0003-4000-8000-000000000a02
+  name: correlation-id
+  instance_name: bulk-partial-plugin
