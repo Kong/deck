@@ -21,6 +21,7 @@ type Validator struct {
 	client               *kong.Client
 	configClient         *kong.Client
 	configChunkSize      int
+	useBulk              bool
 	requireBulk          bool
 	parallelism          int
 	rbacResourcesOnly    bool
@@ -37,7 +38,12 @@ type ValidatorOpts struct {
 	// ConfigChunkSize is the maximum size in bytes of one config validation request.
 	// If it is 0, DefaultConfigChunkSize applies.
 	ConfigChunkSize int
-	// RequireBulkValidation makes validation fail if the control plane does not have the config validation endpoint.
+	// UseBulkValidation opts into the Konnect bulk config validation endpoint, instead of
+	// validating each entity with a separate request. Validation falls back to the per-entity
+	// requests if the control plane does not have the endpoint, unless RequireBulkValidation is set.
+	UseBulkValidation bool
+	// RequireBulkValidation makes validation fail if the control plane does not have the config validation
+	// endpoint, instead of falling back to per-entity requests. It implies UseBulkValidation.
 	RequireBulkValidation bool
 	Parallelism           int
 	RBACResourcesOnly     bool
@@ -84,6 +90,7 @@ func NewValidator(opt ValidatorOpts) *Validator {
 		client:               opt.Client,
 		configClient:         configClient,
 		configChunkSize:      configChunkSize,
+		useBulk:              opt.UseBulkValidation || opt.RequireBulkValidation,
 		requireBulk:          opt.RequireBulkValidation,
 		parallelism:          opt.Parallelism,
 		rbacResourcesOnly:    opt.RBACResourcesOnly,
@@ -245,10 +252,16 @@ func (v *Validator) Validate(formatVersion semver.Version) []error {
 		filteredEntityMap = EntityMap
 	}
 
-	if errs, ok := v.validateWithConfigEndpoint(filteredEntityMap); ok {
-		allErr = append(allErr, errs...)
+	if v.useBulk {
+		if errs, ok := v.validateWithConfigEndpoint(filteredEntityMap); ok {
+			allErr = append(allErr, errs...)
+		} else {
+			allErr = append(allErr, v.localConflictErrors(filteredEntityMap)...)
+			for fieldName, entityName := range filteredEntityMap {
+				allErr = append(allErr, v.validateStateField(fieldName, entityName)...)
+			}
+		}
 	} else {
-		allErr = append(allErr, v.localConflictErrors(filteredEntityMap)...)
 		for fieldName, entityName := range filteredEntityMap {
 			allErr = append(allErr, v.validateStateField(fieldName, entityName)...)
 		}

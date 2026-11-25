@@ -27,6 +27,7 @@ var (
 	validateWorkspace               string
 	validateParallelism             int
 	validateConfigChunkSize         int
+	validateUseBulkValidation       bool
 	validateRequireBulkValidation   bool
 )
 
@@ -39,6 +40,9 @@ func executeValidate(cmd *cobra.Command, _ []string) error {
 	_ = sendAnalytics("validate", "", mode)
 	if validateRequireBulkValidation && mode != modeKonnect {
 		return fmt.Errorf("--require-bulk-validation works only with Konnect")
+	}
+	if validateUseBulkValidation && mode != modeKonnect {
+		return fmt.Errorf("--use-bulk-validation works only with Konnect")
 	}
 	// read target file
 	// this does json schema validation as well
@@ -337,9 +341,15 @@ this command unless --online flag is used.
 		validateCmd.Flags().IntVar(&validateConfigChunkSize, "config-chunk-size",
 			validate.DefaultConfigChunkSize>>20, "Konnect only. Maximum size in MB of one configuration validation request.\n"+
 				"Slower networks may benefit from a smaller size.")
+		validateCmd.Flags().BoolVar(&validateUseBulkValidation, "use-bulk-validation",
+			false, "Konnect only. Validate the configuration with the Konnect bulk configuration validation\n"+
+				"endpoint when the control plane supports it, instead of validating each entity with a\n"+
+				"separate request. Falls back to per-entity validation if the control plane does not\n"+
+				"support the endpoint.")
 		validateCmd.Flags().BoolVar(&validateRequireBulkValidation, "require-bulk-validation",
 			false, "Konnect only. Fail if the control plane does not support the configuration validation\n"+
-				"endpoint, instead of validating each entity with a separate request.")
+				"endpoint, instead of validating each entity with a separate request. Implies\n"+
+				"--use-bulk-validation.")
 	}
 	validateCmd.Flags().BoolVar(&validateKonnectCompatibility, "konnect-compatibility",
 		false, "validate that the state file(s) are ready to be deployed to Konnect")
@@ -402,6 +412,7 @@ func validateWithKong(
 		Client:                kongClient,
 		ConfigClient:          configClient,
 		ConfigChunkSize:       validateConfigChunkSize << 20,
+		UseBulkValidation:     validateUseBulkValidation,
 		RequireBulkValidation: validateRequireBulkValidation,
 		Parallelism:           validateParallelism,
 		RBACResourcesOnly:     validateCmdRBACResourcesOnly,

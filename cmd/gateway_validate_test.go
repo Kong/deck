@@ -62,3 +62,9 @@ func TestValidateCmd_RequireBulkValidationIsOnlyOnGatewayValidate(t *testing.T) 
 	require.Nil(t, newValidateCmd(false, false).Flags().Lookup("require-bulk-validation"))
 	require.Nil(t, newValidateCmd(true, false).Flags().Lookup("require-bulk-validation"))
 }
+
+func TestValidateCmd_UseBulkValidationIsOnlyOnGatewayValidate(t *testing.T) {
+	require.NotNil(t, newValidateCmd(false, true).Flags().Lookup("use-bulk-validation"))
+	require.Nil(t, newValidateCmd(false, false).Flags().Lookup("use-bulk-validation"))
+	require.Nil(t, newValidateCmd(true, false).Flags().Lookup("use-bulk-validation"))
+}

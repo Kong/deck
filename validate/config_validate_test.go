@@ -155,19 +155,25 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 	_ = json.NewEncoder(w).Encode(v)
 }
 
-func (f *fakeKonnect) validator(t *testing.T, ks *state.KongState, filter ...string) *Validator {
+func (f *fakeKonnect) client(t *testing.T) *kong.Client {
 	srv := httptest.NewServer(f)
 	t.Cleanup(srv.Close)
 	client, err := kong.NewClient(kong.String(srv.URL+testCoreEntitiesPath), srv.Client())
 	require.NoError(t, err)
 	client.SetKonnectFlag(true)
+	return client
+}
+
+// validator returns a Validator with bulk validation opted in, since most tests exercise that path.
+func (f *fakeKonnect) validator(t *testing.T, ks *state.KongState, filter ...string) *Validator {
 	return NewValidator(ValidatorOpts{
 		Ctx:                  context.Background(),
 		State:                ks,
-		Client:               client,
+		Client:               f.client(t),
 		Parallelism:          4,
 		OnlineEntitiesFilter: filter,
 		ConfigChunkSize:      f.chunkSize,
+		UseBulkValidation:    true,
 	})
 }
 
@@ -282,6 +288,54 @@ func TestValidate_ConfigEndpointNotFoundUsesPerEntityValidation(t *testing.T) {
 	assert.Len(t, f.entityRequests["services"], 1)
 	assert.Len(t, f.entityRequests["routes"], 1)
 	assert.Len(t, f.entityRequests["plugins"], 2)
+}
+
+func TestValidate_BulkValidationNotUsedByDefault(t *testing.T) {
+	f := newFakeKonnect(t)
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := NewValidator(ValidatorOpts{
+		Ctx: context.Background(), State: ks, Client: f.client(t), Parallelism: 4,
+	})
+
+	errs := v.Validate(format30)
+
+	require.Empty(t, errs)
+	assert.Empty(t, f.configBodies, "the config endpoint must not be used without opting in")
+	assert.Len(t, f.entityRequests["services"], 1)
+	assert.Len(t, f.entityRequests["routes"], 1)
+	assert.Len(t, f.entityRequests["plugins"], 2)
+}
+
+func TestValidate_UseBulkValidationUsesTheConfigEndpoint(t *testing.T) {
+	f := newFakeKonnect(t)
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := NewValidator(ValidatorOpts{
+		Ctx: context.Background(), State: ks, Client: f.client(t), Parallelism: 4, UseBulkValidation: true,
+	})
+
+	errs := v.Validate(format30)
+
+	require.Empty(t, errs)
+	assert.Len(t, f.configBodies, 1)
+	assert.Empty(t, f.entityRequests)
+}
+
+func TestValidate_UseBulkValidationFallsBackWithoutTheConfigEndpoint(t *testing.T) {
+	f := newFakeKonnect(t)
+	f.configEnabled = false
+	ks := newTestState(t)
+	addServiceTree(t, ks, 1, nil)
+	v := NewValidator(ValidatorOpts{
+		Ctx: context.Background(), State: ks, Client: f.client(t), Parallelism: 4, UseBulkValidation: true,
+	})
+
+	errs := v.Validate(format30)
+
+	require.Empty(t, errs)
+	assert.Empty(t, f.configBodies)
+	assert.Len(t, f.entityRequests["services"], 1)
 }
 
 func TestValidate_RequireBulkValidationFailsWithoutTheConfigEndpoint(t *testing.T) {
@@ -699,7 +753,7 @@ func TestValidate_ConfigClientSendsConfigRequests(t *testing.T) {
 	addServiceTree(t, ks, 1, nil)
 
 	errs := NewValidator(ValidatorOpts{
-		Ctx: context.Background(), State: ks, Parallelism: 1,
+		Ctx: context.Background(), State: ks, Parallelism: 1, UseBulkValidation: true,
 		Client: newClient("default-client"), ConfigClient: newClient("config-client"),
 	}).Validate(format30)
 

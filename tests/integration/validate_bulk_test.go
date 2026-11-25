@@ -226,6 +226,56 @@ func Test_Validate_Konnect_BulkConfig_HiddenErrors(t *testing.T) {
 		"validate configuration: 4 more errors are not shown. Fix the errors above and validate again")
 }
 
+// Bulk validation is opt-in: without --use-bulk-validation or --require-bulk-validation,
+// the config validation endpoint is never used, even when the control plane supports it.
+func Test_Validate_Konnect_BulkValidation_NotUsedByDefault(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+	setup(t)
+
+	services := make([]map[string]any, 0, 20)
+	for i := range 20 {
+		services = append(services, map[string]any{
+			"id":   bulkTreeID(1, i),
+			"name": fmt.Sprintf("bulk-bad-port-%d", i),
+			"host": "example.com",
+			"port": 70000,
+		})
+	}
+	stateFile := writeStateFile(t, map[string]any{"_format_version": "3.0", "services": services})
+
+	err := validate(ONLINE, stateFile)
+
+	require.Error(t, err)
+	assert.NotContains(t, err.Error(),
+		"validate configuration: 4 more errors are not shown. Fix the errors above and validate again")
+}
+
+// --use-bulk-validation opts into the config validation endpoint without requiring it to be
+// available, unlike --require-bulk-validation.
+func Test_Validate_Konnect_UseBulkValidation(t *testing.T) {
+	runWhenKonnect(t)
+	setDefaultKonnectControlPlane(t)
+	setup(t)
+
+	services := make([]map[string]any, 0, 20)
+	for i := range 20 {
+		services = append(services, map[string]any{
+			"id":   bulkTreeID(1, i),
+			"name": fmt.Sprintf("bulk-bad-port-%d", i),
+			"host": "example.com",
+			"port": 70000,
+		})
+	}
+	stateFile := writeStateFile(t, map[string]any{"_format_version": "3.0", "services": services})
+
+	err := validate(ONLINE, stateFile, "--use-bulk-validation")
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(),
+		"validate configuration: 4 more errors are not shown. Fix the errors above and validate again")
+}
+
 func Test_Validate_RequireBulkValidation_NotKonnect(t *testing.T) {
 	setup(t)
 	runWhen(t, "kong", ">=2.8.0")
