@@ -18,4 +18,3 @@ ca_certificates:
   tags:
   - ai-gateway-name:my-root-ca
   - env:prod
- 

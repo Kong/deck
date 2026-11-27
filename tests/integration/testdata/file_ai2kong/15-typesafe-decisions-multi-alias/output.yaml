@@ -3,10 +3,10 @@ _info:
   select_tags:
   - managed_by:deck-ai
 ai_models:
-- name: 'jev'
+- name: jev
   tags:
   - ai-gateway-model-alias-group:jev
-- name: 'jev-latest'
+- name: jev-latest
   tags:
   - ai-gateway-model-alias-group:jev
 plugins:
@@ -31,11 +31,11 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: 'jev'
+        model_alias: jev
         name: jev-latest
         provider: typesafe
       route_type: llm/v1/chat
-  model: 'jev'
+  model: jev
   name: ai-proxy-advanced
   route: typesafe-decisions
 - config:
@@ -52,11 +52,11 @@ plugins:
         log_payloads: false
         log_statistics: true
       model:
-        model_alias: 'jev-latest'
+        model_alias: jev-latest
         name: jev-latest
         provider: typesafe
       route_type: llm/v1/chat
-  model: 'jev-latest'
+  model: jev-latest
   name: ai-proxy-advanced
   route: typesafe-decisions
 services:

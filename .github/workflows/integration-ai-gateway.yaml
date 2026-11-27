@@ -25,6 +25,7 @@ jobs:
           - kong/kong-ai-gateway:2.1.0
           - kong/kong-ai-gateway:2.2.0
           - kong/kong-ai-gateway:2.3.0
+          - kong/kong-ai-gateway-dev:2.4.0-rc.1
     env:
       KONG_ANONYMOUS_REPORTS: "off"
       KONG_IMAGE: ${{ matrix.kong_image }}

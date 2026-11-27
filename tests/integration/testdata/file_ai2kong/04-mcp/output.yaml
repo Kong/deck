@@ -15,10 +15,7 @@ services:
         acl_attribute_type: oauth_access_token
         default_acl:
         - allow:
-          - gold
           - premium
-          deny:
-          - platinum
         logging:
           log_audits: false
           log_payloads: false
@@ -32,6 +29,12 @@ services:
           path: /flights
           scheme: https
       name: ai-mcp-proxy
+    - config:
+        allow:
+        - gold
+        always_use_authenticated_groups: true
+        include_consumer_groups: true
+      name: acl
 - host: localhost
   name: secure-flights-mcp-consumer
   routes:
@@ -43,7 +46,6 @@ services:
         acl_attribute_type: consumer
         default_acl:
         - allow:
-          - agents
           - premium
         include_consumer_groups: true
         logging:
@@ -59,6 +61,12 @@ services:
           path: /flights
           scheme: https
       name: ai-mcp-proxy
+    - config:
+        allow:
+        - agents
+        always_use_authenticated_groups: true
+        include_consumer_groups: true
+      name: acl
 - name: vendor-proxy-mcp
   routes:
   - name: vendor-proxy-mcp-route
@@ -105,4 +113,14 @@ services:
             type: object
         tools_cache_ttl_seconds: 300
       name: ai-mcp-proxy
+    - config:
+        access:
+        - |
+          local addr = ngx.var.server_addr or ""
+          if addr:sub(1, 5) ~= "unix:" then
+            return ngx.exit(ngx.HTTP_NOT_FOUND)
+          end
+      name: pre-function
+      tags:
+      - aigw-generated:mcp-toolset-gate
   url: https://upstream.example.com/mcp

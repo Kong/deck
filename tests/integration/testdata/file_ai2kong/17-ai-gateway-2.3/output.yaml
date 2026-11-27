@@ -10,7 +10,7 @@ ai_models:
 - name: gemini-agentic
 plugins:
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 50000000
     sources:
     - body_path: model
       source: body
@@ -27,6 +27,7 @@ plugins:
       - http_413
     genai_category: text/generation
     llm_format: openai
+    max_request_body_size: 50000000
     targets:
     - auth:
         header_name: Authorization
@@ -98,7 +99,7 @@ plugins:
   name: ai-proxy-advanced
   route: openai-chat-2
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - body_path: model
       source: body
@@ -109,6 +110,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: openai
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -133,7 +135,7 @@ plugins:
   name: ai-proxy-advanced
   route: openai-chat-3
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - body_path: model
       source: body
@@ -144,6 +146,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: openai
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -168,7 +171,34 @@ plugins:
   name: ai-proxy-advanced
   route: openai-responses
 - config:
-    max_request_body_size: 8388608
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    max_request_body_size: 20000000
+    targets:
+    - auth:
+        aws_access_key_id: '{vault://ai/aws-access-key-id}'
+        aws_secret_access_key: '{vault://ai/aws-secret-access-key}'
+      description: anthropic.claude-sonnet-4-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: anthropic.claude-sonnet-4-5
+        options:
+          anthropic_version: bedrock-2023-05-31
+          bedrock:
+            aws_region: us-east-1
+            endpoint_type: mantle
+            mantle_openai_path_prefix: /openai/v1
+            vpc_endpoint: vpce-0abc123-xyz.bedrock-mantle.us-east-1.vpce.amazonaws.com
+        provider: bedrock
+      route_type: llm/v1/responses
+  name: ai-proxy-advanced
+  route: openai-responses-lifecycle
+- config:
+    max_request_body_size: 20000000
     sources:
     - body_path: model
       source: body
@@ -179,6 +209,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: anthropic
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -203,7 +234,7 @@ plugins:
   name: ai-proxy-advanced
   route: anthropic-messages
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - path_pattern: model/([^/]+)/
       source: path
@@ -214,6 +245,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: bedrock
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -237,7 +269,7 @@ plugins:
   name: ai-proxy-advanced
   route: bedrock-converse
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - path_pattern: model/([^/]+)/
       source: path
@@ -248,6 +280,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: bedrock
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -271,7 +304,7 @@ plugins:
   name: ai-proxy-advanced
   route: bedrock-invoke
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - body_path: model
       source: body
@@ -282,6 +315,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: bedrock
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -305,7 +339,7 @@ plugins:
   name: ai-proxy-advanced
   route: bedrock-chat
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 20000000
     sources:
     - body_path: model
       source: body
@@ -316,6 +350,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: bedrock
+    max_request_body_size: 20000000
     targets:
     - auth:
         aws_access_key_id: '{vault://ai/aws-access-key-id}'
@@ -339,7 +374,7 @@ plugins:
   name: ai-proxy-advanced
   route: bedrock-messages
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 100000000
     sources:
     - body_path: model
       source: body
@@ -350,6 +385,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: gemini
+    max_request_body_size: 100000000
     targets:
     - auth:
         header_name: Authorization
@@ -368,7 +404,7 @@ plugins:
   name: ai-proxy-advanced
   route: gemini-responses
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 100000000
     sources:
     - body_path: model
       source: body
@@ -379,6 +415,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: gemini
+    max_request_body_size: 100000000
     targets:
     - auth:
         header_name: Authorization
@@ -429,6 +466,17 @@ services:
     - /mantle/v1/responses
     - /mantle/openai/v1/responses
     strip_path: false
+  - methods:
+    - GET
+    - POST
+    - DELETE
+    - OPTIONS
+    name: openai-responses-lifecycle
+    paths:
+    - ~/mantle/responses/.+
+    strip_path: false
+    tags:
+    - aigw:responses-lifecycle
   - methods:
     - POST
     - OPTIONS
@@ -548,8 +596,6 @@ services:
         default_acl:
         - allow_when:
           - has(principal.metadata.tier) && principal.metadata.tier == 'gold'
-          deny_when:
-          - has(principal.metadata.status) && principal.metadata.status == 'suspended'
         include_consumer_groups: true
         logging:
           log_audits: false
@@ -569,4 +615,10 @@ services:
           name: book_flight
           path: /bookings
       name: ai-mcp-proxy
+    - config:
+        always_use_authenticated_groups: true
+        deny_when:
+        - has(principal.metadata.status) && principal.metadata.status == 'suspended'
+        include_consumer_groups: true
+      name: acl
   url: https://flights.internal.kongair.com

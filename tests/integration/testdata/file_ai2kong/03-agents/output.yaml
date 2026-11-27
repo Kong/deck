@@ -29,9 +29,10 @@ services:
         key_names:
         - apikey
       name: key-auth
-    - name: acl
-      config:
+    - config:
         allow:
-          - forecast-users
+        - forecast-users
+        always_use_authenticated_groups: true
         include_consumer_groups: true
+      name: acl
   url: https://weather.internal/api

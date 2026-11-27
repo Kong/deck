@@ -27,4 +27,14 @@ services:
             type: object
         tools_cache_ttl_seconds: 300
       name: ai-mcp-proxy
+    - config:
+        access:
+        - |
+          local addr = ngx.var.server_addr or ""
+          if addr:sub(1, 5) ~= "unix:" then
+            return ngx.exit(ngx.HTTP_NOT_FOUND)
+          end
+      name: pre-function
+      tags:
+      - aigw-generated:mcp-toolset-gate
   url: https://upstream.example.com/mcp
