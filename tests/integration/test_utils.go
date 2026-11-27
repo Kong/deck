@@ -407,6 +407,34 @@ func aiSync(ctx context.Context, sourceFiles ...string) error {
 
 // aiDump reads the AI-managed entities from Kong and writes them in AI Gateway
 // format (the equivalent of `deck ai dump`), returning the generated output.
+// captureStdout runs fn with os.Stdout redirected into an in-memory pipe and
+// returns everything fn wrote. The pipe is drained concurrently with fn:
+// an OS pipe buffers only a fixed amount (64KB on Linux), so reading only
+// after fn returns deadlocks fn once its output exceeds that buffer.
+func captureStdout(fn func() error) (string, error) {
+	rescueStdout := os.Stdout
+	r, w, err := os.Pipe()
+	if err != nil {
+		return "", err
+	}
+	os.Stdout = w
+
+	var out []byte
+	done := make(chan struct{})
+	go func() {
+		out, _ = io.ReadAll(r)
+		close(done)
+	}()
+
+	cmdErr := fn()
+
+	w.Close()
+	os.Stdout = rescueStdout
+	<-done
+
+	return stripansi.Strip(string(out)), cmdErr
+}
+
 func aiDump(opts ...string) (string, error) {
 	deckCmd := cmd.NewRootCmd()
 	args := []string{"ai", "dump"}
@@ -415,18 +443,7 @@ func aiDump(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func syncWithOutput(ctx context.Context, kongFile string, opts ...string) (string, error) {
@@ -437,16 +454,26 @@ func syncWithOutput(ctx context.Context, kongFile string, opts ...string) (strin
 	}
 	deckCmd.SetArgs(args)
 
-	// overwrite default standard output
-	r, w, _ := os.Pipe()
+	// color.Output is drained concurrently: an OS pipe buffers only a fixed
+	// amount, so reading only after the command returns deadlocks it once its
+	// output exceeds that buffer.
+	r, w, err := os.Pipe()
+	if err != nil {
+		return "", err
+	}
 	color.Output = w
 
-	// execute decK command
+	var out []byte
+	done := make(chan struct{})
+	go func() {
+		out, _ = io.ReadAll(r)
+		close(done)
+	}()
+
 	cmdErr := deckCmd.ExecuteContext(ctx)
 
-	// read command output
 	w.Close()
-	out, _ := io.ReadAll(r)
+	<-done
 
 	return stripansi.Strip(string(out)), cmdErr
 }
@@ -470,16 +497,26 @@ func diff(kongFile string, opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// overwrite default standard output
-	r, w, _ := os.Pipe()
+	// color.Output is drained concurrently: an OS pipe buffers only a fixed
+	// amount, so reading only after the command returns deadlocks it once its
+	// output exceeds that buffer.
+	r, w, err := os.Pipe()
+	if err != nil {
+		return "", err
+	}
 	color.Output = w
 
-	// execute decK command
+	var out []byte
+	done := make(chan struct{})
+	go func() {
+		out, _ = io.ReadAll(r)
+		close(done)
+	}()
+
 	cmdErr := deckCmd.ExecuteContext(context.Background())
 
-	// read command output
 	w.Close()
-	out, _ := io.ReadAll(r)
+	<-done
 
 	return stripansi.Strip(string(out)), cmdErr
 }
@@ -492,18 +529,7 @@ func dump(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func fileLint(opts ...string) (string, error) {
@@ -514,18 +540,7 @@ func fileLint(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func fileLintWithStderr(opts ...string) (stdout string, stderr string, err error) {
@@ -538,22 +553,43 @@ func fileLintWithStderr(opts ...string) (stdout string, stderr string, err error
 
 	// capture stdout
 	rescueStdout := os.Stdout
-	rOut, wOut, _ := os.Pipe()
+	rOut, wOut, err := os.Pipe()
+	if err != nil {
+		return "", "", err
+	}
 	os.Stdout = wOut
 
 	// capture stderr
 	rescueStderr := os.Stderr
-	rErr, wErr, _ := os.Pipe()
+	rErr, wErr, err := os.Pipe()
+	if err != nil {
+		return "", "", err
+	}
 	os.Stderr = wErr
+
+	// Both pipes are drained concurrently: an OS pipe buffers only a fixed
+	// amount, so reading only after the command returns deadlocks it once its
+	// output exceeds that buffer.
+	var outBytes, errBytes []byte
+	doneOut := make(chan struct{})
+	go func() {
+		outBytes, _ = io.ReadAll(rOut)
+		close(doneOut)
+	}()
+	doneErr := make(chan struct{})
+	go func() {
+		errBytes, _ = io.ReadAll(rErr)
+		close(doneErr)
+	}()
 
 	cmdErr := deckCmd.ExecuteContext(context.Background())
 
 	wOut.Close()
 	wErr.Close()
-	outBytes, _ := io.ReadAll(rOut)
-	errBytes, _ := io.ReadAll(rErr)
 	os.Stdout = rescueStdout
 	os.Stderr = rescueStderr
+	<-doneOut
+	<-doneErr
 
 	return stripansi.Strip(string(outBytes)), stripansi.Strip(string(errBytes)), cmdErr
 }
@@ -566,18 +602,7 @@ func fileFormat(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func fileConvert(opts ...string) (string, error) {
@@ -588,18 +613,7 @@ func fileConvert(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func fileAI2Kong(opts ...string) (string, error) {
@@ -610,18 +624,7 @@ func fileAI2Kong(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func ping(opts ...string) error {
@@ -643,18 +646,7 @@ func render(opts ...string) (string, error) {
 	}
 	deckCmd.SetArgs(args)
 
-	// capture command output to be used during tests
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	cmdErr := deckCmd.ExecuteContext(context.Background())
-
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	return stripansi.Strip(string(out)), cmdErr
+	return captureStdout(func() error { return deckCmd.ExecuteContext(context.Background()) })
 }
 
 func validate(online bool, opts ...string) error {

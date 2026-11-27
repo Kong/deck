@@ -6,7 +6,7 @@ ai_models:
 - name: okta-gpt-5-4
 plugins:
 - config:
-    max_request_body_size: 8388608
+    max_request_body_size: 50000000
     sources:
     - body_path: model
       source: body
@@ -17,6 +17,7 @@ plugins:
       algorithm: round-robin
     genai_category: text/generation
     llm_format: openai
+    max_request_body_size: 50000000
     targets:
     - auth:
         header_name: Authorization

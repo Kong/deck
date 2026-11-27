@@ -1,0 +1,719 @@
+_format_version: "3.0"
+_info:
+  select_tags:
+  - managed_by:deck-ai
+ai_models:
+- name: balanced-gpt
+- name: pinned-size
+- name: fireworks-llama
+- name: together-chat
+- name: muse-spark
+- name: gemini-agentic
+- name: protected-gpt
+plugins:
+- config:
+    max_request_body_size: 50000000
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat
+- config:
+    balancer:
+      algorithm: lowest-latency
+      latency_strategy: tpot
+    conversation_state:
+      enabled: true
+      strategy: local
+      ttl: 3600
+    genai_category: text/generation
+    llm_format: openai
+    max_request_body_size: 50000000
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: balanced-gpt
+        name: gpt-5
+        provider: openai
+      route_type: llm/v1/chat
+  model: balanced-gpt
+  name: ai-proxy-advanced
+  route: openai-chat
+- config:
+    max_request_body_size: 50000000
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-decisions
+- config:
+    balancer:
+      algorithm: lowest-latency
+      latency_strategy: tpot
+    conversation_state:
+      enabled: true
+      strategy: local
+      ttl: 3600
+    genai_category: text/decisions
+    llm_format: openai
+    max_request_body_size: 50000000
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: balanced-gpt
+        name: gpt-5
+        provider: openai
+      route_type: llm/v1/decisions
+  model: balanced-gpt
+  name: ai-proxy-advanced
+  route: openai-decisions
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-2
+- config:
+    balancer:
+      algorithm: round-robin
+    conversation_state:
+      enabled: true
+      redis:
+        host: redis-ee.internal
+        password: '{vault://env/redis-password}'
+        port: 6379
+        ssl: true
+      strategy: redis
+    genai_category: text/generation
+    llm_format: openai
+    max_request_body_size: 1048576
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5-mini
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: pinned-size
+        name: gpt-5-mini
+        provider: openai
+      route_type: llm/v1/chat
+  model: pinned-size
+  name: ai-proxy-advanced
+  route: openai-chat-2
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-3
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/fireworks-token}
+      description: accounts/fireworks/models/llama-v3p1-8b-instruct
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: fireworks-llama
+        name: accounts/fireworks/models/llama-v3p1-8b-instruct
+        provider: fireworks
+      route_type: llm/v1/chat
+  model: fireworks-llama
+  name: ai-proxy-advanced
+  route: openai-chat-3
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/fireworks-token}
+      description: accounts/fireworks/models/llama-v3p1-8b-instruct
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: fireworks-llama
+        name: accounts/fireworks/models/llama-v3p1-8b-instruct
+        provider: fireworks
+      route_type: llm/v1/responses
+  model: fireworks-llama
+  name: ai-proxy-advanced
+  route: openai-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/fireworks-token}
+      description: accounts/fireworks/models/llama-v3p1-8b-instruct
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: accounts/fireworks/models/llama-v3p1-8b-instruct
+        provider: fireworks
+      route_type: llm/v1/responses
+  name: ai-proxy-advanced
+  route: openai-responses-lifecycle
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: anthropic-messages
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: anthropic
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/fireworks-token}
+      description: accounts/fireworks/models/llama-v3p1-8b-instruct
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: fireworks-llama
+        name: accounts/fireworks/models/llama-v3p1-8b-instruct
+        provider: fireworks
+      route_type: llm/v1/chat
+  model: fireworks-llama
+  name: ai-proxy-advanced
+  route: anthropic-messages
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-4
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/togetherai-token}
+      description: deepseek-ai/DeepSeek-V3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: together-chat
+        name: deepseek-ai/DeepSeek-V3
+        provider: togetherai
+      route_type: llm/v1/chat
+  model: together-chat
+  name: ai-proxy-advanced
+  route: openai-chat-4
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-responses-2
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/togetherai-token}
+      description: deepseek-ai/DeepSeek-V3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: together-chat
+        name: deepseek-ai/DeepSeek-V3
+        provider: togetherai
+      route_type: llm/v1/responses
+  model: together-chat
+  name: ai-proxy-advanced
+  route: openai-responses-2
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/togetherai-token}
+      description: deepseek-ai/DeepSeek-V3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: deepseek-ai/DeepSeek-V3
+        provider: togetherai
+      route_type: llm/v1/responses
+  name: ai-proxy-advanced
+  route: openai-responses-lifecycle-2
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-5
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/meta-token}
+      description: muse-spark-1.3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: muse-spark
+        name: muse-spark-1.3
+        provider: meta
+      route_type: llm/v1/chat
+  model: muse-spark
+  name: ai-proxy-advanced
+  route: openai-chat-5
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-responses-3
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/meta-token}
+      description: muse-spark-1.3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: muse-spark
+        name: muse-spark-1.3
+        provider: meta
+      route_type: llm/v1/responses
+  model: muse-spark
+  name: ai-proxy-advanced
+  route: openai-responses-3
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/meta-token}
+      description: muse-spark-1.3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: muse-spark-1.3
+        provider: meta
+      route_type: llm/v1/responses
+  name: ai-proxy-advanced
+  route: openai-responses-lifecycle-3
+- config:
+    max_request_body_size: 8388608
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: anthropic-messages-2
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: anthropic
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: Bearer {vault://ai/meta-token}
+      description: muse-spark-1.3
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: muse-spark
+        name: muse-spark-1.3
+        provider: meta
+      route_type: llm/v1/chat
+  model: muse-spark
+  name: ai-proxy-advanced
+  route: anthropic-messages-2
+- config:
+    max_request_body_size: 100000000
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: gemini-enterprise-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: gemini
+    max_request_body_size: 100000000
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/gemini-token}'
+      description: global
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: global
+        options:
+          gemini:
+            location_id: global
+            project_id: my-project
+          upstream_url: https://aiplatform.googleapis.com/v1/projects/my-project/locations/global/interactions
+        provider: gemini
+      route_type: llm/v1/responses
+  model: gemini-agentic
+  name: ai-proxy-advanced
+  route: gemini-enterprise-responses
+- config:
+    max_request_body_size: 100000000
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: gemini-enterprise-beta-responses
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: gemini
+    max_request_body_size: 100000000
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://ai/gemini-token}'
+      description: global
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        name: global
+        options:
+          gemini:
+            location_id: global
+            project_id: my-project
+          upstream_url: https://aiplatform.googleapis.com/v1beta1/projects/my-project/locations/global/interactions
+        provider: gemini
+      route_type: llm/v1/responses
+  model: gemini-agentic
+  name: ai-proxy-advanced
+  route: gemini-enterprise-beta-responses
+- config:
+    max_request_body_size: 50000000
+    sources:
+    - body_path: model
+      source: body
+  name: ai-model-selector
+  route: openai-chat-6
+- config:
+    balancer:
+      algorithm: round-robin
+    genai_category: text/generation
+    llm_format: openai
+    max_request_body_size: 50000000
+    targets:
+    - auth:
+        header_name: Authorization
+        header_value: '{vault://env/openai-key}'
+      description: gpt-5
+      logging:
+        log_payloads: false
+        log_statistics: true
+      model:
+        model_alias: protected-gpt
+        name: gpt-5
+        provider: openai
+      route_type: llm/v1/chat
+  model: protected-gpt
+  name: ai-proxy-advanced
+  route: openai-chat-6
+- config:
+    identity_realms: []
+    principals:
+      directory: my-directory
+      enabled: true
+    principals_cache:
+      pepper: '{vault://env/principals-cache-pepper}'
+  name: key-auth
+  route: openai-chat-6
+services:
+- name: ai-gateway
+  routes:
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat
+    paths:
+    - /ai/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-decisions
+    paths:
+    - /ai/v1/decisions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-2
+    paths:
+    - /pinned/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-3
+    paths:
+    - /fireworks/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-responses
+    paths:
+    - /fireworks/responses
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - DELETE
+    - OPTIONS
+    name: openai-responses-lifecycle
+    paths:
+    - ~/fireworks/responses/.+
+    strip_path: false
+    tags:
+    - aigw:responses-lifecycle
+  - methods:
+    - POST
+    - OPTIONS
+    name: anthropic-messages
+    paths:
+    - /fireworks/v1/messages
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-4
+    paths:
+    - /together/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-responses-2
+    paths:
+    - /together/responses
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - DELETE
+    - OPTIONS
+    name: openai-responses-lifecycle-2
+    paths:
+    - ~/together/responses/.+
+    strip_path: false
+    tags:
+    - aigw:responses-lifecycle
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-5
+    paths:
+    - /meta/chat/completions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-responses-3
+    paths:
+    - /meta/responses
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - DELETE
+    - OPTIONS
+    name: openai-responses-lifecycle-3
+    paths:
+    - ~/meta/responses/.+
+    strip_path: false
+    tags:
+    - aigw:responses-lifecycle
+  - methods:
+    - POST
+    - OPTIONS
+    name: anthropic-messages-2
+    paths:
+    - /meta/v1/messages
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: gemini-enterprise-responses
+    paths:
+    - ~/gemini/v1/projects/(?<project_id>[^/]+)/locations/(?<location_id>[^/]+)/interactions
+    strip_path: false
+  - methods:
+    - GET
+    - POST
+    - OPTIONS
+    name: gemini-enterprise-beta-responses
+    paths:
+    - ~/gemini/v1beta1/projects/(?<project_id>[^/]+)/locations/(?<location_id>[^/]+)/interactions
+    strip_path: false
+  - methods:
+    - POST
+    - OPTIONS
+    name: openai-chat-6
+    paths:
+    - /protected/chat/completions
+    strip_path: false
+  url: http://ai-gateway.upstream.local
+- host: vendor-mcp-upstream
+  name: vendor-mcp
+  protocol: https
+  routes:
+  - name: vendor-mcp-route
+    paths:
+    - /mcp/vendor
+    plugins:
+    - config:
+        include_consumer_groups: true
+        logging:
+          log_audits: false
+          log_payloads: false
+          log_statistics: true
+        mode: passthrough-listener
+        tools: []
+      name: ai-mcp-proxy
+- host: booking-upstream
+  name: booking
+  path: /a2a
+  protocol: https
+  routes:
+  - name: booking-route
+    paths:
+    - /booking
+    plugins:
+    - config:
+        logging:
+          log_payloads: false
+          log_statistics: true
+          max_payload_size: 1048576
+      name: ai-a2a-proxy
+upstreams:
+- algorithm: consistent-hashing
+  hash_on: header
+  hash_on_header: Mcp-Session-Id
+  healthchecks:
+    active:
+      healthy:
+        interval: 10
+        successes: 2
+      type: tcp
+      unhealthy:
+        interval: 10
+        tcp_failures: 3
+        timeouts: 3
+    passive:
+      type: tcp
+      unhealthy:
+        tcp_failures: 3
+        timeouts: 3
+  name: vendor-mcp-upstream
+  targets:
+  - target: vendor-1.internal:8443
+    weight: 200
+  - target: vendor-2.internal:8443
+- algorithm: consistent-hashing
+  hash_on: header
+  hash_on_header: X-Session
+  healthchecks:
+    active:
+      healthy:
+        interval: 10
+        successes: 2
+      type: tcp
+      unhealthy:
+        interval: 10
+        tcp_failures: 3
+        timeouts: 3
+    passive:
+      type: tcp
+      unhealthy:
+        tcp_failures: 3
+        timeouts: 3
+  name: booking-upstream
+  targets:
+  - target: booking-1.internal:8443
+    weight: 200
+  - target: booking-2.internal:8443

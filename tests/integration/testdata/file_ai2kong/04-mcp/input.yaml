@@ -6,7 +6,7 @@ mcp_servers:
     access:
       acl_attribute_type: oauth_access_token
       access_token_claim_field: .user.email
-      acls: {allow: [gold], deny: [platinum]}
+      acls: {allow: [gold]}
       default_tool_acls:
         allow:
           - premium

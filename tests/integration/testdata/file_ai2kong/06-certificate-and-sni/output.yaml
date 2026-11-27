@@ -3,8 +3,7 @@ _info:
   select_tags:
   - managed_by:deck-ai
 certificates:
-- id: 13c562a1-191c-4464-9b18-e5222b46035b
-  cert: |
+- cert: |
     -----BEGIN CERTIFICATE-----
     MIIC1jCCAb4CCQCt23nwvxSCvjANBgkqhkiG9w0BAQsFADAtMRYwFAYDVQQDDA0q
     LmV4YW1wbGUuY29tMRMwEQYDVQQKDAprb25naHEub3JnMB4XDTE4MTIzMTIwMTkw
@@ -23,6 +22,7 @@ certificates:
     lrijTlXZFR8NIZBrCo/QZ2cNbUAbN3R0n+/kMFubxBL8WEm6Qhi9jBjbJeDMspd8
     C+/TZJQMpx5vyA==
     -----END CERTIFICATE-----
+  id: 13c562a1-191c-4464-9b18-e5222b46035b
   key: |
     -----BEGIN PRIVATE KEY-----
     MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCo/9q9QF6Pcftg

@@ -743,14 +743,24 @@ func Test_Dump_Deterministic_Sanitizer(t *testing.T) {
 			require.NoError(t, err)
 
 			// capture command output to be used during tests
+			// The pipe is drained concurrently: an OS pipe buffers only a
+			// fixed amount, so reading only after the write finishes
+			// deadlocks it once the output exceeds that buffer.
 			rescueStdout := os.Stdout
-			r, w, _ := os.Pipe()
+			r, w, err := os.Pipe()
+			require.NoError(t, err)
 			os.Stdout = w
+			var out []byte
+			done := make(chan struct{})
+			go func() {
+				out, _ = io.ReadAll(r)
+				close(done)
+			}()
 			err = file.WriteContentToFile(sanitizedOutput, "-", file.YAML)
 			require.NoError(t, err)
 			w.Close()
-			out, _ := io.ReadAll(r)
 			os.Stdout = rescueStdout
+			<-done
 
 			expected, err := readFile(tc.expectedFile)
 			require.NoError(t, err)

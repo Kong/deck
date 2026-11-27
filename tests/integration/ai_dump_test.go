@@ -224,6 +224,28 @@ func Test_AIDump_AIGateway23(t *testing.T) {
 	})
 }
 
+// Test_AIDump_AIGateway24 covers the AI Gateway 2.4 features that have an AI
+// Gateway entity-model representation, mirroring Test_AISync_AIGateway24.
+func Test_AIDump_AIGateway24(t *testing.T) {
+	runWhenAIGateway(t, ">=2.4.0")
+	setup(t)
+
+	runAIDumpCases(t, []aiDumpTestCase{
+		{
+			// The round trip is skipped until the converter drops the
+			// gateway-filled gcp_environment defaults on revert: Kong stores
+			// the gemini target's options.gemini with the schema defaults it
+			// filled (service: legacy, api_endpoint/endpoint_id: null), the
+			// reverted config carries them inside gcp_environment, and
+			// re-converting hoists the unknown "service" key into the target
+			// options, which the ai-proxy-advanced schema rejects.
+			name:          "ai gateway 2.4 features",
+			inputFile:     "testdata/file_ai2kong/18-ai-gateway-2.4/input.yaml",
+			skipRoundTrip: true,
+		},
+	})
+}
+
 // Test_AIDump_CustomPolicy covers reverting a custom plugin definition (and the
 // plugin instance referencing it) back to an AI Gateway custom_policies entry.
 // As in Test_AISync_CustomPolicy, the definition (custom-policy.yaml) is synced

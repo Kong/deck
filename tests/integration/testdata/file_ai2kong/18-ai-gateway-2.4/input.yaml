@@ -1,0 +1,226 @@
+# AI Gateway 2.4 features in one document: the fireworks, togetherai and
+# meta providers, agent and MCP server targets, the OpenAI decisions
+# capability, model session affinity, the principals cache, provider body
+# size inheritance and the Gemini endpoint derivation. Token Vault on a
+# WebSocket realtime model stays out: its datastore is Konnect-only, so a
+# self-hosted gateway cannot serve it.
+model_providers:
+  - type: fireworks
+    display_name: Fireworks Production
+    name: fireworks-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "Bearer {vault://ai/fireworks-token}"
+  - type: togetherai
+    display_name: Together AI Production
+    name: togetherai-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "Bearer {vault://ai/togetherai-token}"
+  - type: meta
+    display_name: Meta Production
+    name: meta-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "Bearer {vault://ai/meta-token}"
+  - type: gemini
+    display_name: Gemini Production
+    name: gemini-prod
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "{vault://ai/gemini-token}"
+  - type: openai
+    display_name: OpenAI Main
+    name: openai-main
+    config:
+      auth:
+        type: basic
+        headers:
+          - name: Authorization
+            value: "{vault://env/openai-key}"
+models:
+  # A model without max_request_body_size gets the published limit of its
+  # providers (new in 2.4). The OpenAI decisions capability (2.4) adds the
+  # decisions route. Session affinity (2.4) becomes the ai-proxy-advanced
+  # conversation_state block.
+  - type: model
+    display_name: Balanced GPT
+    name: balanced-gpt
+    capabilities: [generate, decisions]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/ai]}
+      balancer:
+        algorithm: lowest-latency
+        latency_strategy: tpot
+        session_affinity:
+          enabled: true
+          ttl: 3600
+          storage:
+            type: local
+    targets:
+      - name: gpt-5
+        provider: openai-main
+        config: {type: openai}
+  # An explicit max_request_body_size overrides the provider limit. Session
+  # affinity storage can be a redis-ee datastore referenced with purpose
+  # session-affinity (2.4).
+  - type: model
+    display_name: Pinned Body Size
+    name: pinned-size
+    capabilities: [generate]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/pinned]}
+      max_request_body_size: 1048576
+      balancer:
+        algorithm: round-robin
+        session_affinity:
+          enabled: true
+          storage:
+            type: redis
+            datastore: {name: affinity-redis}
+    datastores:
+      - name: affinity-redis
+        purpose: session-affinity
+    targets:
+      - name: gpt-5-mini
+        provider: openai-main
+        config: {type: openai}
+  # Fireworks serves generate and agentic in the openai format and Messages
+  # in the anthropic format. A target without upstream_url uses the default
+  # base URL.
+  - type: model
+    display_name: Fireworks Llama
+    name: fireworks-llama
+    capabilities: [generate, agentic]
+    formats: [{type: openai}, {type: anthropic}]
+    config:
+      route: {paths: [/fireworks]}
+    targets:
+      - name: accounts/fireworks/models/llama-v3p1-8b-instruct
+        provider: fireworks-prod
+        config: {type: fireworks}
+  # Together AI is an OpenAI-compatible provider (2.4).
+  - type: model
+    display_name: Together Chat
+    name: together-chat
+    capabilities: [generate, agentic]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/together]}
+    targets:
+      - name: deepseek-ai/DeepSeek-V3
+        provider: togetherai-prod
+        config: {type: togetherai}
+  # Meta serves chat and responses in the openai format and Messages in the
+  # anthropic format (2.4). A target without upstream_url uses the Meta
+  # Model API default.
+  - type: model
+    display_name: Muse Spark
+    name: muse-spark
+    capabilities: [generate, agentic]
+    formats: [{type: openai}, {type: anthropic}]
+    config:
+      route: {paths: [/meta]}
+    targets:
+      - name: muse-spark-1.3
+        provider: meta-prod
+        config: {type: meta}
+  # 2.4 derives the Gemini host from location_id, so the converter leaves
+  # gcp_environment as authored instead of filling api_endpoint.
+  - type: model
+    display_name: Gemini Agentic
+    name: gemini-agentic
+    capabilities: [agentic]
+    formats: [{type: gemini}]
+    config:
+      route: {paths: [/gemini]}
+    targets:
+      - name: global
+        provider: gemini-prod
+        config:
+          type: gemini
+          gcp_environment:
+            project_id: my-project
+            location_id: global
+  # A model protected by the key-auth strategy with the principals cache,
+  # so the strategy converts to a scoped key-auth plugin on the route.
+  - type: model
+    display_name: Protected GPT
+    name: protected-gpt
+    capabilities: [generate]
+    formats: [{type: openai}]
+    config:
+      route: {paths: [/protected]}
+    targets:
+      - name: gpt-5
+        provider: openai-main
+        config: {type: openai}
+    access:
+      auth_strategies: [key-auth-principals]
+agents:
+  # Agent targets (2.4) lower to a Kong Upstream with a balancer, protocol
+  # and path.
+  - name: booking
+    type: a2a
+    display_name: Booking
+    config:
+      targets:
+        - address: booking-1.internal:8443
+          weight: 200
+        - address: booking-2.internal:8443
+      balancer:
+        algorithm: consistent-hashing
+        hash_on_header: X-Session
+      path: /a2a
+      route: {paths: [/booking]}
+mcp_servers:
+  # MCP server targets (2.4) lower to a Kong Upstream. A passthrough
+  # listener with a consistent-hashing balancer on the MCP session header.
+  - type: passthrough-listener
+    display_name: Vendor MCP
+    name: vendor-mcp
+    config:
+      targets:
+        - address: vendor-1.internal:8443
+          weight: 200
+        - address: vendor-2.internal:8443
+      balancer:
+        algorithm: consistent-hashing
+        hash_on_header: Mcp-Session-Id
+      route: {paths: [/mcp/vendor]}
+    tools: []
+auth_strategies:
+  # A key-auth strategy with principals and a principals_cache pepper (2.4).
+  - display_name: Key Auth
+    name: key-auth-principals
+    type: key-auth
+    config:
+      principals:
+        enabled: true
+        directory: my-directory
+      principals_cache:
+        pepper: '{vault://env/principals-cache-pepper}'
+datastores:
+  # The redis-ee datastore that backs the pinned-size model's session
+  # affinity storage.
+  - type: redis-ee
+    name: affinity-redis
+    config:
+      host: redis-ee.internal
+      port: 6379
+      password: "{vault://env/redis-password}"
+      ssl: true

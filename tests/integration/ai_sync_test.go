@@ -240,6 +240,26 @@ func Test_AISync_AIGateway23(t *testing.T) {
 	})
 }
 
+// Test_AISync_AIGateway24 covers the AI Gateway 2.4 features: the fireworks,
+// togetherai and meta providers, agent and MCP server targets (Kong Upstreams
+// with balancers), the OpenAI decisions capability, model session affinity,
+// the key-auth principals cache, provider body size inheritance and the
+// Gemini endpoint derivation. Token Vault on a WebSocket realtime model is
+// left out: its datastore is Konnect-only, so a self-hosted gateway cannot
+// serve it.
+func Test_AISync_AIGateway24(t *testing.T) {
+	runWhenAIGateway(t, ">=2.4.0")
+	setup(t)
+
+	runAISyncCases(t, []aiSyncTestCase{
+		{
+			name:       "ai gateway 2.4 features",
+			inputFile:  "testdata/file_ai2kong/18-ai-gateway-2.4/input.yaml",
+			outputFile: "testdata/file_ai2kong/18-ai-gateway-2.4/output.yaml",
+		},
+	})
+}
+
 // Test_AISync_CustomPolicy covers AI Gateway 2.2 custom_policies, which sync as
 // a Kong custom plugin definition (config.custom_plugins) plus the plugin
 // instance that references it. The definition (custom-policy.yaml) is synced
